@@ -1,0 +1,12 @@
+{
+  "name": "full_mission",
+  "hazard_cells": 4,
+  "descent_steps": 200,
+  "descent_dt_seconds": 0.2,
+  "descent_window_seconds": 40,
+  "descent_constraints": "~23000",
+  "metal_msm_threshold": 16384,
+  "gpu_expected": true,
+  "description": "Full powered descent with hazard assessment. 200 steps, exercises Metal GPU acceleration.",
+  "expected_time": "30-45 minutes (Groth16 setup + prove at 23K constraints)"
+}

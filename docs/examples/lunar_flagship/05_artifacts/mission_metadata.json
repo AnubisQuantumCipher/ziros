@@ -1,0 +1,13 @@
+{
+  "backend": "arkworks-groth16",
+  "descent_constraints": "30720",
+  "descent_proof_bytes": "128",
+  "descent_signals": "22901",
+  "descent_steps": "200",
+  "field": "bn254",
+  "hazard_constraints": "32",
+  "hazard_proof_bytes": "128",
+  "hazard_signals": "40",
+  "msm_gpu_expected": "true",
+  "msm_threshold": "16384"
+}

@@ -189,3 +189,4 @@ Read next:
 - [`docs/APPSPEC_REFERENCE.md`](docs/APPSPEC_REFERENCE.md): `AppSpecV1` / `zirapp.json` reference
 - [`docs/NONLINEAR_ANCHORING.md`](docs/NONLINEAR_ANCHORING.md): why the audit rejects linear-only underconstraint
 - [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md): source-checkout EPA walkthrough using `./target-local/release/zkf-cli`
+- [`docs/examples/README.md`](docs/examples/README.md): shipped fixtures and the Lunar Flagship evidence bundle

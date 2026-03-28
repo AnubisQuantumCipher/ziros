@@ -1,0 +1,7 @@
+{
+  "name": "demo",
+  "hazard_cells": 4,
+  "descent_steps": 1,
+  "description": "Quick pipeline validation: 1-step descent + 4-cell hazard assessment",
+  "expected_time": "< 10 seconds"
+}

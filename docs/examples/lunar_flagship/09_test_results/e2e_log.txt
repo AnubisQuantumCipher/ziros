@@ -1,0 +1,7 @@
+E2E: ALL PASSED
+Hazard: 40 signals, 32 constraints
+Descent: 215 signals, 273 constraints
+Verification from files: true
+Tamper detection: true
+Solidity export: true
+Foundry tests: true

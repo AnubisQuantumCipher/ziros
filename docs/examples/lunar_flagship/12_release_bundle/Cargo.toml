@@ -1,0 +1,15 @@
+[package]
+name = "ziros-lunar-flagship"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+zkf-lib = { path = "/Users/sicarii/Desktop/ziros-release/zkf-lib" }
+zkf-backends = { path = "/Users/sicarii/Desktop/ziros-release/zkf-backends" }
+zkf-core = { path = "/Users/sicarii/Desktop/ziros-release/zkf-core" }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
