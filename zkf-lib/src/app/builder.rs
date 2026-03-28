@@ -105,6 +105,30 @@ fn validate_blackbox_surface(
     Ok(())
 }
 
+fn indexed_names(prefix: &str, len: usize) -> ZkfResult<Vec<String>> {
+    if len == 0 {
+        return Err(ZkfError::InvalidArtifact(format!(
+            "indexed signal helper requires len > 0 for prefix '{prefix}'"
+        )));
+    }
+    Ok((0..len).map(|index| format!("{prefix}_{index}")).collect())
+}
+
+fn matrix_names(prefix: &str, rows: usize, cols: usize) -> ZkfResult<Vec<Vec<String>>> {
+    if rows == 0 || cols == 0 {
+        return Err(ZkfError::InvalidArtifact(format!(
+            "matrix signal helper requires rows > 0 and cols > 0 for prefix '{prefix}'"
+        )));
+    }
+    Ok((0..rows)
+        .map(|row| {
+            (0..cols)
+                .map(|col| format!("{prefix}_{row}_{col}"))
+                .collect::<Vec<_>>()
+        })
+        .collect())
+}
+
 fn rewrite_zir_expr(expr: &zir::Expr, signal_names: &BTreeMap<String, String>) -> zir::Expr {
     match expr {
         zir::Expr::Const(value) => zir::Expr::Const(value.clone()),
@@ -667,16 +691,109 @@ impl ProgramBuilder {
         self.add_signal(name, Visibility::Private, field_type(), None)
     }
 
+    pub fn private_input_array(
+        &mut self,
+        prefix: impl AsRef<str>,
+        len: usize,
+    ) -> ZkfResult<Vec<String>> {
+        let names = indexed_names(prefix.as_ref(), len)?;
+        for name in &names {
+            self.private_input(name)?;
+        }
+        Ok(names)
+    }
+
+    pub fn private_input_matrix(
+        &mut self,
+        prefix: impl AsRef<str>,
+        rows: usize,
+        cols: usize,
+    ) -> ZkfResult<Vec<Vec<String>>> {
+        let names = matrix_names(prefix.as_ref(), rows, cols)?;
+        for row in &names {
+            for name in row {
+                self.private_input(name)?;
+            }
+        }
+        Ok(names)
+    }
+
     pub fn public_input(&mut self, name: impl Into<String>) -> ZkfResult<&mut Self> {
         self.add_signal(name, Visibility::Public, field_type(), None)
+    }
+
+    pub fn public_input_array(
+        &mut self,
+        prefix: impl AsRef<str>,
+        len: usize,
+    ) -> ZkfResult<Vec<String>> {
+        let names = indexed_names(prefix.as_ref(), len)?;
+        for name in &names {
+            self.public_input(name)?;
+        }
+        Ok(names)
     }
 
     pub fn public_output(&mut self, name: impl Into<String>) -> ZkfResult<&mut Self> {
         self.add_signal(name, Visibility::Public, field_type(), None)
     }
 
+    pub fn public_output_array(
+        &mut self,
+        prefix: impl AsRef<str>,
+        len: usize,
+    ) -> ZkfResult<Vec<String>> {
+        let names = indexed_names(prefix.as_ref(), len)?;
+        for name in &names {
+            self.public_output(name)?;
+        }
+        Ok(names)
+    }
+
+    pub fn public_output_matrix(
+        &mut self,
+        prefix: impl AsRef<str>,
+        rows: usize,
+        cols: usize,
+    ) -> ZkfResult<Vec<Vec<String>>> {
+        let names = matrix_names(prefix.as_ref(), rows, cols)?;
+        for row in &names {
+            for name in row {
+                self.public_output(name)?;
+            }
+        }
+        Ok(names)
+    }
+
     pub fn private_signal(&mut self, name: impl Into<String>) -> ZkfResult<&mut Self> {
         self.add_signal(name, Visibility::Private, field_type(), None)
+    }
+
+    pub fn private_signal_array(
+        &mut self,
+        prefix: impl AsRef<str>,
+        len: usize,
+    ) -> ZkfResult<Vec<String>> {
+        let names = indexed_names(prefix.as_ref(), len)?;
+        for name in &names {
+            self.private_signal(name)?;
+        }
+        Ok(names)
+    }
+
+    pub fn private_signal_matrix(
+        &mut self,
+        prefix: impl AsRef<str>,
+        rows: usize,
+        cols: usize,
+    ) -> ZkfResult<Vec<Vec<String>>> {
+        let names = matrix_names(prefix.as_ref(), rows, cols)?;
+        for row in &names {
+            for name in row {
+                self.private_signal(name)?;
+            }
+        }
+        Ok(names)
     }
 
     pub fn constant_signal(
@@ -927,6 +1044,158 @@ impl ProgramBuilder {
                 ),
             ]),
             scoped_label(label.as_deref(), "bind"),
+        )
+    }
+
+    pub fn constrain_exactly_one(&mut self, selectors: &[String]) -> ZkfResult<&mut Self> {
+        self.constrain_exactly_one_labeled(selectors, None::<String>)
+    }
+
+    pub fn constrain_exactly_one_labeled(
+        &mut self,
+        selectors: &[String],
+        label: impl Into<Option<String>>,
+    ) -> ZkfResult<&mut Self> {
+        if selectors.is_empty() {
+            return Err(ZkfError::InvalidArtifact(
+                "constrain_exactly_one requires at least one selector".to_string(),
+            ));
+        }
+        let label = label.into();
+        for (index, selector) in selectors.iter().enumerate() {
+            self.constrain_boolean_labeled(
+                selector,
+                scoped_label(label.as_deref(), &format!("selector_{index}")),
+            )?;
+        }
+        let sum = if selectors.len() == 1 {
+            Expr::signal(&selectors[0])
+        } else {
+            Expr::Add(selectors.iter().map(Expr::signal).collect())
+        };
+        self.constrain_equal_labeled(
+            sum,
+            Expr::Const(FieldElement::ONE),
+            scoped_label(label.as_deref(), "sum"),
+        )
+    }
+
+    pub fn constrain_mux_from_one_hot(
+        &mut self,
+        target: impl Into<String>,
+        selectors: &[String],
+        values: &[Expr],
+    ) -> ZkfResult<&mut Self> {
+        self.constrain_mux_from_one_hot_labeled(target, selectors, values, None::<String>)
+    }
+
+    pub fn constrain_mux_from_one_hot_labeled(
+        &mut self,
+        target: impl Into<String>,
+        selectors: &[String],
+        values: &[Expr],
+        label: impl Into<Option<String>>,
+    ) -> ZkfResult<&mut Self> {
+        if selectors.is_empty() {
+            return Err(ZkfError::InvalidArtifact(
+                "constrain_mux_from_one_hot requires at least one selector".to_string(),
+            ));
+        }
+        if selectors.len() != values.len() {
+            return Err(ZkfError::InvalidArtifact(format!(
+                "constrain_mux_from_one_hot requires selector/value length match, got {} selector(s) and {} value(s)",
+                selectors.len(),
+                values.len()
+            )));
+        }
+        let label = label.into();
+        self.constrain_exactly_one_labeled(selectors, scoped_label(label.as_deref(), "one_hot"))?;
+        let terms = selectors
+            .iter()
+            .zip(values.iter().cloned())
+            .map(|(selector, value)| Expr::Mul(Box::new(Expr::signal(selector)), Box::new(value)))
+            .collect::<Vec<_>>();
+        let expr = if terms.len() == 1 {
+            terms.into_iter().next().expect("single mux term")
+        } else {
+            Expr::Add(terms)
+        };
+        self.bind_labeled(target, expr, scoped_label(label.as_deref(), "bind"))
+    }
+
+    pub fn bind_poseidon_commitment(
+        &mut self,
+        target: impl Into<String>,
+        inputs: &[Expr],
+    ) -> ZkfResult<&mut Self> {
+        self.bind_poseidon_commitment_labeled(target, inputs, None::<String>)
+    }
+
+    pub fn bind_poseidon_commitment_labeled(
+        &mut self,
+        target: impl Into<String>,
+        inputs: &[Expr],
+        label: impl Into<Option<String>>,
+    ) -> ZkfResult<&mut Self> {
+        if inputs.is_empty() {
+            return Err(ZkfError::InvalidArtifact(
+                "bind_poseidon_commitment requires at least one input".to_string(),
+            ));
+        }
+
+        let target = target.into();
+        let label = label.into();
+        self.ensure_output_signal(&target)?;
+
+        let zero_name = self.fresh_helper_signal("poseidon_zero");
+        let seed_name = self.fresh_helper_signal("poseidon_seed");
+        self.constant_signal(&zero_name, FieldElement::ZERO)?;
+        self.constant_signal(&seed_name, FieldElement::ZERO)?;
+
+        let params = BTreeMap::from([("width".to_string(), "4".to_string())]);
+        let mut state = Expr::signal(&seed_name);
+        for (chunk_index, chunk) in inputs.chunks(3).enumerate() {
+            let round_prefix = self.fresh_helper_signal(&format!("poseidon_round_{chunk_index}"));
+            let state_names = [
+                format!("{round_prefix}_state_0"),
+                format!("{round_prefix}_state_1"),
+                format!("{round_prefix}_state_2"),
+                format!("{round_prefix}_state_3"),
+            ];
+            for name in &state_names {
+                self.private_signal(name)?;
+            }
+            let lane_0 = chunk
+                .first()
+                .cloned()
+                .unwrap_or_else(|| Expr::signal(&zero_name));
+            let lane_1 = chunk
+                .get(1)
+                .cloned()
+                .unwrap_or_else(|| Expr::signal(&zero_name));
+            let lane_2 = chunk
+                .get(2)
+                .cloned()
+                .unwrap_or_else(|| Expr::signal(&zero_name));
+            self.constrain_blackbox_labeled(
+                BlackBoxOp::Poseidon,
+                &[state, lane_0, lane_1, lane_2],
+                &[
+                    state_names[0].as_str(),
+                    state_names[1].as_str(),
+                    state_names[2].as_str(),
+                    state_names[3].as_str(),
+                ],
+                &params,
+                scoped_label(label.as_deref(), &format!("round_{chunk_index}")),
+            )?;
+            state = Expr::signal(&state_names[0]);
+        }
+
+        self.constrain_equal_labeled(
+            Expr::signal(&target),
+            state,
+            scoped_label(label.as_deref(), "final"),
         )
     }
 
@@ -1464,6 +1733,61 @@ mod tests {
                 .and_then(|signal| signal.ty.as_deref()),
             Some("uint(16)")
         );
+    }
+
+    #[test]
+    fn builder_array_and_matrix_helpers_declare_indexed_signals() {
+        let mut builder = ProgramBuilder::new("indexed_helpers", FieldId::Bn254);
+        let state = builder.private_input_array("state", 3).expect("state array");
+        let modes = builder
+            .public_input_array("mode", 2)
+            .expect("mode array");
+        let matrix = builder
+            .private_signal_matrix("jacobian", 2, 2)
+            .expect("matrix");
+        builder
+            .public_output_array("output", 2)
+            .expect("output array");
+
+        let program = builder.build().expect("build");
+        assert_eq!(state, vec!["state_0", "state_1", "state_2"]);
+        assert_eq!(modes, vec!["mode_0", "mode_1"]);
+        assert_eq!(matrix[1][1], "jacobian_1_1");
+        assert!(program.signals.iter().any(|signal| signal.name == "output_1"));
+    }
+
+    #[test]
+    fn builder_one_hot_mux_and_commitment_helpers_lower() {
+        let mut builder = ProgramBuilder::new("one_hot_mux", FieldId::Bn254);
+        let selectors = builder
+            .private_input_array("profile", 3)
+            .expect("selectors");
+        let values = builder.private_input_array("value", 3).expect("values");
+        builder.public_output("selected").unwrap();
+        builder.public_output("commitment").unwrap();
+        builder
+            .constrain_mux_from_one_hot(
+                "selected",
+                &selectors,
+                &values.iter().map(Expr::signal).collect::<Vec<_>>(),
+            )
+            .expect("mux");
+        builder
+            .bind_poseidon_commitment(
+                "commitment",
+                &values.iter().map(Expr::signal).collect::<Vec<_>>(),
+            )
+            .expect("commitment");
+
+        let program = builder.build().expect("build");
+        assert!(
+            program
+                .constraints
+                .iter()
+                .any(|constraint| matches!(constraint, Constraint::BlackBox { .. }))
+        );
+        assert!(program.signals.iter().any(|signal| signal.name == "selected"));
+        assert!(program.signals.iter().any(|signal| signal.name == "commitment"));
     }
 
     #[test]

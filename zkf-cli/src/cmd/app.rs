@@ -331,6 +331,18 @@ fn scaffold_backend(field: FieldId) -> &'static str {
     }
 }
 
+fn is_aerospace_template(template: &str) -> bool {
+    matches!(
+        template,
+        "gnc-6dof-core"
+            | "tower-catch-geometry"
+            | "barge-terminal-profile"
+            | "planetary-terminal-profile"
+            | "gust-robustness-batch"
+            | "private-starship-flip-catch"
+    )
+}
+
 fn backend_setup_note(backend: &str) -> &'static str {
     match backend {
         "plonky3" => "No trusted setup is required. This is the zero-friction starter lane.",
@@ -342,6 +354,124 @@ fn backend_setup_note(backend: &str) -> &'static str {
         }
         _ => "Keep the selected backend explicit in automation and CI.",
     }
+}
+
+fn aerospace_benchmark_script_content(template: &str, backend: &str) -> String {
+    format!(
+        r#"#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${{BASH_SOURCE[0]}}")/.." && pwd)"
+cd "$ROOT"
+mkdir -p artifacts/benchmarks
+
+START="$(date +%s)"
+cargo test --test smoke -- --nocapture
+cargo run >/dev/null
+END="$(date +%s)"
+DURATION="$((END - START))"
+
+cat > artifacts/benchmarks/latest.txt <<EOF
+template={template}
+backend={backend}
+duration_seconds=$DURATION
+mode=local-scaffold-smoke
+production_posture=imported-crs-only final wrap; tcp-counted transport; neural-engine advisory only
+EOF
+
+echo "benchmark written to artifacts/benchmarks/latest.txt"
+"#
+    )
+}
+
+fn aerospace_report_script_content(template: &str, backend: &str) -> String {
+    format!(
+        r#"#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${{BASH_SOURCE[0]}}")/.." && pwd)"
+cd "$ROOT"
+mkdir -p artifacts/reports
+
+cargo test --test smoke -- --nocapture
+
+cat > artifacts/reports/latest.md <<EOF
+# Aerospace Scaffold Report
+
+- Template: \`{template}\`
+- Backend: \`{backend}\`
+- Proof posture: imported CRS only for regulator-facing Groth16 wrap
+- Distributed transport: TCP counted; RDMA follow-on only
+- Neural Engine: advisory only
+- Generated from: standalone scaffold
+
+## Files
+
+- \`zirapp.json\`
+- \`inputs.compliant.json\`
+- \`inputs.violation.json\`
+- \`tests/smoke.rs\`
+- \`scripts/benchmark.sh\`
+- \`scripts/generate_report.sh\`
+- \`scripts/export_public_bundle.sh\`
+EOF
+
+echo "report written to artifacts/reports/latest.md"
+"#
+    )
+}
+
+fn aerospace_public_bundle_script_content(template: &str) -> String {
+    format!(
+        r#"#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${{BASH_SOURCE[0]}}")/.." && pwd)"
+cd "$ROOT"
+mkdir -p artifacts/public
+
+cp README.md artifacts/public/README.md
+cp zirapp.json artifacts/public/zirapp.json
+
+if [[ -f artifacts/reports/latest.md ]]; then
+  cp artifacts/reports/latest.md artifacts/public/report.md
+fi
+
+cat > artifacts/public/MANIFEST.txt <<EOF
+template={template}
+included=README.md,zirapp.json,report.md(optional)
+excluded=inputs.compliant.json,inputs.violation.json,target,artifacts/private
+sanitization=public-bundle-default
+EOF
+
+echo "public bundle written to artifacts/public"
+"#
+    )
+}
+
+fn append_aerospace_scaffold(root: &PathBuf, template: &str, backend: &str) -> Result<(), String> {
+    std::fs::create_dir_all(root.join("scripts"))
+        .map_err(|error| format!("{}: {error}", root.join("scripts").display()))?;
+    std::fs::create_dir_all(root.join("artifacts/public"))
+        .map_err(|error| format!("{}: {error}", root.join("artifacts/public").display()))?;
+    std::fs::create_dir_all(root.join("artifacts/reports"))
+        .map_err(|error| format!("{}: {error}", root.join("artifacts/reports").display()))?;
+    std::fs::create_dir_all(root.join("artifacts/benchmarks"))
+        .map_err(|error| format!("{}: {error}", root.join("artifacts/benchmarks").display()))?;
+
+    write_text(
+        &root.join("scripts/benchmark.sh"),
+        &aerospace_benchmark_script_content(template, backend),
+    )?;
+    write_text(
+        &root.join("scripts/generate_report.sh"),
+        &aerospace_report_script_content(template, backend),
+    )?;
+    write_text(
+        &root.join("scripts/export_public_bundle.sh"),
+        &aerospace_public_bundle_script_content(template),
+    )?;
+    Ok(())
 }
 
 fn minimal_main_rs_content(backend: &str) -> String {
@@ -721,7 +851,17 @@ fn readme_content(
     style: AppStyle,
     spec: &zkf_lib::AppSpecV1,
 ) -> String {
+    let root = repo_root();
     let backend = scaffold_backend(spec.program.field);
+    let aerospace_extras = if is_aerospace_template(template) {
+        r#"- `scripts/benchmark.sh`: benchmark hook that exercises the scaffold smoke flow and records a local timing artifact.
+- `scripts/generate_report.sh`: emits a regulator-facing local report stub under `artifacts/reports/`.
+- `scripts/export_public_bundle.sh`: emits a sanitized default public bundle under `artifacts/public/`.
+- `artifacts/public/`: default sanitized export target for partner/regulator sharing.
+- `artifacts/reports/`: local report/evidence output directory for the scaffold."#
+    } else {
+        ""
+    };
     let extra = match style {
         AppStyle::Minimal => {
             "- `src/main.rs`: validates with `zkf_lib::check_with_backend(...)`, then proves and verifies in-process with `zkf-lib`."
@@ -752,6 +892,29 @@ Style description: {style_description}
 - `inputs.violation.json`: intentionally bad inputs that should fail closed.
 - `tests/smoke.rs`: proves the compliant inputs and asserts that the violation inputs are rejected.
 - Rust `ProgramBuilder` remains available as the escape hatch when you need advanced authoring.
+{aerospace_extras}
+
+## Start Here
+
+```bash
+cd {name}
+cargo run
+cargo test
+```
+
+Edit loop:
+
+1. Change [`zirapp.json`](zirapp.json) when you want to change the statement being proven.
+2. Keep [`inputs.compliant.json`](inputs.compliant.json) as your known-good sample.
+3. Keep [`inputs.violation.json`](inputs.violation.json) as the fail-closed regression case.
+4. Re-run `cargo run` for the fast proof flow and `cargo test` for the end-to-end smoke test.
+
+When a proof fails:
+
+- Start with the signal labels in `zirapp.json`.
+- If the failure mentions nonlinear anchoring, read `{nonlinear_anchoring}`.
+- For the full standalone-app workflow, read `{app_guide}`.
+- For the declarative spec reference, read `{appspec_guide}`.
 
 ## Current Template Contract
 
@@ -761,6 +924,7 @@ Style description: {style_description}
 - Public outputs: {public_outputs:?}
 - Description: {description}
 - Template args: {template_args:?}
+{aerospace_contract}
 
 ## Run
 
@@ -769,8 +933,8 @@ cargo run
 cargo test
 ```
 
-Explore other scaffold variants with `zkf app gallery`.
-List declarative templates with `zkf app templates`.
+Explore other scaffold variants with `ziros app gallery` (or `zkf app gallery`).
+List declarative templates with `ziros app templates`.
 "#,
         style = style.as_str(),
         style_description = style.one_line_description(),
@@ -780,6 +944,15 @@ List declarative templates with `zkf app templates`.
         public_outputs = spec.public_outputs,
         description = spec.description.as_deref().unwrap_or("n/a"),
         template_args = spec.template_args,
+        aerospace_extras = aerospace_extras,
+        aerospace_contract = if is_aerospace_template(template) {
+            "- Aerospace posture: imported CRS only for regulator-facing wrap; TCP counted distributed transport; Neural Engine advisory only.\n- Production target: reusable Nova/HyperNova fold lane plus Plonky3 batch reducer and Groth16 final wrap."
+        } else {
+            ""
+        },
+        nonlinear_anchoring = root.join("docs/NONLINEAR_ANCHORING.md").display(),
+        app_guide = root.join("docs/APP_DEVELOPER_GUIDE.md").display(),
+        appspec_guide = root.join("docs/APPSPEC_REFERENCE.md").display(),
     )
 }
 
@@ -818,6 +991,9 @@ fn scaffold_app(
     write_json(&root.join("zirapp.json"), &spec)?;
     write_json(&root.join("inputs.compliant.json"), &spec.sample_inputs)?;
     write_json(&root.join("inputs.violation.json"), &spec.violation_inputs)?;
+    if is_aerospace_template(template_name) {
+        append_aerospace_scaffold(&root, template_name, backend)?;
+    }
     write_text(
         &root.join("README.md"),
         &readme_content(name, template_name, style, &spec),

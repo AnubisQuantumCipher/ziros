@@ -4,6 +4,23 @@ use zkf_core::{
     BlackBoxOp, Expr, FieldElement, FieldId, Program, WitnessInputs, ZkfError, ZkfResult,
 };
 
+pub use super::aerospace::{
+    AEROSPACE_ROTATIONAL_AXES, AEROSPACE_TRANSLATIONAL_AXES, STARSHIP_DEFAULT_GNC_STEPS,
+    STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES, STARSHIP_MONTE_CARLO_PRODUCTION_TARGET_SAMPLES,
+    STARSHIP_TEAM_SUBGRAPH_COUNT, BargeTerminalProfileV1, CertificationInvariantSetV1,
+    CertificationObservedMetricsV1, DistributedProofConfigV1, ImportedCrsManifestRefV1,
+    LandingInterfaceProfileV1, MonteCarloBatchConfigV1, PlanetaryTerminalProfileV1,
+    PrivateStarshipFlipCatchRequestV1, RigidBodyStateV1, SurrogateBandRowV1,
+    TeamSubgraphDescriptorV1, TeamSubgraphKindV1, TowerCatchGeometryV1, VehicleEnvelopeV1,
+    add_surrogate_band_lookup, barge_terminal_profile_showcase,
+    build_gnc_6dof_core_program_with_steps, build_gust_robustness_batch_program_with_samples,
+    build_private_starship_flip_catch_program_with_profile,
+    constrain_surrogate_band_lookup, gnc_6dof_core_showcase, gnc_6dof_core_showcase_with_steps,
+    gust_robustness_batch_showcase, gust_robustness_batch_showcase_with_samples,
+    planetary_terminal_profile_showcase, private_starship_flip_catch_inputs_from_request,
+    private_starship_flip_catch_sample_request, private_starship_flip_catch_showcase,
+    private_starship_flip_catch_showcase_with_profile, tower_catch_geometry_showcase,
+};
 use super::builder::ProgramBuilder;
 pub use super::combustion::{
     COMBUSTION_DEFAULT_SAMPLES, COMBUSTION_PUBLIC_OUTPUTS, CombustionInstabilityRequestV1,
@@ -406,6 +423,46 @@ pub fn private_identity_kyc() -> ZkfResult<TemplateProgram> {
     private_identity_app::private_identity_kyc()
 }
 
+pub fn gnc_6dof_core_template() -> ZkfResult<TemplateProgram> {
+    gnc_6dof_core_showcase()
+}
+
+pub fn gnc_6dof_core_template_with_steps(steps: usize) -> ZkfResult<TemplateProgram> {
+    gnc_6dof_core_showcase_with_steps(steps)
+}
+
+pub fn tower_catch_geometry_template() -> ZkfResult<TemplateProgram> {
+    tower_catch_geometry_showcase()
+}
+
+pub fn barge_terminal_profile_template() -> ZkfResult<TemplateProgram> {
+    barge_terminal_profile_showcase()
+}
+
+pub fn planetary_terminal_profile_template() -> ZkfResult<TemplateProgram> {
+    planetary_terminal_profile_showcase()
+}
+
+pub fn gust_robustness_batch_template() -> ZkfResult<TemplateProgram> {
+    gust_robustness_batch_showcase()
+}
+
+pub fn gust_robustness_batch_template_with_samples(samples: usize) -> ZkfResult<TemplateProgram> {
+    gust_robustness_batch_showcase_with_samples(samples)
+}
+
+pub fn private_starship_flip_catch_template() -> ZkfResult<TemplateProgram> {
+    private_starship_flip_catch_showcase()
+}
+
+pub fn private_starship_flip_catch_template_with_profile(
+    profile: LandingInterfaceProfileV1,
+    steps: usize,
+    samples: usize,
+) -> ZkfResult<TemplateProgram> {
+    private_starship_flip_catch_showcase_with_profile(profile, steps, samples)
+}
+
 pub fn private_powered_descent_showcase_template() -> ZkfResult<TemplateProgram> {
     private_powered_descent_showcase()
 }
@@ -546,6 +603,27 @@ mod tests {
         assert_template_roundtrip(
             "thermochemical",
             thermochemical_equilibrium_showcase().expect("thermochemical template"),
+        );
+    }
+
+    #[test]
+    fn aerospace_gnc_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "gnc-6dof-core",
+            gnc_6dof_core_showcase_with_steps(2).expect("gnc template"),
+        );
+    }
+
+    #[test]
+    fn aerospace_flagship_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "private-starship-flip-catch",
+            private_starship_flip_catch_showcase_with_profile(
+                LandingInterfaceProfileV1::TowerCatch,
+                2,
+                4,
+            )
+            .expect("starship template"),
         );
     }
 

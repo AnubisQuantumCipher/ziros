@@ -1,6 +1,7 @@
 pub mod api;
 #[cfg(feature = "full")]
 pub mod audit;
+pub mod aerospace;
 pub mod builder;
 pub mod combustion;
 pub mod descent;
