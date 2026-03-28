@@ -33,8 +33,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Verify Rust toolchain
+        run: |
+          rustup show active-toolchain
+          rustc --version
+          cargo --version
 
       - name: Build release
         run: ./zkf-build.sh --release
@@ -72,8 +75,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Verify Rust toolchain
+        run: |
+          rustup show active-toolchain
+          rustc --version
+          cargo --version
 
       - name: Run Rust test shard
         run: ./scripts/ci/run_rust_test_shard.sh "${{ matrix.shard }}"
@@ -90,8 +96,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Verify Rust toolchain
+        run: |
+          rustup show active-toolchain
+          rustc --version
+          cargo --version
 
       - name: Build release CLI
         run: ./zkf-build.sh --release -p zkf-cli
