@@ -106,6 +106,7 @@ mod circuit;
 mod compact_integration;
 mod composition;
 mod core_util;
+mod debug;
 mod equivalence;
 mod negative_paths;
 mod package_bundle;

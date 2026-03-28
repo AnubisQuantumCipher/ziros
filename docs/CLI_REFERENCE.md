@@ -1,7 +1,9 @@
 # CLI Reference
 
-This file documents the shipped command tree. Requested headings like “swarm
-rules” and “runtime policy” map to the real commands exposed by `zkf-cli`.
+This file documents the source-checkout binary surface. Requested headings like
+“swarm rules” and “runtime policy” map to the real commands exposed by
+`./target-local/release/zkf-cli`. For installed usage, prefer `ziros`; `zkf`
+remains the compatibility alias.
 
 ## Core Proof Flow
 

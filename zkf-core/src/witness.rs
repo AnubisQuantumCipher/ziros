@@ -1541,6 +1541,11 @@ fn map_spec_kernel_error(
 }
 
 fn diagnose_incomplete_witness(program: &Program, witness: &Witness) -> ZkfError {
+    match first_partial_constraint_failure(program, witness) {
+        Ok(Some(error)) | Err(error) => return error,
+        Ok(None) => {}
+    }
+
     let unresolved_signals = program
         .signals
         .iter()
@@ -1574,25 +1579,27 @@ fn diagnose_incomplete_witness(program: &Program, witness: &Witness) -> ZkfError
         .filter(|hint| unresolved.contains(&hint.target))
         .map(|hint| hint.target.clone())
         .collect::<Vec<_>>();
-    let related_equalities = program
+    let blocked_constraints = program
         .constraints
         .iter()
         .enumerate()
-        .filter_map(|(idx, constraint)| match constraint {
-            Constraint::Equal { lhs, rhs, label } => {
-                let mut referenced = BTreeSet::new();
-                collect_signal_names(lhs, &mut referenced);
-                collect_signal_names(rhs, &mut referenced);
-                referenced
-                    .iter()
-                    .any(|name| unresolved.contains(name))
-                    .then_some(label.clone().unwrap_or_else(|| format!("constraint_{idx}")))
-            }
-            _ => None,
+        .filter_map(|(idx, constraint)| {
+            let mut referenced = BTreeSet::new();
+            collect_constraint_signal_names(constraint, &mut referenced);
+            referenced
+                .iter()
+                .any(|name| unresolved.contains(name))
+                .then_some(
+                    constraint
+                        .label()
+                        .cloned()
+                        .unwrap_or_else(|| format!("constraint_{idx}")),
+                )
         })
         .collect::<Vec<_>>();
 
-    if blocked_assignments.is_empty() && blocked_hints.is_empty() && related_equalities.is_empty() {
+    if blocked_assignments.is_empty() && blocked_hints.is_empty() && blocked_constraints.is_empty()
+    {
         return ZkfError::MissingWitnessValue {
             signal: unresolved_signals[0].clone(),
         };
@@ -1608,17 +1615,223 @@ fn diagnose_incomplete_witness(program: &Program, witness: &Witness) -> ZkfError
     if !blocked_hints.is_empty() {
         reasons.push(format!("blocked hints: {}", blocked_hints.join(", ")));
     }
-    if !related_equalities.is_empty() {
+    if !blocked_constraints.is_empty() {
         reasons.push(format!(
-            "non-affine or underdetermined equalities: {}",
-            related_equalities.join(", ")
+            "blocked constraints: {}",
+            blocked_constraints.join(", ")
         ));
     }
+    reasons.push(
+        "next step: run `ziros debug --program <program.json> --inputs <inputs.json> --out debug.json` to inspect unresolved dependencies".to_string(),
+    );
 
     ZkfError::UnsupportedWitnessSolve {
         unresolved_signals,
         reason: reasons.join("; "),
     }
+}
+
+fn first_partial_constraint_failure(
+    program: &Program,
+    witness: &Witness,
+) -> ZkfResult<Option<ZkfError>> {
+    let numeric_values = build_bigint_values(&witness.values, program.field)?;
+
+    for (index, constraint) in program.constraints.iter().enumerate() {
+        let failure = match constraint {
+            Constraint::Equal { lhs, rhs, label } => {
+                let lhs = match eval_expr_bigint(lhs, &numeric_values, program.field) {
+                    Ok(value) => value,
+                    Err(ZkfError::MissingWitnessValue { .. }) => continue,
+                    Err(error) => return Err(error),
+                };
+                let rhs = match eval_expr_bigint(rhs, &numeric_values, program.field) {
+                    Ok(value) => value,
+                    Err(ZkfError::MissingWitnessValue { .. }) => continue,
+                    Err(error) => return Err(error),
+                };
+
+                (lhs != rhs).then_some(ZkfError::ConstraintViolation {
+                    index,
+                    label: label.clone(),
+                    lhs: FieldElement::from_bigint_with_field(lhs, program.field),
+                    rhs: FieldElement::from_bigint_with_field(rhs, program.field),
+                })
+            }
+            Constraint::Boolean { signal, label } => witness.values.get(signal).and_then(|value| {
+                (!field_is_boolean(&value.as_bigint(), program.field)).then_some(
+                    ZkfError::BooleanConstraintViolation {
+                        index,
+                        label: label.clone(),
+                        signal: signal.clone(),
+                        value: value.clone(),
+                    },
+                )
+            }),
+            Constraint::Range {
+                signal,
+                bits,
+                label,
+            } => {
+                let Some(value) = witness.values.get(signal) else {
+                    continue;
+                };
+                let normalized = value.normalized_bigint(program.field)?;
+                let limit = BigInt::from(1u8) << *bits;
+                (normalized >= limit).then_some(ZkfError::RangeConstraintViolation {
+                    index,
+                    label: label.clone(),
+                    signal: signal.clone(),
+                    bits: *bits,
+                    value: value.clone(),
+                })
+            }
+            Constraint::Lookup {
+                inputs,
+                table,
+                outputs,
+                label,
+            } => first_lookup_constraint_failure(
+                program,
+                &numeric_values,
+                index,
+                inputs,
+                table,
+                outputs,
+                label,
+            )?,
+            Constraint::BlackBox { .. } => None,
+        };
+
+        if let Some(failure) = failure {
+            return Ok(Some(failure));
+        }
+    }
+
+    Ok(None)
+}
+
+fn first_lookup_constraint_failure(
+    program: &Program,
+    numeric_values: &BTreeMap<String, BigInt>,
+    index: usize,
+    inputs: &[Expr],
+    table: &str,
+    outputs: &Option<Vec<String>>,
+    label: &Option<String>,
+) -> ZkfResult<Option<ZkfError>> {
+    let evaluated_inputs = match inputs
+        .iter()
+        .map(|expr| eval_expr_bigint(expr, numeric_values, program.field))
+        .collect::<ZkfResult<Vec<_>>>()
+    {
+        Ok(values) => values,
+        Err(ZkfError::MissingWitnessValue { .. }) => return Ok(None),
+        Err(error) => return Err(error),
+    };
+
+    let lookup_table = program
+        .lookup_tables
+        .iter()
+        .find(|item| item.name == table)
+        .ok_or_else(|| ZkfError::UnknownLookupTable {
+            table: table.to_string(),
+        })?;
+
+    if lookup_table.columns.len() < evaluated_inputs.len() {
+        return Ok(Some(ZkfError::LookupConstraintViolation {
+            index,
+            label: label.clone(),
+            table: table.to_string(),
+            message: format!(
+                "constraint provides {} input columns but table '{}' has only {} columns",
+                evaluated_inputs.len(),
+                table,
+                lookup_table.columns.len()
+            ),
+        }));
+    }
+
+    let matched_rows = lookup_table
+        .values
+        .iter()
+        .filter(|row| {
+            evaluated_inputs
+                .iter()
+                .enumerate()
+                .all(|(col_idx, input_value)| {
+                    row.get(col_idx)
+                        .and_then(|value| value.normalized_bigint(program.field).ok())
+                        .is_some_and(|row_value| row_value == *input_value)
+                })
+        })
+        .collect::<Vec<_>>();
+
+    if matched_rows.is_empty() {
+        return Ok(Some(ZkfError::LookupConstraintViolation {
+            index,
+            label: label.clone(),
+            table: table.to_string(),
+            message: format!(
+                "no row matched inputs [{}]",
+                render_runtime_lookup_value_list(&evaluated_inputs, program.field)
+            ),
+        }));
+    }
+
+    let Some(output_names) = outputs.as_ref() else {
+        return Ok(None);
+    };
+
+    let expected_outputs = output_names
+        .iter()
+        .map(|name| {
+            numeric_values
+                .get(name)
+                .cloned()
+                .ok_or_else(|| ZkfError::MissingWitnessValue {
+                    signal: name.clone(),
+                })
+        })
+        .collect::<ZkfResult<Vec<_>>>();
+    let expected_outputs = match expected_outputs {
+        Ok(values) => values,
+        Err(ZkfError::MissingWitnessValue { .. }) => return Ok(None),
+        Err(error) => return Err(error),
+    };
+
+    let matching_output_row = matched_rows.iter().any(|row| {
+        expected_outputs
+            .iter()
+            .enumerate()
+            .all(|(output_idx, expected_value)| {
+                row.get(evaluated_inputs.len() + output_idx)
+                    .and_then(|value| value.normalized_bigint(program.field).ok())
+                    .is_some_and(|row_value| row_value == *expected_value)
+            })
+    });
+    if matching_output_row {
+        return Ok(None);
+    }
+
+    Ok(Some(ZkfError::LookupConstraintViolation {
+        index,
+        label: label.clone(),
+        table: table.to_string(),
+        message: format!(
+            "no row matched inputs [{}] with outputs [{}]",
+            render_runtime_lookup_value_list(&evaluated_inputs, program.field),
+            render_runtime_lookup_value_list(&expected_outputs, program.field)
+        ),
+    }))
+}
+
+fn render_runtime_lookup_value_list(values: &[BigInt], field: FieldId) -> String {
+    values
+        .iter()
+        .map(|value| FieldElement::from_bigint_with_field(value.clone(), field).to_decimal_string())
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 pub fn eval_expr(

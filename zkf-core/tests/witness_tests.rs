@@ -2,7 +2,7 @@ use rand::Rng;
 use std::collections::BTreeMap;
 use zkf_core::{
     Constraint, Expr, FieldElement, FieldId, Program, Signal, Visibility, WitnessAssignment,
-    WitnessHint, WitnessPlan, ZkfError, generate_witness,
+    WitnessHint, WitnessPlan, ZkfError, generate_witness, generate_witness_unchecked,
 };
 
 fn program() -> Program {
@@ -273,6 +273,169 @@ fn witness_generation_rejects_unknown_hint_target() {
         .expect_err("unknown witness-plan hint target must fail");
     match err {
         ZkfError::MissingWitnessValue { signal } => assert_eq!(signal, "typo_product"),
+        other => panic!("unexpected error: {other}"),
+    }
+}
+
+#[test]
+fn incomplete_witness_surfaces_range_failure_before_generic_solver_error() {
+    let program = Program {
+        name: "range_first".to_string(),
+        field: FieldId::Bn254,
+        signals: vec![
+            Signal {
+                name: "x".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "hidden".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+        ],
+        constraints: vec![Constraint::Range {
+            signal: "x".to_string(),
+            bits: 8,
+            label: Some("x_range".to_string()),
+        }],
+        witness_plan: WitnessPlan::default(),
+        ..Default::default()
+    };
+
+    let err = generate_witness_unchecked(
+        &program,
+        &BTreeMap::from([("x".to_string(), FieldElement::from_i64(300))]),
+    )
+    .expect_err("range failure should surface before generic unresolved-signal error");
+
+    match err {
+        ZkfError::RangeConstraintViolation {
+            signal,
+            bits,
+            label,
+            ..
+        } => {
+            assert_eq!(signal, "x");
+            assert_eq!(bits, 8);
+            assert_eq!(label.as_deref(), Some("x_range"));
+        }
+        other => panic!("unexpected error: {other}"),
+    }
+}
+
+#[test]
+fn incomplete_witness_surfaces_equality_failure_before_generic_solver_error() {
+    let program = Program {
+        name: "equality_first".to_string(),
+        field: FieldId::Bn254,
+        signals: vec![
+            Signal {
+                name: "x".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "y".to_string(),
+                visibility: Visibility::Public,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "result".to_string(),
+                visibility: Visibility::Public,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "hidden".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+        ],
+        constraints: vec![
+            Constraint::Equal {
+                lhs: Expr::Add(vec![Expr::signal("x"), Expr::constant_i64(1)]),
+                rhs: Expr::signal("y"),
+                label: Some("increment_matches_public".to_string()),
+            },
+            Constraint::Equal {
+                lhs: Expr::signal("result"),
+                rhs: Expr::signal("x"),
+                label: Some("result_eq_x".to_string()),
+            },
+        ],
+        witness_plan: WitnessPlan::default(),
+        ..Default::default()
+    };
+
+    let err = generate_witness_unchecked(
+        &program,
+        &BTreeMap::from([
+            ("x".to_string(), FieldElement::from_i64(3)),
+            ("y".to_string(), FieldElement::from_i64(9)),
+        ]),
+    )
+    .expect_err("equality failure should surface before generic unresolved-signal error");
+
+    match err {
+        ZkfError::ConstraintViolation { label, .. } => {
+            assert_eq!(label.as_deref(), Some("increment_matches_public"));
+        }
+        other => panic!("unexpected error: {other}"),
+    }
+}
+
+#[test]
+fn unresolved_witness_error_includes_blocked_constraints_and_next_step() {
+    let program = Program {
+        name: "nonlinear".to_string(),
+        field: FieldId::Bn254,
+        signals: vec![
+            Signal {
+                name: "x".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "y".to_string(),
+                visibility: Visibility::Public,
+                constant: None,
+                ty: None,
+            },
+        ],
+        constraints: vec![Constraint::Equal {
+            lhs: Expr::Mul(
+                Box::new(Expr::Signal("x".into())),
+                Box::new(Expr::Signal("x".into())),
+            ),
+            rhs: Expr::Signal("y".into()),
+            label: Some("square".into()),
+        }],
+        witness_plan: WitnessPlan::default(),
+        ..Default::default()
+    };
+
+    let err = generate_witness_unchecked(
+        &program,
+        &BTreeMap::from([("y".to_string(), FieldElement::from_i64(9))]),
+    )
+    .expect_err("quadratic unresolved witness should still fail explicitly");
+
+    match err {
+        ZkfError::UnsupportedWitnessSolve {
+            unresolved_signals,
+            reason,
+        } => {
+            assert_eq!(unresolved_signals, vec!["x".to_string()]);
+            assert!(reason.contains("blocked constraints: square"));
+            assert!(reason.contains("next step: run `ziros debug"));
+        }
         other => panic!("unexpected error: {other}"),
     }
 }

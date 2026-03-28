@@ -16,8 +16,8 @@ changes presentation and interaction.
 Start from the gallery or scaffold directly:
 
 ```bash
-zkf app gallery
-zkf app init my-zk-app --template poseidon-commitment --style tui
+ziros app gallery
+ziros app init my-zk-app --template poseidon-commitment --style tui
 ```
 
 ## How Progress Feeds the UI

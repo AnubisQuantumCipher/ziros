@@ -99,6 +99,35 @@ fn audit_render_includes_plain_english_nonlinear_anchoring_guidance() {
 }
 
 #[test]
+fn render_zkf_error_makes_range_failures_actionable() {
+    let rendered = crate::util::render_zkf_error(zkf_core::ZkfError::RangeConstraintViolation {
+        index: 3,
+        label: Some("x_range".to_string()),
+        signal: "x".to_string(),
+        bits: 8,
+        value: FieldElement::from_i64(300),
+    });
+
+    assert!(rendered.contains("Range check failed for signal 'x'"));
+    assert!(rendered.contains("constraint #3 ('x_range')"));
+    assert!(rendered.contains("max 255"));
+    assert!(rendered.contains("ziros debug"));
+}
+
+#[test]
+fn render_zkf_error_makes_unresolved_witness_failures_actionable() {
+    let rendered = crate::util::render_zkf_error(zkf_core::ZkfError::UnsupportedWitnessSolve {
+        unresolved_signals: vec!["__poseidon_state_0".to_string(), "data_commitment".to_string()],
+        reason: "blocked constraints: measure_range, commitment_stage_1; next step: run `ziros debug --program <program.json> --inputs <inputs.json> --out debug.json` to inspect unresolved dependencies".to_string(),
+    });
+
+    assert!(rendered.contains("Witness generation stalled"));
+    assert!(rendered.contains("__poseidon_state_0"));
+    assert!(rendered.contains("blocked constraints: measure_range, commitment_stage_1"));
+    assert!(rendered.contains("ziros debug"));
+}
+
+#[test]
 fn cli_parses_audit_command() {
     let cli = crate::cli::Cli::parse_from([
         "zkf",

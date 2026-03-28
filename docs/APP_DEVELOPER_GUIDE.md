@@ -13,15 +13,30 @@ Use it for:
 - app-facing audit wrappers
 - programmatic verifier export
 
-Use `zkf app init` / `ziros app init` when you want a working external Rust app scaffolded against
-the current checkout.
+Use `ziros app init` when you want a working external Rust app scaffolded against
+the current checkout. `zkf app init` remains the compatibility alias.
+
+## Start Here
+
+For a first app:
+
+1. scaffold with `ziros app init`
+2. edit `zirapp.json`
+3. run `cargo run`
+4. run `cargo test`
+
+Read these alongside the scaffold:
+
+- [`TUTORIAL.md`](/Users/sicarii/Projects/ZK DEV/docs/TUTORIAL.md)
+- [`APPSPEC_REFERENCE.md`](/Users/sicarii/Projects/ZK DEV/docs/APPSPEC_REFERENCE.md)
+- [`NONLINEAR_ANCHORING.md`](/Users/sicarii/Projects/ZK DEV/docs/NONLINEAR_ANCHORING.md)
 
 ## Scaffold a Standalone App
 
 ```bash
-zkf app init my-zk-app --template poseidon-commitment
-zkf app init my-zk-app --template poseidon-commitment --style tui
-zkf app gallery
+ziros app init my-zk-app --template poseidon-commitment
+ziros app init my-zk-app --template poseidon-commitment --style tui
+ziros app gallery
 cd my-zk-app
 cargo run
 cargo test
@@ -33,7 +48,8 @@ Generated files:
 - `zirapp.json`: canonical declarative app spec
 - `src/spec.rs`: generic runtime loader for `zirapp.json`
 - `src/main.rs`: compile/prove/verify in-process
-- `inputs.example.json`: valid starter inputs
+- `inputs.compliant.json`: valid starter inputs
+- `inputs.violation.json`: intentionally bad inputs that should fail closed
 - `tests/smoke.rs`: end-to-end prove/verify smoke
 - `README.md`: local instructions
 
@@ -63,10 +79,13 @@ when you want a dashboard-style application or want to adapt the AegisVault exam
 List templates with:
 
 ```bash
-zkf app templates
-zkf app templates --json
-zkf app init my-zk-app --template merkle-membership --template-arg depth=4
+ziros app templates
+ziros app templates --json
+ziros app init my-zk-app --template merkle-membership --template-arg depth=4
 ```
+
+The direct `zirapp.json` route remains available when you want the manual/operator
+path, but the scaffold above is the default new-developer workflow.
 
 ## Build a Program Explicitly
 

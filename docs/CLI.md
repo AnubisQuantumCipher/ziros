@@ -18,14 +18,15 @@ supported for compatibility, and internal crate/package names stay `zkf-*` for n
 Scaffold a standalone Rust application that embeds `zkf-lib` directly.
 
 ```bash
-zkf app init my-zk-app --template poseidon-commitment
 ziros app init my-zk-app --template range-proof
-zkf app init my-zk-app --template poseidon-commitment --style tui
+ziros app init my-zk-app --template poseidon-commitment
+ziros app init my-zk-app --template poseidon-commitment --style tui
 ```
 
 The scaffold creates its own `[workspace]`, points `zkf-lib` back at the local ZirOS checkout with
-a path dependency, writes `zirapp.json`, `src/spec.rs`, `src/main.rs`, `inputs.example.json`,
-`tests/smoke.rs`, and a local `README.md`, then leaves you with a normal external Cargo app.
+a path dependency, writes `zirapp.json`, `src/spec.rs`, `src/main.rs`, `inputs.compliant.json`,
+`inputs.violation.json`, `tests/smoke.rs`, and a local `README.md`, then leaves you with a normal
+external Cargo app.
 
 | Flag | Description |
 |------|-------------|
@@ -40,13 +41,14 @@ IR JSON commands remain available for operator workflows, imports, inspection, a
 
 The primary authoring surface is `zirapp.json`; `ProgramBuilder` remains available inside the local
 app dependency graph when the declarative spec is not enough.
+For the declarative schema itself, read
+[`APPSPEC_REFERENCE.md`](/Users/sicarii/Projects/ZK DEV/docs/APPSPEC_REFERENCE.md).
 
 ### `zkf app gallery`
 
 Show the available scaffold styles as styled terminal cards.
 
 ```bash
-zkf app gallery
 ziros app gallery
 ```
 
@@ -61,8 +63,8 @@ The gallery lists exactly three styles:
 List the declarative scaffold templates from the shared registry.
 
 ```bash
-zkf app templates
-zkf app templates --json
+ziros app templates
+ziros app templates --json
 ```
 
 ### `zkf capabilities`

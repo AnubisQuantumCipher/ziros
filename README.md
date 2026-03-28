@@ -156,18 +156,25 @@ The live support matrix for this checkout is
 
 ## Quick Start
 
-Fresh clone to verified proof:
+Command names:
+
+- `ziros`: preferred installed command name
+- `zkf`: compatibility alias for existing scripts
+- `./target-local/release/zkf-cli`: source-checkout binary path used only when this README explicitly points at the workspace build
+
+Recommended first-app path:
 
 ```bash
 git clone git@github.com:anubisquantumcipher/ziros.git
 cd ziros
 ./install.sh
-zkf-cli app init --template range-proof --name quickstart --out /tmp/quickstart
-cargo test --manifest-path /tmp/quickstart/Cargo.toml --quiet
-cargo run --manifest-path /tmp/quickstart/Cargo.toml --quiet
+ziros app init quickstart --template range-proof --out /tmp/quickstart
+cd /tmp/quickstart
+cargo run
+cargo test
 ```
 
-Direct CLI path from `zirapp.json` to a verified proof:
+Direct `zirapp.json` path from a source checkout:
 
 ```bash
 ./target-local/release/zkf-cli compile --spec /tmp/quickstart/zirapp.json --backend plonky3 --out /tmp/quickstart/compiled.json
@@ -175,5 +182,10 @@ Direct CLI path from `zirapp.json` to a verified proof:
 ./target-local/release/zkf-cli verify --program /tmp/quickstart/zirapp.json --artifact /tmp/quickstart/proof.json --backend plonky3
 ```
 
-For the full EPA walkthrough, see
-[`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md).
+Read next:
+
+- [`docs/TUTORIAL.md`](docs/TUTORIAL.md): recommended first-app walkthrough
+- [`docs/APP_DEVELOPER_GUIDE.md`](docs/APP_DEVELOPER_GUIDE.md): standalone app workflow
+- [`docs/APPSPEC_REFERENCE.md`](docs/APPSPEC_REFERENCE.md): `AppSpecV1` / `zirapp.json` reference
+- [`docs/NONLINEAR_ANCHORING.md`](docs/NONLINEAR_ANCHORING.md): why the audit rejects linear-only underconstraint
+- [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md): source-checkout EPA walkthrough using `./target-local/release/zkf-cli`

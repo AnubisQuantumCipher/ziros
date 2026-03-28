@@ -4,6 +4,15 @@ This tutorial walks through a complete ZirOS application using the EPA water
 discharge example. It uses `zirapp.json` as the authoring surface and finishes
 with compile, prove, verify, and Solidity export.
 
+This page is the source-checkout path. If you are building a new standalone app,
+start with [`TUTORIAL.md`](/Users/sicarii/Projects/ZK DEV/docs/TUTORIAL.md) and
+[`APP_DEVELOPER_GUIDE.md`](/Users/sicarii/Projects/ZK DEV/docs/APP_DEVELOPER_GUIDE.md) first.
+
+Command names in this doc:
+
+- installed CLI: `ziros` (preferred) or `zkf` (compatibility alias)
+- source checkout: `./target-local/release/zkf-cli`
+
 ## 1. Start From The Fixture
 
 The repo ships the example spec and inputs here:

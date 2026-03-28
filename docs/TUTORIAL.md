@@ -1,17 +1,21 @@
-# ZKF Tutorial
+# ZirOS Tutorial
 
-## Your First ZK Proof in 5 Minutes
+`ziros` is the preferred installed command name in this guide. `zkf` remains
+the compatibility alias. Use `./target-local/release/zkf-cli` only when you
+explicitly want the source-checkout binary.
+
+## Your First ZK App in 5 Minutes
 
 ### 1. Scaffold a standalone app
 
 ```bash
-zkf app init my-zk-app --template poseidon-commitment
+ziros app init my-zk-app --template poseidon-commitment
 cd my-zk-app
 ```
 
 This is the primary application-developer path in v1. The scaffold gives you a local Cargo
-workspace wired to the current ZirOS checkout, plus a declarative `zirapp.json`, sample inputs,
-and a smoke test.
+workspace wired to the current ZirOS checkout, plus a declarative `zirapp.json`,
+`inputs.compliant.json`, `inputs.violation.json`, and a smoke test.
 
 ### 2. Run the generated app
 
@@ -70,13 +74,18 @@ pub fn program() -> zkf_lib::Program {
 ```
 
 For the full app-developer surface, including input helpers, audit wrappers, and verifier export,
-see [`docs/APP_DEVELOPER_GUIDE.md`](/Users/sicarii/Projects/ZK DEV/docs/APP_DEVELOPER_GUIDE.md).
+see:
+
+- [`docs/APP_DEVELOPER_GUIDE.md`](/Users/sicarii/Projects/ZK DEV/docs/APP_DEVELOPER_GUIDE.md)
+- [`docs/APPSPEC_REFERENCE.md`](/Users/sicarii/Projects/ZK DEV/docs/APPSPEC_REFERENCE.md)
+- [`docs/NONLINEAR_ANCHORING.md`](/Users/sicarii/Projects/ZK DEV/docs/NONLINEAR_ANCHORING.md)
 
 ---
 
 ## Raw IR JSON Flow
 
-You can still author or inspect raw IR JSON directly when you need the lower-level path.
+You can still author or inspect raw IR JSON directly when you need the
+lower-level/manual path.
 
 ### 1. Generate a sample circuit
 

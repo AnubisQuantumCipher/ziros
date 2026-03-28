@@ -2187,6 +2187,12 @@ pub(crate) fn render_zkf_error(err: ZkfError) -> String {
                     failed_categories.join(",")
                 ));
             }
+            if let Some(finding) = report.findings.first() {
+                rendered.push_str(&format!("; first_issue={}", finding.message));
+                if let Some(suggestion) = finding.suggestion.as_deref() {
+                    rendered.push_str(&format!("; suggestion={suggestion}"));
+                }
+            }
             if let Some(analysis) = analysis.as_deref() {
                 rendered.push_str(&format!(
                     "; linear_nullity={}; linearly_underdetermined_private_signals={:?}; nonlinear_unanchored_components={:?}",
@@ -2197,8 +2203,80 @@ pub(crate) fn render_zkf_error(err: ZkfError) -> String {
             }
             rendered
         }
+        ZkfError::ConstraintViolation {
+            index,
+            label,
+            lhs,
+            rhs,
+        } => format!(
+            "Equality constraint failed at {}: lhs={}, rhs={}. {}",
+            render_constraint_ref(index, label.as_deref()),
+            lhs,
+            rhs,
+            debug_next_step_hint()
+        ),
+        ZkfError::BooleanConstraintViolation {
+            index,
+            label,
+            signal,
+            value,
+        } => format!(
+            "Boolean constraint failed for signal '{}' at {}: value={} is not 0 or 1. {}",
+            signal,
+            render_constraint_ref(index, label.as_deref()),
+            value,
+            debug_next_step_hint()
+        ),
+        ZkfError::RangeConstraintViolation {
+            index,
+            label,
+            signal,
+            bits,
+            value,
+        } => {
+            let max = (BigInt::from(1u8) << bits) - 1u8;
+            format!(
+                "Range check failed for signal '{}' at {}: value={} exceeds the {}-bit limit (max {}). {}",
+                signal,
+                render_constraint_ref(index, label.as_deref()),
+                value,
+                bits,
+                max,
+                debug_next_step_hint()
+            )
+        }
+        ZkfError::LookupConstraintViolation {
+            index,
+            label,
+            table,
+            message,
+        } => format!(
+            "Lookup constraint failed for table '{}' at {}: {}. {}",
+            table,
+            render_constraint_ref(index, label.as_deref()),
+            message,
+            debug_next_step_hint()
+        ),
+        ZkfError::UnsupportedWitnessSolve {
+            unresolved_signals,
+            reason,
+        } => format!(
+            "Witness generation stalled with unresolved signals {:?}: {}",
+            unresolved_signals, reason
+        ),
         other => other.to_string(),
     }
+}
+
+fn render_constraint_ref(index: usize, label: Option<&str>) -> String {
+    match label {
+        Some(label) => format!("constraint #{index} ('{label}')"),
+        None => format!("constraint #{index}"),
+    }
+}
+
+fn debug_next_step_hint() -> &'static str {
+    "Next step: run `ziros debug --program <program.json> --inputs <inputs.json> --out debug.json` to inspect witness values and dependency chains."
 }
 
 pub(crate) fn raw_cli_error(payload: impl Into<String>) -> String {

@@ -721,6 +721,7 @@ fn readme_content(
     style: AppStyle,
     spec: &zkf_lib::AppSpecV1,
 ) -> String {
+    let root = repo_root();
     let backend = scaffold_backend(spec.program.field);
     let extra = match style {
         AppStyle::Minimal => {
@@ -753,6 +754,28 @@ Style description: {style_description}
 - `tests/smoke.rs`: proves the compliant inputs and asserts that the violation inputs are rejected.
 - Rust `ProgramBuilder` remains available as the escape hatch when you need advanced authoring.
 
+## Start Here
+
+```bash
+cd {name}
+cargo run
+cargo test
+```
+
+Edit loop:
+
+1. Change [`zirapp.json`](zirapp.json) when you want to change the statement being proven.
+2. Keep [`inputs.compliant.json`](inputs.compliant.json) as your known-good sample.
+3. Keep [`inputs.violation.json`](inputs.violation.json) as the fail-closed regression case.
+4. Re-run `cargo run` for the fast proof flow and `cargo test` for the end-to-end smoke test.
+
+When a proof fails:
+
+- Start with the signal labels in `zirapp.json`.
+- If the failure mentions nonlinear anchoring, read `{nonlinear_anchoring}`.
+- For the full standalone-app workflow, read `{app_guide}`.
+- For the declarative spec reference, read `{appspec_guide}`.
+
 ## Current Template Contract
 
 - Backend: `{backend}`
@@ -769,8 +792,8 @@ cargo run
 cargo test
 ```
 
-Explore other scaffold variants with `zkf app gallery`.
-List declarative templates with `zkf app templates`.
+Explore other scaffold variants with `ziros app gallery` (or `zkf app gallery`).
+List declarative templates with `ziros app templates`.
 "#,
         style = style.as_str(),
         style_description = style.one_line_description(),
@@ -780,6 +803,9 @@ List declarative templates with `zkf app templates`.
         public_outputs = spec.public_outputs,
         description = spec.description.as_deref().unwrap_or("n/a"),
         template_args = spec.template_args,
+        nonlinear_anchoring = root.join("docs/NONLINEAR_ANCHORING.md").display(),
+        app_guide = root.join("docs/APP_DEVELOPER_GUIDE.md").display(),
+        appspec_guide = root.join("docs/APPSPEC_REFERENCE.md").display(),
     )
 }
 
@@ -1031,10 +1057,13 @@ pub(crate) fn handle_app(command: AppCommands) -> Result<(), String> {
             let style = AppStyle::parse(&style)?;
             let path = scaffold_app(&name, &template, &template_args, style, out)?;
             println!(
-                "app scaffold created: template={} style={} -> {}",
+                "app scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo run\n  cargo test\n  edit {}/zirapp.json\n  read {}/README.md",
                 template,
                 style.as_str(),
-                path.display()
+                path.display(),
+                path.display(),
+                path.display(),
+                path.display(),
             );
             Ok(())
         }
