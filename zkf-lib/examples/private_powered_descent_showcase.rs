@@ -24,8 +24,7 @@ use zkf_backends::{
 };
 use zkf_backends::{
     Groth16ExecutionClassification, Groth16ExecutionSummary,
-    groth16_execution_summary_from_metadata, with_allow_dev_deterministic_groth16_override,
-    with_proof_seed_override,
+    groth16_execution_summary_from_metadata, with_proof_seed_override,
 };
 use zkf_core::ccs::CcsProgram;
 use zkf_core::ir::LookupTable;
@@ -41,10 +40,11 @@ use zkf_lib::app::descent::{
     private_powered_descent_witness_with_steps,
 };
 use zkf_lib::evidence::{
-    audit_entry_included, audit_entry_omitted_by_default,
+    ShowcaseGroth16TrustMode, audit_entry_included, audit_entry_omitted_by_default,
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary_with_outputs,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary, repo_root, two_tier_audit_record,
+    generated_app_closure_bundle_summary, repo_root, resolve_showcase_groth16_trust_mode,
+    two_tier_audit_record, with_showcase_groth16_trust_mode,
 };
 use zkf_lib::{ZkfError, ZkfResult, export_groth16_solidity_verifier, verify};
 use zkf_runtime::{
@@ -81,14 +81,10 @@ const TRUSTED_SETUP_MANIFEST_BUNDLE_FILENAME: &str =
 const ARKWORKS_PRODUCTION_DISCLAIMER_REASON: &str = "upstream-ark-groth16-production-disclaimer";
 
 fn with_showcase_groth16_mode<T, F: FnOnce() -> ZkfResult<T>>(
-    trusted_setup_used: bool,
+    trust_mode: ShowcaseGroth16TrustMode,
     f: F,
 ) -> ZkfResult<T> {
-    if trusted_setup_used {
-        f()
-    } else {
-        with_allow_dev_deterministic_groth16_override(Some(true), f)
-    }
+    with_showcase_groth16_trust_mode(trust_mode, f)
 }
 
 #[allow(unsafe_code)]
@@ -2748,8 +2744,9 @@ fn run_prove_core() -> ZkfResult<()> {
     let original_program = template.program.clone();
     let (optimized_program, optimizer_report) = optimize_program(&original_program);
 
+    let trust_mode = resolve_showcase_groth16_trust_mode(APP_ID, &optimized_program)?;
     let trusted_setup_blob_path = requested_groth16_setup_blob_path(&optimized_program);
-    let trusted_setup_requested = trusted_setup_blob_path.is_some();
+    let trusted_setup_requested = trust_mode.trusted_setup_requested();
     let trusted_setup_manifest = match (export_profile, trusted_setup_blob_path.as_deref()) {
         (ExportProfile::Production, Some(path)) => {
             Some(load_and_validate_trusted_setup_manifest(Path::new(path))?)
@@ -2765,13 +2762,15 @@ fn run_prove_core() -> ZkfResult<()> {
     let compile_start = Instant::now();
     let optimized_program_for_compile = optimized_program.clone();
     let source_compiled = run_with_heartbeat_result("compile", move || {
-        with_showcase_groth16_mode(trusted_setup_requested, || {
+        with_showcase_groth16_mode(trust_mode, || {
             if export_profile.is_production() {
                 Ok(compile_arkworks_unchecked(&optimized_program_for_compile)?)
-            } else {
+            } else if trust_mode.uses_explicit_dev_deterministic() {
                 Ok(with_setup_seed_override(Some(SETUP_SEED), || {
                     compile_arkworks_unchecked(&optimized_program_for_compile)
                 })?)
+            } else {
+                Ok(compile_arkworks_unchecked(&optimized_program_for_compile)?)
             }
         })
     })?;
@@ -2819,7 +2818,7 @@ fn run_prove_core() -> ZkfResult<()> {
     let valid_inputs_for_runtime = valid_inputs.clone();
     let base_witness_for_runtime = base_witness.clone();
     let source_execution = run_with_heartbeat_result("runtime-prove", move || {
-        with_showcase_groth16_mode(trusted_setup_used, || {
+        with_showcase_groth16_mode(trust_mode, || {
             let prove = || {
                 RuntimeExecutor::run_backend_prove_job_with_objective(
                     BackendKind::ArkworksGroth16,
@@ -2836,8 +2835,10 @@ fn run_prove_core() -> ZkfResult<()> {
             };
             if export_profile.is_production() {
                 prove()
-            } else {
+            } else if trust_mode.uses_explicit_dev_deterministic() {
                 with_proof_seed_override(Some(PROOF_SEED), prove)
+            } else {
+                prove()
             }
         })
     })?;

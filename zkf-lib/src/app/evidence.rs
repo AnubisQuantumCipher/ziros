@@ -12,8 +12,15 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
-use zkf_backends::{Groth16ExecutionSummary, groth16_execution_summary_from_metadata};
-use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_backends::{
+    ALLOW_DEV_DETERMINISTIC_GROTH16_ENV, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
+    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
+    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_ENV,
+    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, Groth16ExecutionSummary, allow_dev_deterministic_groth16,
+    groth16_execution_summary_from_metadata, requested_groth16_setup_blob_path,
+    with_allow_dev_deterministic_groth16_override,
+};
+use zkf_core::{Program, ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -114,6 +121,72 @@ const MULTI_SATELLITE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 2] = [
         log_file_name: "protocol_lean.log",
     },
 ];
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ShowcaseGroth16TrustMode {
+    TrustedImportedSetup,
+    ExplicitDevDeterministic,
+}
+
+impl ShowcaseGroth16TrustMode {
+    pub fn trusted_setup_requested(self) -> bool {
+        matches!(self, Self::TrustedImportedSetup)
+    }
+
+    pub fn trusted_setup_used(self) -> bool {
+        matches!(self, Self::TrustedImportedSetup)
+    }
+
+    pub fn uses_explicit_dev_deterministic(self) -> bool {
+        matches!(self, Self::ExplicitDevDeterministic)
+    }
+
+    pub fn setup_provenance(self) -> &'static str {
+        match self {
+            Self::TrustedImportedSetup => GROTH16_IMPORTED_SETUP_PROVENANCE,
+            Self::ExplicitDevDeterministic => GROTH16_DETERMINISTIC_DEV_PROVENANCE,
+        }
+    }
+
+    pub fn security_boundary(self) -> &'static str {
+        match self {
+            Self::TrustedImportedSetup => GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
+            Self::ExplicitDevDeterministic => GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
+        }
+    }
+}
+
+pub fn resolve_showcase_groth16_trust_mode(
+    app_id: &str,
+    program: &Program,
+) -> ZkfResult<ShowcaseGroth16TrustMode> {
+    if requested_groth16_setup_blob_path(program).is_some() {
+        return Ok(ShowcaseGroth16TrustMode::TrustedImportedSetup);
+    }
+
+    if allow_dev_deterministic_groth16() {
+        return Ok(ShowcaseGroth16TrustMode::ExplicitDevDeterministic);
+    }
+
+    Err(ZkfError::Backend(format!(
+        "{app_id} is missing Groth16 trust configuration. Provide program metadata key '{}' or env '{}' pointing to an imported trusted setup blob. For explicit development-only reproducibility, set '{}' only for local testing and never for public or production artifacts.",
+        GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
+        GROTH16_SETUP_BLOB_PATH_ENV,
+        ALLOW_DEV_DETERMINISTIC_GROTH16_ENV,
+    )))
+}
+
+pub fn with_showcase_groth16_trust_mode<T, F: FnOnce() -> ZkfResult<T>>(
+    mode: ShowcaseGroth16TrustMode,
+    f: F,
+) -> ZkfResult<T> {
+    match mode {
+        ShowcaseGroth16TrustMode::TrustedImportedSetup => f(),
+        ShowcaseGroth16TrustMode::ExplicitDevDeterministic => {
+            with_allow_dev_deterministic_groth16_override(Some(true), f)
+        }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 struct VerificationLedgerFile {
@@ -1992,6 +2065,8 @@ pub fn two_tier_audit_record(
 mod tests {
     use super::*;
     use std::time::{SystemTime, UNIX_EPOCH};
+    use zkf_backends::with_allow_dev_deterministic_groth16_override;
+    use zkf_core::Program;
 
     #[test]
     fn implementation_closure_generated_outputs_match_repo_files() {
@@ -2119,5 +2194,59 @@ mod tests {
         let written: serde_json::Value = read_json(&json_path).expect("read json");
         assert_eq!(written, json!({ "status": "included" }));
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn showcase_trust_mode_prefers_imported_setup_metadata() {
+        let mut program = Program::default();
+        program.metadata.insert(
+            GROTH16_SETUP_BLOB_PATH_METADATA_KEY.to_string(),
+            "/tmp/imported-setup.blob".to_string(),
+        );
+
+        let mode = resolve_showcase_groth16_trust_mode("test-showcase", &program)
+            .expect("imported setup should satisfy showcase trust contract");
+        assert_eq!(mode, ShowcaseGroth16TrustMode::TrustedImportedSetup);
+        assert!(mode.trusted_setup_used());
+        assert_eq!(mode.setup_provenance(), GROTH16_IMPORTED_SETUP_PROVENANCE);
+        assert_eq!(
+            mode.security_boundary(),
+            GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY
+        );
+    }
+
+    #[test]
+    fn showcase_trust_mode_accepts_explicit_dev_opt_in() {
+        let program = Program::default();
+
+        let mode = with_allow_dev_deterministic_groth16_override(Some(true), || {
+            resolve_showcase_groth16_trust_mode("test-showcase", &program)
+        })
+        .expect("explicit dev opt-in should be honored");
+        assert_eq!(mode, ShowcaseGroth16TrustMode::ExplicitDevDeterministic);
+        assert!(mode.uses_explicit_dev_deterministic());
+        assert_eq!(
+            mode.setup_provenance(),
+            GROTH16_DETERMINISTIC_DEV_PROVENANCE
+        );
+        assert_eq!(
+            mode.security_boundary(),
+            GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY
+        );
+    }
+
+    #[test]
+    fn showcase_trust_mode_rejects_implicit_dev_fallback() {
+        let program = Program::default();
+
+        let error = with_allow_dev_deterministic_groth16_override(Some(false), || {
+            resolve_showcase_groth16_trust_mode("test-showcase", &program)
+        })
+        .expect_err("showcase without trust config should fail closed");
+        assert!(
+            error
+                .to_string()
+                .contains("missing Groth16 trust configuration")
+        );
     }
 }

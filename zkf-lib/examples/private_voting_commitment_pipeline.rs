@@ -8,13 +8,14 @@ use std::time::Instant;
 use zkf_backends::blackbox_gadgets::enrich_witness_for_proving;
 use zkf_backends::foundry_test::{generate_foundry_test_from_artifact, proof_to_calldata_json};
 use zkf_backends::metal_runtime::metal_runtime_report;
-use zkf_backends::{with_allow_dev_deterministic_groth16_override, with_proof_seed_override};
+use zkf_backends::with_proof_seed_override;
 use zkf_core::{BackendKind, FieldElement, Program, Witness, WitnessInputs};
 use zkf_core::{check_constraints, optimize_program};
 use zkf_lib::evidence::{
-    audit_entry_included, collect_formal_evidence_for_generated_app,
+    ShowcaseGroth16TrustMode, audit_entry_included, collect_formal_evidence_for_generated_app,
     effective_gpu_attribution_summary, ensure_file_exists, ensure_foundry_layout,
-    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty, two_tier_audit_record,
+    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty,
+    resolve_showcase_groth16_trust_mode, two_tier_audit_record, with_showcase_groth16_trust_mode,
     write_json, write_text,
 };
 use zkf_lib::templates::private_vote_commitment_three_candidate;
@@ -25,6 +26,7 @@ use zkf_lib::{
 
 const SETUP_SEED: [u8; 32] = [0x11; 32];
 const PROOF_SEED: [u8; 32] = [0x22; 32];
+const APP_ID: &str = "private_voting_commitment_pipeline";
 
 #[derive(Debug, Serialize)]
 struct ProgramStats {
@@ -204,9 +206,15 @@ fn main() -> ZkfResult<()> {
         ("blinding".to_string(), FieldElement::from_u64(424_242)),
     ]);
     let (optimized_program, optimizer_report) = optimize_program(&original_program);
+    let trust_mode = resolve_showcase_groth16_trust_mode(APP_ID, &optimized_program)?;
+    if trust_mode != ShowcaseGroth16TrustMode::ExplicitDevDeterministic {
+        return Err(ZkfError::Backend(
+            "private_voting_commitment_pipeline is a development-only reproducibility harness; set ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16=1 to run it with deterministic Groth16 seeds".to_string(),
+        ));
+    }
 
     let compile_start = Instant::now();
-    let compiled = with_allow_dev_deterministic_groth16_override(Some(true), || {
+    let compiled = with_showcase_groth16_trust_mode(trust_mode, || {
         compile(&optimized_program, "arkworks-groth16", Some(SETUP_SEED))
     })?;
     let compile_ms = compile_start.elapsed().as_secs_f64() * 1_000.0;
@@ -231,7 +239,7 @@ fn main() -> ZkfResult<()> {
     };
 
     let first_prove_start = Instant::now();
-    let proof_first = with_allow_dev_deterministic_groth16_override(Some(true), || {
+    let proof_first = with_showcase_groth16_trust_mode(trust_mode, || {
         with_proof_seed_override(Some(PROOF_SEED), || {
             zkf_lib::prove(&compiled, &enriched_witness)
         })
@@ -248,7 +256,7 @@ fn main() -> ZkfResult<()> {
     }
 
     let second_prove_start = Instant::now();
-    let proof_second = with_allow_dev_deterministic_groth16_override(Some(true), || {
+    let proof_second = with_showcase_groth16_trust_mode(trust_mode, || {
         with_proof_seed_override(Some(PROOF_SEED), || {
             zkf_lib::prove(&compiled, &enriched_witness)
         })

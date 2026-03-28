@@ -12,15 +12,14 @@ use std::sync::Arc;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use zkf_backends::foundry_test::{generate_foundry_test_from_artifact, proof_to_calldata_json};
 use zkf_backends::metal_runtime::metal_runtime_report;
+use zkf_backends::with_proof_seed_override;
 use zkf_backends::{
     BackendRoute, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
     GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
     GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
     GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY, current_metal_thresholds,
     groth16_bn254_witness_map_ntt_parity, prepare_witness_for_proving,
-    requested_groth16_setup_blob_path,
 };
-use zkf_backends::{with_allow_dev_deterministic_groth16_override, with_proof_seed_override};
 use zkf_core::acceleration::{CpuMsmAccelerator, MsmAccelerator, accelerator_registry};
 use zkf_core::ccs::CcsProgram;
 use zkf_core::{
@@ -34,11 +33,12 @@ use zkf_lib::app::multi_satellite::{
     private_multi_satellite_scenario_spec,
 };
 use zkf_lib::evidence::{
-    canonicalize_for_determinism_hash, collect_formal_evidence_for_generated_app,
-    effective_gpu_attribution_summary, ensure_dir_exists, ensure_file_exists,
-    ensure_foundry_layout, foundry_project_dir, generated_app_closure_bundle_summary,
-    hash_json_value, sha256_hex, two_tier_audit_record, write_json as write_bundle_json,
-    write_text as write_bundle_text,
+    ShowcaseGroth16TrustMode, canonicalize_for_determinism_hash,
+    collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
+    ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
+    generated_app_closure_bundle_summary, hash_json_value, resolve_showcase_groth16_trust_mode,
+    sha256_hex, two_tier_audit_record, with_showcase_groth16_trust_mode,
+    write_json as write_bundle_json, write_text as write_bundle_text,
 };
 use zkf_lib::{
     ZkfError, ZkfResult, audit_program_with_live_capabilities, compile,
@@ -56,14 +56,10 @@ const SCENARIOS_ENV: &str = "ZKF_PRIVATE_MULTI_SATELLITE_SCENARIOS";
 const FULL_AUDIT_ENV: &str = "ZKF_PRIVATE_MULTI_SATELLITE_FULL_AUDIT";
 
 fn with_showcase_groth16_mode<T, F: FnOnce() -> ZkfResult<T>>(
-    trusted_setup_used: bool,
+    trust_mode: ShowcaseGroth16TrustMode,
     f: F,
 ) -> ZkfResult<T> {
-    if trusted_setup_used {
-        f()
-    } else {
-        with_allow_dev_deterministic_groth16_override(Some(true), f)
-    }
+    with_showcase_groth16_trust_mode(trust_mode, f)
 }
 
 fn hex_string(bytes: &[u8]) -> String {
@@ -768,13 +764,17 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
         ZkfError::Serialization(format!("serialize original program for metrics: {error}"))
     })?;
 
-    let trusted_setup_requested = requested_groth16_setup_blob_path(&template.program).is_some();
-    let trusted_setup_used = trusted_setup_requested;
+    let trust_mode = resolve_showcase_groth16_trust_mode(APP_ID, &template.program)?;
+    let trusted_setup_used = trust_mode.trusted_setup_used();
 
     let compile_start_ts = timestamp_unix_ms();
     let compile_start = Instant::now();
-    let compiled = with_showcase_groth16_mode(trusted_setup_used, || {
-        compile(&template.program, "arkworks-groth16", Some(SETUP_SEED))
+    let compiled = with_showcase_groth16_mode(trust_mode, || {
+        if trust_mode.uses_explicit_dev_deterministic() {
+            compile(&template.program, "arkworks-groth16", Some(SETUP_SEED))
+        } else {
+            compile(&template.program, "arkworks-groth16", None)
+        }
     })?;
     let compile_ms = compile_start.elapsed().as_secs_f64() * 1_000.0;
     let compile_end_ts = timestamp_unix_ms();
@@ -794,23 +794,27 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
 
     let prove_start_ts = timestamp_unix_ms();
     let prove_start = Instant::now();
-    let execution: BackendProofExecutionResult =
-        with_showcase_groth16_mode(trusted_setup_used, || {
-            with_proof_seed_override(Some(PROOF_SEED), || {
-                RuntimeExecutor::run_backend_prove_job_with_objective(
-                    BackendKind::ArkworksGroth16,
-                    BackendRoute::Auto,
-                    Arc::new(template.program.clone()),
-                    Some(Arc::new(template.sample_inputs.clone())),
-                    Some(Arc::new(base_witness.clone())),
-                    Some(Arc::new(compiled.clone())),
-                    OptimizationObjective::FastestProve,
-                    RequiredTrustLane::StrictCryptographic,
-                    ExecutionMode::Deterministic,
-                )
-                .map_err(|error| ZkfError::Backend(error.to_string()))
-            })
-        })?;
+    let execution: BackendProofExecutionResult = with_showcase_groth16_mode(trust_mode, || {
+        let prove = || {
+            RuntimeExecutor::run_backend_prove_job_with_objective(
+                BackendKind::ArkworksGroth16,
+                BackendRoute::Auto,
+                Arc::new(template.program.clone()),
+                Some(Arc::new(template.sample_inputs.clone())),
+                Some(Arc::new(base_witness.clone())),
+                Some(Arc::new(compiled.clone())),
+                OptimizationObjective::FastestProve,
+                RequiredTrustLane::StrictCryptographic,
+                ExecutionMode::Deterministic,
+            )
+            .map_err(|error| ZkfError::Backend(error.to_string()))
+        };
+        if trust_mode.uses_explicit_dev_deterministic() {
+            with_proof_seed_override(Some(PROOF_SEED), prove)
+        } else {
+            prove()
+        }
+    })?;
     let proving_ms = prove_start.elapsed().as_secs_f64() * 1_000.0;
     let prove_end_ts = timestamp_unix_ms();
 

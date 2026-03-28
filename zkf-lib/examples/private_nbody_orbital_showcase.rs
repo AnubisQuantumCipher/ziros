@@ -8,19 +8,22 @@ use std::sync::Arc;
 use std::time::Instant;
 use zkf_backends::foundry_test::{generate_foundry_test_from_artifact, proof_to_calldata_json};
 use zkf_backends::metal_runtime::metal_runtime_report;
+use zkf_backends::with_proof_seed_override;
 use zkf_backends::with_setup_seed_override;
 use zkf_backends::{
-    BackendRoute, compile_arkworks_unchecked, prepare_witness_for_proving,
-    requested_groth16_setup_blob_path,
+    BackendRoute, GROTH16_IMPORTED_SETUP_PROVENANCE, GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
+    GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
+    compile_arkworks_unchecked, prepare_witness_for_proving,
 };
-use zkf_backends::{with_allow_dev_deterministic_groth16_override, with_proof_seed_override};
 use zkf_core::ccs::CcsProgram;
 use zkf_core::{
     BackendKind, Program, Witness, WitnessInputs, check_constraints, json_from_slice,
     json_to_vec_pretty, optimize_program,
 };
 use zkf_lib::evidence::{
-    collect_formal_evidence_for_generated_app, generated_app_closure_bundle_summary,
+    ShowcaseGroth16TrustMode, collect_formal_evidence_for_generated_app,
+    generated_app_closure_bundle_summary, resolve_showcase_groth16_trust_mode,
+    with_showcase_groth16_trust_mode,
 };
 use zkf_lib::orbital::{
     PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_PRIVATE_INPUTS,
@@ -38,16 +41,13 @@ use zkf_runtime::{
 
 const SETUP_SEED: [u8; 32] = [0x31; 32];
 const PROOF_SEED: [u8; 32] = [0x47; 32];
+const APP_ID: &str = "private_nbody_orbital_showcase";
 
 fn with_showcase_groth16_mode<T, F: FnOnce() -> ZkfResult<T>>(
-    trusted_setup_used: bool,
+    trust_mode: ShowcaseGroth16TrustMode,
     f: F,
 ) -> ZkfResult<T> {
-    if trusted_setup_used {
-        f()
-    } else {
-        with_allow_dev_deterministic_groth16_override(Some(true), f)
-    }
+    with_showcase_groth16_trust_mode(trust_mode, f)
 }
 
 fn hex_string(bytes: &[u8]) -> String {
@@ -985,27 +985,33 @@ fn main() -> ZkfResult<()> {
     eprintln!("private_nbody_orbital_showcase: optimizing program");
     let (optimized_program, optimizer_report) = optimize_program(&original_program);
 
-    let trusted_setup_requested = requested_groth16_setup_blob_path(&optimized_program).is_some();
-    let trusted_setup_used = trusted_setup_requested;
-    let setup_provenance = if trusted_setup_requested {
-        "trusted-imported".to_string()
-    } else {
-        "deterministic-dev".to_string()
-    };
-    let security_boundary = if trusted_setup_requested {
-        "trusted-imported".to_string()
-    } else {
-        "development-only".to_string()
-    };
+    let trust_mode = resolve_showcase_groth16_trust_mode(APP_ID, &optimized_program)?;
+    let trusted_setup_requested = trust_mode.trusted_setup_requested();
 
     eprintln!("private_nbody_orbital_showcase: compiling groth16 artifact");
     let compile_start = Instant::now();
-    let source_compiled = with_showcase_groth16_mode(trusted_setup_used, || {
-        Ok(with_setup_seed_override(Some(SETUP_SEED), || {
-            compile_arkworks_unchecked(&optimized_program)
-        })?)
+    let source_compiled = with_showcase_groth16_mode(trust_mode, || {
+        if trust_mode.uses_explicit_dev_deterministic() {
+            Ok(with_setup_seed_override(Some(SETUP_SEED), || {
+                compile_arkworks_unchecked(&optimized_program)
+            })?)
+        } else {
+            Ok(compile_arkworks_unchecked(&optimized_program)?)
+        }
     })?;
     let compile_ms = compile_start.elapsed().as_secs_f64() * 1_000.0;
+    let setup_provenance = source_compiled
+        .metadata
+        .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+        .cloned()
+        .unwrap_or_else(|| trust_mode.setup_provenance().to_string());
+    let security_boundary = source_compiled
+        .metadata
+        .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+        .cloned()
+        .unwrap_or_else(|| trust_mode.security_boundary().to_string());
+    let trusted_setup_used = security_boundary == GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY
+        || setup_provenance == GROTH16_IMPORTED_SETUP_PROVENANCE;
 
     eprintln!("private_nbody_orbital_showcase: preparing witness");
     let witness_start = Instant::now();
@@ -1017,8 +1023,8 @@ fn main() -> ZkfResult<()> {
     eprintln!("private_nbody_orbital_showcase: running runtime groth16 prove");
     let telemetry_before = telemetry_snapshot();
     let source_runtime_start = Instant::now();
-    let source_execution = with_showcase_groth16_mode(trusted_setup_used, || {
-        with_proof_seed_override(Some(PROOF_SEED), || {
+    let source_execution = with_showcase_groth16_mode(trust_mode, || {
+        let prove = || {
             RuntimeExecutor::run_backend_prove_job_with_objective(
                 BackendKind::ArkworksGroth16,
                 BackendRoute::Auto,
@@ -1031,7 +1037,12 @@ fn main() -> ZkfResult<()> {
                 ExecutionMode::Deterministic,
             )
             .map_err(|error| ZkfError::Backend(error.to_string()))
-        })
+        };
+        if trust_mode.uses_explicit_dev_deterministic() {
+            with_proof_seed_override(Some(PROOF_SEED), prove)
+        } else {
+            prove()
+        }
     })?;
     let source_runtime_ms = source_runtime_start.elapsed().as_secs_f64() * 1_000.0;
     if !verify(&source_execution.compiled, &source_execution.artifact)? {
