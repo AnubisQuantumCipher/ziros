@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT = Path("/Users/sicarii/Projects/ZK DEV")
+ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SOURCE_BINARY = Path("/tmp/zkf-certified-release-binary/zkf-cli")
 DEFAULT_BUNDLE_DIR = Path("/Users/sicarii/Desktop/ZKF-Release-v1.0.0-2026-03-17-NoEmbeddedDashboard")
 DEFAULT_DESKTOP_BINARY = DEFAULT_BUNDLE_DIR / "bin" / "zkf-cli"
