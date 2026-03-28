@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Verify Rust toolchain
         run: |
@@ -43,7 +45,7 @@ jobs:
         run: ./zkf-build.sh --release
 
       - name: Format
-        run: cargo fmt --all -- --check
+        run: ./scripts/ci/check_rustfmt.sh
 
       - name: Clippy
         run: cargo clippy --workspace -- -D warnings
@@ -74,6 +76,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Verify Rust toolchain
         run: |
@@ -95,6 +99,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Verify Rust toolchain
         run: |
