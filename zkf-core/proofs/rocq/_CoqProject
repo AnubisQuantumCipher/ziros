@@ -1,0 +1,20 @@
+-Q ./extraction ZkfCoreExtraction
+./KernelCompat.v
+./extraction/Zkf_core_Field.v
+./extraction/Zkf_core_Proof_kernel_spec_Bundle.v
+./extraction/Zkf_core_Proof_kernel_spec.v
+./extraction/Zkf_core_Proof_kernel_spec_Spec_field_ops.v
+./extraction/Zkf_core_Proof_ccs_spec.v
+./extraction/Zkf_core_Proof_transform_spec.v
+./extraction/Zkf_core_Proof_witness_generation_spec.v
+./KernelArithmetic.v
+./KernelGenerated.v
+./KernelSemantics.v
+./KernelProofs.v
+./WitnessGenerationSemantics.v
+./WitnessGenerationProofs.v
+./WitnessAdapterSemantics.v
+./WitnessAdapterProofs.v
+./FieldGenerationProvenance.v
+./CcsSemantics.v
+./CcsProofs.v

@@ -1,0 +1,525 @@
+{
+  "name": "verify_kyc_identity",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "identity_id",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "age",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "salary",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "age_threshold",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "salary_threshold",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "expected_commitment",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "age_diff",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "salary_diff",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "id_sq",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "id_cb",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "age_sq",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "age_term",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "salary_term",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "hash_sum",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "hash_total",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "final_hash",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "range",
+      "signal": "age",
+      "bits": 8,
+      "label": "range_age_8"
+    },
+    {
+      "kind": "range",
+      "signal": "salary",
+      "bits": 32,
+      "label": "range_salary_32"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "age_diff"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "age"
+          },
+          {
+            "op": "signal",
+            "args": "age_threshold"
+          }
+        ]
+      },
+      "label": "assign_age_diff"
+    },
+    {
+      "kind": "range",
+      "signal": "age_diff",
+      "bits": 8,
+      "label": "range_age_diff_8"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "salary_diff"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "salary"
+          },
+          {
+            "op": "signal",
+            "args": "salary_threshold"
+          }
+        ]
+      },
+      "label": "assign_salary_diff"
+    },
+    {
+      "kind": "range",
+      "signal": "salary_diff",
+      "bits": 32,
+      "label": "range_salary_diff_32"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "id_sq"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "identity_id"
+          },
+          {
+            "op": "signal",
+            "args": "identity_id"
+          }
+        ]
+      },
+      "label": "assign_id_sq"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "id_cb"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "id_sq"
+          },
+          {
+            "op": "signal",
+            "args": "identity_id"
+          }
+        ]
+      },
+      "label": "assign_id_cb"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "age_sq"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "age"
+          },
+          {
+            "op": "signal",
+            "args": "age"
+          }
+        ]
+      },
+      "label": "assign_age_sq"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "age_term"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "age_sq"
+          },
+          {
+            "op": "const",
+            "args": "17"
+          }
+        ]
+      },
+      "label": "assign_age_term"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "salary_term"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "salary"
+          },
+          {
+            "op": "const",
+            "args": "31"
+          }
+        ]
+      },
+      "label": "assign_salary_term"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "hash_sum"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "id_cb"
+          },
+          {
+            "op": "signal",
+            "args": "age_term"
+          }
+        ]
+      },
+      "label": "assign_hash_sum"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "hash_total"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "hash_sum"
+          },
+          {
+            "op": "signal",
+            "args": "salary_term"
+          }
+        ]
+      },
+      "label": "assign_hash_total"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "final_hash"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "hash_total"
+          },
+          {
+            "op": "const",
+            "args": "42"
+          }
+        ]
+      },
+      "label": "assign_final_hash"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "age_diff",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "age"
+            },
+            {
+              "op": "signal",
+              "args": "age_threshold"
+            }
+          ]
+        }
+      },
+      {
+        "target": "salary_diff",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "salary"
+            },
+            {
+              "op": "signal",
+              "args": "salary_threshold"
+            }
+          ]
+        }
+      },
+      {
+        "target": "id_sq",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "identity_id"
+            },
+            {
+              "op": "signal",
+              "args": "identity_id"
+            }
+          ]
+        }
+      },
+      {
+        "target": "id_cb",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "id_sq"
+            },
+            {
+              "op": "signal",
+              "args": "identity_id"
+            }
+          ]
+        }
+      },
+      {
+        "target": "age_sq",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "age"
+            },
+            {
+              "op": "signal",
+              "args": "age"
+            }
+          ]
+        }
+      },
+      {
+        "target": "age_term",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "age_sq"
+            },
+            {
+              "op": "const",
+              "args": "17"
+            }
+          ]
+        }
+      },
+      {
+        "target": "salary_term",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "salary"
+            },
+            {
+              "op": "const",
+              "args": "31"
+            }
+          ]
+        }
+      },
+      {
+        "target": "hash_sum",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "id_cb"
+            },
+            {
+              "op": "signal",
+              "args": "age_term"
+            }
+          ]
+        }
+      },
+      {
+        "target": "hash_total",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "hash_sum"
+            },
+            {
+              "op": "signal",
+              "args": "salary_term"
+            }
+          ]
+        }
+      },
+      {
+        "target": "final_hash",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "hash_total"
+            },
+            {
+              "op": "const",
+              "args": "42"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

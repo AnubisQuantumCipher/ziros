@@ -1,0 +1,81 @@
+/* Global navigation bar */
+#arklib-global-nav {
+    background-color: rgba(15, 23, 42, 0.98);
+    /* Less transparent for readability */
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    color: #f8fafc;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    width: 100%;
+    z-index: 100000;
+    /* Higher than docs header */
+    height: 3rem;
+    /* Fixed height to calculate offsets */
+    position: fixed;
+    /* Fix at top */
+    top: 0;
+    left: 0;
+}
+
+#arklib-global-nav .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#arklib-global-nav .logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f8fafc;
+    text-decoration: none;
+    letter-spacing: -0.025em;
+    /* Optional: Hide ArkLib logo if it feels redundant with docs header, 
+       but keeping it consistent with landing page is usually better. 
+       Let's keep it but make it subtle. */
+}
+
+#arklib-global-nav .nav-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    transition: color 0.2s;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#arklib-global-nav .nav-links a:hover {
+    color: #818cf8;
+}
+
+/* Adjustments for the existing docs layout to account for the top bar */
+body {
+    padding-top: 3rem;
+    /* Push body content down by nav height */
+}
+
+/* Push the existing fixed header down */
+header {
+    top: 3rem !important;
+    /* Move docs header down */
+}
+
+/* Push the existing fixed nav (sidebar) down */
+nav.nav {
+    top: 3rem !important;
+    height: calc(100vh - var(--header-height) - 1em - 3rem) !important;
+}
+
+/* Push the autocomplete results down */
+#autocomplete_results {
+    top: calc(var(--header-height) + 3rem) !important;
+}
+
+/* Adjustments for mobile if needed */
+@media (max-width: 768px) {
+    #arklib-global-nav .nav-links {
+        display: none;
+    }
+}

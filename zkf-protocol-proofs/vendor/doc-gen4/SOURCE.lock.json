@@ -1,0 +1,16 @@
+{
+  "schema": "zkf-upstream-lock-v1",
+  "id": "doc-gen4",
+  "origin": "https://github.com/leanprover/doc-gen4",
+  "revision": "a41d5ebebfa77afe737fec8de8ad03fc8b08fdff",
+  "checked_on": "2026-03-23",
+  "license": "Apache-2.0",
+  "upstream_toolchain": "leanprover/lean4:v4.28.0",
+  "local_toolchain_target": "leanprover/lean4:v4.28.0",
+  "purpose": "Pinned local doc-tooling dependency referenced by the upstream ArkLib package.",
+  "focus_modules": [
+    "DocGen4.Load",
+    "DocGen4.Output",
+    "DocGen4.Process"
+  ]
+}

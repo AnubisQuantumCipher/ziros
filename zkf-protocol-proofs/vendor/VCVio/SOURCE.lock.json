@@ -1,0 +1,17 @@
+{
+  "schema": "zkf-upstream-lock-v1",
+  "id": "vcvio",
+  "origin": "https://github.com/Verified-zkEVM/VCV-io",
+  "revision": "d37e586bbe481ea3925eeb800d5b6fb1e8b829fe",
+  "checked_on": "2026-03-23",
+  "license": "Apache-2.0",
+  "upstream_toolchain": "leanprover/lean4:v4.28.0",
+  "local_toolchain_target": "leanprover/lean4:v4.28.0",
+  "purpose": "Pinned local dependency for ArkLib's crypto and oracle-reduction foundations.",
+  "focus_modules": [
+    "VCVio.CryptoFoundations",
+    "VCVio.EvalDist",
+    "VCVio.OracleComp",
+    "VCVio.ProgramLogic"
+  ]
+}

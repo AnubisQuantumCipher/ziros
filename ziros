@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+selected=""
+for candidate in \
+    "$ROOT_DIR/target-local/release/zkf-cli" \
+    "$ROOT_DIR/target/release/zkf-cli" \
+    "$ROOT_DIR/target-local/debug/zkf-cli" \
+    "$ROOT_DIR/target/debug/zkf-cli"
+do
+    if [[ -x "$candidate" ]]; then
+        if [[ -z "$selected" || "$candidate" -nt "$selected" ]]; then
+            selected="$candidate"
+        fi
+    fi
+done
+
+if [[ -n "$selected" ]]; then
+    exec -a ziros "$selected" "$@"
+fi
+
+exec env ZIROS_INVOKED_AS=1 cargo run -p zkf-cli -- "$@"

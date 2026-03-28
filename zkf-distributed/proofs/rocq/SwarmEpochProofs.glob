@@ -1,0 +1,132 @@
+DIGEST 72669aa4b1a181ea0435c5a32898f905
+FSwarmEpochProofs
+R15:26 KernelCompat <> <> lib
+R56:61 Stdlib.NArith.NArith <> <> lib
+R63:65 Stdlib.micromega.Lia <> <> lib
+R113:155 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> <> lib
+prf 165:174 <> u8_eq_refl
+binder 187:190 <> byte:1
+R212:214 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R197:201 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> u8_eq def
+R203:206 SwarmEpochProofs <> byte:1 var
+R208:211 SwarmEpochProofs <> byte:1 var
+R215:218 Corelib.Init.Datatypes <> true constr
+R255:259 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> u8_eq def
+R278:287 Core.Core_Base_Pos <> haxint_cmp def
+R302:307 Core.Core_Base_interface_Int <> U8_f_v proj
+R302:307 Core.Core_Base_interface_Int <> U8_f_v proj
+R370:381 Core.Core_Base_Binary <> positive_cmp def
+R370:381 Core.Core_Base_Binary <> positive_cmp def
+R433:452 Core.Core_Base_Seq <> positive_cmp_is_spec thm
+R433:452 Core.Core_Base_Seq <> positive_cmp_is_spec thm
+R534:549 Stdlib.PArith.BinPos Pos compare_refl thm
+R534:549 Stdlib.PArith.BinPos Pos compare_refl thm
+R534:549 Stdlib.PArith.BinPos Pos compare_refl thm
+R599:618 Core.Core_Base_Seq <> positive_cmp_is_spec thm
+R599:618 Core.Core_Base_Seq <> positive_cmp_is_spec thm
+R700:715 Stdlib.PArith.BinPos Pos compare_refl thm
+R700:715 Stdlib.PArith.BinPos Pos compare_refl thm
+R700:715 Stdlib.PArith.BinPos Pos compare_refl thm
+prf 759:772 <> array2_eq_refl
+binder 785:789 <> bytes:2
+R817:819 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R796:804 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array2_eq def
+R806:810 SwarmEpochProofs <> bytes:2 var
+R812:816 SwarmEpochProofs <> bytes:2 var
+R820:823 Corelib.Init.Datatypes <> true constr
+R865:873 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array2_eq def
+R895:904 SwarmEpochProofs <> u8_eq_refl thm
+R895:904 SwarmEpochProofs <> u8_eq_refl thm
+R895:904 SwarmEpochProofs <> u8_eq_refl thm
+R917:926 SwarmEpochProofs <> u8_eq_refl thm
+R917:926 SwarmEpochProofs <> u8_eq_refl thm
+R917:926 SwarmEpochProofs <> u8_eq_refl thm
+prf 958:1000 <> distributed_encrypted_gossip_fail_closed_ok
+binder 1013:1022 <> negotiated:3
+binder 1024:1040 <> plaintext_present:4
+binder 1042:1066 <> encrypted_payload_present:5
+R1191:1199 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1073:1117 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> encrypted_gossip_negotiation_fail_closed_spec def
+R1125:1134 SwarmEpochProofs <> negotiated:3 var
+R1142:1158 SwarmEpochProofs <> plaintext_present:4 var
+R1166:1190 SwarmEpochProofs <> encrypted_payload_present:5 var
+R1203:1212 SwarmEpochProofs <> negotiated:3 var
+R1259:1262 Corelib.Init.Datatypes <> andb def
+R1290:1293 Corelib.Init.Datatypes <> negb def
+R1295:1319 SwarmEpochProofs <> encrypted_payload_present:5 var
+R1265:1268 Corelib.Init.Datatypes <> negb def
+R1270:1286 SwarmEpochProofs <> plaintext_present:4 var
+R1225:1228 Corelib.Init.Datatypes <> negb def
+R1230:1246 SwarmEpochProofs <> plaintext_present:4 var
+prf 1521:1564 <> swarm_memory_append_only_prefix_preserved_ok
+binder 1577:1582 <> prefix:6
+binder 1584:1589 <> suffix:7
+R1663:1665 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1596:1608 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> chain_prefix4 def
+R1611:1647 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> append_only_memory_chain_after_append def
+R1649:1654 SwarmEpochProofs <> prefix:6 var
+R1656:1661 SwarmEpochProofs <> suffix:7 var
+R1666:1671 SwarmEpochProofs <> prefix:6 var
+prf 1806:1860 <> snapshot_chain_head_roundtrip_matches_array_equality_ok
+binder 1873:1885 <> exported_head:8
+binder 1887:1899 <> imported_head:9
+R1968:1976 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1906:1939 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> snapshot_chain_head_roundtrip_spec def
+R1941:1953 SwarmEpochProofs <> exported_head:8 var
+R1955:1967 SwarmEpochProofs <> imported_head:9 var
+R1977:1985 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array4_eq def
+R1987:1999 SwarmEpochProofs <> exported_head:8 var
+R2001:2013 SwarmEpochProofs <> imported_head:9 var
+prf 2090:2134 <> intelligence_root_canonical_pair_converges_ok
+binder 2147:2151 <> first:10
+binder 2153:2158 <> second:11
+R2237:2245 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2165:2223 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> intelligence_root_convergence_under_canonical_ordering_spec def
+R2225:2229 SwarmEpochProofs <> first:10 var
+R2231:2236 SwarmEpochProofs <> second:11 var
+R2246:2254 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array2_eq def
+R2265:2296 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> canonical_intelligence_leaf_pair def
+R2298:2302 SwarmEpochProofs <> first:10 var
+R2304:2309 SwarmEpochProofs <> second:11 var
+R2321:2352 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> canonical_intelligence_leaf_pair def
+R2354:2359 SwarmEpochProofs <> second:11 var
+R2361:2365 SwarmEpochProofs <> first:10 var
+prf 2428:2471 <> intelligence_root_canonical_ordering_spec_ok
+binder 2484:2488 <> first:12
+binder 2490:2495 <> second:13
+R2574:2582 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2502:2560 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> intelligence_root_convergence_under_canonical_ordering_spec def
+R2562:2566 SwarmEpochProofs <> first:12 var
+R2568:2573 SwarmEpochProofs <> second:13 var
+R2583:2591 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array2_eq def
+R2602:2633 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> canonical_intelligence_leaf_pair def
+R2635:2639 SwarmEpochProofs <> first:12 var
+R2641:2646 SwarmEpochProofs <> second:13 var
+R2658:2689 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> canonical_intelligence_leaf_pair def
+R2691:2696 SwarmEpochProofs <> second:13 var
+R2698:2702 SwarmEpochProofs <> first:12 var
+prf 2765:2814 <> snapshot_authenticated_roundtrip_helper_surface_ok
+R2820:2820 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R2925:2932 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R3085:3085 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 2828:2833 <> prefix:14
+binder 2835:2840 <> suffix:15
+R2916:2918 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2849:2861 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> chain_prefix4 def
+R2864:2900 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> append_only_memory_chain_after_append def
+R2902:2907 SwarmEpochProofs <> prefix:14 var
+R2909:2914 SwarmEpochProofs <> suffix:15 var
+R2919:2924 SwarmEpochProofs <> prefix:14 var
+binder 2940:2952 <> exported_head:16
+binder 2954:2966 <> imported_head:17
+R3037:3047 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2975:3008 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> snapshot_chain_head_roundtrip_spec def
+R3010:3022 SwarmEpochProofs <> exported_head:16 var
+R3024:3036 SwarmEpochProofs <> imported_head:17 var
+R3048:3056 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> array4_eq def
+R3058:3070 SwarmEpochProofs <> exported_head:16 var
+R3072:3084 SwarmEpochProofs <> imported_head:17 var
+R3114:3157 SwarmEpochProofs <> swarm_memory_append_only_prefix_preserved_ok thm
+R3114:3157 SwarmEpochProofs <> swarm_memory_append_only_prefix_preserved_ok thm
+R3170:3224 SwarmEpochProofs <> snapshot_chain_head_roundtrip_matches_array_equality_ok thm
+R3170:3224 SwarmEpochProofs <> snapshot_chain_head_roundtrip_matches_array_equality_ok thm

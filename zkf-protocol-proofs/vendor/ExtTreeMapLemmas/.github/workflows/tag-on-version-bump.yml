@@ -1,0 +1,43 @@
+name: Tag on Version Bump
+
+# When a PR is merged to master that updates the Lean/mathlib version
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'lakefile.lean'
+      - 'lean-toolchain'
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required to push tags
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history for tag operations
+
+      - name: Extract version from lean-toolchain
+        id: version
+        run: |
+          VERSION=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' lean-toolchain | head -1)
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "Tagging as $VERSION"
+
+      - name: Create and push tag
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          if [ -z "$TAG" ]; then
+            echo "Could not extract version from lean-toolchain"
+            exit 1
+          fi
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi

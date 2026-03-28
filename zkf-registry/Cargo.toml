@@ -1,0 +1,18 @@
+[package]
+name = "zkf-registry"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+zkf-core = { path = "../zkf-core" }
+zkf-gadgets = { path = "../zkf-gadgets" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+ed25519-dalek = { version = "2", optional = true }
+
+[features]
+default = []
+ed25519 = ["ed25519-dalek"]

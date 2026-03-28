@@ -1,0 +1,32 @@
+[package]
+name = "zkf-python"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Python bindings for ZirOS (formerly ZKF)"
+
+[lib]
+name = "zkf"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["metal-gpu"]
+metal-gpu = ["zkf-backends/metal-gpu"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core", features = ["full"] }
+zkf-backends = { path = "../zkf-backends", default-features = false, features = ["full"] }
+zkf-frontends = { path = "../zkf-frontends" }
+zkf-ir-spec = { path = "../zkf-ir-spec" }
+zkf-lib = { path = "../zkf-lib" }
+zkf-runtime = { path = "../zkf-runtime" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+pyo3 = { version = "0.23", features = ["abi3-py38"] }
+
+[build-dependencies]
+pyo3-build-config = "0.23"
+
+[lints]
+workspace = true

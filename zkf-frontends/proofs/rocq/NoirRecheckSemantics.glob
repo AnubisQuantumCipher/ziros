@@ -1,0 +1,38 @@
+DIGEST f75357e476a81a23a24aea60524e6e59
+FNoirRecheckSemantics
+R15:18 Stdlib.Bool.Bool <> <> lib
+ind 32:54 <> t_SpecNoirRecheckStatus
+constr 61:90 <> SpecNoirRecheckStatus_Accepted
+constr 94:123 <> SpecNoirRecheckStatus_Rejected
+scheme 32:54 <> t_SpecNoirRecheckStatus_rect
+scheme 32:54 <> t_SpecNoirRecheckStatus_ind
+scheme 32:54 <> t_SpecNoirRecheckStatus_rec
+scheme 32:54 <> t_SpecNoirRecheckStatus_sind
+rec 134:158 <> t_SpecNoirRecheckBoundary
+proj 167:196 <> f_translated_constraints_valid
+proj 208:229 <> f_acvm_witness_present
+R200:203 Corelib.Init.Datatypes <> bool ind
+R233:236 Corelib.Init.Datatypes <> bool ind
+def 254:286 <> noir_acir_recheck_wrapper_surface
+R302:326 NoirRecheckSemantics <> t_SpecNoirRecheckBoundary rec
+binder 291:298 <> boundary:6
+R331:353 NoirRecheckSemantics <> t_SpecNoirRecheckStatus ind
+R363:366 Corelib.Init.Datatypes <> andb def
+R420:441 NoirRecheckSemantics <> f_acvm_witness_present proj
+R410:417 NoirRecheckSemantics <> boundary:6 var
+R378:407 NoirRecheckSemantics <> f_translated_constraints_valid proj
+R368:375 NoirRecheckSemantics <> boundary:6 var
+R489:518 NoirRecheckSemantics <> SpecNoirRecheckStatus_Rejected constr
+R451:480 NoirRecheckSemantics <> SpecNoirRecheckStatus_Accepted constr
+def 533:555 <> NoirRecheckWrapperSound
+R571:595 NoirRecheckSemantics <> t_SpecNoirRecheckBoundary rec
+binder 560:567 <> boundary:7
+R658:663 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R651:653 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R620:649 NoirRecheckSemantics <> f_translated_constraints_valid proj
+R610:617 NoirRecheckSemantics <> boundary:7 var
+R654:657 Corelib.Init.Datatypes <> true constr
+R697:699 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R674:695 NoirRecheckSemantics <> f_acvm_witness_present proj
+R664:671 NoirRecheckSemantics <> boundary:7 var
+R700:703 Corelib.Init.Datatypes <> true constr

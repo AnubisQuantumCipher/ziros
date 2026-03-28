@@ -1,0 +1,83 @@
+{
+  "backend": "plonky3",
+  "program": {
+    "name": "verify_age",
+    "field": "goldilocks",
+    "signals": [
+      {
+        "name": "birth_year",
+        "visibility": "private"
+      },
+      {
+        "name": "current_year",
+        "visibility": "public"
+      },
+      {
+        "name": "threshold",
+        "visibility": "public"
+      },
+      {
+        "name": "age",
+        "visibility": "private"
+      }
+    ],
+    "constraints": [
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "age"
+        },
+        "rhs": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "current_year"
+            },
+            {
+              "op": "signal",
+              "args": "birth_year"
+            }
+          ]
+        },
+        "label": "assign_age"
+      },
+      {
+        "kind": "range",
+        "signal": "age",
+        "bits": 8,
+        "label": "range_age_8"
+      }
+    ],
+    "witness_plan": {
+      "assignments": [
+        {
+          "target": "age",
+          "expr": {
+            "op": "sub",
+            "args": [
+              {
+                "op": "signal",
+                "args": "current_year"
+              },
+              {
+                "op": "signal",
+                "args": "birth_year"
+              }
+            ]
+          }
+        }
+      ],
+      "hints": []
+    }
+  },
+  "program_digest": "d078a4f808035cff52d6d1caa287bc8c02cdabbbd960a8733e5bbc3da3065447",
+  "metadata": {
+    "field": "goldilocks",
+    "pcs": "fri",
+    "scheme": "stark",
+    "supported_constraints": "equal,boolean,range<=63,division",
+    "trace_width": "12"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "verify_age",
+  "field": "goldilocks",
+  "signals": [
+    {
+      "name": "birth_year",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "current_year",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "threshold",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "age",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "age"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "current_year"
+          },
+          {
+            "op": "signal",
+            "args": "birth_year"
+          }
+        ]
+      },
+      "label": "assign_age"
+    },
+    {
+      "kind": "range",
+      "signal": "age",
+      "bits": 8,
+      "label": "range_age_8"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "age",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "current_year"
+            },
+            {
+              "op": "signal",
+              "args": "birth_year"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

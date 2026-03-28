@@ -1,0 +1,2069 @@
+DIGEST d3439e5cc7b21a6c61562679ec2b030c
+FZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R388:401 ZkfCoreExtraction.Zkf_core_Field <> <> lib
+R442:474 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> <> lib
+R515:540 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> <> lib
+R558:569 KernelCompat <> <> lib
+rec 580:603 <> SpecWitnessSignal_record
+proj 623:656 <> SpecWitnessSignal_f_constant_value
+proj 695:722 <> SpecWitnessSignal_f_required
+R660:667 Core.Core_Option <> t_Option ind
+R671:686 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R726:729 Corelib.Init.Datatypes <> bool ind
+inst 759:791 <> settable_SpecWitnessSignal_record
+R795:802 RecordUpdate.RecordSet <> Settable class
+R811:821 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R852:854 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R889:890 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R919:919 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R891:918 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_f_required proj
+R855:888 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_f_constant_value proj
+R822:851 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessSignal_record constr
+R822:851 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessSignal_record constr
+R959:982 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_record rec
+not 931:931 <> :::'t_SpecWitnessSignal'
+rec 994:1021 <> SpecWitnessAssignment_record
+proj 1041:1083 <> SpecWitnessAssignment_f_target_signal_index
+proj 1100:1127 <> SpecWitnessAssignment_f_expr
+R1087:1093 Core.Core_Primitive <> :::'t_usize' not
+R1131:1146 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+inst 1176:1212 <> settable_SpecWitnessAssignment_record
+R1216:1223 RecordUpdate.RecordSet <> Settable class
+R1232:1242 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1277:1279 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1323:1324 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1353:1353 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1325:1352 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessAssignment_f_expr proj
+R1280:1322 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessAssignment_f_target_signal_index proj
+R1243:1276 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessAssignment_record constr
+R1243:1276 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessAssignment_record constr
+R1397:1424 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessAssignment_record rec
+not 1365:1365 <> :::'t_SpecWitnessAssignment'
+rec 1436:1457 <> SpecWitnessHint_record
+proj 1477:1513 <> SpecWitnessHint_f_target_signal_index
+proj 1530:1566 <> SpecWitnessHint_f_source_signal_index
+R1517:1523 Core.Core_Primitive <> :::'t_usize' not
+R1570:1576 Core.Core_Primitive <> :::'t_usize' not
+inst 1606:1636 <> settable_SpecWitnessHint_record
+R1640:1647 RecordUpdate.RecordSet <> Settable class
+R1656:1666 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1695:1697 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1735:1736 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1774:1774 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1737:1773 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessHint_f_source_signal_index proj
+R1698:1734 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessHint_f_target_signal_index proj
+R1667:1694 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessHint_record constr
+R1667:1694 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessHint_record constr
+R1812:1833 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessHint_record rec
+not 1786:1786 <> :::'t_SpecWitnessHint'
+rec 1845:1879 <> SpecWitnessGenerationProgram_record
+proj 1899:1943 <> SpecWitnessGenerationProgram_f_kernel_program
+proj 1972:2009 <> SpecWitnessGenerationProgram_f_signals
+proj 2061:2102 <> SpecWitnessGenerationProgram_f_assignments
+proj 2158:2193 <> SpecWitnessGenerationProgram_f_hints
+R1947:1965 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelProgram' not
+R2013:2017 KernelCompat <> t_Vec def
+R2021:2039 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessSignal' not
+R2045:2052 KernelCompat <> t_Global constr
+R2106:2110 KernelCompat <> t_Vec def
+R2114:2136 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessAssignment' not
+R2142:2149 KernelCompat <> t_Global constr
+R2197:2201 KernelCompat <> t_Vec def
+R2205:2221 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessHint' not
+R2227:2234 KernelCompat <> t_Global constr
+inst 2268:2311 <> settable_SpecWitnessGenerationProgram_record
+R2315:2322 RecordUpdate.RecordSet <> Settable class
+R2331:2341 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2383:2385 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2431:2432 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2471:2472 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2515:2516 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2553:2553 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2517:2552 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_hints proj
+R2473:2514 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_assignments proj
+R2433:2470 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_signals proj
+R2386:2430 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_kernel_program proj
+R2342:2382 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationProgram_record constr
+R2342:2382 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationProgram_record constr
+R2604:2638 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_record rec
+not 2565:2565 <> :::'t_SpecWitnessGenerationProgram'
+R2676:2720 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_kernel_program proj
+not 2651:2651 <> :::'f_kernel_program'
+R2751:2788 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_signals proj
+not 2733:2733 <> :::'f_signals'
+R2823:2864 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_assignments proj
+not 2801:2801 <> :::'f_assignments'
+R2893:2928 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_hints proj
+not 2877:2877 <> :::'f_hints'
+rec 2940:2994 <> SpecWitnessGenerationError_MissingRequiredSignal_record
+proj 3014:3076 <> SpecWitnessGenerationError_MissingRequiredSignal_f_signal_index
+R3080:3086 Core.Core_Primitive <> :::'t_usize' not
+inst 3115:3178 <> settable_SpecWitnessGenerationError_MissingRequiredSignal_record
+R3182:3189 RecordUpdate.RecordSet <> Settable class
+R3198:3208 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3270:3272 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3336:3336 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3273:3335 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_MissingRequiredSignal_f_signal_index proj
+R3209:3269 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_MissingRequiredSignal_record constr
+R3209:3269 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_MissingRequiredSignal_record constr
+rec 3346:3402 <> SpecWitnessGenerationError_UnsupportedWitnessSolve_record
+proj 3422:3499 <> SpecWitnessGenerationError_UnsupportedWitnessSolve_f_unresolved_signal_indices
+R3503:3507 KernelCompat <> t_Vec def
+R3511:3517 Core.Core_Primitive <> :::'t_usize' not
+R3523:3530 KernelCompat <> t_Global constr
+inst 3561:3626 <> settable_SpecWitnessGenerationError_UnsupportedWitnessSolve_record
+R3630:3637 RecordUpdate.RecordSet <> Settable class
+R3646:3656 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3720:3722 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3801:3801 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3723:3800 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_UnsupportedWitnessSolve_f_unresolved_signal_indices proj
+R3657:3719 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_UnsupportedWitnessSolve_record constr
+R3657:3719 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_UnsupportedWitnessSolve_record constr
+rec 3811:3859 <> SpecWitnessGenerationError_AmbiguousLookup_record
+proj 3879:3939 <> SpecWitnessGenerationError_AmbiguousLookup_f_constraint_index
+proj 3956:4011 <> SpecWitnessGenerationError_AmbiguousLookup_f_table_index
+R3943:3949 Core.Core_Primitive <> :::'t_usize' not
+R4015:4021 Core.Core_Primitive <> :::'t_usize' not
+inst 4051:4108 <> settable_SpecWitnessGenerationError_AmbiguousLookup_record
+R4112:4119 RecordUpdate.RecordSet <> Settable class
+R4128:4138 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4194:4196 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4258:4259 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4316:4316 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4260:4315 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_AmbiguousLookup_f_table_index proj
+R4197:4257 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_AmbiguousLookup_f_constraint_index proj
+R4139:4193 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_AmbiguousLookup_record constr
+R4139:4193 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_AmbiguousLookup_record constr
+ind 4329:4356 <> t_SpecWitnessGenerationError
+constr 4370:4417 <> SpecWitnessGenerationError_MissingRequiredSignal
+constr 4485:4534 <> SpecWitnessGenerationError_UnsupportedWitnessSolve
+constr 4604:4641 <> SpecWitnessGenerationError_KernelCheck
+constr 4675:4716 <> SpecWitnessGenerationError_AmbiguousLookup
+R4476:4480 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4421:4475 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_MissingRequiredSignal_record rec
+R4595:4599 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4538:4594 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_UnsupportedWitnessSolve_record rec
+R4667:4670 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4645:4666 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelCheckError' not
+R4769:4773 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4720:4768 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_AmbiguousLookup_record rec
+scheme 4329:4356 <> t_SpecWitnessGenerationError_rect
+scheme 4329:4356 <> t_SpecWitnessGenerationError_ind
+scheme 4329:4356 <> t_SpecWitnessGenerationError_rec
+scheme 4329:4356 <> t_SpecWitnessGenerationError_sind
+def 4793:4802 <> wg_u32_one
+R4806:4810 Core.Core_Primitive <> :::'t_u32' not
+R4817:4827 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R4830:4840 Core.Core_Base_interface_Int <> Build_t_U32 constr
+def 4860:4872 <> wg_zero_value
+R4876:4891 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R4898:4935 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> zero def
+R4937:4938 Corelib.Init.Datatypes <> tt constr
+def 4953:4970 <> wg_normalize_value
+R4983:4998 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 4975:4979 <> value:24
+R5012:5020 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5004:5008 <> field:25
+R5025:5040 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5047:5089 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalize def
+R5091:5095 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:24 var
+R5097:5101 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:25 var
+def 5116:5127 <> wg_field_add
+R5142:5157 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 5132:5134 <> lhs:26
+binder 5136:5138 <> rhs:27
+R5171:5179 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5163:5167 <> field:28
+R5184:5199 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5206:5248 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Add_f_add def
+R5250:5252 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:26 var
+R5254:5256 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:27 var
+R5258:5262 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:28 var
+def 5277:5288 <> wg_field_sub
+R5303:5318 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 5293:5295 <> lhs:29
+binder 5297:5299 <> rhs:30
+R5332:5340 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5324:5328 <> field:31
+R5345:5360 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5367:5409 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Sub_f_sub def
+R5411:5413 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:29 var
+R5415:5417 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:30 var
+R5419:5423 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:31 var
+def 5438:5449 <> wg_field_mul
+R5464:5479 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 5454:5456 <> lhs:32
+binder 5458:5460 <> rhs:33
+R5493:5501 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5485:5489 <> field:34
+R5506:5521 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5528:5570 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Mul_f_mul def
+R5572:5574 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:32 var
+R5576:5578 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:33 var
+R5580:5584 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:34 var
+def 5599:5610 <> wg_field_div
+R5625:5640 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 5615:5617 <> lhs:35
+binder 5619:5621 <> rhs:36
+R5654:5662 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5646:5650 <> field:37
+R5667:5674 Core.Core_Option <> t_Option ind
+R5678:5693 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5702:5744 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Div_f_div def
+R5746:5748 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:35 var
+R5750:5752 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:36 var
+R5754:5758 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:37 var
+def 5773:5783 <> wg_field_eq
+R5798:5813 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 5788:5790 <> lhs:38
+binder 5792:5794 <> rhs:39
+R5827:5835 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5819:5823 <> field:40
+R5840:5843 Corelib.Init.Datatypes <> bool ind
+R5850:5897 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> PartialEq_f_eq def
+R5899:5901 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:38 var
+R5903:5905 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:39 var
+R5907:5911 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:40 var
+def 5926:5945 <> wg_witness_of_values
+R5959:5963 KernelCompat <> t_Vec def
+R5966:5973 Core.Core_Option <> t_Option ind
+R5977:5992 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R5998:6005 KernelCompat <> t_Global constr
+binder 5950:5955 <> values:41
+R6011:6029 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+R6036:6065 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelWitness_record constr
+R6067:6072 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:41 var
+def 6085:6105 <> wg_seed_signal_values
+R6120:6124 KernelCompat <> t_Vec def
+R6128:6146 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessSignal' not
+R6151:6158 KernelCompat <> t_Global constr
+binder 6110:6116 <> signals:42
+R6166:6170 KernelCompat <> t_Vec def
+R6173:6180 Core.Core_Option <> t_Option ind
+R6184:6199 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R6205:6212 KernelCompat <> t_Global constr
+R6226:6232 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signals:42 var
+R6243:6244 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6253:6254 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6266:6269 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6336:6339 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6295:6328 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_f_constant_value proj
+R6340:6360 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_seed_signal_values:43 def
+def 6397:6411 <> wg_apply_inputs
+R6425:6429 KernelCompat <> t_Vec def
+R6432:6439 Core.Core_Option <> t_Option ind
+R6443:6458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R6464:6471 KernelCompat <> t_Global constr
+binder 6416:6421 <> values:45
+R6487:6491 KernelCompat <> t_Vec def
+R6494:6501 Core.Core_Option <> t_Option ind
+R6505:6520 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R6526:6533 KernelCompat <> t_Global constr
+binder 6478:6483 <> inputs:46
+R6541:6545 KernelCompat <> t_Vec def
+R6548:6555 Core.Core_Option <> t_Option ind
+R6559:6574 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R6580:6587 KernelCompat <> t_Global constr
+R6609:6614 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> inputs:46 var
+R6601:6606 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:45 var
+R6625:6626 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6638:6639 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6658:6661 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6680:6681 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6703:6706 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6741:6744 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6774:6777 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6831:6841 Core.Core_Option <> Option_Some constr
+R6875:6878 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6858:6868 Core.Core_Option <> Option_Some constr
+R6879:6893 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_inputs:47 def
+R6935:6945 Core.Core_Option <> Option_None constr
+R6969:6972 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6973:6987 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_inputs:47 def
+def 7050:7060 <> wg_value_at
+R7074:7078 KernelCompat <> t_Vec def
+R7081:7088 Core.Core_Option <> t_Option ind
+R7092:7107 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R7113:7120 KernelCompat <> t_Global constr
+binder 7065:7070 <> values:51
+R7142:7148 Core.Core_Primitive <> :::'t_usize' not
+binder 7127:7138 <> signal_index:52
+R7153:7160 Core.Core_Option <> t_Option ind
+R7164:7179 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R7194:7202 Stdlib.Lists.List <> nth_error def
+R7212:7223 KernelCompat <> usize_to_nat def
+R7225:7236 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:52 var
+R7204:7209 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:51 var
+R7248:7251 Corelib.Init.Datatypes <> Some constr
+R7276:7279 Corelib.Init.Datatypes <> None constr
+R7288:7298 Core.Core_Option <> Option_None constr
+def 7319:7330 <> wg_has_value
+R7344:7348 KernelCompat <> t_Vec def
+R7351:7358 Core.Core_Option <> t_Option ind
+R7362:7377 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R7383:7390 KernelCompat <> t_Global constr
+binder 7335:7340 <> values:53
+R7412:7418 Core.Core_Primitive <> :::'t_usize' not
+binder 7397:7408 <> signal_index:54
+R7423:7426 Corelib.Init.Datatypes <> bool ind
+R7439:7449 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_value_at def
+R7451:7456 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:53 var
+R7458:7469 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:54 var
+R7480:7490 Core.Core_Option <> Option_Some constr
+R7501:7504 Corelib.Init.Datatypes <> true constr
+R7510:7520 Core.Core_Option <> Option_None constr
+R7529:7533 Corelib.Init.Datatypes <> false constr
+def 7552:7574 <> wg_update_values_at_nat
+R7588:7592 KernelCompat <> t_Vec def
+R7595:7602 Core.Core_Option <> t_Option ind
+R7606:7621 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R7627:7634 KernelCompat <> t_Global constr
+binder 7579:7584 <> values:55
+R7649:7651 Corelib.Init.Datatypes <> nat ind
+binder 7641:7645 <> index:56
+R7665:7680 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 7657:7661 <> value:57
+R7687:7691 KernelCompat <> t_Vec def
+R7694:7701 Core.Core_Option <> t_Option ind
+R7705:7720 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R7726:7733 KernelCompat <> t_Global constr
+R7755:7759 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> index:56 var
+R7747:7752 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:55 var
+R7770:7771 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7783:7784 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7791:7794 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7813:7813 Corelib.Init.Datatypes <> O constr
+R7839:7842 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7822:7832 Core.Core_Option <> Option_Some constr
+R7834:7838 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:57 var
+R7877:7880 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7899:7899 Corelib.Init.Datatypes <> S constr
+R7937:7940 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7941:7963 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_update_values_at_nat:58 def
+R7998:8002 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:57 var
+def 8023:8034 <> wg_set_value
+R8048:8052 KernelCompat <> t_Vec def
+R8055:8062 Core.Core_Option <> t_Option ind
+R8066:8081 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R8087:8094 KernelCompat <> t_Global constr
+binder 8039:8044 <> values:61
+R8116:8122 Core.Core_Primitive <> :::'t_usize' not
+binder 8101:8112 <> signal_index:62
+R8136:8151 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 8128:8132 <> value:63
+R8158:8162 KernelCompat <> t_Vec def
+R8165:8172 Core.Core_Option <> t_Option ind
+R8176:8191 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R8197:8204 KernelCompat <> t_Global constr
+R8212:8234 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_update_values_at_nat def
+R8236:8241 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:61 var
+R8244:8255 KernelCompat <> usize_to_nat def
+R8257:8268 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:62 var
+R8271:8275 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:63 var
+def 8288:8315 <> wg_all_output_values_present
+R8329:8333 KernelCompat <> t_Vec def
+R8336:8343 Core.Core_Option <> t_Option ind
+R8347:8362 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R8368:8375 KernelCompat <> t_Global constr
+binder 8320:8325 <> values:64
+R8399:8403 KernelCompat <> t_Vec def
+R8407:8413 Core.Core_Primitive <> :::'t_usize' not
+R8418:8425 KernelCompat <> t_Global constr
+binder 8382:8395 <> signal_indices:65
+R8431:8434 Corelib.Init.Datatypes <> bool ind
+R8447:8460 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:65 var
+R8471:8472 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8481:8484 Corelib.Init.Datatypes <> true constr
+R8502:8505 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R8538:8541 Corelib.Init.Datatypes <> andb def
+R8591:8618 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_all_output_values_present:66 def
+R8620:8625 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:64 var
+R8550:8561 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R8563:8568 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:64 var
+def 8670:8681 <> wg_usize_mem
+R8701:8707 Core.Core_Primitive <> :::'t_usize' not
+binder 8686:8697 <> signal_index:68
+R8730:8734 KernelCompat <> t_Vec def
+R8738:8744 Core.Core_Primitive <> :::'t_usize' not
+R8749:8756 KernelCompat <> t_Global constr
+binder 8713:8726 <> signal_indices:69
+R8762:8765 Corelib.Init.Datatypes <> bool ind
+R8778:8791 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:69 var
+R8802:8803 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8812:8816 Corelib.Init.Datatypes <> false constr
+R8836:8839 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R8875:8878 KernelCompat <> f_eq def
+R8895:8906 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:68 var
+R8939:8950 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_usize_mem:70 def
+R8952:8963 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:68 var
+R8919:8922 Corelib.Init.Datatypes <> true constr
+def 9009:9028 <> wg_push_unique_usize
+R9048:9054 Core.Core_Primitive <> :::'t_usize' not
+binder 9033:9044 <> signal_index:72
+R9077:9081 KernelCompat <> t_Vec def
+R9085:9091 Core.Core_Primitive <> :::'t_usize' not
+R9096:9103 KernelCompat <> t_Global constr
+binder 9060:9073 <> signal_indices:73
+R9111:9115 KernelCompat <> t_Vec def
+R9119:9125 Core.Core_Primitive <> :::'t_usize' not
+R9130:9137 KernelCompat <> t_Global constr
+R9148:9159 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_usize_mem def
+R9161:9172 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:72 var
+R9174:9187 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:73 var
+R9238:9241 Corelib.Init.Datatypes <> ::list_scope:x_'++'_x not
+R9224:9237 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:73 var
+R9242:9242 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R9255:9255 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R9243:9254 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:72 var
+R9198:9211 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:73 var
+def 9268:9298 <> wg_collect_missing_signals_expr
+R9310:9325 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 9303:9306 <> expr:74
+R9340:9344 KernelCompat <> t_Vec def
+R9347:9354 Core.Core_Option <> t_Option ind
+R9358:9373 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R9379:9386 KernelCompat <> t_Global constr
+binder 9331:9336 <> values:75
+R9399:9403 KernelCompat <> t_Vec def
+R9407:9413 Core.Core_Primitive <> :::'t_usize' not
+R9418:9425 KernelCompat <> t_Global constr
+binder 9393:9395 <> acc:76
+R9433:9437 KernelCompat <> t_Vec def
+R9441:9447 Core.Core_Primitive <> :::'t_usize' not
+R9452:9459 KernelCompat <> t_Global constr
+R9473:9476 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:74 var
+R9487:9508 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Const' not
+R9517:9519 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R9525:9558 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Signal' not
+R9570:9581 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R9583:9588 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+R9633:9652 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_push_unique_usize def
+R9667:9669 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R9614:9616 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R9675:9700 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Add' not
+R9720:9750 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R9763:9765 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R9756:9761 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+binder 9713:9715 <> acc:79
+R9774:9804 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R9817:9819 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:79 var
+R9810:9815 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+R9825:9850 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Sub' not
+R9870:9900 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R9913:9915 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R9906:9911 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+binder 9863:9865 <> acc:80
+R9924:9954 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R9967:9969 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:80 var
+R9960:9965 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+R9975:10000 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Mul' not
+R10020:10050 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R10063:10065 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R10056:10061 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+binder 10013:10015 <> acc:81
+R10074:10104 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R10117:10119 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:81 var
+R10110:10115 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+R10125:10150 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Div' not
+R10170:10200 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R10213:10215 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:76 var
+R10206:10211 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+binder 10163:10165 <> acc:82
+R10224:10254 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr:77 def
+R10267:10269 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> acc:82 var
+R10260:10265 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:75 var
+def 10288:10300 <> wg_eval_exprs
+R10313:10317 KernelCompat <> t_Vec def
+R10321:10336 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+R10341:10348 KernelCompat <> t_Global constr
+binder 10305:10309 <> exprs:83
+R10365:10383 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 10355:10361 <> witness:84
+R10397:10405 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 10389:10393 <> field:85
+R10412:10419 KernelCompat <> t_Result ind
+R10423:10427 KernelCompat <> t_Vec def
+R10431:10446 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R10451:10458 KernelCompat <> t_Global constr
+R10465:10486 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelCheckError' not
+R10501:10505 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> exprs:83 var
+R10516:10517 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R10526:10534 KernelCompat <> Result_Ok constr
+R10536:10537 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R10547:10550 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10580:10607 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'eval_expr' not
+R10595:10601 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> witness:84 var
+R10603:10607 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:85 var
+R10620:10628 KernelCompat <> Result_Ok constr
+R10651:10663 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_eval_exprs:86 def
+R10689:10693 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:85 var
+R10681:10687 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> witness:84 var
+R10708:10716 KernelCompat <> Result_Ok constr
+R10746:10754 KernelCompat <> Result_Ok constr
+R10762:10765 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10792:10801 KernelCompat <> Result_Err constr
+R10820:10829 KernelCompat <> Result_Err constr
+R10853:10862 KernelCompat <> Result_Err constr
+R10879:10888 KernelCompat <> Result_Err constr
+def 10923:10938 <> wg_is_zero_value
+R10949:10964 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 10941:10945 <> value:88
+R10976:10984 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 10968:10972 <> field:89
+R10989:10992 Corelib.Init.Datatypes <> bool ind
+R10999:11009 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_eq def
+R11011:11015 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:88 var
+R11017:11029 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R11031:11035 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:89 var
+def 11048:11069 <> wg_extract_affine_form
+R11081:11096 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 11074:11077 <> expr:90
+R11111:11117 Core.Core_Primitive <> :::'t_usize' not
+binder 11102:11107 <> target:91
+R11132:11136 KernelCompat <> t_Vec def
+R11139:11146 Core.Core_Option <> t_Option ind
+R11150:11165 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R11171:11178 KernelCompat <> t_Global constr
+binder 11123:11128 <> values:92
+R11193:11201 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 11185:11189 <> field:93
+R11208:11215 Core.Core_Option <> t_Option ind
+R11235:11237 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R11219:11234 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R11238:11253 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R11268:11271 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:90 var
+R11282:11307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Const' not
+R11316:11326 Core.Core_Option <> Option_Some constr
+R11328:11328 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11342:11343 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11374:11374 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11329:11341 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R11344:11361 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R11369:11373 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R11380:11413 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Signal' not
+R11425:11428 KernelCompat <> f_eq def
+R11443:11448 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R11537:11547 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_value_at def
+R11549:11554 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R11582:11592 Core.Core_Option <> Option_Some constr
+R11611:11621 Core.Core_Option <> Option_Some constr
+R11623:11623 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11637:11638 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11669:11669 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11624:11636 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R11639:11656 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R11664:11668 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R11679:11689 Core.Core_Option <> Option_None constr
+R11702:11712 Core.Core_Option <> Option_None constr
+R11461:11471 Core.Core_Option <> Option_Some constr
+R11473:11473 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11499:11500 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11514:11514 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11474:11494 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R11501:11513 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R11728:11753 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Add' not
+R11826:11847 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R11867:11871 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R11860:11865 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R11853:11858 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R11768:11789 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R11809:11813 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R11802:11807 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R11795:11800 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R11884:11894 Core.Core_Option <> Option_Some constr
+R11896:11896 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11906:11907 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11917:11917 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11920:11930 Core.Core_Option <> Option_Some constr
+R11932:11932 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11942:11943 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11953:11953 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11964:11974 Core.Core_Option <> Option_Some constr
+R11984:11985 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12024:12035 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12074:12075 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R11986:11997 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_add def
+R12019:12023 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12036:12047 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_add def
+R12069:12073 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12097:12107 Core.Core_Option <> Option_None constr
+R12121:12146 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Sub' not
+R12219:12240 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R12260:12264 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12253:12258 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R12246:12251 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R12161:12182 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R12202:12206 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12195:12200 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R12188:12193 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R12277:12287 Core.Core_Option <> Option_Some constr
+R12289:12289 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12299:12300 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12310:12310 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12313:12323 Core.Core_Option <> Option_Some constr
+R12325:12325 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12335:12336 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12346:12346 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12357:12367 Core.Core_Option <> Option_Some constr
+R12377:12378 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12417:12428 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12467:12468 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12379:12390 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R12412:12416 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12429:12440 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R12462:12466 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12490:12500 Core.Core_Option <> Option_None constr
+R12514:12539 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Mul' not
+R12612:12633 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R12653:12657 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12646:12651 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R12639:12644 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R12554:12575 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R12595:12599 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12588:12593 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R12581:12586 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R12670:12680 Core.Core_Option <> Option_Some constr
+R12682:12682 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12692:12693 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12703:12703 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12706:12716 Core.Core_Option <> Option_Some constr
+R12718:12718 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12728:12729 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12739:12739 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12775:12790 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_is_zero_value def
+R12802:12806 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+binder 12754:12770 <> lhs_coeff_is_zero:96
+R12842:12857 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_is_zero_value def
+R12869:12873 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+binder 12821:12837 <> rhs_coeff_is_zero:97
+R12887:12903 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs_coeff_is_zero:96 var
+R13208:13224 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs_coeff_is_zero:97 var
+R13375:13385 Core.Core_Option <> Option_None constr
+R13239:13249 Core.Core_Option <> Option_Some constr
+R13261:13262 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13301:13314 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13353:13354 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13263:13274 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R13296:13300 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13315:13326 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R13348:13352 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12921:12937 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs_coeff_is_zero:97 var
+R13073:13083 Core.Core_Option <> Option_Some constr
+R13097:13098 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13137:13152 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13191:13192 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13099:13110 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R13132:13136 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13153:13164 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R13186:13190 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R12954:12964 Core.Core_Option <> Option_Some constr
+R12978:12979 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12993:13008 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13047:13048 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12980:12992 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R13009:13020 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R13042:13046 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13407:13417 Core.Core_Option <> Option_None constr
+R13431:13456 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Div' not
+R13529:13550 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R13570:13574 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13563:13568 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R13556:13561 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R13471:13492 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form:94 def
+R13512:13516 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13505:13510 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:92 var
+R13498:13503 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:91 var
+R13587:13597 Core.Core_Option <> Option_Some constr
+R13599:13599 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13609:13610 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13620:13620 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13623:13633 Core.Core_Option <> Option_Some constr
+R13635:13635 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13645:13646 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13656:13656 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13670:13685 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_is_zero_value def
+R13697:13701 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13984:13994 Core.Core_Option <> Option_None constr
+R13776:13787 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_div def
+R13809:13813 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13722:13733 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_div def
+R13755:13759 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:93 var
+R13830:13840 Core.Core_Option <> Option_Some constr
+R13849:13859 Core.Core_Option <> Option_Some constr
+R13883:13893 Core.Core_Option <> Option_Some constr
+R13895:13895 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13901:13902 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13911:13911 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13941:13951 Core.Core_Option <> Option_None constr
+R14016:14026 Core.Core_Option <> Option_None constr
+def 14055:14086 <> wg_solve_single_missing_equality
+R14097:14112 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 14091:14093 <> lhs:98
+R14124:14139 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 14118:14120 <> rhs:99
+R14154:14158 KernelCompat <> t_Vec def
+R14161:14168 Core.Core_Option <> t_Option ind
+R14172:14187 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R14193:14200 KernelCompat <> t_Global constr
+binder 14145:14150 <> values:100
+R14215:14223 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 14207:14211 <> field:101
+R14230:14237 Core.Core_Option <> t_Option ind
+R14248:14250 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R14241:14247 Core.Core_Primitive <> :::'t_usize' not
+R14251:14266 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R14294:14324 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr def
+R14332:14334 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:99 var
+R14342:14347 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:100 var
+R14356:14386 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_missing_signals_expr def
+R14388:14390 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:98 var
+R14392:14397 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:100 var
+R14399:14400 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+binder 14279:14285 <> missing:102
+R14414:14420 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> missing:102 var
+R14431:14431 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R14444:14444 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R14523:14544 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form def
+R14546:14548 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:99 var
+R14563:14568 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:100 var
+R14570:14574 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+R14459:14480 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_affine_form def
+R14482:14484 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:98 var
+R14499:14504 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:100 var
+R14506:14510 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+R14587:14597 Core.Core_Option <> Option_Some constr
+R14599:14599 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14609:14610 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14620:14620 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14623:14633 Core.Core_Option <> Option_Some constr
+R14635:14635 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14645:14646 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14656:14656 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14680:14691 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R14713:14717 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+binder 14671:14675 <> coeff:104
+R14731:14746 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_is_zero_value def
+R14748:14752 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> coeff:104 var
+R14754:14758 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+R14820:14831 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R14853:14857 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+binder 14808:14815 <> constant:105
+R14890:14901 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R14903:14915 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R14917:14924 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constant:105 var
+R14926:14930 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+binder 14874:14885 <> neg_constant:106
+R14949:14960 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_div def
+R14962:14973 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> neg_constant:106 var
+R14975:14979 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> coeff:104 var
+R14981:14985 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:101 var
+R15002:15012 Core.Core_Option <> Option_Some constr
+R15033:15043 Core.Core_Option <> Option_Some constr
+R15045:15045 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15058:15059 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15065:15065 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15077:15087 Core.Core_Option <> Option_None constr
+R15102:15112 Core.Core_Option <> Option_None constr
+R14773:14783 Core.Core_Option <> Option_None constr
+R15146:15156 Core.Core_Option <> Option_None constr
+R15179:15189 Core.Core_Option <> Option_None constr
+def 15210:15232 <> wg_extract_known_scalar
+R15244:15259 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 15237:15240 <> expr:107
+R15274:15278 KernelCompat <> t_Vec def
+R15281:15288 Core.Core_Option <> t_Option ind
+R15292:15307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R15313:15320 KernelCompat <> t_Global constr
+binder 15265:15270 <> values:108
+R15335:15343 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 15327:15331 <> field:109
+R15348:15355 Core.Core_Option <> t_Option ind
+R15359:15374 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R15389:15392 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:107 var
+R15403:15428 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Const' not
+R15437:15447 Core.Core_Option <> Option_Some constr
+R15450:15467 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R15475:15479 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:109 var
+R15486:15519 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Signal' not
+R15534:15544 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_value_at def
+R15546:15551 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:108 var
+R15577:15587 Core.Core_Option <> Option_Some constr
+R15604:15614 Core.Core_Option <> Option_Some constr
+R15617:15634 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R15642:15646 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:109 var
+R15655:15665 Core.Core_Option <> Option_None constr
+R15676:15686 Core.Core_Option <> Option_None constr
+R15709:15719 Core.Core_Option <> Option_None constr
+def 15738:15759 <> wg_scale_missing_terms
+R15773:15788 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 15764:15769 <> factor:111
+R15802:15806 KernelCompat <> t_Vec def
+R15817:15819 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R15810:15816 Core.Core_Primitive <> :::'t_usize' not
+R15820:15835 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R15840:15847 KernelCompat <> t_Global constr
+binder 15794:15798 <> terms:112
+R15862:15870 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 15854:15858 <> field:113
+R15877:15881 KernelCompat <> t_Vec def
+R15892:15894 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R15885:15891 Core.Core_Primitive <> :::'t_usize' not
+R15895:15910 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R15915:15922 KernelCompat <> t_Global constr
+R15936:15940 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> terms:112 var
+R15951:15952 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R15961:15962 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R15989:15992 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R15968:15968 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15981:15982 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15988:15988 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16063:16072 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16016:16016 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16029:16030 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16062:16062 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16031:16042 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R16050:16055 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> factor:111 var
+R16057:16061 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:113 var
+R16073:16094 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_scale_missing_terms:114 def
+R16119:16123 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:113 var
+R16096:16101 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> factor:111 var
+def 16142:16164 <> wg_negate_missing_terms
+R16177:16181 KernelCompat <> t_Vec def
+R16192:16194 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R16185:16191 Core.Core_Primitive <> :::'t_usize' not
+R16195:16210 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R16215:16222 KernelCompat <> t_Global constr
+binder 16169:16173 <> terms:116
+R16237:16245 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 16229:16233 <> field:117
+R16252:16256 KernelCompat <> t_Vec def
+R16267:16269 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R16260:16266 Core.Core_Primitive <> :::'t_usize' not
+R16270:16285 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R16290:16297 KernelCompat <> t_Global constr
+R16311:16315 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> terms:116 var
+R16326:16327 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R16336:16337 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R16364:16367 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16343:16343 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16356:16357 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16363:16363 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16445:16454 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16391:16391 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16404:16405 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16444:16444 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16406:16417 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R16419:16431 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R16439:16443 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:117 var
+R16455:16477 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_negate_missing_terms:118 def
+R16495:16499 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:117 var
+def 16518:16548 <> wg_extract_scaled_missing_terms
+R16560:16575 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 16553:16556 <> expr:120
+R16590:16594 KernelCompat <> t_Vec def
+R16597:16604 Core.Core_Option <> t_Option ind
+R16608:16623 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R16629:16636 KernelCompat <> t_Global constr
+binder 16581:16586 <> values:121
+R16651:16659 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 16643:16647 <> field:122
+R16666:16673 Core.Core_Option <> t_Option ind
+R16697:16699 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R16681:16696 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R16700:16704 KernelCompat <> t_Vec def
+R16715:16717 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R16708:16714 Core.Core_Primitive <> :::'t_usize' not
+R16718:16733 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R16738:16745 KernelCompat <> t_Global constr
+R16761:16764 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:120 var
+R16775:16800 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Const' not
+R16809:16819 Core.Core_Option <> Option_Some constr
+R16821:16821 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16852:16853 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16856:16856 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16822:16839 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R16847:16851 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R16854:16855 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R16862:16895 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Signal' not
+R16910:16920 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_value_at def
+R16922:16927 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R16953:16963 Core.Core_Option <> Option_Some constr
+R16980:16990 Core.Core_Option <> Option_Some constr
+R16992:16992 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17023:17024 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17027:17027 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R16993:17010 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_normalize_value def
+R17018:17022 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17025:17026 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R17035:17045 Core.Core_Option <> Option_None constr
+R17056:17066 Core.Core_Option <> Option_Some constr
+R17068:17068 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17082:17083 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17127:17127 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17069:17081 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+R17084:17084 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R17126:17126 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R17085:17085 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17098:17099 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17125:17125 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17100:17120 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R17141:17166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Add' not
+R17241:17271 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R17284:17288 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17277:17282 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R17181:17211 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R17224:17228 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17217:17222 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R17301:17311 Core.Core_Option <> Option_Some constr
+R17313:17313 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17323:17324 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17336:17336 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17339:17349 Core.Core_Option <> Option_Some constr
+R17351:17351 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17361:17362 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17374:17374 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17385:17395 Core.Core_Option <> Option_Some constr
+R17405:17406 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17445:17456 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17483:17484 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17407:17418 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_add def
+R17440:17444 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17468:17471 Corelib.Init.Datatypes <> ::list_scope:x_'++'_x not
+R17506:17516 Core.Core_Option <> Option_None constr
+R17530:17555 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Sub' not
+R17630:17660 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R17673:17677 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17666:17671 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R17570:17600 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R17613:17617 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17606:17611 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R17690:17700 Core.Core_Option <> Option_Some constr
+R17702:17702 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17712:17713 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17725:17725 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17728:17738 Core.Core_Option <> Option_Some constr
+R17740:17740 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17750:17751 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17763:17763 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17774:17784 Core.Core_Option <> Option_Some constr
+R17794:17795 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17834:17845 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17902:17903 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17796:17807 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R17829:17833 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17857:17860 Corelib.Init.Datatypes <> ::list_scope:x_'++'_x not
+R17861:17883 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_negate_missing_terms def
+R17897:17901 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R17925:17935 Core.Core_Option <> Option_None constr
+R17949:17974 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Mul' not
+R17989:18011 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_known_scalar def
+R18017:18022 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R18024:18028 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18041:18051 Core.Core_Option <> Option_Some constr
+R18075:18105 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R18118:18122 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18111:18116 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R18137:18147 Core.Core_Option <> Option_Some constr
+R18149:18149 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18155:18156 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18164:18164 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18177:18187 Core.Core_Option <> Option_Some constr
+R18199:18200 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18232:18245 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18289:18290 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18201:18212 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R18227:18231 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18246:18267 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_scale_missing_terms def
+R18284:18288 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18300:18310 Core.Core_Option <> Option_None constr
+R18323:18333 Core.Core_Option <> Option_None constr
+R18351:18361 Core.Core_Option <> Option_None constr
+R18378:18400 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_known_scalar def
+R18406:18411 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R18413:18417 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18432:18442 Core.Core_Option <> Option_Some constr
+R18468:18498 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms:123 def
+R18511:18515 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18504:18509 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:121 var
+R18532:18542 Core.Core_Option <> Option_Some constr
+R18544:18544 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18550:18551 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18559:18559 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18574:18584 Core.Core_Option <> Option_Some constr
+R18598:18599 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18631:18646 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18690:18691 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18600:18611 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_mul def
+R18626:18630 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18647:18668 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_scale_missing_terms def
+R18685:18689 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:122 var
+R18703:18713 Core.Core_Option <> Option_None constr
+R18728:18738 Core.Core_Option <> Option_None constr
+R18760:18770 Core.Core_Option <> Option_None constr
+R18783:18793 Core.Core_Option <> Option_None constr
+R18817:18838 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Div' not
+R18847:18857 Core.Core_Option <> Option_None constr
+def 18878:18888 <> wg_min_bits
+R18901:18905 Core.Core_Primitive <> :::'t_u32' not
+binder 18891:18893 <> lhs:125
+binder 18895:18897 <> rhs:126
+R18910:18914 Core.Core_Primitive <> :::'t_u32' not
+R18924:18928 Stdlib.NArith.BinNat N leb def
+R18931:18937 Core.Core_Base_interface_Int <> U32_f_v proj
+R18940:18948 Core.Core_Primitive <> :::'u32_0' not
+R18946:18948 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:125 var
+R18953:18959 Core.Core_Base_interface_Int <> U32_f_v proj
+R18962:18970 Core.Core_Primitive <> :::'u32_0' not
+R18968:18970 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:126 var
+R18998:19000 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:126 var
+R18983:18985 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:125 var
+def 19013:19044 <> wg_signal_range_bits_constraints
+R19063:19067 KernelCompat <> t_Vec def
+R19071:19092 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelConstraint' not
+R19097:19104 KernelCompat <> t_Global constr
+binder 19049:19059 <> constraints:127
+R19126:19132 Core.Core_Primitive <> :::'t_usize' not
+binder 19111:19122 <> signal_index:128
+R19148:19155 Core.Core_Option <> t_Option ind
+R19159:19163 Core.Core_Primitive <> :::'t_u32' not
+binder 19138:19144 <> current:129
+R19170:19177 Core.Core_Option <> t_Option ind
+R19181:19185 Core.Core_Primitive <> :::'t_u32' not
+R19200:19210 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraints:127 var
+R19221:19222 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R19231:19237 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+R19253:19256 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R19334:19380 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Boolean' not
+R19396:19399 KernelCompat <> f_eq def
+R19402:19438 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_signal proj
+R19460:19471 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:128 var
+R19692:19698 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+R19494:19500 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+R19519:19529 Core.Core_Option <> Option_Some constr
+R19551:19561 Core.Core_Option <> Option_Some constr
+R19564:19574 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_min_bits def
+R19576:19585 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_u32_one def
+R19605:19615 Core.Core_Option <> Option_None constr
+R19632:19642 Core.Core_Option <> Option_Some constr
+R19644:19653 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_u32_one def
+R19708:19750 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Range' not
+R19766:19769 KernelCompat <> f_eq def
+R19772:19806 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_signal proj
+R19826:19837 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:128 var
+R20156:20162 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+R19860:19866 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+R19885:19895 Core.Core_Option <> Option_Some constr
+R19917:19927 Core.Core_Option <> Option_Some constr
+R19944:19954 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_min_bits def
+R19957:19989 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_bits proj
+R20027:20037 Core.Core_Option <> Option_None constr
+R20054:20064 Core.Core_Option <> Option_Some constr
+R20067:20099 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_bits proj
+R20185:20191 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> current:129 var
+binder 19290:19293 <> next:135
+R20210:20241 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_signal_range_bits_constraints:130 def
+R20278:20281 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> next:135 var
+R20265:20276 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:128 var
+def 20302:20321 <> wg_signal_range_bits
+R20336:20365 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 20326:20332 <> program:136
+R20386:20392 Core.Core_Primitive <> :::'t_usize' not
+binder 20371:20382 <> signal_index:137
+R20397:20404 Core.Core_Option <> t_Option ind
+R20408:20412 Core.Core_Primitive <> :::'t_u32' not
+R20421:20452 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_signal_range_bits_constraints def
+R20459:20489 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R20492:20515 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R20509:20515 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:136 var
+R20523:20534 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_index:137 var
+R20540:20550 Core.Core_Option <> Option_None constr
+def 20565:20588 <> wg_power_of_two_exponent
+R20599:20599 Corelib.Numbers.BinNums <> Z ind
+binder 20591:20595 <> value:138
+R20604:20611 Core.Core_Option <> t_Option ind
+R20615:20617 Corelib.Init.Datatypes <> nat ind
+R20629:20633 Stdlib.ZArith.BinInt Z ltb def
+R20635:20639 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:138 var
+R20693:20698 Stdlib.ZArith.BinInt Z log2 def
+R20700:20704 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:138 var
+binder 20681:20688 <> exponent:139
+R20716:20720 Stdlib.ZArith.BinInt Z eqb def
+R20724:20726 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R20727:20734 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> exponent:139 var
+R20737:20741 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> value:138 var
+R20801:20811 Core.Core_Option <> Option_None constr
+R20754:20764 Core.Core_Option <> Option_Some constr
+R20767:20774 Stdlib.ZArith.BinInt Z to_nat def
+R20776:20783 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> exponent:139 var
+R20654:20664 Core.Core_Option <> Option_None constr
+rec 20822:20841 <> WgDecodedTerm_record
+proj 20861:20888 <> WgDecodedTerm_f_signal_index
+proj 20905:20926 <> WgDecodedTerm_f_offset
+proj 20939:20958 <> WgDecodedTerm_f_bits
+R20892:20898 Core.Core_Primitive <> :::'t_usize' not
+R20930:20932 Corelib.Init.Datatypes <> nat ind
+R20962:20966 Core.Core_Primitive <> :::'t_u32' not
+def 20984:21005 <> wg_build_decoded_terms
+R21020:21049 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 21010:21016 <> program:144
+R21064:21068 KernelCompat <> t_Vec def
+R21071:21078 Core.Core_Option <> t_Option ind
+R21082:21097 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R21103:21110 KernelCompat <> t_Global constr
+binder 21055:21060 <> values:145
+R21125:21129 KernelCompat <> t_Vec def
+R21140:21142 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R21133:21139 Core.Core_Primitive <> :::'t_usize' not
+R21143:21158 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R21163:21170 KernelCompat <> t_Global constr
+binder 21117:21121 <> terms:146
+R21178:21185 Core.Core_Option <> t_Option ind
+R21189:21193 KernelCompat <> t_Vec def
+R21197:21216 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+R21221:21228 KernelCompat <> t_Global constr
+R21244:21248 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> terms:146 var
+R21259:21260 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R21269:21279 Core.Core_Option <> Option_Some constr
+R21281:21282 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R21309:21312 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R21288:21288 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21301:21302 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21308:21308 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21342:21363 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_build_decoded_terms:147 def
+R21373:21378 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:145 var
+R21365:21371 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:144 var
+R21407:21417 Core.Core_Option <> Option_Some constr
+R21445:21456 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R21458:21463 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:145 var
+R21599:21622 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_power_of_two_exponent def
+R21625:21645 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R21542:21561 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_signal_range_bits def
+R21563:21569 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:144 var
+R21669:21679 Core.Core_Option <> Option_Some constr
+R21687:21697 Core.Core_Option <> Option_Some constr
+R21719:21729 Core.Core_Option <> Option_Some constr
+R21795:21798 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R21744:21769 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_WgDecodedTerm_record constr
+R21842:21852 Core.Core_Option <> Option_None constr
+R21491:21501 Core.Core_Option <> Option_Some constr
+R21872:21882 Core.Core_Option <> Option_None constr
+R21893:21903 Core.Core_Option <> Option_None constr
+def 21932:21942 <> wg_term_end
+R21952:21971 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+binder 21945:21948 <> term:149
+R21976:21978 Corelib.Init.Datatypes <> nat ind
+R22012:22014 Corelib.Init.Peano <> ::nat_scope:x_'+'_x not
+R21985:22006 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_offset proj
+R22008:22011 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> term:149 var
+R22015:22022 Stdlib.NArith.BinNat N to_nat def
+R22025:22031 Core.Core_Base_interface_Int <> U32_f_v proj
+R22034:22066 Core.Core_Primitive <> :::'u32_0' not
+R22041:22060 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_bits proj
+R22062:22065 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> term:149 var
+def 22083:22099 <> wg_terms_disjoint
+R22112:22131 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+binder 22102:22104 <> lhs:150
+binder 22106:22108 <> rhs:151
+R22136:22139 Corelib.Init.Datatypes <> bool ind
+R22146:22148 Corelib.Init.Datatypes <> orb def
+R22216:22222 Stdlib.Arith.PeanoNat Nat leb def
+R22225:22235 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_term_end def
+R22237:22239 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:151 var
+R22243:22264 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_offset proj
+R22266:22268 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:150 var
+R22155:22161 Stdlib.Arith.PeanoNat Nat leb def
+R22164:22174 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_term_end def
+R22176:22178 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:150 var
+R22182:22203 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_offset proj
+R22205:22207 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:151 var
+def 22283:22307 <> wg_term_disjoint_with_all
+R22319:22338 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+binder 22312:22315 <> term:152
+R22362:22366 KernelCompat <> t_Vec def
+R22370:22389 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+R22394:22401 KernelCompat <> t_Global constr
+binder 22344:22358 <> remaining_terms:153
+R22407:22410 Corelib.Init.Datatypes <> bool ind
+R22423:22437 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> remaining_terms:153 var
+R22448:22449 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R22458:22461 Corelib.Init.Datatypes <> true constr
+R22476:22479 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R22498:22501 Corelib.Init.Datatypes <> andb def
+R22551:22575 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_term_disjoint_with_all:154 def
+R22577:22580 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> term:152 var
+R22510:22526 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_terms_disjoint def
+R22528:22531 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> term:152 var
+def 22611:22628 <> wg_ranges_disjoint
+R22641:22645 KernelCompat <> t_Vec def
+R22649:22668 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+R22673:22680 KernelCompat <> t_Global constr
+binder 22633:22637 <> terms:156
+R22686:22689 Corelib.Init.Datatypes <> bool ind
+R22702:22706 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> terms:156 var
+R22717:22718 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R22727:22730 Corelib.Init.Datatypes <> true constr
+R22740:22743 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R22767:22770 Corelib.Init.Datatypes <> andb def
+R22834:22851 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_ranges_disjoint:157 def
+R22779:22803 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_term_disjoint_with_all def
+def 22887:22913 <> wg_decode_radix_assignments
+R22929:22929 Corelib.Numbers.BinNums <> Z ind
+binder 22918:22925 <> target_z:159
+R22943:22947 KernelCompat <> t_Vec def
+R22951:22970 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_record rec
+R22975:22982 KernelCompat <> t_Global constr
+binder 22935:22939 <> terms:160
+R23038:23040 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R22991:22995 KernelCompat <> t_Vec def
+R23006:23008 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R22999:23005 Core.Core_Primitive <> :::'t_usize' not
+R23009:23024 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R23029:23036 KernelCompat <> t_Global constr
+R23041:23041 Corelib.Numbers.BinNums <> Z ind
+R23055:23059 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> terms:160 var
+R23070:23071 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R23080:23080 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23083:23084 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23088:23088 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23081:23082 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R23098:23101 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R23140:23166 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_decode_radix_assignments:161 def
+R23168:23175 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target_z:159 var
+binder 23129:23135 <> decoded:163
+R23229:23231 Corelib.Init.Datatypes <> fst def
+R23233:23239 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> decoded:163 var
+binder 23204:23224 <> remaining_assignments:164
+R23276:23278 Corelib.Init.Datatypes <> snd def
+R23280:23286 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> decoded:163 var
+binder 23252:23271 <> remaining_recomposed:165
+R23312:23317 Stdlib.ZArith.BinInt Z of_N def
+R23320:23326 Core.Core_Base_interface_Int <> U32_f_v proj
+R23329:23361 Core.Core_Primitive <> :::'u32_0' not
+R23336:23355 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_bits proj
+binder 23299:23307 <> bit_count:166
+R23388:23395 Stdlib.ZArith.BinInt Z of_nat def
+R23398:23419 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_offset proj
+binder 23376:23383 <> offset_z:167
+R23446:23446 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R23460:23463 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R23448:23450 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R23451:23459 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> bit_count:166 var
+binder 23438:23441 <> mask:168
+R23488:23493 Stdlib.ZArith.BinInt Z land def
+R23496:23503 Stdlib.ZArith.BinInt Z shiftr def
+R23505:23512 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target_z:159 var
+R23514:23521 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> offset_z:167 var
+R23524:23527 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> mask:168 var
+binder 23477:23483 <> digit_z:169
+R23549:23569 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R23571:23577 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> digit_z:169 var
+binder 23540:23544 <> digit:170
+R23586:23587 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23655:23662 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23711:23712 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23630:23633 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R23588:23588 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23622:23623 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23629:23629 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23589:23616 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> WgDecodedTerm_f_signal_index proj
+R23624:23628 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> digit:170 var
+R23634:23654 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> remaining_assignments:164 var
+R23683:23685 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R23663:23682 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> remaining_recomposed:165 var
+R23686:23693 Stdlib.ZArith.BinInt Z shiftl def
+R23695:23701 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> digit_z:169 var
+R23703:23710 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> offset_z:167 var
+def 23733:23765 <> wg_solve_radix_decomposition_side
+R23780:23809 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 23770:23776 <> program:171
+R23824:23839 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 23815:23820 <> target:172
+R23852:23867 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 23845:23848 <> expr:173
+R23882:23886 KernelCompat <> t_Vec def
+R23889:23896 Core.Core_Option <> t_Option ind
+R23900:23915 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R23921:23928 KernelCompat <> t_Global constr
+binder 23873:23878 <> values:174
+R23936:23943 Core.Core_Option <> t_Option ind
+R23947:23951 KernelCompat <> t_Vec def
+R23962:23964 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R23955:23961 Core.Core_Primitive <> :::'t_usize' not
+R23965:23980 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R23985:23992 KernelCompat <> t_Global constr
+R24015:24039 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R24042:24065 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R24059:24065 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:171 var
+binder 24006:24010 <> field:175
+R24079:24109 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_extract_scaled_missing_terms def
+R24111:24114 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:173 var
+R24116:24121 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:174 var
+R24123:24127 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:175 var
+R24138:24148 Core.Core_Option <> Option_Some constr
+R24150:24150 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24160:24161 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24175:24175 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24187:24193 Stdlib.Arith.PeanoNat Nat ltb def
+R24196:24206 Stdlib.Lists.List <> length abbrev
+R24269:24290 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_build_decoded_terms def
+R24292:24298 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:171 var
+R24300:24305 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:174 var
+R24334:24344 Core.Core_Option <> Option_Some constr
+R24374:24380 Stdlib.Arith.PeanoNat Nat ltb def
+R24383:24393 Stdlib.Lists.List <> length abbrev
+R24455:24472 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_ranges_disjoint def
+R24890:24900 Core.Core_Option <> Option_None constr
+R24519:24539 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R24542:24553 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_sub def
+R24555:24560 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target:172 var
+R24572:24576 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:175 var
+binder 24507:24514 <> target_z:176
+R24607:24633 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_decode_radix_assignments def
+R24635:24642 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target_z:176 var
+binder 24596:24602 <> decoded:177
+R24690:24692 Corelib.Init.Datatypes <> fst def
+R24694:24700 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> decoded:177 var
+binder 24675:24685 <> assignments:178
+R24733:24735 Corelib.Init.Datatypes <> snd def
+R24737:24743 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> decoded:177 var
+binder 24719:24728 <> recomposed:179
+R24761:24765 Stdlib.ZArith.BinInt Z eqb def
+R24767:24776 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> recomposed:179 var
+R24778:24785 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> target_z:176 var
+R24855:24865 Core.Core_Option <> Option_None constr
+R24804:24814 Core.Core_Option <> Option_Some constr
+R24816:24826 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignments:178 var
+R24427:24437 Core.Core_Option <> Option_None constr
+R24910:24920 Core.Core_Option <> Option_None constr
+R24933:24943 Core.Core_Option <> Option_None constr
+R24236:24246 Core.Core_Option <> Option_None constr
+R24959:24969 Core.Core_Option <> Option_None constr
+R24978:24988 Core.Core_Option <> Option_None constr
+def 25009:25024 <> wg_try_eval_expr
+R25036:25051 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 25029:25032 <> expr:180
+R25066:25070 KernelCompat <> t_Vec def
+R25073:25080 Core.Core_Option <> t_Option ind
+R25084:25099 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R25105:25112 KernelCompat <> t_Global constr
+binder 25057:25062 <> values:181
+R25127:25135 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 25119:25123 <> field:182
+R25140:25147 Core.Core_Option <> t_Option ind
+R25151:25166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R25181:25230 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'eval_expr' not
+R25191:25194 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> expr:180 var
+R25197:25216 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_witness_of_values def
+R25218:25223 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:181 var
+R25226:25230 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:182 var
+R25241:25249 KernelCompat <> Result_Ok constr
+R25264:25274 Core.Core_Option <> Option_Some constr
+R25286:25295 KernelCompat <> Result_Err constr
+R25306:25316 Core.Core_Option <> Option_None constr
+def 25337:25373 <> wg_solve_radix_decomposition_equality
+R25388:25417 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 25378:25384 <> program:183
+R25429:25444 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 25423:25425 <> lhs:184
+R25456:25471 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+binder 25450:25452 <> rhs:185
+R25486:25490 KernelCompat <> t_Vec def
+R25493:25500 Core.Core_Option <> t_Option ind
+R25504:25519 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R25525:25532 KernelCompat <> t_Global constr
+binder 25477:25482 <> values:186
+R25540:25547 Core.Core_Option <> t_Option ind
+R25551:25555 KernelCompat <> t_Vec def
+R25566:25568 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R25559:25565 Core.Core_Primitive <> :::'t_usize' not
+R25569:25584 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R25589:25596 KernelCompat <> t_Global constr
+R25619:25643 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R25646:25669 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R25663:25669 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:183 var
+binder 25610:25614 <> field:187
+R25683:25698 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_try_eval_expr def
+R25700:25702 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:184 var
+R25704:25709 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R25711:25715 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:187 var
+R25726:25736 Core.Core_Option <> Option_Some constr
+R25758:25790 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_decomposition_side def
+R25792:25798 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:183 var
+R25807:25809 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:185 var
+R25811:25816 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R25829:25839 Core.Core_Option <> Option_Some constr
+R25862:25872 Core.Core_Option <> Option_Some constr
+R25892:25902 Core.Core_Option <> Option_None constr
+R25919:25934 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_try_eval_expr def
+R25936:25938 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:185 var
+R25940:25945 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R25947:25951 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:187 var
+R25966:25976 Core.Core_Option <> Option_Some constr
+R26002:26034 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_decomposition_side def
+R26036:26042 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:183 var
+R26057:26059 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:184 var
+R26061:26066 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R26076:26086 Core.Core_Option <> Option_None constr
+R26099:26109 Core.Core_Option <> Option_None constr
+R26133:26143 Core.Core_Option <> Option_None constr
+R26158:26173 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_try_eval_expr def
+R26175:26177 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs:185 var
+R26179:26184 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R26186:26190 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:187 var
+R26203:26213 Core.Core_Option <> Option_Some constr
+R26231:26263 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_decomposition_side def
+R26265:26271 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:183 var
+R26280:26282 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs:184 var
+R26284:26289 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:186 var
+R26297:26307 Core.Core_Option <> Option_None constr
+R26318:26328 Core.Core_Option <> Option_None constr
+def 26357:26376 <> wg_row_value_or_zero
+R26387:26391 KernelCompat <> t_Vec def
+R26395:26410 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R26415:26422 KernelCompat <> t_Global constr
+binder 26381:26383 <> row:188
+R26444:26446 Corelib.Init.Datatypes <> nat ind
+binder 26429:26440 <> column_index:189
+R26451:26466 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R26479:26487 Stdlib.Lists.List <> nth_error def
+R26493:26504 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:189 var
+R26489:26491 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> row:188 var
+R26515:26518 Corelib.Init.Datatypes <> Some constr
+R26543:26546 Corelib.Init.Datatypes <> None constr
+R26555:26567 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_zero_value def
+def 26586:26609 <> wg_rows_agree_on_outputs
+R26632:26636 KernelCompat <> t_Vec def
+R26640:26655 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R26660:26667 KernelCompat <> t_Global constr
+binder 26614:26620 <> lhs_row:190
+binder 26622:26628 <> rhs_row:191
+R26689:26691 Corelib.Init.Datatypes <> nat ind
+binder 26674:26685 <> column_index:192
+R26721:26725 KernelCompat <> t_Vec def
+R26729:26735 Core.Core_Primitive <> :::'t_usize' not
+R26740:26747 KernelCompat <> t_Global constr
+binder 26697:26717 <> output_signal_indices:193
+R26762:26770 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 26754:26758 <> field:194
+R26775:26778 Corelib.Init.Datatypes <> bool ind
+R26791:26811 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> output_signal_indices:193 var
+R26822:26823 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R26832:26835 Corelib.Init.Datatypes <> true constr
+R26842:26845 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R26878:26881 Corelib.Init.Datatypes <> andb def
+R27028:27051 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_rows_agree_on_outputs:195 def
+R27151:27155 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:194 var
+R27094:27094 Corelib.Init.Datatypes <> S constr
+R27096:27107 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:192 var
+R27077:27083 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs_row:191 var
+R27061:27067 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs_row:190 var
+R26890:26900 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_field_eq def
+R26911:26930 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_row_value_or_zero def
+R26932:26938 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> lhs_row:190 var
+R26940:26951 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:192 var
+R26963:26982 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_row_value_or_zero def
+R26984:26990 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rhs_row:191 var
+R26992:27003 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:192 var
+R27014:27018 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:194 var
+def 27175:27201 <> wg_find_matching_lookup_row
+R27213:27217 KernelCompat <> t_Vec def
+R27221:27225 KernelCompat <> t_Vec def
+R27229:27244 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R27249:27256 KernelCompat <> t_Global constr
+R27262:27269 KernelCompat <> t_Global constr
+binder 27206:27209 <> rows:197
+R27295:27299 KernelCompat <> t_Vec def
+R27303:27318 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R27323:27330 KernelCompat <> t_Global constr
+binder 27276:27291 <> evaluated_inputs:198
+R27349:27351 Corelib.Init.Datatypes <> nat ind
+binder 27337:27345 <> input_len:199
+R27381:27385 KernelCompat <> t_Vec def
+R27389:27395 Core.Core_Primitive <> :::'t_usize' not
+R27400:27407 KernelCompat <> t_Global constr
+binder 27357:27377 <> output_signal_indices:200
+R27422:27430 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 27414:27418 <> field:201
+R27455:27461 Core.Core_Primitive <> :::'t_usize' not
+binder 27436:27451 <> constraint_index:202
+R27481:27487 Core.Core_Primitive <> :::'t_usize' not
+binder 27467:27477 <> table_index:203
+R27507:27514 Core.Core_Option <> t_Option ind
+R27518:27522 KernelCompat <> t_Vec def
+R27526:27541 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R27546:27553 KernelCompat <> t_Global constr
+binder 27493:27503 <> matched_row:204
+R27563:27570 KernelCompat <> t_Result ind
+R27578:27585 Core.Core_Option <> t_Option ind
+R27589:27593 KernelCompat <> t_Vec def
+R27597:27612 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R27617:27624 KernelCompat <> t_Global constr
+R27637:27664 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R27679:27682 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> rows:197 var
+R27693:27694 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R27703:27711 KernelCompat <> Result_Ok constr
+R27713:27723 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> matched_row:204 var
+R27732:27735 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R27761:27788 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from_list def
+R27794:27809 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> evaluated_inputs:198 var
+R27811:27815 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:201 var
+R28733:28759 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_find_matching_lookup_row:205 def
+R28924:28934 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> matched_row:204 var
+R28904:28914 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> table_index:203 var
+R28879:28894 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraint_index:202 var
+R28865:28869 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:201 var
+R28835:28855 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> output_signal_indices:200 var
+R28817:28825 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:199 var
+R28792:28807 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> evaluated_inputs:198 var
+R27834:27844 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> matched_row:204 var
+R27859:27869 Core.Core_Option <> Option_Some constr
+R27898:27921 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_rows_agree_on_outputs def
+R27940:27948 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:199 var
+R27950:27970 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> output_signal_indices:200 var
+R27972:27976 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:201 var
+R28251:28260 KernelCompat <> Result_Err constr
+R28275:28316 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_AmbiguousLookup constr
+R28333:28387 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_AmbiguousLookup_record constr
+R28405:28420 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraint_index:202 var
+R28438:28448 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> table_index:203 var
+R27993:28019 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_find_matching_lookup_row:205 def
+R28216:28226 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> matched_row:204 var
+R28192:28202 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> table_index:203 var
+R28163:28178 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraint_index:202 var
+R28145:28149 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:201 var
+R28111:28131 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> output_signal_indices:200 var
+R28089:28097 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:199 var
+R28060:28075 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> evaluated_inputs:198 var
+R28460:28470 Core.Core_Option <> Option_None constr
+R28483:28509 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_find_matching_lookup_row:205 def
+R28691:28701 Core.Core_Option <> Option_Some constr
+R28668:28678 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> table_index:203 var
+R28641:28656 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraint_index:202 var
+R28625:28629 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:201 var
+R28593:28613 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> output_signal_indices:200 var
+R28573:28581 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:199 var
+R28546:28561 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> evaluated_inputs:198 var
+def 28953:28985 <> wg_assign_lookup_outputs_from_row
+R28996:29000 KernelCompat <> t_Vec def
+R29004:29019 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29024:29031 KernelCompat <> t_Global constr
+binder 28990:28992 <> row:208
+R29055:29059 KernelCompat <> t_Vec def
+R29063:29069 Core.Core_Primitive <> :::'t_usize' not
+R29074:29081 KernelCompat <> t_Global constr
+binder 29038:29051 <> signal_indices:209
+R29103:29105 Corelib.Init.Datatypes <> nat ind
+binder 29088:29099 <> column_index:210
+R29120:29124 KernelCompat <> t_Vec def
+R29127:29134 Core.Core_Option <> t_Option ind
+R29138:29153 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29159:29166 KernelCompat <> t_Global constr
+binder 29111:29116 <> values:211
+R29184:29187 Corelib.Init.Datatypes <> bool ind
+binder 29173:29180 <> progress:212
+R29243:29245 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R29195:29199 KernelCompat <> t_Vec def
+R29202:29209 Core.Core_Option <> t_Option ind
+R29213:29228 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29234:29241 KernelCompat <> t_Global constr
+R29246:29249 Corelib.Init.Datatypes <> bool ind
+R29263:29276 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signal_indices:209 var
+R29287:29288 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R29297:29297 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R29304:29305 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R29314:29314 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R29298:29303 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:211 var
+R29306:29313 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:212 var
+R29332:29335 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R29371:29382 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R29384:29389 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:211 var
+R29566:29598 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_assign_lookup_outputs_from_row:213 def
+R29761:29764 Corelib.Init.Datatypes <> true constr
+R29679:29690 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_set_value def
+R29692:29697 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:211 var
+R29713:29732 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_row_value_or_zero def
+R29734:29736 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> row:208 var
+R29738:29749 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:210 var
+R29654:29654 Corelib.Init.Datatypes <> S constr
+R29656:29667 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:210 var
+R29608:29610 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> row:208 var
+R29415:29447 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_assign_lookup_outputs_from_row:213 def
+R29542:29549 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:212 var
+R29527:29532 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:211 var
+R29503:29503 Corelib.Init.Datatypes <> S constr
+R29505:29516 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> column_index:210 var
+R29457:29459 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> row:208 var
+def 29783:29802 <> wg_apply_assignments
+R29821:29825 KernelCompat <> t_Vec def
+R29836:29838 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R29829:29835 Core.Core_Primitive <> :::'t_usize' not
+R29839:29854 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29859:29866 KernelCompat <> t_Global constr
+binder 29807:29817 <> assignments:215
+R29882:29886 KernelCompat <> t_Vec def
+R29889:29896 Core.Core_Option <> t_Option ind
+R29900:29915 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29921:29928 KernelCompat <> t_Global constr
+binder 29873:29878 <> values:216
+R29946:29949 Corelib.Init.Datatypes <> bool ind
+binder 29935:29942 <> progress:217
+R30005:30007 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R29957:29961 KernelCompat <> t_Vec def
+R29964:29971 Core.Core_Option <> t_Option ind
+R29975:29990 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R29996:30003 KernelCompat <> t_Global constr
+R30008:30011 Corelib.Init.Datatypes <> bool ind
+R30025:30035 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignments:215 var
+R30046:30047 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R30056:30056 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30063:30064 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30073:30073 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30057:30062 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:216 var
+R30065:30072 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:217 var
+R30100:30103 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R30079:30079 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30092:30093 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30099:30099 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30136:30147 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R30149:30154 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:216 var
+R30254:30273 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_assignments:218 def
+R30362:30365 Corelib.Init.Datatypes <> true constr
+R30314:30325 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_set_value def
+R30327:30332 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:216 var
+R30180:30199 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_assignments:218 def
+R30230:30237 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:217 var
+R30223:30228 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:216 var
+def 30384:30410 <> wg_solve_lookup_constraints
+R30429:30433 KernelCompat <> t_Vec def
+R30437:30458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelConstraint' not
+R30463:30470 KernelCompat <> t_Global constr
+binder 30415:30425 <> constraints:220
+R30487:30516 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 30477:30483 <> program:221
+R30531:30535 KernelCompat <> t_Vec def
+R30538:30545 Core.Core_Option <> t_Option ind
+R30549:30564 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R30570:30577 KernelCompat <> t_Global constr
+binder 30522:30527 <> values:222
+R30595:30598 Corelib.Init.Datatypes <> bool ind
+binder 30584:30591 <> progress:223
+R30605:30612 KernelCompat <> t_Result ind
+R30668:30670 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R30620:30624 KernelCompat <> t_Vec def
+R30627:30634 Core.Core_Option <> t_Option ind
+R30638:30653 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R30659:30666 KernelCompat <> t_Global constr
+R30671:30674 Corelib.Init.Datatypes <> bool ind
+R30684:30711 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R30726:30736 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraints:220 var
+R30747:30748 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R30757:30765 KernelCompat <> Result_Ok constr
+R30767:30767 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30774:30775 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30784:30784 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R30768:30773 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R30776:30783 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R30800:30803 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R30861:30905 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Lookup' not
+R30922:30958 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_outputs proj
+R30991:31001 Core.Core_Option <> Option_Some constr
+R31039:31066 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_all_output_values_present def
+R31068:31073 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R31222:31246 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R31249:31272 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R31266:31272 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+binder 31213:31217 <> field:227
+R31303:31322 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_witness_of_values def
+R31324:31329 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+binder 31292:31298 <> witness:228
+R31350:31362 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_eval_exprs def
+R31383:31418 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R31457:31463 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> witness:228 var
+R31483:31487 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:227 var
+R31506:31514 KernelCompat <> Result_Ok constr
+R31554:31562 Stdlib.Lists.List <> nth_error def
+R31668:31679 KernelCompat <> usize_to_nat def
+R31682:31722 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+R31585:31617 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_lookup_tables proj
+R31620:31643 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R31637:31643 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R31763:31766 Corelib.Init.Datatypes <> Some constr
+R31815:31825 Stdlib.Lists.List <> length abbrev
+R31828:31863 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+binder 31802:31810 <> input_len:229
+R31907:31933 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_find_matching_lookup_row def
+R31958:31985 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_f_rows proj
+R32062:32070 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:229 var
+R32138:32142 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:227 var
+R32167:32201 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_index proj
+R32245:32285 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+R32328:32338 Core.Core_Option <> Option_None constr
+R32361:32369 KernelCompat <> Result_Ok constr
+R32372:32382 Core.Core_Option <> Option_Some constr
+R32451:32483 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_assign_lookup_outputs_from_row def
+R32571:32579 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_len:229 var
+R32601:32606 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R32628:32635 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+binder 32412:32428 <> assignment_result:230
+R32656:32682 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R32811:32813 Corelib.Init.Datatypes <> snd def
+R32815:32831 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignment_result:230 var
+R32769:32771 Corelib.Init.Datatypes <> fst def
+R32773:32789 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignment_result:230 var
+R32742:32748 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R32850:32858 KernelCompat <> Result_Ok constr
+R32860:32870 Core.Core_Option <> Option_None constr
+R32891:32917 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R32956:32963 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R32949:32954 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R32941:32947 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R32981:32990 KernelCompat <> Result_Err constr
+R33017:33026 KernelCompat <> Result_Err constr
+R33066:33069 Corelib.Init.Datatypes <> None constr
+R33088:33097 KernelCompat <> Result_Err constr
+R33116:33153 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_KernelCheck constr
+R33174:33371 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelCheckError_UnknownLookupTable' not
+R33235:33286 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_UnknownLookupTable_record constr
+R33311:33351 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+R33403:33412 KernelCompat <> Result_Err constr
+R33415:33450 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelCheckError_MissingSignal' not
+R33468:33494 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R33533:33540 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R33526:33531 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R33518:33524 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R33554:33563 KernelCompat <> Result_Err constr
+R33586:33595 KernelCompat <> Result_Err constr
+R33598:33635 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_KernelCheck constr
+R31112:31138 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R31177:31184 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R31170:31175 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R31162:31168 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R33666:33676 Core.Core_Option <> Option_None constr
+R33689:33715 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R33754:33761 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R33747:33752 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R33739:33745 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+R33790:33816 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints:224 def
+R33855:33862 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:223 var
+R33848:33853 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:222 var
+R33840:33846 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:221 var
+def 33889:33914 <> wg_solve_radix_constraints
+R33933:33937 KernelCompat <> t_Vec def
+R33941:33962 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelConstraint' not
+R33967:33974 KernelCompat <> t_Global constr
+binder 33919:33929 <> constraints:231
+R33991:34020 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 33981:33987 <> program:232
+R34035:34039 KernelCompat <> t_Vec def
+R34042:34049 Core.Core_Option <> t_Option ind
+R34053:34068 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R34074:34081 KernelCompat <> t_Global constr
+binder 34026:34031 <> values:233
+R34099:34102 Corelib.Init.Datatypes <> bool ind
+binder 34088:34095 <> progress:234
+R34109:34116 KernelCompat <> t_Result ind
+R34172:34174 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R34124:34128 KernelCompat <> t_Vec def
+R34131:34138 Core.Core_Option <> t_Option ind
+R34142:34157 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R34163:34170 KernelCompat <> t_Global constr
+R34175:34178 Corelib.Init.Datatypes <> bool ind
+R34188:34215 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R34230:34240 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraints:231 var
+R34251:34252 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R34261:34269 KernelCompat <> Result_Ok constr
+R34271:34271 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R34278:34279 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R34288:34288 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R34272:34277 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:233 var
+R34280:34287 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:234 var
+R34304:34307 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R34365:34407 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Equal' not
+R34424:34460 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_decomposition_equality def
+R34476:34482 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:232 var
+R34499:34530 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_lhs proj
+R34565:34596 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_rhs proj
+R34630:34635 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:233 var
+R34650:34660 Core.Core_Option <> Option_Some constr
+R34710:34729 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_assignments def
+R34743:34748 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:233 var
+R34750:34757 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:234 var
+binder 34689:34705 <> assignment_result:238
+R34770:34795 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_constraints:235 def
+R34892:34894 Corelib.Init.Datatypes <> snd def
+R34896:34912 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignment_result:238 var
+R34858:34860 Corelib.Init.Datatypes <> fst def
+R34862:34878 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> assignment_result:238 var
+R34839:34845 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:232 var
+R34923:34933 Core.Core_Option <> Option_None constr
+R34946:34971 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_constraints:235 def
+R35010:35017 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:234 var
+R35003:35008 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:233 var
+R34995:35001 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:232 var
+R35046:35071 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_constraints:235 def
+R35110:35117 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:234 var
+R35103:35108 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:233 var
+R35095:35101 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:232 var
+def 35144:35170 <> wg_solve_affine_constraints
+R35189:35193 KernelCompat <> t_Vec def
+R35197:35218 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelConstraint' not
+R35223:35230 KernelCompat <> t_Global constr
+binder 35175:35185 <> constraints:239
+R35247:35276 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 35237:35243 <> program:240
+R35291:35295 KernelCompat <> t_Vec def
+R35298:35305 Core.Core_Option <> t_Option ind
+R35309:35324 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R35330:35337 KernelCompat <> t_Global constr
+binder 35282:35287 <> values:241
+R35355:35358 Corelib.Init.Datatypes <> bool ind
+binder 35344:35351 <> progress:242
+R35365:35372 KernelCompat <> t_Result ind
+R35428:35430 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R35380:35384 KernelCompat <> t_Vec def
+R35387:35394 Core.Core_Option <> t_Option ind
+R35398:35413 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R35419:35426 KernelCompat <> t_Global constr
+R35431:35434 Corelib.Init.Datatypes <> bool ind
+R35444:35471 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R35486:35496 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> constraints:239 var
+R35507:35508 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R35517:35525 KernelCompat <> Result_Ok constr
+R35527:35527 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R35534:35535 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R35544:35544 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R35528:35533 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R35536:35543 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:242 var
+R35560:35563 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R35621:35663 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Equal' not
+R35687:35711 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R35714:35737 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R35731:35737 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:240 var
+binder 35678:35682 <> field:246
+R35755:35786 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_single_missing_equality def
+R35803:35834 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_lhs proj
+R35869:35900 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_rhs proj
+R35934:35939 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R35955:35959 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> field:246 var
+R35974:35984 Core.Core_Option <> Option_Some constr
+R35986:35986 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R35999:36000 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R36006:36006 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R36022:36033 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R36035:36040 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R36167:36193 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_affine_constraints:243 def
+R36314:36317 Corelib.Init.Datatypes <> true constr
+R36262:36273 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_set_value def
+R36275:36280 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R36241:36247 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:240 var
+R36070:36096 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_affine_constraints:243 def
+R36135:36142 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:242 var
+R36128:36133 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R36120:36126 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:240 var
+R36327:36337 Core.Core_Option <> Option_None constr
+R36350:36376 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_affine_constraints:243 def
+R36415:36422 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:242 var
+R36408:36413 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R36400:36406 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:240 var
+R36451:36477 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_affine_constraints:243 def
+R36516:36523 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> progress:242 var
+R36509:36514 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:241 var
+R36501:36507 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:240 var
+def 36550:36562 <> wg_solve_loop
+R36574:36576 Corelib.Init.Datatypes <> nat ind
+binder 36567:36570 <> fuel:247
+R36592:36621 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 36582:36588 <> program:248
+R36636:36640 KernelCompat <> t_Vec def
+R36643:36650 Core.Core_Option <> t_Option ind
+R36654:36669 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R36675:36682 KernelCompat <> t_Global constr
+binder 36627:36632 <> values:249
+R36690:36697 KernelCompat <> t_Result ind
+R36705:36709 KernelCompat <> t_Vec def
+R36712:36719 Core.Core_Option <> t_Option ind
+R36723:36738 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R36744:36751 KernelCompat <> t_Global constr
+R36762:36789 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R36804:36807 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> fuel:247 var
+R36818:36818 Corelib.Init.Datatypes <> O constr
+R36827:36835 KernelCompat <> Result_Ok constr
+R36837:36842 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:249 var
+R36848:36848 Corelib.Init.Datatypes <> S constr
+R36878:36904 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_lookup_constraints def
+R36919:36949 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R36952:36975 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R36969:36975 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R36991:36997 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37011:37016 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:249 var
+R37030:37034 Corelib.Init.Datatypes <> false constr
+R37047:37055 KernelCompat <> Result_Ok constr
+R37057:37057 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37071:37072 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37088:37088 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37105:37130 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_radix_constraints def
+R37147:37177 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R37180:37203 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R37197:37203 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37221:37227 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37300:37308 KernelCompat <> Result_Ok constr
+R37310:37310 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37323:37324 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37339:37339 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37358:37384 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_affine_constraints def
+R37403:37433 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R37436:37459 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R37453:37459 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37479:37485 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37562:37570 KernelCompat <> Result_Ok constr
+R37572:37572 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37584:37585 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37599:37599 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R37724:37732 KernelCompat <> Result_Ok constr
+R37648:37660 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_loop:250 def
+R37677:37683 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:248 var
+R37756:37765 KernelCompat <> Result_Err constr
+R37786:37795 KernelCompat <> Result_Err constr
+R37823:37832 KernelCompat <> Result_Err constr
+R37851:37860 KernelCompat <> Result_Err constr
+R37884:37893 KernelCompat <> Result_Err constr
+R37910:37919 KernelCompat <> Result_Err constr
+def 37952:37989 <> wg_collect_unresolved_required_signals
+R38004:38008 KernelCompat <> t_Vec def
+R38012:38030 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessSignal' not
+R38035:38042 KernelCompat <> t_Global constr
+binder 37994:38000 <> signals:252
+R38058:38062 KernelCompat <> t_Vec def
+R38065:38072 Core.Core_Option <> t_Option ind
+R38076:38091 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R38097:38104 KernelCompat <> t_Global constr
+binder 38049:38054 <> values:253
+R38124:38126 Corelib.Init.Datatypes <> nat ind
+binder 38111:38120 <> next_index:254
+R38133:38137 KernelCompat <> t_Vec def
+R38141:38147 Core.Core_Primitive <> :::'t_usize' not
+R38152:38159 KernelCompat <> t_Global constr
+R38173:38179 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> signals:252 var
+R38190:38191 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R38200:38201 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R38213:38216 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R38273:38310 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_unresolved_required_signals:255 def
+R38362:38362 Corelib.Init.Datatypes <> S constr
+R38364:38373 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> next_index:254 var
+R38346:38351 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:253 var
+binder 38246:38262 <> remaining_indices:257
+R38386:38389 Corelib.Init.Datatypes <> andb def
+R38448:38451 Corelib.Init.Datatypes <> negb def
+R38454:38465 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_has_value def
+R38467:38472 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> values:253 var
+R38475:38484 KernelCompat <> n_to_usize def
+R38487:38494 Stdlib.NArith.BinNat N of_nat def
+R38496:38505 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> next_index:254 var
+R38401:38428 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_f_required proj
+R38591:38607 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> remaining_indices:257 var
+R38554:38557 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R38522:38531 KernelCompat <> n_to_usize def
+R38534:38541 Stdlib.NArith.BinNat N of_nat def
+R38543:38552 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> next_index:254 var
+R38558:38574 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> remaining_indices:257 var
+def 38628:38674 <> generate_non_blackbox_witness_unchecked_runtime
+R38689:38718 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 38679:38685 <> program:258
+R38733:38771 Core.Core_Primitive <> :::'t_Slice' not
+R38742:38749 Core.Core_Option <> t_Option ind
+R38753:38768 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 38724:38729 <> inputs:259
+R38778:38785 KernelCompat <> t_Result ind
+R38789:38807 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+R38813:38840 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R38870:38890 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_seed_signal_values def
+R38893:38909 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_signals' not
+R38903:38909 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:258 var
+binder 38853:38865 <> seeded_values:260
+R38937:38951 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_apply_inputs def
+R38953:38965 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> seeded_values:260 var
+R38968:38983 Core.Core_Primitive <> :::'Slice_f_v' not
+R38978:38983 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> inputs:259 var
+binder 38921:38932 <> input_values:261
+R38997:39009 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_solve_loop def
+R39012:39012 Corelib.Init.Datatypes <> S constr
+R39015:39025 Stdlib.Lists.List <> length abbrev
+R39028:39044 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_signals' not
+R39038:39044 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:258 var
+R39049:39055 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:258 var
+R39057:39068 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> input_values:261 var
+R39079:39087 KernelCompat <> Result_Ok constr
+R39149:39186 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_collect_unresolved_required_signals def
+R39197:39213 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_signals' not
+R39207:39213 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:258 var
+R39246:39246 Corelib.Init.Datatypes <> O constr
+binder 39114:39138 <> unresolved_signal_indices:262
+R39261:39285 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> unresolved_signal_indices:262 var
+R39298:39299 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R39310:39318 KernelCompat <> Result_Ok constr
+R39321:39340 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> wg_witness_of_values def
+R39374:39383 KernelCompat <> Result_Err constr
+R39394:39443 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_UnsupportedWitnessSolve constr
+R39456:39518 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> Build_SpecWitnessGenerationError_UnsupportedWitnessSolve_record constr
+R39532:39556 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> unresolved_signal_indices:262 var
+R39572:39581 KernelCompat <> Result_Err constr
+R39596:39605 KernelCompat <> Result_Err constr
+def 39632:39670 <> generate_non_blackbox_witness_unchecked
+R39683:39712 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 39673:39679 <> program:264
+R39725:39763 Core.Core_Primitive <> :::'t_Slice' not
+R39734:39741 Core.Core_Option <> t_Option ind
+R39745:39760 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 39716:39721 <> inputs:265
+R39768:39775 KernelCompat <> t_Result ind
+R39779:39797 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+R39803:39830 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R39839:39885 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness_unchecked_runtime def
+R39888:39894 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:264 var
+R39898:39903 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> inputs:265 var
+def 39919:39944 <> validate_generated_witness
+R39957:39986 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 39947:39953 <> program:266
+R40000:40018 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 39990:39996 <> witness:267
+R40023:40030 KernelCompat <> t_Result ind
+R40034:40052 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+R40058:40085 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R40100:40149 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'check_program' not
+R40115:40138 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R40132:40138 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:266 var
+R40142:40148 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> witness:267 var
+R40160:40168 KernelCompat <> Result_Ok constr
+R40170:40171 Corelib.Init.Datatypes <> tt constr
+R40180:40188 KernelCompat <> Result_Ok constr
+R40191:40197 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> witness:267 var
+R40204:40213 KernelCompat <> Result_Err constr
+R40230:40239 KernelCompat <> Result_Err constr
+R40242:40279 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationError_KernelCheck constr
+def 40309:40337 <> generate_non_blackbox_witness
+R40350:40379 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'t_SpecWitnessGenerationProgram' not
+binder 40340:40346 <> program:268
+R40392:40430 Core.Core_Primitive <> :::'t_Slice' not
+R40401:40408 Core.Core_Option <> t_Option ind
+R40412:40427 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 40383:40388 <> inputs:269
+R40435:40442 KernelCompat <> t_Result ind
+R40446:40464 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+R40470:40497 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> t_SpecWitnessGenerationError ind
+R40512:40550 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness_unchecked def
+R40553:40559 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:268 var
+R40563:40568 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> inputs:269 var
+R40580:40588 KernelCompat <> Result_Ok constr
+R40607:40632 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> validate_generated_witness def
+R40635:40641 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> program:268 var
+R40658:40667 KernelCompat <> Result_Err constr
+R40684:40693 KernelCompat <> Result_Err constr

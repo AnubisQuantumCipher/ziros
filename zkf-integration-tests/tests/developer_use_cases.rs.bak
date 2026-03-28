@@ -1,0 +1,1169 @@
+//! Developer Use Case Integration Tests
+//!
+//! These tests simulate the circuits that ZK developers actually build and
+//! deploy to production.  Each test constructs a circuit representing a
+//! real-world application pattern — not a toy — and runs it through the
+//! full ZKF pipeline: IR → witness → prove → verify.
+//!
+//! The six patterns tested here cover the overwhelming majority of what
+//! ships in the ZK ecosystem today:
+//!
+//! 1. **Private balance sufficiency** (DeFi) — prove balance ≥ amount
+//!    without revealing balance
+//! 2. **Age/credential verification** (Identity) — prove age ≥ 18
+//!    without revealing birth year
+//! 3. **Nullifier-based spend** (Privacy coins / mixers) — prove you're
+//!    consuming a commitment without revealing which one
+//! 4. **Range-bounded transfer** (Compliance) — prove transfer amount
+//!    is within legal limits without revealing it
+//! 5. **Hash preimage knowledge** (Authentication) — prove you know a
+//!    secret whose hash matches a public commitment
+//! 6. **Private voting** (Governance) — prove eligibility and cast a
+//!    vote without revealing identity
+//!
+//! Each pattern is tested across multiple backends (Groth16, Halo2,
+//! Plonky3) to validate ZKF's "write once, prove anywhere" promise
+//! for real applications, not just arithmetic toys.
+
+use std::collections::BTreeMap;
+use zkf_backends::backend_for;
+use zkf_core::{
+    BackendKind, Constraint, Expr, FieldElement, FieldId, Program, Signal,
+    Visibility, Witness, WitnessAssignment, WitnessInputs, WitnessPlan,
+    check_constraints, collect_public_inputs, generate_witness, optimize_program,
+};
+
+// ============================================================================
+// Helper: Full pipeline runner (same pattern as universal_pipeline.rs)
+// ============================================================================
+
+fn prove_and_verify(
+    program: &Program,
+    inputs: &WitnessInputs,
+    backend_kind: BackendKind,
+) -> Witness {
+    let backend = backend_for(backend_kind);
+
+    let compiled = backend
+        .compile(program)
+        .unwrap_or_else(|e| panic!("[{backend_kind}] compile: {e}"));
+
+    let witness = generate_witness(program, inputs)
+        .unwrap_or_else(|e| panic!("[{backend_kind}] witness: {e}"));
+
+    let proof = backend
+        .prove(&compiled, &witness)
+        .unwrap_or_else(|e| panic!("[{backend_kind}] prove: {e}"));
+
+    let valid = backend
+        .verify(&compiled, &proof)
+        .unwrap_or_else(|e| panic!("[{backend_kind}] verify: {e}"));
+
+    assert!(valid, "[{backend_kind}] proof verification returned false");
+    witness
+}
+
+/// Assert witness generation fails (for negative tests).
+fn must_fail_witness(program: &Program, inputs: &WitnessInputs, reason: &str) {
+    let result = generate_witness(program, inputs);
+    assert!(result.is_err(), "Expected failure: {reason}");
+}
+
+// ============================================================================
+// 1. PRIVATE BALANCE SUFFICIENCY (DeFi)
+//
+// The most common DeFi ZK pattern: a user proves they have enough funds
+// to execute a trade/withdrawal without revealing their actual balance.
+//
+// Public:  threshold (minimum required)
+// Private: balance (actual holdings)
+// Proves:  balance ≥ threshold  (i.e., balance - threshold ≥ 0)
+//
+// Circuit structure:
+//   diff = balance - threshold           (subtraction)
+//   range(diff, 64)                      (diff fits in 64 bits → non-negative)
+//   sufficient ∈ {0,1}                   (boolean flag)
+//   sufficient = 1                       (assertion: the check passed)
+// ============================================================================
+
+/// Max range bits per field (backend-imposed limits).
+fn max_range_bits(field: FieldId) -> u32 {
+    match field {
+        FieldId::PastaFp => 12,      // Halo2 backend limit
+        FieldId::Goldilocks => 63,    // Plonky3 Goldilocks limit
+        _ => 64,
+    }
+}
+
+fn balance_sufficiency_circuit(field: FieldId) -> Program {
+    let diff_expr = Expr::Sub(
+        Box::new(Expr::signal("balance")),
+        Box::new(Expr::signal("threshold")),
+    );
+    let range_bits = max_range_bits(field);
+
+    Program {
+        name: "defi_balance_check".into(),
+        field,
+        signals: vec![
+            Signal { name: "balance".into(),    visibility: Visibility::Private, constant: None },
+            Signal { name: "threshold".into(),  visibility: Visibility::Public,  constant: None },
+            Signal { name: "diff".into(),       visibility: Visibility::Private, constant: None },
+            Signal { name: "sufficient".into(), visibility: Visibility::Public,  constant: None },
+        ],
+        constraints: vec![
+            // diff = balance - threshold
+            Constraint::Equal {
+                lhs: Expr::signal("diff"),
+                rhs: diff_expr.clone(),
+                label: Some("diff_eq_balance_minus_threshold".into()),
+            },
+            // diff fits in range_bits (proves non-negative in unsigned interpretation)
+            Constraint::Range {
+                signal: "diff".into(),
+                bits: range_bits,
+                label: Some("diff_is_non_negative".into()),
+            },
+            // sufficient is boolean
+            Constraint::Boolean {
+                signal: "sufficient".into(),
+                label: Some("sufficient_is_bool".into()),
+            },
+            // sufficient must be 1 (the check passed)
+            Constraint::Equal {
+                lhs: Expr::signal("sufficient"),
+                rhs: Expr::constant_i64(1),
+                label: Some("sufficient_asserted_true".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "diff".into(), expr: diff_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+fn balance_inputs(balance: i64, threshold: i64) -> WitnessInputs {
+    BTreeMap::from([
+        ("balance".into(),    FieldElement::from_i64(balance)),
+        ("threshold".into(),  FieldElement::from_i64(threshold)),
+        ("sufficient".into(), FieldElement::from_i64(1)),
+    ])
+}
+
+#[test]
+fn defi_balance_sufficient_groth16() {
+    let program = balance_sufficiency_circuit(FieldId::Bn254);
+    let witness = prove_and_verify(&program, &balance_inputs(1000, 500), BackendKind::ArkworksGroth16);
+    // diff should be 500
+    assert_eq!(witness.values["diff"], FieldElement::from_i64(500));
+}
+
+#[test]
+fn defi_balance_sufficient_halo2() {
+    let program = balance_sufficiency_circuit(FieldId::PastaFp);
+    prove_and_verify(&program, &balance_inputs(1000, 500), BackendKind::Halo2);
+}
+
+#[test]
+fn defi_balance_sufficient_plonky3() {
+    let program = balance_sufficiency_circuit(FieldId::Goldilocks);
+    prove_and_verify(&program, &balance_inputs(1000, 500), BackendKind::Plonky3);
+}
+
+#[test]
+fn defi_balance_exact_threshold_proves() {
+    // Edge case: balance == threshold → diff = 0, still valid
+    let program = balance_sufficiency_circuit(FieldId::Bn254);
+    let witness = prove_and_verify(&program, &balance_inputs(500, 500), BackendKind::ArkworksGroth16);
+    assert!(witness.values["diff"].is_zero());
+}
+
+#[test]
+fn defi_balance_insufficient_fails_range() {
+    // balance < threshold → diff is negative → fails 64-bit range check
+    let program = balance_sufficiency_circuit(FieldId::Bn254);
+    must_fail_witness(&program, &balance_inputs(100, 500), "insufficient balance should fail range");
+}
+
+#[test]
+fn defi_balance_large_values() {
+    // Real-world DeFi: balances in the billions (wei-scale values)
+    let program = balance_sufficiency_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("balance".into(),    FieldElement::from_u64(1_000_000_000_000u64)),
+        ("threshold".into(),  FieldElement::from_u64(999_999_999_999u64)),
+        ("sufficient".into(), FieldElement::from_i64(1)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert_eq!(witness.values["diff"], FieldElement::from_i64(1));
+}
+
+// ============================================================================
+// 2. AGE / CREDENTIAL VERIFICATION (Identity)
+//
+// KYC without data exposure: prove you're old enough without revealing
+// your exact birth year.  The ZK-KYC market is projected at $903M by 2032.
+//
+// Public:  current_year, minimum_age
+// Private: birth_year
+// Proves:  current_year - birth_year ≥ minimum_age
+//
+// Circuit:
+//   age = current_year - birth_year
+//   excess = age - minimum_age
+//   range(excess, 8)                     (excess fits in 8 bits → age ≥ min)
+//   range(age, 8)                        (age is reasonable, < 256)
+// ============================================================================
+
+fn age_verification_circuit(field: FieldId) -> Program {
+    let age_expr = Expr::Sub(
+        Box::new(Expr::signal("current_year")),
+        Box::new(Expr::signal("birth_year")),
+    );
+    let excess_expr = Expr::Sub(
+        Box::new(Expr::signal("age")),
+        Box::new(Expr::signal("minimum_age")),
+    );
+
+    Program {
+        name: "kyc_age_verify".into(),
+        field,
+        signals: vec![
+            Signal { name: "birth_year".into(),   visibility: Visibility::Private, constant: None },
+            Signal { name: "current_year".into(), visibility: Visibility::Public,  constant: None },
+            Signal { name: "minimum_age".into(),  visibility: Visibility::Public,  constant: None },
+            Signal { name: "age".into(),          visibility: Visibility::Private, constant: None },
+            Signal { name: "excess".into(),       visibility: Visibility::Private, constant: None },
+        ],
+        constraints: vec![
+            // age = current_year - birth_year
+            Constraint::Equal {
+                lhs: Expr::signal("age"),
+                rhs: age_expr.clone(),
+                label: Some("age_eq_current_minus_birth".into()),
+            },
+            // excess = age - minimum_age
+            Constraint::Equal {
+                lhs: Expr::signal("excess"),
+                rhs: excess_expr.clone(),
+                label: Some("excess_eq_age_minus_min".into()),
+            },
+            // excess is non-negative (age ≥ minimum_age)
+            Constraint::Range {
+                signal: "excess".into(),
+                bits: 8,
+                label: Some("excess_non_negative".into()),
+            },
+            // age is reasonable (< 256)
+            Constraint::Range {
+                signal: "age".into(),
+                bits: 8,
+                label: Some("age_reasonable".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "age".into(),    expr: age_expr },
+                WitnessAssignment { target: "excess".into(), expr: excess_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+#[test]
+fn kyc_age_25_passes_groth16() {
+    let program = age_verification_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2000)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert_eq!(witness.values["age"], FieldElement::from_i64(25));
+    assert_eq!(witness.values["excess"], FieldElement::from_i64(7));
+}
+
+#[test]
+fn kyc_age_25_passes_plonky3() {
+    let program = age_verification_circuit(FieldId::Goldilocks);
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2000)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    prove_and_verify(&program, &inputs, BackendKind::Plonky3);
+}
+
+#[test]
+fn kyc_exact_18_passes() {
+    // Edge case: exactly 18 → excess = 0
+    let program = age_verification_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2007)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert!(witness.values["excess"].is_zero());
+}
+
+#[test]
+fn kyc_underage_fails() {
+    // 17 years old → excess = -1 → fails range check
+    let program = age_verification_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2008)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    must_fail_witness(&program, &inputs, "17 years old should fail age check");
+}
+
+#[test]
+fn kyc_birth_year_stays_private() {
+    // Verify that birth_year is NOT in the public inputs
+    let program = age_verification_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2000)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    let witness = generate_witness(&program, &inputs).unwrap();
+    let public = collect_public_inputs(&program, &witness).unwrap();
+
+    // Only current_year and minimum_age should be public
+    assert_eq!(public.len(), 2);
+    assert_eq!(public[0], FieldElement::from_i64(2025));
+    assert_eq!(public[1], FieldElement::from_i64(18));
+    // birth_year must NOT appear in public inputs
+    assert!(
+        !public.contains(&FieldElement::from_i64(2000)),
+        "Birth year must not leak into public inputs"
+    );
+}
+
+// ============================================================================
+// 3. NULLIFIER-BASED SPEND (Privacy / Mixers)
+//
+// The Tornado Cash / Zcash pattern: prove you're consuming a valid
+// commitment without revealing which one.
+//
+// Private: secret, nonce
+// Public:  commitment (= secret * nonce + secret), nullifier (= secret * secret)
+// Proves:  commitment and nullifier are correctly derived from the secret
+//
+// In production, commitment = Poseidon(secret, nonce) and
+// nullifier = Poseidon(secret, secret).  We use algebraic stand-ins
+// here since the BlackBox Poseidon path requires backend-specific
+// support, but the constraint structure is identical.
+//
+// The key privacy property: the nullifier is deterministic per-secret
+// (so double-spend is detectable) but the commitment doesn't reveal
+// which nullifier it corresponds to.
+// ============================================================================
+
+fn nullifier_circuit(field: FieldId) -> Program {
+    // commitment_computed = secret * nonce + secret  (stand-in for hash)
+    let commitment_expr = Expr::Add(vec![
+        Expr::Mul(Box::new(Expr::signal("secret")), Box::new(Expr::signal("nonce"))),
+        Expr::signal("secret"),
+    ]);
+    // nullifier_computed = secret * secret  (stand-in for hash(secret, secret))
+    let nullifier_expr = Expr::Mul(
+        Box::new(Expr::signal("secret")),
+        Box::new(Expr::signal("secret")),
+    );
+
+    Program {
+        name: "nullifier_spend".into(),
+        field,
+        signals: vec![
+            Signal { name: "secret".into(),     visibility: Visibility::Private, constant: None },
+            Signal { name: "nonce".into(),       visibility: Visibility::Private, constant: None },
+            Signal { name: "commitment".into(),  visibility: Visibility::Public,  constant: None },
+            Signal { name: "nullifier".into(),   visibility: Visibility::Public,  constant: None },
+        ],
+        constraints: vec![
+            // commitment matches the derivation
+            Constraint::Equal {
+                lhs: Expr::signal("commitment"),
+                rhs: commitment_expr.clone(),
+                label: Some("commitment_valid".into()),
+            },
+            // nullifier matches the derivation
+            Constraint::Equal {
+                lhs: Expr::signal("nullifier"),
+                rhs: nullifier_expr.clone(),
+                label: Some("nullifier_valid".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "commitment".into(), expr: commitment_expr },
+                WitnessAssignment { target: "nullifier".into(),  expr: nullifier_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+fn nullifier_inputs(secret: i64, nonce: i64) -> WitnessInputs {
+    BTreeMap::from([
+        ("secret".into(), FieldElement::from_i64(secret)),
+        ("nonce".into(),  FieldElement::from_i64(nonce)),
+    ])
+}
+
+#[test]
+fn nullifier_spend_groth16() {
+    let program = nullifier_circuit(FieldId::Bn254);
+    let witness = prove_and_verify(&program, &nullifier_inputs(42, 7), BackendKind::ArkworksGroth16);
+    // commitment = 42 * 7 + 42 = 294 + 42 = 336
+    assert_eq!(witness.values["commitment"], FieldElement::from_i64(336));
+    // nullifier = 42 * 42 = 1764
+    assert_eq!(witness.values["nullifier"], FieldElement::from_i64(1764));
+}
+
+#[test]
+fn nullifier_spend_plonky3() {
+    let program = nullifier_circuit(FieldId::Goldilocks);
+    prove_and_verify(&program, &nullifier_inputs(42, 7), BackendKind::Plonky3);
+}
+
+#[test]
+fn nullifier_spend_halo2() {
+    let program = nullifier_circuit(FieldId::PastaFp);
+    prove_and_verify(&program, &nullifier_inputs(42, 7), BackendKind::Halo2);
+}
+
+#[test]
+fn nullifier_deterministic_per_secret() {
+    // Same secret, different nonces → different commitments, SAME nullifier
+    let program = nullifier_circuit(FieldId::Bn254);
+    let w1 = prove_and_verify(&program, &nullifier_inputs(42, 7), BackendKind::ArkworksGroth16);
+    let w2 = prove_and_verify(&program, &nullifier_inputs(42, 99), BackendKind::ArkworksGroth16);
+
+    // Nullifiers must match (both derived from secret=42)
+    assert_eq!(w1.values["nullifier"], w2.values["nullifier"]);
+    // Commitments must differ (different nonces)
+    assert_ne!(w1.values["commitment"], w2.values["commitment"]);
+}
+
+#[test]
+fn nullifier_wrong_commitment_fails() {
+    // Supply a commitment that doesn't match the secret/nonce
+    let program = nullifier_circuit(FieldId::Bn254);
+    let witness = Witness {
+        values: BTreeMap::from([
+            ("secret".into(),     FieldElement::from_i64(42)),
+            ("nonce".into(),      FieldElement::from_i64(7)),
+            ("commitment".into(), FieldElement::from_i64(999)), // wrong
+            ("nullifier".into(),  FieldElement::from_i64(1764)),
+        ]),
+    };
+    assert!(
+        check_constraints(&program, &witness).is_err(),
+        "Forged commitment must fail"
+    );
+}
+
+#[test]
+fn nullifier_wrong_nullifier_fails() {
+    let program = nullifier_circuit(FieldId::Bn254);
+    let witness = Witness {
+        values: BTreeMap::from([
+            ("secret".into(),     FieldElement::from_i64(42)),
+            ("nonce".into(),      FieldElement::from_i64(7)),
+            ("commitment".into(), FieldElement::from_i64(336)),
+            ("nullifier".into(),  FieldElement::from_i64(999)), // wrong
+        ]),
+    };
+    assert!(
+        check_constraints(&program, &witness).is_err(),
+        "Forged nullifier must fail"
+    );
+}
+
+// ============================================================================
+// 4. RANGE-BOUNDED TRANSFER (Compliance / AML)
+//
+// Regulated DeFi: prove a transfer amount is within legal limits
+// (e.g., < $10,000 for certain jurisdictions) without revealing it.
+//
+// Private: amount
+// Public:  max_allowed
+// Proves:  0 < amount AND amount ≤ max_allowed
+// ============================================================================
+
+fn compliant_transfer_circuit(field: FieldId) -> Program {
+    let gap_expr = Expr::Sub(
+        Box::new(Expr::signal("max_allowed")),
+        Box::new(Expr::signal("amount")),
+    );
+
+    Program {
+        name: "compliant_transfer".into(),
+        field,
+        signals: vec![
+            Signal { name: "amount".into(),      visibility: Visibility::Private, constant: None },
+            Signal { name: "max_allowed".into(), visibility: Visibility::Public,  constant: None },
+            Signal { name: "gap".into(),         visibility: Visibility::Private, constant: None },
+        ],
+        constraints: vec![
+            // gap = max_allowed - amount
+            Constraint::Equal {
+                lhs: Expr::signal("gap"),
+                rhs: gap_expr.clone(),
+                label: Some("gap_eq_max_minus_amount".into()),
+            },
+            // gap is non-negative (amount ≤ max_allowed)
+            Constraint::Range {
+                signal: "gap".into(),
+                bits: 32,
+                label: Some("amount_within_limit".into()),
+            },
+            // amount itself fits in 32 bits (prevents negative/huge values)
+            Constraint::Range {
+                signal: "amount".into(),
+                bits: 32,
+                label: Some("amount_non_negative".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "gap".into(), expr: gap_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+#[test]
+fn compliant_transfer_within_limit_groth16() {
+    let program = compliant_transfer_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("amount".into(),      FieldElement::from_i64(5000)),
+        ("max_allowed".into(), FieldElement::from_i64(10000)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert_eq!(witness.values["gap"], FieldElement::from_i64(5000));
+}
+
+#[test]
+fn compliant_transfer_within_limit_plonky3() {
+    let program = compliant_transfer_circuit(FieldId::Goldilocks);
+    let inputs = BTreeMap::from([
+        ("amount".into(),      FieldElement::from_i64(5000)),
+        ("max_allowed".into(), FieldElement::from_i64(10000)),
+    ]);
+    prove_and_verify(&program, &inputs, BackendKind::Plonky3);
+}
+
+#[test]
+fn compliant_transfer_at_limit_proves() {
+    // Edge case: amount == max → gap = 0
+    let program = compliant_transfer_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("amount".into(),      FieldElement::from_i64(10000)),
+        ("max_allowed".into(), FieldElement::from_i64(10000)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert!(witness.values["gap"].is_zero());
+}
+
+#[test]
+fn compliant_transfer_over_limit_fails() {
+    let program = compliant_transfer_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("amount".into(),      FieldElement::from_i64(10001)),
+        ("max_allowed".into(), FieldElement::from_i64(10000)),
+    ]);
+    must_fail_witness(&program, &inputs, "amount over limit should fail range check");
+}
+
+#[test]
+fn compliant_transfer_amount_stays_private() {
+    let program = compliant_transfer_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("amount".into(),      FieldElement::from_i64(5000)),
+        ("max_allowed".into(), FieldElement::from_i64(10000)),
+    ]);
+    let witness = generate_witness(&program, &inputs).unwrap();
+    let public = collect_public_inputs(&program, &witness).unwrap();
+
+    // Only max_allowed is public
+    assert_eq!(public.len(), 1);
+    assert_eq!(public[0], FieldElement::from_i64(10000));
+}
+
+// ============================================================================
+// 5. HASH PREIMAGE KNOWLEDGE (Authentication)
+//
+// The simplest ZK pattern and the gateway use case: prove you know a
+// secret whose "hash" matches a public value, without revealing the secret.
+//
+// In production this uses Poseidon/Pedersen.  We use an algebraic
+// stand-in: hash(secret) = secret² + secret + 42.
+//
+// Private: secret
+// Public:  hash_output
+// Proves:  hash_output = f(secret)
+// ============================================================================
+
+fn preimage_circuit(field: FieldId) -> Program {
+    // hash(secret) = secret² + secret + 42
+    let hash_expr = Expr::Add(vec![
+        Expr::Mul(Box::new(Expr::signal("secret")), Box::new(Expr::signal("secret"))),
+        Expr::signal("secret"),
+        Expr::constant_i64(42),
+    ]);
+
+    Program {
+        name: "hash_preimage".into(),
+        field,
+        signals: vec![
+            Signal { name: "secret".into(),      visibility: Visibility::Private, constant: None },
+            Signal { name: "hash_output".into(), visibility: Visibility::Public,  constant: None },
+        ],
+        constraints: vec![
+            Constraint::Equal {
+                lhs: Expr::signal("hash_output"),
+                rhs: hash_expr.clone(),
+                label: Some("hash_matches_preimage".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "hash_output".into(), expr: hash_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+#[test]
+fn preimage_knowledge_groth16() {
+    let program = preimage_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([("secret".into(), FieldElement::from_i64(10))]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    // hash(10) = 100 + 10 + 42 = 152
+    assert_eq!(witness.values["hash_output"], FieldElement::from_i64(152));
+}
+
+#[test]
+fn preimage_knowledge_halo2() {
+    let program = preimage_circuit(FieldId::PastaFp);
+    let inputs = BTreeMap::from([("secret".into(), FieldElement::from_i64(10))]);
+    prove_and_verify(&program, &inputs, BackendKind::Halo2);
+}
+
+#[test]
+fn preimage_knowledge_plonky3() {
+    let program = preimage_circuit(FieldId::Goldilocks);
+    let inputs = BTreeMap::from([("secret".into(), FieldElement::from_i64(10))]);
+    prove_and_verify(&program, &inputs, BackendKind::Plonky3);
+}
+
+#[test]
+fn preimage_wrong_secret_fails() {
+    let program = preimage_circuit(FieldId::Bn254);
+    // Correct hash for secret=10 is 152. Supply wrong hash.
+    let witness = Witness {
+        values: BTreeMap::from([
+            ("secret".into(),      FieldElement::from_i64(10)),
+            ("hash_output".into(), FieldElement::from_i64(999)),
+        ]),
+    };
+    assert!(
+        check_constraints(&program, &witness).is_err(),
+        "Wrong hash output should fail"
+    );
+}
+
+#[test]
+fn preimage_secret_not_in_public() {
+    let program = preimage_circuit(FieldId::Bn254);
+    let inputs = BTreeMap::from([("secret".into(), FieldElement::from_i64(10))]);
+    let witness = generate_witness(&program, &inputs).unwrap();
+    let public = collect_public_inputs(&program, &witness).unwrap();
+
+    assert_eq!(public.len(), 1);
+    assert_eq!(public[0], FieldElement::from_i64(152));
+    // Secret must NOT be in public inputs
+    assert!(
+        !public.contains(&FieldElement::from_i64(10)),
+        "Secret must not leak"
+    );
+}
+
+// ============================================================================
+// 6. PRIVATE VOTING (Governance)
+//
+// Combine credential verification + nullifier for private governance:
+// - Prove you're eligible to vote (your weight is in valid range)
+// - Commit to a vote choice without revealing it
+// - Produce a nullifier so you can't vote twice
+//
+// Private: voter_secret, vote_choice
+// Public:  election_id, nullifier, vote_commitment
+// Proves:
+//   nullifier = voter_secret * voter_secret  (deterministic per-voter)
+//   vote_commitment = vote_choice * election_id + voter_secret  (binds vote to election)
+//   vote_choice ∈ {0, 1}  (binary vote: yes/no)
+// ============================================================================
+
+fn private_vote_circuit(field: FieldId) -> Program {
+    let nullifier_expr = Expr::Mul(
+        Box::new(Expr::signal("voter_secret")),
+        Box::new(Expr::signal("voter_secret")),
+    );
+    let commitment_expr = Expr::Add(vec![
+        Expr::Mul(
+            Box::new(Expr::signal("vote_choice")),
+            Box::new(Expr::signal("election_id")),
+        ),
+        Expr::signal("voter_secret"),
+    ]);
+
+    Program {
+        name: "private_vote".into(),
+        field,
+        signals: vec![
+            Signal { name: "voter_secret".into(),    visibility: Visibility::Private, constant: None },
+            Signal { name: "vote_choice".into(),     visibility: Visibility::Private, constant: None },
+            Signal { name: "election_id".into(),     visibility: Visibility::Public,  constant: None },
+            Signal { name: "nullifier".into(),       visibility: Visibility::Public,  constant: None },
+            Signal { name: "vote_commitment".into(), visibility: Visibility::Public,  constant: None },
+        ],
+        constraints: vec![
+            // vote_choice must be 0 or 1
+            Constraint::Boolean {
+                signal: "vote_choice".into(),
+                label: Some("vote_is_binary".into()),
+            },
+            // nullifier = voter_secret²
+            Constraint::Equal {
+                lhs: Expr::signal("nullifier"),
+                rhs: nullifier_expr.clone(),
+                label: Some("nullifier_derivation".into()),
+            },
+            // vote_commitment = vote_choice * election_id + voter_secret
+            Constraint::Equal {
+                lhs: Expr::signal("vote_commitment"),
+                rhs: commitment_expr.clone(),
+                label: Some("vote_commitment_derivation".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "nullifier".into(),       expr: nullifier_expr },
+                WitnessAssignment { target: "vote_commitment".into(), expr: commitment_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+fn vote_inputs(voter_secret: i64, vote_choice: i64, election_id: i64) -> WitnessInputs {
+    BTreeMap::from([
+        ("voter_secret".into(), FieldElement::from_i64(voter_secret)),
+        ("vote_choice".into(),  FieldElement::from_i64(vote_choice)),
+        ("election_id".into(),  FieldElement::from_i64(election_id)),
+    ])
+}
+
+#[test]
+fn vote_yes_groth16() {
+    let program = private_vote_circuit(FieldId::Bn254);
+    let witness = prove_and_verify(&program, &vote_inputs(123, 1, 2025), BackendKind::ArkworksGroth16);
+    // nullifier = 123² = 15129
+    assert_eq!(witness.values["nullifier"], FieldElement::from_i64(15129));
+    // commitment = 1 * 2025 + 123 = 2148
+    assert_eq!(witness.values["vote_commitment"], FieldElement::from_i64(2148));
+}
+
+#[test]
+fn vote_no_groth16() {
+    let program = private_vote_circuit(FieldId::Bn254);
+    let witness = prove_and_verify(&program, &vote_inputs(123, 0, 2025), BackendKind::ArkworksGroth16);
+    // commitment = 0 * 2025 + 123 = 123
+    assert_eq!(witness.values["vote_commitment"], FieldElement::from_i64(123));
+    // Same voter → same nullifier regardless of vote
+    assert_eq!(witness.values["nullifier"], FieldElement::from_i64(15129));
+}
+
+#[test]
+fn vote_same_voter_same_nullifier() {
+    // Privacy property: nullifier is deterministic per-voter, not per-vote
+    let program = private_vote_circuit(FieldId::Bn254);
+    let w_yes = prove_and_verify(&program, &vote_inputs(123, 1, 2025), BackendKind::ArkworksGroth16);
+    let w_no  = prove_and_verify(&program, &vote_inputs(123, 0, 2025), BackendKind::ArkworksGroth16);
+    assert_eq!(w_yes.values["nullifier"], w_no.values["nullifier"]);
+}
+
+#[test]
+fn vote_invalid_choice_fails() {
+    // vote_choice = 2 → boolean constraint fails
+    let program = private_vote_circuit(FieldId::Bn254);
+    must_fail_witness(&program, &vote_inputs(123, 2, 2025), "vote_choice=2 should fail boolean");
+}
+
+#[test]
+fn vote_across_backends() {
+    let inputs = vote_inputs(42, 1, 100);
+
+    let p_bn254 = private_vote_circuit(FieldId::Bn254);
+    let w1 = prove_and_verify(&p_bn254, &inputs, BackendKind::ArkworksGroth16);
+
+    let p_pasta = private_vote_circuit(FieldId::PastaFp);
+    let w2 = prove_and_verify(&p_pasta, &inputs, BackendKind::Halo2);
+
+    let p_gold = private_vote_circuit(FieldId::Goldilocks);
+    let w3 = prove_and_verify(&p_gold, &inputs, BackendKind::Plonky3);
+
+    // All backends should produce the same witness values
+    assert_eq!(w1.values["nullifier"], w2.values["nullifier"]);
+    assert_eq!(w2.values["nullifier"], w3.values["nullifier"]);
+    assert_eq!(w1.values["vote_commitment"], w2.values["vote_commitment"]);
+    assert_eq!(w2.values["vote_commitment"], w3.values["vote_commitment"]);
+}
+
+// ============================================================================
+// 7. CROSS-CUTTING: Optimizer preserves application semantics
+//
+// Take a real use case circuit, optimize it, and prove the optimized
+// version still works.  This catches optimizer bugs that would break
+// production circuits.
+// ============================================================================
+
+#[test]
+fn optimizer_preserves_defi_balance_check() {
+    let original = balance_sufficiency_circuit(FieldId::Bn254);
+    let (optimized, report) = optimize_program(&original);
+
+    assert!(report.output_constraints <= report.input_constraints);
+
+    let inputs = balance_inputs(1000, 500);
+    let witness = prove_and_verify(&optimized, &inputs, BackendKind::ArkworksGroth16);
+    assert_eq!(witness.values["diff"], FieldElement::from_i64(500));
+}
+
+#[test]
+fn optimizer_preserves_age_verification() {
+    let original = age_verification_circuit(FieldId::Goldilocks);
+    let (optimized, _) = optimize_program(&original);
+
+    let inputs = BTreeMap::from([
+        ("birth_year".into(),   FieldElement::from_i64(2000)),
+        ("current_year".into(), FieldElement::from_i64(2025)),
+        ("minimum_age".into(),  FieldElement::from_i64(18)),
+    ]);
+    prove_and_verify(&optimized, &inputs, BackendKind::Plonky3);
+}
+
+#[test]
+fn optimizer_preserves_voting() {
+    let original = private_vote_circuit(FieldId::PastaFp);
+    let (optimized, _) = optimize_program(&original);
+    prove_and_verify(&optimized, &vote_inputs(42, 1, 100), BackendKind::Halo2);
+}
+
+// ============================================================================
+// 8. COMPOSABILITY: Multiple use cases in one circuit
+//
+// Real applications combine patterns.  Here we build a circuit that
+// combines balance sufficiency + range compliance + nullifier in one
+// program — like a regulated private transfer.
+// ============================================================================
+
+fn regulated_private_transfer(field: FieldId) -> Program {
+    let diff_expr = Expr::Sub(
+        Box::new(Expr::signal("balance")),
+        Box::new(Expr::signal("amount")),
+    );
+    let gap_expr = Expr::Sub(
+        Box::new(Expr::signal("max_allowed")),
+        Box::new(Expr::signal("amount")),
+    );
+    let nullifier_expr = Expr::Mul(
+        Box::new(Expr::signal("sender_secret")),
+        Box::new(Expr::signal("sender_secret")),
+    );
+    let range_bits = max_range_bits(field);
+    let small_range = range_bits.min(32);
+
+    Program {
+        name: "regulated_private_transfer".into(),
+        field,
+        signals: vec![
+            // Private
+            Signal { name: "balance".into(),       visibility: Visibility::Private, constant: None },
+            Signal { name: "amount".into(),        visibility: Visibility::Private, constant: None },
+            Signal { name: "sender_secret".into(), visibility: Visibility::Private, constant: None },
+            Signal { name: "diff".into(),          visibility: Visibility::Private, constant: None },
+            Signal { name: "gap".into(),           visibility: Visibility::Private, constant: None },
+            // Public
+            Signal { name: "max_allowed".into(),   visibility: Visibility::Public,  constant: None },
+            Signal { name: "nullifier".into(),     visibility: Visibility::Public,  constant: None },
+        ],
+        constraints: vec![
+            // Balance sufficiency: balance - amount ≥ 0
+            Constraint::Equal {
+                lhs: Expr::signal("diff"),
+                rhs: diff_expr.clone(),
+                label: Some("balance_minus_amount".into()),
+            },
+            Constraint::Range {
+                signal: "diff".into(),
+                bits: range_bits,
+                label: Some("balance_sufficient".into()),
+            },
+            // Compliance: amount ≤ max_allowed
+            Constraint::Equal {
+                lhs: Expr::signal("gap"),
+                rhs: gap_expr.clone(),
+                label: Some("max_minus_amount".into()),
+            },
+            Constraint::Range {
+                signal: "gap".into(),
+                bits: small_range,
+                label: Some("amount_compliant".into()),
+            },
+            // Amount itself is positive
+            Constraint::Range {
+                signal: "amount".into(),
+                bits: small_range,
+                label: Some("amount_positive".into()),
+            },
+            // Nullifier for double-spend prevention
+            Constraint::Equal {
+                lhs: Expr::signal("nullifier"),
+                rhs: nullifier_expr.clone(),
+                label: Some("nullifier_derivation".into()),
+            },
+        ],
+        witness_plan: WitnessPlan {
+            assignments: vec![
+                WitnessAssignment { target: "diff".into(),      expr: diff_expr },
+                WitnessAssignment { target: "gap".into(),       expr: gap_expr },
+                WitnessAssignment { target: "nullifier".into(), expr: nullifier_expr },
+            ],
+            hints: vec![],
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+#[test]
+fn regulated_transfer_valid_groth16() {
+    let program = regulated_private_transfer(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(10000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(9999)),
+    ]);
+    let witness = prove_and_verify(&program, &inputs, BackendKind::ArkworksGroth16);
+    assert_eq!(witness.values["diff"], FieldElement::from_i64(5000));
+    assert_eq!(witness.values["nullifier"], FieldElement::from_i64(5929)); // 77²
+}
+
+#[test]
+fn regulated_transfer_valid_plonky3() {
+    let program = regulated_private_transfer(FieldId::Goldilocks);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(10000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(9999)),
+    ]);
+    prove_and_verify(&program, &inputs, BackendKind::Plonky3);
+}
+
+#[test]
+fn regulated_transfer_over_limit_fails() {
+    // amount (5000) > max_allowed (4000) → gap is negative
+    let program = regulated_private_transfer(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(10000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(4000)),
+    ]);
+    must_fail_witness(&program, &inputs, "over-limit transfer should fail");
+}
+
+#[test]
+fn regulated_transfer_insufficient_balance_fails() {
+    // balance (3000) < amount (5000)
+    let program = regulated_private_transfer(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(3000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(9999)),
+    ]);
+    must_fail_witness(&program, &inputs, "insufficient balance should fail");
+}
+
+#[test]
+fn regulated_transfer_private_signals_hidden() {
+    let program = regulated_private_transfer(FieldId::Bn254);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(10000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(9999)),
+    ]);
+    let witness = generate_witness(&program, &inputs).unwrap();
+    let public = collect_public_inputs(&program, &witness).unwrap();
+
+    // Only max_allowed and nullifier should be public
+    assert_eq!(public.len(), 2);
+    // balance, amount, sender_secret must NOT appear
+    assert!(!public.contains(&FieldElement::from_i64(10000)));
+    assert!(!public.contains(&FieldElement::from_i64(5000)));
+    assert!(!public.contains(&FieldElement::from_i64(77)));
+}
+
+// ============================================================================
+// 9. STARK-TO-GROTH16 WRAPPING (Production Pipeline)
+//
+// The wrapping path is where Metal GPU acceleration matters most.
+// A STARK proof (Plonky3) gets wrapped into a Groth16 SNARK via an R1CS
+// FRI verifier circuit.  This produces MSMs in the thousands to tens of
+// thousands of points — well above the GPU dispatch threshold.
+//
+// This test exercises the full pipeline:
+//   Plonky3 STARK proof → FRI verifier R1CS → Groth16 prove → verify
+// ============================================================================
+
+#[test]
+#[ignore] // ~10 min: 194M-constraint FRI verifier R1CS + Groth16 setup. Run: cargo test -- --ignored
+fn stark_to_groth16_wrapping_pipeline() {
+    use zkf_backends::wrapping::default_wrapper_registry;
+
+    // Use the regulated transfer circuit (largest IR) on Goldilocks for Plonky3
+    let program = regulated_private_transfer(FieldId::Goldilocks);
+    let inputs = BTreeMap::from([
+        ("balance".into(),       FieldElement::from_i64(10000)),
+        ("amount".into(),        FieldElement::from_i64(5000)),
+        ("sender_secret".into(), FieldElement::from_i64(77)),
+        ("max_allowed".into(),   FieldElement::from_i64(9999)),
+    ]);
+
+    // Step 1: Prove with Plonky3 (STARK)
+    let plonky3 = backend_for(BackendKind::Plonky3);
+    let compiled = plonky3
+        .compile(&program)
+        .expect("Plonky3 compile failed");
+    let witness = generate_witness(&program, &inputs)
+        .expect("witness generation failed");
+    let stark_proof = plonky3
+        .prove(&compiled, &witness)
+        .expect("Plonky3 STARK prove failed");
+
+    // Verify the STARK proof first
+    let stark_ok = plonky3
+        .verify(&compiled, &stark_proof)
+        .expect("STARK verify failed");
+    assert!(stark_ok, "STARK proof must verify");
+
+    eprintln!(
+        "  [wrapping-test] STARK proof: {} bytes, {} public inputs",
+        stark_proof.proof.len(),
+        stark_proof.public_inputs.len()
+    );
+
+    // Step 2: Wrap STARK → Groth16
+    let registry = default_wrapper_registry();
+    let wrapper = registry
+        .find(BackendKind::Plonky3, BackendKind::ArkworksGroth16)
+        .expect("no Plonky3→Groth16 wrapper registered");
+
+    let groth16_proof = wrapper
+        .wrap(&stark_proof, &compiled)
+        .expect("STARK→Groth16 wrapping failed");
+
+    eprintln!(
+        "  [wrapping-test] Groth16 proof: {} bytes",
+        groth16_proof.proof.len()
+    );
+
+    // Step 3: Verify the wrapped Groth16 proof
+    let groth16_ok = wrapper
+        .verify_wrapped(&groth16_proof)
+        .expect("Groth16 verify failed");
+    assert!(groth16_ok, "wrapped Groth16 proof must verify");
+
+    // The wrapped proof should be much smaller than the STARK
+    assert!(
+        groth16_proof.proof.len() < stark_proof.proof.len(),
+        "Groth16 should compress the STARK proof: {} vs {} bytes",
+        groth16_proof.proof.len(),
+        stark_proof.proof.len()
+    );
+}
+
+#[test]
+#[ignore] // ~10 min: 194M-constraint FRI verifier R1CS + Groth16 setup. Run: cargo test -- --ignored
+fn stark_to_groth16_wrapping_balance_check() {
+    use zkf_backends::wrapping::default_wrapper_registry;
+
+    let program = balance_sufficiency_circuit(FieldId::Goldilocks);
+    let inputs = balance_inputs(1000, 500);
+
+    let plonky3 = backend_for(BackendKind::Plonky3);
+    let compiled = plonky3.compile(&program).expect("compile");
+    let witness = generate_witness(&program, &inputs).expect("witness");
+    let stark_proof = plonky3.prove(&compiled, &witness).expect("prove");
+
+    assert!(plonky3.verify(&compiled, &stark_proof).expect("verify"), "STARK");
+
+    let registry = default_wrapper_registry();
+    let wrapper = registry
+        .find(BackendKind::Plonky3, BackendKind::ArkworksGroth16)
+        .expect("wrapper");
+
+    let groth16 = wrapper.wrap(&stark_proof, &compiled).expect("wrap");
+    assert!(wrapper.verify_wrapped(&groth16).expect("verify"), "Groth16");
+
+    eprintln!(
+        "  [wrapping-test] balance_check: STARK={} bytes → Groth16={} bytes",
+        stark_proof.proof.len(),
+        groth16.proof.len()
+    );
+}
+
+// ============================================================================
+// Summary
+//
+// Test count by use case:
+//   DeFi balance sufficiency:       6  (3 backends + edge case + negative + large values)
+//   KYC age verification:           5  (2 backends + edge case + negative + privacy check)
+//   Nullifier-based spend:          6  (3 backends + determinism + 2 forgery negatives)
+//   Range-bounded transfer:         5  (2 backends + edge case + negative + privacy check)
+//   Hash preimage knowledge:        5  (3 backends + forgery negative + privacy check)
+//   Private voting:                 5  (yes/no + determinism + negative + cross-backend)
+//   Optimizer on real circuits:     3  (DeFi + KYC + voting)
+//   Composed regulated transfer:    5  (2 backends + 2 negatives + privacy check)
+//   STARK→Groth16 wrapping:         2  (full pipeline + balance check, #[ignore] — 194M constraints, ~10 min)
+//                           Total: 42
+// ============================================================================

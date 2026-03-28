@@ -1,0 +1,207 @@
+{
+  "name": "rollup_step",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "sender_id",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "old_balance",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "amount",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "old_state",
+      "visibility": "public",
+      "ty": "uint32"
+    },
+    {
+      "name": "computed_old",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "new_balance",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "new_state",
+      "visibility": "private",
+      "ty": "field"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "computed_old"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "signal",
+                "args": "sender_id"
+              },
+              {
+                "op": "const",
+                "args": "31"
+              }
+            ]
+          },
+          {
+            "op": "signal",
+            "args": "old_balance"
+          }
+        ]
+      },
+      "label": "assign_computed_old"
+    },
+    {
+      "kind": "range",
+      "signal": "old_balance",
+      "bits": 32,
+      "label": "range_old_balance_32"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "new_balance"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "old_balance"
+          },
+          {
+            "op": "signal",
+            "args": "amount"
+          }
+        ]
+      },
+      "label": "assign_new_balance"
+    },
+    {
+      "kind": "range",
+      "signal": "new_balance",
+      "bits": 32,
+      "label": "range_new_balance_32"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "new_state"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "signal",
+                "args": "sender_id"
+              },
+              {
+                "op": "const",
+                "args": "31"
+              }
+            ]
+          },
+          {
+            "op": "signal",
+            "args": "new_balance"
+          }
+        ]
+      },
+      "label": "assign_new_state"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "computed_old",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "signal",
+                  "args": "sender_id"
+                },
+                {
+                  "op": "const",
+                  "args": "31"
+                }
+              ]
+            },
+            {
+              "op": "signal",
+              "args": "old_balance"
+            }
+          ]
+        }
+      },
+      {
+        "target": "new_balance",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "old_balance"
+            },
+            {
+              "op": "signal",
+              "args": "amount"
+            }
+          ]
+        }
+      },
+      {
+        "target": "new_state",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "signal",
+                  "args": "sender_id"
+                },
+                {
+                  "op": "const",
+                  "args": "31"
+                }
+              ]
+            },
+            {
+              "op": "signal",
+              "args": "new_balance"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

@@ -1,0 +1,61 @@
+DIGEST f5537e3c9e0ed31f07d3cdd96b76b7b5
+FWitnessAdapterSemantics
+R27:30 Stdlib.Lists.List <> <> lib
+R32:45 Stdlib.Strings.String <> <> lib
+R55:72 Stdlib.Lists.List ListNotations <> mod
+rec 234:254 <> WitnessAdapterSurface
+proj 270:299 <> witness_adapter_kernel_program
+proj 318:347 <> witness_adapter_kernel_witness
+proj 375:402 <> witness_adapter_signal_names
+proj 421:453 <> witness_adapter_constraint_labels
+proj 481:507 <> witness_adapter_table_names
+R303:306 Corelib.Init.Datatypes <> list ind
+R308:313 Stdlib.Strings.String <> string ind
+R351:354 Corelib.Init.Datatypes <> list ind
+R357:362 Corelib.Init.Datatypes <> option ind
+R364:369 Stdlib.Strings.String <> string ind
+R406:409 Corelib.Init.Datatypes <> list ind
+R411:416 Stdlib.Strings.String <> string ind
+R457:460 Corelib.Init.Datatypes <> list ind
+R463:468 Corelib.Init.Datatypes <> option ind
+R470:475 Stdlib.Strings.String <> string ind
+R511:514 Corelib.Init.Datatypes <> list ind
+R516:521 Stdlib.Strings.String <> string ind
+def 539:564 <> witness_adapter_shell_copy
+R579:599 WitnessAdapterSemantics <> WitnessAdapterSurface rec
+binder 569:575 <> surface:7
+R604:624 WitnessAdapterSemantics <> WitnessAdapterSurface rec
+R631:637 WitnessAdapterSemantics <> surface:7 var
+def 652:680 <> WitnessKernelAdapterPreserved
+R700:720 WitnessAdapterSemantics <> WitnessAdapterSurface rec
+binder 685:690 <> before:8
+binder 692:696 <> after:9
+R811:816 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R772:774 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R735:764 WitnessAdapterSemantics <> witness_adapter_kernel_program proj
+R766:771 WitnessAdapterSemantics <> before:8 var
+R775:804 WitnessAdapterSemantics <> witness_adapter_kernel_program proj
+R806:810 WitnessAdapterSemantics <> after:9 var
+R893:898 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R854:856 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R817:846 WitnessAdapterSemantics <> witness_adapter_kernel_witness proj
+R848:853 WitnessAdapterSemantics <> before:8 var
+R857:886 WitnessAdapterSemantics <> witness_adapter_kernel_witness proj
+R888:892 WitnessAdapterSemantics <> after:9 var
+R971:976 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R934:936 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R899:926 WitnessAdapterSemantics <> witness_adapter_signal_names proj
+R928:933 WitnessAdapterSemantics <> before:8 var
+R937:964 WitnessAdapterSemantics <> witness_adapter_signal_names proj
+R966:970 WitnessAdapterSemantics <> after:9 var
+R1059:1064 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1017:1019 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R977:1009 WitnessAdapterSemantics <> witness_adapter_constraint_labels proj
+R1011:1016 WitnessAdapterSemantics <> before:8 var
+R1020:1052 WitnessAdapterSemantics <> witness_adapter_constraint_labels proj
+R1054:1058 WitnessAdapterSemantics <> after:9 var
+R1099:1101 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1065:1091 WitnessAdapterSemantics <> witness_adapter_table_names proj
+R1093:1098 WitnessAdapterSemantics <> before:8 var
+R1102:1128 WitnessAdapterSemantics <> witness_adapter_table_names proj
+R1130:1134 WitnessAdapterSemantics <> after:9 var

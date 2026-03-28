@@ -1,0 +1,41 @@
+[package]
+name = "zkf-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "C-compatible FFI bridge for embedding ZKF into native applications (Swift, etc.)"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[features]
+default = ["metal-gpu"]
+metal-gpu = ["zkf-backends/metal-gpu"]
+neural-engine = ["zkf-runtime/neural-engine"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
+zkf-backends = { path = "../zkf-backends", features = ["native-nova"] }
+zkf-frontends = { path = "../zkf-frontends" }
+zkf-gadgets = { path = "../zkf-gadgets" }
+zkf-registry = { path = "../zkf-registry" }
+zkf-examples = { path = "../zkf-examples" }
+zkf-conformance = { path = "../zkf-conformance" }
+zkf-runtime = { path = "../zkf-runtime" }
+serde_json.workspace = true
+serde.workspace = true
+libc.workspace = true
+sha2.workspace = true
+dirs = "5"
+serde_cbor = "0.11"
+
+[build-dependencies]
+cbindgen = "0.27"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "zkf-test-all"
+path = "src/test_all.rs"

@@ -1,0 +1,6 @@
+-R ./ TODO
+-arg -w
+-arg all
+
+Zkf_runtime_Proof_swarm_spec.v
+Zkf_runtime_Proof_runtime_spec.v

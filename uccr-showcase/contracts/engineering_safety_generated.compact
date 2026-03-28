@@ -1,0 +1,409 @@
+{
+  "backend": "midnight-compact",
+  "program": {
+    "name": "uccr_engineering_safety",
+    "field": "pasta-fp",
+    "signals": [
+      {
+        "name": "design_load_capacity_scaled",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "applied_load_scaled",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "material_yield_stress_scaled",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "applied_stress_scaled",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "design_id_hash",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "blinding",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "__load_margin",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "__stress_margin",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "__sha_b0",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b1",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b2",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b3",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b4",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b5",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b6",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b7",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b8",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b9",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b10",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b11",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b12",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b13",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b14",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b15",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b16",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b17",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b18",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b19",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b20",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b21",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b22",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b23",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b24",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b25",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b26",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b27",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b28",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b29",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b30",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b31",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "safety_factor_bps",
+        "visibility": "constant",
+        "constant": "15000",
+        "ty": "field"
+      },
+      {
+        "name": "safety_commitment_hi",
+        "visibility": "public",
+        "ty": "field"
+      },
+      {
+        "name": "safety_commitment_lo",
+        "visibility": "public",
+        "ty": "field"
+      }
+    ],
+    "constraints": [
+      {
+        "kind": "range",
+        "signal": "design_load_capacity_scaled",
+        "bits": 32
+      },
+      {
+        "kind": "range",
+        "signal": "applied_load_scaled",
+        "bits": 32
+      },
+      {
+        "kind": "range",
+        "signal": "material_yield_stress_scaled",
+        "bits": 32
+      },
+      {
+        "kind": "range",
+        "signal": "applied_stress_scaled",
+        "bits": 32
+      },
+      {
+        "kind": "range",
+        "signal": "design_id_hash",
+        "bits": 32
+      },
+      {
+        "kind": "range",
+        "signal": "blinding",
+        "bits": 32
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "__load_margin"
+        },
+        "rhs": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "design_load_capacity_scaled"
+            },
+            {
+              "op": "signal",
+              "args": "applied_load_scaled"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "range",
+        "signal": "__load_margin",
+        "bits": 32
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "__stress_margin"
+        },
+        "rhs": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "material_yield_stress_scaled"
+            },
+            {
+              "op": "signal",
+              "args": "applied_stress_scaled"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "range",
+        "signal": "__stress_margin",
+        "bits": 32
+      },
+      {
+        "kind": "black_box",
+        "op": "sha256",
+        "inputs": [
+          {
+            "op": "signal",
+            "args": "design_id_hash"
+          },
+          {
+            "op": "signal",
+            "args": "design_load_capacity_scaled"
+          },
+          {
+            "op": "signal",
+            "args": "applied_load_scaled"
+          },
+          {
+            "op": "signal",
+            "args": "blinding"
+          }
+        ],
+        "outputs": [
+          "__sha_b0",
+          "__sha_b1",
+          "__sha_b2",
+          "__sha_b3",
+          "__sha_b4",
+          "__sha_b5",
+          "__sha_b6",
+          "__sha_b7",
+          "__sha_b8",
+          "__sha_b9",
+          "__sha_b10",
+          "__sha_b11",
+          "__sha_b12",
+          "__sha_b13",
+          "__sha_b14",
+          "__sha_b15",
+          "__sha_b16",
+          "__sha_b17",
+          "__sha_b18",
+          "__sha_b19",
+          "__sha_b20",
+          "__sha_b21",
+          "__sha_b22",
+          "__sha_b23",
+          "__sha_b24",
+          "__sha_b25",
+          "__sha_b26",
+          "__sha_b27",
+          "__sha_b28",
+          "__sha_b29",
+          "__sha_b30",
+          "__sha_b31"
+        ],
+        "params": {
+          "input_num_bits": "8"
+        }
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "safety_commitment_hi"
+        },
+        "rhs": {
+          "op": "signal",
+          "args": "__sha_b0"
+        }
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "safety_commitment_lo"
+        },
+        "rhs": {
+          "op": "signal",
+          "args": "__sha_b31"
+        }
+      }
+    ],
+    "witness_plan": {
+      "assignments": [],
+      "hints": []
+    },
+    "metadata": {
+      "domain": "engineering",
+      "ir_family": "zir-v1",
+      "scale_factor": "0.01 kN or 0.01 MPa",
+      "standard": "DO-178C / AS9100 / ASME BPVC / ISO 2394"
+    }
+  },
+  "program_digest": "f3efedf6b0c9120b3b4b41f8d4d9288987dba7db4399f5002633f7b3dcb7e356",
+  "metadata": {
+    "compact_compile_artifacts_dir": "/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/zkf-midnight/uccr_engineering_safety-1774655619005/artifacts",
+    "compact_compile_status": "ok",
+    "compact_source": "pragma language_version 0.21;\n\n// ZKF program: uccr_engineering_safety\n// Field: PastaFp\n\nwitness get_design_load_capacity_scaled(): Field;\nwitness get_applied_load_scaled(): Field;\nwitness get_material_yield_stress_scaled(): Field;\nwitness get_applied_stress_scaled(): Field;\nwitness get_design_id_hash(): Field;\nwitness get_blinding(): Field;\nwitness get___load_margin(): Field;\nwitness get___stress_margin(): Field;\nwitness get___sha_b0(): Field;\nwitness get___sha_b1(): Field;\nwitness get___sha_b2(): Field;\nwitness get___sha_b3(): Field;\nwitness get___sha_b4(): Field;\nwitness get___sha_b5(): Field;\nwitness get___sha_b6(): Field;\nwitness get___sha_b7(): Field;\nwitness get___sha_b8(): Field;\nwitness get___sha_b9(): Field;\nwitness get___sha_b10(): Field;\nwitness get___sha_b11(): Field;\nwitness get___sha_b12(): Field;\nwitness get___sha_b13(): Field;\nwitness get___sha_b14(): Field;\nwitness get___sha_b15(): Field;\nwitness get___sha_b16(): Field;\nwitness get___sha_b17(): Field;\nwitness get___sha_b18(): Field;\nwitness get___sha_b19(): Field;\nwitness get___sha_b20(): Field;\nwitness get___sha_b21(): Field;\nwitness get___sha_b22(): Field;\nwitness get___sha_b23(): Field;\nwitness get___sha_b24(): Field;\nwitness get___sha_b25(): Field;\nwitness get___sha_b26(): Field;\nwitness get___sha_b27(): Field;\nwitness get___sha_b28(): Field;\nwitness get___sha_b29(): Field;\nwitness get___sha_b30(): Field;\nwitness get___sha_b31(): Field;\n\nexport circuit uccr_engineering_safety(safety_commitment_hi: Field, safety_commitment_lo: Field): [Field, Field] {\n  const design_load_capacity_scaled = get_design_load_capacity_scaled();\n  const applied_load_scaled = get_applied_load_scaled();\n  const material_yield_stress_scaled = get_material_yield_stress_scaled();\n  const applied_stress_scaled = get_applied_stress_scaled();\n  const design_id_hash = get_design_id_hash();\n  const blinding = get_blinding();\n  const __load_margin = get___load_margin();\n  const __stress_margin = get___stress_margin();\n  const __sha_b0 = get___sha_b0();\n  const __sha_b1 = get___sha_b1();\n  const __sha_b2 = get___sha_b2();\n  const __sha_b3 = get___sha_b3();\n  const __sha_b4 = get___sha_b4();\n  const __sha_b5 = get___sha_b5();\n  const __sha_b6 = get___sha_b6();\n  const __sha_b7 = get___sha_b7();\n  const __sha_b8 = get___sha_b8();\n  const __sha_b9 = get___sha_b9();\n  const __sha_b10 = get___sha_b10();\n  const __sha_b11 = get___sha_b11();\n  const __sha_b12 = get___sha_b12();\n  const __sha_b13 = get___sha_b13();\n  const __sha_b14 = get___sha_b14();\n  const __sha_b15 = get___sha_b15();\n  const __sha_b16 = get___sha_b16();\n  const __sha_b17 = get___sha_b17();\n  const __sha_b18 = get___sha_b18();\n  const __sha_b19 = get___sha_b19();\n  const __sha_b20 = get___sha_b20();\n  const __sha_b21 = get___sha_b21();\n  const __sha_b22 = get___sha_b22();\n  const __sha_b23 = get___sha_b23();\n  const __sha_b24 = get___sha_b24();\n  const __sha_b25 = get___sha_b25();\n  const __sha_b26 = get___sha_b26();\n  const __sha_b27 = get___sha_b27();\n  const __sha_b28 = get___sha_b28();\n  const __sha_b29 = get___sha_b29();\n  const __sha_b30 = get___sha_b30();\n  const __sha_b31 = get___sha_b31();\n\n  const safety_factor_bps = 15000;\n\n  const design_load_capacity_scaled_uint = design_load_capacity_scaled as Uint<32>; // c0\n  const applied_load_scaled_uint = applied_load_scaled as Uint<32>; // c1\n  const material_yield_stress_scaled_uint = material_yield_stress_scaled as Uint<32>; // c2\n  const applied_stress_scaled_uint = applied_stress_scaled as Uint<32>; // c3\n  const design_id_hash_uint = design_id_hash as Uint<32>; // c4\n  const blinding_uint = blinding as Uint<32>; // c5\n  assert(__load_margin == (design_load_capacity_scaled - applied_load_scaled), \"c6\");\n  const __load_margin_uint = __load_margin as Uint<32>; // c7\n  assert(__stress_margin == (material_yield_stress_scaled - applied_stress_scaled), \"c8\");\n  const __stress_margin_uint = __stress_margin as Uint<32>; // c9\n  // c10: sha256([design_id_hash, design_load_capacity_scaled, applied_load_scaled, blinding]) -> [__sha_b0, __sha_b1, __sha_b2, __sha_b3, __sha_b4, __sha_b5, __sha_b6, __sha_b7, __sha_b8, __sha_b9, __sha_b10, __sha_b11, __sha_b12, __sha_b13, __sha_b14, __sha_b15, __sha_b16, __sha_b17, __sha_b18, __sha_b19, __sha_b20, __sha_b21, __sha_b22, __sha_b23, __sha_b24, __sha_b25, __sha_b26, __sha_b27, __sha_b28, __sha_b29, __sha_b30, __sha_b31]\n  assert(safety_commitment_hi == __sha_b0, \"c11\");\n  assert(safety_commitment_lo == __sha_b31, \"c12\");\n\n  return [safety_commitment_hi, safety_commitment_lo];\n}\n",
+    "delegated_backend_hint": "halo2",
+    "mode": "native",
+    "support_class": "delegated",
+    "trust_model": "attestation",
+    "trust_tier": "2"
+  }
+}

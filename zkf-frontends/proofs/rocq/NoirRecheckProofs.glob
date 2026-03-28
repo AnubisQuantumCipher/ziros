@@ -1,0 +1,12 @@
+DIGEST f63e2c336c70f0e462c0b127c660d111
+FNoirRecheckProofs
+R15:34 NoirRecheckSemantics <> <> lib
+prf 46:79 <> noir_acir_recheck_wrapper_sound_ok
+binder 92:99 <> boundary:1
+R187:194 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R148:156 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R106:138 NoirRecheckSemantics <> noir_acir_recheck_wrapper_surface def
+R140:147 NoirRecheckProofs <> boundary:1 var
+R157:186 NoirRecheckSemantics <> SpecNoirRecheckStatus_Accepted constr
+R195:217 NoirRecheckSemantics <> NoirRecheckWrapperSound def
+R219:226 NoirRecheckProofs <> boundary:1 var

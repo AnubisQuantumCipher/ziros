@@ -1,0 +1,46 @@
+[package]
+name = "zkf-api"
+version.workspace = true
+edition.workspace = true
+license = "BSL-1.1"
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "ZKF Proving-as-a-Service API server"
+publish = false
+
+[features]
+default = ["metal-gpu"]
+metal-gpu = ["zkf-backends/metal-gpu", "zkf-backends-pro/metal-gpu"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
+zkf-backends = { path = "../zkf-backends" }
+zkf-backends-pro = { path = "../zkf-backends-pro" }
+zkf-frontends = { path = "../zkf-frontends" }
+zkf-lib = { path = "../zkf-lib" }
+zkf-runtime = { path = "../zkf-runtime" }
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+base64.workspace = true
+num-bigint.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+rand.workspace = true
+uuid = { version = "1", features = ["v4"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+rusqlite = { version = "0.33", features = ["bundled"] }
+postgres = "0.19"
+chacha20poly1305 = "0.10"
+
+[dev-dependencies]
+ed25519-dalek.workspace = true
+libcrux-ml-dsa.workspace = true
+tempfile = "3"
+tower = "0.5"
+
+[lints]
+workspace = true

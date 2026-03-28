@@ -1,0 +1,207 @@
+{
+  "schema": "zkf-completion-status-v2",
+  "generated_from": "zkf-ir-spec/verification-ledger.json",
+  "current_priority": "formal-verification-zero-repo-assumption-program",
+  "current_priority_progress": "March 25, 2026 release-grade closure complete. Ledger inventory totals 143 rows with 143 machine-checked rows. Ledger counts: 143 mechanized_local, 0 mechanized_generated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 115 mechanized_implementation_claim, 0 bounded_check, 3 attestation_backed_lane, 16 model_only_claim, 9 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. All protocol rows are mechanized_local.",
+  "build_status": "March 25, 2026: generated implementation-closure truth and finished-app bundle exporters build cleanly on the current tree. Passed checks: `cargo build -p zkf-lib --example private_nbody_orbital_showcase`; `cargo build -p zkf-lib --example private_satellite_conjunction_showcase`; `cargo build -p zkf-lib --example private_voting_commitment_pipeline`; and `cargo build --workspace`.",
+  "test_status": "March 25, 2026: generated implementation-closure truth and finished-app bundle closure are green on the current tree. Passed checks: `cargo test -p zkf-lib implementation_closure_generated_outputs_match_repo_files --lib -- --nocapture`; `cargo test -p zkf-lib satellite_plan_commitment_tamper_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_state_commitment_tamper_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_tampered_running_minimum_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_small_step_witness_satisfies_constraints --lib -- --nocapture`; `cargo test -p zkf-lib --lib`; `cargo test -p zkf-core --lib`; `cargo test -p zkf-backends --lib`; `cargo test -p zkf-integration-tests --test private_nbody_orbital_showcase -- --nocapture`; `cargo test -p zkf-integration-tests --test private_satellite_conjunction_showcase -- --nocapture`; and `cargo test -p zkf-integration-tests --test private_voting_commitment_pipeline -- --nocapture`.",
+  "recent_delivery": "Added a shared generated-closure and formal-evidence layer in `zkf-lib::evidence` that reads only the live truth sources (`zkf-ir-spec/verification-ledger.json`, `.zkf-completion-status.json`, `docs/CANONICAL_TRUTH.md`, and `support-matrix.json`), normalizes them to the approved assurance vocabulary, and validates checked-in repo extracts under `forensics/generated/`. Standardized the orbital, satellite, and private-voting exporters on those generated closure extracts so `formal/exercised_surfaces.json` is now a repo-generated closure document, and surfaced the generated closure path and assurance counts in the bundle manifest and reports. Tightened truth-sync with unit tests that rebuild the generated documents in memory, integration tests that require the generated closure path/counts in exported bundles, and a satellite integration helper fix that always rebuilds the release example binary instead of reusing a stale artifact from disk.",
+  "authoritative_status_source": "zkf-ir-spec/verification-ledger.json",
+  "total_entries": 143,
+  "mechanized_total": 143,
+  "counts": {
+    "mechanized_local": 143,
+    "mechanized_generated": 0,
+    "bounded_checked": 0,
+    "assumed_external": 0,
+    "pending": 0
+  },
+  "assurance_class_counts": {
+    "mechanized_implementation_claim": 115,
+    "bounded_check": 0,
+    "attestation_backed_lane": 3,
+    "model_only_claim": 16,
+    "hypothesis_carried_theorem": 9
+  },
+  "runtime_proof_coverage": {
+    "schema": "zkf-runtime-proof-coverage-v1",
+    "total_files": 89,
+    "total_functions": 1788,
+    "file_counts": {
+      "implementation_mechanized": 27,
+      "shell_contract_mechanized": 32,
+      "explicit_tcb_adapter": 30
+    },
+    "function_counts": {
+      "implementation_mechanized": 199,
+      "shell_contract_mechanized": 1037,
+      "explicit_tcb_adapter": 552
+    },
+    "complete_files": 89,
+    "complete_functions": 1788,
+    "targets": [
+      {
+        "name": "zkf-runtime-full",
+        "total_files": 39,
+        "total_functions": 950,
+        "complete_files": 39,
+        "complete_functions": 950,
+        "closed": true,
+        "file_counts": {
+          "implementation_mechanized": 12,
+          "shell_contract_mechanized": 15,
+          "explicit_tcb_adapter": 12
+        },
+        "function_counts": {
+          "implementation_mechanized": 88,
+          "shell_contract_mechanized": 514,
+          "explicit_tcb_adapter": 348
+        }
+      },
+      {
+        "name": "zkf-runtime-swarm-path",
+        "total_files": 13,
+        "total_functions": 284,
+        "complete_files": 13,
+        "complete_functions": 284,
+        "closed": true,
+        "file_counts": {
+          "implementation_mechanized": 6,
+          "shell_contract_mechanized": 6,
+          "explicit_tcb_adapter": 1
+        },
+        "function_counts": {
+          "implementation_mechanized": 42,
+          "shell_contract_mechanized": 235,
+          "explicit_tcb_adapter": 7
+        }
+      },
+      {
+        "name": "zkf-distributed-swarm-path",
+        "total_files": 37,
+        "total_functions": 554,
+        "complete_files": 37,
+        "complete_functions": 554,
+        "closed": true,
+        "file_counts": {
+          "implementation_mechanized": 9,
+          "shell_contract_mechanized": 11,
+          "explicit_tcb_adapter": 17
+        },
+        "function_counts": {
+          "implementation_mechanized": 69,
+          "shell_contract_mechanized": 288,
+          "explicit_tcb_adapter": 197
+        }
+      },
+      {
+        "name": "zkf-runtime-app-proof-surfaces",
+        "total_files": 0,
+        "total_functions": 0,
+        "complete_files": 0,
+        "complete_functions": 0,
+        "closed": true,
+        "file_counts": {},
+        "function_counts": {}
+      }
+    ]
+  },
+  "swarm_proof_boundary": {
+    "runtime_target": {
+      "name": "zkf-runtime-swarm-path",
+      "total_files": 13,
+      "total_functions": 284,
+      "complete_files": 13,
+      "complete_functions": 284,
+      "closed": true,
+      "file_counts": {
+        "implementation_mechanized": 6,
+        "shell_contract_mechanized": 6,
+        "explicit_tcb_adapter": 1
+      },
+      "function_counts": {
+        "implementation_mechanized": 42,
+        "shell_contract_mechanized": 235,
+        "explicit_tcb_adapter": 7
+      }
+    },
+    "distributed_target": {
+      "name": "zkf-distributed-swarm-path",
+      "total_files": 37,
+      "total_functions": 554,
+      "complete_files": 37,
+      "complete_functions": 554,
+      "closed": true,
+      "file_counts": {
+        "implementation_mechanized": 9,
+        "shell_contract_mechanized": 11,
+        "explicit_tcb_adapter": 17
+      },
+      "function_counts": {
+        "implementation_mechanized": 69,
+        "shell_contract_mechanized": 288,
+        "explicit_tcb_adapter": 197
+      }
+    },
+    "closed": true
+  },
+  "trusted_assumption_rows": [],
+  "release_grade_ready": true,
+  "release_grade_blockers": [],
+  "protocol_rows": [
+    {
+      "theorem_id": "protocol.fri_completeness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::plonky3",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
+    },
+    {
+      "theorem_id": "protocol.fri_proximity_soundness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::plonky3",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
+    },
+    {
+      "theorem_id": "protocol.groth16_completeness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::arkworks",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+    },
+    {
+      "theorem_id": "protocol.groth16_knowledge_soundness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::arkworks",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+    },
+    {
+      "theorem_id": "protocol.groth16_zero_knowledge",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::arkworks",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+    },
+    {
+      "theorem_id": "protocol.hypernova_completeness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::nova_native",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
+    },
+    {
+      "theorem_id": "protocol.hypernova_folding_soundness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::nova_native",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
+    },
+    {
+      "theorem_id": "protocol.nova_completeness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::nova_native",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
+    },
+    {
+      "theorem_id": "protocol.nova_folding_soundness",
+      "status": "mechanized_local",
+      "scope": "zkf-backends::nova_native",
+      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
+    }
+  ]
+}

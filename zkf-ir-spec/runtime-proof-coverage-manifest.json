@@ -1,0 +1,776 @@
+{
+  "schema": "zkf-runtime-proof-coverage-v1",
+  "targets": [
+    {
+      "name": "zkf-runtime-full",
+      "root": "zkf-runtime/src",
+      "exclude_files": [
+        "proof_runtime_spec.rs",
+        "proof_swarm_spec.rs",
+        "verification_kani.rs",
+        "buffer_bridge_core.rs"
+      ],
+      "entries": [
+        {
+          "path": "adapters.rs",
+          "fn_count": 16,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.adapter_backend_graph_emission",
+            "runtime.adapter_wrapper_graph_emission"
+          ]
+        },
+        {
+          "path": "adapter_core.rs",
+          "fn_count": 6,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.adapter_backend_graph_emission",
+            "runtime.adapter_wrapper_graph_emission"
+          ]
+        },
+        {
+          "path": "adaptive_tuning.rs",
+          "fn_count": 29,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Adaptive threshold learning is an operational telemetry-and-filesystem adapter. It may influence stage placement and performance heuristics, but it does not widen the accepted proof relation, alter verifier semantics, or upgrade non-cryptographic lanes into proof-bearing ones."
+        },
+        {
+          "path": "api.rs",
+          "fn_count": 36,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.api_control_plane_request_projection",
+            "runtime.api_backend_candidate_selection",
+            "runtime.api_batch_scheduler_determinism"
+          ]
+        },
+        {
+          "path": "api_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.api_control_plane_request_projection",
+            "runtime.api_backend_candidate_selection",
+            "runtime.api_batch_scheduler_determinism"
+          ]
+        },
+        {
+          "path": "swarm_artifact_core.rs",
+          "fn_count": 5,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.non_interference"
+          ]
+        },
+        {
+          "path": "swarm_builder_core.rs",
+          "fn_count": 8,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.builder_rule_state_machine"
+          ]
+        },
+        {
+          "path": "swarm_entrypoint_core.rs",
+          "fn_count": 4,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.entrypoint_signal_routing"
+          ]
+        },
+        {
+          "path": "swarm_queen_core.rs",
+          "fn_count": 11,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.escalation_monotonicity",
+            "swarm.weighted_network_pressure_median"
+          ]
+        },
+        {
+          "path": "swarm_sentinel_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.sentinel_rate_limit_soundness",
+            "swarm.sentinel_baseline_soundness"
+          ]
+        },
+        {
+          "path": "swarm_warrior_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.warrior_quorum_soundness"
+          ]
+        },
+        {
+          "path": "buffer_bridge.rs",
+          "fn_count": 56,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.buffer_typed_views_bounded",
+            "runtime.buffer_spill_reload_roundtrip_bounded"
+          ]
+        },
+        {
+          "path": "control_plane.rs",
+          "fn_count": 142,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "The control plane is the advisory backend-selection, model-loading, and scheduling boundary. It may choose among already-admitted routes or reject jobs, but proof validity and strict-lane admission remain enforced by runtime/backend verification gates outside this file."
+        },
+        {
+          "path": "cpu_driver.rs",
+          "fn_count": 34,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "The CPU driver is the concrete execution adapter from runtime nodes into backend engines and host resources. It is proof-relevant as an implementation boundary, but cryptographic acceptance still comes from backend prove/verify semantics and the runtime trust-lane gates rather than from this adapter itself."
+        },
+        {
+          "path": "execution.rs",
+          "fn_count": 30,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.execution_context_artifact_state_machine"
+          ]
+        },
+        {
+          "path": "execution_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.execution_context_artifact_state_machine"
+          ]
+        },
+        {
+          "path": "graph.rs",
+          "fn_count": 24,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.graph_topological_order_soundness",
+            "runtime.graph_trust_propagation_monotonicity"
+          ]
+        },
+        {
+          "path": "graph_core.rs",
+          "fn_count": 5,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.graph_topological_order_soundness",
+            "runtime.graph_trust_propagation_monotonicity"
+          ]
+        },
+        {
+          "path": "hybrid.rs",
+          "fn_count": 34,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.hybrid_verification_soundness",
+            "runtime.hybrid_replay_manifest_determinism"
+          ]
+        },
+        {
+          "path": "hybrid_core.rs",
+          "fn_count": 11,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.hybrid_verification_soundness",
+            "runtime.hybrid_replay_manifest_determinism"
+          ]
+        },
+        {
+          "path": "lib.rs",
+          "fn_count": 66,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.graph_topological_order_soundness",
+            "runtime.execution_context_artifact_state_machine",
+            "runtime.scheduler_placement_resolution",
+            "runtime.api_control_plane_request_projection",
+            "runtime.adapter_backend_graph_emission",
+            "runtime.hybrid_verification_soundness"
+          ]
+        },
+        {
+          "path": "memory.rs",
+          "fn_count": 17,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Unified buffer allocation and backing-state management are runtime storage boundaries. Bugs here can affect availability or data movement, but the file is now recorded explicitly as TCB infrastructure rather than being silently counted as an unclassified proof claim."
+        },
+        {
+          "path": "memory_plan.rs",
+          "fn_count": 14,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Runtime memory planning is an operational resource-budget and placement boundary. It can enable spill, CPU override, or GPU residency limits, but it does not widen the accepted proof relation or bypass the strict cryptographic admission gates."
+        },
+        {
+          "path": "metal_dispatch_macos.rs",
+          "fn_count": 23,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "gpu.launch_contract_sound",
+            "gpu.dispatch_schedule_sound",
+            "gpu.shader_bundle_provenance",
+            "gpu.runtime_fail_closed",
+            "gpu.cpu_gpu_partition_equivalence"
+          ],
+          "notes": "The macOS Metal dispatch bridge is now constrained by the generated GPU inventory, verified-lane whitelist, and runtime artifact attestation checks. The remaining trusted boundary is the pinned Apple Metal compiler/driver/runtime/hardware stack documented in the proof boundary."
+        },
+        {
+          "path": "metal_driver.rs",
+          "fn_count": 14,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "gpu.runtime_fail_closed",
+            "gpu.cpu_gpu_partition_equivalence"
+          ],
+          "notes": "The runtime-to-Metal driver boundary is now mechanized at the shell-contract level: verified mode is explicit, unavailable or drifting GPU lanes fail closed, and non-whitelisted stages stay on CPU or an explicit non-verified lane."
+        },
+        {
+          "path": "scheduler.rs",
+          "fn_count": 16,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "runtime.scheduler_placement_resolution",
+            "runtime.scheduler_gpu_fallback_fail_closed",
+            "runtime.scheduler_trace_accounting"
+          ]
+        },
+        {
+          "path": "scheduler_core.rs",
+          "fn_count": 10,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "runtime.scheduler_placement_resolution",
+            "runtime.scheduler_gpu_fallback_fail_closed",
+            "runtime.scheduler_trace_accounting"
+          ]
+        },
+        {
+          "path": "security.rs",
+          "fn_count": 22,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Security policy, anomaly scoring, and model-integrity handling are operational enforcement layers. They may reject, quarantine, or downgrade work, but they do not make invalid proofs verify and must not be read as mechanized proof-kernel logic."
+        },
+        {
+          "path": "slot_map.rs",
+          "fn_count": 9,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Slot-map storage is a small data-structure adapter used by the runtime allocator. It is now classified explicitly as infrastructure TCB surface rather than an unstated proof-bearing component."
+        },
+        {
+          "path": "swarm/builder.rs",
+          "fn_count": 45,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.builder_rule_state_machine"
+          ]
+        },
+        {
+          "path": "swarm/config.rs",
+          "fn_count": 7,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Swarm configuration is an environment and filesystem boundary. Proof-relevant state transitions live in the shipped Swarm core modules; this file remains an explicit configuration adapter."
+        },
+        {
+          "path": "swarm/entrypoint.rs",
+          "fn_count": 11,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.entrypoint_signal_routing"
+          ]
+        },
+        {
+          "path": "swarm/queen.rs",
+          "fn_count": 68,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.escalation_monotonicity",
+            "swarm.weighted_network_pressure_median"
+          ]
+        },
+        {
+          "path": "swarm/sentinel.rs",
+          "fn_count": 61,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.sentinel_rate_limit_soundness",
+            "swarm.sentinel_baseline_soundness"
+          ]
+        },
+        {
+          "path": "swarm/warrior.rs",
+          "fn_count": 14,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.warrior_quorum_soundness"
+          ]
+        },
+        {
+          "path": "telemetry.rs",
+          "fn_count": 7,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Telemetry aggregation and reporting are observational surfaces only. They describe execution after the fact and must not be interpreted as proof-carrying logic or verifier enforcement."
+        },
+        {
+          "path": "telemetry_collector.rs",
+          "fn_count": 25,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Telemetry collection is a filesystem and host-inspection adapter that emits JSON evidence for operators and models. It is intentionally outside the mechanized proof kernel and does not change proof acceptance semantics."
+        },
+        {
+          "path": "trust.rs",
+          "fn_count": 15,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Trust-model labels and hardware-profile detection define runtime policy vocabulary and admission metadata. They are explicit boundary logic for classification and fail-closed gating, not standalone arithmetic proof theorems."
+        },
+        {
+          "path": "watchdog.rs",
+          "fn_count": 27,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "The watchdog is an anomaly-detection and throttling boundary over runtime traces and host pressure signals. It may trigger rejection or resource-policy changes, but it does not alter proof bytes or verifier truth."
+        }
+      ]
+    },
+    {
+      "name": "zkf-runtime-swarm-path",
+      "root": "zkf-runtime/src",
+      "include_paths": [
+        "api.rs",
+        "swarm/",
+        "swarm_artifact_core.rs",
+        "swarm_builder_core.rs",
+        "swarm_entrypoint_core.rs",
+        "swarm_queen_core.rs",
+        "swarm_sentinel_core.rs",
+        "swarm_warrior_core.rs"
+      ],
+      "exclude_files": [
+        "proof_swarm_spec.rs",
+        "verification_kani.rs"
+      ],
+      "entries": [
+        {
+          "path": "api.rs",
+          "fn_count": 36,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.non_interference"
+          ]
+        },
+        {
+          "path": "swarm_artifact_core.rs",
+          "fn_count": 5,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.non_interference"
+          ]
+        },
+        {
+          "path": "swarm_builder_core.rs",
+          "fn_count": 8,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.builder_rule_state_machine"
+          ]
+        },
+        {
+          "path": "swarm_entrypoint_core.rs",
+          "fn_count": 4,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.entrypoint_signal_routing"
+          ]
+        },
+        {
+          "path": "swarm_queen_core.rs",
+          "fn_count": 11,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.escalation_monotonicity",
+            "swarm.weighted_network_pressure_median"
+          ]
+        },
+        {
+          "path": "swarm_sentinel_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.sentinel_rate_limit_soundness",
+            "swarm.sentinel_baseline_soundness"
+          ]
+        },
+        {
+          "path": "swarm_warrior_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.warrior_quorum_soundness"
+          ]
+        },
+        {
+          "path": "swarm/builder.rs",
+          "fn_count": 45,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.builder_rule_state_machine"
+          ]
+        },
+        {
+          "path": "swarm/config.rs",
+          "fn_count": 7,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Swarm configuration is an environment and filesystem boundary. Proof-relevant state transitions live in the shipped Swarm core modules; this file remains an explicit configuration adapter."
+        },
+        {
+          "path": "swarm/entrypoint.rs",
+          "fn_count": 11,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.entrypoint_signal_routing"
+          ]
+        },
+        {
+          "path": "swarm/queen.rs",
+          "fn_count": 68,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.escalation_monotonicity",
+            "swarm.weighted_network_pressure_median"
+          ]
+        },
+        {
+          "path": "swarm/sentinel.rs",
+          "fn_count": 61,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.sentinel_rate_limit_soundness",
+            "swarm.sentinel_baseline_soundness"
+          ]
+        },
+        {
+          "path": "swarm/warrior.rs",
+          "fn_count": 14,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.warrior_quorum_soundness"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zkf-distributed-swarm-path",
+      "root": "zkf-distributed/src",
+      "exclude_files": [
+        "proof_swarm_reputation_spec.rs",
+        "verification_kani.rs"
+      ],
+      "entries": [
+        {
+          "path": "bundle.rs",
+          "fn_count": 31,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Distributed execution bundles are a postcard/JSON serialization boundary between the runtime scheduler and remote transport. Proof-relevant Swarm decisions live in the shipped Swarm cores; bundle materialization remains an explicit adapter."
+        },
+        {
+          "path": "config.rs",
+          "fn_count": 5,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Cluster configuration is an environment boundary. Swarm proof obligations attach to the shipped core policy modules rather than this configuration loader."
+        },
+        {
+          "path": "coordinator.rs",
+          "fn_count": 56,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.coordinator_acceptance_soundness"
+          ]
+        },
+        {
+          "path": "discovery.rs",
+          "fn_count": 20,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Peer discovery is a raw network and host-environment boundary. Swarm proof-relevant admission and quorum logic lives above it in mechanized core modules."
+        },
+        {
+          "path": "error.rs",
+          "fn_count": 4,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Distributed error shaping is a reporting surface, not a proof-bearing state machine. It remains an explicit boundary adapter for Swarm closure."
+        },
+        {
+          "path": "execution.rs",
+          "fn_count": 5,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Remote execution dispatch is an effectful worker boundary. Swarm-specific acceptance logic is mechanized in coordinator and transport cores instead of this adapter."
+        },
+        {
+          "path": "health.rs",
+          "fn_count": 13,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Health tracking consumes live peer signals and clocks. The Swarm proof boundary treats it as an observational adapter beneath mechanized quorum and epoch policy."
+        },
+        {
+          "path": "identity.rs",
+          "fn_count": 11,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Cluster identity and placement metadata remain an explicit adapter surface. Swarm cryptographic identity binding is mechanized in the Swarm identity core."
+        },
+        {
+          "path": "lib.rs",
+          "fn_count": 4,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "The crate root is an export shell. Swarm proof-relevant logic is carried by the shipped core modules and their delegating shells."
+        },
+        {
+          "path": "partition/cost_model.rs",
+          "fn_count": 7,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Partition cost estimation is an optimization heuristic outside the Swarm proof surface. It remains an explicit adapter for distributed scheduling."
+        },
+        {
+          "path": "partition/mod.rs",
+          "fn_count": 19,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Graph partitioning is a distributed execution shell. Swarm acceptance, identity, gossip, and transport invariants are proven in dedicated Swarm cores."
+        },
+        {
+          "path": "partition/strategy.rs",
+          "fn_count": 1,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Partition strategy selection is a policy shell outside the Swarm proof boundary and remains an explicit adapter."
+        },
+        {
+          "path": "protocol.rs",
+          "fn_count": 4,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.protocol_digest_codec_determinism"
+          ]
+        },
+        {
+          "path": "swarm_protocol_core.rs",
+          "fn_count": 8,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.protocol_digest_codec_determinism"
+          ]
+        },
+        {
+          "path": "swarm_consensus_core.rs",
+          "fn_count": 4,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.consensus_two_thirds_threshold"
+          ]
+        },
+        {
+          "path": "swarm_diplomat_core.rs",
+          "fn_count": 8,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.gossip_boundedness",
+            "swarm.diplomat_intelligence_root_determinism"
+          ]
+        },
+        {
+          "path": "swarm_epoch_core.rs",
+          "fn_count": 8,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.epoch_negotiation_fail_closed"
+          ]
+        },
+        {
+          "path": "swarm_identity_core.rs",
+          "fn_count": 7,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.identity_bundle_pow_binding"
+          ]
+        },
+        {
+          "path": "swarm_memory_core.rs",
+          "fn_count": 6,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.memory_snapshot_identity"
+          ]
+        },
+        {
+          "path": "swarm_reputation_core.rs",
+          "fn_count": 14,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.reputation_boundedness"
+          ]
+        },
+        {
+          "path": "swarm_coordinator_core.rs",
+          "fn_count": 5,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.coordinator_acceptance_soundness"
+          ]
+        },
+        {
+          "path": "swarm_transport_core.rs",
+          "fn_count": 9,
+          "coverage_state": "implementation_mechanized",
+          "evidence_rows": [
+            "swarm.transport_integrity_fail_closed",
+            "swarm.protocol_digest_codec_determinism"
+          ]
+        },
+        {
+          "path": "swarm/consensus.rs",
+          "fn_count": 9,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.consensus_two_thirds_threshold"
+          ]
+        },
+        {
+          "path": "swarm/diplomat.rs",
+          "fn_count": 35,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.gossip_boundedness",
+            "swarm.diplomat_intelligence_root_determinism"
+          ]
+        },
+        {
+          "path": "swarm/epoch.rs",
+          "fn_count": 27,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.epoch_negotiation_fail_closed"
+          ]
+        },
+        {
+          "path": "swarm/identity.rs",
+          "fn_count": 66,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.identity_bundle_pow_binding"
+          ]
+        },
+        {
+          "path": "swarm/memory.rs",
+          "fn_count": 38,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.memory_snapshot_identity"
+          ]
+        },
+        {
+          "path": "swarm/mod.rs",
+          "fn_count": 6,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.protocol_digest_codec_determinism"
+          ]
+        },
+        {
+          "path": "swarm/reputation.rs",
+          "fn_count": 34,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.reputation_boundedness"
+          ]
+        },
+        {
+          "path": "telemetry.rs",
+          "fn_count": 1,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Distributed telemetry is observational only and sits below the mechanized Swarm policy cores."
+        },
+        {
+          "path": "transfer/compression.rs",
+          "fn_count": 5,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Chunk compression is an external codec boundary. Swarm integrity proofs attach to the fail-closed transport core rather than the compression implementation."
+        },
+        {
+          "path": "transfer/mod.rs",
+          "fn_count": 7,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.transport_integrity_fail_closed"
+          ]
+        },
+        {
+          "path": "transport/frame.rs",
+          "fn_count": 6,
+          "coverage_state": "shell_contract_mechanized",
+          "evidence_rows": [
+            "swarm.transport_integrity_fail_closed"
+          ]
+        },
+        {
+          "path": "transport/mod.rs",
+          "fn_count": 15,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "The transport trait is an IO boundary. Swarm proof-relevant fail-closed framing and digest checks are mechanized in the transport core."
+        },
+        {
+          "path": "transport/rdma.rs",
+          "fn_count": 6,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "RDMA transport is an external hardware and network adapter outside the current Swarm mechanized core."
+        },
+        {
+          "path": "transport/tcp.rs",
+          "fn_count": 17,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "TCP transport is a raw network boundary. Swarm proof-relevant framing and integrity checks are carried by the shipped transport core."
+        },
+        {
+          "path": "worker.rs",
+          "fn_count": 33,
+          "coverage_state": "explicit_tcb_adapter",
+          "evidence_rows": [],
+          "notes": "Worker orchestration is an effectful execution shell. Swarm closure mechanizes the policy and integrity decisions above it rather than the worker IO boundary."
+        }
+      ]
+    },
+    {
+      "name": "zkf-runtime-app-proof-surfaces",
+      "root": "zkf-runtime/proofs/verus",
+      "include_paths": [
+        "powered_descent_verus.rs"
+      ],
+      "entries": [],
+      "notes": "Proof-only Verus surfaces under zkf-runtime/proofs/verus are tracked by verification-ledger and finished-app evidence rows. This manifest remains scoped to executable runtime/distributed Rust functions, so the powered descent proof file contributes no counted fn entries here."
+    }
+  ]
+}

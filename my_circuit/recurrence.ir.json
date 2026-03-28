@@ -1,0 +1,144 @@
+{
+  "name": "recurrence_1",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "x",
+      "visibility": "private"
+    },
+    {
+      "name": "y",
+      "visibility": "private"
+    },
+    {
+      "name": "acc_0",
+      "visibility": "private"
+    },
+    {
+      "name": "mul_0",
+      "visibility": "private"
+    },
+    {
+      "name": "acc_1",
+      "visibility": "public"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "acc_0"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "x"
+          },
+          {
+            "op": "signal",
+            "args": "y"
+          }
+        ]
+      },
+      "label": "acc_init"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "mul_0"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "acc_0"
+          },
+          {
+            "op": "signal",
+            "args": "x"
+          }
+        ]
+      },
+      "label": "mul_step_0"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "acc_1"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "mul_0"
+          },
+          {
+            "op": "signal",
+            "args": "y"
+          }
+        ]
+      },
+      "label": "acc_step_0"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "acc_0",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "x"
+            },
+            {
+              "op": "signal",
+              "args": "y"
+            }
+          ]
+        }
+      },
+      {
+        "target": "mul_0",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "acc_0"
+            },
+            {
+              "op": "signal",
+              "args": "x"
+            }
+          ]
+        }
+      },
+      {
+        "target": "acc_1",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "mul_0"
+            },
+            {
+              "op": "signal",
+              "args": "y"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

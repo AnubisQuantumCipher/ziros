@@ -1,0 +1,4186 @@
+[
+  {
+    "name": "zk_rollup",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zk_rollup/Cargo.toml",
+    "crate_dir": "zk_rollup",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-dsl",
+          "package_name": "zkf-dsl",
+          "classification": "internal",
+          "detail": "path=../zkf-dsl"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-dsl"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zk_rollup",
+        "kind": "bin",
+        "src": "zk_rollup/src/main.rs"
+      }
+    ],
+    "module_trees": {
+      "zk_rollup": [
+        "- file: src/main.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-api",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-api/Cargo.toml",
+    "crate_dir": "zkf-api",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "axum",
+          "package_name": "axum",
+          "classification": "external",
+          "detail": "0.8"
+        },
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "chacha20poly1305",
+          "package_name": "chacha20poly1305",
+          "classification": "external",
+          "detail": "0.10"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "postgres",
+          "package_name": "postgres",
+          "classification": "external",
+          "detail": "0.19"
+        },
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rusqlite",
+          "package_name": "rusqlite",
+          "classification": "external",
+          "detail": "features=['bundled'], version='0.33'"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tokio",
+          "package_name": "tokio",
+          "classification": "external",
+          "detail": "features=['full'], version='1'"
+        },
+        {
+          "name": "tower-http",
+          "package_name": "tower-http",
+          "classification": "external",
+          "detail": "features=['cors', 'trace'], version='0.6'"
+        },
+        {
+          "name": "tracing",
+          "package_name": "tracing",
+          "classification": "external",
+          "detail": "0.1"
+        },
+        {
+          "name": "tracing-subscriber",
+          "package_name": "tracing-subscriber",
+          "classification": "external",
+          "detail": "features=['env-filter'], version='0.3'"
+        },
+        {
+          "name": "uuid",
+          "package_name": "uuid",
+          "classification": "external",
+          "detail": "features=['v4'], version='1'"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-backends-pro",
+          "package_name": "zkf-backends-pro",
+          "classification": "internal",
+          "detail": "path=../zkf-backends-pro"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libcrux-ml-dsa",
+          "package_name": "libcrux-ml-dsa",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tempfile",
+          "package_name": "tempfile",
+          "classification": "external",
+          "detail": "3"
+        },
+        {
+          "name": "tower",
+          "package_name": "tower",
+          "classification": "external",
+          "detail": "0.5"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-backends-pro",
+      "zkf-core",
+      "zkf-frontends",
+      "zkf-lib",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu",
+        "zkf-backends-pro/metal-gpu"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf-api",
+        "kind": "bin",
+        "src": "zkf-api/src/main.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf-api": [
+        "- file: src/main.rs",
+        "  - mod: auth -> src/auth.rs",
+        "    - file: src/auth.rs",
+        "  - mod: db -> src/db.rs",
+        "    - file: src/db.rs",
+        "      - inline mod: tests",
+        "  - mod: handlers -> src/handlers.rs",
+        "    - file: src/handlers.rs",
+        "      - inline mod: tests",
+        "  - mod: jobs -> src/jobs.rs",
+        "    - file: src/jobs.rs",
+        "      - inline mod: tests",
+        "  - mod: metering -> src/metering.rs",
+        "    - file: src/metering.rs",
+        "      - inline mod: tests",
+        "  - mod: solidity -> src/solidity.rs",
+        "    - file: src/solidity.rs",
+        "  - mod: types -> src/types.rs",
+        "    - file: src/types.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-backends",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-backends/Cargo.toml",
+    "crate_dir": "zkf-backends",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "acir",
+          "package_name": "acir",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acvm_blackbox_solver",
+          "package_name": "acvm_blackbox_solver",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bincode",
+          "package_name": "bincode",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver",
+          "package_name": "bn254_blackbox_solver",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "group",
+          "package_name": "group",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "k256",
+          "package_name": "k256",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "nova-snark",
+          "package_name": "nova-snark",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "once_cell",
+          "package_name": "once_cell",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p256",
+          "package_name": "p256",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "risc0-binfmt",
+          "package_name": "risc0-binfmt",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "risc0-zkos-v1compat",
+          "package_name": "risc0-zkos-v1compat",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "risc0-zkvm",
+          "package_name": "risc0-zkvm",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sp1-sdk",
+          "package_name": "sp1-sdk",
+          "classification": "external",
+          "detail": "features=['blocking'], optional=True, workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "proptest",
+          "package_name": "proptest",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-examples",
+          "package_name": "zkf-examples",
+          "classification": "internal",
+          "detail": "path=../zkf-examples"
+        }
+      ],
+      "target cfg(not(target_arch = \"wasm32\")) dependencies": [
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ec",
+          "package_name": "ark-ec",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-groth16",
+          "package_name": "ark-groth16",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-poly",
+          "package_name": "ark-poly",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-relations",
+          "package_name": "ark-relations",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-serialize",
+          "package_name": "ark-serialize",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-snark",
+          "package_name": "ark-snark",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ff",
+          "package_name": "ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "halo2_proofs",
+          "package_name": "halo2_proofs",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "halo2_proofs_pse",
+          "package_name": "halo2_proofs_pse",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-air",
+          "package_name": "p3-air",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-baby-bear",
+          "package_name": "p3-baby-bear",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-challenger",
+          "package_name": "p3-challenger",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-circle",
+          "package_name": "p3-circle",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-commit",
+          "package_name": "p3-commit",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-dft",
+          "package_name": "p3-dft",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-field",
+          "package_name": "p3-field",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-fri",
+          "package_name": "p3-fri",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-goldilocks",
+          "package_name": "p3-goldilocks",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-keccak",
+          "package_name": "p3-keccak",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-matrix",
+          "package_name": "p3-matrix",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-merkle-tree",
+          "package_name": "p3-merkle-tree",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-mersenne-31",
+          "package_name": "p3-mersenne-31",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-poseidon2",
+          "package_name": "p3-poseidon2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-symmetric",
+          "package_name": "p3-symmetric",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-uni-stark",
+          "package_name": "p3-uni-stark",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "postcard",
+          "package_name": "postcard",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand09",
+          "package_name": "rand09",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand_chacha",
+          "package_name": "rand_chacha",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ureq",
+          "package_name": "ureq",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ],
+      "target cfg(target_os = \"macos\") dependencies": [
+        {
+          "name": "zkf-metal",
+          "package_name": "zkf-metal",
+          "classification": "internal",
+          "detail": "path=../zkf-metal"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core",
+      "zkf-examples",
+      "zkf-metal"
+    ],
+    "feature_flags": {
+      "default": [
+        "full",
+        "metal-gpu"
+      ],
+      "full": [
+        "native-blackbox-solvers",
+        "native-nova",
+        "nova-compression"
+      ],
+      "kani-minimal": [],
+      "native-blackbox-solvers": [
+        "dep:acvm_blackbox_solver",
+        "dep:bn254_blackbox_solver"
+      ],
+      "native-nova": [
+        "dep:nova-snark",
+        "nova-snark/experimental",
+        "zkf-core/native-nova"
+      ],
+      "nova-compression": [
+        "native-nova"
+      ],
+      "native-sp1": [
+        "dep:sp1-sdk",
+        "zkf-core/native-sp1"
+      ],
+      "native-risc-zero": [
+        "dep:risc0-zkvm",
+        "dep:risc0-binfmt",
+        "dep:risc0-zkos-v1compat",
+        "zkf-core/native-risc-zero"
+      ],
+      "metal-gpu": [
+        "dep:zkf-metal"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_backends",
+        "kind": "lib",
+        "src": "zkf-backends/src/lib.rs"
+      },
+      {
+        "name": "zkf-recursive-groth16-worker",
+        "kind": "bin",
+        "src": "zkf-backends/src/bin/zkf-recursive-groth16-worker.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_backends": [
+        "- file: src/lib.rs",
+        "  - include!: src/lib_non_hax.rs",
+        "    - file: src/lib_non_hax.rs",
+        "      - mod: aggregation -> src/aggregation.rs",
+        "        - file: src/aggregation.rs",
+        "          - inline mod: tests",
+        "      - mod: arkworks -> src/arkworks.rs",
+        "        - file: src/arkworks.rs",
+        "          - inline mod: tests",
+        "      - mod: audited_backend -> src/audited_backend.rs",
+        "        - file: src/audited_backend.rs",
+        "          - inline mod: tests",
+        "      - mod: blackbox_gadgets -> src/blackbox_gadgets/mod.rs",
+        "        - file: src/blackbox_gadgets/mod.rs",
+        "          - mod: bits -> src/blackbox_gadgets/bits.rs",
+        "            - file: src/blackbox_gadgets/bits.rs",
+        "          - mod: blake2s -> src/blackbox_gadgets/blake2s.rs",
+        "            - file: src/blackbox_gadgets/blake2s.rs",
+        "          - mod: ec_ops -> src/blackbox_gadgets/ec_ops.rs",
+        "            - file: src/blackbox_gadgets/ec_ops.rs",
+        "          - mod: keccak256 -> src/blackbox_gadgets/keccak256.rs",
+        "            - file: src/blackbox_gadgets/keccak256.rs",
+        "          - mod: lookup_lowering -> src/blackbox_gadgets/lookup_lowering.rs",
+        "            - file: src/blackbox_gadgets/lookup_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: pedersen -> src/blackbox_gadgets/pedersen.rs",
+        "            - file: src/blackbox_gadgets/pedersen.rs",
+        "          - mod: schnorr -> src/blackbox_gadgets/schnorr.rs",
+        "            - file: src/blackbox_gadgets/schnorr.rs",
+        "          - inline mod: tests",
+        "      - mod: blackbox_native -> src/blackbox_native.rs",
+        "        - file: src/blackbox_native.rs",
+        "          - inline mod: tests",
+        "      - mod: ceremony -> src/ceremony.rs",
+        "        - file: src/ceremony.rs",
+        "          - inline mod: tests",
+        "      - mod: compat -> src/compat.rs",
+        "        - file: src/compat.rs",
+        "      - mod: foundry_test -> src/foundry_test.rs",
+        "        - file: src/foundry_test.rs",
+        "          - inline mod: tests",
+        "      - mod: groth16_hex -> src/groth16_hex.rs",
+        "        - file: src/groth16_hex.rs",
+        "          - inline mod: tests",
+        "      - mod: groth16_proof -> src/groth16_proof.rs",
+        "        - file: src/groth16_proof.rs",
+        "          - inline mod: tests",
+        "      - mod: groth16_vk -> src/groth16_vk.rs",
+        "        - file: src/groth16_vk.rs",
+        "          - inline mod: tests",
+        "      - mod: halo2 -> src/halo2.rs",
+        "        - file: src/halo2.rs",
+        "          - inline mod: tests",
+        "      - mod: halo2_bls12_381 -> src/halo2_bls12_381.rs",
+        "        - file: src/halo2_bls12_381.rs",
+        "          - inline mod: tests",
+        "      - mod: hypernova -> src/hypernova.rs",
+        "        - file: src/hypernova.rs",
+        "          - inline mod: tests",
+        "      - mod: lowering -> src/lowering/mod.rs",
+        "        - file: src/lowering/mod.rs",
+        "          - mod: arkworks_lowering -> src/lowering/arkworks_lowering.rs",
+        "            - file: src/lowering/arkworks_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: halo2_lowering -> src/lowering/halo2_lowering.rs",
+        "            - file: src/lowering/halo2_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: midnight_lowering -> src/lowering/midnight_lowering.rs",
+        "            - file: src/lowering/midnight_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: nova_lowering -> src/lowering/nova_lowering.rs",
+        "            - file: src/lowering/nova_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: plonky3_lowering -> src/lowering/plonky3_lowering.rs",
+        "            - file: src/lowering/plonky3_lowering.rs",
+        "              - inline mod: tests",
+        "          - mod: sp1_lowering -> src/lowering/sp1_lowering.rs",
+        "            - file: src/lowering/sp1_lowering.rs",
+        "              - inline mod: tests",
+        "      - mod: metal_runtime -> src/metal_runtime.rs",
+        "        - file: src/metal_runtime.rs",
+        "          - inline mod: tests",
+        "      - mod: midnight -> src/midnight.rs",
+        "        - file: src/midnight.rs",
+        "      - mod: midnight_client -> src/midnight_client.rs",
+        "        - file: src/midnight_client.rs",
+        "          - inline mod: tests",
+        "      - mod: midnight_codegen -> src/midnight_codegen.rs",
+        "        - file: src/midnight_codegen.rs",
+        "          - inline mod: tests",
+        "      - mod: midnight_native -> src/midnight_native.rs",
+        "        - file: src/midnight_native.rs",
+        "      - mod: midnight_tx -> src/midnight_tx.rs",
+        "        - file: src/midnight_tx.rs",
+        "          - inline mod: tests",
+        "      - mod: native_field -> src/native_field.rs",
+        "        - file: src/native_field.rs",
+        "      - mod: nova_native -> src/nova_native.rs",
+        "        - file: src/nova_native.rs",
+        "          - inline mod: tests",
+        "      - mod: r1cs_lowering -> src/r1cs_lowering.rs",
+        "        - file: src/r1cs_lowering.rs",
+        "          - inline mod: tests",
+        "      - mod: range_decomposition -> src/range_decomposition.rs",
+        "        - file: src/range_decomposition.rs",
+        "          - inline mod: tests",
+        "      - mod: recursive_aggregation -> src/recursive_aggregation.rs",
+        "        - file: src/recursive_aggregation.rs",
+        "          - inline mod: tests",
+        "      - mod: risc_zero_native -> src/risc_zero_native.rs",
+        "        - file: src/risc_zero_native.rs",
+        "          - inline mod: tests",
+        "      - mod: sp1_native -> src/sp1_native.rs",
+        "        - file: src/sp1_native.rs",
+        "      - mod: verification_kani -> src/verification_kani.rs",
+        "        - file: src/verification_kani.rs",
+        "      - mod: verifier_export -> src/verifier_export/mod.rs",
+        "        - file: src/verifier_export/mod.rs",
+        "          - mod: groth16 -> src/verifier_export/groth16.rs",
+        "            - file: src/verifier_export/groth16.rs",
+        "              - inline mod: tests",
+        "          - mod: halo2 -> src/verifier_export/halo2.rs",
+        "            - file: src/verifier_export/halo2.rs",
+        "              - inline mod: tests",
+        "              - inline mod: tests",
+        "          - mod: plonky3 -> src/verifier_export/plonky3.rs",
+        "            - file: src/verifier_export/plonky3.rs",
+        "              - inline mod: tests",
+        "              - inline mod: tests",
+        "      - mod: wrapping -> src/wrapping/mod.rs",
+        "        - file: src/wrapping/mod.rs",
+        "          - mod: air_eval_circuit -> src/wrapping/air_eval_circuit.rs",
+        "            - file: src/wrapping/air_eval_circuit.rs",
+        "              - inline mod: tests",
+        "          - mod: duplex_challenger -> src/wrapping/duplex_challenger.rs",
+        "            - file: src/wrapping/duplex_challenger.rs",
+        "              - inline mod: tests",
+        "          - mod: fri_gadgets -> src/wrapping/fri_gadgets.rs",
+        "            - file: src/wrapping/fri_gadgets.rs",
+        "              - inline mod: tests",
+        "          - mod: fri_query_step -> src/wrapping/fri_query_step.rs",
+        "            - file: src/wrapping/fri_query_step.rs",
+        "              - inline mod: tests",
+        "          - mod: fri_verifier_circuit -> src/wrapping/fri_verifier_circuit.rs",
+        "            - file: src/wrapping/fri_verifier_circuit.rs",
+        "              - inline mod: tests",
+        "          - mod: groth16_recursive_verifier -> src/wrapping/groth16_recursive_verifier.rs",
+        "            - file: src/wrapping/groth16_recursive_verifier.rs",
+        "              - inline mod: tests",
+        "          - mod: halo2_ipa_accumulator -> src/wrapping/halo2_ipa_accumulator.rs",
+        "            - file: src/wrapping/halo2_ipa_accumulator.rs",
+        "              - inline mod: tests",
+        "          - mod: halo2_to_groth16 -> src/wrapping/halo2_to_groth16.rs",
+        "            - file: src/wrapping/halo2_to_groth16.rs",
+        "              - inline mod: tests",
+        "          - mod: nonnative_bn254_fq -> src/wrapping/nonnative_bn254_fq.rs",
+        "            - file: src/wrapping/nonnative_bn254_fq.rs",
+        "              - inline mod: tests",
+        "          - mod: nonnative_goldilocks -> src/wrapping/nonnative_goldilocks.rs",
+        "            - file: src/wrapping/nonnative_goldilocks.rs",
+        "              - inline mod: tests",
+        "          - mod: nonnative_pallas -> src/wrapping/nonnative_pallas.rs",
+        "            - file: src/wrapping/nonnative_pallas.rs",
+        "              - inline mod: tests",
+        "          - mod: nova_stark_compress -> src/wrapping/nova_stark_compress.rs",
+        "            - file: src/wrapping/nova_stark_compress.rs",
+        "              - inline mod: hex",
+        "              - inline mod: tests",
+        "          - mod: nova_universal_aggregator -> src/wrapping/nova_universal_aggregator.rs",
+        "            - file: src/wrapping/nova_universal_aggregator.rs",
+        "              - inline mod: nova_impl",
+        "              - inline mod: tests",
+        "          - mod: nova_verifier_circuit -> src/wrapping/nova_verifier_circuit.rs",
+        "            - file: src/wrapping/nova_verifier_circuit.rs",
+        "              - inline mod: tests",
+        "          - mod: poseidon2_goldilocks -> src/wrapping/poseidon2_goldilocks.rs",
+        "            - file: src/wrapping/poseidon2_goldilocks.rs",
+        "              - inline mod: tests",
+        "          - mod: stark_to_groth16 -> src/wrapping/stark_to_groth16.rs",
+        "            - file: src/wrapping/stark_to_groth16.rs",
+        "              - inline mod: tests",
+        "      - inline mod: bounded_cache_tests",
+        "      - inline mod: tests"
+      ],
+      "zkf-recursive-groth16-worker": [
+        "- file: src/bin/zkf-recursive-groth16-worker.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-backends-pro",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-backends-pro/Cargo.toml",
+    "crate_dir": "zkf-backends-pro",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-metal",
+          "package_name": "zkf-metal",
+          "classification": "internal",
+          "detail": "path=../zkf-metal"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-metal"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-metal"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_backends_pro",
+        "kind": "lib",
+        "src": "zkf-backends-pro/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_backends_pro": [
+        "- file: src/lib.rs",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-cli",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-cli/Cargo.toml",
+    "crate_dir": "zkf-cli",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "clap",
+          "package_name": "clap",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "getrandom",
+          "package_name": "getrandom",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "getrandom02",
+          "package_name": "getrandom02",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libc",
+          "package_name": "libc",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libcrux-ml-dsa",
+          "package_name": "libcrux-ml-dsa",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "owo-colors",
+          "package_name": "owo-colors",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_cbor",
+          "package_name": "serde_cbor",
+          "classification": "external",
+          "detail": "0.11"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-conformance",
+          "package_name": "zkf-conformance",
+          "classification": "internal",
+          "detail": "path=../zkf-conformance"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-distributed",
+          "package_name": "zkf-distributed",
+          "classification": "internal",
+          "detail": "path=../zkf-distributed"
+        },
+        {
+          "name": "zkf-examples",
+          "package_name": "zkf-examples",
+          "classification": "internal",
+          "detail": "path=../zkf-examples"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-gadgets",
+          "package_name": "zkf-gadgets",
+          "classification": "internal",
+          "detail": "path=../zkf-gadgets"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        },
+        {
+          "name": "zkf-registry",
+          "package_name": "zkf-registry",
+          "classification": "internal",
+          "detail": "path=../zkf-registry"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        },
+        {
+          "name": "zkf-ui",
+          "package_name": "zkf-ui",
+          "classification": "internal",
+          "detail": "path=../zkf-ui"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "tempfile",
+          "package_name": "tempfile",
+          "classification": "external",
+          "detail": "3"
+        }
+      ],
+      "target cfg(target_os = \"macos\") dependencies": [
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "objc2",
+          "package_name": "objc2",
+          "classification": "external",
+          "detail": "0.6"
+        },
+        {
+          "name": "objc2-metal",
+          "package_name": "objc2-metal",
+          "classification": "external",
+          "detail": "features=['MTLBuffer', 'MTLResource', 'MTLTypes'], version='0.3'"
+        },
+        {
+          "name": "zkf-metal",
+          "package_name": "zkf-metal",
+          "classification": "internal",
+          "detail": "path=../zkf-metal"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-conformance",
+      "zkf-core",
+      "zkf-distributed",
+      "zkf-examples",
+      "zkf-frontends",
+      "zkf-gadgets",
+      "zkf-lib",
+      "zkf-metal",
+      "zkf-registry",
+      "zkf-runtime",
+      "zkf-ui"
+    ],
+    "feature_flags": {
+      "default": [
+        "acvm-solver",
+        "acvm-solver-beta9",
+        "acvm-solver-beta19",
+        "metal-gpu",
+        "native-nova",
+        "native-sp1",
+        "native-risc-zero"
+      ],
+      "acvm-solver": [
+        "zkf-core/acvm-solver"
+      ],
+      "acvm-solver-beta9": [
+        "zkf-core/acvm-solver-beta9"
+      ],
+      "acvm-solver-beta19": [
+        "zkf-core/acvm-solver-beta19"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu",
+        "dep:zkf-metal"
+      ],
+      "native-nova": [
+        "zkf-backends/native-nova",
+        "zkf-backends/nova-compression",
+        "zkf-core/native-nova"
+      ],
+      "native-sp1": [
+        "zkf-backends/native-sp1",
+        "zkf-core/native-sp1"
+      ],
+      "native-risc-zero": [
+        "zkf-backends/native-risc-zero",
+        "zkf-core/native-risc-zero"
+      ],
+      "neural-engine": [
+        "zkf-runtime/neural-engine"
+      ],
+      "distributed": []
+    },
+    "entry_targets": [
+      {
+        "name": "zkf-cli",
+        "kind": "bin",
+        "src": "zkf-cli/src/main.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf-cli": [
+        "- file: src/main.rs",
+        "  - mod: benchmark -> src/benchmark.rs",
+        "    - file: src/benchmark.rs",
+        "      - inline mod: tests",
+        "  - mod: cli -> src/cli.rs",
+        "    - file: src/cli.rs",
+        "  - mod: cmd -> src/cmd/mod.rs",
+        "    - file: src/cmd/mod.rs",
+        "      - inline mod: tests",
+        "  - mod: compose -> src/compose.rs",
+        "    - file: src/compose.rs",
+        "  - mod: package_io -> src/package_io.rs",
+        "    - file: src/package_io.rs",
+        "      - inline mod: tests",
+        "  - mod: runtime_metal -> src/runtime_metal.rs",
+        "    - file: src/runtime_metal.rs",
+        "  - mod: solidity -> src/solidity.rs",
+        "    - file: src/solidity.rs",
+        "  - mod: types -> src/types.rs",
+        "    - file: src/types.rs",
+        "  - mod: util -> src/util.rs",
+        "    - file: src/util.rs",
+        "      - inline mod: tests",
+        "  - mod: tests -> src/tests/mod.rs",
+        "    - file: src/tests/mod.rs",
+        "      - mod: app -> src/tests/app.rs",
+        "        - file: src/tests/app.rs",
+        "      - mod: audit -> src/tests/audit.rs",
+        "        - file: src/tests/audit.rs",
+        "      - mod: circuit -> src/tests/circuit.rs",
+        "        - file: src/tests/circuit.rs",
+        "      - mod: composition -> src/tests/composition.rs",
+        "        - file: src/tests/composition.rs",
+        "      - mod: core_util -> src/tests/core_util.rs",
+        "        - file: src/tests/core_util.rs",
+        "      - mod: equivalence -> src/tests/equivalence.rs",
+        "        - file: src/tests/equivalence.rs",
+        "      - mod: package_bundle -> src/tests/package_bundle.rs",
+        "        - file: src/tests/package_bundle.rs",
+        "      - mod: package_migrate -> src/tests/package_migrate.rs",
+        "        - file: src/tests/package_migrate.rs",
+        "      - mod: package_prove -> src/tests/package_prove.rs",
+        "        - file: src/tests/package_prove.rs",
+        "      - mod: package_run -> src/tests/package_run.rs",
+        "        - file: src/tests/package_run.rs",
+        "      - mod: package_verify_metadata -> src/tests/package_verify_metadata.rs",
+        "        - file: src/tests/package_verify_metadata.rs",
+        "      - mod: package_verify_run_execution -> src/tests/package_verify_run_execution.rs",
+        "        - file: src/tests/package_verify_run_execution.rs",
+        "      - mod: package_verify_run_solver -> src/tests/package_verify_run_solver.rs",
+        "        - file: src/tests/package_verify_run_solver.rs",
+        "      - mod: package_verify_zir -> src/tests/package_verify_zir.rs",
+        "        - file: src/tests/package_verify_zir.rs",
+        "      - mod: package_zir -> src/tests/package_zir.rs",
+        "        - file: src/tests/package_zir.rs",
+        "      - mod: startup -> src/tests/startup.rs",
+        "        - file: src/tests/startup.rs",
+        "      - mod: swarm -> src/tests/swarm.rs",
+        "        - file: src/tests/swarm.rs",
+        "      - mod: verify -> src/tests/verify.rs",
+        "        - file: src/tests/verify.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-conformance",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-conformance/Cargo.toml",
+    "crate_dir": "zkf-conformance",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_conformance",
+        "kind": "lib",
+        "src": "zkf-conformance/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_conformance": [
+        "- file: src/lib.rs",
+        "  - mod: programs -> src/programs.rs",
+        "    - file: src/programs.rs",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-core",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-core/Cargo.toml",
+    "crate_dir": "zkf-core",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "acir_beta19",
+          "package_name": "acir_beta19",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "acir_beta9",
+          "package_name": "acir_beta9",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "acvm",
+          "package_name": "acvm",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "acvm_beta19",
+          "package_name": "acvm_beta19",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "acvm_beta9",
+          "package_name": "acvm_beta9",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "argon2",
+          "package_name": "argon2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-bls12-381",
+          "package_name": "ark-bls12-381",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ec",
+          "package_name": "ark-ec",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-serialize",
+          "package_name": "ark-serialize",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver",
+          "package_name": "bn254_blackbox_solver",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver_beta19",
+          "package_name": "bn254_blackbox_solver_beta19",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver_beta9",
+          "package_name": "bn254_blackbox_solver_beta9",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ff",
+          "package_name": "ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libc",
+          "package_name": "libc",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libcrux-ml-dsa",
+          "package_name": "libcrux-ml-dsa",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "once_cell",
+          "package_name": "once_cell",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "pasta_curves",
+          "package_name": "pasta_curves",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "features=['unbounded_depth'], workspace=True"
+        },
+        {
+          "name": "serde_stacker",
+          "package_name": "serde_stacker",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "stacker",
+          "package_name": "stacker",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "thiserror",
+          "package_name": "thiserror",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "proptest",
+          "package_name": "proptest",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ]
+    },
+    "internal_dependencies": [],
+    "feature_flags": {
+      "default": [
+        "full"
+      ],
+      "full": [],
+      "guest": [],
+      "native-nova": [],
+      "native-sp1": [],
+      "native-risc-zero": [],
+      "kani-residual": [],
+      "acvm-solver": [
+        "dep:acvm",
+        "dep:bn254_blackbox_solver"
+      ],
+      "acvm-solver-beta9": [
+        "dep:acir_beta9",
+        "dep:acvm_beta9",
+        "dep:bn254_blackbox_solver_beta9"
+      ],
+      "acvm-solver-beta19": [
+        "dep:acir_beta19",
+        "dep:acvm_beta19",
+        "dep:bn254_blackbox_solver_beta19"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_core",
+        "kind": "lib",
+        "src": "zkf-core/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_core": [
+        "- file: src/lib.rs",
+        "  - mod: artifact -> src/artifact.rs",
+        "    - file: src/artifact.rs",
+        "      - inline mod: base64_bytes",
+        "      - inline mod: base64_opt_bytes",
+        "      - inline mod: tests",
+        "  - mod: credential -> src/credential.rs",
+        "    - file: src/credential.rs",
+        "      - inline mod: tests",
+        "  - mod: dsl_types -> src/dsl_types.rs",
+        "    - file: src/dsl_types.rs",
+        "      - inline mod: tests",
+        "  - mod: error -> src/error.rs",
+        "    - file: src/error.rs",
+        "  - mod: field -> src/field.rs",
+        "    - file: src/field.rs",
+        "      - inline mod: large_prime_fiat",
+        "      - inline mod: tests",
+        "  - mod: ir -> src/ir.rs",
+        "    - file: src/ir.rs",
+        "  - mod: proof_ccs_spec -> src/proof_ccs_spec.rs",
+        "    - file: src/proof_ccs_spec.rs",
+        "  - mod: proof_constant_time_spec -> src/proof_constant_time_spec.rs",
+        "    - file: src/proof_constant_time_spec.rs",
+        "      - inline mod: tests",
+        "  - mod: proof_kernel -> src/proof_kernel.rs",
+        "    - file: src/proof_kernel.rs",
+        "  - mod: proof_kernel_spec -> src/proof_kernel_spec.rs",
+        "    - file: src/proof_kernel_spec.rs",
+        "  - mod: proof_transform_spec -> src/proof_transform_spec.rs",
+        "    - file: src/proof_transform_spec.rs",
+        "  - mod: proof_witness_adapter_spec -> src/proof_witness_adapter_spec.rs",
+        "    - file: src/proof_witness_adapter_spec.rs",
+        "  - mod: proof_witness_generation_spec -> src/proof_witness_generation_spec.rs",
+        "    - file: src/proof_witness_generation_spec.rs",
+        "  - mod: stack_safe_json -> src/stack_safe_json.rs",
+        "    - file: src/stack_safe_json.rs",
+        "      - inline mod: tests",
+        "  - mod: verification_kani -> src/verification_kani.rs",
+        "    - file: src/verification_kani.rs",
+        "  - mod: witness -> src/witness.rs",
+        "    - file: src/witness.rs",
+        "      - inline mod: witness_validation_tests",
+        "      - inline mod: proof_kernel_tests",
+        "      - inline mod: tests",
+        "      - inline mod: private_identity_fixture",
+        "  - mod: capability -> src/capability.rs",
+        "    - file: src/capability.rs",
+        "      - inline mod: tests",
+        "  - mod: fiat_generated -> src/fiat_generated/mod.rs",
+        "    - file: src/fiat_generated/mod.rs",
+        "  - mod: acceleration -> src/acceleration.rs",
+        "    - file: src/acceleration.rs",
+        "      - inline mod: tests",
+        "  - mod: aggregation -> src/aggregation.rs",
+        "    - file: src/aggregation.rs",
+        "      - inline mod: tests",
+        "  - mod: artifact_v2 -> src/artifact_v2.rs",
+        "    - file: src/artifact_v2.rs",
+        "      - inline mod: tests",
+        "  - mod: audit -> src/audit.rs",
+        "    - file: src/audit.rs",
+        "      - inline mod: tests",
+        "  - mod: benchmark -> src/benchmark.rs",
+        "    - file: src/benchmark.rs",
+        "      - inline mod: tests",
+        "  - mod: ccs -> src/ccs.rs",
+        "    - file: src/ccs.rs",
+        "      - inline mod: tests",
+        "  - mod: debugger -> src/debugger.rs",
+        "    - file: src/debugger.rs",
+        "  - mod: diagnostics -> src/diagnostics.rs",
+        "    - file: src/diagnostics.rs",
+        "      - inline mod: tests",
+        "  - mod: hir -> src/hir.rs",
+        "    - file: src/hir.rs",
+        "  - mod: keystore -> src/keystore.rs",
+        "    - file: src/keystore.rs",
+        "      - inline mod: hex",
+        "      - inline mod: tests",
+        "  - mod: lowering -> src/lowering/mod.rs",
+        "    - file: src/lowering/mod.rs",
+        "      - mod: hir_to_zir -> src/lowering/hir_to_zir.rs",
+        "        - file: src/lowering/hir_to_zir.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: normalize -> src/normalize.rs",
+        "    - file: src/normalize.rs",
+        "      - inline mod: tests",
+        "  - mod: optimizer -> src/optimizer.rs",
+        "    - file: src/optimizer.rs",
+        "      - inline mod: tests",
+        "  - mod: optimizer_zir -> src/optimizer_zir.rs",
+        "    - file: src/optimizer_zir.rs",
+        "      - inline mod: tests",
+        "  - mod: platform -> src/platform.rs",
+        "    - file: src/platform.rs",
+        "      - inline mod: tests",
+        "  - mod: privacy -> src/privacy.rs",
+        "    - file: src/privacy.rs",
+        "      - inline mod: tests",
+        "  - mod: recursion -> src/recursion.rs",
+        "    - file: src/recursion.rs",
+        "      - inline mod: tests",
+        "  - mod: resources -> src/resources.rs",
+        "    - file: src/resources.rs",
+        "      - inline mod: tests",
+        "  - mod: secure_random -> src/secure_random.rs",
+        "    - file: src/secure_random.rs",
+        "      - inline mod: tests",
+        "  - mod: setup -> src/setup.rs",
+        "    - file: src/setup.rs",
+        "      - inline mod: tests",
+        "  - mod: solver -> src/solver.rs",
+        "    - file: src/solver.rs",
+        "      - mod: acvm_beta9_adapter -> unresolved from src/solver.rs",
+        "      - inline mod: acvm_adapter",
+        "  - mod: tooling -> src/tooling.rs",
+        "    - file: src/tooling.rs",
+        "  - mod: type_check -> src/type_check.rs",
+        "    - file: src/type_check.rs",
+        "      - inline mod: tests",
+        "  - mod: wrapping -> src/wrapping.rs",
+        "    - file: src/wrapping.rs",
+        "      - inline mod: tests",
+        "  - mod: zir -> src/zir.rs",
+        "    - file: src/zir.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-crypto-accel",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-crypto-accel/Cargo.toml",
+    "crate_dir": "zkf-crypto-accel",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "cfg-if",
+          "package_name": "cfg-if",
+          "classification": "external",
+          "detail": "1.0"
+        },
+        {
+          "name": "libc",
+          "package_name": "libc",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ]
+    },
+    "internal_dependencies": [],
+    "feature_flags": {
+      "default": []
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_crypto_accel",
+        "kind": "lib",
+        "src": "zkf-crypto-accel/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_crypto_accel": [
+        "- file: src/lib.rs",
+        "  - mod: accelerate_ffi -> src/accelerate_ffi.rs",
+        "    - file: src/accelerate_ffi.rs",
+        "      - inline mod: tests",
+        "  - mod: aes -> src/aes.rs",
+        "    - file: src/aes.rs",
+        "      - inline mod: tests",
+        "  - mod: detect -> src/detect.rs",
+        "    - file: src/detect.rs",
+        "      - inline mod: tests",
+        "  - mod: keccak -> src/keccak.rs",
+        "    - file: src/keccak.rs",
+        "      - inline mod: tests",
+        "  - mod: montgomery -> src/montgomery.rs",
+        "    - file: src/montgomery.rs",
+        "      - inline mod: tests",
+        "  - mod: pmull -> src/pmull.rs",
+        "    - file: src/pmull.rs",
+        "      - inline mod: tests",
+        "  - mod: sha256 -> src/sha256.rs",
+        "    - file: src/sha256.rs",
+        "      - inline mod: tests",
+        "  - mod: sme -> src/sme.rs",
+        "    - file: src/sme.rs",
+        "      - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-distributed",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-distributed/Cargo.toml",
+    "crate_dir": "zkf-distributed",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "chacha20poly1305",
+          "package_name": "chacha20poly1305",
+          "classification": "external",
+          "detail": "0.10"
+        },
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "2"
+        },
+        {
+          "name": "flate2",
+          "package_name": "flate2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "hkdf",
+          "package_name": "hkdf",
+          "classification": "external",
+          "detail": "0.12"
+        },
+        {
+          "name": "libcrux-ml-dsa",
+          "package_name": "libcrux-ml-dsa",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "log",
+          "package_name": "log",
+          "classification": "external",
+          "detail": "0.4"
+        },
+        {
+          "name": "lz4_flex",
+          "package_name": "lz4_flex",
+          "classification": "external",
+          "detail": "0.11"
+        },
+        {
+          "name": "postcard",
+          "package_name": "postcard",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rusqlite",
+          "package_name": "rusqlite",
+          "classification": "external",
+          "detail": "features=['bundled'], version='0.33'"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "thiserror",
+          "package_name": "thiserror",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "x25519-dalek",
+          "package_name": "x25519-dalek",
+          "classification": "external",
+          "detail": "features=['static_secrets'], version='2'"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "proptest",
+          "package_name": "proptest",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tempfile",
+          "package_name": "tempfile",
+          "classification": "external",
+          "detail": "3"
+        },
+        {
+          "name": "zkf-examples",
+          "package_name": "zkf-examples",
+          "classification": "internal",
+          "detail": "path=../zkf-examples"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ],
+      "target cfg(not(target_arch = \"wasm32\")) dependencies": [
+        {
+          "name": "hostname",
+          "package_name": "hostname",
+          "classification": "external",
+          "detail": "0.4"
+        },
+        {
+          "name": "mdns-sd",
+          "package_name": "mdns-sd",
+          "classification": "external",
+          "detail": "optional=True, version='0.11'"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-examples",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "full",
+        "mdns"
+      ],
+      "full": [
+        "dep:zkf-backends",
+        "dep:zkf-runtime"
+      ],
+      "kani-minimal": [],
+      "mdns": [
+        "dep:mdns-sd"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_distributed",
+        "kind": "lib",
+        "src": "zkf-distributed/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_distributed": [
+        "- file: src/lib.rs",
+        "  - mod: bundle -> src/bundle.rs",
+        "    - file: src/bundle.rs",
+        "      - inline mod: tests",
+        "  - mod: config -> src/config.rs",
+        "    - file: src/config.rs",
+        "      - inline mod: tests",
+        "  - mod: coordinator -> src/coordinator.rs",
+        "    - file: src/coordinator.rs",
+        "      - inline mod: tests",
+        "  - mod: discovery -> src/discovery.rs",
+        "    - file: src/discovery.rs",
+        "      - inline mod: tests",
+        "  - mod: error -> src/error.rs",
+        "    - file: src/error.rs",
+        "  - mod: execution -> src/execution.rs",
+        "    - file: src/execution.rs",
+        "  - mod: health -> src/health.rs",
+        "    - file: src/health.rs",
+        "      - inline mod: tests",
+        "  - mod: identity -> src/identity.rs",
+        "    - file: src/identity.rs",
+        "      - inline mod: tests",
+        "  - mod: partition -> src/partition/mod.rs",
+        "    - file: src/partition/mod.rs",
+        "      - mod: cost_model -> src/partition/cost_model.rs",
+        "        - file: src/partition/cost_model.rs",
+        "          - inline mod: tests",
+        "      - mod: strategy -> src/partition/strategy.rs",
+        "        - file: src/partition/strategy.rs",
+        "      - inline mod: tests",
+        "  - mod: protocol -> src/protocol.rs",
+        "    - file: src/protocol.rs",
+        "  - mod: swarm -> src/swarm/mod.rs",
+        "    - file: src/swarm/mod.rs",
+        "      - mod: consensus -> src/swarm/consensus.rs",
+        "        - file: src/swarm/consensus.rs",
+        "          - inline mod: tests",
+        "      - mod: diplomat -> src/swarm/diplomat.rs",
+        "        - file: src/swarm/diplomat.rs",
+        "          - inline mod: tests",
+        "      - mod: epoch -> src/swarm/epoch.rs",
+        "        - file: src/swarm/epoch.rs",
+        "          - inline mod: tests",
+        "      - mod: identity -> src/swarm/identity.rs",
+        "        - file: src/swarm/identity.rs",
+        "          - inline mod: tests",
+        "      - mod: memory -> src/swarm/memory.rs",
+        "        - file: src/swarm/memory.rs",
+        "          - inline mod: base64_bytes",
+        "          - inline mod: tests",
+        "      - mod: reputation -> src/swarm/reputation.rs",
+        "        - file: src/swarm/reputation.rs",
+        "          - inline mod: tests",
+        "  - mod: telemetry -> src/telemetry.rs",
+        "    - file: src/telemetry.rs",
+        "  - mod: transfer -> src/transfer/mod.rs",
+        "    - file: src/transfer/mod.rs",
+        "      - mod: compression -> src/transfer/compression.rs",
+        "        - file: src/transfer/compression.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: transport -> src/transport/mod.rs",
+        "    - file: src/transport/mod.rs",
+        "      - mod: frame -> src/transport/frame.rs",
+        "        - file: src/transport/frame.rs",
+        "          - inline mod: tests",
+        "      - mod: rdma -> src/transport/rdma.rs",
+        "        - file: src/transport/rdma.rs",
+        "      - mod: tcp -> src/transport/tcp.rs",
+        "        - file: src/transport/tcp.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: verification_kani -> src/verification_kani.rs",
+        "    - file: src/verification_kani.rs",
+        "  - mod: worker -> src/worker.rs",
+        "    - file: src/worker.rs",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-dsl",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-dsl/Cargo.toml",
+    "crate_dir": "zkf-dsl",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "proc-macro2",
+          "package_name": "proc-macro2",
+          "classification": "external",
+          "detail": "1"
+        },
+        {
+          "name": "quote",
+          "package_name": "quote",
+          "classification": "external",
+          "detail": "1"
+        },
+        {
+          "name": "syn",
+          "package_name": "syn",
+          "classification": "external",
+          "detail": "features=['full', 'extra-traits'], version='2'"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core"
+    ],
+    "feature_flags": {},
+    "entry_targets": [],
+    "module_trees": {}
+  },
+  {
+    "name": "zkf-examples",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-examples/Cargo.toml",
+    "crate_dir": "zkf-examples",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core",
+      "zkf-lib"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_examples",
+        "kind": "lib",
+        "src": "zkf-examples/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_examples": [
+        "- file: src/lib.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-ffi",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-ffi/Cargo.toml",
+    "crate_dir": "zkf-ffi",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "dirs",
+          "package_name": "dirs",
+          "classification": "external",
+          "detail": "5"
+        },
+        {
+          "name": "libc",
+          "package_name": "libc",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_cbor",
+          "package_name": "serde_cbor",
+          "classification": "external",
+          "detail": "0.11"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-conformance",
+          "package_name": "zkf-conformance",
+          "classification": "internal",
+          "detail": "path=../zkf-conformance"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-examples",
+          "package_name": "zkf-examples",
+          "classification": "internal",
+          "detail": "path=../zkf-examples"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-gadgets",
+          "package_name": "zkf-gadgets",
+          "classification": "internal",
+          "detail": "path=../zkf-gadgets"
+        },
+        {
+          "name": "zkf-registry",
+          "package_name": "zkf-registry",
+          "classification": "internal",
+          "detail": "path=../zkf-registry"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ],
+      "build-dependencies": [
+        {
+          "name": "cbindgen",
+          "package_name": "cbindgen",
+          "classification": "external",
+          "detail": "0.27"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-conformance",
+      "zkf-core",
+      "zkf-examples",
+      "zkf-frontends",
+      "zkf-gadgets",
+      "zkf-registry",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu"
+      ],
+      "neural-engine": [
+        "zkf-runtime/neural-engine"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf-test-all",
+        "kind": "bin",
+        "src": "zkf-ffi/src/test_all.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf-test-all": [
+        "- file: src/test_all.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-frontend-sdk",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-frontend-sdk/Cargo.toml",
+    "crate_dir": "zkf-frontend-sdk",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-ir-spec",
+          "package_name": "zkf-ir-spec",
+          "classification": "internal",
+          "detail": "path=../zkf-ir-spec"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core",
+      "zkf-ir-spec"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_frontend_sdk",
+        "kind": "lib",
+        "src": "zkf-frontend-sdk/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_frontend_sdk": [
+        "- file: src/lib.rs",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-frontends",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-frontends/Cargo.toml",
+    "crate_dir": "zkf-frontends",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "acir",
+          "package_name": "acir",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acir_beta19",
+          "package_name": "acir_beta19",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acir_beta9",
+          "package_name": "acir_beta9",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acvm",
+          "package_name": "acvm",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acvm_beta19",
+          "package_name": "acvm_beta19",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acvm_beta9",
+          "package_name": "acvm_beta9",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "base64",
+          "package_name": "base64",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bincode",
+          "package_name": "bincode",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver",
+          "package_name": "bn254_blackbox_solver",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver_beta19",
+          "package_name": "bn254_blackbox_solver_beta19",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver_beta9",
+          "package_name": "bn254_blackbox_solver_beta9",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "flate2",
+          "package_name": "flate2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "noir_keccak_compat",
+          "package_name": "keccak",
+          "classification": "external",
+          "detail": "package='keccak', version='=0.2.0-rc.0'"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "semver",
+          "package_name": "semver",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_frontends",
+        "kind": "lib",
+        "src": "zkf-frontends/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_frontends": [
+        "- file: src/lib.rs",
+        "  - mod: cairo -> src/cairo.rs",
+        "    - file: src/cairo.rs",
+        "      - inline mod: tests",
+        "  - mod: circom -> src/circom.rs",
+        "    - file: src/circom.rs",
+        "  - mod: external -> src/external.rs",
+        "    - file: src/external.rs",
+        "  - mod: halo2_export -> src/halo2_export.rs",
+        "    - file: src/halo2_export.rs",
+        "      - inline mod: tests",
+        "  - mod: noir -> src/noir.rs",
+        "    - file: src/noir.rs",
+        "  - mod: plonky3_air_export -> src/plonky3_air_export.rs",
+        "    - file: src/plonky3_air_export.rs",
+        "      - inline mod: tests",
+        "  - mod: proof_noir_recheck_spec -> src/proof_noir_recheck_spec.rs",
+        "    - file: src/proof_noir_recheck_spec.rs",
+        "  - mod: translation -> src/translation.rs",
+        "    - file: src/translation.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-gadgets",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-gadgets/Cargo.toml",
+    "crate_dir": "zkf-gadgets",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-traits",
+          "package_name": "num-traits",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_gadgets",
+        "kind": "lib",
+        "src": "zkf-gadgets/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_gadgets": [
+        "- file: src/lib.rs",
+        "  - mod: blake3 -> src/blake3.rs",
+        "    - file: src/blake3.rs",
+        "      - inline mod: tests",
+        "  - mod: boolean -> src/boolean.rs",
+        "    - file: src/boolean.rs",
+        "      - inline mod: tests",
+        "  - mod: comparison -> src/comparison.rs",
+        "    - file: src/comparison.rs",
+        "      - inline mod: tests",
+        "  - mod: ecdsa -> src/ecdsa.rs",
+        "    - file: src/ecdsa.rs",
+        "      - inline mod: tests",
+        "  - mod: gadget -> src/gadget.rs",
+        "    - file: src/gadget.rs",
+        "  - mod: kzg -> src/kzg.rs",
+        "    - file: src/kzg.rs",
+        "      - inline mod: tests",
+        "  - mod: merkle -> src/merkle.rs",
+        "    - file: src/merkle.rs",
+        "      - inline mod: tests",
+        "  - mod: nonnative -> src/nonnative.rs",
+        "    - file: src/nonnative.rs",
+        "      - inline mod: tests",
+        "  - mod: plonk_gate -> src/plonk_gate.rs",
+        "    - file: src/plonk_gate.rs",
+        "      - inline mod: tests",
+        "  - mod: poseidon -> src/poseidon.rs",
+        "    - file: src/poseidon.rs",
+        "      - inline mod: tests",
+        "  - mod: range -> src/range.rs",
+        "    - file: src/range.rs",
+        "      - inline mod: tests",
+        "  - mod: registry -> src/registry.rs",
+        "    - file: src/registry.rs",
+        "      - inline mod: tests",
+        "  - mod: schnorr -> src/schnorr.rs",
+        "    - file: src/schnorr.rs",
+        "      - inline mod: tests",
+        "  - mod: secp256k1 -> src/secp256k1.rs",
+        "    - file: src/secp256k1.rs",
+        "      - inline mod: tests",
+        "  - mod: sha256 -> src/sha256.rs",
+        "    - file: src/sha256.rs",
+        "      - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-gpu",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-gpu/Cargo.toml",
+    "crate_dir": "zkf-gpu",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ]
+    },
+    "internal_dependencies": [],
+    "feature_flags": {
+      "default": []
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_gpu",
+        "kind": "lib",
+        "src": "zkf-gpu/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_gpu": [
+        "- file: src/lib.rs",
+        "  - mod: buffer -> src/buffer.rs",
+        "    - file: src/buffer.rs",
+        "  - mod: device -> src/device.rs",
+        "    - file: src/device.rs",
+        "  - mod: ops -> src/ops.rs",
+        "    - file: src/ops.rs",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-integration-tests",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-integration-tests/Cargo.toml",
+    "crate_dir": "zkf-integration-tests",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-field",
+          "package_name": "p3-field",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-goldilocks",
+          "package_name": "p3-goldilocks",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-symmetric",
+          "package_name": "p3-symmetric",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "rand09",
+          "package_name": "rand09",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tempfile",
+          "package_name": "tempfile",
+          "classification": "external",
+          "detail": "3"
+        },
+        {
+          "name": "tiny-keccak",
+          "package_name": "tiny-keccak",
+          "classification": "external",
+          "detail": "features=['keccak'], version='2'"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-distributed",
+          "package_name": "zkf-distributed",
+          "classification": "internal",
+          "detail": "path=../zkf-distributed"
+        },
+        {
+          "name": "zkf-examples",
+          "package_name": "zkf-examples",
+          "classification": "internal",
+          "detail": "path=../zkf-examples"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-gadgets",
+          "package_name": "zkf-gadgets",
+          "classification": "internal",
+          "detail": "path=../zkf-gadgets"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        },
+        {
+          "name": "zkf-metal",
+          "package_name": "zkf-metal",
+          "classification": "internal",
+          "detail": "path=../zkf-metal"
+        },
+        {
+          "name": "zkf-registry",
+          "package_name": "zkf-registry",
+          "classification": "internal",
+          "detail": "path=../zkf-registry"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-distributed",
+      "zkf-examples",
+      "zkf-frontends",
+      "zkf-gadgets",
+      "zkf-lib",
+      "zkf-metal",
+      "zkf-registry",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_integration_tests",
+        "kind": "lib",
+        "src": "zkf-integration-tests/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_integration_tests": [
+        "- file: src/lib.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-ir-spec",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-ir-spec/Cargo.toml",
+    "crate_dir": "zkf-ir-spec",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_ir_spec",
+        "kind": "lib",
+        "src": "zkf-ir-spec/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_ir_spec": [
+        "- file: src/lib.rs",
+        "  - mod: canonical -> src/canonical.rs",
+        "    - file: src/canonical.rs",
+        "      - inline mod: tests",
+        "  - mod: formal -> src/formal.rs",
+        "    - file: src/formal.rs",
+        "      - inline mod: tests",
+        "  - mod: schema -> src/schema.rs",
+        "    - file: src/schema.rs",
+        "      - inline mod: tests",
+        "  - mod: semantics -> src/semantics.rs",
+        "    - file: src/semantics.rs",
+        "  - mod: verification -> src/verification.rs",
+        "    - file: src/verification.rs",
+        "      - inline mod: tests",
+        "  - mod: version -> src/version.rs",
+        "    - file: src/version.rs",
+        "      - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-lib",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-lib/Cargo.toml",
+    "crate_dir": "zkf-lib",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "acir",
+          "package_name": "acir",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "acvm_blackbox_solver",
+          "package_name": "acvm_blackbox_solver",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "argon2",
+          "package_name": "argon2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ec",
+          "package_name": "ark-ec",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-groth16",
+          "package_name": "ark-groth16",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-serialize",
+          "package_name": "ark-serialize",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-snark",
+          "package_name": "ark-snark",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "bn254_blackbox_solver",
+          "package_name": "bn254_blackbox_solver",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "libcrux-ml-dsa",
+          "package_name": "libcrux-ml-dsa",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "stacker",
+          "package_name": "stacker",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-gadgets",
+          "package_name": "zkf-gadgets",
+          "classification": "internal",
+          "detail": "path=../zkf-gadgets"
+        },
+        {
+          "name": "zkf-ir-spec",
+          "package_name": "zkf-ir-spec",
+          "classification": "internal",
+          "detail": "path=../zkf-ir-spec"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-frontends",
+      "zkf-gadgets",
+      "zkf-ir-spec",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "full",
+        "metal-gpu"
+      ],
+      "full": [
+        "zkf-core/full"
+      ],
+      "frontends": [
+        "dep:zkf-frontends"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_lib",
+        "kind": "lib",
+        "src": "zkf-lib/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_lib": [
+        "- file: src/lib.rs",
+        "  - mod: app -> src/app/mod.rs",
+        "    - file: src/app/mod.rs",
+        "      - mod: api -> src/app/api.rs",
+        "        - file: src/app/api.rs",
+        "          - inline mod: tests",
+        "      - mod: audit -> src/app/audit.rs",
+        "        - file: src/app/audit.rs",
+        "          - inline mod: tests",
+        "      - mod: builder -> src/app/builder.rs",
+        "        - file: src/app/builder.rs",
+        "          - inline mod: tests",
+        "      - mod: descent -> src/app/descent.rs",
+        "        - file: src/app/descent.rs",
+        "          - inline mod: tests",
+        "      - mod: evidence -> src/app/evidence.rs",
+        "        - file: src/app/evidence.rs",
+        "          - inline mod: tests",
+        "      - mod: inputs -> src/app/inputs.rs",
+        "        - file: src/app/inputs.rs",
+        "          - inline mod: tests",
+        "      - mod: multi_satellite -> src/app/multi_satellite.rs",
+        "        - file: src/app/multi_satellite.rs",
+        "          - inline mod: tests",
+        "      - mod: orbital -> src/app/orbital.rs",
+        "        - file: src/app/orbital.rs",
+        "          - inline mod: tests",
+        "      - mod: private_identity -> src/app/private_identity.rs",
+        "        - file: src/app/private_identity.rs",
+        "          - inline mod: tests",
+        "      - mod: progress -> src/app/progress.rs",
+        "        - file: src/app/progress.rs",
+        "      - mod: satellite -> src/app/satellite.rs",
+        "        - file: src/app/satellite.rs",
+        "          - inline mod: tests",
+        "      - mod: templates -> src/app/templates.rs",
+        "        - file: src/app/templates.rs",
+        "          - inline mod: tests",
+        "      - mod: verifier -> src/app/verifier.rs",
+        "        - file: src/app/verifier.rs",
+        "          - inline mod: tests",
+        "  - mod: verification_kani -> src/verification_kani.rs",
+        "    - file: src/verification_kani.rs",
+        "  - inline mod: descent",
+        "  - inline mod: inputs",
+        "  - inline mod: evidence",
+        "  - inline mod: multi_satellite",
+        "  - inline mod: orbital",
+        "  - inline mod: satellite",
+        "  - inline mod: templates",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-lsp",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-lsp/Cargo.toml",
+    "crate_dir": "zkf-lsp",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tokio",
+          "package_name": "tokio",
+          "classification": "external",
+          "detail": "features=['full'], version='1'"
+        },
+        {
+          "name": "tower-lsp",
+          "package_name": "tower-lsp",
+          "classification": "external",
+          "detail": "0.20"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_lsp",
+        "kind": "lib",
+        "src": "zkf-lsp/src/lib.rs"
+      },
+      {
+        "name": "zkf-lsp",
+        "kind": "bin",
+        "src": "zkf-lsp/src/main.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_lsp": [
+        "- file: src/lib.rs",
+        "  - mod: server -> src/server.rs",
+        "    - file: src/server.rs",
+        "      - inline mod: tests"
+      ],
+      "zkf-lsp": [
+        "- file: src/main.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-metal",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-metal/Cargo.toml",
+    "crate_dir": "zkf-metal",
+    "dependency_sections": {
+      "dependencies": [],
+      "dev-dependencies": [
+        {
+          "name": "ark-std",
+          "package_name": "ark-std",
+          "classification": "external",
+          "detail": "0.5"
+        },
+        {
+          "name": "criterion",
+          "package_name": "criterion",
+          "classification": "external",
+          "detail": "features=['html_reports'], version='0.5'"
+        },
+        {
+          "name": "rand",
+          "package_name": "rand",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "0.10"
+        },
+        {
+          "name": "tiny-keccak",
+          "package_name": "tiny-keccak",
+          "classification": "external",
+          "detail": "features=['keccak'], version='2'"
+        }
+      ],
+      "build-dependencies": [
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "target cfg(target_os = \"macos\") dependencies": [
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ec",
+          "package_name": "ark-ec",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-poly",
+          "package_name": "ark-poly",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ark-serialize",
+          "package_name": "ark-serialize",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "block2",
+          "package_name": "block2",
+          "classification": "external",
+          "detail": "0.6"
+        },
+        {
+          "name": "ff",
+          "package_name": "ff",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "halo2curves",
+          "package_name": "halo2curves",
+          "classification": "external",
+          "detail": "features=['std', 'bits', 'derive_serde'], version='0.9.0'"
+        },
+        {
+          "name": "itertools",
+          "package_name": "itertools",
+          "classification": "external",
+          "detail": "0.14"
+        },
+        {
+          "name": "log",
+          "package_name": "log",
+          "classification": "external",
+          "detail": "0.4"
+        },
+        {
+          "name": "objc2",
+          "package_name": "objc2",
+          "classification": "external",
+          "detail": "0.6"
+        },
+        {
+          "name": "objc2-foundation",
+          "package_name": "objc2-foundation",
+          "classification": "external",
+          "detail": "features=['NSString', 'NSError', 'NSDictionary', 'NSArray', 'NSURL'], version='0.3'"
+        },
+        {
+          "name": "objc2-metal",
+          "package_name": "objc2-metal",
+          "classification": "external",
+          "detail": "features=['MTLAllocation', 'MTLArgument', 'MTLDevice', 'MTLCommandQueue', 'MTLCommandBuffer', 'MTLCommandEncoder', 'MTLComputeCommandEncoder', 'MTLComputePipeline', 'MTLPipeline', 'MTLLibrary', 'MTLEvent', 'MTLResource', 'MTLBuffer', 'MTLTypes', 'MTLBinaryArchive', 'MTLResidencySet', 'MTL4CommandAllocator'], version='0.3'"
+        },
+        {
+          "name": "p3-baby-bear",
+          "package_name": "p3-baby-bear",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-commit",
+          "package_name": "p3-commit",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-dft",
+          "package_name": "p3-dft",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-field",
+          "package_name": "p3-field",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-goldilocks",
+          "package_name": "p3-goldilocks",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-matrix",
+          "package_name": "p3-matrix",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-merkle-tree",
+          "package_name": "p3-merkle-tree",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-poseidon2",
+          "package_name": "p3-poseidon2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-symmetric",
+          "package_name": "p3-symmetric",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "pasta_curves",
+          "package_name": "pasta_curves",
+          "classification": "external",
+          "detail": "0.5"
+        },
+        {
+          "name": "rand09",
+          "package_name": "rand09",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "features=['derive'], version='1'"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core"
+    ],
+    "feature_flags": {
+      "default": [],
+      "metal4": []
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_metal",
+        "kind": "lib",
+        "src": "zkf-metal/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_metal": [
+        "- file: src/lib.rs",
+        "  - mod: async_dispatch -> src/async_dispatch.rs",
+        "    - file: src/async_dispatch.rs",
+        "      - inline mod: tests",
+        "  - mod: batch_prover -> src/batch_prover.rs",
+        "    - file: src/batch_prover.rs",
+        "      - inline mod: tests",
+        "  - mod: constraint_eval -> src/constraint_eval.rs",
+        "    - file: src/constraint_eval.rs",
+        "      - inline mod: tests",
+        "  - mod: device -> src/device.rs",
+        "    - file: src/device.rs",
+        "      - inline mod: tests",
+        "  - mod: field_ops -> src/field_ops.rs",
+        "    - file: src/field_ops.rs",
+        "      - inline mod: tests",
+        "  - mod: fri -> src/fri.rs",
+        "    - file: src/fri.rs",
+        "      - inline mod: tests",
+        "  - mod: hash -> src/hash/mod.rs",
+        "    - file: src/hash/mod.rs",
+        "      - inline mod: tests",
+        "  - mod: launch_contracts -> src/launch_contracts.rs",
+        "    - file: src/launch_contracts.rs",
+        "      - inline mod: tests",
+        "  - mod: merkle -> src/merkle.rs",
+        "    - file: src/merkle.rs",
+        "      - inline mod: tests",
+        "  - mod: metal4 -> src/metal4/mod.rs",
+        "    - file: src/metal4/mod.rs",
+        "      - mod: barrier -> src/metal4/barrier.rs",
+        "        - file: src/metal4/barrier.rs",
+        "          - inline mod: tests",
+        "      - mod: residency -> src/metal4/residency.rs",
+        "        - file: src/metal4/residency.rs",
+        "          - inline mod: tests",
+        "      - mod: tensor_msm -> src/metal4/tensor_msm.rs",
+        "        - file: src/metal4/tensor_msm.rs",
+        "          - inline mod: tests",
+        "      - mod: unified_encoder -> src/metal4/unified_encoder.rs",
+        "        - file: src/metal4/unified_encoder.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: msm -> src/msm/mod.rs",
+        "    - file: src/msm/mod.rs",
+        "      - mod: bn254 -> src/msm/bn254.rs",
+        "        - file: src/msm/bn254.rs",
+        "      - mod: pallas -> src/msm/pallas.rs",
+        "        - file: src/msm/pallas.rs",
+        "      - mod: pallas_pippenger -> src/msm/pallas_pippenger.rs",
+        "        - file: src/msm/pallas_pippenger.rs",
+        "          - inline mod: tests",
+        "      - mod: pippenger -> src/msm/pippenger.rs",
+        "        - file: src/msm/pippenger.rs",
+        "          - inline mod: tests",
+        "      - mod: vesta -> src/msm/vesta.rs",
+        "        - file: src/msm/vesta.rs",
+        "      - mod: vesta_pippenger -> src/msm/vesta_pippenger.rs",
+        "        - file: src/msm/vesta_pippenger.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: ntt -> src/ntt/mod.rs",
+        "    - file: src/ntt/mod.rs",
+        "      - mod: bn254 -> src/ntt/bn254.rs",
+        "        - file: src/ntt/bn254.rs",
+        "          - inline mod: tests",
+        "      - mod: fields -> src/ntt/fields.rs",
+        "        - file: src/ntt/fields.rs",
+        "          - inline mod: tests",
+        "      - mod: p3_adapter -> src/ntt/p3_adapter.rs",
+        "        - file: src/ntt/p3_adapter.rs",
+        "          - inline mod: tests",
+        "      - mod: radix2 -> src/ntt/radix2.rs",
+        "        - file: src/ntt/radix2.rs",
+        "      - inline mod: tests",
+        "  - mod: pipeline -> src/pipeline.rs",
+        "    - file: src/pipeline.rs",
+        "      - inline mod: tests",
+        "  - mod: poly -> src/poly.rs",
+        "    - file: src/poly.rs",
+        "      - inline mod: tests",
+        "  - mod: poseidon2 -> src/poseidon2/mod.rs",
+        "    - file: src/poseidon2/mod.rs",
+        "      - mod: babybear -> src/poseidon2/babybear.rs",
+        "        - file: src/poseidon2/babybear.rs",
+        "          - inline mod: tests",
+        "      - mod: goldilocks -> src/poseidon2/goldilocks.rs",
+        "        - file: src/poseidon2/goldilocks.rs",
+        "          - inline mod: tests",
+        "      - inline mod: tests",
+        "  - mod: proof_ir -> src/proof_ir.rs",
+        "    - file: src/proof_ir.rs",
+        "  - mod: registry -> src/registry.rs",
+        "    - file: src/registry.rs",
+        "  - mod: shader_library -> src/shader_library.rs",
+        "    - file: src/shader_library.rs",
+        "      - inline mod: kernels",
+        "      - inline mod: msm_kernels",
+        "  - mod: tuning -> src/tuning.rs",
+        "    - file: src/tuning.rs",
+        "      - inline mod: tests",
+        "  - mod: verification_kani -> src/verification_kani.rs",
+        "    - file: src/verification_kani.rs",
+        "  - mod: verified_artifacts -> src/verified_artifacts.rs",
+        "    - file: src/verified_artifacts.rs",
+        "      - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-python",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-python/Cargo.toml",
+    "crate_dir": "zkf-python",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "pyo3",
+          "package_name": "pyo3",
+          "classification": "external",
+          "detail": "features=['abi3-py38'], version='0.23'"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-frontends",
+          "package_name": "zkf-frontends",
+          "classification": "internal",
+          "detail": "path=../zkf-frontends"
+        },
+        {
+          "name": "zkf-ir-spec",
+          "package_name": "zkf-ir-spec",
+          "classification": "internal",
+          "detail": "path=../zkf-ir-spec"
+        },
+        {
+          "name": "zkf-runtime",
+          "package_name": "zkf-runtime",
+          "classification": "internal",
+          "detail": "path=../zkf-runtime"
+        }
+      ],
+      "build-dependencies": [
+        {
+          "name": "pyo3-build-config",
+          "package_name": "pyo3-build-config",
+          "classification": "external",
+          "detail": "0.23"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-frontends",
+      "zkf-ir-spec",
+      "zkf-runtime"
+    ],
+    "feature_flags": {
+      "default": [
+        "metal-gpu"
+      ],
+      "metal-gpu": [
+        "zkf-backends/metal-gpu"
+      ]
+    },
+    "entry_targets": [],
+    "module_trees": {}
+  },
+  {
+    "name": "zkf-registry",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-registry/Cargo.toml",
+    "crate_dir": "zkf-registry",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "optional=True, version='2'"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        },
+        {
+          "name": "zkf-gadgets",
+          "package_name": "zkf-gadgets",
+          "classification": "internal",
+          "detail": "path=../zkf-gadgets"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-core",
+      "zkf-gadgets"
+    ],
+    "feature_flags": {
+      "default": [],
+      "ed25519": [
+        "ed25519-dalek"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_registry",
+        "kind": "lib",
+        "src": "zkf-registry/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_registry": [
+        "- file: src/lib.rs",
+        "  - mod: manifest -> src/manifest.rs",
+        "    - file: src/manifest.rs",
+        "      - inline mod: tests",
+        "  - mod: registry -> src/registry.rs",
+        "    - file: src/registry.rs",
+        "      - inline mod: tests",
+        "  - mod: resolver -> src/resolver.rs",
+        "    - file: src/resolver.rs",
+        "      - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-runtime",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-runtime/Cargo.toml",
+    "crate_dir": "zkf-runtime",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "ark-bn254",
+          "package_name": "ark-bn254",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ark-ec",
+          "package_name": "ark-ec",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ark-ff",
+          "package_name": "ark-ff",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ark-poly",
+          "package_name": "ark-poly",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ark-serialize",
+          "package_name": "ark-serialize",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "ed25519-dalek",
+          "package_name": "ed25519-dalek",
+          "classification": "external",
+          "detail": "2"
+        },
+        {
+          "name": "log",
+          "package_name": "log",
+          "classification": "external",
+          "detail": "0.4"
+        },
+        {
+          "name": "num-bigint",
+          "package_name": "num-bigint",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "p3-baby-bear",
+          "package_name": "p3-baby-bear",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "p3-dft",
+          "package_name": "p3-dft",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "p3-field",
+          "package_name": "p3-field",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "p3-goldilocks",
+          "package_name": "p3-goldilocks",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "p3-matrix",
+          "package_name": "p3-matrix",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "p3-symmetric",
+          "package_name": "p3-symmetric",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "rand09",
+          "package_name": "rand09",
+          "classification": "external",
+          "detail": "optional=True, workspace=True"
+        },
+        {
+          "name": "serde",
+          "package_name": "serde",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "serde_json",
+          "package_name": "serde_json",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "sha2",
+          "package_name": "sha2",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "tempfile",
+          "package_name": "tempfile",
+          "classification": "external",
+          "detail": "3"
+        },
+        {
+          "name": "thiserror",
+          "package_name": "thiserror",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-core",
+          "package_name": "zkf-core",
+          "classification": "internal",
+          "detail": "path=../zkf-core"
+        }
+      ],
+      "dev-dependencies": [
+        {
+          "name": "proptest",
+          "package_name": "proptest",
+          "classification": "external",
+          "detail": "workspace=True"
+        }
+      ],
+      "target cfg(hax) dependencies": [
+        {
+          "name": "hax-lib",
+          "package_name": "hax-lib",
+          "classification": "external",
+          "detail": "git='https://github.com/cryspen/hax', rev='1f0259212fa994fb351853026397042c497d07b9'"
+        }
+      ],
+      "target cfg(target_vendor = \"apple\") dependencies": [
+        {
+          "name": "halo2curves",
+          "package_name": "halo2curves",
+          "classification": "external",
+          "detail": "features=['std', 'bits', 'derive_serde'], version='0.9.0'"
+        },
+        {
+          "name": "objc2",
+          "package_name": "objc2",
+          "classification": "external",
+          "detail": "=0.6.4"
+        },
+        {
+          "name": "objc2-core-ml",
+          "package_name": "objc2-core-ml",
+          "classification": "external",
+          "detail": "features=['MLDictionaryFeatureProvider', 'MLFeatureProvider', 'MLFeatureValue', 'MLModel', 'MLModelConfiguration', 'MLModel_MLModelCompilation', 'MLMultiArray'], version='=0.3.2'"
+        },
+        {
+          "name": "objc2-foundation",
+          "package_name": "objc2-foundation",
+          "classification": "external",
+          "detail": "features=['NSArray', 'NSDictionary', 'NSError', 'NSObject', 'NSString', 'NSURL', 'NSValue'], version='=0.3.2'"
+        },
+        {
+          "name": "objc2-metal",
+          "package_name": "objc2-metal",
+          "classification": "external",
+          "detail": "features=['MTLBuffer', 'MTLResource', 'MTLTypes'], version='0.3'"
+        },
+        {
+          "name": "tiny-keccak",
+          "package_name": "tiny-keccak",
+          "classification": "external",
+          "detail": "features=['keccak'], version='2'"
+        },
+        {
+          "name": "zkf-metal",
+          "package_name": "zkf-metal",
+          "classification": "internal",
+          "detail": "path=../zkf-metal"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-core",
+      "zkf-metal"
+    ],
+    "feature_flags": {
+      "default": [
+        "full"
+      ],
+      "full": [
+        "dep:zkf-backends",
+        "cpu-backends"
+      ],
+      "kani-minimal": [],
+      "neural-engine": [],
+      "cpu-backends": [
+        "dep:ark-bn254",
+        "dep:ark-ec",
+        "dep:ark-ff",
+        "dep:ark-poly",
+        "dep:ark-serialize",
+        "dep:p3-field",
+        "dep:p3-goldilocks",
+        "dep:p3-baby-bear",
+        "dep:p3-dft",
+        "dep:p3-matrix",
+        "dep:p3-symmetric",
+        "dep:rand09"
+      ]
+    },
+    "entry_targets": [
+      {
+        "name": "zkf_runtime",
+        "kind": "lib",
+        "src": "zkf-runtime/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_runtime": [
+        "- file: src/lib.rs",
+        "  - mod: adapters -> src/adapters.rs",
+        "    - file: src/adapters.rs",
+        "  - mod: adaptive_tuning -> src/adaptive_tuning.rs",
+        "    - file: src/adaptive_tuning.rs",
+        "      - inline mod: tests",
+        "  - mod: api -> src/api.rs",
+        "    - file: src/api.rs",
+        "      - inline mod: tests",
+        "  - mod: buffer_bridge -> src/buffer_bridge.rs",
+        "    - file: src/buffer_bridge.rs",
+        "  - mod: control_plane -> src/control_plane.rs",
+        "    - file: src/control_plane.rs",
+        "      - inline mod: tests",
+        "  - mod: cpu_driver -> src/cpu_driver.rs",
+        "    - file: src/cpu_driver.rs",
+        "  - mod: error -> src/error.rs",
+        "    - file: src/error.rs",
+        "  - mod: execution -> src/execution.rs",
+        "    - file: src/execution.rs",
+        "  - mod: graph -> src/graph.rs",
+        "    - file: src/graph.rs",
+        "  - mod: hybrid -> src/hybrid.rs",
+        "    - file: src/hybrid.rs",
+        "      - inline mod: tests",
+        "  - mod: memory -> src/memory.rs",
+        "    - file: src/memory.rs",
+        "  - mod: metal_dispatch_macos -> src/metal_dispatch_macos.rs",
+        "    - file: src/metal_dispatch_macos.rs",
+        "  - mod: metal_driver -> src/metal_driver.rs",
+        "    - file: src/metal_driver.rs",
+        "  - mod: scheduler -> src/scheduler.rs",
+        "    - file: src/scheduler.rs",
+        "  - mod: security -> src/security.rs",
+        "    - file: src/security.rs",
+        "      - inline mod: tests",
+        "  - mod: slot_map -> src/slot_map.rs",
+        "    - file: src/slot_map.rs",
+        "  - mod: swarm -> src/swarm/mod.rs",
+        "    - file: src/swarm/mod.rs",
+        "      - mod: builder -> src/swarm/builder.rs",
+        "        - file: src/swarm/builder.rs",
+        "          - inline mod: tests",
+        "      - mod: config -> src/swarm/config.rs",
+        "        - file: src/swarm/config.rs",
+        "      - mod: entrypoint -> src/swarm/entrypoint.rs",
+        "        - file: src/swarm/entrypoint.rs",
+        "          - inline mod: tests",
+        "      - mod: queen -> src/swarm/queen.rs",
+        "        - file: src/swarm/queen.rs",
+        "          - inline mod: tests",
+        "      - mod: sentinel -> src/swarm/sentinel.rs",
+        "        - file: src/swarm/sentinel.rs",
+        "          - inline mod: tests",
+        "      - mod: warrior -> src/swarm/warrior.rs",
+        "        - file: src/swarm/warrior.rs",
+        "          - inline mod: tests",
+        "  - mod: telemetry -> src/telemetry.rs",
+        "    - file: src/telemetry.rs",
+        "  - mod: telemetry_collector -> src/telemetry_collector.rs",
+        "    - file: src/telemetry_collector.rs",
+        "      - inline mod: tests",
+        "  - mod: trust -> src/trust.rs",
+        "    - file: src/trust.rs",
+        "  - mod: verification_kani -> src/verification_kani.rs",
+        "    - file: src/verification_kani.rs",
+        "  - mod: watchdog -> src/watchdog.rs",
+        "    - file: src/watchdog.rs",
+        "      - inline mod: tests",
+        "  - inline mod: tests"
+      ]
+    }
+  },
+  {
+    "name": "zkf-tui",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-tui/Cargo.toml",
+    "crate_dir": "zkf-tui",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "crossterm",
+          "package_name": "crossterm",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "ratatui",
+          "package_name": "ratatui",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-backends",
+          "package_name": "zkf-backends",
+          "classification": "internal",
+          "detail": "path=../zkf-backends"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        },
+        {
+          "name": "zkf-ui",
+          "package_name": "zkf-ui",
+          "classification": "internal",
+          "detail": "path=../zkf-ui"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-backends",
+      "zkf-lib",
+      "zkf-ui"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_tui",
+        "kind": "lib",
+        "src": "zkf-tui/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_tui": [
+        "- file: src/lib.rs",
+        "  - mod: dashboard -> src/dashboard.rs",
+        "    - file: src/dashboard.rs",
+        "      - inline mod: tests",
+        "  - mod: proof_jobs -> src/proof_jobs.rs",
+        "    - file: src/proof_jobs.rs",
+        "      - inline mod: tests",
+        "  - mod: reference_apps -> src/reference_apps.rs",
+        "    - file: src/reference_apps.rs",
+        "  - mod: validation -> src/validation.rs",
+        "    - file: src/validation.rs",
+        "      - inline mod: tests",
+        "  - mod: widgets -> src/widgets/mod.rs",
+        "    - file: src/widgets/mod.rs",
+        "      - mod: audit_panel -> src/widgets/audit_panel.rs",
+        "        - file: src/widgets/audit_panel.rs",
+        "      - mod: command_bar -> src/widgets/command_bar.rs",
+        "        - file: src/widgets/command_bar.rs",
+        "      - mod: credential_panel -> src/widgets/credential_panel.rs",
+        "        - file: src/widgets/credential_panel.rs",
+        "      - mod: health_gauge -> src/widgets/health_gauge.rs",
+        "        - file: src/widgets/health_gauge.rs",
+        "      - mod: proof_animation -> src/widgets/proof_animation.rs",
+        "        - file: src/widgets/proof_animation.rs",
+        "          - inline mod: tests",
+        "      - mod: proof_gauge -> src/widgets/proof_gauge.rs",
+        "        - file: src/widgets/proof_gauge.rs",
+        "          - inline mod: tests",
+        "      - mod: proof_modal -> src/widgets/proof_modal.rs",
+        "        - file: src/widgets/proof_modal.rs",
+        "      - mod: status_panel -> src/widgets/status_panel.rs",
+        "        - file: src/widgets/status_panel.rs",
+        "      - mod: vault_table -> src/widgets/vault_table.rs",
+        "        - file: src/widgets/vault_table.rs"
+      ]
+    }
+  },
+  {
+    "name": "zkf-ui",
+    "version": "1.0.0",
+    "edition": "2024",
+    "manifest_path": "zkf-ui/Cargo.toml",
+    "crate_dir": "zkf-ui",
+    "dependency_sections": {
+      "dependencies": [
+        {
+          "name": "indicatif",
+          "package_name": "indicatif",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "owo-colors",
+          "package_name": "owo-colors",
+          "classification": "external",
+          "detail": "workspace=True"
+        },
+        {
+          "name": "zkf-lib",
+          "package_name": "zkf-lib",
+          "classification": "internal",
+          "detail": "path=../zkf-lib"
+        }
+      ]
+    },
+    "internal_dependencies": [
+      "zkf-lib"
+    ],
+    "feature_flags": {},
+    "entry_targets": [
+      {
+        "name": "zkf_ui",
+        "kind": "lib",
+        "src": "zkf-ui/src/lib.rs"
+      }
+    ],
+    "module_trees": {
+      "zkf_ui": [
+        "- file: src/lib.rs",
+        "  - mod: progress -> src/progress.rs",
+        "    - file: src/progress.rs",
+        "      - inline mod: tests",
+        "  - mod: render -> src/render.rs",
+        "    - file: src/render.rs",
+        "      - inline mod: tests",
+        "  - mod: theme -> src/theme.rs",
+        "    - file: src/theme.rs"
+      ]
+    }
+  }
+]

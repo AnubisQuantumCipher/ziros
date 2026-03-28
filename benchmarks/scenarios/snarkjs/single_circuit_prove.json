@@ -1,0 +1,21 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": ".",
+  "command": [
+    "python3",
+    "benchmarks/workspaces/snarkjs/run.py",
+    "--scenario",
+    "single_circuit_prove",
+    "--mode",
+    "prove"
+  ],
+  "verify_command": [
+    "python3",
+    "benchmarks/workspaces/snarkjs/run.py",
+    "--scenario",
+    "single_circuit_prove",
+    "--mode",
+    "verify"
+  ],
+  "proof_path": "benchmarks/workspaces/snarkjs/single_circuit_prove/build/proof.json"
+}

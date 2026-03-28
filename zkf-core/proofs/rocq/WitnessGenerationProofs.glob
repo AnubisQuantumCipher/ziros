@@ -1,0 +1,48 @@
+DIGEST 6ec46b42b8e942dd59a44c05e72c74b3
+FWitnessGenerationProofs
+R15:26 KernelCompat <> <> lib
+R44:58 KernelGenerated <> <> lib
+R76:101 WitnessGenerationSemantics <> <> lib
+R142:179 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> <> lib
+prf 189:223 <> validate_generated_witness_sound_ok
+binder 236:242 <> program:1
+binder 244:250 <> witness:2
+binder 252:268 <> validated_witness:3
+R347:354 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R317:319 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R275:300 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> validate_generated_witness def
+R302:308 WitnessGenerationProofs <> program:1 var
+R310:316 WitnessGenerationProofs <> witness:2 var
+R320:328 KernelCompat <> Result_Ok constr
+R330:346 WitnessGenerationProofs <> validated_witness:3 var
+R382:389 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R372:374 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R355:371 WitnessGenerationProofs <> validated_witness:3 var
+R375:381 WitnessGenerationProofs <> witness:2 var
+R390:413 WitnessGenerationSemantics <> GeneratedWitnessAccepted def
+R415:421 WitnessGenerationProofs <> program:1 var
+R423:429 WitnessGenerationProofs <> witness:2 var
+R502:527 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> validate_generated_witness def
+R555:602 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'check_program' not
+R570:593 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+R555:602 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'check_program' not
+R570:593 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> :::'f_kernel_program' not
+prf 763:800 <> generate_non_blackbox_witness_sound_ok
+binder 813:819 <> program:4
+binder 821:826 <> inputs:5
+binder 828:834 <> witness:6
+R905:912 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R885:887 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R841:869 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness def
+R871:877 WitnessGenerationProofs <> program:4 var
+R879:884 WitnessGenerationProofs <> inputs:5 var
+R888:896 KernelCompat <> Result_Ok constr
+R898:904 WitnessGenerationProofs <> witness:6 var
+R913:936 WitnessGenerationSemantics <> GeneratedWitnessAccepted def
+R938:944 WitnessGenerationProofs <> program:4 var
+R946:952 WitnessGenerationProofs <> witness:6 var
+R1014:1042 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness def
+R1070:1108 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness_unchecked def
+R1070:1108 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> generate_non_blackbox_witness_unchecked def
+R1176:1210 WitnessGenerationProofs <> validate_generated_witness_sound_ok thm
+R1176:1210 WitnessGenerationProofs <> validate_generated_witness_sound_ok thm

@@ -1,0 +1,6 @@
+[package]
+name = "developer_workload"
+type = "bin"
+authors = ["ZKF"]
+
+[dependencies]

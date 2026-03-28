@@ -1,0 +1,6 @@
+[package]
+name = "single_circuit_prove"
+type = "bin"
+authors = ["ZKF"]
+
+[dependencies]

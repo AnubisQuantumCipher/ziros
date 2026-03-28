@@ -1,0 +1,103 @@
+{
+  "name": "mul_add",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "x",
+      "visibility": "private"
+    },
+    {
+      "name": "y",
+      "visibility": "private"
+    },
+    {
+      "name": "sum",
+      "visibility": "private"
+    },
+    {
+      "name": "product",
+      "visibility": "public"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "sum"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "x"
+          },
+          {
+            "op": "signal",
+            "args": "y"
+          }
+        ]
+      },
+      "label": "sum_constraint"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "product"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "sum"
+          },
+          {
+            "op": "signal",
+            "args": "x"
+          }
+        ]
+      },
+      "label": "product_constraint"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "sum",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "x"
+            },
+            {
+              "op": "signal",
+              "args": "y"
+            }
+          ]
+        }
+      },
+      {
+        "target": "product",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "sum"
+            },
+            {
+              "op": "signal",
+              "args": "x"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

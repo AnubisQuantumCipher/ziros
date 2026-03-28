@@ -1,0 +1,70 @@
+DIGEST cfedbbcefd1b5b8f2c8d2b7b420770d3
+FLookupLoweringSemantics
+R15:27 BackendCompat <> <> lib
+R72:110 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> <> lib
+def 125:159 <> SupportedSelectorValueTableLowering
+R174:196 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> t_LookupLoweringSurface def
+binder 164:170 <> surface:1
+R259:265 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R213:250 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_supported_path proj
+R252:258 LookupLoweringSemantics <> surface:1 var
+R266:315 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> SpecSupportedLookupLoweringPath_SelectorValueTable constr
+def 330:362 <> LookupLoweringWitnessPreservation
+R381:387 Core.Core_Primitive <> :::'t_usize' not
+binder 367:377 <> input_count:2
+R408:414 Core.Core_Primitive <> :::'t_usize' not
+binder 393:404 <> output_count:3
+R433:439 Core.Core_Primitive <> :::'t_usize' not
+binder 420:429 <> table_rows:4
+R461:467 Core.Core_Primitive <> :::'t_usize' not
+binder 445:457 <> table_columns:5
+R483:505 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> t_LookupLoweringSurface def
+binder 473:479 <> surface:6
+R565:570 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R522:556 LookupLoweringSemantics <> SupportedSelectorValueTableLowering def
+R558:564 LookupLoweringSemantics <> surface:6 var
+R628:633 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R614:616 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R571:605 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_input_count proj
+R607:613 LookupLoweringSemantics <> surface:6 var
+R617:627 LookupLoweringSemantics <> input_count:2 var
+R693:698 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R678:680 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R634:669 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_output_count proj
+R671:677 LookupLoweringSemantics <> surface:6 var
+R681:692 LookupLoweringSemantics <> output_count:3 var
+R754:759 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R741:743 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R699:732 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_table_rows proj
+R734:740 LookupLoweringSemantics <> surface:6 var
+R744:753 LookupLoweringSemantics <> table_rows:4 var
+R821:826 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R805:807 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R760:796 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_table_columns proj
+R798:804 LookupLoweringSemantics <> surface:6 var
+R808:820 LookupLoweringSemantics <> table_columns:5 var
+R886:891 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R873:875 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R827:864 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_selector_count proj
+R866:872 LookupLoweringSemantics <> surface:6 var
+R876:885 LookupLoweringSemantics <> table_rows:4 var
+R961:966 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R948:950 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R892:939 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_boolean_constraint_count proj
+R941:947 LookupLoweringSemantics <> surface:6 var
+R951:960 LookupLoweringSemantics <> table_rows:4 var
+R1101:1106 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1019:1025 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R967:1010 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_output_binding_count proj
+R1012:1018 LookupLoweringSemantics <> surface:6 var
+R1026:1061 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_output_binding_count def
+R1063:1073 LookupLoweringSemantics <> input_count:2 var
+R1075:1086 LookupLoweringSemantics <> output_count:3 var
+R1088:1100 LookupLoweringSemantics <> table_columns:5 var
+R1164:1170 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1107:1155 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_f_equality_constraint_count proj
+R1157:1163 LookupLoweringSemantics <> surface:6 var
+R1171:1211 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_equality_constraint_count def
+R1213:1223 LookupLoweringSemantics <> input_count:2 var
+R1225:1236 LookupLoweringSemantics <> output_count:3 var
+R1238:1250 LookupLoweringSemantics <> table_columns:5 var

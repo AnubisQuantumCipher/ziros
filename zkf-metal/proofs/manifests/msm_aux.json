@@ -1,0 +1,3169 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "msm_aux",
+  "claim": "attested GPU surface from Rust inputs to GPU outputs, bound to the shipped metallib, reflection, and pipeline descriptors; certification status is carried per program by certified_claim",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_simd_accumulate",
+      "family": "msm_aux",
+      "kernel": "msm_bucket_acc_simd",
+      "variant": "simd_accumulate",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "simd_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_simd"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_acc_simd",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "35d78b56ff73732e7a3e7d633e613ed484357ad0f135b94552c59e15ca0bc8d1",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_simd",
+            "source_path": "zkf-metal/src/shaders/msm_bn254.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "simd_accumulate"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_sort_count",
+      "family": "msm_aux",
+      "kernel": "msm_sort_count",
+      "variant": "sort_count",
+      "field": null,
+      "curve": "bn254",
+      "route": "hybrid",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "point_bucket_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "bucket_counts",
+          "kind": "global_output",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "sort_count",
+          "operator": "msm_bucket_count",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "point_bucket_map"
+          ],
+          "writes": [
+            "bucket_counts"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_sort_count"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_sort_count",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "0ef0edb67e1a8517d26281f1710df553488606af82a99f597047eb91f74cb275",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "0954a27ef7bf8d8c058cc48d97a552770477e2074ec3c39c9799239c06ad1a83",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "point_bucket_map",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_counts",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_sort_count",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "sort_count"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_sort_scatter",
+      "family": "msm_aux",
+      "kernel": "msm_sort_scatter",
+      "variant": "sort_scatter",
+      "field": null,
+      "curve": "bn254",
+      "route": "hybrid",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "point_bucket_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_offsets",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "write_cursors",
+          "kind": "global_output",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "sorted_indices",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "sort_scatter",
+          "operator": "msm_bucket_scatter",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "point_bucket_map",
+            "bucket_offsets"
+          ],
+          "writes": [
+            "write_cursors",
+            "sorted_indices"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_sort_scatter"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_sort_scatter",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "49005ab2d341fd630c499c84fe7e7195dbf1831965f49849cfa012e2841f7a39",
+            "public_reflection_sha256": "17a71a032c68f01370cfb280a894393aa091e7eb23a83b0f10445d0646ee4df9",
+            "pipeline_descriptor_sha256": "24f9197944f08a3baef2c2687be6d4b3c32d0cf277649f8dc8e6675c443f47d7",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "point_bucket_map",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_offsets",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "write_cursors",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "sorted_indices",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_sort_scatter",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "sort_scatter"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_sorted_accumulate",
+      "family": "msm_aux",
+      "kernel": "msm_bucket_acc_sorted",
+      "variant": "sorted_accumulate",
+      "field": null,
+      "curve": "bn254",
+      "route": "hybrid",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "sorted_indices",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_offsets",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_counts",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "sorted_accumulate",
+          "operator": "msm_sorted_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "bases_x",
+            "bases_y",
+            "sorted_indices",
+            "bucket_offsets",
+            "bucket_counts"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_sorted"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_acc_sorted",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "41343f47ba7e725ebbca6b2463bd16bd394d641cda99f79f0585f8a6d01caf0a",
+            "public_reflection_sha256": "eb7b1b870ea71744491a035cd5f1f67ecf741269b6dfef808072172d415e6183",
+            "pipeline_descriptor_sha256": "b36622f41c8d5060c557e9e6e20c31d586a86c9f2ceaac1e43901ed59516509f",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "sorted_indices",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_offsets",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_counts",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "num_buckets",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 7,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_sorted",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "sorted_accumulate"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_naf_sort_count",
+      "family": "msm_aux",
+      "kernel": "msm_sort_count_naf",
+      "variant": "naf_sort_count",
+      "field": null,
+      "curve": "bn254",
+      "route": "naf",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "naf_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "bucket_counts",
+          "kind": "global_output",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "naf_sort_count",
+          "operator": "msm_bucket_count",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "naf_map"
+          ],
+          "writes": [
+            "bucket_counts"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_sort_count_naf"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_sort_count_naf",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "bc2a6c01ca9913fea720c14591e22a3c24e0c1dc1cce77e67b4ce44bf6a1614c",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "e82dfd1c155304f09696864d5da9a938bfc55f9f585d84041f05d492d6029ee8",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "naf_map",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_counts",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_sort_count_naf",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "naf_sort_count"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_naf_sort_scatter",
+      "family": "msm_aux",
+      "kernel": "msm_sort_scatter_naf",
+      "variant": "naf_sort_scatter",
+      "field": null,
+      "curve": "bn254",
+      "route": "naf",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "naf_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_offsets",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "write_cursors",
+          "kind": "global_output",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "sorted_indices",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "naf_sort_scatter",
+          "operator": "msm_bucket_scatter",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "naf_map",
+            "bucket_offsets"
+          ],
+          "writes": [
+            "write_cursors",
+            "sorted_indices"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_sort_scatter_naf"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_sort_scatter_naf",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "4561c31d4023a2611ab760f517fd6df2a95ca2cd546d9984b227010cc594f3c0",
+            "public_reflection_sha256": "17a71a032c68f01370cfb280a894393aa091e7eb23a83b0f10445d0646ee4df9",
+            "pipeline_descriptor_sha256": "a9328e712d25dae7cb0d821e04e7927ca65c6e81299481245fbd024f7e3f840c",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "naf_map",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_offsets",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "write_cursors",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "sorted_indices",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_sort_scatter_naf",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "naf_sort_scatter"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_bn254_naf_sorted_accumulate",
+      "family": "msm_aux",
+      "kernel": "msm_bucket_acc_sorted_naf",
+      "variant": "naf_sorted_accumulate",
+      "field": null,
+      "curve": "bn254",
+      "route": "naf",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "sorted_indices_naf",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_offsets",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "bucket_counts",
+          "kind": "global_input",
+          "start": {
+            "symbol": "bucket_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "symbol": "num_buckets"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "naf_sorted_accumulate",
+          "operator": "msm_sorted_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "bases_x",
+            "bases_y",
+            "sorted_indices_naf",
+            "bucket_offsets",
+            "bucket_counts"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_sorted_naf"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_acc_sorted_naf",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "88dd3ef2786c6b9f38648905d0abb83e9ff97460b4f9f5e7de208ad0c03a3764",
+            "public_reflection_sha256": "eb7b1b870ea71744491a035cd5f1f67ecf741269b6dfef808072172d415e6183",
+            "pipeline_descriptor_sha256": "944b2cdebf99f7c28e922c4e10593f2c37fcbc0519b39af673b92eb01097c7c3",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "sorted_indices",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_offsets",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_counts",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "num_buckets_naf",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 7,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_sorted_naf",
+            "source_path": "zkf-metal/src/shaders/msm_sort.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "naf_sorted_accumulate"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_pallas_simd_accumulate",
+      "family": "msm_aux",
+      "kernel": "msm_bucket_acc_simd",
+      "variant": "simd_accumulate",
+      "field": null,
+      "curve": "pallas",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "simd_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
+          "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_pallas.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pallas_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_simd"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "pallas_msm_library",
+            "entrypoint": "msm_bucket_acc_simd",
+            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "08d121bdcdf77f41c21037bc3337ab62f13449f851c92ff10646c4658fb7ebc6",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_simd",
+            "source_path": "zkf-metal/src/shaders/msm_pallas.metal",
+            "library": "pallas_msm_library",
+            "binding_kind": "simd_accumulate"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.msm_aux_surface_attested",
+      "program_id": "msm_vesta_simd_accumulate",
+      "family": "msm_aux",
+      "kernel": "msm_bucket_acc_simd",
+      "variant": "simd_accumulate",
+      "field": null,
+      "curve": "vesta",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "simd_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
+          "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_vesta.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/vesta_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_simd"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "vesta_msm_library",
+            "entrypoint": "msm_bucket_acc_simd",
+            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "afc1ab829d47c4f75b2ca36a9348ea6416ee2c2ef6fc16e477a7a728d6eabc46",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped auxiliary MSM kernels exactly",
+        "workgroup_policy": "auxiliary MSM kernels are attested but not counted as certified family theorems",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_simd",
+            "source_path": "zkf-metal/src/shaders/msm_vesta.metal",
+            "library": "vesta_msm_library",
+            "binding_kind": "simd_accumulate"
+          }
+        ]
+      },
+      "certified_claim": false
+    }
+  ]
+}

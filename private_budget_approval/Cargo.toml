@@ -1,0 +1,11 @@
+[package]
+name = "private_budget_approval"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+zkf-lib = { path = "/Users/sicarii/Projects/ZK DEV/zkf-lib" }
+zkf-backends = { path = "/Users/sicarii/Projects/ZK DEV/zkf-backends" }
+serde_json = "1"

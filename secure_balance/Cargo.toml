@@ -1,0 +1,18 @@
+[package]
+name = "secure_balance"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+zkf-api = { version = "0.1.0", path = "../zkf-api" }
+zkf-core = { version = "0.1.0", path = "../zkf-core" }
+zkf-dsl = { version = "0.1.0", path = "../zkf-dsl" }
+
+[lints]
+workspace = true

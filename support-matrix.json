@@ -1,0 +1,369 @@
+{
+  "schema_version": "2.0",
+  "generated_for": "0.1.0",
+  "backends": [
+    {
+      "id": "plonky3",
+      "mode": "native",
+      "status": "ready",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-lowered-ir",
+      "fields": [
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "gpu_stages": [
+        "fft-ntt",
+        "hash-merkle"
+      ],
+      "gpu_coverage": "2/2 GPU stages active on current host",
+      "notes": "Plonky3 STARK backend with native field profiles: Goldilocks/BabyBear over FRI and Mersenne31 over Circle PCS. Supports Equal/Boolean constraints, range constraints via bit decomposition (field-safe bit cap), and division via derived quotient columns. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-lowered-ir aggregation_semantics=single-proof-with-optional-wrapper"
+    },
+    {
+      "id": "halo2",
+      "mode": "native",
+      "status": "ready",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-basic-ir",
+      "fields": [
+        "pasta-fp"
+      ],
+      "gpu_stages": [
+        "msm"
+      ],
+      "gpu_coverage": "1/2 GPU stages active on current host",
+      "notes": "Plonkish backend implemented with Halo2 (IPA). Supports Equal/Boolean/Range/Div. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only"
+    },
+    {
+      "id": "halo2-bls12-381",
+      "mode": "native",
+      "status": "ready",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-basic-ir",
+      "fields": [
+        "bls12-381"
+      ],
+      "gpu_coverage": "0/2 GPU stages active on current host",
+      "notes": "PLONK+KZG on BLS12-381 via PSE halo2 fork. Real BLS12-381 Fr field, SHPLONK multiopen, deterministic trusted setup. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only"
+    },
+    {
+      "id": "arkworks-groth16",
+      "mode": "native",
+      "status": "limited",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-basic-ir",
+      "fields": [
+        "bn254"
+      ],
+      "gpu_stages": [
+        "fft-ntt",
+        "qap-witness-map",
+        "msm"
+      ],
+      "gpu_coverage": "3/3 GPU stages active on current host",
+      "notes": "Groth16 on BN254 for smallest proof size and cheap on-chain verification. implementation_type=native compiled_in=true production_ready=false assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only readiness_reason=upstream-ark-groth16-production-disclaimer operator_action=treat arkworks-groth16 as non-production until the upstream production disclaimer is resolved or the dependency is replaced"
+    },
+    {
+      "id": "sp1",
+      "mode": "delegated",
+      "status": "broken",
+      "assurance_lane": "attestation-backed-host-validated-lane",
+      "proof_semantics": "attestation-over-host-validation",
+      "delegates_to": "plonky3",
+      "fields": [
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "gpu_coverage": "0/0 GPU stages active on current host",
+      "notes": "SP1 compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. implementation_type=delegated compiled_in=false production_ready=false assurance_lane=attestation-backed-host-validated-lane proof_semantics=attestation-over-host-validation aggregation_semantics=zkvm-attestation explicit_compat_alias=sp1-compat readiness_reason=native-backend-not-compiled operator_action=build a binary with the native feature enabled or request `sp1-compat` with --allow-compat"
+    },
+    {
+      "id": "risc-zero",
+      "mode": "delegated",
+      "status": "broken",
+      "assurance_lane": "attestation-backed-host-validated-lane",
+      "proof_semantics": "attestation-over-host-validation",
+      "delegates_to": "plonky3",
+      "fields": [
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "gpu_coverage": "0/0 GPU stages active on current host",
+      "notes": "RISC Zero compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. Native RISC Zero integration requires the `native-risc-zero` feature flag. implementation_type=delegated compiled_in=false production_ready=false assurance_lane=attestation-backed-host-validated-lane proof_semantics=attestation-over-host-validation aggregation_semantics=zkvm-attestation explicit_compat_alias=risc-zero-compat readiness_reason=native-backend-not-compiled operator_action=build a binary with the native feature enabled or request `risc-zero-compat` with --allow-compat"
+    },
+    {
+      "id": "nova",
+      "mode": "native",
+      "status": "ready",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+      "fields": [
+        "bn254"
+      ],
+      "gpu_coverage": "0/1 GPU stages active on current host",
+      "notes": "Native Nova backend (nova-snark) with IR-backed step circuit and classic/hypernova profiles. Compatibility delegation is disabled by default and can be enabled only with ZKF_NOVA_ALLOW_COMPAT_DELEGATE=true. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir-recursive-shell aggregation_semantics=cryptographic-recursive-folding"
+    },
+    {
+      "id": "hypernova",
+      "mode": "native",
+      "status": "ready",
+      "assurance_lane": "native-cryptographic-proof",
+      "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+      "fields": [
+        "bn254"
+      ],
+      "gpu_coverage": "0/1 GPU stages active on current host",
+      "notes": "HyperNova native mode: delegates to Nova native backend with HyperNova CCS profile for real multifolding over Pallas/Vesta curve cycle. Supports BN254 IR programs (mapped to Pallas scalar field). implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir-recursive-shell aggregation_semantics=cryptographic-recursive-multifolding"
+    },
+    {
+      "id": "midnight-compact",
+      "mode": "native",
+      "status": "broken",
+      "assurance_lane": "delegated-or-external-lane",
+      "proof_semantics": "external-or-delegated",
+      "fields": [
+        "pasta-fp",
+        "pasta-fq"
+      ],
+      "gpu_coverage": "0/0 GPU stages active on current host",
+      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds"
+    }
+  ],
+  "frontends": [
+    {
+      "id": "noir",
+      "status": "ready",
+      "input_formats": [
+        "noir-artifact-json",
+        "acir-program-json"
+      ],
+      "notes": "ACIR import supports AssertZero, RANGE, AND/XOR (bit-decomposed), native BlackBox constraints (SHA256/Keccak256/Pedersen/Schnorr/ECDSA/Blake2s/RecursiveAggregation marker), plus compatibility hint-backed blackbox metadata for unsupported ops, Directive::ToLeRadix, MemoryInit/MemoryOp (constant and dynamic index via multiplexer), Brillig hints, and multi-function Call inlining."
+    },
+    {
+      "id": "circom",
+      "status": "ready",
+      "input_formats": [
+        "circom-r1cs-json",
+        "zkf-program-json",
+        "frontend-descriptor-json"
+      ],
+      "notes": "Circom frontend supports snarkjs-style R1CS JSON import (`constraints`, `nVars`) and descriptor/direct Program passthrough; execution supports native witness-runner descriptors (`witness_runner.kind=snarkjs`) plus command hooks and descriptor witness loading."
+    },
+    {
+      "id": "cairo",
+      "status": "limited",
+      "input_formats": [
+        "sierra-json",
+        "cairo-descriptor-json",
+        "zkf-program-json",
+        "zkf-zir-program-json"
+      ],
+      "notes": "Cairo frontend imports Sierra IR (JSON) into ZKF. Supports descriptor-based import with optional build hooks (e.g., `scarb build`), direct ZIR loading for stateful Cairo/StarkNet flows, and descriptor-driven execution via `execute_command`. Native Sierra → constraint translation handles the supported felt252/integer/enum/struct/memory/control-flow subset. Unsupported Sierra libfuncs fail closed during import instead of being silently lowered to fallback BlackBox constraints."
+    },
+    {
+      "id": "compact",
+      "status": "ready",
+      "input_formats": [
+        "compact-zkir-json",
+        "compact-descriptor-json",
+        "zkf-program-json",
+        "compact-source"
+      ],
+      "notes": "Midnight Compact frontend: imports local compactc 0.29.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows."
+    },
+    {
+      "id": "halo2-rust",
+      "status": "ready",
+      "input_formats": [
+        "zkf-halo2-export-json",
+        "zkf-halo2-export-descriptor-json"
+      ],
+      "notes": "Halo2 frontend import accepts explicit ZkfHalo2Export schema (`schema=zkf-halo2-export-v1`) via embedded export object or `halo2_export_path`."
+    },
+    {
+      "id": "plonky3-air",
+      "status": "ready",
+      "input_formats": [
+        "zkf-plonky3-air-export-json",
+        "zkf-plonky3-air-export-descriptor-json"
+      ],
+      "notes": "Plonky3 AIR frontend import accepts explicit ZkfPlonky3AirExport schema (`schema=zkf-plonky3-air-export-v1`) via embedded export object or `plonky3_air_export_path`."
+    },
+    {
+      "id": "zkvm",
+      "status": "ready",
+      "input_formats": [
+        "zkvm-descriptor-json",
+        "zkf-program-json"
+      ],
+      "notes": "External-tool frontend for zkVM (SP1, RISC Zero): supports descriptor-based import/execute with toolchain hooks, ELF binary detection, and witness loading."
+    }
+  ],
+  "gadgets": [
+    {
+      "id": "blake3",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "pasta-fq",
+        "goldilocks"
+      ],
+      "audit_status": "unaudited",
+      "notes": "BLAKE3 hash function circuit."
+    },
+    {
+      "id": "boolean",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "pasta-fq",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "Boolean logic gates (AND, OR, NOT, XOR)."
+    },
+    {
+      "id": "comparison",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "pasta-fq",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "unaudited",
+      "notes": "Comparison operations (less-than, greater-than, equal)."
+    },
+    {
+      "id": "ecdsa",
+      "status": "limited",
+      "supported_fields": [
+        "bn254"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "ECDSA signature verification over secp256k1 (Bitcoin/Ethereum). blackbox_ops=ecdsa_secp256k1,ecdsa_secp256r1"
+    },
+    {
+      "id": "kzg",
+      "status": "limited",
+      "supported_fields": [
+        "bn254",
+        "bls12-381"
+      ],
+      "audit_status": "unaudited",
+      "notes": "KZG polynomial commitment pairing verification. blackbox_ops=pairing_check"
+    },
+    {
+      "id": "merkle",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "Merkle tree inclusion proof verification."
+    },
+    {
+      "id": "plonk_gate",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "pasta-fq",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "unaudited",
+      "notes": "Universal Plonk gate constraint with configurable selectors."
+    },
+    {
+      "id": "poseidon",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "Poseidon algebraic hash function (ZK-friendly). blackbox_ops=poseidon"
+    },
+    {
+      "id": "range",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "pasta-fq",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "Range constraint: value < 2^bits."
+    },
+    {
+      "id": "schnorr",
+      "status": "limited",
+      "supported_fields": [
+        "bn254"
+      ],
+      "audit_status": "unaudited",
+      "notes": "Schnorr signature verification. blackbox_ops=schnorr_verify"
+    },
+    {
+      "id": "sha256",
+      "status": "ready",
+      "supported_fields": [
+        "bn254",
+        "bls12-381",
+        "pasta-fp",
+        "goldilocks",
+        "babybear",
+        "mersenne31"
+      ],
+      "audit_status": "informally-reviewed",
+      "notes": "SHA-256 hash function circuit (NIST FIPS 180-4). blackbox_ops=sha256"
+    }
+  ],
+  "registry": {
+    "local": "ready",
+    "remote": "ready",
+    "version_resolution": "ready",
+    "security": "ready",
+    "notes": "Local + remote registries with CombinedRegistry fallback, SemVer resolution, and SHA-256 manifest/content integrity checks."
+  },
+  "roadmap_completion": {
+    "phase_10_production_hardening": "in_progress",
+    "phase_1_acir_native_semantics": "ready",
+    "phase_2_acvm_solver_completion": "ready",
+    "phase_3_plonky3_multifield": "ready",
+    "phase_4_nova_hypernova_native": "ready",
+    "phase_5_sp1_native_sdk": "delegated",
+    "phase_6_midnight_native_runtime": "delegated",
+    "phase_7_attestation_composition": "ready",
+    "phase_8_frontend_expansion": "ready",
+    "phase_9_advanced_tooling": "in_progress"
+  }
+}

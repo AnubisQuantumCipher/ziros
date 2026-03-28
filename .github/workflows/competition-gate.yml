@@ -1,0 +1,57 @@
+name: competition-gate
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  competition-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run competition gate
+        run: make competition-gate
+
+      - name: Upload competition artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: competition-linux-artifacts
+          path: |
+            target/competition/competitive_harness.json
+            target/competition/competition_gate.json
+            target/competition/toolchain_manifest.json
+            target/competition
+
+  competition-apple-silicon:
+    runs-on:
+      - self-hosted
+      - macOS
+      - ARM64
+      - m4-max
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run competition gate
+        run: make competition-gate
+
+      - name: Upload competition artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: competition-apple-silicon-artifacts
+          path: |
+            target/competition/competitive_harness.json
+            target/competition/competition_gate.json
+            target/competition/toolchain_manifest.json
+            target/competition

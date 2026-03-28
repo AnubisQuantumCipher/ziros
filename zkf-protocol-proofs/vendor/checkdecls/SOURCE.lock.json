@@ -1,0 +1,14 @@
+{
+  "schema": "zkf-upstream-lock-v1",
+  "id": "checkdecls",
+  "origin": "https://github.com/PatrickMassot/checkdecls.git",
+  "revision": "3d425859e73fcfbef85b9638c2a91708ef4a22d4",
+  "checked_on": "2026-03-23",
+  "license": "Apache-2.0",
+  "upstream_toolchain": "leanprover/lean4:v4.18.0",
+  "local_toolchain_target": "leanprover/lean4:v4.28.0",
+  "purpose": "Pinned local check-tooling dependency referenced by the upstream ArkLib package.",
+  "focus_modules": [
+    "Main"
+  ]
+}

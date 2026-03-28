@@ -1,0 +1,346 @@
+{
+  "backend": "midnight-compact",
+  "program": {
+    "name": "uccr_finance_solvency",
+    "field": "pasta-fp",
+    "signals": [
+      {
+        "name": "total_assets_scaled",
+        "visibility": "private",
+        "ty": "uint(48)"
+      },
+      {
+        "name": "total_liabilities_scaled",
+        "visibility": "private",
+        "ty": "uint(48)"
+      },
+      {
+        "name": "blinding",
+        "visibility": "private",
+        "ty": "uint(32)"
+      },
+      {
+        "name": "__surplus",
+        "visibility": "private",
+        "ty": "uint(48)"
+      },
+      {
+        "name": "__sha_b0",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b1",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b2",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b3",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b4",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b5",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b6",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b7",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b8",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b9",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b10",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b11",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b12",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b13",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b14",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b15",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b16",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b17",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b18",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b19",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b20",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b21",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b22",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b23",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b24",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b25",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b26",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b27",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b28",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b29",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b30",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "__sha_b31",
+        "visibility": "private",
+        "ty": "field"
+      },
+      {
+        "name": "required_margin_bps",
+        "visibility": "constant",
+        "constant": "1250",
+        "ty": "field"
+      },
+      {
+        "name": "commitment_hi",
+        "visibility": "public",
+        "ty": "field"
+      },
+      {
+        "name": "commitment_lo",
+        "visibility": "public",
+        "ty": "field"
+      }
+    ],
+    "constraints": [
+      {
+        "kind": "range",
+        "signal": "total_assets_scaled",
+        "bits": 48
+      },
+      {
+        "kind": "range",
+        "signal": "total_liabilities_scaled",
+        "bits": 48
+      },
+      {
+        "kind": "range",
+        "signal": "blinding",
+        "bits": 32
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "__surplus"
+        },
+        "rhs": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "total_assets_scaled"
+            },
+            {
+              "op": "signal",
+              "args": "total_liabilities_scaled"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "range",
+        "signal": "__surplus",
+        "bits": 48
+      },
+      {
+        "kind": "black_box",
+        "op": "sha256",
+        "inputs": [
+          {
+            "op": "signal",
+            "args": "total_assets_scaled"
+          },
+          {
+            "op": "signal",
+            "args": "total_liabilities_scaled"
+          },
+          {
+            "op": "signal",
+            "args": "blinding"
+          }
+        ],
+        "outputs": [
+          "__sha_b0",
+          "__sha_b1",
+          "__sha_b2",
+          "__sha_b3",
+          "__sha_b4",
+          "__sha_b5",
+          "__sha_b6",
+          "__sha_b7",
+          "__sha_b8",
+          "__sha_b9",
+          "__sha_b10",
+          "__sha_b11",
+          "__sha_b12",
+          "__sha_b13",
+          "__sha_b14",
+          "__sha_b15",
+          "__sha_b16",
+          "__sha_b17",
+          "__sha_b18",
+          "__sha_b19",
+          "__sha_b20",
+          "__sha_b21",
+          "__sha_b22",
+          "__sha_b23",
+          "__sha_b24",
+          "__sha_b25",
+          "__sha_b26",
+          "__sha_b27",
+          "__sha_b28",
+          "__sha_b29",
+          "__sha_b30",
+          "__sha_b31"
+        ],
+        "params": {
+          "input_num_bits": "8"
+        }
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "commitment_hi"
+        },
+        "rhs": {
+          "op": "signal",
+          "args": "__sha_b0"
+        }
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "commitment_lo"
+        },
+        "rhs": {
+          "op": "signal",
+          "args": "__sha_b31"
+        }
+      }
+    ],
+    "witness_plan": {
+      "assignments": [],
+      "hints": []
+    },
+    "metadata": {
+      "domain": "finance",
+      "ir_family": "zir-v1",
+      "required_margin_bps": "1250",
+      "scale_factor": "1e-6 USD",
+      "standard": "Basel III Tier-1 Capital Adequacy / Proof of Solvency"
+    }
+  },
+  "program_digest": "d3d7fbddb4725624b24ec75e9d06063885fcd0cc25f3fef9bd4bac5241a0fb64",
+  "metadata": {
+    "compact_compile_artifacts_dir": "/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/zkf-midnight/uccr_finance_solvency-1774655555019/artifacts",
+    "compact_compile_status": "ok",
+    "compact_source": "pragma language_version 0.21;\n\n// ZKF program: uccr_finance_solvency\n// Field: PastaFp\n\nwitness get_total_assets_scaled(): Field;\nwitness get_total_liabilities_scaled(): Field;\nwitness get_blinding(): Field;\nwitness get___surplus(): Field;\nwitness get___sha_b0(): Field;\nwitness get___sha_b1(): Field;\nwitness get___sha_b2(): Field;\nwitness get___sha_b3(): Field;\nwitness get___sha_b4(): Field;\nwitness get___sha_b5(): Field;\nwitness get___sha_b6(): Field;\nwitness get___sha_b7(): Field;\nwitness get___sha_b8(): Field;\nwitness get___sha_b9(): Field;\nwitness get___sha_b10(): Field;\nwitness get___sha_b11(): Field;\nwitness get___sha_b12(): Field;\nwitness get___sha_b13(): Field;\nwitness get___sha_b14(): Field;\nwitness get___sha_b15(): Field;\nwitness get___sha_b16(): Field;\nwitness get___sha_b17(): Field;\nwitness get___sha_b18(): Field;\nwitness get___sha_b19(): Field;\nwitness get___sha_b20(): Field;\nwitness get___sha_b21(): Field;\nwitness get___sha_b22(): Field;\nwitness get___sha_b23(): Field;\nwitness get___sha_b24(): Field;\nwitness get___sha_b25(): Field;\nwitness get___sha_b26(): Field;\nwitness get___sha_b27(): Field;\nwitness get___sha_b28(): Field;\nwitness get___sha_b29(): Field;\nwitness get___sha_b30(): Field;\nwitness get___sha_b31(): Field;\n\nexport circuit uccr_finance_solvency(commitment_hi: Field, commitment_lo: Field): [Field, Field] {\n  const total_assets_scaled = get_total_assets_scaled();\n  const total_liabilities_scaled = get_total_liabilities_scaled();\n  const blinding = get_blinding();\n  const __surplus = get___surplus();\n  const __sha_b0 = get___sha_b0();\n  const __sha_b1 = get___sha_b1();\n  const __sha_b2 = get___sha_b2();\n  const __sha_b3 = get___sha_b3();\n  const __sha_b4 = get___sha_b4();\n  const __sha_b5 = get___sha_b5();\n  const __sha_b6 = get___sha_b6();\n  const __sha_b7 = get___sha_b7();\n  const __sha_b8 = get___sha_b8();\n  const __sha_b9 = get___sha_b9();\n  const __sha_b10 = get___sha_b10();\n  const __sha_b11 = get___sha_b11();\n  const __sha_b12 = get___sha_b12();\n  const __sha_b13 = get___sha_b13();\n  const __sha_b14 = get___sha_b14();\n  const __sha_b15 = get___sha_b15();\n  const __sha_b16 = get___sha_b16();\n  const __sha_b17 = get___sha_b17();\n  const __sha_b18 = get___sha_b18();\n  const __sha_b19 = get___sha_b19();\n  const __sha_b20 = get___sha_b20();\n  const __sha_b21 = get___sha_b21();\n  const __sha_b22 = get___sha_b22();\n  const __sha_b23 = get___sha_b23();\n  const __sha_b24 = get___sha_b24();\n  const __sha_b25 = get___sha_b25();\n  const __sha_b26 = get___sha_b26();\n  const __sha_b27 = get___sha_b27();\n  const __sha_b28 = get___sha_b28();\n  const __sha_b29 = get___sha_b29();\n  const __sha_b30 = get___sha_b30();\n  const __sha_b31 = get___sha_b31();\n\n  const required_margin_bps = 1250;\n\n  const total_assets_scaled_uint = total_assets_scaled as Uint<48>; // c0\n  const total_liabilities_scaled_uint = total_liabilities_scaled as Uint<48>; // c1\n  const blinding_uint = blinding as Uint<32>; // c2\n  assert(__surplus == (total_assets_scaled - total_liabilities_scaled), \"c3\");\n  const __surplus_uint = __surplus as Uint<48>; // c4\n  // c5: sha256([total_assets_scaled, total_liabilities_scaled, blinding]) -> [__sha_b0, __sha_b1, __sha_b2, __sha_b3, __sha_b4, __sha_b5, __sha_b6, __sha_b7, __sha_b8, __sha_b9, __sha_b10, __sha_b11, __sha_b12, __sha_b13, __sha_b14, __sha_b15, __sha_b16, __sha_b17, __sha_b18, __sha_b19, __sha_b20, __sha_b21, __sha_b22, __sha_b23, __sha_b24, __sha_b25, __sha_b26, __sha_b27, __sha_b28, __sha_b29, __sha_b30, __sha_b31]\n  assert(commitment_hi == __sha_b0, \"c6\");\n  assert(commitment_lo == __sha_b31, \"c7\");\n\n  return [commitment_hi, commitment_lo];\n}\n",
+    "delegated_backend_hint": "halo2",
+    "mode": "native",
+    "support_class": "delegated",
+    "trust_model": "attestation",
+    "trust_tier": "2"
+  }
+}

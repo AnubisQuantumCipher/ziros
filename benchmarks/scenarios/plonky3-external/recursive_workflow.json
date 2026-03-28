@@ -1,0 +1,29 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": "benchmarks/workspaces/plonky3-external",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "prove",
+    "--scenario",
+    "recursive-workflow",
+    "--out-dir",
+    "out/recursive_workflow"
+  ],
+  "verify_command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "verify",
+    "--scenario",
+    "recursive-workflow",
+    "--out-dir",
+    "out/recursive_workflow"
+  ],
+  "proof_path": "out/recursive_workflow/proof.bin"
+}

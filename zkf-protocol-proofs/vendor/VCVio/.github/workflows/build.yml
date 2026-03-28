@@ -1,0 +1,68 @@
+on:
+  push:
+
+jobs:
+  # Cancels previous runs of jobs in this file
+  cancel:
+    name: "Cancel Previous Runs (CI)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          all_but_latest: true
+          access_token: ${{ github.token }}
+
+  check_imported:
+    name: Check Library File Imports
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: update root import files
+        run: bash ./scripts/update-lib.sh
+
+      - name: check that all files are imported
+        run: git diff --exit-code
+
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: install elan
+        run: |
+          set -o pipefail
+          curl -sSfL https://github.com/leanprover/elan/releases/download/v3.0.0/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - uses: actions/checkout@v4
+
+      - name: build project
+        run: |
+          lake exe cache clean
+          lake exe cache get
+          lake build
+
+      - name: build examples
+        run: |
+          lake build Examples
+
+      # - name: shake imports
+      #   run: |
+      #     lake exe shake VCVio
+
+  # lint:
+  #   name: Lint Files
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: install Python
+  #       if: ${{ 'ubuntu-latest' == 'ubuntu-latest' }}
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: 3.8
+
+  #     - uses: actions/checkout@v4
+
+  #     - name: lint
+  #       run: |
+  #         ./scripts/lint-style.sh

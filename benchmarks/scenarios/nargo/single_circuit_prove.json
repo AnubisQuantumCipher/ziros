@@ -1,0 +1,21 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": ".",
+  "command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "single_circuit_prove",
+    "--mode",
+    "prove"
+  ],
+  "verify_command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "single_circuit_prove",
+    "--mode",
+    "verify"
+  ],
+  "proof_path": "benchmarks/workspaces/nargo/single_circuit_prove/target/bb/proof.json"
+}

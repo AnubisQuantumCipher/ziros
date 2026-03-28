@@ -1,0 +1,118 @@
+{
+  "backend": "arkworks-groth16",
+  "program": {
+    "name": "mul_add",
+    "field": "bn254",
+    "signals": [
+      {
+        "name": "x",
+        "visibility": "private"
+      },
+      {
+        "name": "y",
+        "visibility": "private"
+      },
+      {
+        "name": "sum",
+        "visibility": "private"
+      },
+      {
+        "name": "product",
+        "visibility": "public"
+      }
+    ],
+    "constraints": [
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "sum"
+        },
+        "rhs": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "x"
+            },
+            {
+              "op": "signal",
+              "args": "y"
+            }
+          ]
+        },
+        "label": "sum_constraint"
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "product"
+        },
+        "rhs": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "sum"
+            },
+            {
+              "op": "signal",
+              "args": "x"
+            }
+          ]
+        },
+        "label": "product_constraint"
+      }
+    ],
+    "witness_plan": {
+      "assignments": [
+        {
+          "target": "sum",
+          "expr": {
+            "op": "add",
+            "args": [
+              {
+                "op": "signal",
+                "args": "x"
+              },
+              {
+                "op": "signal",
+                "args": "y"
+              }
+            ]
+          }
+        },
+        {
+          "target": "product",
+          "expr": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "signal",
+                "args": "sum"
+              },
+              {
+                "op": "signal",
+                "args": "x"
+              }
+            ]
+          }
+        }
+      ],
+      "hints": []
+    }
+  },
+  "program_digest": "e0a1ff7e9c0405fcdd5c8572ae86ff5a328f8cebb4f4cb122630a21ae68794f7",
+  "compiled_data": "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",
+  "metadata": {
+    "curve": "bn254",
+    "r1cs_constraints_total": "2",
+    "r1cs_recursive_markers": "0",
+    "scheme": "groth16",
+    "setup_blob_version": "1",
+    "setup_deterministic": "true",
+    "setup_seed_hex": "34e4d6e7d541c72a46f120e89f71539ceff6484a276627eb91726e79be8054a0",
+    "setup_seed_source": "program-digest"
+  }
+}

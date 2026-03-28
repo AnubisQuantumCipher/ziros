@@ -1,0 +1,11 @@
+-R ./ TODO
+-arg -w
+-arg all
+
+Zkf_core_Proof_witness_generation_spec.v
+Zkf_core_Proof_transform_spec.v
+Zkf_core_Proof_kernel_spec_Spec_field_ops.v
+Zkf_core_Proof_kernel_spec_Bundle.v
+Zkf_core_Proof_kernel_spec.v
+Zkf_core_Proof_ccs_spec.v
+Zkf_core_Field.v

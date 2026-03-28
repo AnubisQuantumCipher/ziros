@@ -1,0 +1,57 @@
+DIGEST 6f8e71fc640875e63e35a8ba08d06f6a
+FBlackboxHashSemantics
+R24:29 Stdlib.NArith.NArith <> <> lib
+R47:59 BackendCompat <> <> lib
+R104:140 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> <> lib
+def 155:161 <> usize_4
+R165:171 Core.Core_Primitive <> :::'t_usize' not
+R176:185 BackendCompat <> n_to_usize def
+def 203:210 <> usize_32
+R214:220 Core.Core_Primitive <> :::'t_usize' not
+R225:234 BackendCompat <> n_to_usize def
+def 254:289 <> PoseidonBn254Width4LoweringSemantics
+R304:334 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> t_CriticalHashLoweringSemantics def
+binder 292:300 <> semantics:1
+R419:424 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R373:375 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R349:362 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_op abbrev
+R364:372 BlackboxHashSemantics <> semantics:1 var
+R376:418 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SupportedCriticalHashOp_PoseidonBn254Width4 constr
+R467:472 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R457:459 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R425:446 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_inputs_len abbrev
+R448:456 BlackboxHashSemantics <> semantics:1 var
+R460:466 BlackboxHashSemantics <> usize_4 def
+R516:521 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R506:508 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R473:495 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_outputs_len abbrev
+R497:505 BlackboxHashSemantics <> semantics:1 var
+R509:515 BlackboxHashSemantics <> usize_4 def
+R550:552 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R522:539 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_aux_witness_mode abbrev
+R541:549 BlackboxHashSemantics <> semantics:1 var
+R553:602 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashAuxWitnessMode_ConstraintSolverDerived constr
+def 617:652 <> Sha256BytesToDigestLoweringSemantics
+R670:676 Core.Core_Primitive <> :::'t_usize' not
+binder 657:666 <> inputs_len:2
+R694:724 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> t_CriticalHashLoweringSemantics def
+binder 682:690 <> semantics:3
+R811:816 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R765:767 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R741:754 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_op abbrev
+R756:764 BlackboxHashSemantics <> semantics:3 var
+R768:810 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SupportedCriticalHashOp_Sha256BytesToDigest constr
+R862:867 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R849:851 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R817:838 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_inputs_len abbrev
+R840:848 BlackboxHashSemantics <> semantics:3 var
+R852:861 BlackboxHashSemantics <> inputs_len:2 var
+R912:917 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R901:903 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R868:890 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_supported_outputs_len abbrev
+R892:900 BlackboxHashSemantics <> semantics:3 var
+R904:911 BlackboxHashSemantics <> usize_32 def
+R946:948 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R918:935 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> f_aux_witness_mode abbrev
+R937:945 BlackboxHashSemantics <> semantics:3 var
+R949:998 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashAuxWitnessMode_ConstraintSolverDerived constr

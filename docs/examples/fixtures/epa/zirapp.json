@@ -1,0 +1,164 @@
+{
+  "program": {
+    "name": "epa_water_discharge_compliance",
+    "field": "bn254"
+  },
+  "signals": [
+    { "name": "ph_x10", "visibility": "private" },
+    { "name": "lead_ppb", "visibility": "private" },
+    { "name": "mercury_ppb", "visibility": "private" },
+    { "name": "dissolved_oxygen_ppm", "visibility": "private" },
+    { "name": "temperature_c", "visibility": "private" },
+    { "name": "blinding", "visibility": "private" },
+    { "name": "commitment", "visibility": "public" },
+    { "name": "__ph_shifted", "visibility": "private" },
+    { "name": "__lead_gap", "visibility": "private" },
+    { "name": "__mercury_gap", "visibility": "private" },
+    { "name": "__do_shifted", "visibility": "private" },
+    { "name": "__temp_gap", "visibility": "private" },
+    { "name": "__poseidon_zero_0", "visibility": "constant", "constant": "0" },
+    { "name": "__p1_s0", "visibility": "private" },
+    { "name": "__p1_s1", "visibility": "private" },
+    { "name": "__p1_s2", "visibility": "private" },
+    { "name": "__p1_s3", "visibility": "private" },
+    { "name": "__p2_s0", "visibility": "private" },
+    { "name": "__p2_s1", "visibility": "private" },
+    { "name": "__p2_s2", "visibility": "private" },
+    { "name": "__p2_s3", "visibility": "private" },
+    { "name": "__p3_s0", "visibility": "private" },
+    { "name": "__p3_s1", "visibility": "private" },
+    { "name": "__p3_s2", "visibility": "private" },
+    { "name": "__p3_s3", "visibility": "private" },
+    { "name": "__p4_s0", "visibility": "private" },
+    { "name": "__p4_s1", "visibility": "private" },
+    { "name": "__p4_s2", "visibility": "private" },
+    { "name": "__p4_s3", "visibility": "private" },
+    { "name": "__ph_min", "visibility": "constant", "constant": "60" },
+    { "name": "__lead_max", "visibility": "constant", "constant": "15" },
+    { "name": "__mercury_max", "visibility": "constant", "constant": "2" },
+    { "name": "__do_min", "visibility": "constant", "constant": "5" },
+    { "name": "__temp_max", "visibility": "constant", "constant": "35" }
+  ],
+  "ops": [
+    { "kind": "range", "signal": "ph_x10", "bits": 16 },
+    { "kind": "range", "signal": "lead_ppb", "bits": 16 },
+    { "kind": "range", "signal": "mercury_ppb", "bits": 16 },
+    { "kind": "range", "signal": "dissolved_oxygen_ppm", "bits": 16 },
+    { "kind": "range", "signal": "temperature_c", "bits": 16 },
+    { "kind": "range", "signal": "blinding", "bits": 32 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__ph_shifted" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "ph_x10" }, { "op": "signal", "args": "__ph_min" }] }
+    },
+    { "kind": "range", "signal": "__ph_shifted", "bits": 8 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__lead_gap" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "__lead_max" }, { "op": "signal", "args": "lead_ppb" }] }
+    },
+    { "kind": "range", "signal": "__lead_gap", "bits": 8 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__mercury_gap" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "__mercury_max" }, { "op": "signal", "args": "mercury_ppb" }] }
+    },
+    { "kind": "range", "signal": "__mercury_gap", "bits": 8 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__do_shifted" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "dissolved_oxygen_ppm" }, { "op": "signal", "args": "__do_min" }] }
+    },
+    { "kind": "range", "signal": "__do_shifted", "bits": 16 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__temp_gap" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "__temp_max" }, { "op": "signal", "args": "temperature_c" }] }
+    },
+    { "kind": "range", "signal": "__temp_gap", "bits": 8 },
+    {
+      "kind": "black_box",
+      "op": "poseidon",
+      "inputs": [
+        { "op": "signal", "args": "ph_x10" },
+        { "op": "signal", "args": "lead_ppb" },
+        { "op": "signal", "args": "mercury_ppb" },
+        { "op": "signal", "args": "__poseidon_zero_0" }
+      ],
+      "outputs": ["__p1_s0", "__p1_s1", "__p1_s2", "__p1_s3"],
+      "params": { "width": "4" }
+    },
+    {
+      "kind": "black_box",
+      "op": "poseidon",
+      "inputs": [
+        { "op": "signal", "args": "__p1_s0" },
+        { "op": "signal", "args": "dissolved_oxygen_ppm" },
+        { "op": "signal", "args": "temperature_c" },
+        { "op": "signal", "args": "blinding" }
+      ],
+      "outputs": ["__p2_s0", "__p2_s1", "__p2_s2", "__p2_s3"],
+      "params": { "width": "4" }
+    },
+    {
+      "kind": "black_box",
+      "op": "poseidon",
+      "inputs": [
+        { "op": "signal", "args": "__p2_s0" },
+        { "op": "signal", "args": "__ph_shifted" },
+        { "op": "signal", "args": "__lead_gap" },
+        { "op": "signal", "args": "__mercury_gap" }
+      ],
+      "outputs": ["__p3_s0", "__p3_s1", "__p3_s2", "__p3_s3"],
+      "params": { "width": "4" }
+    },
+    {
+      "kind": "black_box",
+      "op": "poseidon",
+      "inputs": [
+        { "op": "signal", "args": "__p3_s0" },
+        { "op": "signal", "args": "__do_shifted" },
+        { "op": "signal", "args": "__temp_gap" },
+        { "op": "signal", "args": "__poseidon_zero_0" }
+      ],
+      "outputs": ["__p4_s0", "__p4_s1", "__p4_s2", "__p4_s3"],
+      "params": { "width": "4" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "commitment" },
+      "rhs": { "op": "signal", "args": "__p4_s0" }
+    }
+  ],
+  "metadata": {
+    "ir_family": "zir-v1",
+    "source_ir": "ir-v2"
+  },
+  "sample_inputs": {
+    "ph_x10": "72",
+    "lead_ppb": "8",
+    "mercury_ppb": "1",
+    "dissolved_oxygen_ppm": "9",
+    "temperature_c": "22",
+    "blinding": "777"
+  },
+  "violation_inputs": {
+    "ph_x10": "72",
+    "lead_ppb": "25",
+    "mercury_ppb": "1",
+    "dissolved_oxygen_ppm": "9",
+    "temperature_c": "22",
+    "blinding": "777"
+  },
+  "expected_inputs": [
+    "ph_x10",
+    "lead_ppb",
+    "mercury_ppb",
+    "dissolved_oxygen_ppm",
+    "temperature_c",
+    "blinding"
+  ],
+  "public_outputs": ["commitment"],
+  "description": "Prove EPA water discharge compliance without revealing sensor readings.",
+  "template_id": "epa-water-compliance"
+}

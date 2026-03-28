@@ -1,0 +1,216 @@
+DIGEST 0b88e537014dd0cac4cbb9e04313f388
+FEmbeddedPipelineComposition
+R15:18 Stdlib.Bool.Bool <> <> lib
+R36:41 Stdlib.NArith.NArith <> <> lib
+R60:71 KernelCompat <> <> lib
+R89:103 KernelGenerated <> <> lib
+R121:135 KernelSemantics <> <> lib
+R153:171 PipelineComposition <> <> lib
+R212:240 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> <> lib
+R280:310 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> <> lib
+def 325:358 <> proof_embedded_field_of_core_field
+R369:377 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 361:365 <> field:1
+R382:403 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> t_ProofEmbeddedFieldId ind
+R416:420 EmbeddedPipelineComposition <> field:1 var
+R431:443 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bn254 constr
+R448:473 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bn254 constr
+R479:496 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bls12_381_ constr
+R501:531 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bls12_381_ constr
+R537:551 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFp constr
+R556:583 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFp constr
+R589:603 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFq constr
+R608:635 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFq constr
+R641:658 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Goldilocks constr
+R663:693 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Goldilocks constr
+R699:714 ZkfCoreExtraction.Zkf_core_Field <> FieldId_BabyBear constr
+R719:747 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_BabyBear constr
+R753:770 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Mersenne31 constr
+R775:805 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Mersenne31 constr
+prf 823:866 <> canonical_input_key_string_resolves_alias_ok
+binder 879:887 <> requested:3
+binder 889:900 <> alias_target:4
+R956:964 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R907:932 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> canonical_input_key_string def
+R934:942 EmbeddedPipelineComposition <> requested:3 var
+R944:955 EmbeddedPipelineComposition <> alias_target:4 var
+R971:982 EmbeddedPipelineComposition <> alias_target:4 var
+R997:1007 Core.Core_Option <> Option_Some constr
+R1034:1044 Core.Core_Option <> Option_None constr
+R1049:1057 EmbeddedPipelineComposition <> requested:3 var
+prf 1162:1214 <> program_digest_guard_accepts_only_matching_digests_ok
+binder 1227:1234 <> expected:6
+binder 1236:1240 <> found:7
+R1297:1304 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1290:1292 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1247:1274 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_digest_guard_accepts def
+R1276:1283 EmbeddedPipelineComposition <> expected:6 var
+R1285:1289 EmbeddedPipelineComposition <> found:7 var
+R1293:1296 Corelib.Init.Datatypes <> true constr
+R1313:1315 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1305:1312 EmbeddedPipelineComposition <> expected:6 var
+R1316:1320 EmbeddedPipelineComposition <> found:7 var
+R1370:1382 Stdlib.Strings.String <> eqb_eq thm
+R1370:1382 Stdlib.Strings.String <> eqb_eq thm
+prf 1415:1454 <> program_digest_guard_rejects_mismatch_ok
+binder 1467:1474 <> expected:8
+binder 1476:1480 <> found:9
+R1504:1511 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1495:1498 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R1487:1494 EmbeddedPipelineComposition <> expected:8 var
+R1499:1503 EmbeddedPipelineComposition <> found:9 var
+R1555:1557 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1512:1539 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_digest_guard_accepts def
+R1541:1548 EmbeddedPipelineComposition <> expected:8 var
+R1550:1554 EmbeddedPipelineComposition <> found:9 var
+R1558:1562 Corelib.Init.Datatypes <> false constr
+R1619:1646 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_digest_guard_accepts def
+R1619:1646 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_digest_guard_accepts def
+R1721:1773 EmbeddedPipelineComposition <> program_digest_guard_accepts_only_matching_digests_ok thm
+R1721:1773 EmbeddedPipelineComposition <> program_digest_guard_accepts_only_matching_digests_ok thm
+prf 1825:1878 <> program_mismatch_fields_preserve_expected_and_found_ok
+binder 1891:1898 <> expected:10
+binder 1900:1904 <> found:11
+R1995:2002 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1984:1986 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1911:1942 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_expected proj
+R1945:1967 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_mismatch_fields def
+R1969:1976 EmbeddedPipelineComposition <> expected:10 var
+R1978:1982 EmbeddedPipelineComposition <> found:11 var
+R1987:1994 EmbeddedPipelineComposition <> expected:10 var
+R2073:2075 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2003:2031 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_found proj
+R2034:2056 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_mismatch_fields def
+R2058:2065 EmbeddedPipelineComposition <> expected:10 var
+R2067:2071 EmbeddedPipelineComposition <> found:11 var
+R2076:2080 EmbeddedPipelineComposition <> found:11 var
+prf 2151:2195 <> default_backend_for_proof_field_spec_total_ok
+binder 2208:2212 <> field:12
+R2261:2269 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2219:2254 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> default_backend_for_proof_field_spec def
+R2256:2260 EmbeddedPipelineComposition <> field:12 var
+R2276:2280 EmbeddedPipelineComposition <> field:12 var
+R2295:2320 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bn254 constr
+R2325:2364 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_ArkworksGroth16 constr
+R2374:2404 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bls12_381_ constr
+R2409:2446 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2Bls12381 constr
+R2456:2483 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFp constr
+R2493:2520 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFq constr
+R2525:2554 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R2525:2554 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R2564:2594 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Goldilocks constr
+R2604:2632 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_BabyBear constr
+R2642:2672 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Mersenne31 constr
+R2677:2708 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R2677:2708 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R2677:2708 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+prf 2789:2834 <> digest_bytes_match_accepts_only_equal_bytes_ok
+binder 2847:2854 <> expected:14
+binder 2856:2860 <> found:15
+R2907:2914 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2900:2902 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2867:2884 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> digest_bytes_match def
+R2886:2893 EmbeddedPipelineComposition <> expected:14 var
+R2895:2899 EmbeddedPipelineComposition <> found:15 var
+R2903:2906 Corelib.Init.Datatypes <> true constr
+R2923:2925 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2915:2922 EmbeddedPipelineComposition <> expected:14 var
+R2926:2930 EmbeddedPipelineComposition <> found:15 var
+R3189:3201 Stdlib.Bool.Bool <> andb_true_iff thm
+R3189:3201 Stdlib.Bool.Bool <> andb_true_iff thm
+R3241:3248 Stdlib.NArith.BinNat N eqb_eq thm
+R3241:3248 Stdlib.NArith.BinNat N eqb_eq thm
+prf 3600:3648 <> private_identity_merkle_direction_binary_guard_ok
+binder 3661:3669 <> direction:16
+R3729:3737 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3676:3718 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> private_identity_merkle_direction_is_binary def
+R3720:3728 EmbeddedPipelineComposition <> direction:16 var
+R3738:3740 Corelib.Init.Datatypes <> orb def
+R3797:3801 Stdlib.NArith.BinNat N eqb def
+R3804:3809 Core.Core_Base_interface_Int <> U8_f_v proj
+R3812:3825 Core.Core_Primitive <> :::'u8_0' not
+R3817:3825 EmbeddedPipelineComposition <> direction:16 var
+R3751:3755 Stdlib.NArith.BinNat N eqb def
+R3758:3763 Core.Core_Base_interface_Int <> U8_f_v proj
+R3766:3779 Core.Core_Primitive <> :::'u8_0' not
+R3771:3779 EmbeddedPipelineComposition <> direction:16 var
+prf 3891:3934 <> private_identity_public_input_arity_guard_ok
+binder 3947:3949 <> len:17
+R4007:4015 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3956:4002 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> private_identity_public_input_arity_is_expected def
+R4004:4006 EmbeddedPipelineComposition <> len:17 var
+R4016:4019 KernelCompat <> f_eq def
+R4021:4023 EmbeddedPipelineComposition <> len:17 var
+R4026:4069 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> private_identity_expected_public_input_arity def
+R4071:4072 Corelib.Init.Datatypes <> tt constr
+prf 4126:4161 <> embedded_default_path_composition_ok
+binder 4174:4180 <> program:18
+binder 4182:4188 <> witness:19
+binder 4190:4198 <> requested:20
+binder 4200:4211 <> alias_target:21
+binder 4213:4220 <> expected:22
+binder 4222:4226 <> found:23
+R4287:4294 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4272:4274 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4233:4255 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_check_program def
+R4257:4263 EmbeddedPipelineComposition <> program:18 var
+R4265:4271 EmbeddedPipelineComposition <> witness:19 var
+R4275:4283 KernelCompat <> Result_Ok constr
+R4285:4286 Corelib.Init.Datatypes <> tt constr
+R4456:4463 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R4344:4352 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4295:4320 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> canonical_input_key_string def
+R4322:4330 EmbeddedPipelineComposition <> requested:20 var
+R4332:4343 EmbeddedPipelineComposition <> alias_target:21 var
+R4359:4370 EmbeddedPipelineComposition <> alias_target:21 var
+R4385:4395 Core.Core_Option <> Option_Some constr
+R4422:4432 Core.Core_Option <> Option_None constr
+R4437:4445 EmbeddedPipelineComposition <> requested:20 var
+R4464:4464 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R4525:4533 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R4505:4508 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4498:4500 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4465:4482 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> digest_bytes_match def
+R4484:4491 EmbeddedPipelineComposition <> expected:22 var
+R4493:4497 EmbeddedPipelineComposition <> found:23 var
+R4501:4504 Corelib.Init.Datatypes <> true constr
+R4517:4519 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4509:4516 EmbeddedPipelineComposition <> expected:22 var
+R4520:4524 EmbeddedPipelineComposition <> found:23 var
+R5178:5185 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R4652:4660 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4534:4569 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> default_backend_for_proof_field_spec def
+R4578:4611 EmbeddedPipelineComposition <> proof_embedded_field_of_core_field def
+R4614:4641 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R4643:4649 EmbeddedPipelineComposition <> program:18 var
+R4667:4700 EmbeddedPipelineComposition <> proof_embedded_field_of_core_field def
+R4703:4730 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R4732:4738 EmbeddedPipelineComposition <> program:18 var
+R4754:4779 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bn254 constr
+R4784:4823 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_ArkworksGroth16 constr
+R4833:4863 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bls12_381_ constr
+R4868:4905 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2Bls12381 constr
+R4915:4942 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFp constr
+R4952:4979 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFq constr
+R4984:5013 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R4984:5013 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R5023:5053 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Goldilocks constr
+R5063:5091 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_BabyBear constr
+R5101:5131 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Mersenne31 constr
+R5136:5167 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R5136:5167 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R5136:5167 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R5186:5197 KernelSemantics <> ProgramHolds def
+R5206:5232 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_program_to_kernel def
+R5243:5269 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> optimize_zir_program_output def
+R5272:5295 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> normalize_program_output def
+R5297:5303 EmbeddedPipelineComposition <> program:18 var
+R5314:5320 EmbeddedPipelineComposition <> witness:19 var
+R5420:5463 EmbeddedPipelineComposition <> canonical_input_key_string_resolves_alias_ok thm
+R5420:5463 EmbeddedPipelineComposition <> canonical_input_key_string_resolves_alias_ok thm
+R5489:5534 EmbeddedPipelineComposition <> digest_bytes_match_accepts_only_equal_bytes_ok thm
+R5489:5534 EmbeddedPipelineComposition <> digest_bytes_match_accepts_only_equal_bytes_ok thm
+R5654:5698 EmbeddedPipelineComposition <> default_backend_for_proof_field_spec_total_ok thm
+R5654:5698 EmbeddedPipelineComposition <> default_backend_for_proof_field_spec_total_ok thm
+R5716:5759 PipelineComposition <> embedded_default_pipeline_to_kernel_sound_ok thm
+R5716:5759 PipelineComposition <> embedded_default_pipeline_to_kernel_sound_ok thm

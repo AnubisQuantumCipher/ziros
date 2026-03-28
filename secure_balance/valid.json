@@ -1,0 +1,6 @@
+{
+  "amt": "35",
+  "bal": "100",
+  "expected_commitment": "1342",
+  "user_id": "42"
+}

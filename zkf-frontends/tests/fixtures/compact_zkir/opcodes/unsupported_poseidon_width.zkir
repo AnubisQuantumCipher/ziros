@@ -1,0 +1,8 @@
+{
+  "version": { "major": 2, "minor": 0 },
+  "do_communications_commitment": false,
+  "num_inputs": 3,
+  "instructions": [
+    { "op": "persistent_hash", "inputs": [0, 1, 2], "state_len": 3 }
+  ]
+}

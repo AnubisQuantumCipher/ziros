@@ -1,0 +1,115 @@
+{
+  "program": {
+    "name": "uccr_finance_solvency",
+    "field": "pasta-fp"
+  },
+  "description": "Prove that a financial institution's total assets exceed its total liabilities by a required regulatory capital margin, without revealing the actual asset or liability figures. Suitable for Basel III Tier-1 capital adequacy attestation, proof-of-solvency for crypto exchanges, and confidential counterparty risk disclosure. The SHA-256 commitment binds the prover to their private values while keeping them hidden.",
+  "signals": [
+    { "name": "total_assets_scaled",       "visibility": "private" },
+    { "name": "total_liabilities_scaled",  "visibility": "private" },
+    { "name": "blinding",                  "visibility": "private" },
+    { "name": "__surplus",                 "visibility": "private" },
+    { "name": "__sha_b0",                  "visibility": "private" },
+    { "name": "__sha_b1",                  "visibility": "private" },
+    { "name": "__sha_b2",                  "visibility": "private" },
+    { "name": "__sha_b3",                  "visibility": "private" },
+    { "name": "__sha_b4",                  "visibility": "private" },
+    { "name": "__sha_b5",                  "visibility": "private" },
+    { "name": "__sha_b6",                  "visibility": "private" },
+    { "name": "__sha_b7",                  "visibility": "private" },
+    { "name": "__sha_b8",                  "visibility": "private" },
+    { "name": "__sha_b9",                  "visibility": "private" },
+    { "name": "__sha_b10",                 "visibility": "private" },
+    { "name": "__sha_b11",                 "visibility": "private" },
+    { "name": "__sha_b12",                 "visibility": "private" },
+    { "name": "__sha_b13",                 "visibility": "private" },
+    { "name": "__sha_b14",                 "visibility": "private" },
+    { "name": "__sha_b15",                 "visibility": "private" },
+    { "name": "__sha_b16",                 "visibility": "private" },
+    { "name": "__sha_b17",                 "visibility": "private" },
+    { "name": "__sha_b18",                 "visibility": "private" },
+    { "name": "__sha_b19",                 "visibility": "private" },
+    { "name": "__sha_b20",                 "visibility": "private" },
+    { "name": "__sha_b21",                 "visibility": "private" },
+    { "name": "__sha_b22",                 "visibility": "private" },
+    { "name": "__sha_b23",                 "visibility": "private" },
+    { "name": "__sha_b24",                 "visibility": "private" },
+    { "name": "__sha_b25",                 "visibility": "private" },
+    { "name": "__sha_b26",                 "visibility": "private" },
+    { "name": "__sha_b27",                 "visibility": "private" },
+    { "name": "__sha_b28",                 "visibility": "private" },
+    { "name": "__sha_b29",                 "visibility": "private" },
+    { "name": "__sha_b30",                 "visibility": "private" },
+    { "name": "__sha_b31",                 "visibility": "private" },
+    { "name": "required_margin_bps",       "visibility": "constant", "constant": "1250" },
+    { "name": "commitment_hi",             "visibility": "public" },
+    { "name": "commitment_lo",             "visibility": "public" }
+  ],
+  "ops": [
+    { "kind": "range", "signal": "total_assets_scaled",      "bits": 48 },
+    { "kind": "range", "signal": "total_liabilities_scaled", "bits": 48 },
+    { "kind": "range", "signal": "blinding",                 "bits": 32 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__surplus" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "total_assets_scaled" },
+          { "op": "signal", "args": "total_liabilities_scaled" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__surplus", "bits": 48 },
+    {
+      "kind": "black_box",
+      "op": "sha256",
+      "inputs": [
+        { "op": "signal", "args": "total_assets_scaled" },
+        { "op": "signal", "args": "total_liabilities_scaled" },
+        { "op": "signal", "args": "blinding" }
+      ],
+      "outputs": [
+        "__sha_b0",  "__sha_b1",  "__sha_b2",  "__sha_b3",
+        "__sha_b4",  "__sha_b5",  "__sha_b6",  "__sha_b7",
+        "__sha_b8",  "__sha_b9",  "__sha_b10", "__sha_b11",
+        "__sha_b12", "__sha_b13", "__sha_b14", "__sha_b15",
+        "__sha_b16", "__sha_b17", "__sha_b18", "__sha_b19",
+        "__sha_b20", "__sha_b21", "__sha_b22", "__sha_b23",
+        "__sha_b24", "__sha_b25", "__sha_b26", "__sha_b27",
+        "__sha_b28", "__sha_b29", "__sha_b30", "__sha_b31"
+      ],
+      "params": { "input_num_bits": "8" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "commitment_hi" },
+      "rhs": { "op": "signal", "args": "__sha_b0" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "commitment_lo" },
+      "rhs": { "op": "signal", "args": "__sha_b31" }
+    }
+  ],
+  "expected_inputs": ["total_assets_scaled", "total_liabilities_scaled", "blinding"],
+  "public_outputs": ["commitment_hi", "commitment_lo"],
+  "sample_inputs": {
+    "total_assets_scaled": "125000000",
+    "total_liabilities_scaled": "100000000",
+    "blinding": "42"
+  },
+  "violation_inputs": {
+    "total_assets_scaled": "95000000",
+    "total_liabilities_scaled": "100000000",
+    "blinding": "42"
+  },
+  "metadata": {
+    "domain": "finance",
+    "standard": "Basel III Tier-1 Capital Adequacy / Proof of Solvency",
+    "required_margin_bps": "1250",
+    "scale_factor": "1e-6 USD",
+    "ir_family": "zir-v1"
+  },
+  "template_id": "uccr-finance-solvency"
+}

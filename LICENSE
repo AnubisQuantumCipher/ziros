@@ -1,0 +1,25 @@
+ZirOS Proprietary License
+
+Copyright (c) 2026 AnubisQuantumCipher. All rights reserved.
+
+This repository and all source code, proof artifacts, build scripts, documentation,
+and related materials are proprietary and confidential.
+
+Permission is granted only to authorized collaborators of AnubisQuantumCipher to
+clone, review, modify, build, test, and operate this repository for internal
+development, evaluation, and deployment purposes.
+
+Except as expressly authorized in writing by AnubisQuantumCipher, you may not:
+
+1. copy, publish, sublicense, distribute, or disclose this repository or any
+   substantial portion of it to any third party;
+2. create public mirrors, public forks, or public derivative repositories;
+3. redistribute binaries, source snapshots, proof bundles, or generated assets
+   outside an authorized private release process;
+4. remove or alter copyright, attribution, or confidentiality notices.
+
+This repository is provided "as is", without warranty of any kind, express or
+implied, including but not limited to merchantability, fitness for a particular
+purpose, title, and non-infringement.
+
+Use of this repository constitutes acceptance of this license.

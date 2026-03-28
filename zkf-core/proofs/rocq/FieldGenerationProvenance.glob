@@ -1,0 +1,59 @@
+DIGEST 2daf417e3324ea95b8a2ea73628c4aa9
+FFieldGenerationProvenance
+R27:30 Stdlib.Lists.List <> <> lib
+R32:37 Stdlib.NArith.NArith <> <> lib
+R47:64 Stdlib.Lists.List ListNotations <> mod
+ind 271:292 <> LargePrimeRuntimeField
+constr 299:303 <> Bn254
+constr 307:315 <> Bls12_381
+constr 319:325 <> PastaFp
+constr 329:335 <> PastaFq
+constr 339:358 <> OtherLargePrimeField
+scheme 271:292 <> LargePrimeRuntimeField_rect
+scheme 271:292 <> LargePrimeRuntimeField_ind
+scheme 271:292 <> LargePrimeRuntimeField_rec
+scheme 271:292 <> LargePrimeRuntimeField_sind
+def 373:406 <> large_prime_runtime_dispatch_index
+R419:440 FieldGenerationProvenance <> LargePrimeRuntimeField ind
+binder 411:415 <> field:3
+R445:450 Corelib.Init.Datatypes <> option ind
+R452:452 Corelib.Numbers.BinNums <> N ind
+R465:469 FieldGenerationProvenance <> field:3 var
+R480:484 FieldGenerationProvenance <> Bn254 constr
+R489:492 Corelib.Init.Datatypes <> Some constr
+R502:510 FieldGenerationProvenance <> Bls12_381 constr
+R515:518 Corelib.Init.Datatypes <> Some constr
+R528:534 FieldGenerationProvenance <> PastaFp constr
+R539:542 Corelib.Init.Datatypes <> Some constr
+R552:558 FieldGenerationProvenance <> PastaFq constr
+R563:566 Corelib.Init.Datatypes <> Some constr
+R581:584 Corelib.Init.Datatypes <> None constr
+def 605:637 <> manifest_pinned_large_prime_field
+R650:671 FieldGenerationProvenance <> LargePrimeRuntimeField ind
+binder 642:646 <> field:5
+R686:692 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R697:698 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+binder 693:696 <> slot:6
+R739:741 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R699:732 FieldGenerationProvenance <> large_prime_runtime_dispatch_index def
+R734:738 FieldGenerationProvenance <> field:5 var
+R742:745 Corelib.Init.Datatypes <> Some constr
+R747:750 FieldGenerationProvenance <> slot:6 var
+def 765:792 <> large_prime_runtime_manifest
+R796:799 Corelib.Init.Datatypes <> list ind
+R801:822 FieldGenerationProvenance <> LargePrimeRuntimeField ind
+R829:830 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R836:840 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R850:854 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R862:866 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R874:877 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R831:835 FieldGenerationProvenance <> Bn254 constr
+R841:849 FieldGenerationProvenance <> Bls12_381 constr
+R855:861 FieldGenerationProvenance <> PastaFp constr
+R867:873 FieldGenerationProvenance <> PastaFq constr
+prf 889:923 <> large_prime_runtime_fiat_binding_ok
+R929:934 Corelib.Lists.ListDef <> Forall ind
+R970:997 FieldGenerationProvenance <> large_prime_runtime_manifest def
+R936:968 FieldGenerationProvenance <> manifest_pinned_large_prime_field def
+R1043:1075 FieldGenerationProvenance <> manifest_pinned_large_prime_field def
+R1078:1111 FieldGenerationProvenance <> large_prime_runtime_dispatch_index def

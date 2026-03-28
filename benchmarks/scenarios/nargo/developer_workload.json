@@ -1,0 +1,21 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": ".",
+  "command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "developer_workload",
+    "--mode",
+    "prove"
+  ],
+  "verify_command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "developer_workload",
+    "--mode",
+    "verify"
+  ],
+  "proof_path": "benchmarks/workspaces/nargo/developer_workload/target/bb/proof.json"
+}

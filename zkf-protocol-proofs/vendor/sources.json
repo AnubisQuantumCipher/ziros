@@ -1,0 +1,117 @@
+{
+  "schema": "zkf-protocol-vendor-v1",
+  "sources": [
+    {
+      "id": "formal-snarks-project",
+      "kind": "repository",
+      "role": "groth16-knowledge-soundness-starting-point",
+      "origin": "https://github.com/BoltonBailey/formal-snarks-project",
+      "revision": "dcfc78d456882087d4e592e090e8d6d6df83e560",
+      "license": "MIT",
+      "upstream_toolchain": "leanprover/lean4:v4.10.0-rc2",
+      "local_path": "zkf-protocol-proofs/vendor/formal-snarks-project",
+      "status": "vendored"
+    },
+    {
+      "id": "arklib",
+      "kind": "repository",
+      "role": "fri-ior-foundation",
+      "origin": "https://github.com/Verified-zkEVM/ArkLib",
+      "revision": "74f8ca485e9072fba82ba6a78debe50c5b7feb06",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.28.0",
+      "local_path": "zkf-protocol-proofs/vendor/arklib",
+      "status": "vendored"
+    },
+    {
+      "id": "vcvio",
+      "kind": "repository",
+      "role": "arklib-crypto-probability-foundation",
+      "origin": "https://github.com/Verified-zkEVM/VCV-io",
+      "revision": "d37e586bbe481ea3925eeb800d5b6fb1e8b829fe",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.28.0",
+      "local_path": "zkf-protocol-proofs/vendor/VCVio",
+      "status": "vendored"
+    },
+    {
+      "id": "comp-poly",
+      "kind": "repository",
+      "role": "arklib-polynomial-foundation",
+      "origin": "https://github.com/Verified-zkEVM/CompPoly",
+      "revision": "d7b9f987496841b066d4958b72f774f545ce907b",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.28.0",
+      "local_path": "zkf-protocol-proofs/vendor/CompPoly",
+      "status": "vendored"
+    },
+    {
+      "id": "ext-tree-map-lemmas",
+      "kind": "repository",
+      "role": "comp-poly-support-library",
+      "origin": "https://github.com/Verified-zkEVM/ExtTreeMapLemmas",
+      "revision": "82d5763c08b020fc38898a4fd59a5213059a5f87",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.28.0",
+      "local_path": "zkf-protocol-proofs/vendor/ExtTreeMapLemmas",
+      "status": "vendored"
+    },
+    {
+      "id": "doc-gen4",
+      "kind": "repository",
+      "role": "arklib-doc-tooling",
+      "origin": "https://github.com/leanprover/doc-gen4",
+      "revision": "a41d5ebebfa77afe737fec8de8ad03fc8b08fdff",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.28.0",
+      "local_path": "zkf-protocol-proofs/vendor/doc-gen4",
+      "status": "vendored"
+    },
+    {
+      "id": "checkdecls",
+      "kind": "repository",
+      "role": "arklib-check-tooling",
+      "origin": "https://github.com/PatrickMassot/checkdecls.git",
+      "revision": "3d425859e73fcfbef85b9638c2a91708ef4a22d4",
+      "license": "Apache-2.0",
+      "upstream_toolchain": "leanprover/lean4:v4.18.0",
+      "local_path": "zkf-protocol-proofs/vendor/checkdecls",
+      "status": "vendored"
+    },
+    {
+      "id": "groth16-2016-260",
+      "kind": "paper",
+      "role": "groth16-protocol-reference",
+      "origin": "https://eprint.iacr.org/2016/260",
+      "status": "reference"
+    },
+    {
+      "id": "fri-2017-602",
+      "kind": "paper",
+      "role": "fri-protocol-reference",
+      "origin": "https://eprint.iacr.org/2017/602",
+      "status": "reference"
+    },
+    {
+      "id": "nova-security-2024-232",
+      "kind": "paper",
+      "role": "nova-security-baseline",
+      "origin": "https://eprint.iacr.org/2024/232",
+      "status": "reference"
+    },
+    {
+      "id": "nova-2021-370",
+      "kind": "paper",
+      "role": "nova-protocol-reference",
+      "origin": "https://eprint.iacr.org/2021/370",
+      "status": "reference"
+    },
+    {
+      "id": "hypernova-2023-573",
+      "kind": "paper",
+      "role": "hypernova-protocol-reference",
+      "origin": "https://eprint.iacr.org/2023/573",
+      "status": "reference"
+    }
+  ]
+}

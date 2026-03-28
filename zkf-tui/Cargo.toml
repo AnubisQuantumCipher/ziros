@@ -1,0 +1,17 @@
+[package]
+name = "zkf-tui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "ZirOS dashboard shell and widgets for standalone TUI apps"
+
+[dependencies]
+crossterm.workspace = true
+ratatui.workspace = true
+zkf-backends = { path = "../zkf-backends" }
+zkf-lib = { path = "../zkf-lib" }
+zkf-ui = { path = "../zkf-ui" }
+
+[lints]
+workspace = true

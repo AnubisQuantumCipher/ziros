@@ -1,0 +1,30 @@
+DIGEST 233741a154dd9253b90d4b436db8bfdc
+FZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R388:420 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> <> lib
+R446:449 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> zero def
+not 433:433 <> :::'zero'
+R481:489 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalize def
+not 463:463 <> :::'normalize'
+R521:529 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Add_f_add def
+not 503:503 <> :::'Add_f_add'
+R561:569 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Sub_f_sub def
+not 543:543 <> :::'Sub_f_sub'
+R601:609 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Mul_f_mul def
+not 583:583 <> :::'Mul_f_mul'
+R641:649 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Div_f_div def
+not 623:623 <> :::'Div_f_div'
+R686:699 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> PartialEq_f_eq def
+not 663:663 <> :::'PartialEq_f_eq'
+R732:741 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> is_boolean def
+not 713:713 <> :::'is_boolean'
+R773:781 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> fits_bits def
+not 755:755 <> :::'fits_bits'

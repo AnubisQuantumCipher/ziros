@@ -1,0 +1,217 @@
+{
+  "schema": "zkf-competition-manifest-v1",
+  "required_scenarios": [
+    "single_circuit_prove",
+    "developer_workload",
+    "recursive_workflow"
+  ],
+  "tools": [
+    {
+      "id": "snarkjs",
+      "label": "snarkjs",
+      "toolchain_ids": [
+        "node",
+        "npm",
+        "snarkjs",
+        "circom2"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/snarkjs/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/snarkjs/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/snarkjs/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gnark",
+      "label": "gnark",
+      "toolchain_ids": [
+        "go"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/gnark/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/gnark/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/gnark/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nargo",
+      "label": "Noir/Nargo",
+      "toolchain_ids": [
+        "nargo",
+        "bb"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/nargo/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/nargo/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/nargo/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sp1-official",
+      "label": "SP1",
+      "toolchain_ids": [
+        "cargo",
+        "docker",
+        "sp1up",
+        "cargo-prove"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/sp1-official/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/sp1-official/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/sp1-official/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "risc-zero-official",
+      "label": "RISC Zero",
+      "toolchain_ids": [
+        "cargo",
+        "rzup",
+        "cargo-risczero"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/risc-zero-official/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/risc-zero-official/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/risc-zero-official/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plonky3-external",
+      "label": "Plonky3 (External)",
+      "toolchain_ids": [
+        "cargo"
+      ],
+      "scenarios": [
+        {
+          "id": "single_circuit_prove",
+          "runner": "benchmarks/runners/plonky3-external/single_circuit_prove.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "developer_workload",
+          "runner": "benchmarks/runners/plonky3-external/developer_workload.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        },
+        {
+          "id": "recursive_workflow",
+          "runner": "benchmarks/runners/plonky3-external/recursive_workflow.sh",
+          "supports_lanes": [
+            "linux",
+            "apple-silicon"
+          ]
+        }
+      ]
+    }
+  ]
+}

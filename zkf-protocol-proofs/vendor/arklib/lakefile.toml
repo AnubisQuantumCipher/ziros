@@ -1,0 +1,24 @@
+name = "Arklib"
+lintDriver = "batteries/runLinter"
+defaultTargets = ["ArkLib"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+weak.linter.mathlibStandardSet = true
+weak.linter.style.longFile = 1500
+
+[moreServerOptions]
+linter.mathlibStandardSet = true
+linter.style.longFile = 1500
+
+[[require]]
+name = "VCVio"
+path = "../VCVio"
+
+[[require]]
+name = "CompPoly"
+path = "../CompPoly"
+
+[[lean_lib]]
+name = "ArkLib"

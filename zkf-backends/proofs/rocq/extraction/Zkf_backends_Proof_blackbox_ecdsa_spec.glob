@@ -1,0 +1,258 @@
+DIGEST b7b94b069725de7f2558805768fd4335
+FZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R365:377 BackendCompat <> <> lib
+R405:415 Core.ControlFlow <> <> lib
+ind 429:457 <> t_SupportedCriticalEcdsaCurve
+constr 471:507 <> SupportedCriticalEcdsaCurve_Secp256k1
+constr 511:547 <> SupportedCriticalEcdsaCurve_Secp256r1
+scheme 429:457 <> t_SupportedCriticalEcdsaCurve_rect
+scheme 429:457 <> t_SupportedCriticalEcdsaCurve_ind
+scheme 429:457 <> t_SupportedCriticalEcdsaCurve_rec
+scheme 429:457 <> t_SupportedCriticalEcdsaCurve_sind
+ind 563:591 <> t_CriticalEcdsaAuxWitnessMode
+constr 605:652 <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness
+scheme 563:591 <> t_CriticalEcdsaAuxWitnessMode_rect
+scheme 563:591 <> t_CriticalEcdsaAuxWitnessMode_ind
+scheme 563:591 <> t_CriticalEcdsaAuxWitnessMode_rec
+scheme 563:591 <> t_CriticalEcdsaAuxWitnessMode_sind
+rec 664:698 <> CriticalEcdsaRuntimeRelation_record
+proj 718:774 <> CriticalEcdsaRuntimeRelation_f_valid_signature_forces_one
+proj 788:847 <> CriticalEcdsaRuntimeRelation_f_invalid_signature_forces_zero
+proj 861:917 <> CriticalEcdsaRuntimeRelation_f_malformed_abi_fails_closed
+proj 931:978 <> CriticalEcdsaRuntimeRelation_f_low_s_is_required
+R778:781 Corelib.Init.Datatypes <> bool ind
+R851:854 Corelib.Init.Datatypes <> bool ind
+R921:924 Corelib.Init.Datatypes <> bool ind
+R982:985 Corelib.Init.Datatypes <> bool ind
+def 1004:1033 <> t_CriticalEcdsaRuntimeRelation
+R1038:1072 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_record rec
+inst 1099:1142 <> settable_CriticalEcdsaRuntimeRelation_record
+R1146:1153 RecordUpdate.RecordSet <> Settable class
+R1162:1172 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1214:1216 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1274:1275 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1336:1337 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1395:1396 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1445:1445 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1397:1444 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_low_s_is_required proj
+R1338:1394 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_malformed_abi_fails_closed proj
+R1276:1335 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_invalid_signature_forces_zero proj
+R1217:1273 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_valid_signature_forces_one proj
+R1173:1213 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaRuntimeRelation_record constr
+R1173:1213 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaRuntimeRelation_record constr
+abbrev 1457:1484 <> f_valid_signature_forces_one
+R1489:1545 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_valid_signature_forces_one proj
+abbrev 1557:1614 <> t_CriticalEcdsaRuntimeRelationf_valid_signature_forces_one
+R1619:1675 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_valid_signature_forces_one proj
+abbrev 1687:1717 <> f_invalid_signature_forces_zero
+R1722:1781 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_invalid_signature_forces_zero proj
+abbrev 1793:1853 <> t_CriticalEcdsaRuntimeRelationf_invalid_signature_forces_zero
+R1858:1917 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_invalid_signature_forces_zero proj
+abbrev 1929:1956 <> f_malformed_abi_fails_closed
+R1961:2017 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_malformed_abi_fails_closed proj
+abbrev 2029:2086 <> t_CriticalEcdsaRuntimeRelationf_malformed_abi_fails_closed
+R2091:2147 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_malformed_abi_fails_closed proj
+abbrev 2159:2177 <> f_low_s_is_required
+R2182:2229 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_low_s_is_required proj
+abbrev 2241:2289 <> t_CriticalEcdsaRuntimeRelationf_low_s_is_required
+R2294:2341 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation_f_low_s_is_required proj
+def 2355:2382 <> CriticalEcdsaRuntimeRelation
+R2387:2427 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaRuntimeRelation_record constr
+ind 2441:2461 <> t_SpecCriticalEcdsaOp
+constr 2475:2503 <> SpecCriticalEcdsaOp_Secp256k1
+constr 2507:2535 <> SpecCriticalEcdsaOp_Secp256r1
+constr 2539:2563 <> SpecCriticalEcdsaOp_Other
+scheme 2441:2461 <> t_SpecCriticalEcdsaOp_rect
+scheme 2441:2461 <> t_SpecCriticalEcdsaOp_ind
+scheme 2441:2461 <> t_SpecCriticalEcdsaOp_rec
+scheme 2441:2461 <> t_SpecCriticalEcdsaOp_sind
+ind 2580:2605 <> t_SpecCriticalEcdsaFieldId
+constr 2619:2648 <> SpecCriticalEcdsaFieldId_Bn254
+constr 2652:2681 <> SpecCriticalEcdsaFieldId_Other
+scheme 2580:2605 <> t_SpecCriticalEcdsaFieldId_rect
+scheme 2580:2605 <> t_SpecCriticalEcdsaFieldId_ind
+scheme 2580:2605 <> t_SpecCriticalEcdsaFieldId_rec
+scheme 2580:2605 <> t_SpecCriticalEcdsaFieldId_sind
+rec 2694:2729 <> CriticalEcdsaByteAbiSemantics_record
+proj 2749:2795 <> CriticalEcdsaByteAbiSemantics_f_supported_curve
+proj 2834:2880 <> CriticalEcdsaByteAbiSemantics_f_supported_field
+proj 2916:2967 <> CriticalEcdsaByteAbiSemantics_f_supported_inputs_len
+proj 2984:3036 <> CriticalEcdsaByteAbiSemantics_f_supported_outputs_len
+proj 3053:3101 <> CriticalEcdsaByteAbiSemantics_f_result_is_boolean
+proj 3115:3162 <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode
+proj 3201:3248 <> CriticalEcdsaByteAbiSemantics_f_runtime_relation
+R2799:2827 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SupportedCriticalEcdsaCurve ind
+R2884:2909 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SpecCriticalEcdsaFieldId ind
+R2971:2977 Core.Core_Primitive <> :::'t_usize' not
+R3040:3046 Core.Core_Primitive <> :::'t_usize' not
+R3105:3108 Corelib.Init.Datatypes <> bool ind
+R3166:3194 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaAuxWitnessMode ind
+R3252:3281 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaRuntimeRelation def
+def 3300:3330 <> t_CriticalEcdsaByteAbiSemantics
+R3335:3370 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_record rec
+inst 3400:3444 <> settable_CriticalEcdsaByteAbiSemantics_record
+R3448:3455 RecordUpdate.RecordSet <> Settable class
+R3464:3474 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3517:3519 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3567:3568 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3616:3617 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3670:3671 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3725:3726 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3776:3777 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3826:3827 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3876:3876 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3828:3875 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_runtime_relation proj
+R3778:3825 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode proj
+R3727:3775 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_result_is_boolean proj
+R3672:3724 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_outputs_len proj
+R3618:3669 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_inputs_len proj
+R3569:3615 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_field proj
+R3520:3566 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_curve proj
+R3475:3516 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaByteAbiSemantics_record constr
+R3475:3516 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaByteAbiSemantics_record constr
+abbrev 3888:3904 <> f_supported_curve
+R3909:3955 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_curve proj
+abbrev 3967:4014 <> t_CriticalEcdsaByteAbiSemanticsf_supported_curve
+R4019:4065 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_curve proj
+abbrev 4077:4093 <> f_supported_field
+R4098:4144 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_field proj
+abbrev 4156:4203 <> t_CriticalEcdsaByteAbiSemanticsf_supported_field
+R4208:4254 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_field proj
+abbrev 4266:4287 <> f_supported_inputs_len
+R4292:4343 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_inputs_len proj
+abbrev 4355:4407 <> t_CriticalEcdsaByteAbiSemanticsf_supported_inputs_len
+R4412:4463 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_inputs_len proj
+abbrev 4475:4497 <> f_supported_outputs_len
+R4502:4554 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_outputs_len proj
+abbrev 4566:4619 <> t_CriticalEcdsaByteAbiSemanticsf_supported_outputs_len
+R4624:4676 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_supported_outputs_len proj
+abbrev 4688:4706 <> f_result_is_boolean
+R4711:4759 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_result_is_boolean proj
+abbrev 4771:4820 <> t_CriticalEcdsaByteAbiSemanticsf_result_is_boolean
+R4825:4873 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_result_is_boolean proj
+abbrev 4885:4902 <> f_aux_witness_mode
+R4907:4954 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode proj
+abbrev 4966:5014 <> t_CriticalEcdsaByteAbiSemanticsf_aux_witness_mode
+R5019:5066 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode proj
+abbrev 5078:5095 <> f_runtime_relation
+R5100:5147 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_runtime_relation proj
+abbrev 5159:5207 <> t_CriticalEcdsaByteAbiSemanticsf_runtime_relation
+R5212:5259 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_runtime_relation proj
+def 5273:5301 <> CriticalEcdsaByteAbiSemantics
+R5306:5347 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> Build_CriticalEcdsaByteAbiSemantics_record constr
+def 5362:5389 <> critical_ecdsa_proof_surface
+R5397:5417 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SpecCriticalEcdsaOp ind
+binder 5392:5393 <> op:22
+R5429:5454 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SpecCriticalEcdsaFieldId ind
+binder 5421:5425 <> field:23
+R5471:5477 Core.Core_Primitive <> :::'t_usize' not
+binder 5458:5467 <> inputs_len:24
+R5495:5501 Core.Core_Primitive <> :::'t_usize' not
+binder 5481:5491 <> outputs_len:25
+R5506:5513 Core.Core_Option <> t_Option ind
+R5517:5545 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SupportedCriticalEcdsaCurve ind
+R5560:5564 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> field:23 var
+R5575:5604 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R5625:5626 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> op:22 var
+R5639:5667 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256k1 constr
+R5684:5687 Corelib.Init.Datatypes <> andb def
+R5728:5731 BackendCompat <> f_eq abbrev
+R5753:5759 Core.Core_Primitive <> :::'t_usize' not
+R5734:5744 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> outputs_len:25 var
+R5690:5693 BackendCompat <> f_eq abbrev
+R5716:5722 Core.Core_Primitive <> :::'t_usize' not
+R5696:5705 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> inputs_len:24 var
+R5777:5780 Corelib.Init.Datatypes <> true constr
+R5793:5803 Core.Core_Option <> Option_Some constr
+R5806:5816 Core.Core_Option <> Option_Some constr
+R5819:5855 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256k1 constr
+R5880:5890 Core.Core_Option <> Option_None constr
+R5919:5929 Core.Core_Option <> Option_None constr
+R5950:5960 Core.Core_Option <> Option_Some constr
+R5983:5993 Core.Core_Option <> Option_None constr
+R6016:6017 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> op:22 var
+R6032:6060 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256r1 constr
+R6079:6082 Corelib.Init.Datatypes <> andb def
+R6123:6126 BackendCompat <> f_eq abbrev
+R6148:6154 Core.Core_Primitive <> :::'t_usize' not
+R6129:6139 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> outputs_len:25 var
+R6085:6088 BackendCompat <> f_eq abbrev
+R6111:6117 Core.Core_Primitive <> :::'t_usize' not
+R6091:6100 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> inputs_len:24 var
+R6174:6177 Corelib.Init.Datatypes <> true constr
+R6192:6202 Core.Core_Option <> Option_Some constr
+R6205:6215 Core.Core_Option <> Option_Some constr
+R6218:6254 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256r1 constr
+R6283:6293 Core.Core_Option <> Option_None constr
+R6328:6338 Core.Core_Option <> Option_None constr
+R6363:6373 Core.Core_Option <> Option_Some constr
+R6400:6410 Core.Core_Option <> Option_None constr
+R6423:6433 Core.Core_Option <> Option_None constr
+R6457:6486 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Other constr
+R6495:6505 Core.Core_Option <> Option_None constr
+def 6526:6556 <> critical_ecdsa_aux_witness_mode
+R6567:6595 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SupportedCriticalEcdsaCurve ind
+binder 6559:6563 <> curve:29
+R6600:6628 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaAuxWitnessMode ind
+R6644:6648 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> curve:29 var
+R6655:6702 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness constr
+def 6717:6747 <> critical_ecdsa_runtime_relation
+R6758:6786 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SupportedCriticalEcdsaCurve ind
+binder 6750:6754 <> curve:30
+R6791:6820 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaRuntimeRelation def
+R6836:6840 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> curve:30 var
+R6847:6874 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaRuntimeRelation def
+R6885:6888 Corelib.Init.Datatypes <> bool ind
+R6878:6881 Corelib.Init.Datatypes <> true constr
+R6901:6904 Corelib.Init.Datatypes <> bool ind
+R6894:6897 Corelib.Init.Datatypes <> true constr
+R6917:6920 Corelib.Init.Datatypes <> bool ind
+R6910:6913 Corelib.Init.Datatypes <> true constr
+R6933:6936 Corelib.Init.Datatypes <> bool ind
+R6926:6929 Corelib.Init.Datatypes <> true constr
+def 6953:6985 <> critical_ecdsa_byte_abi_semantics
+R6993:7013 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SpecCriticalEcdsaOp ind
+binder 6988:6989 <> op:31
+R7025:7050 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SpecCriticalEcdsaFieldId ind
+binder 7017:7021 <> field:32
+R7067:7073 Core.Core_Primitive <> :::'t_usize' not
+binder 7054:7063 <> inputs_len:33
+R7091:7097 Core.Core_Primitive <> :::'t_usize' not
+binder 7077:7087 <> outputs_len:34
+R7102:7109 Core.Core_Option <> t_Option ind
+R7113:7143 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaByteAbiSemantics def
+R7158:7185 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_proof_surface def
+R7188:7189 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> op:31 var
+R7193:7197 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> field:32 var
+R7201:7210 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> inputs_len:33 var
+R7214:7224 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> outputs_len:34 var
+R7236:7246 Core.Core_Option <> Option_Some constr
+R7263:7273 Core.Core_Option <> Option_Some constr
+R7276:7304 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics def
+R7315:7319 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> field:32 var
+R7323:7332 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> inputs_len:33 var
+R7336:7346 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> outputs_len:34 var
+R7358:7361 Corelib.Init.Datatypes <> bool ind
+R7351:7354 Corelib.Init.Datatypes <> true constr
+R7366:7396 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_aux_witness_mode def
+R7408:7438 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_runtime_relation def
+R7454:7464 Core.Core_Option <> Option_None constr
+R7473:7483 Core.Core_Option <> Option_None constr
+def 7504:7519 <> ecdsa_curve_name
+R7530:7558 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_SupportedCriticalEcdsaCurve ind
+binder 7522:7526 <> curve:35
+R7563:7568 Stdlib.Strings.String <> string ind
+R7581:7585 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> curve:35 var
+R7596:7632 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256k1 constr
+R7663:7668 Stdlib.Strings.String <> string ind
+R7675:7711 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256r1 constr
+R7742:7747 Stdlib.Strings.String <> string ind

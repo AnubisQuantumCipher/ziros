@@ -1,0 +1,18 @@
+{
+  "schema": "zkf-upstream-lock-v1",
+  "id": "formal-snarks-project",
+  "origin": "https://github.com/BoltonBailey/formal-snarks-project",
+  "revision": "dcfc78d456882087d4e592e090e8d6d6df83e560",
+  "checked_on": "2026-03-23",
+  "license": "MIT",
+  "upstream_toolchain": "leanprover/lean4:v4.10.0-rc2",
+  "local_toolchain_target": "leanprover/lean4:v4.28.0",
+  "purpose": "Groth16 knowledge soundness starting point for the exact Arkworks BN254 imported-CRS surface.",
+  "focus_modules": [
+    "FormalSnarksProject.SNARKs.Groth16",
+    "FormalSnarksProject.SNARKs.Groth16TypeIII.Defs",
+    "FormalSnarksProject.SNARKs.Groth16TypeIII.Completeness",
+    "FormalSnarksProject.SNARKs.Groth16TypeIII.Soundness",
+    "FormalSnarksProject.Models.StraightforwardAGMProofSystem"
+  ]
+}

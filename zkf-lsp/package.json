@@ -1,0 +1,48 @@
+{
+  "name": "zkf-lsp",
+  "displayName": "ZKF IR Support",
+  "version": "0.0.1",
+  "publisher": "zkf",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:zkf-ir",
+    "onLanguage:zkf-zir"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "zkf-ir",
+        "aliases": [
+          "ZKF IR"
+        ],
+        "extensions": [
+          ".ir.json"
+        ]
+      },
+      {
+        "id": "zkf-zir",
+        "aliases": [
+          "ZKF ZIR"
+        ],
+        "extensions": [
+          ".zir.json"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "ZirOS LSP",
+      "properties": {
+        "zkf.languageServerPath": {
+          "type": "string",
+          "default": "zkf-lsp",
+          "description": "Path to the zkf-lsp executable."
+        }
+      }
+    }
+  }
+}

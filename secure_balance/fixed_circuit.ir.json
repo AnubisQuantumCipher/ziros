@@ -1,0 +1,62 @@
+{
+  "name": "secure_transfer",
+  "field": "bn254",
+  "signals": [
+    { "name": "bal", "visibility": "private", "ty": "uint32" },
+    { "name": "amt", "visibility": "private", "ty": "uint32" },
+    { "name": "user_id", "visibility": "private", "ty": "uint32" },
+    { "name": "expected_commitment", "visibility": "public", "ty": "uint32" },
+    { "name": "computed_hash", "visibility": "private", "ty": "field" },
+    { "name": "remaining", "visibility": "public", "ty": "field" }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "computed_hash" },
+      "rhs": {
+        "op": "add",
+        "args": [
+          { "op": "mul", "args": [{ "op": "signal", "args": "bal" }, { "op": "const", "args": "13" }] },
+          { "op": "signal", "args": "user_id" }
+        ]
+      },
+      "label": "assign_computed_hash"
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "expected_commitment" },
+      "rhs": { "op": "signal", "args": "computed_hash" },
+      "label": "bind_commitment"
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "remaining" },
+      "rhs": { "op": "sub", "args": [{ "op": "signal", "args": "bal" }, { "op": "signal", "args": "amt" }] },
+      "label": "assign_remaining"
+    },
+    {
+      "kind": "range",
+      "signal": "remaining",
+      "bits": 32,
+      "label": "range_remaining_32"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "computed_hash",
+        "expr": {
+          "op": "add",
+          "args": [
+            { "op": "mul", "args": [{ "op": "signal", "args": "bal" }, { "op": "const", "args": "13" }] },
+            { "op": "signal", "args": "user_id" }
+          ]
+        }
+      },
+      {
+        "target": "remaining",
+        "expr": { "op": "sub", "args": [{ "op": "signal", "args": "bal" }, { "op": "signal", "args": "amt" }] }
+      }
+    ]
+  }
+}

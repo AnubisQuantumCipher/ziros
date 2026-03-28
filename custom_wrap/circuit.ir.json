@@ -1,0 +1,125 @@
+{
+  "name": "hash_preimage",
+  "field": "goldilocks",
+  "signals": [
+    {
+      "name": "preimage",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "salt",
+      "visibility": "private",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "expected_hash",
+      "visibility": "public",
+      "ty": {
+        "kind": "u_int",
+        "bits": 32
+      }
+    },
+    {
+      "name": "internal_val",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    },
+    {
+      "name": "computed_hash",
+      "visibility": "private",
+      "ty": {
+        "kind": "field"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "internal_val"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "preimage"
+          },
+          {
+            "op": "signal",
+            "args": "salt"
+          }
+        ]
+      },
+      "label": "assign_internal_val"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "computed_hash"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "signal",
+            "args": "internal_val"
+          },
+          {
+            "op": "const",
+            "args": "42"
+          }
+        ]
+      },
+      "label": "assign_computed_hash"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "internal_val",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "preimage"
+            },
+            {
+              "op": "signal",
+              "args": "salt"
+            }
+          ]
+        }
+      },
+      {
+        "target": "computed_hash",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "internal_val"
+            },
+            {
+              "op": "const",
+              "args": "42"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

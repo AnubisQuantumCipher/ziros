@@ -1,0 +1,189 @@
+{
+  "name": "weighted_threshold_verifier",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "b1",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "s1",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "c1",
+      "visibility": "public",
+      "ty": "uint32"
+    },
+    {
+      "name": "b2",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "s2",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "c2",
+      "visibility": "public",
+      "ty": "uint32"
+    },
+    {
+      "name": "b3",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "s3",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "c3",
+      "visibility": "public",
+      "ty": "uint32"
+    },
+    {
+      "name": "threshold",
+      "visibility": "public",
+      "ty": "uint32"
+    },
+    {
+      "name": "total",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "diff",
+      "visibility": "private",
+      "ty": "field"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "range",
+      "signal": "b1",
+      "bits": 32,
+      "label": "range_b1_32"
+    },
+    {
+      "kind": "range",
+      "signal": "b2",
+      "bits": 32,
+      "label": "range_b2_32"
+    },
+    {
+      "kind": "range",
+      "signal": "b3",
+      "bits": 32,
+      "label": "range_b3_32"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "total"
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "signal",
+                "args": "b1"
+              },
+              {
+                "op": "signal",
+                "args": "b2"
+              }
+            ]
+          },
+          {
+            "op": "signal",
+            "args": "b3"
+          }
+        ]
+      },
+      "label": "assign_total"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "diff"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "total"
+          },
+          {
+            "op": "signal",
+            "args": "threshold"
+          }
+        ]
+      },
+      "label": "assign_diff"
+    },
+    {
+      "kind": "range",
+      "signal": "diff",
+      "bits": 32,
+      "label": "range_diff_32"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "total",
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "signal",
+                  "args": "b1"
+                },
+                {
+                  "op": "signal",
+                  "args": "b2"
+                }
+              ]
+            },
+            {
+              "op": "signal",
+              "args": "b3"
+            }
+          ]
+        }
+      },
+      {
+        "target": "diff",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "total"
+            },
+            {
+              "op": "signal",
+              "args": "threshold"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

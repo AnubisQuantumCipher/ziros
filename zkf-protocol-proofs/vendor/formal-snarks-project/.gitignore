@@ -1,0 +1,14 @@
+*.olean
+*.png
+/_target
+/leanpkg.path
+src/mwe.lean
+presentation/__latexindent_temp.tex
+presentation/presentation.nav
+presentation/presentation.snm
+presentation/presentation.toc
+presentation/presentation.vrb
+presentation/alice.jpeg
+presentation/bob.jpeg
+*.DS_Store
+**/.lake/**

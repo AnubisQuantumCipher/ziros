@@ -1,0 +1,590 @@
+DIGEST f27eca8a1132002458e3ff474a63e3e6
+FKernelSemantics
+R15:18 Stdlib.Lists.List <> <> lib
+R20:25 Stdlib.NArith.NArith <> <> lib
+R35:52 Stdlib.Lists.List ListNotations <> mod
+R71:82 KernelCompat <> <> lib
+R100:114 KernelGenerated <> <> lib
+ind 128:135 <> ExprEval
+constr 247:260 <> ExprEval_Const
+constr 364:378 <> ExprEval_Signal
+constr 557:568 <> ExprEval_Add
+constr 796:807 <> ExprEval_Sub
+constr 1035:1046 <> ExprEval_Mul
+constr 1274:1285 <> ExprEval_Div
+R150:168 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 140:146 <> witness:1
+R182:190 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 174:178 <> field:2
+R213:216 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R197:212 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+R233:236 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R217:232 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 262:266 <> value:5
+R274:281 KernelSemantics <> ExprEval:3 ind
+R339:359 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'normalize' not
+R349:353 KernelSemantics <> value:5 var
+R355:359 KernelSemantics <> field:2 var
+R304:329 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Const' not
+R325:329 KernelSemantics <> value:5 var
+R291:295 KernelSemantics <> field:2 var
+R283:289 KernelSemantics <> witness:1 var
+binder 380:391 <> signal_index:6
+binder 393:397 <> value:7
+R469:476 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R451:453 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R405:450 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'kernel_signal_value' not
+R425:431 KernelSemantics <> witness:1 var
+R433:444 KernelSemantics <> signal_index:6 var
+R446:450 KernelSemantics <> field:2 var
+R454:462 KernelCompat <> Result_Ok constr
+R464:468 KernelSemantics <> value:7 var
+R477:484 KernelSemantics <> ExprEval:3 ind
+R549:553 KernelSemantics <> value:7 var
+R507:540 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Signal' not
+R529:540 KernelSemantics <> signal_index:6 var
+R494:498 KernelSemantics <> field:2 var
+R486:492 KernelSemantics <> witness:1 var
+binder 570:572 <> lhs:8
+binder 574:576 <> rhs:9
+binder 578:586 <> lhs_value:10
+binder 588:596 <> rhs_value:11
+R640:647 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R604:611 KernelSemantics <> ExprEval:3 ind
+R631:639 KernelSemantics <> lhs_value:10 var
+R627:629 KernelSemantics <> lhs:8 var
+R621:625 KernelSemantics <> field:2 var
+R613:619 KernelSemantics <> witness:1 var
+R684:691 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R648:655 KernelSemantics <> ExprEval:3 ind
+R675:683 KernelSemantics <> rhs_value:11 var
+R671:673 KernelSemantics <> rhs:9 var
+R665:669 KernelSemantics <> field:2 var
+R657:663 KernelSemantics <> witness:1 var
+R692:699 KernelSemantics <> ExprEval:3 ind
+R757:791 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'Add_f_add' not
+R767:775 KernelSemantics <> lhs_value:10 var
+R777:785 KernelSemantics <> rhs_value:11 var
+R787:791 KernelSemantics <> field:2 var
+R722:747 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Add' not
+R741:743 KernelSemantics <> lhs:8 var
+R745:747 KernelSemantics <> rhs:9 var
+R709:713 KernelSemantics <> field:2 var
+R701:707 KernelSemantics <> witness:1 var
+binder 809:811 <> lhs:12
+binder 813:815 <> rhs:13
+binder 817:825 <> lhs_value:14
+binder 827:835 <> rhs_value:15
+R879:886 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R843:850 KernelSemantics <> ExprEval:3 ind
+R870:878 KernelSemantics <> lhs_value:14 var
+R866:868 KernelSemantics <> lhs:12 var
+R860:864 KernelSemantics <> field:2 var
+R852:858 KernelSemantics <> witness:1 var
+R923:930 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R887:894 KernelSemantics <> ExprEval:3 ind
+R914:922 KernelSemantics <> rhs_value:15 var
+R910:912 KernelSemantics <> rhs:13 var
+R904:908 KernelSemantics <> field:2 var
+R896:902 KernelSemantics <> witness:1 var
+R931:938 KernelSemantics <> ExprEval:3 ind
+R996:1030 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'Sub_f_sub' not
+R1006:1014 KernelSemantics <> lhs_value:14 var
+R1016:1024 KernelSemantics <> rhs_value:15 var
+R1026:1030 KernelSemantics <> field:2 var
+R961:986 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Sub' not
+R980:982 KernelSemantics <> lhs:12 var
+R984:986 KernelSemantics <> rhs:13 var
+R948:952 KernelSemantics <> field:2 var
+R940:946 KernelSemantics <> witness:1 var
+binder 1048:1050 <> lhs:16
+binder 1052:1054 <> rhs:17
+binder 1056:1064 <> lhs_value:18
+binder 1066:1074 <> rhs_value:19
+R1118:1125 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1082:1089 KernelSemantics <> ExprEval:3 ind
+R1109:1117 KernelSemantics <> lhs_value:18 var
+R1105:1107 KernelSemantics <> lhs:16 var
+R1099:1103 KernelSemantics <> field:2 var
+R1091:1097 KernelSemantics <> witness:1 var
+R1162:1169 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1126:1133 KernelSemantics <> ExprEval:3 ind
+R1153:1161 KernelSemantics <> rhs_value:19 var
+R1149:1151 KernelSemantics <> rhs:17 var
+R1143:1147 KernelSemantics <> field:2 var
+R1135:1141 KernelSemantics <> witness:1 var
+R1170:1177 KernelSemantics <> ExprEval:3 ind
+R1235:1269 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'Mul_f_mul' not
+R1245:1253 KernelSemantics <> lhs_value:18 var
+R1255:1263 KernelSemantics <> rhs_value:19 var
+R1265:1269 KernelSemantics <> field:2 var
+R1200:1225 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Mul' not
+R1219:1221 KernelSemantics <> lhs:16 var
+R1223:1225 KernelSemantics <> rhs:17 var
+R1187:1191 KernelSemantics <> field:2 var
+R1179:1185 KernelSemantics <> witness:1 var
+binder 1287:1289 <> lhs:20
+binder 1291:1293 <> rhs:21
+binder 1295:1303 <> lhs_value:22
+binder 1305:1313 <> rhs_value:23
+binder 1315:1319 <> value:24
+R1363:1370 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1327:1334 KernelSemantics <> ExprEval:3 ind
+R1354:1362 KernelSemantics <> lhs_value:22 var
+R1350:1352 KernelSemantics <> lhs:20 var
+R1344:1348 KernelSemantics <> field:2 var
+R1336:1342 KernelSemantics <> witness:1 var
+R1407:1414 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1371:1378 KernelSemantics <> ExprEval:3 ind
+R1398:1406 KernelSemantics <> rhs_value:23 var
+R1394:1396 KernelSemantics <> rhs:21 var
+R1388:1392 KernelSemantics <> field:2 var
+R1380:1386 KernelSemantics <> witness:1 var
+R1470:1477 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1450:1452 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1415:1449 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'Div_f_div' not
+R1425:1433 KernelSemantics <> lhs_value:22 var
+R1435:1443 KernelSemantics <> rhs_value:23 var
+R1445:1449 KernelSemantics <> field:2 var
+R1453:1463 Core.Core_Option <> Option_Some constr
+R1465:1469 KernelSemantics <> value:24 var
+R1478:1485 KernelSemantics <> ExprEval:3 ind
+R1542:1546 KernelSemantics <> value:24 var
+R1508:1533 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelExpr_Div' not
+R1527:1529 KernelSemantics <> lhs:20 var
+R1531:1533 KernelSemantics <> rhs:21 var
+R1495:1499 KernelSemantics <> field:2 var
+R1487:1493 KernelSemantics <> witness:1 var
+scheme 128:135 <> ExprEval_ind
+scheme 128:135 <> ExprEval_sind
+ind 1560:1569 <> InputsEval
+constr 1713:1726 <> InputsEval_nil
+constr 1767:1781 <> InputsEval_cons
+R1584:1602 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 1574:1580 <> witness:25
+R1616:1624 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 1608:1612 <> field:26
+R1662:1667 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1631:1635 KernelCompat <> t_Vec def
+R1637:1652 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelExpr' not
+R1654:1661 KernelCompat <> t_Global constr
+R1699:1702 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1668:1672 KernelCompat <> t_Vec def
+R1674:1689 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R1691:1698 KernelCompat <> t_Global constr
+R1734:1743 KernelSemantics <> InputsEval:27 ind
+R1762:1763 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R1759:1760 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R1753:1757 KernelSemantics <> field:26 var
+R1745:1751 KernelSemantics <> witness:25 var
+binder 1783:1786 <> expr:29
+binder 1788:1802 <> remaining_exprs:30
+binder 1804:1808 <> value:31
+binder 1810:1825 <> remaining_values:32
+R1866:1873 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1833:1840 KernelSemantics <> ExprEval ind
+R1842:1848 KernelSemantics <> witness:25 var
+R1850:1854 KernelSemantics <> field:26 var
+R1856:1859 KernelSemantics <> expr:29 var
+R1861:1865 KernelSemantics <> value:31 var
+R1931:1938 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1874:1883 KernelSemantics <> InputsEval:27 ind
+R1915:1930 KernelSemantics <> remaining_values:32 var
+R1899:1913 KernelSemantics <> remaining_exprs:30 var
+R1893:1897 KernelSemantics <> field:26 var
+R1885:1891 KernelSemantics <> witness:25 var
+R1939:1948 KernelSemantics <> InputsEval:27 ind
+R2008:2011 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R2003:2007 KernelSemantics <> value:31 var
+R2012:2027 KernelSemantics <> remaining_values:32 var
+R1975:1978 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R1971:1974 KernelSemantics <> expr:29 var
+R1979:1993 KernelSemantics <> remaining_exprs:30 var
+R1958:1962 KernelSemantics <> field:26 var
+R1950:1956 KernelSemantics <> witness:25 var
+scheme 1560:1569 <> InputsEval_ind
+scheme 1560:1569 <> InputsEval_sind
+ind 2042:2062 <> RenderedLookupOutputs
+constr 2253:2277 <> RenderedLookupOutputs_nil
+constr 2372:2397 <> RenderedLookupOutputs_take
+constr 2943:2968 <> RenderedLookupOutputs_skip
+R2077:2095 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 2067:2073 <> witness:33
+R2109:2117 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 2101:2105 <> field:34
+R2138:2160 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelLookupTable' not
+binder 2123:2134 <> lookup_table:35
+R2174:2179 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2167:2173 Core.Core_Primitive <> :::'t_usize' not
+R2202:2207 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2180:2184 KernelCompat <> t_Vec def
+R2186:2192 Core.Core_Primitive <> :::'t_usize' not
+R2194:2201 KernelCompat <> t_Global constr
+R2239:2242 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2208:2212 KernelCompat <> t_Vec def
+R2214:2229 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R2231:2238 KernelCompat <> t_Global constr
+binder 2279:2292 <> current_column:38
+R2300:2320 KernelSemantics <> RenderedLookupOutputs:36 ind
+R2367:2368 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R2364:2365 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R2349:2362 KernelSemantics <> current_column:38 var
+R2336:2347 KernelSemantics <> lookup_table:35 var
+R2330:2334 KernelSemantics <> field:34 var
+R2322:2328 KernelSemantics <> witness:33 var
+binder 2399:2412 <> current_column:39
+binder 2414:2425 <> signal_index:40
+binder 2427:2443 <> remaining_indices:41
+binder 2445:2449 <> value:42
+binder 2451:2466 <> remaining_values:43
+R2530:2537 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2523:2525 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2474:2477 KernelCompat <> f_lt def
+R2479:2492 KernelSemantics <> current_column:39 var
+R2495:2521 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R2510:2521 KernelSemantics <> lookup_table:35 var
+R2526:2529 Corelib.Init.Datatypes <> true constr
+R2602:2609 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2584:2586 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2538:2583 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'kernel_signal_value' not
+R2558:2564 KernelSemantics <> witness:33 var
+R2566:2577 KernelSemantics <> signal_index:40 var
+R2579:2583 KernelSemantics <> field:34 var
+R2587:2595 KernelCompat <> Result_Ok constr
+R2597:2601 KernelSemantics <> value:42 var
+R2769:2776 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2610:2630 KernelSemantics <> RenderedLookupOutputs:36 ind
+R2753:2768 KernelSemantics <> remaining_values:43 var
+R2729:2745 KernelSemantics <> remaining_indices:41 var
+R2684:2688 KernelCompat <> f_add def
+R2690:2703 KernelSemantics <> current_column:39 var
+R2706:2715 KernelCompat <> n_to_usize def
+R2664:2675 KernelSemantics <> lookup_table:35 var
+R2652:2656 KernelSemantics <> field:34 var
+R2638:2644 KernelSemantics <> witness:33 var
+R2777:2797 KernelSemantics <> RenderedLookupOutputs:36 ind
+R2919:2922 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R2914:2918 KernelSemantics <> value:42 var
+R2923:2938 KernelSemantics <> remaining_values:43 var
+R2884:2887 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R2872:2883 KernelSemantics <> signal_index:40 var
+R2888:2904 KernelSemantics <> remaining_indices:41 var
+R2850:2863 KernelSemantics <> current_column:39 var
+R2831:2842 KernelSemantics <> lookup_table:35 var
+R2819:2823 KernelSemantics <> field:34 var
+R2805:2811 KernelSemantics <> witness:33 var
+binder 2970:2983 <> current_column:44
+binder 2985:2996 <> signal_index:45
+binder 2998:3014 <> remaining_indices:46
+binder 3016:3031 <> remaining_values:47
+R3096:3103 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3088:3090 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3039:3042 KernelCompat <> f_lt def
+R3044:3057 KernelSemantics <> current_column:44 var
+R3060:3086 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R3075:3086 KernelSemantics <> lookup_table:35 var
+R3091:3095 Corelib.Init.Datatypes <> false constr
+R3263:3270 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3104:3124 KernelSemantics <> RenderedLookupOutputs:36 ind
+R3247:3262 KernelSemantics <> remaining_values:47 var
+R3223:3239 KernelSemantics <> remaining_indices:46 var
+R3178:3182 KernelCompat <> f_add def
+R3184:3197 KernelSemantics <> current_column:44 var
+R3200:3209 KernelCompat <> n_to_usize def
+R3158:3169 KernelSemantics <> lookup_table:35 var
+R3146:3150 KernelSemantics <> field:34 var
+R3132:3138 KernelSemantics <> witness:33 var
+R3271:3291 KernelSemantics <> RenderedLookupOutputs:36 ind
+R3407:3422 KernelSemantics <> remaining_values:47 var
+R3378:3381 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R3366:3377 KernelSemantics <> signal_index:45 var
+R3382:3398 KernelSemantics <> remaining_indices:46 var
+R3344:3357 KernelSemantics <> current_column:44 var
+R3325:3336 KernelSemantics <> lookup_table:35 var
+R3313:3317 KernelSemantics <> field:34 var
+R3299:3305 KernelSemantics <> witness:33 var
+scheme 2042:2062 <> RenderedLookupOutputs_ind
+scheme 2042:2062 <> RenderedLookupOutputs_sind
+def 3437:3452 <> LookupRowMatches
+R3465:3473 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 3457:3461 <> field:48
+R3485:3489 KernelCompat <> t_Vec def
+R3491:3506 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R3508:3515 KernelCompat <> t_Global constr
+binder 3479:3481 <> row:49
+R3530:3534 KernelCompat <> t_Vec def
+R3536:3551 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R3553:3560 KernelCompat <> t_Global constr
+binder 3521:3526 <> inputs:50
+R3585:3592 Core.Core_Option <> t_Option ind
+R3595:3599 KernelCompat <> t_Vec def
+R3601:3616 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R3618:3625 KernelCompat <> t_Global constr
+binder 3566:3581 <> expected_outputs:51
+R3644:3650 Core.Core_Primitive <> :::'t_usize' not
+binder 3632:3640 <> input_len:52
+R3717:3722 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R3710:3712 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3665:3692 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from_list def
+R3694:3696 KernelSemantics <> row:49 var
+R3698:3703 KernelSemantics <> inputs:50 var
+R3705:3709 KernelSemantics <> field:48 var
+R3713:3716 Corelib.Init.Datatypes <> true constr
+R3729:3744 KernelSemantics <> expected_outputs:51 var
+R3755:3765 Core.Core_Option <> Option_Some constr
+R3888:3890 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3784:3812 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from_list def
+R3823:3842 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix_list def
+R3844:3846 KernelSemantics <> row:49 var
+R3848:3856 KernelSemantics <> input_len:52 var
+R3883:3887 KernelSemantics <> field:48 var
+R3891:3894 Corelib.Init.Datatypes <> true constr
+R3900:3910 Core.Core_Option <> Option_None constr
+R3921:3924 Corelib.Init.Logic <> True ind
+def 3945:3961 <> LookupRowsSatisfy
+R3973:3977 KernelCompat <> t_Vec def
+R3980:3984 KernelCompat <> t_Vec def
+R3986:4001 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R4003:4010 KernelCompat <> t_Global constr
+R4013:4020 KernelCompat <> t_Global constr
+binder 3966:3969 <> rows:54
+R4034:4042 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 4026:4030 <> field:55
+R4057:4061 KernelCompat <> t_Vec def
+R4063:4078 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R4080:4087 KernelCompat <> t_Global constr
+binder 4048:4053 <> inputs:56
+R4112:4119 Core.Core_Option <> t_Option ind
+R4122:4126 KernelCompat <> t_Vec def
+R4128:4143 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R4145:4152 KernelCompat <> t_Global constr
+binder 4093:4108 <> expected_outputs:57
+R4171:4177 Core.Core_Primitive <> :::'t_usize' not
+binder 4159:4167 <> input_len:58
+R4192:4198 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R4202:4207 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+binder 4199:4201 <> row:59
+R4219:4226 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R4208:4209 Stdlib.Lists.List <> In def
+R4215:4218 KernelSemantics <> rows:54 var
+R4211:4213 KernelSemantics <> row:59 var
+R4227:4242 KernelSemantics <> LookupRowMatches def
+R4244:4248 KernelSemantics <> field:55 var
+R4250:4252 KernelSemantics <> row:59 var
+R4254:4259 KernelSemantics <> inputs:56 var
+R4261:4276 KernelSemantics <> expected_outputs:57 var
+R4278:4286 KernelSemantics <> input_len:58 var
+ind 4300:4320 <> LookupExpectedOutputs
+constr 4544:4569 <> LookupExpectedOutputs_none
+constr 4698:4723 <> LookupExpectedOutputs_some
+R4335:4353 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 4325:4331 <> witness:60
+R4367:4375 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 4359:4363 <> field:61
+R4396:4418 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelLookupTable' not
+binder 4381:4392 <> lookup_table:62
+R4436:4442 Core.Core_Primitive <> :::'t_usize' not
+binder 4424:4432 <> input_len:63
+R4482:4487 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4449:4456 Core.Core_Option <> t_Option ind
+R4459:4463 KernelCompat <> t_Vec def
+R4465:4471 Core.Core_Primitive <> :::'t_usize' not
+R4473:4480 KernelCompat <> t_Global constr
+R4530:4533 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4488:4495 Core.Core_Option <> t_Option ind
+R4498:4502 KernelCompat <> t_Vec def
+R4504:4519 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R4521:4528 KernelCompat <> t_Global constr
+R4577:4597 KernelSemantics <> LookupExpectedOutputs:64 ind
+R4684:4694 Core.Core_Option <> Option_None constr
+R4666:4676 Core.Core_Option <> Option_None constr
+R4650:4658 KernelSemantics <> input_len:63 var
+R4631:4642 KernelSemantics <> lookup_table:62 var
+R4619:4623 KernelSemantics <> field:61 var
+R4605:4611 KernelSemantics <> witness:60 var
+binder 4725:4738 <> signal_indices:66
+binder 4740:4745 <> values:67
+R4833:4840 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4753:4773 KernelSemantics <> RenderedLookupOutputs ind
+R4775:4781 KernelSemantics <> witness:60 var
+R4783:4787 KernelSemantics <> field:61 var
+R4789:4800 KernelSemantics <> lookup_table:62 var
+R4802:4810 KernelSemantics <> input_len:63 var
+R4812:4825 KernelSemantics <> signal_indices:66 var
+R4827:4832 KernelSemantics <> values:67 var
+R4841:4861 KernelSemantics <> LookupExpectedOutputs:64 ind
+R4966:4976 Core.Core_Option <> Option_Some constr
+R4978:4983 KernelSemantics <> values:67 var
+R4931:4941 Core.Core_Option <> Option_Some constr
+R4943:4956 KernelSemantics <> signal_indices:66 var
+R4914:4922 KernelSemantics <> input_len:63 var
+R4895:4906 KernelSemantics <> lookup_table:62 var
+R4883:4887 KernelSemantics <> field:61 var
+R4869:4875 KernelSemantics <> witness:60 var
+scheme 4300:4320 <> LookupExpectedOutputs_ind
+scheme 4300:4320 <> LookupExpectedOutputs_sind
+ind 4998:5012 <> ConstraintHolds
+constr 5122:5142 <> ConstraintHolds_Equal
+constr 5662:5684 <> ConstraintHolds_Boolean
+constr 6052:6072 <> ConstraintHolds_Range
+constr 6500:6521 <> ConstraintHolds_Lookup
+R5027:5045 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelProgram' not
+binder 5017:5023 <> program:68
+R5061:5079 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 5051:5057 <> witness:69
+R5108:5111 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5086:5107 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelConstraint' not
+binder 5144:5159 <> equal_constraint:72
+binder 5161:5169 <> lhs_value:73
+binder 5171:5179 <> rhs_value:74
+R5325:5332 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5187:5194 KernelSemantics <> ExprEval ind
+R5202:5208 KernelSemantics <> witness:69 var
+R5217:5241 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R5243:5249 KernelSemantics <> program:68 var
+R5259:5290 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_lhs proj
+R5292:5307 KernelSemantics <> equal_constraint:72 var
+R5316:5324 KernelSemantics <> lhs_value:73 var
+R5471:5478 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5333:5340 KernelSemantics <> ExprEval ind
+R5348:5354 KernelSemantics <> witness:69 var
+R5363:5387 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R5389:5395 KernelSemantics <> program:68 var
+R5405:5436 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_rhs proj
+R5438:5453 KernelSemantics <> equal_constraint:72 var
+R5462:5470 KernelSemantics <> rhs_value:74 var
+R5556:5563 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5549:5551 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R5479:5548 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'PartialEq_f_eq' not
+R5494:5502 KernelSemantics <> lhs_value:73 var
+R5504:5512 KernelSemantics <> rhs_value:74 var
+R5515:5539 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R5541:5547 KernelSemantics <> program:68 var
+R5552:5555 Corelib.Init.Datatypes <> true constr
+R5564:5578 KernelSemantics <> ConstraintHolds:70 ind
+R5615:5657 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Equal' not
+R5642:5657 KernelSemantics <> equal_constraint:72 var
+R5600:5606 KernelSemantics <> witness:69 var
+R5586:5592 KernelSemantics <> program:68 var
+binder 5686:5703 <> boolean_constraint:75
+binder 5705:5709 <> value:76
+R5875:5882 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5857:5859 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R5717:5856 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'kernel_signal_value' not
+R5743:5749 KernelSemantics <> witness:69 var
+R5758:5794 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_signal proj
+R5796:5813 KernelSemantics <> boolean_constraint:75 var
+R5823:5847 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R5849:5855 KernelSemantics <> program:68 var
+R5860:5868 KernelCompat <> Result_Ok constr
+R5870:5874 KernelSemantics <> value:76 var
+R5942:5949 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5935:5937 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R5883:5934 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'is_boolean' not
+R5894:5898 KernelSemantics <> value:76 var
+R5901:5925 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R5927:5933 KernelSemantics <> program:68 var
+R5938:5941 Corelib.Init.Datatypes <> true constr
+R5950:5964 KernelSemantics <> ConstraintHolds:70 ind
+R6001:6047 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Boolean' not
+R6030:6047 KernelSemantics <> boolean_constraint:75 var
+R5986:5992 KernelSemantics <> witness:69 var
+R5972:5978 KernelSemantics <> program:68 var
+binder 6074:6089 <> range_constraint:77
+binder 6091:6095 <> value:78
+R6257:6264 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6239:6241 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R6103:6238 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'kernel_signal_value' not
+R6129:6135 KernelSemantics <> witness:69 var
+R6144:6178 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_signal proj
+R6180:6195 KernelSemantics <> range_constraint:77 var
+R6205:6229 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R6231:6237 KernelSemantics <> program:68 var
+R6242:6250 KernelCompat <> Result_Ok constr
+R6252:6256 KernelSemantics <> value:78 var
+R6394:6401 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6387:6389 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R6265:6386 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> :::'fits_bits' not
+R6281:6285 KernelSemantics <> value:78 var
+R6294:6326 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_bits proj
+R6328:6343 KernelSemantics <> range_constraint:77 var
+R6353:6377 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R6379:6385 KernelSemantics <> program:68 var
+R6390:6393 Corelib.Init.Datatypes <> true constr
+R6402:6416 KernelSemantics <> ConstraintHolds:70 ind
+R6453:6495 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Range' not
+R6480:6495 KernelSemantics <> range_constraint:77 var
+R6438:6444 KernelSemantics <> witness:69 var
+R6424:6430 KernelSemantics <> program:68 var
+binder 6523:6539 <> lookup_constraint:79
+binder 6541:6552 <> lookup_table:80
+binder 6554:6569 <> evaluated_inputs:81
+binder 6571:6586 <> expected_outputs:82
+R6746:6753 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6713:6721 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R6594:6602 KernelCompat <> impl__get def
+R6653:6693 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+R6695:6711 KernelSemantics <> lookup_constraint:79 var
+R6611:6617 KernelCompat <> f_deref def
+R6620:6642 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_lookup_tables' not
+R6636:6642 KernelSemantics <> program:68 var
+R6722:6732 Core.Core_Option <> Option_Some constr
+R6734:6745 KernelSemantics <> lookup_table:80 var
+R6879:6886 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6871:6873 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R6754:6757 KernelCompat <> f_gt def
+R6766:6776 KernelCompat <> impl_1__len def
+R6779:6814 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R6816:6832 KernelSemantics <> lookup_constraint:79 var
+R6843:6869 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R6858:6869 KernelSemantics <> lookup_table:80 var
+R6874:6878 Corelib.Init.Datatypes <> false constr
+R7039:7046 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6887:6896 KernelSemantics <> InputsEval ind
+R6904:6910 KernelSemantics <> witness:69 var
+R6919:6943 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R6945:6951 KernelSemantics <> program:68 var
+R6961:6996 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R6998:7014 KernelSemantics <> lookup_constraint:79 var
+R7023:7038 KernelSemantics <> evaluated_inputs:81 var
+R7307:7314 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R7047:7067 KernelSemantics <> LookupExpectedOutputs ind
+R7075:7081 KernelSemantics <> witness:69 var
+R7090:7114 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R7116:7122 KernelSemantics <> program:68 var
+R7131:7142 KernelSemantics <> lookup_table:80 var
+R7151:7161 KernelCompat <> impl_1__len def
+R7164:7199 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R7201:7217 KernelSemantics <> lookup_constraint:79 var
+R7228:7264 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_outputs proj
+R7266:7282 KernelSemantics <> lookup_constraint:79 var
+R7291:7306 KernelSemantics <> expected_outputs:82 var
+R7525:7532 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R7315:7331 KernelSemantics <> LookupRowsSatisfy def
+R7340:7358 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_rows' not
+R7347:7358 KernelSemantics <> lookup_table:80 var
+R7368:7392 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R7394:7400 KernelSemantics <> program:68 var
+R7409:7424 KernelSemantics <> evaluated_inputs:81 var
+R7432:7447 KernelSemantics <> expected_outputs:82 var
+R7456:7466 KernelCompat <> impl_1__len def
+R7469:7504 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R7506:7522 KernelSemantics <> lookup_constraint:79 var
+R7533:7547 KernelSemantics <> ConstraintHolds:70 ind
+R7584:7628 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'SpecKernelConstraint_Lookup' not
+R7612:7628 KernelSemantics <> lookup_constraint:79 var
+R7569:7575 KernelSemantics <> witness:69 var
+R7555:7561 KernelSemantics <> program:68 var
+scheme 4998:5012 <> ConstraintHolds_ind
+scheme 4998:5012 <> ConstraintHolds_sind
+def 7644:7655 <> ProgramHolds
+R7670:7688 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelProgram' not
+binder 7660:7666 <> program:83
+R7704:7722 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 7694:7700 <> witness:84
+R7737:7742 Corelib.Lists.ListDef <> Forall ind
+R7779:7809 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R7811:7817 KernelSemantics <> program:83 var
+R7745:7759 KernelSemantics <> ConstraintHolds ind
+R7761:7767 KernelSemantics <> program:83 var
+R7769:7775 KernelSemantics <> witness:84 var

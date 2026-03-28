@@ -1,0 +1,6 @@
+[package]
+name = "recursive_workflow"
+type = "bin"
+authors = ["ZKF"]
+
+[dependencies]

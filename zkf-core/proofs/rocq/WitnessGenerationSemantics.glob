@@ -1,0 +1,25 @@
+DIGEST 223bb63e97554bc88bd60c71846f5883
+FWitnessGenerationSemantics
+R15:26 KernelCompat <> <> lib
+R44:58 KernelGenerated <> <> lib
+R99:136 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> <> lib
+R177:200 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessSignal_record rec
+not 149:149 <> :::'t_SpecWitnessSignal'
+R252:286 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_record rec
+not 213:213 <> :::'t_SpecWitnessGenerationProgram'
+R324:368 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_kernel_program proj
+not 299:299 <> :::'f_kernel_program'
+R399:436 ZkfCoreExtraction.Zkf_core_Proof_witness_generation_spec <> SpecWitnessGenerationProgram_f_signals proj
+not 381:381 <> :::'f_signals'
+def 452:475 <> GeneratedWitnessAccepted
+R490:519 WitnessGenerationSemantics <> :::'t_SpecWitnessGenerationProgram' not
+binder 480:486 <> program:1
+R535:553 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 525:531 <> witness:2
+R616:618 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R568:615 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'check_program' not
+R583:606 WitnessGenerationSemantics <> :::'f_kernel_program' not
+R600:606 WitnessGenerationSemantics <> program:1 var
+R609:615 WitnessGenerationSemantics <> witness:2 var
+R619:627 KernelCompat <> Result_Ok constr
+R629:630 Corelib.Init.Datatypes <> tt constr

@@ -1,0 +1,27 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": "benchmarks/workspaces/gnark",
+  "command": [
+    "go",
+    "run",
+    ".",
+    "--mode",
+    "prove",
+    "--scenario",
+    "single_circuit_prove",
+    "--out-dir",
+    "out/single_circuit_prove"
+  ],
+  "verify_command": [
+    "go",
+    "run",
+    ".",
+    "--mode",
+    "verify",
+    "--scenario",
+    "single_circuit_prove",
+    "--out-dir",
+    "out/single_circuit_prove"
+  ],
+  "proof_path": "out/single_circuit_prove/proof.bin"
+}

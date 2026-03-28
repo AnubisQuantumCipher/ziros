@@ -1,0 +1,171 @@
+name: PR Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+jobs:
+  review:
+    if: >-
+      (
+        github.event_name == 'pull_request' &&
+        (
+          github.event.pull_request.author_association == 'OWNER' ||
+          github.event.pull_request.author_association == 'MEMBER' ||
+          github.event.pull_request.author_association == 'COLLABORATOR'
+        )
+      ) ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        startsWith(github.event.comment.body, '/review') &&
+        (
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'COLLABORATOR'
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Extract arguments from comment
+        id: get_args
+        if: github.event_name == 'issue_comment'
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          # Generate a random EOF marker for the GITHUB_OUTPUT heredoc.
+          # This variable is passed to awk which handles all output writing.
+          EOF=$(openssl rand -hex 8)
+
+          awk -v eof="$EOF" -v gh_out="$GITHUB_OUTPUT" '
+            BEGIN {
+              ext = ""
+              repo = ""
+              com = ""
+              section = ""
+            }
+            /^External:/ { section="ext"; next }
+            /^Internal:/ { section="repo"; next }
+            /^Comments:/ { section="com"; next }
+            { 
+              gsub(/\r/, "", $0);
+              gsub(/^[ \t]+|[ \t]+$/, "", $0);
+              if ($0 == "" || $0 == "/review") { next }
+
+              if (section == "ext") {
+                sub(/^- +/, "");
+                if (ext != "") { ext = ext "," $0 } else { ext = $0 }
+              }
+              else if (section == "repo") {
+                sub(/^- +/, "");
+                if (repo != "") { repo = repo "," $0 } else { repo = $0 }
+              }
+              else if (section == "com") {
+                if (com != "") { com = com "\n" $0 } else { com = $0 }
+              }
+            }
+            END {
+              printf "external_refs=%s\n", ext >> gh_out
+              printf "repo_context_refs=%s\n", repo >> gh_out
+              printf "additional_comments<<%s\n", eof >> gh_out
+              printf "%s\n", com >> gh_out
+              printf "%s\n", eof >> gh_out
+            }
+          ' <<< "$COMMENT_BODY"
+        shell: bash
+      - uses: alexanderlhicks/lean-review-workflow@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          pr_number: ${{ github.event.issue.number || github.event.pull_request.number }}
+          external_refs: "${{ steps.get_args.outputs.external_refs }}"
+          repo_context_refs: "${{ steps.get_args.outputs.repo_context_refs }}"
+          additional_comments: "${{ steps.get_args.outputs.additional_comments }}"
+      - name: Annotate AI review comment
+        if: success()
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.issue.number || context.payload.pull_request?.number;
+
+            if (!pull_number) {
+              core.setFailed('Could not determine pull request number for AI review annotation.');
+              return;
+            }
+
+            const { data: pull } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number,
+            });
+
+            const { data: headCommit } = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: pull.head.sha,
+            });
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: pull_number,
+              per_page: 100,
+            });
+
+            const botComment = comments
+              .filter(comment =>
+                comment.user?.type === 'Bot' &&
+                (
+                  comment.body?.includes('### 🤖 AI Review') ||
+                  comment.body?.includes('### 🤖 Initial AI review')
+                )
+              )
+              .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
+
+            if (!botComment) {
+              core.warning('AI review comment not found; skipping metadata annotation.');
+              return;
+            }
+
+            const metadataStart = '<!-- ai-review-metadata:start -->';
+            const metadataEnd = '<!-- ai-review-metadata:end -->';
+            const commitMessage = headCommit.commit.message.trim();
+            const metadataBlock = [
+              metadataStart,
+              '### Reviewed Revision',
+              `- Commit: \`${pull.head.sha}\``,
+              '- Commit message:',
+              '```text',
+              commitMessage,
+              '```',
+              metadataEnd,
+            ].join('\n');
+
+            const metadataPattern = new RegExp(
+              `${metadataStart.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}[\\s\\S]*?${metadataEnd.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\n*`,
+              'm'
+            );
+            const cleanedBody = botComment.body.replace(metadataPattern, '').trim();
+            const anchor = '### 🤖 AI Review';
+            const anchorIndex = cleanedBody.indexOf(anchor);
+            const updatedBody = anchorIndex === -1
+              ? `${metadataBlock}\n\n${cleanedBody}`
+              : [
+                  cleanedBody.slice(0, anchorIndex + anchor.length),
+                  metadataBlock,
+                  cleanedBody.slice(anchorIndex + anchor.length).trimStart(),
+                ].filter(Boolean).join('\n\n');
+
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: botComment.id,
+              body: updatedBody,
+            });

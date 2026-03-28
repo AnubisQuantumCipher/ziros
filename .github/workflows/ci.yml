@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: ci
+    runs-on: macos-latest
+    env:
+      CARGO_TERM_COLOR: always
+      ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        run: ./zkf-build.sh --release
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace -- -D warnings
+
+      - name: Tests
+        run: make test
+
+      - name: Audit built-in examples
+        run: make audit
+
+      - name: Conformance
+        run: ./scripts/run_conformance_suite.sh
+
+      - name: Doctor
+        run: ./target-local/release/zkf-cli doctor
+
+      - name: Metal diagnostics
+        run: |
+          if [ "$(uname -m)" = "arm64" ]; then
+            ./target-local/release/zkf-cli metal-doctor
+          else
+            echo "Non-Apple-Silicon macOS runner detected; skipping Metal-specific diagnostics."
+          fi

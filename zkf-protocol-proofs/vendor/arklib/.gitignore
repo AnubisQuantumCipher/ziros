@@ -1,0 +1,39 @@
+/.lake/
+.DS_Store
+/.ignore/
+
+# LaTeX compilation files
+*.aux
+*.paux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+
+.nvim.lua
+
+# Print files for local viewing
+/blueprint/print/
+
+# Web files for local viewing
+/blueprint/web/
+
+# Print file in blueprint src
+/blueprint/src/print.pdf
+
+/.claude/
+/.cursor/
+/.venv/
+/.vscode/
+__pycache__/
+
+# Generated dependency analysis files
+/dependency_graphs/
+
+# Generated documentation and temporary comparison
+/home_page/docs/
+/home_page/docs_original/

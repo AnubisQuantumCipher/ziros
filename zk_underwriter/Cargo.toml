@@ -1,0 +1,23 @@
+[package]
+name = "zk_underwriter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+hex = "0.4.3"
+k256 = { version = "0.13.4", features = ["ecdsa"] }
+num-bigint.workspace = true
+num-traits.workspace = true
+rand.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+zkf-core = { version = "0.1.0", path = "../zkf-core" }
+zkf-dsl = { version = "0.1.0", path = "../zkf-dsl" }
+
+[lints]
+workspace = true

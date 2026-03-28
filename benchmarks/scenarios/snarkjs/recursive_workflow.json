@@ -1,0 +1,21 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": ".",
+  "command": [
+    "python3",
+    "benchmarks/workspaces/snarkjs/run.py",
+    "--scenario",
+    "recursive_workflow",
+    "--mode",
+    "prove"
+  ],
+  "verify_command": [
+    "python3",
+    "benchmarks/workspaces/snarkjs/run.py",
+    "--scenario",
+    "recursive_workflow",
+    "--mode",
+    "verify"
+  ],
+  "proof_path": "benchmarks/workspaces/snarkjs/recursive_workflow/build/proof.json"
+}

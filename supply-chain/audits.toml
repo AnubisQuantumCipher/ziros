@@ -1,0 +1,20 @@
+
+# cargo-vet audits file
+
+[[audits.ed25519-dalek]]
+who = "ZKF Security"
+criteria = "safe-to-deploy"
+version = "2.2.0"
+notes = "Hybrid identity classical signature boundary for Apple-Silicon defense tranche."
+
+[[audits.libcrux-ml-dsa]]
+who = "ZKF Security"
+criteria = "safe-to-deploy"
+version = "0.0.8"
+notes = "Hybrid identity ML-DSA boundary for Apple-Silicon defense tranche; formally reviewed entry required before dependency changes."
+
+[[audits.sha2]]
+who = "ZKF Security"
+criteria = "safe-to-deploy"
+version = "0.10.9"
+notes = "Digest boundary for proof replay manifests, transcripts, and swarm signatures."

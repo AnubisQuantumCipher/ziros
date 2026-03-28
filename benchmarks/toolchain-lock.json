@@ -1,0 +1,271 @@
+{
+  "schema": "zkf-competition-toolchain-lock-v1",
+  "tools": [
+    {
+      "id": "node",
+      "label": "Node.js",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "node",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "v20",
+      "operator_action": "install Node.js 20.x or newer so the snarkjs lane can run"
+    },
+    {
+      "id": "npm",
+      "label": "npm",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "npm",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "10",
+      "operator_action": "install npm 10.x or newer alongside Node.js"
+    },
+    {
+      "id": "go",
+      "label": "Go",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "go",
+          "version"
+        ]
+      ],
+      "expected_version_hint": "go1.24",
+      "operator_action": "install Go 1.24.x or newer for the gnark lane"
+    },
+    {
+      "id": "cargo",
+      "label": "Cargo",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "cargo",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "cargo 1.86",
+      "operator_action": "install Rust/Cargo so the Rust-based competition lanes can run"
+    },
+    {
+      "id": "docker",
+      "label": "Docker",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "docker",
+          "info",
+          "--format",
+          "{{json .ServerVersion}}"
+        ]
+      ],
+      "host_requirements": {
+        "Darwin": {
+          "probe_command": [
+            "docker",
+            "info",
+            "--format",
+            "{{json .MemTotal}}"
+          ],
+          "minimum_memory_bytes": 32000000000,
+          "failure_reason": "docker-memory-too-low",
+          "operator_action": "increase Docker Desktop or Colima memory to at least 32GB before running the official SP1 Groth16 lane on macOS; for Colima, restart with `colima stop && colima start --cpu 8 --memory 32 --disk 80`"
+        }
+      },
+      "operator_action": "start Docker Desktop or Colima and ensure `docker info` succeeds so the official SP1 lane can produce Groth16 proofs"
+    },
+    {
+      "id": "nargo",
+      "label": "Nargo",
+      "required": true,
+      "install_supported": false,
+      "probe_commands": [
+        [
+          "nargo",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "1.0.0-beta.19",
+      "operator_action": "install Noir/Nargo so the Noir lane can run"
+    },
+    {
+      "id": "snarkjs",
+      "label": "snarkjs",
+      "required": true,
+      "install_supported": true,
+      "probe_commands": [
+        [
+          "snarkjs",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "0.7.5",
+      "path_hints": [
+        "$HOME/.zkf-competition-tools/node_modules/.bin"
+      ],
+      "install_source": "https://www.npmjs.com/package/snarkjs",
+      "install_command": [
+        "bash",
+        "-lc",
+        "mkdir -p \"$HOME/.zkf-competition-tools\" && npm install --prefix \"$HOME/.zkf-competition-tools\" snarkjs@0.7.5"
+      ],
+      "operator_action": "install snarkjs 0.7.5 with npm so the snarkjs lane can run"
+    },
+    {
+      "id": "circom2",
+      "label": "circom2",
+      "required": true,
+      "install_supported": true,
+      "probe_commands": [
+        [
+          "circom2",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "0.2.22",
+      "path_hints": [
+        "$HOME/.zkf-competition-tools/node_modules/.bin"
+      ],
+      "install_source": "https://www.npmjs.com/package/circom2",
+      "install_command": [
+        "bash",
+        "-lc",
+        "mkdir -p \"$HOME/.zkf-competition-tools\" && npm install --prefix \"$HOME/.zkf-competition-tools\" circom2@0.2.22"
+      ],
+      "operator_action": "install circom2 0.2.22 with npm so the repo-owned Circom scenarios can compile deterministically"
+    },
+    {
+      "id": "bb",
+      "label": "Barretenberg bb",
+      "required": true,
+      "install_supported": true,
+      "probe_commands": [
+        [
+          "bb",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "4.0.4",
+      "path_hints": [
+        "$HOME/.zkf-competition-tools/node_modules/.bin"
+      ],
+      "install_source": "https://www.npmjs.com/package/@aztec/bb.js",
+      "install_command": [
+        "bash",
+        "-lc",
+        "mkdir -p \"$HOME/.zkf-competition-tools\" && npm install --prefix \"$HOME/.zkf-competition-tools\" @aztec/bb.js@4.0.4"
+      ],
+      "operator_action": "install the pinned bb CLI so the Noir/Nargo proving lane can generate and verify proofs"
+    },
+    {
+      "id": "sp1up",
+      "label": "sp1up",
+      "required": true,
+      "install_supported": true,
+      "probe_commands": [
+        [
+          "bash",
+          "-lc",
+          "command -v sp1up"
+        ]
+      ],
+      "path_hints": [
+        "$HOME/.sp1/bin"
+      ],
+      "install_source": "https://sp1.succinct.xyz",
+      "install_command": [
+        "bash",
+        "-lc",
+        "curl -L https://sp1.succinct.xyz | bash"
+      ],
+      "operator_action": "install the SP1 updater so the official SP1 toolchain can be provisioned"
+    },
+    {
+      "id": "cargo-prove",
+      "label": "cargo-prove",
+      "required": true,
+      "install_supported": true,
+      "depends_on": [
+        "sp1up"
+      ],
+      "probe_commands": [
+        [
+          "cargo",
+          "prove",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "3",
+      "path_hints": [
+        "$HOME/.sp1/bin"
+      ],
+      "install_source": "https://docs.succinct.xyz/docs/sp1/getting-started/install",
+      "install_command": [
+        "bash",
+        "-lc",
+        "export PATH=\"$HOME/.sp1/bin:$PATH\" && sp1up"
+      ],
+      "operator_action": "run sp1up so cargo-prove is installed and on PATH"
+    },
+    {
+      "id": "rzup",
+      "label": "rzup",
+      "required": true,
+      "install_supported": true,
+      "probe_commands": [
+        [
+          "rzup",
+          "--version"
+        ]
+      ],
+      "path_hints": [
+        "$HOME/.risc0/bin"
+      ],
+      "install_source": "https://dev.risczero.com/api/zkvm/install",
+      "install_command": [
+        "bash",
+        "-lc",
+        "curl -L https://risczero.com/install | bash"
+      ],
+      "operator_action": "install rzup so the official RISC Zero toolchain can be provisioned"
+    },
+    {
+      "id": "cargo-risczero",
+      "label": "cargo-risczero",
+      "required": true,
+      "install_supported": true,
+      "depends_on": [
+        "rzup"
+      ],
+      "probe_commands": [
+        [
+          "cargo",
+          "risczero",
+          "--version"
+        ]
+      ],
+      "expected_version_hint": "3",
+      "path_hints": [
+        "$HOME/.risc0/bin"
+      ],
+      "install_source": "https://dev.risczero.com/api/zkvm/install",
+      "install_command": [
+        "bash",
+        "-lc",
+        "export PATH=\"$HOME/.risc0/bin:$PATH\" && rzup install"
+      ],
+      "operator_action": "run rzup install so cargo-risczero is installed and on PATH"
+    }
+  ]
+}

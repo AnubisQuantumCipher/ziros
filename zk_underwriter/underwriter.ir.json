@@ -1,0 +1,124 @@
+{
+  "name": "verify_credit_score",
+  "field": "bn254",
+  "signals": [
+    {
+      "name": "pk_x",
+      "visibility": "public",
+      "ty": "field"
+    },
+    {
+      "name": "pk_y",
+      "visibility": "public",
+      "ty": "field"
+    },
+    {
+      "name": "sig_r",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "sig_s",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "msg_hash",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "score",
+      "visibility": "private",
+      "ty": "uint32"
+    },
+    {
+      "name": "diff",
+      "visibility": "private",
+      "ty": "field"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "black_box",
+      "op": "ecdsa_secp256k1",
+      "inputs": [
+        {
+          "op": "signal",
+          "args": "pk_x"
+        },
+        {
+          "op": "signal",
+          "args": "pk_y"
+        },
+        {
+          "op": "signal",
+          "args": "sig_r"
+        },
+        {
+          "op": "signal",
+          "args": "sig_s"
+        },
+        {
+          "op": "signal",
+          "args": "msg_hash"
+        }
+      ],
+      "label": "ecdsa_verify"
+    },
+    {
+      "kind": "range",
+      "signal": "score",
+      "bits": 10,
+      "label": "range_score_10"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "diff"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "score"
+          },
+          {
+            "op": "const",
+            "args": "700"
+          }
+        ]
+      },
+      "label": "assign_diff"
+    },
+    {
+      "kind": "range",
+      "signal": "diff",
+      "bits": 10,
+      "label": "range_diff_10"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "diff",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "score"
+            },
+            {
+              "op": "const",
+              "args": "700"
+            }
+          ]
+        }
+      }
+    ],
+    "hints": []
+  }
+}

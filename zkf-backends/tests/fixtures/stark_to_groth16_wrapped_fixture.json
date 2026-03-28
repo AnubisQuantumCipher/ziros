@@ -1,0 +1,40 @@
+{
+  "backend": "arkworks-groth16",
+  "program_digest": "78a2f6eeb5dcef25fbde51f2e7308b2bbc637b0708ec057cd75c1c83957f34d0",
+  "proof": "8mWSTg5KQB/4TAp5hcPMpX0c/KMndWHn+GUOLoyqRqUCluJzsTkrA96y0hWvsmVv5QCrD05LElBs8vKbGfyeIhjaviypHpkS7usjYiAasw0o3kdOh5ifJvMFtAdr2VeJyPDqCQdqH9tCmX7t4PL3Y8xLm3mQuiYVYwFTUjIGARM=",
+  "verification_key": "goSxDQeKT+XIAeE7qtGJu29NWpLhBLDyuNVbvQfIISyv5eiYbCXNarJ1ZPOKrA94gKiE90q9HcFel4H1QzXuESS2h5rygyRGX+rvzlE8Xmr5bSz39L4UhRLrcX6CFOqBijfNwHz/RlKFRWD5IcmXUWdvk0LhxFRX820zGvP0+C7W0QkVrO3gq/RZ25GS162S7nHoM0ekC+BzPhhK9HOCq8lBLnLZnb3TX/x+MB2Pwo4qz16hEMfwn1Z/z3172mkBcmiA5Cup6smz6an32B6XAvuRrD91N3pvjNmXUoMH3QwSAAAAAAAAAKtrN3lsocA4FzNtQKytVrm/2vO77mF/MmkHWYO9dXAouPuMruPRAjz+D1JCZpjjHrXqvmN4PzvqPg9nHOdtkYgapg4hoFvGwVIpPp2Ygcr/oUtcoDXuXNjnHheGg4XimDcDLUisDXAsDAy616ET32JN54oF+MDW/FOPgJ3lnxEu2HAPlV2k8q0oMuRkFMh1ZDlOCltVD4tc8EQO+MSAWycgFXvt0vs6nXPFY+nr1BXMKa3JAx3d4AKWk2uWW+8eK5zpm5FvY5qDbV86qii21SluSYiyVKAMrvzf8Tra3hiMURmvIuJUYOK8xBXuAYmCKg3az331rurpVoGpzOrZA53tXQbdlIF83yxfHoPO/hzsQu6VhXYJjshk6+34VtE6L/Uvyg/1YQF6f1XfVqY7UtHrbUlJwlezfweNeRq6hVOr0v9m7DEVT+kTtj4LftF1C85F7YdUEzYag1Einq49jKFsBMbPKnVTIjF7tTdzTyBMaPauzuI6Z2Nnb3huIeyDIocUTwBNoeYTM0eTDnSEvKr4iazVqKOz3hlTKoQea+sjCjxfurL8RGhpRM8XrsPh8PgEtQRW8l5PlFafn0uU4w4jR8GtuknFUIgU/3pXXt52iN7X3h11XQYA1lViuNZPngWsaSQTW3SzQA9H/1RxKsstcVUY6aj5zmAP/Gx+IhKkR2Ncanp1ONKw7Dnvlfh8MAM1BQFnRbdtNOlVHUrACK12RA9vK6V0UJRAq30n97f8fDtdDS9tnHVbb1pQwvavkA==",
+  "public_inputs": [
+    "91"
+  ],
+  "metadata": {
+    "wrapper": "stark-to-groth16",
+    "status": "wrapped-v2",
+    "scheme": "groth16",
+    "curve": "bn254",
+    "source_backend": "plonky3",
+    "source_digest": "78a2f6eeb5dcef25fbde51f2e7308b2bbc637b0708ec057cd75c1c83957f34d0",
+    "source_proof_size": "982",
+    "proof_engine": "stark-export-wrapper",
+    "proof_semantics": "wrapped-fri-verifier-circuit",
+    "blackbox_semantics": "not-applicable-wrapper-circuit",
+    "prover_acceleration_scope": "target-groth16-prover-only",
+    "wrapper_semantics": "fri-verifier-circuit",
+    "export_scheme": "groth16",
+    "metal_complete": "false",
+    "cpu_math_fallback_reason": "export-wrapper-not-primary-engine",
+    "gpu_stage_coverage": "{\"coverage_ratio\":0.3333333333333333,\"required_stages\":[\"fft-ntt\",\"qap-witness-map\",\"msm\"],\"metal_stages\":[\"msm\"],\"cpu_stages\":[\"fft-ntt\",\"qap-witness-map\"]}",
+    "metal_gpu_busy_ratio": "0.0",
+    "metal_stage_breakdown": "{}",
+    "metal_inflight_jobs": "0",
+    "metal_no_cpu_fallback": "false",
+    "metal_counter_source": "fixture-precomputed",
+    "metal_dispatch_circuit_open": "false",
+    "metal_dispatch_last_failure": "",
+    "groth16_public_inputs_hex": "WwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD7m+elPwQGagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPBSE6WftHaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/RclD+cm9hsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAka/7XrwIs8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADTk2gYx5UiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJ0iTytOIKMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQD53NXit3vwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPheFvp8kNJUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3o2vH2Q1KukAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSSLfBtglYlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYvEnCYX0/EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUHQ/1JXcIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABrVMVxoGX/WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIzVS9rRzt+rAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8oovcIkBGD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABf9tBVmN3RnQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+    "num_queries": "2",
+    "num_fri_rounds": "0",
+    "log_degree": "0",
+    "merkle_tree_height": "2",
+    "poseidon2_seed": "12231413597645291865"
+  }
+}

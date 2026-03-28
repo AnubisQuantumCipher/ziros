@@ -1,0 +1,8 @@
+{
+  "age": "25",
+  "age_threshold": "18",
+  "expected_commitment": "3111010",
+  "identity_id": "7",
+  "salary": "100000",
+  "salary_threshold": "50000"
+}

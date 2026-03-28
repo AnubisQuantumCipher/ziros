@@ -1,0 +1,118 @@
+{
+  "backend": "plonky3",
+  "program": {
+    "name": "hash_preimage",
+    "field": "goldilocks",
+    "signals": [
+      {
+        "name": "preimage",
+        "visibility": "private"
+      },
+      {
+        "name": "salt",
+        "visibility": "private"
+      },
+      {
+        "name": "expected_hash",
+        "visibility": "public"
+      },
+      {
+        "name": "internal_val",
+        "visibility": "private"
+      },
+      {
+        "name": "computed_hash",
+        "visibility": "private"
+      }
+    ],
+    "constraints": [
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "internal_val"
+        },
+        "rhs": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "preimage"
+            },
+            {
+              "op": "signal",
+              "args": "salt"
+            }
+          ]
+        },
+        "label": "assign_internal_val"
+      },
+      {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "args": "computed_hash"
+        },
+        "rhs": {
+          "op": "add",
+          "args": [
+            {
+              "op": "signal",
+              "args": "internal_val"
+            },
+            {
+              "op": "const",
+              "args": "42"
+            }
+          ]
+        },
+        "label": "assign_computed_hash"
+      }
+    ],
+    "witness_plan": {
+      "assignments": [
+        {
+          "target": "internal_val",
+          "expr": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "signal",
+                "args": "preimage"
+              },
+              {
+                "op": "signal",
+                "args": "salt"
+              }
+            ]
+          }
+        },
+        {
+          "target": "computed_hash",
+          "expr": {
+            "op": "add",
+            "args": [
+              {
+                "op": "signal",
+                "args": "internal_val"
+              },
+              {
+                "op": "const",
+                "args": "42"
+              }
+            ]
+          }
+        }
+      ],
+      "hints": []
+    }
+  },
+  "program_digest": "71838338da9d156abd103723d1c7b83a20f0e10cecbce346123d065ce8f1eba5",
+  "metadata": {
+    "field": "goldilocks",
+    "pcs": "fri",
+    "scheme": "stark",
+    "supported_constraints": "equal,boolean,range<=63,division",
+    "trace_width": "5"
+  }
+}

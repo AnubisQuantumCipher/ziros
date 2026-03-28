@@ -1,0 +1,162 @@
+DIGEST 4c29c60a05f2e3ec589f681cfba2a051
+FSwarmReputationProofs
+R15:18 Stdlib.Bool.Bool <> <> lib
+R36:52 Stdlib.Floats.Floats <> <> lib
+R82:87 Stdlib.NArith.NArith <> <> lib
+R105:116 KernelCompat <> <> lib
+R165:207 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> <> lib
+def 222:242 <> unit_interval_clamped
+R253:257 Corelib.Floats.PrimFloat <> float prim
+binder 245:249 <> value:1
+R272:278 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R282:287 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+binder 279:281 <> raw:2
+R293:295 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R288:292 SwarmReputationProofs <> value:1 var
+R296:325 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> clamp_reputation_unit_interval def
+R327:329 SwarmReputationProofs <> raw:2 var
+prf 341:371 <> swarm_reputation_boundedness_ok
+binder 384:396 <> decayed_score:3
+binder 398:401 <> kind:4
+binder 403:407 <> score:5
+binder 409:420 <> decay_factor:6
+R513:520 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R427:447 SwarmReputationProofs <> unit_interval_clamped def
+R450:492 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> bounded_reputation_after_decayed_score_spec def
+R494:506 SwarmReputationProofs <> decayed_score:3 var
+R508:511 SwarmReputationProofs <> kind:4 var
+R521:541 SwarmReputationProofs <> unit_interval_clamped def
+R544:567 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> bounded_decay_score_spec def
+R569:573 SwarmReputationProofs <> score:5 var
+R575:586 SwarmReputationProofs <> decay_factor:6 var
+R666:668 Corelib.Floats.PrimFloat <> add prim
+R685:704 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> reputation_delta_for def
+R666:668 Corelib.Floats.PrimFloat <> add prim
+R685:704 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> reputation_delta_for def
+R749:751 Corelib.Floats.PrimFloat <> add prim
+R762:785 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> neutral_reputation_bound def
+R787:788 Corelib.Init.Datatypes <> tt constr
+R800:802 Corelib.Floats.PrimFloat <> mul prim
+R815:817 Corelib.Floats.PrimFloat <> sub prim
+R832:861 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> clamp_reputation_unit_interval def
+R883:906 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> neutral_reputation_bound def
+R908:909 Corelib.Init.Datatypes <> tt constr
+R924:953 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> clamp_reputation_unit_interval def
+R749:751 Corelib.Floats.PrimFloat <> add prim
+R762:785 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> neutral_reputation_bound def
+R787:788 Corelib.Init.Datatypes <> tt constr
+R800:802 Corelib.Floats.PrimFloat <> mul prim
+R815:817 Corelib.Floats.PrimFloat <> sub prim
+R832:861 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> clamp_reputation_unit_interval def
+R883:906 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> neutral_reputation_bound def
+R908:909 Corelib.Init.Datatypes <> tt constr
+R924:953 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> clamp_reputation_unit_interval def
+prf 1003:1053 <> bounded_gossip_count_spec_selects_pending_or_cap_ok
+binder 1066:1072 <> pending:7
+binder 1074:1083 <> gossip_max:8
+R1134:1142 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1090:1114 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> bounded_gossip_count_spec def
+R1116:1122 SwarmReputationProofs <> pending:7 var
+R1124:1133 SwarmReputationProofs <> gossip_max:8 var
+R1168:1171 KernelCompat <> f_eq def
+R1173:1182 SwarmReputationProofs <> gossip_max:8 var
+R1185:1194 KernelCompat <> n_to_usize def
+R1244:1253 SwarmReputationProofs <> gossip_max:8 var
+R1215:1224 KernelCompat <> n_to_usize def
+binder 1147:1152 <> capped:9
+R1267:1270 KernelCompat <> f_lt def
+R1272:1278 SwarmReputationProofs <> pending:7 var
+R1280:1285 SwarmReputationProofs <> capped:9 var
+R1317:1322 SwarmReputationProofs <> capped:9 var
+R1298:1304 SwarmReputationProofs <> pending:7 var
+prf 1390:1443 <> median_activation_level_three_honest_majority_alert_ok
+R1646:1651 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1606:1608 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1449:1477 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> median_activation_level_three def
+R1483:1521 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Dormant constr
+R1527:1563 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1569:1605 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1609:1645 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1849:1854 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1809:1811 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1652:1680 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> median_activation_level_three def
+R1686:1722 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1728:1766 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Dormant constr
+R1772:1808 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1812:1848 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R2012:2014 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1855:1883 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> median_activation_level_three def
+R1889:1925 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1931:1967 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+R1973:2011 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Dormant constr
+R2015:2051 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> ProofDistributedActivationLevel_Alert constr
+prf 2104:2161 <> probationary_peer_score_basis_points_is_capped_addition_ok
+binder 2174:2181 <> raw_gain:10
+R2233:2235 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2188:2223 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> probationary_peer_score_basis_points def
+R2225:2232 SwarmReputationProofs <> raw_gain:10 var
+R2236:2246 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u16 constr
+R2249:2259 Core.Core_Base_interface_Int <> Build_t_U16 constr
+prf 2323:2366 <> admission_pow_total_cost_is_exact_product_ok
+binder 2379:2388 <> peer_count:11
+binder 2390:2406 <> unit_cost_seconds:12
+R2466:2468 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2413:2436 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> admission_pow_total_cost def
+R2438:2447 SwarmReputationProofs <> peer_count:11 var
+R2449:2465 SwarmReputationProofs <> unit_cost_seconds:12 var
+R2469:2485 SwarmReputationProofs <> unit_cost_seconds:12 var
+prf 2563:2622 <> distributed_acceptance_surface_requires_all_preconditions_ok
+binder 2635:2650 <> activation_level:13
+binder 2652:2666 <> peer_reputation:14
+binder 2668:2680 <> stage_anomaly:15
+binder 2682:2694 <> backend_trust:16
+binder 2705:2723 <> attestation_matches:17
+binder 2725:2737 <> digests_agree:18
+R2910:2918 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2744:2778 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> distributed_acceptance_surface_spec def
+R2786:2801 SwarmReputationProofs <> activation_level:13 var
+R2809:2823 SwarmReputationProofs <> peer_reputation:14 var
+R2831:2843 SwarmReputationProofs <> stage_anomaly:15 var
+R2851:2863 SwarmReputationProofs <> backend_trust:16 var
+R2871:2889 SwarmReputationProofs <> attestation_matches:17 var
+R2897:2909 SwarmReputationProofs <> digests_agree:18 var
+R2919:2922 Corelib.Init.Datatypes <> andb def
+R3131:3143 SwarmReputationProofs <> digests_agree:18 var
+R2933:2936 Corelib.Init.Datatypes <> andb def
+R2979:3010 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> coordinator_requires_quorum_spec def
+R3024:3039 SwarmReputationProofs <> activation_level:13 var
+R3053:3067 SwarmReputationProofs <> peer_reputation:14 var
+R3081:3093 SwarmReputationProofs <> stage_anomaly:15 var
+R3107:3119 SwarmReputationProofs <> backend_trust:16 var
+R2948:2966 SwarmReputationProofs <> attestation_matches:17 var
+prf 3296:3343 <> hybrid_bundle_surface_complete_is_logical_and_ok
+binder 3356:3380 <> public_key_bundle_present:19
+binder 3382:3405 <> signature_bundle_present:20
+R3510:3518 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3412:3446 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> hybrid_bundle_surface_complete_spec def
+R3454:3478 SwarmReputationProofs <> public_key_bundle_present:19 var
+R3486:3509 SwarmReputationProofs <> signature_bundle_present:20 var
+R3519:3522 Corelib.Init.Datatypes <> andb def
+R3550:3573 SwarmReputationProofs <> signature_bundle_present:20 var
+R3524:3548 SwarmReputationProofs <> public_key_bundle_present:19 var
+prf 3673:3724 <> hybrid_signature_material_complete_is_logical_and_ok
+binder 3737:3751 <> ed25519_present:21
+binder 3753:3766 <> ml_dsa_present:22
+R3843:3851 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3773:3811 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> hybrid_signature_material_complete_spec def
+R3813:3827 SwarmReputationProofs <> ed25519_present:21 var
+R3829:3842 SwarmReputationProofs <> ml_dsa_present:22 var
+R3852:3855 Corelib.Init.Datatypes <> andb def
+R3873:3886 SwarmReputationProofs <> ml_dsa_present:22 var
+R3857:3871 SwarmReputationProofs <> ed25519_present:21 var
+prf 3966:4012 <> hybrid_admission_pow_identity_prefers_bundle_ok
+binder 4025:4041 <> legacy_public_key:23
+binder 4043:4065 <> public_key_bundle_bytes:24
+R4166:4174 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4072:4111 ZkfDistributedExtraction.Zkf_distributed_Proof_swarm_reputation_spec <> hybrid_admission_pow_identity_bytes_spec def
+R4119:4135 SwarmReputationProofs <> legacy_public_key:23 var
+R4143:4165 SwarmReputationProofs <> public_key_bundle_bytes:24 var
+R4181:4203 SwarmReputationProofs <> public_key_bundle_bytes:24 var
+R4218:4228 Core.Core_Option <> Option_Some constr
+R4267:4277 Core.Core_Option <> Option_None constr
+R4282:4298 SwarmReputationProofs <> legacy_public_key:23 var

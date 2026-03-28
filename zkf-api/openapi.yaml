@@ -1,0 +1,288 @@
+openapi: "3.1.0"
+info:
+  title: ZKF Proving-as-a-Service API
+  version: "0.1.0"
+  description: |
+    Universal zero-knowledge proving API. Submit circuits in any frontend format,
+    prove with any backend, wrap STARK proofs into Groth16, and generate Solidity verifiers.
+  contact:
+    email: api@zkf.dev
+  license:
+    name: BSL-1.1
+    url: https://mariadb.com/bsl11/
+
+servers:
+  - url: https://api.zkf.dev
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/prove:
+    post:
+      summary: Generate a zero-knowledge proof
+      description: |
+        Submit a ZKF program and witness inputs to generate a proof.
+        `ir-v2` is the default backend dialect; `zir-v1` is also accepted when
+        `ir_family` requests it or when the caller uses `auto`.
+        Backend is auto-selected based on field unless specified.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProveRequest"
+      responses:
+        "200":
+          description: Proof generated (sync) or job created (async)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "429":
+          description: Quota exceeded
+        "401":
+          description: Invalid API key
+
+  /v1/wrap:
+    post:
+      summary: Wrap a STARK proof into Groth16
+      description: |
+        Compress a Plonky3 STARK proof into a constant-size Groth16 proof
+        suitable for on-chain verification (~280K gas on Ethereum).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WrapRequest"
+      responses:
+        "200":
+          description: Wrapped proof
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+
+  /v1/deploy:
+    post:
+      summary: Generate a Solidity verifier contract
+      description: |
+        Generate a Solidity smart contract that verifies proofs on-chain.
+        Supports Groth16 and SP1 backends.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeployRequest"
+      responses:
+        "200":
+          description: Solidity source code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  solidity:
+                    type: string
+                  contract_name:
+                    type: string
+                  estimated_deploy_gas:
+                    type: integer
+                  estimated_verify_gas:
+                    type: integer
+
+  /v1/benchmark:
+    post:
+      summary: Cross-backend benchmark
+      description: |
+        Benchmark the same circuit across multiple backends.
+        Accepts either lowered `ir-v2` or canonical `zir-v1` program payloads.
+        Returns timing data for compile, prove, and verify stages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BenchmarkRequest"
+      responses:
+        "200":
+          description: Benchmark results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+
+  /v1/status/{id}:
+    get:
+      summary: Check job status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "404":
+          description: Job not found
+
+  /v1/capabilities:
+    get:
+      summary: List supported backends, frontends, and wrapping paths
+      responses:
+        "200":
+          description: Capabilities matrix
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapabilitiesResponse"
+
+  /health:
+    get:
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key from zkf.dev dashboard
+
+  schemas:
+    ProveRequest:
+      type: object
+      required: [program, inputs]
+      properties:
+        program:
+          type: object
+          description: ZKF program JSON (`ir-v2` by default, or `zir-v1` when `ir_family` requests it)
+        ir_family:
+          type: string
+          enum: [auto, zir-v1, ir-v2]
+          default: auto
+        inputs:
+          type: object
+          description: Witness inputs as key-value map
+        backend:
+          type: string
+          enum: [arkworks-groth16, halo2, halo2-bls12-381, plonky3, nova, hypernova, sp1, risc-zero, midnight-compact]
+        mode:
+          type: string
+          enum: [metal-first]
+
+    WrapRequest:
+      type: object
+      required: [proof, compiled]
+      properties:
+        proof:
+          type: object
+          description: Source proof artifact JSON
+        compiled:
+          type: object
+          description: Source compiled program JSON
+        target:
+          type: string
+          default: arkworks-groth16
+
+    DeployRequest:
+      type: object
+      required: [proof, backend]
+      properties:
+        proof:
+          type: object
+        backend:
+          type: string
+        contract_name:
+          type: string
+
+    BenchmarkRequest:
+      type: object
+      required: [program, inputs]
+      properties:
+        program:
+          type: object
+          description: ZKF program JSON (`ir-v2` by default, or `zir-v1` when `ir_family` requests it)
+        ir_family:
+          type: string
+          enum: [auto, zir-v1, ir-v2]
+          default: auto
+        inputs:
+          type: object
+        backends:
+          type: array
+          items:
+            type: string
+        iterations:
+          type: integer
+          default: 1
+
+    JobResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, running, completed, failed]
+        result:
+          type: object
+        error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    CapabilitiesResponse:
+      type: object
+      properties:
+        version:
+          type: string
+        backends:
+          type: array
+          items:
+            type: string
+        frontends:
+          type: array
+          items:
+            type: string
+        wrapping_paths:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        gpu_available:
+          type: boolean
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        uptime_seconds:
+          type: integer

@@ -1,0 +1,140 @@
+{
+  "program": {
+    "name": "uccr_engineering_safety",
+    "field": "pasta-fp"
+  },
+  "description": "Prove that a structural or mechanical design meets required safety factor tolerances (load capacity vs. design load, material stress vs. yield strength) without revealing proprietary CAD parameters, material specifications, or exact design margins. Applicable to aerospace certification (DO-178C/DO-254), civil structural certification, and nuclear safety-critical system attestation.",
+  "signals": [
+    { "name": "design_load_capacity_scaled", "visibility": "private" },
+    { "name": "applied_load_scaled",         "visibility": "private" },
+    { "name": "material_yield_stress_scaled","visibility": "private" },
+    { "name": "applied_stress_scaled",       "visibility": "private" },
+    { "name": "design_id_hash",              "visibility": "private" },
+    { "name": "blinding",                    "visibility": "private" },
+    { "name": "__load_margin",               "visibility": "private" },
+    { "name": "__stress_margin",             "visibility": "private" },
+    { "name": "__sha_b0",                    "visibility": "private" },
+    { "name": "__sha_b1",                    "visibility": "private" },
+    { "name": "__sha_b2",                    "visibility": "private" },
+    { "name": "__sha_b3",                    "visibility": "private" },
+    { "name": "__sha_b4",                    "visibility": "private" },
+    { "name": "__sha_b5",                    "visibility": "private" },
+    { "name": "__sha_b6",                    "visibility": "private" },
+    { "name": "__sha_b7",                    "visibility": "private" },
+    { "name": "__sha_b8",                    "visibility": "private" },
+    { "name": "__sha_b9",                    "visibility": "private" },
+    { "name": "__sha_b10",                   "visibility": "private" },
+    { "name": "__sha_b11",                   "visibility": "private" },
+    { "name": "__sha_b12",                   "visibility": "private" },
+    { "name": "__sha_b13",                   "visibility": "private" },
+    { "name": "__sha_b14",                   "visibility": "private" },
+    { "name": "__sha_b15",                   "visibility": "private" },
+    { "name": "__sha_b16",                   "visibility": "private" },
+    { "name": "__sha_b17",                   "visibility": "private" },
+    { "name": "__sha_b18",                   "visibility": "private" },
+    { "name": "__sha_b19",                   "visibility": "private" },
+    { "name": "__sha_b20",                   "visibility": "private" },
+    { "name": "__sha_b21",                   "visibility": "private" },
+    { "name": "__sha_b22",                   "visibility": "private" },
+    { "name": "__sha_b23",                   "visibility": "private" },
+    { "name": "__sha_b24",                   "visibility": "private" },
+    { "name": "__sha_b25",                   "visibility": "private" },
+    { "name": "__sha_b26",                   "visibility": "private" },
+    { "name": "__sha_b27",                   "visibility": "private" },
+    { "name": "__sha_b28",                   "visibility": "private" },
+    { "name": "__sha_b29",                   "visibility": "private" },
+    { "name": "__sha_b30",                   "visibility": "private" },
+    { "name": "__sha_b31",                   "visibility": "private" },
+    { "name": "safety_factor_bps",           "visibility": "constant", "constant": "15000" },
+    { "name": "safety_commitment_hi",        "visibility": "public" },
+    { "name": "safety_commitment_lo",        "visibility": "public" }
+  ],
+  "ops": [
+    { "kind": "range", "signal": "design_load_capacity_scaled", "bits": 32 },
+    { "kind": "range", "signal": "applied_load_scaled",         "bits": 32 },
+    { "kind": "range", "signal": "material_yield_stress_scaled","bits": 32 },
+    { "kind": "range", "signal": "applied_stress_scaled",       "bits": 32 },
+    { "kind": "range", "signal": "design_id_hash",              "bits": 32 },
+    { "kind": "range", "signal": "blinding",                    "bits": 32 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__load_margin" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "design_load_capacity_scaled" },
+          { "op": "signal", "args": "applied_load_scaled" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__load_margin", "bits": 32 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__stress_margin" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "material_yield_stress_scaled" },
+          { "op": "signal", "args": "applied_stress_scaled" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__stress_margin", "bits": 32 },
+    {
+      "kind": "black_box",
+      "op": "sha256",
+      "inputs": [
+        { "op": "signal", "args": "design_id_hash" },
+        { "op": "signal", "args": "design_load_capacity_scaled" },
+        { "op": "signal", "args": "applied_load_scaled" },
+        { "op": "signal", "args": "blinding" }
+      ],
+      "outputs": [
+        "__sha_b0",  "__sha_b1",  "__sha_b2",  "__sha_b3",
+        "__sha_b4",  "__sha_b5",  "__sha_b6",  "__sha_b7",
+        "__sha_b8",  "__sha_b9",  "__sha_b10", "__sha_b11",
+        "__sha_b12", "__sha_b13", "__sha_b14", "__sha_b15",
+        "__sha_b16", "__sha_b17", "__sha_b18", "__sha_b19",
+        "__sha_b20", "__sha_b21", "__sha_b22", "__sha_b23",
+        "__sha_b24", "__sha_b25", "__sha_b26", "__sha_b27",
+        "__sha_b28", "__sha_b29", "__sha_b30", "__sha_b31"
+      ],
+      "params": { "input_num_bits": "8" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "safety_commitment_hi" },
+      "rhs": { "op": "signal", "args": "__sha_b0" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "safety_commitment_lo" },
+      "rhs": { "op": "signal", "args": "__sha_b31" }
+    }
+  ],
+  "expected_inputs": ["design_load_capacity_scaled", "applied_load_scaled", "material_yield_stress_scaled", "applied_stress_scaled", "design_id_hash", "blinding"],
+  "public_outputs": ["safety_commitment_hi", "safety_commitment_lo"],
+  "sample_inputs": {
+    "design_load_capacity_scaled": "15000",
+    "applied_load_scaled":         "10000",
+    "material_yield_stress_scaled":"25000",
+    "applied_stress_scaled":       "16000",
+    "design_id_hash":              "55443322",
+    "blinding":                    "77777"
+  },
+  "violation_inputs": {
+    "design_load_capacity_scaled": "9000",
+    "applied_load_scaled":         "10000",
+    "material_yield_stress_scaled":"25000",
+    "applied_stress_scaled":       "16000",
+    "design_id_hash":              "55443322",
+    "blinding":                    "77777"
+  },
+  "metadata": {
+    "domain": "engineering",
+    "standard": "DO-178C / AS9100 / ASME BPVC / ISO 2394",
+    "scale_factor": "0.01 kN or 0.01 MPa",
+    "ir_family": "zir-v1"
+  },
+  "template_id": "uccr-engineering-safety"
+}

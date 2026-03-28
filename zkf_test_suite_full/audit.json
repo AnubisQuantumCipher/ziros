@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "timestamp": "1773258885Z",
+  "program_digest": "764a8049369949529675ff6f1d38bd48973a2208271128e94746ada42fcbe26a",
+  "field": "bn254",
+  "checks": [
+    {
+      "name": "type_check",
+      "category": "type_safety",
+      "status": "pass",
+      "evidence": "all signals and constraints well-typed",
+      "duration_ms": 0
+    },
+    {
+      "name": "normalization_idempotency",
+      "category": "normalization",
+      "status": "pass",
+      "evidence": "digest stable: 554317d79c34c91b",
+      "duration_ms": 0
+    },
+    {
+      "name": "underconstrained_signals",
+      "category": "underconstrained_signals",
+      "status": "warn",
+      "evidence": "0 unconstrained, 2 underdetermined",
+      "duration_ms": 0
+    },
+    {
+      "name": "constraint_soundness",
+      "category": "constraint_soundness",
+      "status": "pass",
+      "evidence": "2 constraint(s) over 4 signal(s)"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "warning",
+      "category": "underconstrained_signals",
+      "message": "private signal 'y' is linearly underdetermined (nullity>0)",
+      "location": "signal 'y'"
+    },
+    {
+      "severity": "warning",
+      "category": "underconstrained_signals",
+      "message": "private signal 'sum' is linearly underdetermined (nullity>0)",
+      "location": "signal 'sum'"
+    }
+  ],
+  "summary": {
+    "total_checks": 4,
+    "passed": 3,
+    "warned": 1,
+    "failed": 0,
+    "skipped": 0,
+    "overall_status": "warn"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "balance_transfer",
+  "field": "bn254",
+  "signals": [
+    { "name": "bal", "visibility": "private" },
+    { "name": "amt", "visibility": "private" },
+    { "name": "remaining", "visibility": "public" },
+    { "name": "valid", "visibility": "public" }
+  ],
+  "constraints": [
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "remaining" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "bal" },
+          { "op": "signal", "args": "amt" }
+        ]
+      },
+      "label": "remaining_eq"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "remaining",
+        "expr": {
+          "op": "sub",
+          "args": [
+            { "op": "signal", "args": "bal" },
+            { "op": "signal", "args": "amt" }
+          ]
+        }
+      },
+      {
+        "target": "valid",
+        "expr": {
+          "op": "const",
+          "args": "1"
+        }
+      }
+    ],
+    "hints": []
+  }
+}

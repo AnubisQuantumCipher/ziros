@@ -1,0 +1,1346 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "poseidon2",
+  "claim": "end-to-end mechanized GPU lane from Rust inputs to GPU outputs, assuming the pinned Apple Metal stack executes the attested metallib and pipeline state correctly",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.poseidon2_differential_bounded",
+      "program_id": "poseidon2_goldilocks",
+      "family": "poseidon2",
+      "kernel": "poseidon2_goldilocks",
+      "variant": "goldilocks_scalar",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "perm_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "perm_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "state_elements"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "is_multiple_of": [
+                {
+                  "symbol": "state_elements"
+                },
+                16
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "round_constant_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "state_elements",
+          "min_value": 16,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 16
+        },
+        {
+          "name": "round_constant_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "perm_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "lane_index",
+          "min_value": 0,
+          "max_value": 15,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "state",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "round_constants",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "round_constant_count"
+          },
+          "bound": {
+            "symbol": "round_constant_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "matrix_diag",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "state",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "external_rounds",
+          "operator": "poseidon2_external_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "matrix_layer",
+          "operator": "poseidon2_matrix_layer",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "sbox_layer",
+          "operator": "poseidon2_s_box",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "internal_rounds",
+          "operator": "poseidon2_internal_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants"
+          ],
+          "writes": [
+            "state"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poseidon2/mod.rs": "dab6a5e6f25e83cd5d879dc9542d284122576e9f14a19c710c7e63737d033ed8",
+          "zkf-metal/src/shaders/poseidon2.metal": "62b99acc0edcb1cef5a382f121496464619b3dab50f0c82f81109fae5b04918c"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poseidon2.metal",
+          "zkf-metal/src/poseidon2/mod.rs"
+        ],
+        "entrypoints": [
+          "poseidon2_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poseidon2_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "b92c96851403fd48a960de69a26222a7b4177c43f04b0778384bdcb2b3fd303d",
+            "public_reflection_sha256": "8817fe11a9b3fa31ee82063650672d2754f67bc46a87b1db094cfda1ef2af731",
+            "pipeline_descriptor_sha256": "592d17f9aa1e026f0ee168959149725c0f555d1cc7b7b4b19f8b7e2900edebb3",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "states",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "round_constants",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_perms",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_external_rounds",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_internal_rounds",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "internal_diag",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the scalar or SIMD Poseidon2 kernel exactly",
+        "workgroup_policy": "scalar path uses one thread per permutation; SIMD path uses 16 threads per permutation",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poseidon2_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "poseidon2_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "poseidon2_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 3,
+            "entrypoint": "poseidon2_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.poseidon2_differential_bounded",
+      "program_id": "poseidon2_goldilocks_simd",
+      "family": "poseidon2",
+      "kernel": "poseidon2_goldilocks_simd",
+      "variant": "goldilocks_simd",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "add": [
+            {
+              "mul": [
+                {
+                  "symbol": "perm_index"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "symbol": "lane_index"
+            }
+          ]
+        },
+        "lane_index": {
+          "symbol": "lane_index"
+        },
+        "batch_index": {
+          "symbol": "perm_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "state_elements"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "is_multiple_of": [
+                {
+                  "symbol": "state_elements"
+                },
+                16
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "round_constant_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "state_elements",
+          "min_value": 16,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 16
+        },
+        {
+          "name": "round_constant_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "perm_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "lane_index",
+          "min_value": 0,
+          "max_value": 15,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "state",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "round_constants",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "round_constant_count"
+          },
+          "bound": {
+            "symbol": "round_constant_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "matrix_diag",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "state",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [
+        {
+          "name": "lane_scratch",
+          "kind": "shared",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 8
+        }
+      ],
+      "barriers": [
+        {
+          "after_step": 1,
+          "scope": "threadgroup"
+        }
+      ],
+      "steps": [
+        {
+          "name": "external_rounds",
+          "operator": "poseidon2_external_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "matrix_layer",
+          "operator": "poseidon2_matrix_layer",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "sbox_layer",
+          "operator": "poseidon2_s_box",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "internal_rounds",
+          "operator": "poseidon2_internal_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants"
+          ],
+          "writes": [
+            "state"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poseidon2/mod.rs": "dab6a5e6f25e83cd5d879dc9542d284122576e9f14a19c710c7e63737d033ed8",
+          "zkf-metal/src/shaders/poseidon2.metal": "62b99acc0edcb1cef5a382f121496464619b3dab50f0c82f81109fae5b04918c"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poseidon2.metal",
+          "zkf-metal/src/poseidon2/mod.rs"
+        ],
+        "entrypoints": [
+          "poseidon2_goldilocks_simd"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poseidon2_goldilocks_simd",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "b92c96851403fd48a960de69a26222a7b4177c43f04b0778384bdcb2b3fd303d",
+            "public_reflection_sha256": "8817fe11a9b3fa31ee82063650672d2754f67bc46a87b1db094cfda1ef2af731",
+            "pipeline_descriptor_sha256": "22bbe6ecbeec7d2a47820d31842fc5b0243b140fc0ba8f07a7eaf7eac0c76142",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "states",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "round_constants",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_perms",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_external_rounds",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_internal_rounds",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "internal_diag",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the scalar or SIMD Poseidon2 kernel exactly",
+        "workgroup_policy": "scalar path uses one thread per permutation; SIMD path uses 16 threads per permutation",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poseidon2_goldilocks_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "poseidon2_goldilocks_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "poseidon2_goldilocks_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 3,
+            "entrypoint": "poseidon2_goldilocks_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.poseidon2_differential_bounded",
+      "program_id": "poseidon2_babybear",
+      "family": "poseidon2",
+      "kernel": "poseidon2_babybear",
+      "variant": "babybear_scalar",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "perm_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "perm_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "state_elements"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "is_multiple_of": [
+                {
+                  "symbol": "state_elements"
+                },
+                16
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "round_constant_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "state_elements",
+          "min_value": 16,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 16
+        },
+        {
+          "name": "round_constant_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "perm_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "lane_index",
+          "min_value": 0,
+          "max_value": 15,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "state",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "round_constants",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "round_constant_count"
+          },
+          "bound": {
+            "symbol": "round_constant_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "matrix_diag",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "state",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "external_rounds",
+          "operator": "poseidon2_external_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "matrix_layer",
+          "operator": "poseidon2_matrix_layer",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "sbox_layer",
+          "operator": "poseidon2_s_box",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "internal_rounds",
+          "operator": "poseidon2_internal_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants"
+          ],
+          "writes": [
+            "state"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poseidon2/mod.rs": "dab6a5e6f25e83cd5d879dc9542d284122576e9f14a19c710c7e63737d033ed8",
+          "zkf-metal/src/shaders/poseidon2.metal": "62b99acc0edcb1cef5a382f121496464619b3dab50f0c82f81109fae5b04918c"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poseidon2.metal",
+          "zkf-metal/src/poseidon2/mod.rs"
+        ],
+        "entrypoints": [
+          "poseidon2_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poseidon2_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "b92c96851403fd48a960de69a26222a7b4177c43f04b0778384bdcb2b3fd303d",
+            "public_reflection_sha256": "8817fe11a9b3fa31ee82063650672d2754f67bc46a87b1db094cfda1ef2af731",
+            "pipeline_descriptor_sha256": "dba8f2201f4f72e28a75ec76c2f90f829b74b12229b1b7e0c9a45d762ea76d1e",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "states",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "round_constants",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_perms",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_external_rounds",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_internal_rounds",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "internal_diag",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the scalar or SIMD Poseidon2 kernel exactly",
+        "workgroup_policy": "scalar path uses one thread per permutation; SIMD path uses 16 threads per permutation",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poseidon2_babybear",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "poseidon2_babybear",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "poseidon2_babybear",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          },
+          {
+            "step_index": 3,
+            "entrypoint": "poseidon2_babybear",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "scalar"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.poseidon2_differential_bounded",
+      "program_id": "poseidon2_babybear_simd",
+      "family": "poseidon2",
+      "kernel": "poseidon2_babybear_simd",
+      "variant": "babybear_simd",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "add": [
+            {
+              "mul": [
+                {
+                  "symbol": "perm_index"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "symbol": "lane_index"
+            }
+          ]
+        },
+        "lane_index": {
+          "symbol": "lane_index"
+        },
+        "batch_index": {
+          "symbol": "perm_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "state_elements"
+                },
+                {
+                  "nat_const": 16
+                }
+              ]
+            },
+            {
+              "is_multiple_of": [
+                {
+                  "symbol": "state_elements"
+                },
+                16
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "round_constant_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "state_elements",
+          "min_value": 16,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 16
+        },
+        {
+          "name": "round_constant_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "perm_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "lane_index",
+          "min_value": 0,
+          "max_value": 15,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "state",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "round_constants",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "round_constant_count"
+          },
+          "bound": {
+            "symbol": "round_constant_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "matrix_diag",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "state",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "perm_index"
+              },
+              {
+                "nat_const": 16
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "symbol": "state_elements"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [
+        {
+          "name": "lane_scratch",
+          "kind": "shared",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 16
+          },
+          "bound": {
+            "nat_const": 16
+          },
+          "element_bytes": 4
+        }
+      ],
+      "barriers": [
+        {
+          "after_step": 1,
+          "scope": "threadgroup"
+        }
+      ],
+      "steps": [
+        {
+          "name": "external_rounds",
+          "operator": "poseidon2_external_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "matrix_layer",
+          "operator": "poseidon2_matrix_layer",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "matrix_diag"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "sbox_layer",
+          "operator": "poseidon2_s_box",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state"
+          ],
+          "writes": [
+            "state"
+          ]
+        },
+        {
+          "name": "internal_rounds",
+          "operator": "poseidon2_internal_round",
+          "arithmetic_domain": "field",
+          "reads": [
+            "state",
+            "round_constants"
+          ],
+          "writes": [
+            "state"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poseidon2/mod.rs": "dab6a5e6f25e83cd5d879dc9542d284122576e9f14a19c710c7e63737d033ed8",
+          "zkf-metal/src/shaders/poseidon2.metal": "62b99acc0edcb1cef5a382f121496464619b3dab50f0c82f81109fae5b04918c"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poseidon2.metal",
+          "zkf-metal/src/poseidon2/mod.rs"
+        ],
+        "entrypoints": [
+          "poseidon2_babybear_simd"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poseidon2_babybear_simd",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "b92c96851403fd48a960de69a26222a7b4177c43f04b0778384bdcb2b3fd303d",
+            "public_reflection_sha256": "8817fe11a9b3fa31ee82063650672d2754f67bc46a87b1db094cfda1ef2af731",
+            "pipeline_descriptor_sha256": "cfd01b2a5a169e2bffcde5be49c70bf3a55f477ee9399ce780fa10c0490dc914",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "states",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "round_constants",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_perms",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_external_rounds",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_internal_rounds",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "internal_diag",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the scalar or SIMD Poseidon2 kernel exactly",
+        "workgroup_policy": "scalar path uses one thread per permutation; SIMD path uses 16 threads per permutation",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poseidon2_babybear_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "poseidon2_babybear_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "poseidon2_babybear_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          },
+          {
+            "step_index": 3,
+            "entrypoint": "poseidon2_babybear_simd",
+            "source_path": "zkf-metal/src/shaders/poseidon2.metal",
+            "library": "main_library",
+            "binding_kind": "simd"
+          }
+        ]
+      },
+      "certified_claim": true
+    }
+  ]
+}

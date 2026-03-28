@@ -1,0 +1,24 @@
+[package]
+name = "zkf-backends-pro"
+version.workspace = true
+edition.workspace = true
+license = "BSL-1.1"
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "ZKF Pro backends: STARK-to-SNARK wrapping, Metal GPU acceleration, Midnight integration"
+publish = false
+
+[features]
+default = ["metal-gpu"]
+metal-gpu = ["zkf-metal"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
+zkf-backends = { path = "../zkf-backends" }
+zkf-metal = { path = "../zkf-metal", optional = true }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

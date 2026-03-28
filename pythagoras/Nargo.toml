@@ -1,0 +1,6 @@
+[package]
+name = "pythagoras"
+type = "bin"
+authors = [""]
+
+[dependencies]

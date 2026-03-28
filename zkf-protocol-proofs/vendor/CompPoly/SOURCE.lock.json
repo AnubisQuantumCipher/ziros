@@ -1,0 +1,17 @@
+{
+  "schema": "zkf-upstream-lock-v1",
+  "id": "comp-poly",
+  "origin": "https://github.com/Verified-zkEVM/CompPoly",
+  "revision": "d7b9f987496841b066d4958b72f774f545ce907b",
+  "checked_on": "2026-03-23",
+  "license": "Apache-2.0",
+  "upstream_toolchain": "leanprover/lean4:v4.28.0",
+  "local_toolchain_target": "leanprover/lean4:v4.28.0",
+  "purpose": "Pinned local polynomial and field algebra dependency for ArkLib's FRI formalization.",
+  "focus_modules": [
+    "CompPoly.Fields.Basic",
+    "CompPoly.Multilinear.Basic",
+    "CompPoly.Multivariate.CMvPolynomial",
+    "CompPoly.Univariate.Basic"
+  ]
+}

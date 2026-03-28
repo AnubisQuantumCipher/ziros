@@ -1,0 +1,101 @@
+{
+  "note": "Override-only example. The default gate runs the repo-owned corpus under benchmarks/manifest.json.",
+  "competitors": {
+    "snarkjs": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real snarkjs scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    },
+    "gnark": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real gnark scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    },
+    "nargo": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real nargo scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    },
+    "sp1-official": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real SP1 scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        },
+        "recursive_workflow": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real SP1 recursive scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    },
+    "risc-zero-official": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real RISC Zero scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        },
+        "recursive_workflow": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real RISC Zero recursive scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    },
+    "plonky3-external": {
+      "scenarios": {
+        "single_circuit_prove": {
+          "cmd": [
+            "bash",
+            "-lc",
+            "echo 'replace with a real external Plonky3 scenario command'"
+          ],
+          "workdir": ".",
+          "timeout_sec": 1800
+        }
+      }
+    }
+  }
+}

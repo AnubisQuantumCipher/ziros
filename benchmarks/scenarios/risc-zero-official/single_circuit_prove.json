@@ -1,0 +1,29 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": "benchmarks/workspaces/risc-zero-official",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "prove",
+    "--scenario",
+    "single-circuit-prove",
+    "--out-dir",
+    "out/single_circuit_prove"
+  ],
+  "verify_command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "verify",
+    "--scenario",
+    "single-circuit-prove",
+    "--out-dir",
+    "out/single_circuit_prove"
+  ],
+  "proof_path": "out/single_circuit_prove/proof.bin"
+}

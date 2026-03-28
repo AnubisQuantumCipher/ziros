@@ -1,0 +1,281 @@
+#![allow(unexpected_cfgs)]
+
+//! ZKF Library — embeddable ZK framework for compiling, proving, and verifying circuits.
+//!
+//! This crate is the standalone application surface for ZirOS-built apps.
+//! Shipped applications should link this crate directly instead of shelling out
+//! to `zkf-cli` at runtime.
+
+#[cfg(not(hax))]
+pub mod app;
+pub(crate) mod proof_embedded_app_spec;
+#[cfg(kani)]
+mod verification_kani;
+
+// ---------------------------------------------------------------------------
+// Core re-exports — always available
+// ---------------------------------------------------------------------------
+
+pub use zkf_core::{
+    BackendKind, CompiledProgram, Constraint, CredentialClaimsV1, CredentialProofBundleV1, Expr,
+    FieldElement, FieldId, IssuerSignedCredentialV1, Program, ProofArtifact, PublicKeyBundle,
+    Signal, SignatureBundle, SignatureScheme, Visibility, Witness, WitnessAssignment, WitnessHint,
+    WitnessInputs, WitnessPlan, ZkfError, ZkfResult, bundle_has_required_signature_material,
+    derive_subject_key_hash, generate_witness, signed_message_has_complete_bundle_surface,
+    verify_bundle, verify_ed25519_signature, verify_ml_dsa_signature, verify_signed_message,
+};
+
+// ---------------------------------------------------------------------------
+// Phase 0-2 re-exports — gated behind the "full" feature
+// ---------------------------------------------------------------------------
+
+#[cfg(all(feature = "full", not(hax)))]
+pub use zkf_core::{
+    AUDIT_REPORT_VERSION, ArtifactKind, AuditCategory, AuditCheck, AuditFinding, AuditReport,
+    AuditSeverity, AuditStatus, AuditSummary, BackendCapabilityEntry, BackendCapabilityMatrix,
+    BenchmarkMetrics, BenchmarkReport, DiagnosticsReport, ExportMode, FieldAdapter,
+    GpuAcceleration, NormalizationReport, RecursionPlan, SecurityModel, SetupKind, SetupProvenance,
+    StatsAggregate, SupportClass, TypeError, ZkfArtifactBundle, audit_program,
+    available_recursion_paths, normalize, sanitize_artifact, solve_and_validate_witness,
+    solver_by_name, type_check,
+};
+
+// ---------------------------------------------------------------------------
+// Backend re-exports
+// ---------------------------------------------------------------------------
+
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use zkf_backends::verifier_export::{
+    VerifierExportResult, VerifierLanguage, verifier_exporter_for,
+};
+#[cfg(not(hax))]
+pub use zkf_backends::{BackendEngine, backend_for, preferred_backend_for_program};
+#[cfg(not(hax))]
+pub use zkf_backends::{
+    BackendRoute, BackendSelection, backend_for_route, parse_backend_selection,
+    validate_backend_selection_identity,
+};
+
+// ---------------------------------------------------------------------------
+// Frontend re-exports — opt-in for applications that import external circuit
+// formats at runtime.
+// ---------------------------------------------------------------------------
+
+#[cfg(all(feature = "frontends", not(hax)))]
+pub use zkf_frontends::{FrontendEngine, FrontendKind, frontend_for};
+
+// ---------------------------------------------------------------------------
+// IR spec re-exports
+// ---------------------------------------------------------------------------
+
+pub use zkf_ir_spec::{IR_SPEC_MAJOR, IR_SPEC_MINOR, version::IrVersion};
+
+// ---------------------------------------------------------------------------
+// Stable app surface re-exports
+// ---------------------------------------------------------------------------
+
+#[cfg(all(feature = "full", not(hax)))]
+pub use app::api::capability_matrix;
+#[cfg(not(hax))]
+pub use app::api::{
+    EmbeddedCheck, EmbeddedProof, check, check_with_backend, compile, compile_and_prove,
+    compile_and_prove_default, compile_and_prove_with_progress,
+    compile_and_prove_with_progress_backend, compile_default, default_backend,
+    default_backend_name, load_inputs, load_program, prove, prove_with_inputs,
+    resolve_input_aliases, verify, verify_program, verify_program_default, version,
+    witness_from_inputs, witness_inputs_from_json_map,
+};
+#[cfg(all(feature = "full", not(hax)))]
+pub use app::audit::{audit_program_default, audit_program_with_live_capabilities};
+#[cfg(not(hax))]
+pub use app::builder::{BooleanOp, ProgramBuilder};
+#[cfg(not(hax))]
+pub use app::descent::{
+    PRIVATE_POWERED_DESCENT_DEFAULT_STEPS, PRIVATE_POWERED_DESCENT_DIMENSIONS,
+    PRIVATE_POWERED_DESCENT_PRIVATE_INPUTS, PRIVATE_POWERED_DESCENT_PUBLIC_INPUTS,
+    PRIVATE_POWERED_DESCENT_PUBLIC_OUTPUTS, PrivatePoweredDescentPrivateInputsV1,
+    PrivatePoweredDescentPublicInputsV1, PrivatePoweredDescentRequestV1,
+    build_private_powered_descent_program, private_powered_descent_sample_inputs,
+    private_powered_descent_showcase, private_powered_descent_showcase_with_steps,
+    private_powered_descent_witness, private_powered_descent_witness_with_steps,
+};
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use app::evidence::{
+    DEFAULT_FORMAL_SCRIPT_SPECS, FormalScriptSpec, GENERATED_APP_CLOSURE_DIR_RELATIVE_PATH,
+    GENERATED_APP_CLOSURE_SCHEMA, GENERATED_IMPLEMENTATION_CLOSURE_SCHEMA,
+    IMPLEMENTATION_CLOSURE_ASSURANCE_VOCABULARY, IMPLEMENTATION_CLOSURE_SUMMARY_RELATIVE_PATH,
+    audit_entry_included, audit_entry_omitted_by_default, canonicalize_for_determinism_hash,
+    collect_default_formal_evidence, collect_formal_evidence,
+    collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
+    ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
+    generated_app_closure_bundle_summary, generated_app_closure_relative_path,
+    generated_app_formal_script_specs, hash_json_value, json_pretty, load_generated_app_closure,
+    load_generated_implementation_closure_summary, read_json as read_bundle_json,
+    read_text as read_bundle_text, repo_root as bundle_repo_root, sha256_hex,
+    two_tier_audit_record, write_json as write_bundle_json, write_text as write_bundle_text,
+};
+#[cfg(not(hax))]
+pub use app::inputs::{
+    bools_to_field_elements, bytes_to_field_elements, merkle_path_witness_inputs,
+    string_to_field_elements, u64s_to_field_elements,
+};
+#[cfg(not(hax))]
+pub use app::multi_satellite::{
+    PRIVATE_MULTI_SATELLITE_BASE_PAIR_COUNT, PRIVATE_MULTI_SATELLITE_BASE_PUBLIC_OUTPUTS,
+    PRIVATE_MULTI_SATELLITE_BASE_SATELLITE_COUNT, PRIVATE_MULTI_SATELLITE_BASE_STEPS,
+    PRIVATE_MULTI_SATELLITE_DIMENSIONS, PRIVATE_MULTI_SATELLITE_PRIVATE_INPUTS_PER_SATELLITE,
+    PRIVATE_MULTI_SATELLITE_PUBLIC_INPUTS, PRIVATE_MULTI_SATELLITE_STRESS_PAIR_COUNT,
+    PRIVATE_MULTI_SATELLITE_STRESS_PUBLIC_OUTPUTS, PRIVATE_MULTI_SATELLITE_STRESS_SATELLITE_COUNT,
+    PRIVATE_MULTI_SATELLITE_STRESS_STEPS, PRIVATE_MULTI_SATELLITE_TIMESTEP_SECONDS, PairCheck,
+    PrivateMultiSatelliteScenario, PrivateMultiSatelliteScenarioSpec,
+    private_multi_satellite_conjunction_sample_inputs,
+    private_multi_satellite_conjunction_showcase_base32,
+    private_multi_satellite_conjunction_showcase_for_scenario,
+    private_multi_satellite_conjunction_showcase_stress64,
+    private_multi_satellite_conjunction_witness, private_multi_satellite_pair_schedule,
+    private_multi_satellite_scenario_spec,
+};
+#[cfg(not(hax))]
+pub use app::orbital::{
+    PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_DIMENSIONS,
+    PRIVATE_NBODY_PRIVATE_INPUTS, PRIVATE_NBODY_PUBLIC_OUTPUTS,
+    private_nbody_orbital_sample_inputs, private_nbody_orbital_showcase,
+    private_nbody_orbital_showcase_with_steps, private_nbody_orbital_witness,
+    private_nbody_orbital_witness_with_steps,
+};
+#[cfg(not(hax))]
+pub use app::private_identity::{
+    CredentialPublicInputsV1, MerklePathNodeV1, PRIVATE_IDENTITY_ML_DSA_CONTEXT,
+    PRIVATE_IDENTITY_PUBLIC_INPUTS_LEN, PRIVATE_IDENTITY_TREE_DEPTH, PRIVATE_IDENTITY_TREE_LEAVES,
+    PRIVATE_IDENTITY_VERIFICATION_MODE, PrivateIdentityPathProveRequestV1, PrivateIdentityPolicyV1,
+    PrivateIdentityProveRequestV1, PrivateIdentityRegistryV1, PrivateIdentityVerificationReportV1,
+    active_leaf_from_credential_id, credential_id_from_claims, merkle_root_bn254,
+    merkle_root_from_path_bn254, poseidon_hash4_bn254, private_identity_kyc,
+    private_identity_public_inputs_from_artifact, prove_private_identity,
+    prove_private_identity_with_paths, verify_private_identity_artifact,
+};
+#[cfg(not(hax))]
+pub use app::progress::{ProofEvent, ProofStage};
+#[cfg(not(hax))]
+pub use app::satellite::{
+    PRIVATE_SATELLITE_DEFAULT_STEPS, PRIVATE_SATELLITE_DIMENSIONS,
+    PRIVATE_SATELLITE_PRIVATE_INPUTS, PRIVATE_SATELLITE_PUBLIC_INPUTS,
+    PRIVATE_SATELLITE_PUBLIC_OUTPUTS, PRIVATE_SATELLITE_SPACECRAFT_COUNT,
+    private_satellite_conjunction_sample_inputs, private_satellite_conjunction_showcase,
+    private_satellite_conjunction_witness,
+};
+#[cfg(not(hax))]
+pub use app::spec::{
+    AppSpecCustomGateV1, AppSpecLookupTableV1, AppSpecMemoryRegionV1, AppSpecProgramV1,
+    AppSpecSignalV1, AppSpecV1, BuilderOpV1, TemplateArgSpecV1, TemplateRegistryEntryV1,
+    build_app_spec, instantiate_template, template_registry,
+};
+#[cfg(not(hax))]
+pub use app::templates::TemplateProgram;
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use app::verifier::{export_groth16_solidity_verifier, export_verifier};
+#[cfg(not(hax))]
+pub use zkf_gadgets::{Gadget, GadgetRegistry, GadgetSpec};
+
+#[cfg(not(hax))]
+pub mod descent {
+    pub use crate::app::descent::*;
+}
+
+#[cfg(not(hax))]
+pub mod inputs {
+    pub use crate::app::inputs::*;
+}
+
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub mod evidence {
+    pub use crate::app::evidence::*;
+}
+
+#[cfg(not(hax))]
+pub mod multi_satellite {
+    pub use crate::app::multi_satellite::{
+        PRIVATE_MULTI_SATELLITE_BASE_PAIR_COUNT, PRIVATE_MULTI_SATELLITE_BASE_PUBLIC_OUTPUTS,
+        PRIVATE_MULTI_SATELLITE_BASE_SATELLITE_COUNT, PRIVATE_MULTI_SATELLITE_BASE_STEPS,
+        PRIVATE_MULTI_SATELLITE_DIMENSIONS, PRIVATE_MULTI_SATELLITE_PRIVATE_INPUTS_PER_SATELLITE,
+        PRIVATE_MULTI_SATELLITE_PUBLIC_INPUTS, PRIVATE_MULTI_SATELLITE_STRESS_PAIR_COUNT,
+        PRIVATE_MULTI_SATELLITE_STRESS_PUBLIC_OUTPUTS,
+        PRIVATE_MULTI_SATELLITE_STRESS_SATELLITE_COUNT, PRIVATE_MULTI_SATELLITE_STRESS_STEPS,
+        PRIVATE_MULTI_SATELLITE_TIMESTEP_SECONDS, PairCheck, PrivateMultiSatelliteScenario,
+        PrivateMultiSatelliteScenarioSpec, private_multi_satellite_conjunction_sample_inputs,
+        private_multi_satellite_conjunction_showcase_base32,
+        private_multi_satellite_conjunction_showcase_for_scenario,
+        private_multi_satellite_conjunction_showcase_stress64,
+        private_multi_satellite_conjunction_witness, private_multi_satellite_pair_schedule,
+        private_multi_satellite_scenario_spec,
+    };
+}
+
+#[cfg(not(hax))]
+pub mod orbital {
+    pub use crate::app::orbital::*;
+}
+
+#[cfg(not(hax))]
+pub mod satellite {
+    pub use crate::app::satellite::{
+        PRIVATE_SATELLITE_DEFAULT_STEPS, PRIVATE_SATELLITE_DIMENSIONS,
+        PRIVATE_SATELLITE_PRIVATE_INPUTS, PRIVATE_SATELLITE_PUBLIC_INPUTS,
+        PRIVATE_SATELLITE_PUBLIC_OUTPUTS, PRIVATE_SATELLITE_SPACECRAFT_COUNT,
+        private_satellite_conjunction_sample_inputs, private_satellite_conjunction_showcase,
+        private_satellite_conjunction_witness,
+    };
+}
+
+#[cfg(not(hax))]
+pub mod templates {
+    pub use crate::app::templates::*;
+}
+
+#[cfg(all(test, not(hax)))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn raw_ir_construction_works_via_reexported_witness_types() {
+        let program = Program {
+            name: "raw-ir".to_string(),
+            field: FieldId::Bn254,
+            signals: vec![
+                Signal {
+                    name: "x".to_string(),
+                    visibility: Visibility::Private,
+                    constant: None,
+                    ty: None,
+                },
+                Signal {
+                    name: "out".to_string(),
+                    visibility: Visibility::Public,
+                    constant: None,
+                    ty: None,
+                },
+            ],
+            constraints: vec![Constraint::Equal {
+                lhs: Expr::signal("out"),
+                rhs: Expr::signal("x"),
+                label: None,
+            }],
+            witness_plan: WitnessPlan {
+                assignments: vec![WitnessAssignment {
+                    target: "out".to_string(),
+                    expr: Expr::signal("x"),
+                }],
+                hints: vec![WitnessHint {
+                    target: "out".to_string(),
+                    source: "identity".to_string(),
+                    kind: zkf_core::WitnessHintKind::Copy,
+                }],
+                ..WitnessPlan::default()
+            },
+            ..Program::default()
+        };
+
+        let compiled = compile_default(&program, None).expect("compile raw IR program");
+        assert_eq!(compiled.program.name, "raw-ir");
+    }
+}

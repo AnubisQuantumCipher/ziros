@@ -1,0 +1,29 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": "benchmarks/workspaces/plonky3-external",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "prove",
+    "--scenario",
+    "developer-workload",
+    "--out-dir",
+    "out/developer_workload"
+  ],
+  "verify_command": [
+    "cargo",
+    "run",
+    "--release",
+    "--",
+    "--mode",
+    "verify",
+    "--scenario",
+    "developer-workload",
+    "--out-dir",
+    "out/developer_workload"
+  ],
+  "proof_path": "out/developer_workload/proof.bin"
+}

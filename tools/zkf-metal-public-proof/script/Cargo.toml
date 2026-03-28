@@ -1,0 +1,13 @@
+[package]
+name = "zkf-metal-public-proof-script"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bincode = "1.3"
+clap = { version = "4.5", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+zkf-backends = { path = "../../../zkf-backends" }
+zkf-lib = { path = "../../../zkf-lib" }
+zkf-metal-public-proof-lib = { path = "../lib" }

@@ -1,0 +1,161 @@
+{
+  "program": {
+    "name": "uccr_clinical_trial_eligibility",
+    "field": "pasta-fp"
+  },
+  "description": "Prove that a patient meets clinical trial enrollment criteria (age range, biomarker thresholds) without revealing their identity, exact age, or specific biomarker values. Compliant with HIPAA and GDPR. Enables privacy-preserving multi-site trial recruitment and IRB-auditable eligibility attestation. The SHA-256 commitment binds the patient's private health data to the proof without exposing it.",
+  "signals": [
+    { "name": "patient_age",              "visibility": "private" },
+    { "name": "biomarker_level_scaled",   "visibility": "private" },
+    { "name": "patient_id_hash",          "visibility": "private" },
+    { "name": "blinding",                 "visibility": "private" },
+    { "name": "__age_above_min",          "visibility": "private" },
+    { "name": "__age_below_max",          "visibility": "private" },
+    { "name": "__biomarker_above_min",    "visibility": "private" },
+    { "name": "__biomarker_below_max",    "visibility": "private" },
+    { "name": "__sha_b0",                 "visibility": "private" },
+    { "name": "__sha_b1",                 "visibility": "private" },
+    { "name": "__sha_b2",                 "visibility": "private" },
+    { "name": "__sha_b3",                 "visibility": "private" },
+    { "name": "__sha_b4",                 "visibility": "private" },
+    { "name": "__sha_b5",                 "visibility": "private" },
+    { "name": "__sha_b6",                 "visibility": "private" },
+    { "name": "__sha_b7",                 "visibility": "private" },
+    { "name": "__sha_b8",                 "visibility": "private" },
+    { "name": "__sha_b9",                 "visibility": "private" },
+    { "name": "__sha_b10",                "visibility": "private" },
+    { "name": "__sha_b11",                "visibility": "private" },
+    { "name": "__sha_b12",                "visibility": "private" },
+    { "name": "__sha_b13",                "visibility": "private" },
+    { "name": "__sha_b14",                "visibility": "private" },
+    { "name": "__sha_b15",                "visibility": "private" },
+    { "name": "__sha_b16",                "visibility": "private" },
+    { "name": "__sha_b17",                "visibility": "private" },
+    { "name": "__sha_b18",                "visibility": "private" },
+    { "name": "__sha_b19",                "visibility": "private" },
+    { "name": "__sha_b20",                "visibility": "private" },
+    { "name": "__sha_b21",                "visibility": "private" },
+    { "name": "__sha_b22",                "visibility": "private" },
+    { "name": "__sha_b23",                "visibility": "private" },
+    { "name": "__sha_b24",                "visibility": "private" },
+    { "name": "__sha_b25",                "visibility": "private" },
+    { "name": "__sha_b26",                "visibility": "private" },
+    { "name": "__sha_b27",                "visibility": "private" },
+    { "name": "__sha_b28",                "visibility": "private" },
+    { "name": "__sha_b29",                "visibility": "private" },
+    { "name": "__sha_b30",                "visibility": "private" },
+    { "name": "__sha_b31",                "visibility": "private" },
+    { "name": "min_age",                  "visibility": "constant", "constant": "18" },
+    { "name": "max_age",                  "visibility": "constant", "constant": "75" },
+    { "name": "min_biomarker_scaled",     "visibility": "constant", "constant": "100" },
+    { "name": "max_biomarker_scaled",     "visibility": "constant", "constant": "5000" },
+    { "name": "eligibility_commitment_hi","visibility": "public" },
+    { "name": "eligibility_commitment_lo","visibility": "public" }
+  ],
+  "ops": [
+    { "kind": "range", "signal": "patient_age",            "bits": 8  },
+    { "kind": "range", "signal": "biomarker_level_scaled", "bits": 16 },
+    { "kind": "range", "signal": "patient_id_hash",        "bits": 32 },
+    { "kind": "range", "signal": "blinding",               "bits": 32 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__age_above_min" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "patient_age" },
+          { "op": "signal", "args": "min_age" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__age_above_min", "bits": 8 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__age_below_max" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "max_age" },
+          { "op": "signal", "args": "patient_age" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__age_below_max", "bits": 8 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__biomarker_above_min" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "biomarker_level_scaled" },
+          { "op": "signal", "args": "min_biomarker_scaled" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__biomarker_above_min", "bits": 16 },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "__biomarker_below_max" },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "max_biomarker_scaled" },
+          { "op": "signal", "args": "biomarker_level_scaled" }
+        ]
+      }
+    },
+    { "kind": "range", "signal": "__biomarker_below_max", "bits": 16 },
+    {
+      "kind": "black_box",
+      "op": "sha256",
+      "inputs": [
+        { "op": "signal", "args": "patient_id_hash" },
+        { "op": "signal", "args": "patient_age" },
+        { "op": "signal", "args": "biomarker_level_scaled" },
+        { "op": "signal", "args": "blinding" }
+      ],
+      "outputs": [
+        "__sha_b0",  "__sha_b1",  "__sha_b2",  "__sha_b3",
+        "__sha_b4",  "__sha_b5",  "__sha_b6",  "__sha_b7",
+        "__sha_b8",  "__sha_b9",  "__sha_b10", "__sha_b11",
+        "__sha_b12", "__sha_b13", "__sha_b14", "__sha_b15",
+        "__sha_b16", "__sha_b17", "__sha_b18", "__sha_b19",
+        "__sha_b20", "__sha_b21", "__sha_b22", "__sha_b23",
+        "__sha_b24", "__sha_b25", "__sha_b26", "__sha_b27",
+        "__sha_b28", "__sha_b29", "__sha_b30", "__sha_b31"
+      ],
+      "params": { "input_num_bits": "8" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "eligibility_commitment_hi" },
+      "rhs": { "op": "signal", "args": "__sha_b0" }
+    },
+    {
+      "kind": "equal",
+      "lhs": { "op": "signal", "args": "eligibility_commitment_lo" },
+      "rhs": { "op": "signal", "args": "__sha_b31" }
+    }
+  ],
+  "expected_inputs": ["patient_age", "biomarker_level_scaled", "patient_id_hash", "blinding"],
+  "public_outputs": ["eligibility_commitment_hi", "eligibility_commitment_lo"],
+  "sample_inputs": {
+    "patient_age": "45",
+    "biomarker_level_scaled": "2500",
+    "patient_id_hash": "99887766",
+    "blinding": "13579"
+  },
+  "violation_inputs": {
+    "patient_age": "16",
+    "biomarker_level_scaled": "2500",
+    "patient_id_hash": "99887766",
+    "blinding": "13579"
+  },
+  "metadata": {
+    "domain": "medicine",
+    "standard": "HIPAA / GDPR / ICH E6(R2) GCP",
+    "biomarker_scale": "0.01 ng/mL",
+    "ir_family": "zir-v1"
+  },
+  "template_id": "uccr-clinical-trial-eligibility"
+}

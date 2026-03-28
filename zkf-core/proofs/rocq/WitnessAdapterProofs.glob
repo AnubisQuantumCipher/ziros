@@ -1,0 +1,11 @@
+DIGEST 52fe8ef89dc575bf306697e8e24f6a44
+FWitnessAdapterProofs
+R15:37 WitnessAdapterSemantics <> <> lib
+prf 49:86 <> witness_kernel_adapter_preservation_ok
+binder 99:105 <> surface:1
+R112:140 WitnessAdapterSemantics <> WitnessKernelAdapterPreserved def
+R142:148 WitnessAdapterProofs <> surface:1 var
+R151:176 WitnessAdapterSemantics <> witness_adapter_shell_copy def
+R178:184 WitnessAdapterProofs <> surface:1 var
+R222:247 WitnessAdapterSemantics <> witness_adapter_shell_copy def
+R250:278 WitnessAdapterSemantics <> WitnessKernelAdapterPreserved def

@@ -1,0 +1,8 @@
+{
+  "version": { "major": 2, "minor": 0 },
+  "do_communications_commitment": false,
+  "num_inputs": 1,
+  "instructions": [
+    { "op": "pi_skip", "guard": 0, "count": 1 }
+  ]
+}

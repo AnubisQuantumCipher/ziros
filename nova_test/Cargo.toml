@@ -1,0 +1,17 @@
+[package]
+name = "nova_test"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+zkf-backends = { version = "0.1.0", path = "../zkf-backends", features = ["metal-gpu", "native-nova"] }
+zkf-core = { version = "0.1.0", path = "../zkf-core" }
+zkf-examples = { version = "0.1.0", path = "../zkf-examples" }
+
+[lints]
+workspace = true

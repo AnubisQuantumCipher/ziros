@@ -1,0 +1,1235 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "poly",
+  "claim": "attested GPU surface from Rust inputs to GPU outputs, bound to the shipped metallib, reflection, and pipeline descriptors; certification status is carried per program by certified_claim",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.poly_surface_attested",
+      "program_id": "poly_eval_goldilocks",
+      "family": "poly",
+      "kernel": "poly_eval_goldilocks",
+      "variant": "goldilocks_eval",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "degree"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "poly_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "degree",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "coefficient_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "coeffs",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "degree"
+          },
+          "bound": {
+            "symbol": "degree"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "points",
+          "kind": "global_input",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_eval",
+          "operator": "poly_eval",
+          "arithmetic_domain": "field",
+          "reads": [
+            "coeffs",
+            "points"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poly.rs": "2e847875f91159f08dcfc5e93589df39ef1a065c37ed3449309afd8c010844e1",
+          "zkf-metal/src/shaders/poly_ops.metal": "107305b64fbf9d419125018de0812dcfb2adec0691e46f8b22361a818c8af1bc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poly_ops.metal",
+          "zkf-metal/src/poly.rs"
+        ],
+        "entrypoints": [
+          "poly_eval_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poly_eval_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "ea6f0e67f9892c7abb1d7a58e82743e06016cf01c3900ef51bc5046a4df60c49",
+            "public_reflection_sha256": "c8f6c52b5dc5d5633e01a08568ff064eef2af9050a526821c3f13675694ec645",
+            "pipeline_descriptor_sha256": "4fdaab5357d51cea29b76ede79aca38affd8d1c2c93e56621d9faffc15d4c1a4",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "coeffs",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "points",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "degree",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped polynomial kernels exactly",
+        "workgroup_policy": "one thread per point or coefficient; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poly_eval_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poly_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_eval"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.poly_surface_attested",
+      "program_id": "poly_batch_eval_goldilocks",
+      "family": "poly",
+      "kernel": "poly_batch_eval_goldilocks",
+      "variant": "goldilocks_batch_eval",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "add": [
+            {
+              "mul": [
+                {
+                  "symbol": "poly_index"
+                },
+                {
+                  "symbol": "point_count"
+                }
+              ]
+            },
+            {
+              "symbol": "point_index"
+            }
+          ]
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "poly_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "degree"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "poly_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "degree",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "coefficient_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "coeffs_flat",
+          "kind": "constant",
+          "start": {
+            "mul": [
+              {
+                "symbol": "poly_index"
+              },
+              {
+                "symbol": "degree"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "degree"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "poly_count"
+              },
+              {
+                "symbol": "degree"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "points",
+          "kind": "global_input",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "add": [
+              {
+                "mul": [
+                  {
+                    "symbol": "poly_index"
+                  },
+                  {
+                    "symbol": "point_count"
+                  }
+                ]
+              },
+              {
+                "symbol": "point_index"
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "poly_count"
+              },
+              {
+                "symbol": "point_count"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_batch_eval",
+          "operator": "poly_batch_eval",
+          "arithmetic_domain": "field",
+          "reads": [
+            "coeffs_flat",
+            "points"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poly.rs": "2e847875f91159f08dcfc5e93589df39ef1a065c37ed3449309afd8c010844e1",
+          "zkf-metal/src/shaders/poly_ops.metal": "107305b64fbf9d419125018de0812dcfb2adec0691e46f8b22361a818c8af1bc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poly_ops.metal",
+          "zkf-metal/src/poly.rs"
+        ],
+        "entrypoints": [
+          "poly_batch_eval_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poly_batch_eval_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "2243b2e046fb16a0e848938850f51ca582f9e9c221e297fe55afef72338928ac",
+            "public_reflection_sha256": "028820d57c4fbd966e2097ec00f9fef045882550dab8edcee889d122d001cbd1",
+            "pipeline_descriptor_sha256": "be135d24c2c48b7697dcb140da3a0ea02f5a7e8753bdd861526fcf9465c36888",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "coeffs_flat",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "points",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "degree",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_polys",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped polynomial kernels exactly",
+        "workgroup_policy": "one thread per point or coefficient; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poly_batch_eval_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poly_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_batch_eval"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.poly_surface_attested",
+      "program_id": "poly_quotient_goldilocks",
+      "family": "poly",
+      "kernel": "poly_quotient_goldilocks",
+      "variant": "goldilocks_quotient",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "degree"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "poly_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "degree",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "coefficient_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "evals",
+          "kind": "global_input",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_quotient",
+          "operator": "poly_quotient",
+          "arithmetic_domain": "field",
+          "reads": [
+            "evals"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poly.rs": "2e847875f91159f08dcfc5e93589df39ef1a065c37ed3449309afd8c010844e1",
+          "zkf-metal/src/shaders/poly_ops.metal": "107305b64fbf9d419125018de0812dcfb2adec0691e46f8b22361a818c8af1bc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poly_ops.metal",
+          "zkf-metal/src/poly.rs"
+        ],
+        "entrypoints": [
+          "poly_quotient_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poly_quotient_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "d30a23498eb42677cc0fe9064d1221a6055be80044e0e02dfe13f290cafaae23",
+            "public_reflection_sha256": "624efea199cec488fe78c5375574faa06c85e4bba498276da40bd4639422fbff",
+            "pipeline_descriptor_sha256": "e0820fda5838ed660c020bbad8715ef0c47bab197e23ede346605d4bc19d0cfe",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "evals",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "z",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "f_z",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "generator",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped polynomial kernels exactly",
+        "workgroup_policy": "one thread per point or coefficient; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poly_quotient_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poly_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_quotient"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.poly_surface_attested",
+      "program_id": "poly_coset_shift_goldilocks",
+      "family": "poly",
+      "kernel": "poly_coset_shift_goldilocks",
+      "variant": "goldilocks_coset_shift",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "coefficient_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "degree"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "poly_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "degree",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "coefficient_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "coeffs",
+          "kind": "global_input",
+          "start": {
+            "symbol": "coefficient_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "degree"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "coeffs",
+          "kind": "global_output",
+          "start": {
+            "symbol": "coefficient_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "degree"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_coset_shift",
+          "operator": "poly_coset_shift",
+          "arithmetic_domain": "field",
+          "reads": [
+            "coeffs"
+          ],
+          "writes": [
+            "coeffs"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poly.rs": "2e847875f91159f08dcfc5e93589df39ef1a065c37ed3449309afd8c010844e1",
+          "zkf-metal/src/shaders/poly_ops.metal": "107305b64fbf9d419125018de0812dcfb2adec0691e46f8b22361a818c8af1bc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poly_ops.metal",
+          "zkf-metal/src/poly.rs"
+        ],
+        "entrypoints": [
+          "poly_coset_shift_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poly_coset_shift_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "341f588156a5fead1e8e9e79300572d5ee339ba71a31db01907b5ae75fb14f08",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "c6149434a1aad0a03ba9a5421d4deac88d2a23a0c248f38daa4b748356fba4e4",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "coeffs",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "shift",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped polynomial kernels exactly",
+        "workgroup_policy": "one thread per point or coefficient; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poly_coset_shift_goldilocks",
+            "source_path": "zkf-metal/src/shaders/poly_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_coset_shift"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.poly_surface_attested",
+      "program_id": "poly_eval_babybear",
+      "family": "poly",
+      "kernel": "poly_eval_babybear",
+      "variant": "babybear_eval",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "degree"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "poly_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "degree",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "poly_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "coefficient_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "coeffs",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "degree"
+          },
+          "bound": {
+            "symbol": "degree"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "points",
+          "kind": "global_input",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "symbol": "point_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "point_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "babybear_eval",
+          "operator": "poly_eval",
+          "arithmetic_domain": "field",
+          "reads": [
+            "coeffs",
+            "points"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/poly.rs": "2e847875f91159f08dcfc5e93589df39ef1a065c37ed3449309afd8c010844e1",
+          "zkf-metal/src/shaders/poly_ops.metal": "107305b64fbf9d419125018de0812dcfb2adec0691e46f8b22361a818c8af1bc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/poly_ops.metal",
+          "zkf-metal/src/poly.rs"
+        ],
+        "entrypoints": [
+          "poly_eval_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "poly_eval_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "ea6f0e67f9892c7abb1d7a58e82743e06016cf01c3900ef51bc5046a4df60c49",
+            "public_reflection_sha256": "c8f6c52b5dc5d5633e01a08568ff064eef2af9050a526821c3f13675694ec645",
+            "pipeline_descriptor_sha256": "428e461265405a15d10fd4ae06a69f68d27d19ffde8ae2565a1329e7a33434b2",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "coeffs",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "points",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "degree",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped polynomial kernels exactly",
+        "workgroup_policy": "one thread per point or coefficient; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "poly_eval_babybear",
+            "source_path": "zkf-metal/src/shaders/poly_ops.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_eval"
+          }
+        ]
+      },
+      "certified_claim": false
+    }
+  ]
+}

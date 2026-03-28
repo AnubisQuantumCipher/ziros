@@ -1,0 +1,19 @@
+[package]
+name = "zk_rollup"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+num-bigint.workspace = true
+serde_json.workspace = true
+zkf-backends = { version = "0.1.0", path = "../zkf-backends", features = ["native-nova", "metal-gpu"] }
+zkf-core = { version = "0.1.0", path = "../zkf-core" }
+zkf-dsl = { version = "0.1.0", path = "../zkf-dsl" }
+
+[lints]
+workspace = true

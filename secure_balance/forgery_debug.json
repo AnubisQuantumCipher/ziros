@@ -1,0 +1,338 @@
+{
+  "program_name": "secure_transfer",
+  "program_digest": "b3544f300974a5e7e63ed2a0a3e6f52cc64504c06767e64983d89560fb200fdd",
+  "field": "bn254",
+  "passed": true,
+  "total_constraints": 3,
+  "evaluated_constraints": 3,
+  "constraints": [
+    {
+      "index": 0,
+      "label": "assign_computed_hash",
+      "passed": true,
+      "detail": {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "name": "computed_hash",
+          "value": "13042"
+        },
+        "rhs": {
+          "op": "add",
+          "value": "13042",
+          "terms": [
+            {
+              "op": "mul",
+              "value": "13000",
+              "left": {
+                "op": "signal",
+                "name": "bal",
+                "value": "1000"
+              },
+              "right": {
+                "op": "const",
+                "literal": "13",
+                "value": "13"
+              }
+            },
+            {
+              "op": "signal",
+              "name": "user_id",
+              "value": "42"
+            }
+          ]
+        },
+        "lhs_value": "13042",
+        "rhs_value": "13042"
+      }
+    },
+    {
+      "index": 1,
+      "label": "assign_remaining",
+      "passed": true,
+      "detail": {
+        "kind": "equal",
+        "lhs": {
+          "op": "signal",
+          "name": "remaining",
+          "value": "65"
+        },
+        "rhs": {
+          "op": "sub",
+          "value": "65",
+          "left": {
+            "op": "signal",
+            "name": "bal",
+            "value": "1000"
+          },
+          "right": {
+            "op": "signal",
+            "name": "amt",
+            "value": "935"
+          }
+        },
+        "lhs_value": "65",
+        "rhs_value": "65"
+      }
+    },
+    {
+      "index": 2,
+      "label": "range_remaining_32",
+      "passed": true,
+      "detail": {
+        "kind": "range",
+        "signal": "remaining",
+        "bits": 32,
+        "limit": "4294967296",
+        "value": "65"
+      }
+    }
+  ],
+  "symbolic_constraints": [
+    {
+      "index": 0,
+      "label": "assign_computed_hash",
+      "form": "computed_hash == ((bal * 13) + user_id)",
+      "expanded_form": "((bal * 13) + user_id) == ((bal * 13) + user_id)",
+      "dependencies": [
+        "bal",
+        "computed_hash",
+        "user_id"
+      ],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false
+    },
+    {
+      "index": 1,
+      "label": "assign_remaining",
+      "form": "remaining == (bal - amt)",
+      "expanded_form": "(bal - amt) == (bal - amt)",
+      "dependencies": [
+        "amt",
+        "bal",
+        "remaining"
+      ],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false
+    },
+    {
+      "index": 2,
+      "label": "range_remaining_32",
+      "form": "0 <= remaining < 2^32",
+      "expanded_form": "0 <= (bal - amt) < 2^32",
+      "dependencies": [
+        "remaining"
+      ],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false
+    }
+  ],
+  "symbolic_witness": [
+    {
+      "name": "bal",
+      "visibility": "private",
+      "origin": "input",
+      "expr": "bal",
+      "dependencies": [],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    },
+    {
+      "name": "amt",
+      "visibility": "private",
+      "origin": "input",
+      "expr": "amt",
+      "dependencies": [],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    },
+    {
+      "name": "user_id",
+      "visibility": "private",
+      "origin": "input",
+      "expr": "user_id",
+      "dependencies": [],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    },
+    {
+      "name": "expected_commitment",
+      "visibility": "public",
+      "origin": "input",
+      "expr": "expected_commitment",
+      "dependencies": [],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    },
+    {
+      "name": "computed_hash",
+      "visibility": "private",
+      "origin": "assignment",
+      "expr": "((bal * 13) + user_id)",
+      "dependencies": [
+        "bal",
+        "user_id"
+      ],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    },
+    {
+      "name": "remaining",
+      "visibility": "private",
+      "origin": "assignment",
+      "expr": "(bal - amt)",
+      "dependencies": [
+        "amt",
+        "bal"
+      ],
+      "unresolved_dependencies": [],
+      "degree_estimate": 1,
+      "nonlinear": false,
+      "resolved": true
+    }
+  ],
+  "underconstrained": {
+    "unconstrained_private_signals": [],
+    "referenced_private_signals": [
+      "amt",
+      "bal",
+      "computed_hash",
+      "remaining",
+      "user_id"
+    ],
+    "linear_private_signal_count": 5,
+    "linear_constraint_count": 2,
+    "linear_rank": 2,
+    "linear_nullity": 3,
+    "linearly_underdetermined_private_signals": [
+      "user_id",
+      "computed_hash",
+      "remaining"
+    ],
+    "nonlinear_constraint_count": 0,
+    "nonlinear_private_signal_count": 0,
+    "nonlinear_private_signals": [],
+    "nonlinear_only_private_signals": [],
+    "nonlinear_private_components": [],
+    "nonlinear_unanchored_components": [],
+    "nonlinear_potentially_free_private_signals": [],
+    "private_signal_constraint_counts": {
+      "amt": 1,
+      "bal": 2,
+      "computed_hash": 1,
+      "remaining": 2,
+      "user_id": 1
+    },
+    "note": "Linear rank/nullity is conservative. Non-linear participation and component anchoring highlight private signal clusters that may remain underdetermined without public anchors."
+  },
+  "witness_flow": {
+    "nodes": [
+      {
+        "name": "bal",
+        "visibility": "private"
+      },
+      {
+        "name": "amt",
+        "visibility": "private"
+      },
+      {
+        "name": "user_id",
+        "visibility": "private"
+      },
+      {
+        "name": "expected_commitment",
+        "visibility": "public"
+      },
+      {
+        "name": "computed_hash",
+        "visibility": "private"
+      },
+      {
+        "name": "remaining",
+        "visibility": "private"
+      }
+    ],
+    "edges": [
+      {
+        "from": "amt",
+        "to": "remaining"
+      },
+      {
+        "from": "bal",
+        "to": "computed_hash"
+      },
+      {
+        "from": "bal",
+        "to": "remaining"
+      },
+      {
+        "from": "user_id",
+        "to": "computed_hash"
+      }
+    ],
+    "assignments": [
+      {
+        "target": "computed_hash",
+        "dependencies": [
+          "bal",
+          "user_id"
+        ],
+        "expr": {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "signal",
+                  "args": "bal"
+                },
+                {
+                  "op": "const",
+                  "args": "13"
+                }
+              ]
+            },
+            {
+              "op": "signal",
+              "args": "user_id"
+            }
+          ]
+        }
+      },
+      {
+        "target": "remaining",
+        "dependencies": [
+          "amt",
+          "bal"
+        ],
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "bal"
+            },
+            {
+              "op": "signal",
+              "args": "amt"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

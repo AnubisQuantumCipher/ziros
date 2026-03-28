@@ -1,0 +1,16 @@
+[package]
+name = "zkf-frontend-sdk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "SDK for building ZKF frontend plugins — compile external circuit formats to ZKF IR"
+
+[dependencies]
+zkf-core = { path = "../zkf-core", default-features = false }
+zkf-ir-spec = { path = "../zkf-ir-spec" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

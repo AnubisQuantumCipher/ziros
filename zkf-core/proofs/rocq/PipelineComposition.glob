@@ -1,0 +1,54 @@
+DIGEST 5f9ea56cbbabb843381790f4610efe7b
+FPipelineComposition
+R15:26 KernelCompat <> <> lib
+R44:58 KernelGenerated <> <> lib
+R76:100 KernelFieldEncodingProofs <> <> lib
+R118:132 KernelSemantics <> <> lib
+R150:161 KernelProofs <> <> lib
+R179:196 TransformSemantics <> <> lib
+R214:228 TransformProofs <> <> lib
+R269:297 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> <> lib
+prf 309:347 <> cli_runtime_pipeline_to_kernel_sound_ok
+binder 360:366 <> program:1
+binder 368:374 <> witness:2
+R435:442 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R420:422 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R381:403 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_check_program def
+R405:411 PipelineComposition <> program:1 var
+R413:419 PipelineComposition <> witness:2 var
+R423:431 KernelCompat <> Result_Ok constr
+R433:434 Corelib.Init.Datatypes <> tt constr
+R443:454 KernelSemantics <> ProgramHolds def
+R463:489 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_program_to_kernel def
+R500:525 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> optimize_ir_program_output def
+R528:551 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> normalize_program_output def
+R553:559 PipelineComposition <> program:1 var
+R570:576 PipelineComposition <> witness:2 var
+R628:663 TransformProofs <> transform_program_to_kernel_sound_ok thm
+R628:663 TransformProofs <> transform_program_to_kernel_sound_ok thm
+R675:723 TransformProofs <> optimize_supported_ir_program_preserves_checks_ok thm
+R675:723 TransformProofs <> optimize_supported_ir_program_preserves_checks_ok thm
+R735:781 TransformProofs <> normalize_supported_program_preserves_checks_ok thm
+R735:781 TransformProofs <> normalize_supported_program_preserves_checks_ok thm
+prf 814:857 <> embedded_default_pipeline_to_kernel_sound_ok
+binder 870:876 <> program:3
+binder 878:884 <> witness:4
+R945:952 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R930:932 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R891:913 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_check_program def
+R915:921 PipelineComposition <> program:3 var
+R923:929 PipelineComposition <> witness:4 var
+R933:941 KernelCompat <> Result_Ok constr
+R943:944 Corelib.Init.Datatypes <> tt constr
+R953:964 KernelSemantics <> ProgramHolds def
+R973:999 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_program_to_kernel def
+R1010:1036 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> optimize_zir_program_output def
+R1039:1062 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> normalize_program_output def
+R1064:1070 PipelineComposition <> program:3 var
+R1081:1087 PipelineComposition <> witness:4 var
+R1139:1174 TransformProofs <> transform_program_to_kernel_sound_ok thm
+R1139:1174 TransformProofs <> transform_program_to_kernel_sound_ok thm
+R1186:1235 TransformProofs <> optimize_supported_zir_program_preserves_checks_ok thm
+R1186:1235 TransformProofs <> optimize_supported_zir_program_preserves_checks_ok thm
+R1247:1293 TransformProofs <> normalize_supported_program_preserves_checks_ok thm
+R1247:1293 TransformProofs <> normalize_supported_program_preserves_checks_ok thm

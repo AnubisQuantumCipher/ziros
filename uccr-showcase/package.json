@@ -1,0 +1,37 @@
+{
+  "name": "uccr-showcase",
+  "version": "0.1.0",
+  "description": "Universal Confidential Compliance Registry — ZirOS showcase on Midnight Network. Demonstrates privacy-preserving compliance proofs for finance, medicine, and engineering.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "deploy:finance":   "node --experimental-vm-modules dist/deploy-finance.js",
+    "deploy:clinical":  "node --experimental-vm-modules dist/deploy-clinical.js",
+    "deploy:engineering": "node --experimental-vm-modules dist/deploy-engineering.js",
+    "deploy:all":       "node --experimental-vm-modules dist/deploy-all.js",
+    "prove:finance":    "node --experimental-vm-modules dist/prove-finance.js",
+    "prove:clinical":   "node --experimental-vm-modules dist/prove-clinical.js",
+    "prove:engineering":"node --experimental-vm-modules dist/prove-engineering.js",
+    "wallet:setup":     "node --experimental-vm-modules dist/setup-wallet.js",
+    "clean":            "rm -rf dist"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "0.14.0",
+    "@midnight-ntwrk/ledger": "4.0.0",
+    "@midnight-ntwrk/midnight-js-contracts": "3.1.0",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "3.1.0",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "3.1.0",
+    "@midnight-ntwrk/midnight-js-level-private-state-provider": "3.1.0",
+    "@midnight-ntwrk/midnight-js-network-id": "3.1.0",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "3.1.0",
+    "@midnight-ntwrk/midnight-js-types": "3.1.0",
+    "@midnight-ntwrk/wallet": "5.0.0",
+    "@midnight-ntwrk/wallet-api": "5.0.0",
+    "@midnight-ntwrk/zswap": "4.0.0",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "@types/node": "^22.0.0"
+  }
+}

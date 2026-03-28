@@ -1,0 +1,21 @@
+{
+  "schema": "zkf-competition-scenario-config-v1",
+  "workdir": ".",
+  "command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "recursive_workflow",
+    "--mode",
+    "prove"
+  ],
+  "verify_command": [
+    "python3",
+    "benchmarks/workspaces/nargo/run.py",
+    "--scenario",
+    "recursive_workflow",
+    "--mode",
+    "verify"
+  ],
+  "proof_path": "benchmarks/workspaces/nargo/recursive_workflow/target/bb/proof.json"
+}

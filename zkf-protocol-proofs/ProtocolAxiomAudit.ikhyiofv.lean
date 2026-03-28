@@ -1,0 +1,10 @@
+import ZkfProtocolProofs
+#print axioms ZkfProtocolProofs.groth16_exact_completeness
+#print axioms ZkfProtocolProofs.groth16_exact_knowledge_soundness
+#print axioms ZkfProtocolProofs.groth16_exact_zero_knowledge
+#print axioms ZkfProtocolProofs.fri_exact_completeness
+#print axioms ZkfProtocolProofs.fri_exact_proximity_soundness
+#print axioms ZkfProtocolProofs.nova_exact_completeness
+#print axioms ZkfProtocolProofs.nova_exact_folding_sound
+#print axioms ZkfProtocolProofs.hypernova_exact_completeness
+#print axioms ZkfProtocolProofs.hypernova_exact_folding_sound
