@@ -758,6 +758,89 @@ pub fn template_registry() -> Vec<TemplateRegistryEntryV1> {
             template_args: Vec::new(),
         },
         TemplateRegistryEntryV1 {
+            id: "gnc-6dof-core".to_string(),
+            description:
+                "Reusable aerospace 6-DOF GNC core with surrogate lookup binding and fixed-step safety outputs."
+                    .to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "steps".to_string(),
+                description: "Number of fixed GNC checkpoints to scaffold.".to_string(),
+                default_value: Some(super::templates::STARSHIP_DEFAULT_GNC_STEPS.to_string()),
+                required: false,
+            }],
+        },
+        TemplateRegistryEntryV1 {
+            id: "tower-catch-geometry".to_string(),
+            description:
+                "Tower-catch geometry certificate with arm-clearance and catch-box constraints."
+                    .to_string(),
+            release_ready: true,
+            template_args: Vec::new(),
+        },
+        TemplateRegistryEntryV1 {
+            id: "barge-terminal-profile".to_string(),
+            description:
+                "Barge terminal-profile certificate with deck-motion and clearance bounds."
+                    .to_string(),
+            release_ready: true,
+            template_args: Vec::new(),
+        },
+        TemplateRegistryEntryV1 {
+            id: "planetary-terminal-profile".to_string(),
+            description:
+                "Planetary pad terminal-profile certificate with pad-radius, slope, and dust constraints."
+                    .to_string(),
+            release_ready: true,
+            template_args: Vec::new(),
+        },
+        TemplateRegistryEntryV1 {
+            id: "gust-robustness-batch".to_string(),
+            description:
+                "Monte-Carlo gust robustness batch reducer with zero admitted failures."
+                    .to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "samples".to_string(),
+                description: "Number of attested Monte-Carlo samples in the batch surface."
+                    .to_string(),
+                default_value: Some(
+                    super::templates::STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES.to_string(),
+                ),
+                required: false,
+            }],
+        },
+        TemplateRegistryEntryV1 {
+            id: "private-starship-flip-catch".to_string(),
+            description:
+                "Flagship private Starship-class flip-and-catch certification surface with committed team subgraphs."
+                    .to_string(),
+            release_ready: true,
+            template_args: vec![
+                TemplateArgSpecV1 {
+                    name: "profile".to_string(),
+                    description: "Landing profile: tower-catch, barge-propulsive, or planetary-pad."
+                        .to_string(),
+                    default_value: Some("tower-catch".to_string()),
+                    required: false,
+                },
+                TemplateArgSpecV1 {
+                    name: "steps".to_string(),
+                    description: "Number of fixed GNC checkpoints.".to_string(),
+                    default_value: Some(super::templates::STARSHIP_DEFAULT_GNC_STEPS.to_string()),
+                    required: false,
+                },
+                TemplateArgSpecV1 {
+                    name: "samples".to_string(),
+                    description: "Number of attested Monte-Carlo batch samples.".to_string(),
+                    default_value: Some(
+                        super::templates::STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES.to_string(),
+                    ),
+                    required: false,
+                },
+            ],
+        },
+        TemplateRegistryEntryV1 {
             id: "private-powered-descent".to_string(),
             description:
                 "Private powered-descent guidance showcase with strict runtime-compatible outputs."
@@ -886,6 +969,66 @@ pub fn instantiate_template(
             reject_unknown_args(template_args, &[])?;
             super::templates::private_identity_kyc()?
         }
+        "gnc-6dof-core" => {
+            reject_unknown_args(template_args, &["steps"])?;
+            super::templates::gnc_6dof_core_template_with_steps(parse_usize_arg(
+                template_args,
+                "steps",
+                super::templates::STARSHIP_DEFAULT_GNC_STEPS,
+            )?)?
+        }
+        "tower-catch-geometry" => {
+            reject_unknown_args(template_args, &[])?;
+            super::templates::tower_catch_geometry_template()?
+        }
+        "barge-terminal-profile" => {
+            reject_unknown_args(template_args, &[])?;
+            super::templates::barge_terminal_profile_template()?
+        }
+        "planetary-terminal-profile" => {
+            reject_unknown_args(template_args, &[])?;
+            super::templates::planetary_terminal_profile_template()?
+        }
+        "gust-robustness-batch" => {
+            reject_unknown_args(template_args, &["samples"])?;
+            super::templates::gust_robustness_batch_template_with_samples(parse_usize_arg(
+                template_args,
+                "samples",
+                super::templates::STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES,
+            )?)?
+        }
+        "private-starship-flip-catch" => {
+            reject_unknown_args(template_args, &["profile", "steps", "samples"])?;
+            let profile = match parse_string_arg(template_args, "profile", "tower-catch") {
+                "tower-catch" | "tower_catch" | "tower" => {
+                    super::templates::LandingInterfaceProfileV1::TowerCatch
+                }
+                "barge-propulsive" | "barge_propulsive" | "barge" => {
+                    super::templates::LandingInterfaceProfileV1::BargePropulsive
+                }
+                "planetary-pad" | "planetary_pad" | "planetary" => {
+                    super::templates::LandingInterfaceProfileV1::PlanetaryPad
+                }
+                other => {
+                    return Err(ZkfError::InvalidArtifact(format!(
+                        "private-starship-flip-catch template arg 'profile' must be tower-catch, barge-propulsive, or planetary-pad, got '{other}'"
+                    )));
+                }
+            };
+            super::templates::private_starship_flip_catch_template_with_profile(
+                profile,
+                parse_usize_arg(
+                    template_args,
+                    "steps",
+                    super::templates::STARSHIP_DEFAULT_GNC_STEPS,
+                )?,
+                parse_usize_arg(
+                    template_args,
+                    "samples",
+                    super::templates::STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES,
+                )?,
+            )?
+        }
         "private-powered-descent" => {
             reject_unknown_args(template_args, &["steps"])?;
             super::templates::private_powered_descent_showcase_with_steps(parse_usize_arg(
@@ -975,6 +1118,12 @@ mod tests {
         let registry = template_registry();
         assert!(registry.iter().any(|entry| entry.id == "private-vote"));
         assert!(registry.iter().any(|entry| entry.id == "private-identity"));
+        assert!(registry.iter().any(|entry| entry.id == "gnc-6dof-core"));
+        assert!(
+            registry
+                .iter()
+                .any(|entry| entry.id == "private-starship-flip-catch")
+        );
         assert!(
             registry
                 .iter()

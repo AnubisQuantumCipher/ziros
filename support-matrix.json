@@ -349,6 +349,42 @@
   ],
   "app_templates": [
     {
+      "id": "gnc-6dof-core",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Reusable aerospace 6-DOF GNC core surface with fixed-step safety outputs, surrogate-band lookup binding, bounded replan latency, and nonlinear commitment links."
+    },
+    {
+      "id": "tower-catch-geometry",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Tower-catch landing-interface certificate with catch-box geometry, arm-clearance floor, and fail-closed closing-speed bounds."
+    },
+    {
+      "id": "barge-terminal-profile",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Barge terminal-profile certificate with deck-motion, lateral-clearance, and fail-closed terminal-velocity bounds."
+    },
+    {
+      "id": "planetary-terminal-profile",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Planetary pad terminal-profile certificate with pad-radius, slope, dust-clearance, and fail-closed landing bounds."
+    },
+    {
+      "id": "gust-robustness-batch",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Monte-Carlo gust robustness batch reducer with zero admitted failures, bounded replan latency, and production-target metadata for the larger 10,000-sample certification lane."
+    },
+    {
+      "id": "private-starship-flip-catch",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Flagship private Starship-class flip-and-catch certification surface with committed team subgraphs, imported-CRS-only production posture, TCP-counted transport, one-hot landing-profile selection, and nonlinear batch/subgraph commitments."
+    },
+    {
       "id": "thermochemical-equilibrium",
       "status": "ready",
       "field": "bn254",

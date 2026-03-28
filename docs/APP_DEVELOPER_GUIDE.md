@@ -61,6 +61,12 @@ Available templates:
 - `private-vote`
 - `range-proof`
 - `sha256-preimage`
+- `gnc-6dof-core`
+- `tower-catch-geometry`
+- `barge-terminal-profile`
+- `planetary-terminal-profile`
+- `gust-robustness-batch`
+- `private-starship-flip-catch`
 - `private-powered-descent`
 - `private-satellite-conjunction`
 - `private-multi-satellite-base32`
@@ -88,10 +94,38 @@ ziros app templates --json
 ziros app init my-zk-app --template merkle-membership --template-arg depth=4
 ziros app init my-zk-app --template real-gas-state --template-arg model=redlich-kwong
 ziros app init my-zk-app --template navier-stokes-structured --template-arg cells=4
+ziros app init my-zk-app --template private-starship-flip-catch --template-arg profile=tower-catch --template-arg steps=6 --template-arg samples=8
 ```
 
 The direct `zirapp.json` route remains available when you want the manual/operator
 path, but the scaffold above is the default new-developer workflow.
+
+## Aerospace App Kit
+
+The aerospace templates are first-class `zkf-lib` app surfaces. They do not introduce a second DSL.
+
+- `gnc-6dof-core`: reusable fixed-step GNC core with surrogate lookup binding and fail-closed replan checks
+- `tower-catch-geometry`: landing-interface certificate for tower-arm catch corridors
+- `barge-terminal-profile`: landing-interface certificate for moving-deck terminal constraints
+- `planetary-terminal-profile`: landing-interface certificate for planetary pad bounds
+- `gust-robustness-batch`: Monte-Carlo batch reducer for admitted wind-envelope samples
+- `private-starship-flip-catch`: flagship composed app surface that binds team-private subgraphs, imported-CRS-only posture, TCP-counted transport, and landing-profile selection
+
+Scaffolds for aerospace templates also emit:
+
+- `scripts/benchmark.sh`
+- `scripts/generate_report.sh`
+- `scripts/export_public_bundle.sh`
+- `artifacts/benchmarks/`
+- `artifacts/reports/`
+- `artifacts/public/`
+
+The scaffold contract stays honest about production posture:
+
+- final regulator-facing wrap is imported CRS only
+- Neural Engine is advisory only
+- TCP is the counted distributed transport surface
+- RDMA remains follow-on until it has implementation and proof-boundary closure
 
 ## Scientific Certificate Lanes
 
@@ -136,8 +170,10 @@ pub fn program() -> zkf_lib::Program {
 Available builder methods:
 
 - signal declaration: `private_input`, `public_input`, `public_output`, `private_signal`, `constant_signal`
+- indexed signal helpers: `private_input_array`, `private_input_matrix`, `public_input_array`, `public_output_array`, `public_output_matrix`, `private_signal_array`, `private_signal_matrix`
 - witness/alias support: `add_assignment`, `bind`, `add_hint`, `input_alias`
-- constraints: `constrain_equal`, `constrain_boolean`, `constrain_range`, `constrain_leq`, `constrain_geq`, `constrain_nonzero`, `constrain_select`
+- constraints: `constrain_equal`, `constrain_boolean`, `constrain_range`, `constrain_leq`, `constrain_geq`, `constrain_nonzero`, `constrain_select`, `constrain_exactly_one`, `constrain_mux_from_one_hot`
+- commitment helpers: `bind_poseidon_commitment`, `poseidon_hash`, `sha256_hash`
 - parity surfaces: `add_lookup_table`, `constrain_lookup`, `define_custom_gate`, `constrain_custom_gate`, `define_memory_region`, `constrain_memory_read`, `constrain_memory_write`, `constrain_copy`, `constrain_permutation`, `constrain_blackbox`
 - extension hooks: `register_gadget`, `with_registry`, `emit_gadget`
 

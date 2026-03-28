@@ -47,6 +47,42 @@ fn app_init_generates_updated_readme_and_input_files() {
 }
 
 #[test]
+fn aerospace_app_init_generates_scripts_and_public_bundle_dirs() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let out = temp.path().join("starship-app");
+    let label = super::cmd::handle(
+        crate::cli::Commands::App {
+            command: crate::cli::AppCommands::Init {
+                name: Some("starship-app".to_string()),
+                name_positional: None,
+                template: "private-starship-flip-catch".to_string(),
+                template_arg: vec![
+                    "steps=2".to_string(),
+                    "samples=4".to_string(),
+                    "profile=tower-catch".to_string(),
+                ],
+                style: "minimal".to_string(),
+                out: Some(out.clone()),
+            },
+        },
+        false,
+    );
+    assert!(label.is_ok());
+
+    let readme = std::fs::read_to_string(out.join("README.md")).expect("readme");
+    assert!(readme.contains("scripts/benchmark.sh"));
+    assert!(readme.contains("scripts/generate_report.sh"));
+    assert!(readme.contains("scripts/export_public_bundle.sh"));
+
+    assert!(out.join("scripts/benchmark.sh").is_file());
+    assert!(out.join("scripts/generate_report.sh").is_file());
+    assert!(out.join("scripts/export_public_bundle.sh").is_file());
+    assert!(out.join("artifacts/public").is_dir());
+    assert!(out.join("artifacts/reports").is_dir());
+    assert!(out.join("artifacts/benchmarks").is_dir());
+}
+
+#[test]
 fn app_templates_command_name_is_wired() {
     let label = super::cmd::handle(
         crate::cli::Commands::App {

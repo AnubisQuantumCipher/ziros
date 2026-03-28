@@ -77,6 +77,24 @@ pub use zkf_ir_spec::{IR_SPEC_MAJOR, IR_SPEC_MINOR, version::IrVersion};
 #[cfg(all(feature = "full", not(hax)))]
 pub use app::api::capability_matrix;
 #[cfg(not(hax))]
+pub use app::aerospace::{
+    AEROSPACE_ROTATIONAL_AXES, AEROSPACE_TRANSLATIONAL_AXES, STARSHIP_DEFAULT_GNC_STEPS,
+    STARSHIP_DEFAULT_MONTE_CARLO_SAMPLES, STARSHIP_MONTE_CARLO_PRODUCTION_TARGET_SAMPLES,
+    STARSHIP_TEAM_SUBGRAPH_COUNT, BargeTerminalProfileV1, CertificationInvariantSetV1,
+    CertificationObservedMetricsV1, DistributedProofConfigV1, ImportedCrsManifestRefV1,
+    LandingInterfaceProfileV1, MonteCarloBatchConfigV1, PlanetaryTerminalProfileV1,
+    PrivateStarshipFlipCatchRequestV1, RigidBodyStateV1, SurrogateBandRowV1,
+    TeamSubgraphDescriptorV1, TeamSubgraphKindV1, TowerCatchGeometryV1, VehicleEnvelopeV1,
+    add_surrogate_band_lookup, barge_terminal_profile_showcase,
+    build_gnc_6dof_core_program_with_steps, build_gust_robustness_batch_program_with_samples,
+    build_private_starship_flip_catch_program_with_profile,
+    constrain_surrogate_band_lookup, gnc_6dof_core_showcase, gnc_6dof_core_showcase_with_steps,
+    gust_robustness_batch_showcase, gust_robustness_batch_showcase_with_samples,
+    planetary_terminal_profile_showcase, private_starship_flip_catch_inputs_from_request,
+    private_starship_flip_catch_sample_request, private_starship_flip_catch_showcase,
+    private_starship_flip_catch_showcase_with_profile, tower_catch_geometry_showcase,
+};
+#[cfg(not(hax))]
 pub use app::api::{
     EmbeddedCheck, EmbeddedProof, check, check_with_backend, compile, compile_and_prove,
     compile_and_prove_default, compile_and_prove_with_progress,
@@ -207,6 +225,11 @@ pub use zkf_gadgets::{Gadget, GadgetRegistry, GadgetSpec};
 #[cfg(not(hax))]
 pub mod combustion {
     pub use crate::app::combustion::*;
+}
+
+#[cfg(not(hax))]
+pub mod aerospace {
+    pub use crate::app::aerospace::*;
 }
 
 #[cfg(not(hax))]

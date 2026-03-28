@@ -11,6 +11,11 @@ Use `ProgramBuilder` instead when you need imperative Rust authoring, dynamic
 program construction, or library-driven reuse that is awkward to express in
 JSON.
 
+This stability guarantee also applies to the aerospace app kit. Templates such
+as `gnc-6dof-core` and `private-starship-flip-catch` are built on the same
+`AppSpecV1` contract plus reusable builder/helpers; they do not fork a separate
+authoring schema.
+
 ## Top-Level Fields
 
 An `AppSpecV1` document contains:
@@ -151,6 +156,7 @@ Switch to `ProgramBuilder` when:
 - you need loops, branching, or host-language abstraction during construction
 - the program shape depends on runtime configuration
 - you want a Rust API instead of a JSON contract
+- you want indexed helpers such as arrays/matrices, one-hot selection, or reusable commitment-link helpers
 
 ## Related Docs
 
