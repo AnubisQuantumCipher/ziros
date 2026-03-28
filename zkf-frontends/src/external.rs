@@ -69,13 +69,11 @@ impl FrontendEngine for CompactFrontend {
         let accepted = zkir_match || descriptor_match || compact_extension || compact_keyword;
         FrontendProbe {
             accepted,
-            format: accepted.then_some(
-                if zkir_match {
-                    "compact-zkir-json".to_string()
-                } else {
-                    "compact-descriptor-json".to_string()
-                },
-            ),
+            format: accepted.then_some(if zkir_match {
+                "compact-zkir-json".to_string()
+            } else {
+                "compact-descriptor-json".to_string()
+            }),
             noir_version: None,
             notes: if accepted {
                 vec![]

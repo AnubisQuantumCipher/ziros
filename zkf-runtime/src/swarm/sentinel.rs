@@ -601,7 +601,8 @@ impl SentinelState {
             manifold.count,
             config.seal_every_observations,
             last.map(|seal| seal.observation_count),
-            last.map(|seal| seal.commitment == commitment).unwrap_or(false),
+            last.map(|seal| seal.commitment == commitment)
+                .unwrap_or(false),
         ) {
             return;
         }

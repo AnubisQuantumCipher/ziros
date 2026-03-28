@@ -9,16 +9,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Some(flag) = args.next() {
         match flag.as_str() {
             "--out-dir" => {
-                manifest_dir = PathBuf::from(
-                    args.next()
-                        .ok_or("--out-dir requires a path")?,
-                );
+                manifest_dir = PathBuf::from(args.next().ok_or("--out-dir requires a path")?);
             }
             "--lean-dir" => {
-                lean_dir = PathBuf::from(
-                    args.next()
-                        .ok_or("--lean-dir requires a path")?,
-                );
+                lean_dir = PathBuf::from(args.next().ok_or("--lean-dir requires a path")?);
             }
             _ => {
                 return Err("usage: cargo run -p zkf-metal --example export_gpu_proof_artifacts [--out-dir PATH] [--lean-dir PATH]".into());

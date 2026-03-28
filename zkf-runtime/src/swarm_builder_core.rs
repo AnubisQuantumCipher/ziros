@@ -100,9 +100,7 @@ pub(crate) fn next_rule_state_after_shadow_observation(
     shadow_false_positive_rate_basis_points: u32,
     auto_promote: bool,
 ) -> RuleState {
-    if current_state == RuleState::Shadow
-        && shadow_observation_count >= MIN_SHADOW_OBSERVATIONS
-    {
+    if current_state == RuleState::Shadow && shadow_observation_count >= MIN_SHADOW_OBSERVATIONS {
         if shadow_false_positive_rate_basis_points > MAX_SHADOW_FALSE_POSITIVE_RATE_BPS {
             RuleState::Revoked
         } else if auto_promote {

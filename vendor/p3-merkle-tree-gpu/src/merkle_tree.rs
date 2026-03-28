@@ -159,10 +159,7 @@ impl<F: Clone + Send + Sync, W: Clone, M: Matrix<F>, const DIGEST_ELEMS: usize>
     /// - `digest_layers` must be consistent with `leaves` (same structure as
     ///   `MerkleTree::new` would produce).
     /// - The last layer must contain exactly one digest (the root).
-    pub fn from_precomputed(
-        leaves: Vec<M>,
-        digest_layers: Vec<Vec<[W; DIGEST_ELEMS]>>,
-    ) -> Self {
+    pub fn from_precomputed(leaves: Vec<M>, digest_layers: Vec<Vec<[W; DIGEST_ELEMS]>>) -> Self {
         Self {
             leaves,
             digest_layers,

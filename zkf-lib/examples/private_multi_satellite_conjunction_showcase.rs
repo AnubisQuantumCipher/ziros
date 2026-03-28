@@ -116,7 +116,11 @@ fn full_audit_requested() -> bool {
 fn selected_scenarios() -> ZkfResult<Vec<PrivateMultiSatelliteScenario>> {
     let raw = env::var(SCENARIOS_ENV).unwrap_or_else(|_| "base32,stress64".to_string());
     let mut scenarios = Vec::new();
-    for token in raw.split(',').map(str::trim).filter(|value| !value.is_empty()) {
+    for token in raw
+        .split(',')
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
         let scenario = match token {
             "base32" => PrivateMultiSatelliteScenario::Base32,
             "stress64" => PrivateMultiSatelliteScenario::Stress64,
@@ -140,10 +144,12 @@ fn selected_scenarios() -> ZkfResult<Vec<PrivateMultiSatelliteScenario>> {
 fn default_output_dir(spec: &PrivateMultiSatelliteScenarioSpec) -> PathBuf {
     let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
     match spec.scenario {
-        PrivateMultiSatelliteScenario::Base32 => PathBuf::from(home)
-            .join("Desktop/ZirOS_Private_MultiSatellite_32Sat_64Pairs_120Steps"),
-        PrivateMultiSatelliteScenario::Stress64 => PathBuf::from(home)
-            .join("Desktop/ZirOS_Private_MultiSatellite_64Sat_256Pairs_240Steps"),
+        PrivateMultiSatelliteScenario::Base32 => {
+            PathBuf::from(home).join("Desktop/ZirOS_Private_MultiSatellite_32Sat_64Pairs_120Steps")
+        }
+        PrivateMultiSatelliteScenario::Stress64 => {
+            PathBuf::from(home).join("Desktop/ZirOS_Private_MultiSatellite_64Sat_256Pairs_240Steps")
+        }
         PrivateMultiSatelliteScenario::Mini => {
             PathBuf::from(home).join("Desktop/ZirOS_Private_MultiSatellite_Mini")
         }
@@ -323,33 +329,34 @@ fn public_inputs_bundle(
             }))
         })
         .collect::<ZkfResult<Vec<_>>>()?;
-    let pair_results = pair_schedule
-        .iter()
-        .map(|pair| {
-            let min_name = format!("pair_{}_minimum_separation", pair.index);
-            let safe_name = format!("pair_{}_safe", pair.index);
-            let min_value = witness
-                .values
-                .get(&min_name)
-                .ok_or_else(|| ZkfError::MissingWitnessValue {
-                    signal: min_name.clone(),
+    let pair_results =
+        pair_schedule
+            .iter()
+            .map(|pair| {
+                let min_name = format!("pair_{}_minimum_separation", pair.index);
+                let safe_name = format!("pair_{}_safe", pair.index);
+                let min_value =
+                    witness
+                        .values
+                        .get(&min_name)
+                        .ok_or_else(|| ZkfError::MissingWitnessValue {
+                            signal: min_name.clone(),
+                        })?;
+                let safe_value = witness.values.get(&safe_name).ok_or_else(|| {
+                    ZkfError::MissingWitnessValue {
+                        signal: safe_name.clone(),
+                    }
                 })?;
-            let safe_value = witness
-                .values
-                .get(&safe_name)
-                .ok_or_else(|| ZkfError::MissingWitnessValue {
-                    signal: safe_name.clone(),
-                })?;
-            Ok(json!({
-                "pair_index": pair.index,
-                "offset": pair.offset,
-                "sat_a": pair.sat_a,
-                "sat_b": pair.sat_b,
-                "minimum_separation": min_value.to_decimal_string(),
-                "safe": safe_value.as_bigint() != num_bigint::BigInt::from(0u8),
-            }))
-        })
-        .collect::<ZkfResult<Vec<_>>>()?;
+                Ok(json!({
+                    "pair_index": pair.index,
+                    "offset": pair.offset,
+                    "sat_a": pair.sat_a,
+                    "sat_b": pair.sat_b,
+                    "minimum_separation": min_value.to_decimal_string(),
+                    "safe": safe_value.as_bigint() != num_bigint::BigInt::from(0u8),
+                }))
+            })
+            .collect::<ZkfResult<Vec<_>>>()?;
     let unsafe_pairs = pair_results
         .iter()
         .filter(|entry| entry.get("safe").and_then(serde_json::Value::as_bool) == Some(false))
@@ -434,15 +441,17 @@ fn recompute_mission_digest(public_inputs: &serde_json::Value) -> ZkfResult<Stri
         let sat_a = entry
             .get("sat_a")
             .and_then(serde_json::Value::as_u64)
-            .ok_or_else(|| ZkfError::InvalidArtifact("pair_results entry missing sat_a".to_string()))?;
+            .ok_or_else(|| {
+                ZkfError::InvalidArtifact("pair_results entry missing sat_a".to_string())
+            })?;
         let sat_b = entry
             .get("sat_b")
             .and_then(serde_json::Value::as_u64)
-            .ok_or_else(|| ZkfError::InvalidArtifact("pair_results entry missing sat_b".to_string()))?;
+            .ok_or_else(|| {
+                ZkfError::InvalidArtifact("pair_results entry missing sat_b".to_string())
+            })?;
         let pair_leaf = zkf_lib::app::private_identity::poseidon_permutation4_bn254(&[
-            zkf_core::FieldElement::from_bigint(
-                parse_decimal_bigint(minimum)?,
-            ),
+            zkf_core::FieldElement::from_bigint(parse_decimal_bigint(minimum)?),
             if safe {
                 zkf_core::FieldElement::ONE
             } else {
@@ -455,12 +464,12 @@ fn recompute_mission_digest(public_inputs: &serde_json::Value) -> ZkfResult<Stri
             .clone();
         items.push(pair_leaf);
     }
-    items.push(zkf_core::FieldElement::from_bigint(
-        parse_decimal_bigint(collision_threshold)?,
-    ));
-    items.push(zkf_core::FieldElement::from_bigint(
-        parse_decimal_bigint(delta_v_budget)?,
-    ));
+    items.push(zkf_core::FieldElement::from_bigint(parse_decimal_bigint(
+        collision_threshold,
+    )?));
+    items.push(zkf_core::FieldElement::from_bigint(parse_decimal_bigint(
+        delta_v_budget,
+    )?));
 
     let mission_domain = zkf_core::FieldElement::from_u64(50_000);
     let mut acc = zkf_lib::app::private_identity::poseidon_permutation4_bn254(&[
@@ -504,7 +513,9 @@ fn local_formal_checks(
     let pair_results = public_inputs
         .get("pair_results")
         .and_then(serde_json::Value::as_array)
-        .ok_or_else(|| ZkfError::InvalidArtifact("public inputs missing pair results".to_string()))?;
+        .ok_or_else(|| {
+            ZkfError::InvalidArtifact("public inputs missing pair results".to_string())
+        })?;
     let threshold = public_inputs
         .get("collision_threshold")
         .and_then(serde_json::Value::as_str)
@@ -553,14 +564,19 @@ fn local_formal_checks(
 fn os_version() -> String {
     let output = Command::new("sw_vers").arg("-productVersion").output();
     match output {
-        Ok(output) if output.status.success() => String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        Ok(output) if output.status.success() => {
+            String::from_utf8_lossy(&output.stdout).trim().to_string()
+        }
         _ => env::consts::OS.to_string(),
     }
 }
 
 fn run_foundry_report(project_dir: &Path, out_dir: &Path) -> ZkfResult<serde_json::Value> {
     let mut command = Command::new("forge");
-    command.current_dir(project_dir).arg("test").arg("--gas-report");
+    command
+        .current_dir(project_dir)
+        .arg("test")
+        .arg("--gas-report");
     let output = command.output();
     let report_path = out_dir.join("foundry_report.txt");
     match output {
@@ -582,10 +598,7 @@ fn run_foundry_report(project_dir: &Path, out_dir: &Path) -> ZkfResult<serde_jso
             }))
         }
         Err(error) => {
-            write_text(
-                &report_path,
-                &format!("forge invocation failed: {error}\n"),
-            )?;
+            write_text(&report_path, &format!("forge invocation failed: {error}\n"))?;
             Ok(json!({
                 "generated": false,
                 "passed": false,
@@ -895,7 +908,11 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
             "cpu",
             "cpu",
             "cpu",
-            Some(json_to_vec_pretty(&template.sample_inputs).map_err(|error| ZkfError::Serialization(format!("serialize inputs: {error}")) )?.len()),
+            Some(
+                json_to_vec_pretty(&template.sample_inputs)
+                    .map_err(|error| ZkfError::Serialization(format!("serialize inputs: {error}")))?
+                    .len()
+            ),
             Some(witness_bytes.len()),
             Some(prepared_witness.values.len()),
             false,
@@ -911,17 +928,36 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
             None,
             None,
             None,
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
             None,
             None,
             None,
             true,
             true,
             false,
-            runtime_artifact.metadata.get("qap_witness_map_fallback_state").map(String::as_str) != Some("none"),
-            runtime_artifact.metadata.get("qap_witness_map_reason").cloned(),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_fallback_state")
+                .map(String::as_str)
+                != Some("none"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_reason")
+                .cloned(),
             "backend-delegated-telemetry-gap",
         ),
         stage_metric(
@@ -930,17 +966,36 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
             None,
             None,
             None,
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("qap_witness_map_engine").map(String::as_str).unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
             None,
             None,
             None,
             true,
             true,
             false,
-            runtime_artifact.metadata.get("qap_witness_map_fallback_state").map(String::as_str) != Some("none"),
-            runtime_artifact.metadata.get("qap_witness_map_reason").cloned(),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_fallback_state")
+                .map(String::as_str)
+                != Some("none"),
+            runtime_artifact
+                .metadata
+                .get("qap_witness_map_reason")
+                .cloned(),
             "backend-delegated-telemetry-gap",
         ),
         stage_metric(
@@ -949,16 +1004,32 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
             None,
             None,
             None,
-            runtime_artifact.metadata.get("groth16_msm_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("groth16_msm_engine").map(String::as_str).unwrap_or("cpu"),
-            runtime_artifact.metadata.get("groth16_msm_engine").map(String::as_str).unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("groth16_msm_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("groth16_msm_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
+            runtime_artifact
+                .metadata
+                .get("groth16_msm_engine")
+                .map(String::as_str)
+                .unwrap_or("cpu"),
             None,
             None,
             None,
             true,
             true,
             false,
-            runtime_artifact.metadata.get("groth16_msm_fallback_state").map(String::as_str) != Some("none"),
+            runtime_artifact
+                .metadata
+                .get("groth16_msm_fallback_state")
+                .map(String::as_str)
+                != Some("none"),
             runtime_artifact.metadata.get("groth16_msm_reason").cloned(),
             "backend-delegated-telemetry-gap",
         ),
@@ -1129,7 +1200,10 @@ fn execute_scenario_once(spec: &PrivateMultiSatelliteScenarioSpec) -> ZkfResult<
         })
         .collect::<Vec<_>>();
     let backend_delegated_gpu_stages = [
-        runtime_artifact.metadata.get("qap_witness_map_engine").cloned(),
+        runtime_artifact
+            .metadata
+            .get("qap_witness_map_engine")
+            .cloned(),
         runtime_artifact.metadata.get("groth16_msm_engine").cloned(),
     ]
     .into_iter()
@@ -1270,25 +1344,27 @@ fn determinism_report(
         .collect::<ZkfResult<Vec<_>>>()?;
 
     let proofs_match = proof_hashes.windows(2).all(|window| window[0] == window[1]);
-    let witnesses_match = witness_hashes.windows(2).all(|window| window[0] == window[1]);
+    let witnesses_match = witness_hashes
+        .windows(2)
+        .all(|window| window[0] == window[1]);
     let outputs_match = public_output_hashes
         .windows(2)
         .all(|window| window[0] == window[1]);
     let manifest_match = manifest_hashes
         .windows(2)
         .all(|window| window[0] == window[1]);
-    let runtime_raw_match = runtime_trace_hashes.windows(2).all(|window| {
-        window[0].get("raw") == window[1].get("raw")
-    });
-    let runtime_canonical_match = runtime_trace_hashes.windows(2).all(|window| {
-        window[0].get("canonical") == window[1].get("canonical")
-    });
-    let stage_raw_match = stage_metric_hashes.windows(2).all(|window| {
-        window[0].get("raw") == window[1].get("raw")
-    });
-    let stage_canonical_match = stage_metric_hashes.windows(2).all(|window| {
-        window[0].get("canonical") == window[1].get("canonical")
-    });
+    let runtime_raw_match = runtime_trace_hashes
+        .windows(2)
+        .all(|window| window[0].get("raw") == window[1].get("raw"));
+    let runtime_canonical_match = runtime_trace_hashes
+        .windows(2)
+        .all(|window| window[0].get("canonical") == window[1].get("canonical"));
+    let stage_raw_match = stage_metric_hashes
+        .windows(2)
+        .all(|window| window[0].get("raw") == window[1].get("raw"));
+    let stage_canonical_match = stage_metric_hashes
+        .windows(2)
+        .all(|window| window[0].get("canonical") == window[1].get("canonical"));
 
     let mut differences = Vec::new();
     if !runtime_raw_match && runtime_canonical_match {
@@ -1590,9 +1666,15 @@ fn export_scenario_bundle(
     write_text(&out_dir.join("verifier.sol"), &verifier_source)?;
     write_json(&out_dir.join("calldata.json"), &calldata)?;
     write_json(&out_dir.join("runtime_trace.json"), &run.runtime_trace)?;
-    write_json(&out_dir.join("accelerator_trace.json"), &run.accelerator_trace)?;
+    write_json(
+        &out_dir.join("accelerator_trace.json"),
+        &run.accelerator_trace,
+    )?;
     write_json(&out_dir.join("stage_metrics.json"), &run.stage_metrics)?;
-    write_json(&out_dir.join("compiled_circuit_metrics.json"), &run.ccs_summary)?;
+    write_json(
+        &out_dir.join("compiled_circuit_metrics.json"),
+        &run.ccs_summary,
+    )?;
 
     write_text(
         &project_dir.join("src/PrivateMultiSatelliteVerifier.sol"),
@@ -1603,8 +1685,7 @@ fn export_scenario_bundle(
         &foundry_test.source,
     )?;
 
-    let formal_inherited =
-        collect_formal_evidence_for_generated_app(out_dir, APP_ID)?;
+    let formal_inherited = collect_formal_evidence_for_generated_app(out_dir, APP_ID)?;
     let generated_closure = generated_app_closure_bundle_summary(APP_ID)?;
     let local_checks = local_formal_checks(spec, pair_schedule, &run.public_inputs)?;
     write_json(&out_dir.join("formal/local_checks.json"), &local_checks)?;
@@ -1623,11 +1704,16 @@ fn export_scenario_bundle(
         fs::create_dir_all(&audit_dir)
             .map_err(|error| ZkfError::Io(format!("create {}: {error}", audit_dir.display())))?;
         let source_audit = audit_program_with_live_capabilities(
-            run.compiled.original_program.as_ref().unwrap_or(&run.compiled.program),
+            run.compiled
+                .original_program
+                .as_ref()
+                .unwrap_or(&run.compiled.program),
             Some(BackendKind::ArkworksGroth16),
         );
-        let compiled_audit =
-            audit_program_with_live_capabilities(&run.compiled.program, Some(BackendKind::ArkworksGroth16));
+        let compiled_audit = audit_program_with_live_capabilities(
+            &run.compiled.program,
+            Some(BackendKind::ArkworksGroth16),
+        );
         write_json(&audit_dir.join("source_audit.json"), &source_audit)?;
         write_json(&audit_dir.join("compiled_audit.json"), &compiled_audit)?;
         two_tier_audit_record(
@@ -1690,7 +1776,10 @@ fn export_scenario_bundle(
         "repo_inherited": formal_inherited.1,
         "local_checks": local_checks,
     });
-    write_json(&out_dir.join("formal_evidence_summary.json"), &formal_summary)?;
+    write_json(
+        &out_dir.join("formal_evidence_summary.json"),
+        &formal_summary,
+    )?;
 
     let foundry = run_foundry_report(&project_dir, out_dir)?;
     let benchmark_summary = json!({
@@ -1764,7 +1853,10 @@ fn export_scenario_bundle(
         &audit_summary,
         &foundry,
     );
-    write_text(&out_dir.join("human_readable_summary.md"), &summary_markdown)?;
+    write_text(
+        &out_dir.join("human_readable_summary.md"),
+        &summary_markdown,
+    )?;
 
     let manifest = export_manifest(
         spec,

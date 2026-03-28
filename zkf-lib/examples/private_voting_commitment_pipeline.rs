@@ -14,8 +14,8 @@ use zkf_core::{check_constraints, optimize_program};
 use zkf_lib::evidence::{
     audit_entry_included, collect_formal_evidence_for_generated_app,
     effective_gpu_attribution_summary, ensure_file_exists, ensure_foundry_layout,
-    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty,
-    two_tier_audit_record, write_json, write_text,
+    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty, two_tier_audit_record,
+    write_json, write_text,
 };
 use zkf_lib::templates::private_vote_commitment_three_candidate;
 use zkf_lib::{
@@ -316,18 +316,15 @@ fn main() -> ZkfResult<()> {
         collect_formal_evidence_for_generated_app(&out_dir, "private_voting_commitment_pipeline")?;
     let generated_closure_summary =
         generated_app_closure_bundle_summary("private_voting_commitment_pipeline")?;
-    let effective_gpu_attribution = effective_gpu_attribution_summary(0, 0.0, &proof_first.metadata);
+    let effective_gpu_attribution =
+        effective_gpu_attribution_summary(0, 0.0, &proof_first.metadata);
 
     fs::create_dir_all(&audit_dir)
         .map_err(|error| ZkfError::Io(format!("create {}: {error}", audit_dir.display())))?;
-    let source_audit = audit_program_with_live_capabilities(
-        &original_program,
-        Some(BackendKind::ArkworksGroth16),
-    );
-    let compiled_audit = audit_program_with_live_capabilities(
-        &compiled.program,
-        Some(BackendKind::ArkworksGroth16),
-    );
+    let source_audit =
+        audit_program_with_live_capabilities(&original_program, Some(BackendKind::ArkworksGroth16));
+    let compiled_audit =
+        audit_program_with_live_capabilities(&compiled.program, Some(BackendKind::ArkworksGroth16));
     write_json(&source_audit_path, &source_audit)?;
     write_json(&compiled_audit_path, &compiled_audit)?;
     let audit_summary = two_tier_audit_record(

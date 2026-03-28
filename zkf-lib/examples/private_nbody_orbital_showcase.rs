@@ -28,8 +28,8 @@ use zkf_lib::orbital::{
     private_nbody_orbital_showcase_with_steps, private_nbody_orbital_witness_with_steps,
 };
 use zkf_lib::{
-    ZkfError, ZkfResult, audit_program_with_live_capabilities,
-    export_groth16_solidity_verifier, verify,
+    ZkfError, ZkfResult, audit_program_with_live_capabilities, export_groth16_solidity_verifier,
+    verify,
 };
 use zkf_runtime::{
     BackendProofExecutionResult, ExecutionMode, OptimizationObjective, RequiredTrustLane,

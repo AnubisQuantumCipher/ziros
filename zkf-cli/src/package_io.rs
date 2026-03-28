@@ -331,8 +331,7 @@ pub(crate) fn write_proof_artifacts(
             .and_then(|value| value.parse::<bool>().ok()),
         runtime_execution_regime: runtime_realization.execution_regime,
         runtime_gpu_stage_busy_ratio: runtime_realization.gpu_stage_busy_ratio,
-        runtime_prover_acceleration_realized: runtime_realization
-            .prover_acceleration_realized,
+        runtime_prover_acceleration_realized: runtime_realization.prover_acceleration_realized,
         prover_acceleration_realization: runtime_realization.acceleration_label,
         cpu_math_fallback_reason: artifact.metadata.get("cpu_math_fallback_reason").cloned(),
         export_scheme: artifact.metadata.get("export_scheme").cloned(),

@@ -277,16 +277,16 @@ impl CpuBackendDriver {
         };
 
         if let Some(compiled) = compiled {
-            let prepared = if ensure_witness_completeness(&compiled.program, witness.as_ref()).is_ok()
-            {
-                (*witness).clone()
-            } else {
-                prepare_witness_for_proving(&compiled, witness.as_ref()).map_err(|error| {
-                    RuntimeError::WitnessGeneration(format!(
-                        "witness-solve could not normalize supplied witness: {error}"
-                    ))
-                })?
-            };
+            let prepared =
+                if ensure_witness_completeness(&compiled.program, witness.as_ref()).is_ok() {
+                    (*witness).clone()
+                } else {
+                    prepare_witness_for_proving(&compiled, witness.as_ref()).map_err(|error| {
+                        RuntimeError::WitnessGeneration(format!(
+                            "witness-solve could not normalize supplied witness: {error}"
+                        ))
+                    })?
+                };
             exec_ctx.compiled = Some(Arc::new(compiled));
             exec_ctx.witness = Some(Arc::new(prepared.clone()));
             Ok(Some(prepared))

@@ -803,9 +803,9 @@ fn threat_kind_label(kind: ThreatSignalKind) -> &'static str {
 }
 
 fn severity_weight(severity: ThreatSeverity) -> f64 {
-    swarm_queen_core::basis_points_to_pressure(
-        swarm_queen_core::severity_weight_basis_points(severity),
-    )
+    swarm_queen_core::basis_points_to_pressure(swarm_queen_core::severity_weight_basis_points(
+        severity,
+    ))
 }
 
 fn stage_hash(stage_key: &str) -> u64 {

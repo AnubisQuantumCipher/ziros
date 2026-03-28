@@ -4225,7 +4225,10 @@ mod tests {
             fastest.selected,
             BackendKind::Plonky3 | BackendKind::Nova
         ));
-        assert!(matches!(smallest.selected, BackendKind::Plonky3 | BackendKind::Nova));
+        assert!(matches!(
+            smallest.selected,
+            BackendKind::Plonky3 | BackendKind::Nova
+        ));
         assert!(fastest.notes.iter().any(|note| {
             note.contains("arkworks-groth16") && note.contains("filtered backend")
         }));

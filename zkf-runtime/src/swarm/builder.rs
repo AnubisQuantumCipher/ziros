@@ -415,12 +415,8 @@ fn transition_rule(
         ));
     }
     record = match next_state {
-        RuleState::Shadow => {
-            transition_record(record, next_state, event)?
-        }
-        RuleState::Live => {
-            promote_record(record, event)?
-        }
+        RuleState::Shadow => transition_record(record, next_state, event)?,
+        RuleState::Live => promote_record(record, event)?,
         RuleState::Revoked => revoke_record(record, event)?,
         other => transition_record(record, other, event)?,
     };

@@ -17,8 +17,8 @@ use crate::execution_core;
 use crate::graph::ProverGraph;
 use crate::memory::UnifiedBufferPool;
 use crate::memory_plan::{
-    RuntimeHostSnapshot, RuntimeMemoryPlanInput, RuntimeMemoryProbe,
-    compute_runtime_memory_plan, estimate_job_bytes_from_constraint_count,
+    RuntimeHostSnapshot, RuntimeMemoryPlanInput, RuntimeMemoryProbe, compute_runtime_memory_plan,
+    estimate_job_bytes_from_constraint_count,
 };
 use crate::scheduler::{DeterministicScheduler, PlacementContext};
 use crate::security::SecuritySupervisor;
@@ -54,7 +54,9 @@ fn graph_required_bytes(graph: &ProverGraph, exec_ctx: &ExecutionContext) -> u64
                 .or_insert(handle.size_bytes);
         }
     }
-    let graph_bytes = seen.values().fold(0u64, |acc, size| acc.saturating_add(*size as u64));
+    let graph_bytes = seen
+        .values()
+        .fold(0u64, |acc, size| acc.saturating_add(*size as u64));
     let initial_bytes = exec_ctx
         .initial_buffers
         .values()
@@ -68,7 +70,9 @@ fn runtime_metal_probe() -> RuntimeMemoryProbe {
         recommended_working_set_size_bytes: report
             .recommended_working_set_size_bytes
             .map(|value| value as u64),
-        current_allocated_size_bytes: report.current_allocated_size_bytes.map(|value| value as u64),
+        current_allocated_size_bytes: report
+            .current_allocated_size_bytes
+            .map(|value| value as u64),
     }
 }
 
@@ -463,8 +467,9 @@ impl RuntimeExecutor {
             })
             .unwrap_or_default();
         let graph_required_bytes = graph_required_bytes(&graph, exec_ctx);
-        let job_estimate_bytes = graph_required_bytes
-            .max(estimate_job_bytes_from_constraint_count(compiled_constraint_count));
+        let job_estimate_bytes = graph_required_bytes.max(
+            estimate_job_bytes_from_constraint_count(compiled_constraint_count),
+        );
         let memory_plan = compute_runtime_memory_plan(
             &host,
             RuntimeMemoryPlanInput {
@@ -475,8 +480,8 @@ impl RuntimeExecutor {
             },
         );
         let pool = UnifiedBufferPool::new(memory_plan.runtime_pool_limit_bytes as usize);
-        let gpu_available = gpu_driver.is_some_and(|driver| driver.is_available())
-            && memory_plan.gpu_allowed;
+        let gpu_available =
+            gpu_driver.is_some_and(|driver| driver.is_available()) && memory_plan.gpu_allowed;
         let swarm_config = SwarmConfig::from_env();
         let swarm_controller = SwarmController::new(swarm_config.clone());
 
@@ -513,9 +518,7 @@ impl RuntimeExecutor {
         }
         let mut report =
             scheduler.execute_with_context_and_drivers(graph, exec_ctx, &mut bridge, gpu_driver)?;
-        report.peak_memory_bytes = report
-            .peak_memory_bytes
-            .max(bridge.peak_resident_bytes());
+        report.peak_memory_bytes = report.peak_memory_bytes.max(bridge.peak_resident_bytes());
         adaptive_threshold_scope.finish(&report);
         let produced_artifact = execution_core::preferred_output_artifact(exec_ctx);
         let expected_proof_size = control_plane_decision

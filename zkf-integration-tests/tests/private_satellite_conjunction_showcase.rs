@@ -448,8 +448,7 @@ fn private_satellite_conjunction_showcase_example_exports_bundle_and_reverifies_
                 .and_then(|value| value.get("runs"))
                 .and_then(serde_json::Value::as_array)
                 .is_some_and(|runs| runs.iter().any(|run| {
-                    run.get("name").and_then(serde_json::Value::as_str)
-                        == Some("protocol_lean")
+                    run.get("name").and_then(serde_json::Value::as_str) == Some("protocol_lean")
                 })),
             "formal evidence should record the protocol_lean runner explicitly"
         );

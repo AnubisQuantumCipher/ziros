@@ -171,7 +171,8 @@ fn private_voting_example_exports_mandatory_evidence_bundle() {
     let proof_second: ProofArtifact = read_json(&proof_second_path);
     let audit: serde_json::Value = read_json(&audit_path);
     let evidence_manifest: serde_json::Value = read_json(&evidence_manifest_path);
-    let exercised_surfaces: serde_json::Value = read_json(&formal_dir.join("exercised_surfaces.json"));
+    let exercised_surfaces: serde_json::Value =
+        read_json(&formal_dir.join("exercised_surfaces.json"));
     let report = fs::read_to_string(&report_path).expect("read report");
     let formal_status = evidence_manifest
         .get("formal_evidence")
@@ -231,7 +232,10 @@ fn private_voting_example_exports_mandatory_evidence_bundle() {
     );
 
     let mut forge = Command::new("forge");
-    forge.current_dir(&foundry_dir).arg("test").env("HOME", temp_home.path());
+    forge
+        .current_dir(&foundry_dir)
+        .arg("test")
+        .env("HOME", temp_home.path());
     apply_toolchain_env(&mut forge);
     assert_command_success(
         forge.output().expect("run forge test"),

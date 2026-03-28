@@ -173,10 +173,7 @@ fn solve_hints_runtime(
                 WitnessHintKind::Copy => (source_value, source_numeric),
                 WitnessHintKind::InverseOrZero => {
                     if source_numeric.is_zero() {
-                        (
-                            bigint_to_spec_value(BigInt::zero(), field),
-                            BigInt::zero(),
-                        )
+                        (bigint_to_spec_value(BigInt::zero(), field), BigInt::zero())
                     } else {
                         let inverse = field_inv(&source_numeric, field).unwrap_or_default();
                         (bigint_to_spec_value(inverse.clone(), field), inverse)

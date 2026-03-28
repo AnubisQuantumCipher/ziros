@@ -30,16 +30,10 @@ mod tests {
     #[test]
     fn attestation_matching_is_exact() {
         assert!(attestation_matches_subgraph_digests(
-            [1; 32],
-            [2; 32],
-            [1; 32],
-            [2; 32]
+            [1; 32], [2; 32], [1; 32], [2; 32]
         ));
         assert!(!attestation_matches_subgraph_digests(
-            [1; 32],
-            [2; 32],
-            [1; 32],
-            [3; 32]
+            [1; 32], [2; 32], [1; 32], [3; 32]
         ));
     }
 

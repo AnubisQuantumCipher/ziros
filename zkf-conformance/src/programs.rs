@@ -174,7 +174,8 @@ fn boolean(field: FieldId) -> ConformanceProgram {
 fn add_chain(field: FieldId) -> ConformanceProgram {
     ConformanceProgram {
         name: "add_chain".into(),
-        description: "Chained addition: a + b == c, c + d == out, plus nonlinear anchoring on b*d".into(),
+        description: "Chained addition: a + b == c, c + d == out, plus nonlinear anchoring on b*d"
+            .into(),
         program: Program {
             name: "add_chain".into(),
             field,

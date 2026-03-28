@@ -348,9 +348,7 @@ fn assert_bundle_contract(
         Some(2)
     );
     assert_eq!(
-        manifest
-            .get("scenario")
-            .and_then(serde_json::Value::as_str),
+        manifest.get("scenario").and_then(serde_json::Value::as_str),
         Some(scenario)
     );
     assert_eq!(
@@ -422,7 +420,9 @@ fn run_export_scenario_and_assert_bundle(
             .env("ZKF_PRIVATE_MULTI_SATELLITE_SCENARIOS", &scenario);
         apply_toolchain_env(&mut example);
         assert_command_success(
-            example.output().expect("run multi-satellite example binary"),
+            example
+                .output()
+                .expect("run multi-satellite example binary"),
             "multi-satellite showcase example binary",
         );
 
@@ -454,11 +454,10 @@ fn run_export_scenario_and_assert_bundle(
 fn private_multi_satellite_conjunction_showcase_mini_compiles_and_prepares_witness() {
     run_with_large_stack("multi-satellite-mini-compile", || {
         with_swarm_home(|_home| {
-            let template =
-                private_multi_satellite_conjunction_showcase_for_scenario(
-                    PrivateMultiSatelliteScenario::Mini,
-                )
-                .expect("multi-satellite template");
+            let template = private_multi_satellite_conjunction_showcase_for_scenario(
+                PrivateMultiSatelliteScenario::Mini,
+            )
+            .expect("multi-satellite template");
             let base_witness = private_multi_satellite_conjunction_witness(
                 &template.sample_inputs,
                 PrivateMultiSatelliteScenario::Mini,
@@ -491,7 +490,7 @@ fn private_multi_satellite_conjunction_showcase_mini_compiles_and_prepares_witne
 
 #[test]
 fn private_multi_satellite_conjunction_showcase_example_exports_mini_bundle_and_reverifies_from_disk()
-{
+ {
     if !env_flag(EXPORT_MINI_ENV) {
         return;
     }
@@ -499,8 +498,8 @@ fn private_multi_satellite_conjunction_showcase_example_exports_mini_bundle_and_
 }
 
 #[test]
-fn private_multi_satellite_conjunction_showcase_example_exports_base32_bundle_and_reverifies_from_disk(
-) {
+fn private_multi_satellite_conjunction_showcase_example_exports_base32_bundle_and_reverifies_from_disk()
+ {
     if !env_flag(EXPORT_BASE32_ENV) {
         return;
     }

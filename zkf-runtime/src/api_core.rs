@@ -30,7 +30,11 @@ pub(crate) fn default_requested_jobs() -> usize {
     std::env::var("ZKF_PROVING_THREADS")
         .ok()
         .and_then(|value| value.parse::<usize>().ok())
-        .unwrap_or_else(|| zkf_core::SystemResources::detect().recommend().proving_threads)
+        .unwrap_or_else(|| {
+            zkf_core::SystemResources::detect()
+                .recommend()
+                .proving_threads
+        })
         .max(1)
 }
 

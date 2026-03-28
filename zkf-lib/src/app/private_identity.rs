@@ -471,7 +471,10 @@ pub fn private_identity_kyc() -> zkf_core::ZkfResult<TemplateProgram> {
     insert_path_inputs(&mut sample_inputs, "active", &active_path);
 
     let mut violation_inputs = sample_inputs.clone();
-    violation_inputs.insert("required_status_bit_0".to_string(), FieldElement::from_u64(2));
+    violation_inputs.insert(
+        "required_status_bit_0".to_string(),
+        FieldElement::from_u64(2),
+    );
 
     Ok(TemplateProgram {
         program: builder.build()?,

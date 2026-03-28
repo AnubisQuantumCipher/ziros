@@ -9,6 +9,7 @@
 use crate::error::RuntimeError;
 use crate::memory::{BufferHandle, MemoryClass, NodeId, UnifiedBufferPool};
 use crate::slot_map::SlotMap;
+use serde::Serialize;
 #[cfg(not(feature = "kani-minimal"))]
 use std::io::{Read, Write};
 #[cfg(not(feature = "kani-minimal"))]
@@ -16,7 +17,6 @@ use std::path::Path;
 use std::path::PathBuf;
 #[cfg(not(feature = "kani-minimal"))]
 use std::sync::atomic::{AtomicU64, Ordering};
-use serde::Serialize;
 
 // ─── Physical Buffer ──────────────────────────────────────────────────────
 

@@ -243,8 +243,7 @@ impl<E: Engine> SumcheckProof<E> {
         assert_eq!(
           *l, expected_size,
           "Mismatch in size for {} at index {}",
-          polyname,
-          i
+          polyname, i
         );
       }
     }

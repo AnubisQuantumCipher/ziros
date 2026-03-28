@@ -318,8 +318,7 @@ impl DeterministicScheduler {
 
             let mut dispatch_ok = false;
             let verified_gpu_lane = gpu_driver.is_some_and(|gpu| {
-                gpu.verification_mode()
-                    == crate::metal_driver::GpuVerificationMode::VerifiedPinned
+                gpu.verification_mode() == crate::metal_driver::GpuVerificationMode::VerifiedPinned
             });
 
             if verified_gpu_lane
@@ -457,12 +456,7 @@ impl DeterministicScheduler {
                 .unwrap_or_default();
             let current = bridge_bytes.max(pool_bytes);
             scheduler_core::record_trace(&mut report, trace, current);
-            release_completed_handles(
-                &self.pool,
-                bridge,
-                node,
-                &mut remaining_consumers,
-            );
+            release_completed_handles(&self.pool, bridge, node, &mut remaining_consumers);
         }
 
         report.total_wall_time = job_start.elapsed();

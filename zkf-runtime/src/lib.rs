@@ -63,6 +63,8 @@ pub(crate) mod scheduler_core;
 pub mod security;
 mod slot_map;
 #[cfg(all(feature = "full", not(hax)))]
+pub mod swarm;
+#[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_artifact_core;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_builder_core;
@@ -74,8 +76,6 @@ pub(crate) mod swarm_queen_core;
 pub(crate) mod swarm_sentinel_core;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_warrior_core;
-#[cfg(all(feature = "full", not(hax)))]
-pub mod swarm;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod telemetry;
 #[cfg(all(feature = "full", not(hax)))]
@@ -136,8 +136,7 @@ pub use memory_plan::{
 #[cfg(all(feature = "full", not(hax)))]
 pub use metal_driver::{
     DispatchResult, FallbackSignal, GpuDispatchDriver, GpuNodeTelemetry, GpuVerificationMode,
-    NullGpuDriver,
-    create_metal_buffer_allocator, create_metal_dispatch_driver,
+    NullGpuDriver, create_metal_buffer_allocator, create_metal_dispatch_driver,
 };
 #[cfg(all(feature = "full", not(hax)))]
 pub use scheduler::{

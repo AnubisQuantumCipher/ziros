@@ -176,44 +176,42 @@ pub fn compute_hash_aux_witness(
     let outputs_len = output_values.len();
     let op_spec = spec_hash_op(op);
     let field_spec = spec_hash_field(field);
-    let Some(surface) =
-        critical_hash_lowering_semantics(op_spec, field_spec, inputs_len, outputs_len).or_else(
-            || {
-                if outputs_len != 0 {
-                    return None;
-                }
-                match (op_spec, field_spec, inputs_len) {
-                    (SpecCriticalHashBlackBoxOp::Poseidon, SpecCriticalHashFieldId::Bn254, 4) => {
-                        Some(CriticalHashLoweringSemantics {
-                            supported_op: SupportedCriticalHashOp::PoseidonBn254Width4,
-                            supported_inputs_len: 4,
-                            supported_outputs_len: 4,
-                            aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
-                        })
-                    }
-                    (
-                        SpecCriticalHashBlackBoxOp::Poseidon,
-                        SpecCriticalHashFieldId::Bls12_381,
-                        4,
-                    ) => Some(CriticalHashLoweringSemantics {
-                        supported_op: SupportedCriticalHashOp::PoseidonBls12381Width4,
-                        supported_inputs_len: 4,
-                        supported_outputs_len: 4,
-                        aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
-                    }),
-                    (SpecCriticalHashBlackBoxOp::Sha256, _, _) => {
-                        Some(CriticalHashLoweringSemantics {
-                            supported_op: SupportedCriticalHashOp::Sha256BytesToDigest,
-                            supported_inputs_len: inputs_len,
-                            supported_outputs_len: 32,
-                            aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
-                        })
-                    }
-                    _ => None,
-                }
-            },
-        )
-    else {
+    let Some(surface) = critical_hash_lowering_semantics(
+        op_spec,
+        field_spec,
+        inputs_len,
+        outputs_len,
+    )
+    .or_else(|| {
+        if outputs_len != 0 {
+            return None;
+        }
+        match (op_spec, field_spec, inputs_len) {
+            (SpecCriticalHashBlackBoxOp::Poseidon, SpecCriticalHashFieldId::Bn254, 4) => {
+                Some(CriticalHashLoweringSemantics {
+                    supported_op: SupportedCriticalHashOp::PoseidonBn254Width4,
+                    supported_inputs_len: 4,
+                    supported_outputs_len: 4,
+                    aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
+                })
+            }
+            (SpecCriticalHashBlackBoxOp::Poseidon, SpecCriticalHashFieldId::Bls12_381, 4) => {
+                Some(CriticalHashLoweringSemantics {
+                    supported_op: SupportedCriticalHashOp::PoseidonBls12381Width4,
+                    supported_inputs_len: 4,
+                    supported_outputs_len: 4,
+                    aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
+                })
+            }
+            (SpecCriticalHashBlackBoxOp::Sha256, _, _) => Some(CriticalHashLoweringSemantics {
+                supported_op: SupportedCriticalHashOp::Sha256BytesToDigest,
+                supported_inputs_len: inputs_len,
+                supported_outputs_len: 32,
+                aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
+            }),
+            _ => None,
+        }
+    }) else {
         unreachable!("hash proof kernel only dispatches supported poseidon/sha256 surfaces");
     };
     match op {

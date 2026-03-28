@@ -38,6 +38,8 @@ pub(crate) mod proof_swarm_reputation_spec;
 #[cfg(not(hax))]
 pub mod protocol;
 #[cfg(all(feature = "full", not(hax)))]
+pub mod swarm;
+#[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_consensus_core;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_coordinator_core;
@@ -55,8 +57,6 @@ pub(crate) mod swarm_protocol_core;
 pub(crate) mod swarm_reputation_core;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod swarm_transport_core;
-#[cfg(all(feature = "full", not(hax)))]
-pub mod swarm;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod telemetry;
 #[cfg(not(hax))]

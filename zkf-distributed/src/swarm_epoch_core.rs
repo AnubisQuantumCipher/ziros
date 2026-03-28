@@ -51,7 +51,9 @@ pub(crate) fn associated_data(
 
 #[cfg(test)]
 mod tests {
-    use super::{associated_data, has_plaintext_threat_surface, is_epoch_allowed, negotiate_encrypted_gossip};
+    use super::{
+        associated_data, has_plaintext_threat_surface, is_epoch_allowed, negotiate_encrypted_gossip,
+    };
     use crate::identity::PeerId;
 
     #[test]

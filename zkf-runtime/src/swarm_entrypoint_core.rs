@@ -29,7 +29,9 @@ mod tests {
 
     #[test]
     fn detects_security_context_activity() {
-        assert!(!context_has_security_signal(&RuntimeSecurityContext::default()));
+        assert!(!context_has_security_signal(
+            &RuntimeSecurityContext::default()
+        ));
         assert!(context_has_security_signal(&RuntimeSecurityContext {
             malformed_request_count: 1,
             ..RuntimeSecurityContext::default()

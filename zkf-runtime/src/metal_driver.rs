@@ -139,8 +139,9 @@ impl GpuDispatchDriver for NullGpuDriver {
 pub fn create_metal_dispatch_driver(
     verification_mode: GpuVerificationMode,
 ) -> Option<Box<dyn GpuDispatchDriver>> {
-    crate::metal_dispatch_macos::create_metal_dispatch_driver(verification_mode)
-        .or_else(|| Some(Box::new(NullGpuDriver::new(verification_mode)) as Box<dyn GpuDispatchDriver>))
+    crate::metal_dispatch_macos::create_metal_dispatch_driver(verification_mode).or_else(|| {
+        Some(Box::new(NullGpuDriver::new(verification_mode)) as Box<dyn GpuDispatchDriver>)
+    })
 }
 
 #[cfg(not(target_os = "macos"))]

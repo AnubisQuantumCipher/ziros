@@ -240,9 +240,8 @@ pub fn evaluate_adaptive_quorum(
             agreeing_peers.len(),
             results.len(),
             (policy.agreement_threshold * 1000.0).round() as u32,
-        )
-            && (!policy.require_backend_diversity
-                || agreeing_backend_count >= config.emergency_min_distinct_backends),
+        ) && (!policy.require_backend_diversity
+            || agreeing_backend_count >= config.emergency_min_distinct_backends),
         majority_digest: Some(majority_digest),
         agreeing_peers,
         disagreeing_peers,

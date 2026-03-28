@@ -25,10 +25,10 @@ use crate::swarm::{
     persist_attestation_chain, persist_threat_intelligence_outcome, severity_to_string,
     trace_digest,
 };
+use crate::swarm_coordinator_core;
 use crate::telemetry::{
     DistributedExecutionReport, DistributedNodeTrace, TransferDirection, TransferTrace,
 };
-use crate::swarm_coordinator_core;
 use crate::transfer::BufferTransferManager;
 use crate::transport::{Transport, create_transport};
 use serde::Serialize;

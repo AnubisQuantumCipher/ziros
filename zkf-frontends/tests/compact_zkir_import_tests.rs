@@ -38,17 +38,29 @@ fn compact_import_reads_raw_zkir_and_discovers_sidecars() {
     let program = import_fixture("contracts/passing/zkir/set.zkir");
 
     assert_eq!(program.field, FieldId::Bls12_381);
-    assert_eq!(program.metadata.get("frontend").map(String::as_str), Some("compact"));
     assert_eq!(
-        program.metadata.get("preferred_backend").map(String::as_str),
+        program.metadata.get("frontend").map(String::as_str),
+        Some("compact")
+    );
+    assert_eq!(
+        program
+            .metadata
+            .get("preferred_backend")
+            .map(String::as_str),
         Some("halo2-bls12-381")
     );
     assert_eq!(
-        program.metadata.get("compact_compiler_version").map(String::as_str),
+        program
+            .metadata
+            .get("compact_compiler_version")
+            .map(String::as_str),
         Some("0.29.0")
     );
     assert_eq!(
-        program.metadata.get("compact_language_version").map(String::as_str),
+        program
+            .metadata
+            .get("compact_language_version")
+            .map(String::as_str),
         Some("0.21.0")
     );
 
@@ -61,14 +73,11 @@ fn compact_import_reads_raw_zkir_and_discovers_sidecars() {
     assert_eq!(signal.visibility, Visibility::Private);
     assert_eq!(signal.ty.as_deref(), Some("Uint<64>"));
     assert!(
-        program
-            .constraints
-            .iter()
-            .any(|constraint| matches!(
-                constraint,
-                Constraint::Range { signal, bits, .. }
-                    if signal == value_signal && *bits == 64
-            )),
+        program.constraints.iter().any(|constraint| matches!(
+            constraint,
+            Constraint::Range { signal, bits, .. }
+                if signal == value_signal && *bits == 64
+        )),
         "expected imported Uint<64> argument to carry a range constraint"
     );
 
@@ -77,7 +86,10 @@ fn compact_import_reads_raw_zkir_and_discovers_sidecars() {
         .iter()
         .filter(|signal| signal.visibility == Visibility::Public)
         .count();
-    assert!(public_count > 0, "disclose transcript should materialize public signals");
+    assert!(
+        public_count > 0,
+        "disclose transcript should materialize public signals"
+    );
 
     let transcript: Vec<String> = serde_json::from_str(
         program
@@ -86,7 +98,10 @@ fn compact_import_reads_raw_zkir_and_discovers_sidecars() {
             .expect("transcript metadata"),
     )
     .expect("transcript json");
-    assert!(!transcript.is_empty(), "expected disclose/public transcript entries");
+    assert!(
+        !transcript.is_empty(),
+        "expected disclose/public transcript entries"
+    );
 }
 
 #[test]
@@ -95,7 +110,10 @@ fn compact_import_preserves_underconstrained_linear_contracts_for_audit() {
     let analysis = zkf_core::analyze_underconstrained(&program);
 
     assert_eq!(program.field, FieldId::Bls12_381);
-    assert!(analysis.linear_nullity > 0, "expected positive linear nullity");
+    assert!(
+        analysis.linear_nullity > 0,
+        "expected positive linear nullity"
+    );
     assert!(
         !analysis.linearly_underdetermined_private_signals.is_empty(),
         "expected linearly underdetermined private signals"
@@ -219,7 +237,11 @@ fn compact_import_rejects_unsupported_schema_unknown_opcode_and_dynamic_pi_skip(
             &FrontendImportOptions::default(),
         )
         .expect_err("unknown opcode should fail closed");
-    assert!(opcode_err.to_string().contains("unsupported Compact zkir opcode"));
+    assert!(
+        opcode_err
+            .to_string()
+            .contains("unsupported Compact zkir opcode")
+    );
 
     let pi_skip_err = compact
         .compile_to_ir(

@@ -130,7 +130,9 @@ pub(crate) fn threat_kind_from_string(kind: &str) -> ThreatSignalKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{severity_from_string, severity_to_string, threat_kind_from_string, threat_kind_to_string};
+    use super::{
+        severity_from_string, severity_to_string, threat_kind_from_string, threat_kind_to_string,
+    };
     use zkf_runtime::security::{ThreatSeverity, ThreatSignalKind};
 
     #[test]

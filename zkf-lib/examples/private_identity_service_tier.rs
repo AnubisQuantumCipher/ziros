@@ -6,8 +6,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use zkf_core::{BackendKind, FrontendProvenance, PackageManifest};
 use zkf_lib::{
-    poseidon_hash4_bn254, Expr, FieldElement, FieldId, MerklePathNodeV1, Program, ProgramBuilder,
-    WitnessInputs, ZkfError, ZkfResult,
+    Expr, FieldElement, FieldId, MerklePathNodeV1, Program, ProgramBuilder, WitnessInputs,
+    ZkfError, ZkfResult, poseidon_hash4_bn254,
 };
 
 const MERKLE_DEPTH: usize = 3;
