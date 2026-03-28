@@ -8,13 +8,23 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16: "1"
+
 jobs:
-  ci:
-    name: ci
+  quality:
+    name: quality
     runs-on: macos-latest
-    env:
-      CARGO_TERM_COLOR: always
-      ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16: "1"
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,8 +41,48 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace -- -D warnings
 
-      - name: Tests
-        run: make test
+      - name: Python tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
+  rust_tests:
+    name: rust tests / ${{ matrix.shard }}
+    runs-on: macos-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        shard:
+          - foundations
+          - runtime
+          - apps
+          - backends_core
+          - backends_recursive
+          - cli
+          - integration
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Rust test shard
+        run: ./scripts/ci/run_rust_test_shard.sh "${{ matrix.shard }}"
+
+  operational:
+    name: operational checks
+    runs-on: macos-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release CLI
+        run: ./zkf-build.sh --release -p zkf-cli
 
       - name: Audit built-in examples
         run: make audit
@@ -50,3 +100,29 @@ jobs:
           else
             echo "Non-Apple-Silicon macOS runner detected; skipping Metal-specific diagnostics."
           fi
+
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - quality
+      - rust_tests
+      - operational
+    steps:
+      - name: Evaluate required checks
+        env:
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          RUST_TESTS_RESULT: ${{ needs.rust_tests.result }}
+          OPERATIONAL_RESULT: ${{ needs.operational.result }}
+        run: |
+          echo "quality=${QUALITY_RESULT}"
+          echo "rust_tests=${RUST_TESTS_RESULT}"
+          echo "operational=${OPERATIONAL_RESULT}"
+
+          for result in "$QUALITY_RESULT" "$RUST_TESTS_RESULT" "$OPERATIONAL_RESULT"; do
+            if [ "$result" != "success" ]; then
+              echo "required job failed: ${result}" >&2
+              exit 1
+            fi
+          done
