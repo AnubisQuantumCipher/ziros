@@ -1182,6 +1182,10 @@ mod tests {
                 .arg("--manifest-path")
                 .arg(root.join("Cargo.toml"))
                 .arg("--quiet")
+                .env(
+                    "CARGO_TARGET_DIR",
+                    temp.path().join(format!("target-{}", style.as_str())),
+                )
                 .status()
                 .expect("cargo test should run");
 
