@@ -108,7 +108,7 @@ fn sample_burn_steps_for_horizon(steps: usize) -> [BigInt; PRIVATE_SATELLITE_SPA
     }
 }
 
-fn private_satellite_conjunction_sample_inputs_for_steps(steps: usize) -> WitnessInputs {
+pub fn private_satellite_conjunction_sample_inputs_for_steps(steps: usize) -> WitnessInputs {
     let burn_steps = sample_burn_steps_for_horizon(steps);
     let mut inputs = WitnessInputs::new();
     inputs.insert(

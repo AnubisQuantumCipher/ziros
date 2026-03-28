@@ -39,6 +39,8 @@ pub mod execution;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod execution_core;
 #[cfg(all(feature = "full", not(hax)))]
+pub(crate) mod gpu_attribution;
+#[cfg(all(feature = "full", not(hax)))]
 pub mod graph;
 #[cfg(all(feature = "full", not(hax)))]
 pub(crate) mod graph_core;

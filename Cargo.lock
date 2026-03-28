@@ -11618,6 +11618,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "zk_carbon"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "zkf-api",
+ "zkf-core",
+ "zkf-dsl",
+]
+
+[[package]]
 name = "zk_rollup"
 version = "0.1.0"
 dependencies = [

@@ -1,7 +1,7 @@
 use crate::blackbox_gadgets;
 use crate::blackbox_native::validate_blackbox_constraints;
-use crate::range_decomposition;
 use crate::r1cs_lowering::LoweredR1csProgram;
+use crate::range_decomposition;
 use std::collections::BTreeMap;
 use std::sync::{Mutex, OnceLock};
 use zkf_core::{
@@ -252,8 +252,11 @@ pub(crate) fn audited_witness_for_proving(
         )?;
     }
     let enriched = blackbox_gadgets::enrich_witness_for_proving(compiled, witness)?;
-    let enriched =
-        range_decomposition::enrich_range_witness(&compiled.program, &compiled.metadata, &enriched)?;
+    let enriched = range_decomposition::enrich_range_witness(
+        &compiled.program,
+        &compiled.metadata,
+        &enriched,
+    )?;
     // When the compiled artifact preserved a pre-lowering source program, run
     // native BlackBox validation against that original surface too. Otherwise,
     // post-lowering validation only sees the arithmetic expansion and silently
@@ -269,12 +272,12 @@ pub(crate) fn audited_witness_for_proving(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::range_decomposition;
     use acir::FieldElement as AcirFieldElement;
     use bn254_blackbox_solver::poseidon2_permutation;
     use num_bigint::{BigInt, Sign};
     use proptest::prelude::*;
     use std::collections::BTreeMap;
-    use crate::range_decomposition;
     use zkf_core::{
         BlackBoxOp, Constraint, Expr, FieldElement, FieldId, Signal, Visibility, Witness,
         WitnessPlan,
@@ -605,18 +608,13 @@ mod tests {
         .expect("range decomposition metadata");
 
         let witness = Witness {
-            values: BTreeMap::from([(
-                "x".to_string(),
-                FieldElement::from_i64(7),
-            )]),
+            values: BTreeMap::from([("x".to_string(), FieldElement::from_i64(7))]),
         };
         let enriched = audited_witness_for_proving(BackendKind::Halo2Bls12381, &compiled, &witness)
             .expect("range chunks should be derived before audited constraint checks");
 
         assert!(
-            enriched
-                .values
-                .contains_key("__halo2_bls_range_0_chunk_0"),
+            enriched.values.contains_key("__halo2_bls_range_0_chunk_0"),
             "expected range chunk witness to be populated"
         );
     }

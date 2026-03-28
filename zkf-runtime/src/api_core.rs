@@ -1,6 +1,10 @@
 use crate::control_plane::{ControlPlaneExecutionSummary, ControlPlaneRequest, JobKind};
 use crate::execution::ExecutionContext;
 use crate::execution_core;
+use crate::gpu_attribution::{
+    backend_delegated_gpu_summary, effective_gpu_stage_busy_ratio,
+    effective_realized_gpu_capable_stages,
+};
 use crate::security::SecurityEvaluation;
 use crate::telemetry::GraphExecutionReport;
 use crate::trust::RequiredTrustLane;
@@ -199,6 +203,9 @@ pub(crate) fn build_runtime_outputs(
     security: Option<&SecurityEvaluation>,
 ) -> serde_json::Value {
     let mut map = execution_core::output_presence_map(&exec_ctx.outputs);
+    let preferred_artifact = execution_core::preferred_output_artifact(exec_ctx);
+    let effective_gpu_busy_ratio = effective_gpu_stage_busy_ratio(report, preferred_artifact);
+    let effective_gpu_stages = effective_realized_gpu_capable_stages(report, preferred_artifact);
     map.insert(
         "trust_model".into(),
         serde_json::Value::String(report.final_trust_model.as_str().to_string()),
@@ -226,6 +233,18 @@ pub(crate) fn build_runtime_outputs(
         serde_json::json!(report.gpu_stage_busy_ratio()),
     );
     map.insert(
+        "runtime_effective_gpu_stage_busy_ratio".into(),
+        serde_json::json!(effective_gpu_busy_ratio),
+    );
+    map.insert(
+        "runtime_effective_gpu_capable_stages".into(),
+        serde_json::to_value(&effective_gpu_stages).unwrap_or_else(|_| serde_json::json!([])),
+    );
+    map.insert(
+        "runtime_effective_gpu_participation".into(),
+        serde_json::json!(!effective_gpu_stages.is_empty() || effective_gpu_busy_ratio > 0.0),
+    );
+    map.insert(
         "runtime_gpu_wall_time_ms".into(),
         serde_json::json!(report.gpu_wall_time().as_secs_f64() * 1000.0),
     );
@@ -241,6 +260,12 @@ pub(crate) fn build_runtime_outputs(
         "runtime_metal_counter_source".into(),
         serde_json::json!(report.counter_source()),
     );
+    if let Some(summary) = backend_delegated_gpu_summary(report, preferred_artifact) {
+        map.insert(
+            "runtime_backend_delegated_gpu".into(),
+            serde_json::to_value(summary).unwrap_or_else(|_| serde_json::json!({})),
+        );
+    }
 
     if let Some(control_plane) = control_plane {
         map.insert(
@@ -375,4 +400,114 @@ pub(crate) fn build_runtime_outputs(
         serde_json::to_value(&report.watchdog_alerts).unwrap_or_else(|_| serde_json::json!([])),
     );
     serde_json::Value::Object(map)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::graph::DevicePlacement;
+    use crate::memory::NodeId;
+    use crate::telemetry::NodeTrace;
+    use crate::trust::TrustModel;
+    use std::collections::BTreeMap;
+    use std::time::Duration;
+    use zkf_core::artifact::{BackendKind, ProofArtifact};
+
+    fn delegated_backend_report() -> GraphExecutionReport {
+        GraphExecutionReport {
+            node_traces: vec![NodeTrace {
+                node_id: NodeId::new(),
+                op_name: "BackendProve",
+                stage_key: "backend-prove".to_string(),
+                placement: DevicePlacement::Cpu,
+                trust_model: TrustModel::Cryptographic,
+                wall_time: Duration::from_secs(4),
+                problem_size: None,
+                input_bytes: 64,
+                output_bytes: 64,
+                predicted_cpu_ms: None,
+                predicted_gpu_ms: None,
+                prediction_confidence: None,
+                prediction_observation_count: None,
+                input_digest: [0; 8],
+                output_digest: [1; 8],
+                allocated_bytes_after: 0,
+                accelerator_name: Some("BackendProve-arkworks-groth16".to_string()),
+                fell_back: false,
+                buffer_residency: None,
+                delegated: true,
+                delegated_backend: Some("arkworks-groth16".to_string()),
+            }],
+            total_wall_time: Duration::from_secs(4),
+            peak_memory_bytes: 0,
+            gpu_nodes: 0,
+            cpu_nodes: 1,
+            delegated_nodes: 1,
+            final_trust_model: TrustModel::Cryptographic,
+            fallback_nodes: 0,
+            watchdog_alerts: Vec::new(),
+        }
+    }
+
+    fn delegated_gpu_artifact() -> ProofArtifact {
+        let mut metadata = BTreeMap::new();
+        metadata.insert("groth16_msm_engine".to_string(), "metal-bn254-msm".to_string());
+        metadata.insert(
+            "qap_witness_map_engine".to_string(),
+            "metal-bn254-ntt+streamed-reduction".to_string(),
+        );
+        metadata.insert("metal_gpu_busy_ratio".to_string(), "0.25".to_string());
+        metadata.insert("metal_no_cpu_fallback".to_string(), "true".to_string());
+        metadata.insert(
+            "metal_stage_breakdown".to_string(),
+            serde_json::json!({
+                "witness_map": {"accelerator": "metal-bn254-ntt+streamed-reduction"},
+                "msm_window": {"accelerator": "metal"}
+            })
+            .to_string(),
+        );
+        ProofArtifact {
+            backend: BackendKind::ArkworksGroth16,
+            program_digest: "test".to_string(),
+            proof: Vec::new(),
+            verification_key: Vec::new(),
+            public_inputs: Vec::new(),
+            metadata,
+            security_profile: None,
+            hybrid_bundle: None,
+            credential_bundle: None,
+            archive_metadata: None,
+        }
+    }
+
+    #[test]
+    fn build_runtime_outputs_exposes_backend_delegated_gpu_participation() {
+        let report = delegated_backend_report();
+        let mut exec_ctx = ExecutionContext::default();
+        exec_ctx.set_proof_artifact(delegated_gpu_artifact());
+
+        let outputs = build_runtime_outputs(&exec_ctx, &report, None, None);
+
+        assert_eq!(outputs["runtime_gpu_stage_busy_ratio"], serde_json::json!(0.0));
+        assert_eq!(
+            outputs["runtime_effective_gpu_stage_busy_ratio"],
+            serde_json::json!(0.25)
+        );
+        assert_eq!(
+            outputs["runtime_effective_gpu_capable_stages"],
+            serde_json::json!(["fft-ntt", "msm", "qap-witness-map"])
+        );
+        assert_eq!(
+            outputs["runtime_effective_gpu_participation"],
+            serde_json::json!(true)
+        );
+        assert_eq!(
+            outputs["runtime_backend_delegated_gpu"]["classification"],
+            serde_json::json!("backend-delegated")
+        );
+        assert_eq!(
+            outputs["runtime_backend_delegated_gpu"]["metal_no_cpu_fallback"],
+            serde_json::json!(true)
+        );
+    }
 }

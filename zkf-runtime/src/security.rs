@@ -476,7 +476,10 @@ fn collect_signals(
                 count: None,
             });
         }
-        if report.gpu_nodes == 0 && !summary.realized_gpu_capable_stages.is_empty() {
+        if report.gpu_nodes == 0
+            && report.delegated_nodes == 0
+            && !summary.realized_gpu_capable_stages.is_empty()
+        {
             signals.push(ThreatSignal {
                 kind: ThreatSignalKind::TelemetryIntegrityMismatch,
                 severity: ThreatSeverity::Moderate,

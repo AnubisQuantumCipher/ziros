@@ -1,4 +1,5 @@
 use crate::error::RuntimeError;
+use crate::gpu_attribution::effective_realized_gpu_capable_stages;
 use crate::graph::{
     DevicePlacement, ProverGraph, gpu_capable_stage_keys, is_gpu_capable_stage_key,
 };
@@ -860,11 +861,9 @@ pub fn finalize_control_plane_execution(
                 .and_then(|raw| raw.parse().ok())
         })
     });
-    let realized_gpu_capable_stages = report
-        .stage_breakdown()
+    let realized_gpu_capable_stages = effective_realized_gpu_capable_stages(report, artifact)
         .into_iter()
-        .filter(|(stage, telemetry)| is_gpu_capable_stage_key(stage) && telemetry.gpu_nodes > 0)
-        .map(|(stage, _)| stage)
+        .filter(|stage| is_gpu_capable_stage_key(stage))
         .collect::<Vec<_>>();
     apply_realized_eta_fallback(&mut decision, &realized_gpu_capable_stages);
     let anomaly_verdict = evaluate_observed_anomaly(

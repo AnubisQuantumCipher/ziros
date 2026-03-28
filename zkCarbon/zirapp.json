@@ -1,0 +1,144 @@
+{
+  "program": {
+    "name": "zk_carbon",
+    "field": "bn254"
+  },
+  "signals": [
+    {
+      "name": "baseline_emissions",
+      "visibility": "private"
+    },
+    {
+      "name": "current_emissions",
+      "visibility": "private"
+    },
+    {
+      "name": "blinding",
+      "visibility": "private"
+    },
+    {
+      "name": "__poseidon_zero_0",
+      "visibility": "constant",
+      "constant": "0"
+    },
+    {
+      "name": "reduction_delta",
+      "visibility": "public"
+    },
+    {
+      "name": "min_threshold",
+      "visibility": "public"
+    },
+    {
+      "name": "facility_commitment",
+      "visibility": "public"
+    },
+    {
+      "name": "__poseidon_commitment_state_0",
+      "visibility": "private"
+    },
+    {
+      "name": "__poseidon_commitment_state_1",
+      "visibility": "private"
+    },
+    {
+      "name": "__poseidon_commitment_state_2",
+      "visibility": "private"
+    },
+    {
+      "name": "__poseidon_commitment_state_3",
+      "visibility": "private"
+    }
+  ],
+  "ops": [
+    {
+      "kind": "range",
+      "signal": "baseline_emissions",
+      "bits": 32,
+      "label": "baseline_emissions must be a valid 32-bit value"
+    },
+    {
+      "kind": "range",
+      "signal": "current_emissions",
+      "bits": 32,
+      "label": "current_emissions must be a valid 32-bit value"
+    },
+    {
+      "kind": "range",
+      "signal": "reduction_delta",
+      "bits": 32,
+      "label": "reduction_delta must be a valid 32-bit value"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "reduction_delta"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          { "op": "signal", "args": "baseline_emissions" },
+          { "op": "signal", "args": "current_emissions" }
+        ]
+      },
+      "label": "reduction_delta = baseline - current"
+    },
+    {
+      "kind": "black_box",
+      "op": "poseidon",
+      "inputs": [
+        { "op": "signal", "args": "baseline_emissions" },
+        { "op": "signal", "args": "current_emissions" },
+        { "op": "signal", "args": "blinding" },
+        { "op": "signal", "args": "__poseidon_zero_0" }
+      ],
+      "outputs": [
+        "__poseidon_commitment_state_0",
+        "__poseidon_commitment_state_1",
+        "__poseidon_commitment_state_2",
+        "__poseidon_commitment_state_3"
+      ],
+      "params": { "width": "4" },
+      "label": "Poseidon commitment to sensor data"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "facility_commitment"
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "__poseidon_commitment_state_0"
+      },
+      "label": "facility_commitment matches Poseidon hash of sensor data"
+    }
+  ],
+  "metadata": {
+    "ir_family": "zir-v1",
+    "source_ir": "ir-v2"
+  },
+  "sample_inputs": {
+    "baseline_emissions": "5000",
+    "current_emissions": "3800",
+    "blinding": "42"
+  },
+  "violation_inputs": {
+    "baseline_emissions": "3800",
+    "current_emissions": "5000",
+    "blinding": "42"
+  },
+  "expected_inputs": [
+    "baseline_emissions",
+    "current_emissions",
+    "blinding"
+  ],
+  "public_outputs": [
+    "reduction_delta",
+    "min_threshold",
+    "facility_commitment"
+  ],
+  "description": "Prove that a facility reduced emissions from a private baseline to a private current level, producing a public reduction delta bound to a Poseidon commitment of the sensor data. The carbon credit is mathematically tied to the proof — no auditor required.",
+  "template_id": "poseidon-commitment"
+}

@@ -1,5 +1,6 @@
 use crate::adaptive_tuning::{AdaptiveTuningStatus, adaptive_tuning_status};
 use crate::control_plane::{ControlPlaneExecutionSummary, JobKind, ModelCatalog};
+use crate::gpu_attribution::{artifact_gpu_busy_ratio, effective_realized_gpu_capable_stages};
 use crate::graph::gpu_capable_stage_keys;
 use crate::security::{RuntimeModelIntegrity, SecurityVerdict};
 use crate::swarm::SwarmTelemetryDigest;
@@ -340,6 +341,8 @@ fn build_record(
     let platform_capability = PlatformCapability::detect();
     let adaptive_tuning = adaptive_tuning_status();
     let stage_breakdown = report.stage_breakdown();
+    let artifact_gpu_busy_ratio = artifact_gpu_busy_ratio(artifact);
+    let effective_gpu_stages = effective_realized_gpu_capable_stages(report, artifact);
     let timestamp_unix_ms = unix_time_now_ms();
     let telemetry_sequence_id = next_telemetry_sequence_id(timestamp_unix_ms);
     let mut per_stage_times_ms = BTreeMap::new();
@@ -359,6 +362,13 @@ fn build_record(
             stages_on_cpu.push(stage.clone());
         }
     }
+    for stage in &effective_gpu_stages {
+        if !stages_on_gpu.iter().any(|existing| existing == stage) {
+            stages_on_gpu.push(stage.clone());
+        }
+    }
+    stages_on_gpu.sort();
+    stages_on_gpu.dedup();
 
     let memory_pressure_bytes = resources
         .total_ram_bytes
@@ -368,7 +378,7 @@ fn build_record(
         .unwrap_or_else(|| {
             gpu_capable_stage_keys()
                 .iter()
-                .filter(|stage| stages_on_gpu.iter().any(|candidate| candidate == **stage))
+                .filter(|stage| effective_gpu_stages.iter().any(|candidate| candidate == **stage))
                 .map(|stage| (*stage).to_string())
                 .collect()
         });
@@ -396,7 +406,8 @@ fn build_record(
         hardware_state: HardwareState {
             gpu_utilization: report
                 .gpu_stage_busy_ratio()
-                .max(metal_runtime.metal_gpu_busy_ratio),
+                .max(metal_runtime.metal_gpu_busy_ratio)
+                .max(artifact_gpu_busy_ratio),
             memory_pressure_bytes,
             thermal_pressure: control_plane
                 .and_then(|value| value.decision.features.thermal_pressure),

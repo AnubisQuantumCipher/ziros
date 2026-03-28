@@ -28,6 +28,7 @@ members = [
   "zkf-ui",
   "zkf-tui",
   "zk_rollup",
+  "zkCarbon",
 ]
 exclude = [
   "vendor/ark-relations-patched",
