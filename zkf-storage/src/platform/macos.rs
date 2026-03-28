@@ -8,15 +8,23 @@ pub(crate) fn platform_drive_info() -> Result<PlatformDriveInfo, StorageError> {
     let profiler_output = run_command("system_profiler", &["SPNVMeDataType", "-detailLevel", "mini"])
         .unwrap_or_default();
 
-    let (device_name, used_bytes, available_bytes) = parse_df_k_output(&df_output)?;
+    let (device_name, df_used_bytes, df_available_bytes) = parse_df_k_output(&df_output)?;
     let capacity_from_diskutil = parse_bytes_from_key(&diskutil_output, "Disk Size")
         .or_else(|| parse_bytes_from_key(&diskutil_output, "Container Total Space"))
-        .unwrap_or_else(|| used_bytes.saturating_add(available_bytes));
+        .unwrap_or_else(|| df_used_bytes.saturating_add(df_available_bytes));
+    let available_bytes = parse_bytes_from_key(&diskutil_output, "Container Free Space")
+        .or_else(|| parse_bytes_from_key(&diskutil_output, "Available Space"))
+        .unwrap_or(df_available_bytes);
+    let used_bytes = capacity_from_diskutil
+        .checked_sub(available_bytes)
+        .unwrap_or(df_used_bytes);
     let model = parse_value(&profiler_output, "Model")
         .or_else(|| parse_value(&diskutil_output, "Device / Media Name"))
         .or_else(|| parse_value(&diskutil_output, "Media Name"));
     let serial = parse_value(&profiler_output, "Serial Number");
     let firmware = parse_value(&profiler_output, "Revision");
+    let smart_status = parse_value(&profiler_output, "S.M.A.R.T. status")
+        .or_else(|| parse_value(&diskutil_output, "SMART Status"));
 
     Ok(PlatformDriveInfo {
         device_name,
@@ -29,7 +37,7 @@ pub(crate) fn platform_drive_info() -> Result<PlatformDriveInfo, StorageError> {
         wear_level_percent: None,
         temperature_celsius: None,
         power_on_hours: None,
-        smart_available: false,
+        smart_available: smart_status.is_some(),
     })
 }
 
@@ -98,7 +106,7 @@ pub(crate) fn parse_df_k_output(output: &str) -> Result<(String, u64, u64), Stor
 
 #[cfg(test)]
 mod tests {
-    use super::parse_df_k_output;
+    use super::{parse_bytes_from_key, parse_df_k_output};
 
     #[test]
     fn parses_df_k_output() {
@@ -107,5 +115,21 @@ mod tests {
         assert_eq!(device, "/dev/disk3s1s1");
         assert_eq!(used, 1_024_000);
         assert_eq!(available, 2_048_000);
+    }
+
+    #[test]
+    fn parses_container_free_space_from_diskutil() {
+        let output = "\
+Disk Size:                 994.7 GB (994662584320 Bytes)\n\
+Container Total Space:     994.7 GB (994662584320 Bytes)\n\
+Container Free Space:      164.1 GB (164143951872 Bytes)\n";
+        assert_eq!(
+            parse_bytes_from_key(output, "Container Free Space"),
+            Some(164_143_951_872)
+        );
+        assert_eq!(
+            parse_bytes_from_key(output, "Container Total Space"),
+            Some(994_662_584_320)
+        );
     }
 }
