@@ -37,10 +37,12 @@ use zkf_lib::app::descent::{
     private_powered_descent_witness_with_steps,
 };
 use zkf_lib::evidence::{
+    archive_showcase_artifacts,
     audit_entry_included, audit_entry_omitted_by_default,
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary, repo_root, two_tier_audit_record,
+    generated_app_closure_bundle_summary, purge_showcase_witness_artifacts, repo_root,
+    two_tier_audit_record,
 };
 use zkf_lib::{ZkfError, ZkfResult, export_groth16_solidity_verifier, verify};
 use zkf_runtime::{
@@ -2589,6 +2591,27 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
     if bundle_mode.is_public() {
         finalize_public_bundle(&paths, checkpoint.full_audit_requested)?;
     }
+
+    archive_showcase_artifacts(
+        APP_ID,
+        &[
+            paths.proof_path.as_path(),
+            paths.verifier_path.as_path(),
+            paths.calldata_path.as_path(),
+            paths.summary_path.as_path(),
+            paths.audit_path.as_path(),
+            paths.audit_summary_path.as_path(),
+            paths.evidence_manifest_path.as_path(),
+            paths.runtime_trace_path.as_path(),
+            paths.execution_trace_path.as_path(),
+            paths.report_path.as_path(),
+            paths.mission_assurance_path.as_path(),
+        ],
+    )?;
+    purge_showcase_witness_artifacts(&[
+        paths.witness_base_path.as_path(),
+        paths.witness_path.as_path(),
+    ])?;
 
     println!("{}", paths.summary_path.display());
     println!("{}", paths.verifier_path.display());

@@ -371,6 +371,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: SwarmCommands,
     },
+    /// SSD guardian: archive, purge, health, policy, and daemon management.
+    Storage {
+        #[command(subcommand)]
+        command: StorageCommands,
+    },
     /// Retrain the Neural Engine control-plane models from telemetry and publish a fresh bundle.
     Retrain {
         #[arg(long, action = clap::ArgAction::Append)]
@@ -596,6 +601,57 @@ pub(crate) enum CircuitCommands {
         show_assignments: bool,
         #[arg(long)]
         show_flow: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum StorageCommands {
+    /// Report disk free state, cache usage, and recoverable storage.
+    Status {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Archive showcase artifacts and telemetry into the iCloud ZirOS archive.
+    Archive {
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Purge ephemeral artifacts such as debug caches and witness files.
+    Purge {
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(long)]
+        include_release: bool,
+    },
+    /// Archive then purge recoverable storage.
+    Sweep {
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Monitor SSD health and trigger archive or sweep actions based on thresholds.
+    Watch {
+        #[arg(long, default_value = "3600")]
+        interval: u64,
+    },
+    /// Restore an archived file to the local machine.
+    Restore {
+        #[arg()]
+        path: PathBuf,
+    },
+    /// Emit structured SSD and storage-health diagnostics.
+    Doctor {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Show the effective retention policy and active storage profile.
+    Policy {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Install or remove the background launchd storage guardian agent.
+    Install {
+        #[arg(long)]
+        uninstall: bool,
     },
 }
 

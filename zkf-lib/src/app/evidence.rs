@@ -13,6 +13,10 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_storage::{
+    FileClass, StorageGuardianConfig, archive_file, classify_path, current_utc_timestamp,
+    icloud_archive_root, purge_ephemeral,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -1327,6 +1331,89 @@ pub fn repo_root() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")))
 }
 
+pub fn archive_showcase_artifacts(app_id: &str, artifacts: &[&Path]) -> ZkfResult<()> {
+    let config = StorageGuardianConfig::from_env();
+    if !(config.enabled && config.auto_archive_proofs && config.icloud_archive_enabled) {
+        return Ok(());
+    }
+
+    let home = std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("."));
+    let archive_root = match icloud_archive_root() {
+        Some(path) => path,
+        None if config.dry_run => expected_icloud_archive_root(&home),
+        None => {
+            return Err(ZkfError::Io(
+                "iCloud Drive is not available at ~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS_Archive"
+                    .to_string(),
+            ));
+        }
+    };
+    let run_name = format!("{app_id}_{}", current_utc_timestamp());
+
+    for artifact in artifacts {
+        if !artifact.exists() || classify_path(artifact) != FileClass::Archivable {
+            continue;
+        }
+        let archive_dest = archive_file(
+            artifact,
+            FileClass::Archivable,
+            &run_name,
+            &archive_root,
+            true,
+        )
+        .map_err(storage_error_to_zkf)?;
+        if config.dry_run {
+            continue;
+        }
+        if let Some(parent) = archive_dest.parent() {
+            fs::create_dir_all(parent).map_err(|error| {
+                ZkfError::Io(format!("create {}: {error}", parent.display()))
+            })?;
+        }
+        fs::copy(artifact, &archive_dest).map_err(|error| {
+            ZkfError::Io(format!(
+                "copy {} -> {}: {error}",
+                artifact.display(),
+                archive_dest.display()
+            ))
+        })?;
+    }
+
+    Ok(())
+}
+
+pub fn purge_showcase_witness_artifacts(paths: &[&Path]) -> ZkfResult<()> {
+    let config = StorageGuardianConfig::from_env();
+    if !(config.enabled && config.purge_witness_after_prove) {
+        return Ok(());
+    }
+
+    let purge_targets = paths
+        .iter()
+        .filter(|path| path.exists() && classify_path(path) == FileClass::Ephemeral)
+        .map(|path| (*path).to_path_buf())
+        .collect::<Vec<_>>();
+    if purge_targets.is_empty() {
+        return Ok(());
+    }
+
+    purge_ephemeral(&purge_targets, config.dry_run).map_err(storage_error_to_zkf)?;
+    Ok(())
+}
+
+fn expected_icloud_archive_root(home: &Path) -> PathBuf {
+    home.join("Library")
+        .join("Mobile Documents")
+        .join("com~apple~CloudDocs")
+        .join("ZirOS_Archive")
+}
+
+fn storage_error_to_zkf(error: zkf_storage::StorageError) -> ZkfError {
+    ZkfError::Io(error.to_string())
+}
+
 fn surface_id_string(surface: &serde_json::Value) -> ZkfResult<String> {
     surface
         .get("surface_id")
@@ -1834,9 +1921,39 @@ pub fn two_tier_audit_record(
 }
 
 #[cfg(test)]
+#[allow(unsafe_code)]
 mod tests {
     use super::*;
+    use std::sync::{Mutex, OnceLock};
     use std::time::{SystemTime, UNIX_EPOCH};
+
+    static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+
+    fn with_env<T>(pairs: &[(&str, &str)], f: impl FnOnce() -> T) -> T {
+        let _guard = ENV_LOCK
+            .get_or_init(|| Mutex::new(()))
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let old_values = pairs
+            .iter()
+            .map(|(key, _)| ((*key).to_string(), std::env::var_os(key)))
+            .collect::<Vec<_>>();
+        unsafe {
+            for (key, value) in pairs {
+                std::env::set_var(key, value);
+            }
+        }
+        let result = f();
+        unsafe {
+            for (key, old_value) in old_values {
+                match old_value {
+                    Some(value) => std::env::set_var(key, value),
+                    None => std::env::remove_var(key),
+                }
+            }
+        }
+        result
+    }
 
     #[test]
     fn implementation_closure_generated_outputs_match_repo_files() {
@@ -1964,5 +2081,45 @@ mod tests {
         let written: serde_json::Value = read_json(&json_path).expect("read json");
         assert_eq!(written, json!({ "status": "included" }));
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn archive_showcase_artifacts_dry_run_preserves_local_bundle_files() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let home = temp.path().join("home");
+        let artifact = temp.path().join("private_demo.runtime.proof.json");
+        fs::create_dir_all(&home).expect("home");
+        fs::write(&artifact, "{}").expect("artifact");
+        with_env(
+            &[
+                ("HOME", home.to_str().expect("home path")),
+                ("ZKF_STORAGE_ENABLED", "1"),
+                ("ZKF_STORAGE_ARCHIVE_PROOFS", "1"),
+                ("ZKF_STORAGE_DRY_RUN", "1"),
+            ],
+            || {
+                archive_showcase_artifacts("private_demo", &[artifact.as_path()])
+                    .expect("archive dry run");
+            },
+        );
+        assert!(artifact.exists());
+    }
+
+    #[test]
+    fn purge_showcase_witness_artifacts_removes_ephemeral_witness_files() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let witness_path = temp.path().join("private_demo.witness.prepared.json");
+        fs::write(&witness_path, "{}").expect("witness");
+        with_env(
+            &[
+                ("ZKF_STORAGE_ENABLED", "1"),
+                ("ZKF_STORAGE_PURGE_WITNESS", "1"),
+            ],
+            || {
+                purge_showcase_witness_artifacts(&[witness_path.as_path()])
+                    .expect("purge witness");
+            },
+        );
+        assert!(!witness_path.exists());
     }
 }

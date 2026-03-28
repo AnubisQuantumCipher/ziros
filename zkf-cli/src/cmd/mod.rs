@@ -21,6 +21,7 @@ pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
 pub(crate) mod swarm;
+pub(crate) mod storage;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
 pub(crate) mod witness;
@@ -28,7 +29,7 @@ pub(crate) mod witness;
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    TelemetryCommands,
+    StorageCommands, TelemetryCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -370,6 +371,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             }
         },
         Commands::Swarm { command } => swarm::handle_swarm(command),
+        Commands::Storage { command } => storage::handle_storage(command),
         Commands::Retrain {
             input,
             profile,
@@ -497,6 +499,7 @@ fn command_name(command: &Commands) -> String {
             ClusterCommands::Benchmark { .. } => "cluster:benchmark".to_string(),
         },
         Commands::Swarm { command } => format!("swarm:{}", swarm_command_name(command)),
+        Commands::Storage { command } => format!("storage:{}", storage_command_name(command)),
         Commands::Retrain { .. } => "retrain".to_string(),
         Commands::Telemetry { command } => match command {
             TelemetryCommands::Stats { .. } => "telemetry:stats".to_string(),
@@ -524,6 +527,20 @@ fn swarm_command_name(command: &crate::cli::SwarmCommands) -> &'static str {
         crate::cli::SwarmCommands::Reputation { .. } => "reputation",
         crate::cli::SwarmCommands::ReputationLog { .. } => "reputation-log",
         crate::cli::SwarmCommands::ReputationVerify { .. } => "reputation-verify",
+    }
+}
+
+fn storage_command_name(command: &StorageCommands) -> &'static str {
+    match command {
+        StorageCommands::Status { .. } => "status",
+        StorageCommands::Archive { .. } => "archive",
+        StorageCommands::Purge { .. } => "purge",
+        StorageCommands::Sweep { .. } => "sweep",
+        StorageCommands::Watch { .. } => "watch",
+        StorageCommands::Restore { .. } => "restore",
+        StorageCommands::Doctor { .. } => "doctor",
+        StorageCommands::Policy { .. } => "policy",
+        StorageCommands::Install { .. } => "install",
     }
 }
 

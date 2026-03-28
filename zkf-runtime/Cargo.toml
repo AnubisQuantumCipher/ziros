@@ -8,6 +8,7 @@ authors.workspace = true
 [dependencies]
 zkf-backends = { path = "../zkf-backends", optional = true }
 zkf-core = { path = "../zkf-core" }
+zkf-storage = { path = "../zkf-storage" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

@@ -41,6 +41,7 @@ use zkf_core::artifact::{CompiledProgram, ProofArtifact};
 use zkf_core::ir::Program;
 use zkf_core::witness::{WitnessInputs, ensure_witness_completeness};
 use zkf_core::wrapping::{WrapperExecutionPolicy, WrapperPreview};
+use zkf_storage::StorageGuardianConfig;
 
 /// Compiles a program description into a ProverGraph plan.
 pub struct RuntimeCompiler;
@@ -165,6 +166,21 @@ fn normalize_authoritative_witness_for_backend_prove(
 }
 
 type NormalizedAuthoritativeWitness = (Option<Arc<Witness>>, Option<Arc<CompiledProgram>>);
+
+fn purge_runtime_witness(exec_ctx: &mut ExecutionContext, enabled: bool) {
+    if enabled {
+        exec_ctx.witness.take();
+        exec_ctx.witness_inputs.take();
+    }
+}
+
+fn maybe_purge_runtime_witness(exec_ctx: &mut ExecutionContext) {
+    let config = StorageGuardianConfig::from_env();
+    purge_runtime_witness(
+        exec_ctx,
+        config.enabled && config.purge_witness_after_prove,
+    );
+}
 
 fn enforce_strict_cryptographic_backend_request(
     backend: zkf_core::artifact::BackendKind,
@@ -773,6 +789,7 @@ impl RuntimeExecutor {
         ) {
             log::warn!("failed to persist prove telemetry: {err}");
         }
+        maybe_purge_runtime_witness(&mut emission.exec_ctx);
         Ok(BackendProofExecutionResult {
             result,
             compiled,
@@ -1113,6 +1130,7 @@ fn build_control_plane_request<'a>(
 mod tests {
     use super::*;
     use crate::adapters::emit_backend_prove_graph_with_context;
+    use crate::execution::ExecutionContext;
     use crate::memory::UnifiedBufferPool;
     use crate::trust::TrustModel;
     use zkf_backends::backend_for_route;
@@ -1161,6 +1179,21 @@ mod tests {
                 ("sum".to_string(), FieldElement::from_i64(x + y)),
             ]),
         }
+    }
+
+    #[test]
+    fn purge_runtime_witness_clears_authoritative_inputs_when_enabled() {
+        let mut exec_ctx = ExecutionContext::default()
+            .with_inputs(Arc::new(std::collections::BTreeMap::from([(
+                "x".to_string(),
+                zkf_core::FieldElement::from_i64(2),
+            )])))
+            .with_witness(Arc::new(witness(2, 5)));
+
+        purge_runtime_witness(&mut exec_ctx, true);
+
+        assert!(exec_ctx.witness.is_none());
+        assert!(exec_ctx.witness_inputs.is_none());
     }
 
     #[test]

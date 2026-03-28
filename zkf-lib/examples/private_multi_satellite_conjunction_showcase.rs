@@ -34,11 +34,12 @@ use zkf_lib::app::multi_satellite::{
     private_multi_satellite_scenario_spec,
 };
 use zkf_lib::evidence::{
+    archive_showcase_artifacts,
     canonicalize_for_determinism_hash, collect_formal_evidence_for_generated_app,
     effective_gpu_attribution_summary, ensure_dir_exists, ensure_file_exists,
     ensure_foundry_layout, foundry_project_dir, generated_app_closure_bundle_summary,
-    hash_json_value, sha256_hex, two_tier_audit_record, write_json as write_bundle_json,
-    write_text as write_bundle_text,
+    hash_json_value, purge_showcase_witness_artifacts, sha256_hex, two_tier_audit_record,
+    write_json as write_bundle_json, write_text as write_bundle_text,
 };
 use zkf_lib::{
     ZkfError, ZkfResult, audit_program_with_live_capabilities, compile,
@@ -1899,6 +1900,19 @@ fn export_scenario_bundle(
     ensure_file_exists(&project_dir.join("foundry.toml"))?;
     ensure_file_exists(&project_dir.join("src/PrivateMultiSatelliteVerifier.sol"))?;
     ensure_file_exists(&project_dir.join("test/PrivateMultiSatelliteVerifier.t.sol"))?;
+
+    archive_showcase_artifacts(
+        APP_ID,
+        &[
+            &out_dir.join("proof.json"),
+            &out_dir.join("runtime_trace.json"),
+            &out_dir.join("verifier.sol"),
+            &out_dir.join("calldata.json"),
+            &out_dir.join("audit_summary.json"),
+            &out_dir.join("human_readable_summary.md"),
+        ],
+    )?;
+    purge_showcase_witness_artifacts(&[&out_dir.join("witness.json")])?;
 
     Ok(())
 }

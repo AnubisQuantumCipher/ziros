@@ -25,6 +25,7 @@ members = [
   "zkf-metal",
   "zkf-runtime",
   "zkf-distributed",
+  "zkf-storage",
   "zkf-ui",
   "zkf-tui",
   "zk_rollup",

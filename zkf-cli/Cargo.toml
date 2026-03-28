@@ -28,6 +28,7 @@ distributed = []
 [dependencies]
 zkf-runtime = { path = "../zkf-runtime" }
 zkf-distributed = { path = "../zkf-distributed" }
+zkf-storage = { path = "../zkf-storage" }
 ed25519-dalek.workspace = true
 base64.workspace = true
 clap.workspace = true

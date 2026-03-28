@@ -46,8 +46,14 @@ echo "Building ZirOS..."
 
 install_binary
 
+mkdir -p "$HOME/.zkf/storage" "$HOME/.zkf/logs"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    "$BIN_DIR/zkf-cli" storage install 2>/dev/null || true
+fi
+
 echo "Running doctor..."
 "$BIN_DIR/zkf-cli" doctor
+"$BIN_DIR/zkf-cli" storage status
 
 cat <<EOF
 

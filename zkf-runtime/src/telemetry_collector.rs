@@ -19,6 +19,7 @@ use zkf_core::artifact::{BackendKind, CompiledProgram, ProofArtifact};
 use zkf_core::ccs::program_constraint_degree;
 use zkf_core::ir::{Constraint, Program};
 use zkf_core::{FieldId, PlatformCapability, SystemResources, Witness, WitnessInputs};
+use zkf_storage::{current_icloud_archive_bytes, get_ssd_health};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TelemetryRecord {
@@ -30,6 +31,12 @@ pub struct TelemetryRecord {
     pub metadata: TelemetryMetadata,
     pub platform_capability: PlatformCapability,
     pub adaptive_tuning: AdaptiveTuningStatus,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage_free_gb: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage_used_percent: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage_icloud_archived_bytes: Option<u64>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub watchdog_alerts: Vec<WatchdogAlert>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -340,6 +347,11 @@ fn build_record(
     let metal_runtime = metal_runtime_report();
     let platform_capability = PlatformCapability::detect();
     let adaptive_tuning = adaptive_tuning_status();
+    let storage_health = get_ssd_health().ok();
+    let storage_free_gb = storage_health
+        .as_ref()
+        .map(|health| health.available_bytes as f64 / 1_000_000_000.0);
+    let storage_used_percent = storage_health.as_ref().map(|health| health.used_percent);
     let stage_breakdown = report.stage_breakdown();
     let artifact_gpu_busy_ratio = artifact_gpu_busy_ratio(artifact);
     let effective_gpu_stages = effective_realized_gpu_capable_stages(report, artifact);
@@ -476,6 +488,9 @@ fn build_record(
         },
         platform_capability,
         adaptive_tuning,
+        storage_free_gb,
+        storage_used_percent,
+        storage_icloud_archived_bytes: current_icloud_archive_bytes(),
         watchdog_alerts: report.watchdog_alerts.clone(),
         control_plane: control_plane.cloned(),
         security_verdict: security_verdict.cloned(),
@@ -945,6 +960,8 @@ mod tests {
                 .contains(&"witness-solve".to_string())
         );
         assert!(payload.outcome.gpu_was_faster);
+        assert!(payload.storage_free_gb.is_some());
+        assert!(payload.storage_used_percent.is_some());
     }
 
     #[test]

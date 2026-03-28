@@ -28,9 +28,10 @@ use zkf_lib::app::satellite::{
     private_satellite_conjunction_witness_with_steps,
 };
 use zkf_lib::evidence::{
+    archive_showcase_artifacts,
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary,
+    generated_app_closure_bundle_summary, purge_showcase_witness_artifacts,
 };
 use zkf_lib::{
     ZkfError, ZkfResult, audit_program_with_live_capabilities, compile,
@@ -817,6 +818,24 @@ fn export_showcase_bundle(inputs: ShowcaseExportInputs) -> ZkfResult<()> {
     ensure_file_exists(&evidence_manifest_path)?;
     ensure_file_exists(&report_path)?;
     ensure_file_exists(&mission_assurance_path)?;
+
+    archive_showcase_artifacts(
+        "private_satellite_conjunction_showcase",
+        &[
+            proof_path.as_path(),
+            verifier_path.as_path(),
+            calldata_path.as_path(),
+            execution_trace_path.as_path(),
+            runtime_trace_path.as_path(),
+            summary_path.as_path(),
+            audit_path.as_path(),
+            audit_summary_path.as_path(),
+            report_path.as_path(),
+            mission_assurance_path.as_path(),
+            evidence_manifest_path.as_path(),
+        ],
+    )?;
+    purge_showcase_witness_artifacts(&[witness_base_path.as_path(), witness_path.as_path()])?;
 
     println!("{}", summary_path.display());
     println!("{}", verifier_path.display());

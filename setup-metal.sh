@@ -139,13 +139,30 @@ echo -e "${BOLD}5. Doctor Preflight${NC}"
 "${BIN}" metal-doctor --json | tee "${OUT_DIR}/metal-doctor.json" >/dev/null
 ok "metal-doctor preflight captured"
 
+echo ""
+echo -e "${BOLD}6. Storage Guardian Gate${NC}"
+STORAGE_JSON="$("${BIN}" storage doctor --json)"
+echo "${STORAGE_JSON}" | tee "${OUT_DIR}/storage-doctor.json" >/dev/null
+HEALTH="$(echo "${STORAGE_JSON}" | jq -r '.health_status')"
+FREE_GB="$(echo "${STORAGE_JSON}" | jq -r '.available_gb')"
+if [[ "${HEALTH}" == "critical" ]]; then
+    fail "storage doctor reported critical SSD health"
+    exit 1
+fi
+if awk "BEGIN { exit !(${FREE_GB} < 50) }"; then
+    warn "free space below 50 GB; running storage sweep"
+    "${BIN}" storage sweep
+else
+    ok "storage doctor passed (${FREE_GB} GB free)"
+fi
+
 if [[ ! -f "${PROOF}" || ! -f "${COMPILED}" ]]; then
     fail "strict provisioning inputs are required; missing proof=${PROOF} or compiled=${COMPILED}"
     exit 1
 fi
 
 echo ""
-echo -e "${BOLD}6. Strict Cache Prepare${NC}"
+echo -e "${BOLD}7. Strict Cache Prepare${NC}"
 "${BIN}" runtime prepare \
     --proof "${PROOF}" \
     --compiled "${COMPILED}" \
@@ -153,7 +170,7 @@ echo -e "${BOLD}6. Strict Cache Prepare${NC}"
 ok "Strict direct-wrap cache prepared"
 
 echo ""
-echo -e "${BOLD}7. Certified Production Gate${NC}"
+echo -e "${BOLD}8. Certified Production Gate${NC}"
 "${ROOT_DIR}/scripts/production_gate.sh" \
     --proof "${PROOF}" \
     --compiled "${COMPILED}" \
@@ -162,7 +179,7 @@ echo -e "${BOLD}7. Certified Production Gate${NC}"
 ok "Certified production gate passed"
 
 echo ""
-echo -e "${BOLD}8. Certified Production Soak${NC}"
+echo -e "${BOLD}9. Certified Production Soak${NC}"
 "${ROOT_DIR}/scripts/production_soak.sh" \
     --proof "${PROOF}" \
     --compiled "${COMPILED}" \
@@ -172,7 +189,7 @@ echo -e "${BOLD}8. Certified Production Soak${NC}"
 ok "Certified production soak passed"
 
 echo ""
-echo -e "${BOLD}9. Strict Doctor Gate${NC}"
+echo -e "${BOLD}10. Strict Doctor Gate${NC}"
 "${BIN}" metal-doctor --strict --json | tee "${OUT_DIR}/metal-doctor-strict.json" >/dev/null
 ok "metal-doctor strict gate passed"
 

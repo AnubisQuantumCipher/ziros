@@ -20,7 +20,8 @@ use zkf_core::{
     json_to_vec_pretty, optimize_program,
 };
 use zkf_lib::evidence::{
-    collect_formal_evidence_for_generated_app, generated_app_closure_bundle_summary,
+    archive_showcase_artifacts, collect_formal_evidence_for_generated_app,
+    generated_app_closure_bundle_summary, purge_showcase_witness_artifacts,
 };
 use zkf_lib::orbital::{
     PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_PRIVATE_INPUTS,
@@ -956,6 +957,21 @@ fn export_showcase_bundle(inputs: ShowcaseExportInputs) -> ZkfResult<()> {
             report_path.display()
         )));
     }
+
+    archive_showcase_artifacts(
+        "private_nbody_orbital_showcase",
+        &[
+            proof_path.as_path(),
+            verifier_path.as_path(),
+            calldata_path.as_path(),
+            summary_path.as_path(),
+            audit_path.as_path(),
+            runtime_trace_path.as_path(),
+            report_path.as_path(),
+            evidence_manifest_path.as_path(),
+        ],
+    )?;
+    purge_showcase_witness_artifacts(&[witness_base_path.as_path(), witness_path.as_path()])?;
 
     println!("{}", summary_path.display());
     println!("{}", verifier_path.display());

@@ -23,6 +23,7 @@ ark-serialize.workspace = true
 ark-snark.workspace = true
 zkf-core = { path = "../zkf-core", default-features = false }
 zkf-backends = { path = "../zkf-backends", default-features = false, features = ["full"] }
+zkf-storage = { path = "../zkf-storage" }
 zkf-frontends = { path = "../zkf-frontends", optional = true }
 zkf-gadgets = { path = "../zkf-gadgets" }
 zkf-ir-spec = { path = "../zkf-ir-spec" }
