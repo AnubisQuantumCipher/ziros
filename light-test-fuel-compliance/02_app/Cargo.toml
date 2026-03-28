@@ -1,0 +1,12 @@
+[package]
+name = "satellite-fuel-compliance"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zkf-core = { path = "/home/user/ziros/zkf-core", default-features = false }
+zkf-backends = { path = "/home/user/ziros/zkf-backends", default-features = false }
+zkf-gadgets = { path = "/home/user/ziros/zkf-gadgets" }
+zkf-ir-spec = { path = "/home/user/ziros/zkf-ir-spec" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

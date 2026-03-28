@@ -1,0 +1,12 @@
+{
+  "compliant_scenario": {
+    "compliance_status": "1",
+    "fuel_commitment": "130010000"
+  },
+  "fuel_trace": [
+    8500,
+    6500,
+    5500,
+    5000
+  ]
+}

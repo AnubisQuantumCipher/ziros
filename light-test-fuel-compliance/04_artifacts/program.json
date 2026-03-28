@@ -1,0 +1,657 @@
+{
+  "name": "satellite_fuel_compliance",
+  "field": "goldilocks",
+  "signals": [
+    {
+      "name": "starting_fuel",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "burn_step_0",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "burn_step_1",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "burn_step_2",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "burn_step_3",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "safety_reserve",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "fuel_commitment",
+      "visibility": "public",
+      "ty": "field"
+    },
+    {
+      "name": "compliance_status",
+      "visibility": "public",
+      "ty": "field"
+    },
+    {
+      "name": "__anchor_one",
+      "visibility": "constant",
+      "constant": "1",
+      "ty": "field"
+    },
+    {
+      "name": "fuel_after_step_0",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "fuel_after_step_1",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "fuel_after_step_2",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "fuel_after_step_3",
+      "visibility": "private",
+      "ty": "field"
+    },
+    {
+      "name": "safety_slack",
+      "visibility": "private",
+      "ty": "uint(16)"
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "range",
+      "signal": "starting_fuel",
+      "bits": 16,
+      "label": "starting_fuel_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "starting_fuel"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "starting_fuel"
+      },
+      "label": "starting_fuel_anchor"
+    },
+    {
+      "kind": "range",
+      "signal": "burn_step_0",
+      "bits": 16,
+      "label": "burn_step_0_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "burn_step_0"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "burn_step_0"
+      },
+      "label": "burn_step_0_anchor"
+    },
+    {
+      "kind": "range",
+      "signal": "burn_step_1",
+      "bits": 16,
+      "label": "burn_step_1_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "burn_step_1"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "burn_step_1"
+      },
+      "label": "burn_step_1_anchor"
+    },
+    {
+      "kind": "range",
+      "signal": "burn_step_2",
+      "bits": 16,
+      "label": "burn_step_2_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "burn_step_2"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "burn_step_2"
+      },
+      "label": "burn_step_2_anchor"
+    },
+    {
+      "kind": "range",
+      "signal": "burn_step_3",
+      "bits": 16,
+      "label": "burn_step_3_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "burn_step_3"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "burn_step_3"
+      },
+      "label": "burn_step_3_anchor"
+    },
+    {
+      "kind": "range",
+      "signal": "safety_reserve",
+      "bits": 16,
+      "label": "safety_reserve_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "safety_reserve"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "safety_reserve"
+      },
+      "label": "safety_reserve_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "fuel_after_step_0"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "starting_fuel"
+          },
+          {
+            "op": "signal",
+            "args": "burn_step_0"
+          }
+        ]
+      },
+      "label": "fuel_step_0_eq"
+    },
+    {
+      "kind": "range",
+      "signal": "fuel_after_step_0",
+      "bits": 16,
+      "label": "fuel_step_0_nonneg"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_0"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "fuel_after_step_0"
+      },
+      "label": "fuel_step_0_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "fuel_after_step_1"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_0"
+          },
+          {
+            "op": "signal",
+            "args": "burn_step_1"
+          }
+        ]
+      },
+      "label": "fuel_step_1_eq"
+    },
+    {
+      "kind": "range",
+      "signal": "fuel_after_step_1",
+      "bits": 16,
+      "label": "fuel_step_1_nonneg"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_1"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "fuel_after_step_1"
+      },
+      "label": "fuel_step_1_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "fuel_after_step_2"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_1"
+          },
+          {
+            "op": "signal",
+            "args": "burn_step_2"
+          }
+        ]
+      },
+      "label": "fuel_step_2_eq"
+    },
+    {
+      "kind": "range",
+      "signal": "fuel_after_step_2",
+      "bits": 16,
+      "label": "fuel_step_2_nonneg"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_2"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "fuel_after_step_2"
+      },
+      "label": "fuel_step_2_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "fuel_after_step_3"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_2"
+          },
+          {
+            "op": "signal",
+            "args": "burn_step_3"
+          }
+        ]
+      },
+      "label": "fuel_step_3_eq"
+    },
+    {
+      "kind": "range",
+      "signal": "fuel_after_step_3",
+      "bits": 16,
+      "label": "fuel_step_3_nonneg"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_3"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "fuel_after_step_3"
+      },
+      "label": "fuel_step_3_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "safety_slack"
+      },
+      "rhs": {
+        "op": "sub",
+        "args": [
+          {
+            "op": "signal",
+            "args": "fuel_after_step_3"
+          },
+          {
+            "op": "signal",
+            "args": "safety_reserve"
+          }
+        ]
+      },
+      "label": "safety_slack_eq"
+    },
+    {
+      "kind": "range",
+      "signal": "safety_slack",
+      "bits": 16,
+      "label": "safety_slack_range"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "safety_slack"
+          },
+          {
+            "op": "signal",
+            "args": "__anchor_one"
+          }
+        ]
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "safety_slack"
+      },
+      "label": "safety_slack_anchor"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "fuel_commitment"
+      },
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "signal",
+            "args": "starting_fuel"
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "signal",
+                "args": "starting_fuel"
+              },
+              {
+                "op": "signal",
+                "args": "safety_reserve"
+              },
+              {
+                "op": "const",
+                "args": "1"
+              }
+            ]
+          }
+        ]
+      },
+      "label": "fuel_commitment_eq"
+    },
+    {
+      "kind": "equal",
+      "lhs": {
+        "op": "signal",
+        "args": "compliance_status"
+      },
+      "rhs": {
+        "op": "signal",
+        "args": "__anchor_one"
+      },
+      "label": "compliance_status_eq"
+    },
+    {
+      "kind": "boolean",
+      "signal": "compliance_status",
+      "label": "compliance_status_bool"
+    }
+  ],
+  "witness_plan": {
+    "assignments": [
+      {
+        "target": "fuel_after_step_0",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "starting_fuel"
+            },
+            {
+              "op": "signal",
+              "args": "burn_step_0"
+            }
+          ]
+        }
+      },
+      {
+        "target": "fuel_after_step_1",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "fuel_after_step_0"
+            },
+            {
+              "op": "signal",
+              "args": "burn_step_1"
+            }
+          ]
+        }
+      },
+      {
+        "target": "fuel_after_step_2",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "fuel_after_step_1"
+            },
+            {
+              "op": "signal",
+              "args": "burn_step_2"
+            }
+          ]
+        }
+      },
+      {
+        "target": "fuel_after_step_3",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "fuel_after_step_2"
+            },
+            {
+              "op": "signal",
+              "args": "burn_step_3"
+            }
+          ]
+        }
+      },
+      {
+        "target": "safety_slack",
+        "expr": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "signal",
+              "args": "fuel_after_step_3"
+            },
+            {
+              "op": "signal",
+              "args": "safety_reserve"
+            }
+          ]
+        }
+      },
+      {
+        "target": "fuel_commitment",
+        "expr": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "signal",
+              "args": "starting_fuel"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "signal",
+                  "args": "starting_fuel"
+                },
+                {
+                  "op": "signal",
+                  "args": "safety_reserve"
+                },
+                {
+                  "op": "const",
+                  "args": "1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "target": "compliance_status",
+        "expr": {
+          "op": "signal",
+          "args": "__anchor_one"
+        }
+      }
+    ],
+    "hints": []
+  },
+  "metadata": {
+    "application": "Private Satellite Fuel Budget Compliance Verifier",
+    "num_maneuver_steps": "4"
+  }
+}

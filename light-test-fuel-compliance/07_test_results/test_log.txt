@@ -1,0 +1,16 @@
+=== Satellite Fuel Compliance — Test Results ===
+
+Circuit:
+  Signals: 14
+  Constraints: 30
+
+Compliant Scenario:
+  Proof size: 3054 bytes
+  Compile+Prove: 16ms
+  Verify: 5ms
+  Result: VERIFIED
+
+Non-Compliant Scenario:
+  Correctly rejected: range constraint violation at index 25 (Some("safety_slack_range")) for signal 'safety_slack': bits=16, value=18446744069414581821
+
+Total wall time: 23ms

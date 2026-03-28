@@ -1,0 +1,8 @@
+{
+  "burn_step_0": "3000",
+  "burn_step_1": "3000",
+  "burn_step_2": "2500",
+  "burn_step_3": "1000",
+  "safety_reserve": "3000",
+  "starting_fuel": "10000"
+}

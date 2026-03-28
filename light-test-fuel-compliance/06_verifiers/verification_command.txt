@@ -1,0 +1,7 @@
+# Verification was performed inline using zkf_backends::BackendEngine::verify()
+# Backend: plonky3 (Goldilocks, transparent setup)
+# Verified: true
+# Time: 5ms
+#
+# To reproduce:
+#   cd /home/user/Desktop/ZirOS_Light_Test_Fuel_Compliance/03_scripts/../02_app && cargo run -- /home/user/Desktop/ZirOS_Light_Test_Fuel_Compliance/03_scripts/..

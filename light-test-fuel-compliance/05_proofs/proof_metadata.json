@@ -1,0 +1,5 @@
+{
+  "backend": "plonky3",
+  "proof_size_bytes": 3054,
+  "compile_prove_ms": 16
+}

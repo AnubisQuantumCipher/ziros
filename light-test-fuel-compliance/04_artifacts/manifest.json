@@ -1,0 +1,8 @@
+{
+  "application": "Private Satellite Fuel Budget Compliance Verifier",
+  "version": "0.1.0",
+  "field": "Goldilocks",
+  "backend": "plonky3",
+  "num_maneuver_steps": 4,
+  "description": "Proves satellite fuel remaining after maneuver sequence stays above safety reserve without revealing private fuel data."
+}

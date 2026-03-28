@@ -1,0 +1,1 @@
+plonky3 (Goldilocks field, transparent setup — no trusted ceremony)
