@@ -347,6 +347,32 @@
       "notes": "SHA-256 hash function circuit (NIST FIPS 180-4). blackbox_ops=sha256"
     }
   ],
+  "app_templates": [
+    {
+      "id": "thermochemical-equilibrium",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Gas-phase thermochemical-equilibrium certificate with element balance, nonnegative species amounts, KKT-style complementarity, and Poseidon binding over the attested species/coefficient surface."
+    },
+    {
+      "id": "real-gas-state",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Real-gas cubic EOS state certificate for Peng-Robinson or Redlich-Kwong with reduced mixing arithmetic, admissible Z > B root selection, and committed coefficient binding."
+    },
+    {
+      "id": "navier-stokes-structured",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Structured-grid 1D finite-volume Navier-Stokes step certificate using attested Rusanov convective and central viscous flux witnesses. Discrete step-only surface; no claim of global PDE closure."
+    },
+    {
+      "id": "combustion-instability-rayleigh",
+      "status": "ready",
+      "field": "bn254",
+      "notes": "Rayleigh-window thermoacoustic instability certificate with a coupled low-order modal growth relation and explicit sign witnesses."
+    }
+  ],
   "registry": {
     "local": "ready",
     "remote": "ready",

@@ -178,18 +178,20 @@ fn should_use_streamed_groth16_setup(
     constraint_count: usize,
     resources: &SystemResources,
 ) -> bool {
+    let large_program = resources.unified_memory
+        && resources.total_ram_bytes <= SIXTY_FOUR_GIB
+        && (signal_count >= LARGE_GROTH16_SETUP_SIGNAL_THRESHOLD
+            || constraint_count >= LARGE_GROTH16_SETUP_CONSTRAINT_THRESHOLD);
+
     if let Ok(value) = std::env::var("ZKF_GROTH16_STREAMED_SETUP") {
         match value.trim().to_ascii_lowercase().as_str() {
-            "1" | "true" | "yes" | "on" => return true,
+            "1" | "true" | "yes" | "on" => return large_program,
             "0" | "false" | "no" | "off" => return false,
             _ => {}
         }
     }
 
-    resources.unified_memory
-        && resources.total_ram_bytes <= SIXTY_FOUR_GIB
-        && (signal_count >= LARGE_GROTH16_SETUP_SIGNAL_THRESHOLD
-            || constraint_count >= LARGE_GROTH16_SETUP_CONSTRAINT_THRESHOLD)
+    large_program
 }
 
 fn streamed_groth16_cache_paths(program_digest: &str, setup_seed: &[u8; 32]) -> (PathBuf, PathBuf) {
