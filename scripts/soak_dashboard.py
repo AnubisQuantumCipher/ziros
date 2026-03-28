@@ -21,7 +21,9 @@ STRICT_CERT_INSTALLED = Path(
     "/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/"
     "zkf-stark-to-groth16/certification/strict-m4-max.json"
 )
-BINARY = Path("target/release/zkf-cli")
+BINARY = Path("target-local/release/zkf-cli")
+if not BINARY.exists():
+    BINARY = Path("target/release/zkf-cli")
 
 REFRESH_SECONDS = int(os.environ.get("ZKF_DASH_REFRESH", "10"))
 

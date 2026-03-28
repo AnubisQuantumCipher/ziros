@@ -2,7 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BIN="${ROOT_DIR}/target/release/zkf-cli"
+BIN="${ROOT_DIR}/target-local/release/zkf-cli"
+if [[ ! -x "${BIN}" && -x "${ROOT_DIR}/target/release/zkf-cli" ]]; then
+    BIN="${ROOT_DIR}/target/release/zkf-cli"
+fi
 PROOF=""
 COMPILED=""
 OUT_DIR=""

@@ -16,6 +16,7 @@ find_preferred_binary() {
     fi
     for candidate in \
         "$ROOT/bin/zkf-cli" \
+        "$ROOT/target-local/debug/zkf-cli" \
         "$ROOT/target/debug/zkf-cli"
     do
         if [[ -x "$candidate" ]]; then
@@ -27,18 +28,23 @@ find_preferred_binary() {
 }
 
 find_release_fallback() {
-    local candidate="$ROOT/target/release/zkf-cli"
-    if [[ -x "$candidate" ]]; then
-        echo "$candidate"
-        return 0
-    fi
+    local candidate
+    for candidate in \
+        "$ROOT/target-local/release/zkf-cli" \
+        "$ROOT/target/release/zkf-cli"
+    do
+        if [[ -x "$candidate" ]]; then
+            echo "$candidate"
+            return 0
+        fi
+    done
     return 1
 }
 
 if ! ZKF="$(find_preferred_binary)"; then
     build_binary || exit 1
     ZKF="$(find_preferred_binary || find_release_fallback)" || {
-        echo "error: could not find zkf-cli in bin/, target/debug/, or target/release/ after build" >&2
+        echo "error: could not find zkf-cli in bin/, target-local/, or target/ after build" >&2
         exit 1
     }
 fi
