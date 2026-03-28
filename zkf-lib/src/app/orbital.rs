@@ -1464,16 +1464,16 @@ mod tests {
     fn orbital_gpu_attribution_detects_backend_delegated_metal() {
         let mut metadata = BTreeMap::new();
         metadata.insert(
+            "groth16_execution_classification".to_string(),
+            "metal-realized".to_string(),
+        );
+        metadata.insert(
             "groth16_msm_engine".to_string(),
             "metal-bn254-msm".to_string(),
         );
         metadata.insert(
             "qap_witness_map_engine".to_string(),
             "metal-bn254-ntt+streamed-reduction".to_string(),
-        );
-        metadata.insert(
-            "gpu_stage_coverage".to_string(),
-            r#"{"coverage_ratio":0.5,"metal_stages":["msm","fft-ntt"]}"#.to_string(),
         );
         metadata.insert("metal_gpu_busy_ratio".to_string(), "0.75".to_string());
         metadata.insert("metal_available".to_string(), "true".to_string());
@@ -1507,12 +1507,51 @@ mod tests {
         assert!(
             sources
                 .iter()
-                .any(|value| value.as_str() == Some("artifact.metadata.backend_engine"))
+                .any(|value| value.as_str() == Some("artifact.metadata.groth16_execution.msm"))
         );
         assert!(
             sources
                 .iter()
-                .any(|value| value.as_str() == Some("artifact.metadata.metal_gpu_busy_ratio"))
+                .any(|value| value.as_str()
+                    == Some("artifact.metadata.groth16_execution.witness_map"))
+        );
+    }
+
+    #[test]
+    fn orbital_gpu_attribution_ignores_capability_only_hints() {
+        let mut metadata = BTreeMap::new();
+        metadata.insert(
+            "best_msm_accelerator".to_string(),
+            "metal-bn254-msm".to_string(),
+        );
+        metadata.insert(
+            "gpu_stage_coverage".to_string(),
+            r#"{"coverage_ratio":1.0,"metal_stages":["msm","fft-ntt"],"cpu_stages":[]}"#
+                .to_string(),
+        );
+        metadata.insert("metal_available".to_string(), "true".to_string());
+        metadata.insert("metal_compiled".to_string(), "true".to_string());
+        metadata.insert("metal_complete".to_string(), "true".to_string());
+
+        let summary = effective_gpu_attribution_summary(0, 0.0, &metadata);
+        assert_eq!(
+            summary
+                .get("classification")
+                .and_then(serde_json::Value::as_str),
+            Some("none")
+        );
+        assert_eq!(
+            summary
+                .get("effective_gpu_participation")
+                .and_then(serde_json::Value::as_bool),
+            Some(false)
+        );
+        assert_eq!(
+            summary
+                .get("realized_gpu_capable_stages")
+                .and_then(serde_json::Value::as_array)
+                .map(Vec::len),
+            Some(0)
         );
     }
 }

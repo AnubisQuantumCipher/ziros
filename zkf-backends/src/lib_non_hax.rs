@@ -8,6 +8,7 @@ mod blackbox_native;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod ceremony;
 mod compat;
+pub mod execution_summary;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod foundry_test;
 #[cfg(not(target_arch = "wasm32"))]
@@ -70,10 +71,10 @@ pub use arkworks::{
     compile_and_prove_arkworks_unchecked_for_test_fixture, compile_arkworks_unchecked,
     groth16_bn254_witness_map_ntt_parity, synthetic_groth16_compiled_for_artifact,
 };
-#[cfg(not(target_arch = "wasm32"))]
-pub use r1cs_lowering::lower_program_for_backend;
-#[cfg(all(not(target_arch = "wasm32"), feature = "native-nova"))]
-pub use nova_native::compile_nova_unchecked;
+pub use execution_summary::{
+    Groth16ExecutionClassification, Groth16ExecutionSummary, Groth16MetalThresholdSummary,
+    Groth16StageExecutionSummary, groth16_execution_summary_from_metadata,
+};
 #[cfg(not(target_arch = "wasm32"))]
 use halo2::Halo2Backend;
 #[cfg(not(target_arch = "wasm32"))]
@@ -84,7 +85,11 @@ use hypernova::HyperNovaBackend;
 use midnight_native::MidnightNativeBackend;
 #[cfg(all(not(target_arch = "wasm32"), feature = "native-nova"))]
 use nova_native::NovaNativeBackend;
+#[cfg(all(not(target_arch = "wasm32"), feature = "native-nova"))]
+pub use nova_native::compile_nova_unchecked;
 use once_cell::sync::Lazy;
+#[cfg(not(target_arch = "wasm32"))]
+pub use r1cs_lowering::lower_program_for_backend;
 use std::collections::{HashMap, VecDeque};
 use std::sync::Once;
 use zkf_core::SupportClass;
@@ -511,8 +516,7 @@ pub const GROTH16_DETERMINISTIC_DEV_PROVENANCE: &str = "deterministic-dev";
 pub const GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE: &str = "local-ceremony-phase2-streamed";
 pub const GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY: &str = "trusted-imported";
 pub const GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY: &str = "development-only";
-pub const GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY: &str =
-    "trusted-local-ceremony";
+pub const GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY: &str = "trusted-local-ceremony";
 pub const GROTH16_SETUP_BLOB_PATH_ENV: &str = "ZKF_GROTH16_SETUP_BLOB_PATH";
 pub const ALLOW_DEV_DETERMINISTIC_GROTH16_ENV: &str = "ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16";
 

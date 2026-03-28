@@ -6,7 +6,9 @@ use std::sync::{
 };
 use std::thread;
 
-use zkf_backends::{CapabilityReport, GpuStageCoverage, recommend_gpu_jobs};
+use zkf_backends::{
+    CapabilityReport, GpuStageCoverage, groth16_execution_summary_from_metadata, recommend_gpu_jobs,
+};
 use zkf_core::{CompiledProgram, PackageManifest, Program, ProofArtifact, Witness};
 use zkf_runtime::{ExecutionMode, RequiredTrustLane, RuntimeExecutor};
 
@@ -152,6 +154,7 @@ pub(crate) fn prove_package(
         metal_inflight_jobs: metadata_usize(&artifact.metadata, "metal_inflight_jobs"),
         metal_no_cpu_fallback: metadata_bool(&artifact.metadata, "metal_no_cpu_fallback"),
         metal_counter_source: artifact.metadata.get("metal_counter_source").cloned(),
+        groth16_execution: groth16_execution_summary_from_metadata(&artifact.metadata),
         hybrid,
         security_profile: Some(artifact.effective_security_profile().as_str().to_string()),
         replay_manifest_path: artifact
@@ -393,6 +396,7 @@ pub(crate) fn prove_all_package(
             metal_inflight_jobs: metadata_usize(&item.artifact.metadata, "metal_inflight_jobs"),
             metal_no_cpu_fallback: metadata_bool(&item.artifact.metadata, "metal_no_cpu_fallback"),
             metal_counter_source: item.artifact.metadata.get("metal_counter_source").cloned(),
+            groth16_execution: groth16_execution_summary_from_metadata(&item.artifact.metadata),
             hybrid: false,
             security_profile: item
                 .artifact
@@ -705,6 +709,7 @@ fn success_entry(report: crate::ProveResult) -> crate::ProveAllEntry {
         metal_inflight_jobs: report.metal_inflight_jobs,
         metal_no_cpu_fallback: report.metal_no_cpu_fallback,
         metal_counter_source: report.metal_counter_source,
+        groth16_execution: report.groth16_execution,
         implementation_type: None,
         readiness: Some("ready".to_string()),
         readiness_reason: None,
@@ -738,6 +743,7 @@ fn failed_entry(backend: zkf_core::BackendKind, err: String) -> crate::ProveAllE
         metal_inflight_jobs: None,
         metal_no_cpu_fallback: None,
         metal_counter_source: None,
+        groth16_execution: None,
         implementation_type: None,
         readiness: None,
         readiness_reason: None,
@@ -772,6 +778,7 @@ fn skipped_entry(report: &CapabilityReport, error: Option<String>) -> crate::Pro
         metal_inflight_jobs: None,
         metal_no_cpu_fallback: None,
         metal_counter_source: None,
+        groth16_execution: None,
         implementation_type: Some(report.implementation_type),
         readiness: Some(if program_blocked {
             "blocked".to_string()

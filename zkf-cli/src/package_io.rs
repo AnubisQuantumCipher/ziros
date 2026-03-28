@@ -1,5 +1,6 @@
 use serde::Serialize;
 use std::path::{Path, PathBuf};
+use zkf_backends::{Groth16ExecutionSummary, groth16_execution_summary_from_metadata};
 use zkf_core::{
     BackendKind, CompiledProgram, PACKAGE_SCHEMA_VERSION, PackageFileRef, PackageManifest, Program,
     ProofArtifact, Witness,
@@ -249,6 +250,8 @@ struct ProveArtifactReport {
     cpu_math_fallback_reason: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     export_scheme: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    groth16_execution: Option<Groth16ExecutionSummary>,
 }
 
 pub(crate) fn write_proof_artifacts(
@@ -335,6 +338,7 @@ pub(crate) fn write_proof_artifacts(
         prover_acceleration_realization: runtime_realization.acceleration_label,
         cpu_math_fallback_reason: artifact.metadata.get("cpu_math_fallback_reason").cloned(),
         export_scheme: artifact.metadata.get("export_scheme").cloned(),
+        groth16_execution: groth16_execution_summary_from_metadata(&artifact.metadata),
     };
     let report_rel = PathBuf::from(format!("proofs/{}/{run_id}/report.json", backend.as_str()));
     let report_path = root.join(&report_rel);

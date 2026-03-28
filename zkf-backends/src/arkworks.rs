@@ -9,9 +9,8 @@ use crate::r1cs_lowering::lower_program_for_backend;
 use crate::{
     BackendEngine, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
     GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
-    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
-    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
-    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY,
+    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
+    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
     GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
     GROTH16_STREAMED_PK_PATH_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY,
     GROTH16_STREAMED_SETUP_STORAGE_VALUE, GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY,
@@ -58,6 +57,9 @@ const LARGE_GROTH16_SETUP_SIGNAL_THRESHOLD: usize = 1_000;
 const LARGE_GROTH16_SETUP_CONSTRAINT_THRESHOLD: usize = 1_000;
 const FORTY_EIGHT_GIB: u64 = 48 * 1024 * 1024 * 1024;
 const SIXTY_FOUR_GIB: u64 = 64 * 1024 * 1024 * 1024;
+const STREAMED_GROTH16_PROVE_MATERIALIZE_EXTRA_HEADROOM_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+const STREAMED_GROTH16_PROVE_MATERIALIZE_TOTAL_RAM_DIVISOR: u64 = 4;
+const STREAMED_GROTH16_PROVE_MATERIALIZE_AVAILABLE_MULTIPLIER: u64 = 2;
 
 pub struct ArkworksGroth16Backend;
 
@@ -72,6 +74,37 @@ struct StreamedSetupBlob {
     blob: Vec<u8>,
     pk_path: PathBuf,
     shape_path: PathBuf,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum StreamedGroth16ProveMode {
+    Streamed,
+    Materialized,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Groth16ProveKeyStorage {
+    InMemorySetupBlob,
+    StreamedPk,
+    MaterializedStreamedPk,
+}
+
+impl Groth16ProveKeyStorage {
+    fn as_metadata_value(self) -> &'static str {
+        match self {
+            Self::InMemorySetupBlob => "in-memory-setup-blob",
+            Self::StreamedPk => "streamed-pk",
+            Self::MaterializedStreamedPk => "materialized-streamed-pk",
+        }
+    }
+
+    fn reason(self) -> &'static str {
+        match self {
+            Self::InMemorySetupBlob => "setup-blob-in-memory",
+            Self::StreamedPk => "streamed-pk-sequential-prove",
+            Self::MaterializedStreamedPk => "materialized-streamed-pk-for-metal-prove",
+        }
+    }
 }
 
 fn load_requested_setup_blob(path: impl AsRef<Path>) -> ZkfResult<Vec<u8>> {
@@ -351,6 +384,81 @@ fn compiled_streamed_setup_paths(compiled: &CompiledProgram) -> Option<(PathBuf,
         .get(GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY)
         .map(PathBuf::from)?;
     Some((pk_path, shape_path))
+}
+
+fn streamed_groth16_prove_mode_override() -> Option<StreamedGroth16ProveMode> {
+    let value = std::env::var("ZKF_GROTH16_STREAMED_PROVE_MODE").ok()?;
+    match value.trim().to_ascii_lowercase().as_str() {
+        "streamed" => Some(StreamedGroth16ProveMode::Streamed),
+        "materialized" | "materialize" | "in-memory" => {
+            Some(StreamedGroth16ProveMode::Materialized)
+        }
+        _ => None,
+    }
+}
+
+fn should_materialize_streamed_groth16_pk_for_prove_with_context(
+    pk_bytes: u64,
+    resources: &SystemResources,
+    metal_available: bool,
+    metal_dispatch_circuit_open: bool,
+    mode_override: Option<StreamedGroth16ProveMode>,
+) -> bool {
+    match mode_override {
+        Some(StreamedGroth16ProveMode::Materialized) => return true,
+        Some(StreamedGroth16ProveMode::Streamed) => return false,
+        None => {}
+    }
+
+    if pk_bytes == 0
+        || !resources.unified_memory
+        || resources.total_ram_bytes < FORTY_EIGHT_GIB
+        || matches!(resources.pressure.level, PressureLevel::High)
+        || !metal_available
+        || metal_dispatch_circuit_open
+    {
+        return false;
+    }
+
+    let total_budget = resources
+        .total_ram_bytes
+        .checked_div(STREAMED_GROTH16_PROVE_MATERIALIZE_TOTAL_RAM_DIVISOR)
+        .unwrap_or(0);
+    if pk_bytes > total_budget {
+        return false;
+    }
+
+    let projected_peak = pk_bytes
+        .saturating_mul(STREAMED_GROTH16_PROVE_MATERIALIZE_AVAILABLE_MULTIPLIER)
+        .saturating_add(STREAMED_GROTH16_PROVE_MATERIALIZE_EXTRA_HEADROOM_BYTES);
+    projected_peak <= resources.available_ram_bytes
+}
+
+fn should_materialize_streamed_groth16_pk_for_prove(path: &Path) -> bool {
+    let pk_bytes = fs::metadata(path).map(|meta| meta.len()).unwrap_or(0);
+    let resources = SystemResources::detect();
+    let runtime = crate::metal_runtime_report();
+    should_materialize_streamed_groth16_pk_for_prove_with_context(
+        pk_bytes,
+        &resources,
+        runtime.metal_available,
+        runtime.metal_dispatch_circuit_open,
+        streamed_groth16_prove_mode_override(),
+    )
+}
+
+fn append_groth16_prove_key_storage_metadata(
+    metadata: &mut BTreeMap<String, String>,
+    storage: Groth16ProveKeyStorage,
+) {
+    metadata.insert(
+        "groth16_prove_key_storage".to_string(),
+        storage.as_metadata_value().to_string(),
+    );
+    metadata.insert(
+        "groth16_prove_key_storage_reason".to_string(),
+        storage.reason().to_string(),
+    );
 }
 
 fn annotate_setup_metadata(
@@ -684,28 +792,8 @@ impl BackendEngine for ArkworksGroth16Backend {
                 IrCircuit::from_witness(compiled.program.clone(), &enriched.values)?;
             let (mut rng, proof_seed_source, proof_seed) =
                 proof_rng_for_witness(compiled, &enriched);
-            let (proof, verification_key_bytes, msm_dispatch) = if let Some((pk_path, shape_path)) =
-                compiled_streamed_setup_paths(compiled)
-            {
-                let prove_shape = load_streamed_groth16_prove_shape(&shape_path)?;
-                let (proof, vk, msm_dispatch) = create_local_groth16_proof_with_streamed_pk_path(
-                    &pk_path,
-                    proving_circuit,
-                    &mut rng,
-                    &prove_shape,
-                )?;
-                let mut vk_bytes = Vec::new();
-                vk.serialize_compressed(&mut vk_bytes)
-                    .map_err(|err| ZkfError::Serialization(err.to_string()))?;
-                (proof, vk_bytes, msm_dispatch)
-            } else {
-                let (pk_bytes, vk_bytes) = unpack_setup_blob(setup_blob)?;
-                let pk = ProvingKey::<Bn254>::deserialize_compressed(pk_bytes.as_slice())
-                    .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
-                let (proof, msm_dispatch) =
-                    create_local_groth16_proof(&pk, proving_circuit, &mut rng)?;
-                (proof, vk_bytes, msm_dispatch)
-            };
+            let (proof, verification_key_bytes, msm_dispatch, prove_key_storage) =
+                prove_with_compiled_setup(compiled, setup_blob, proving_circuit, &mut rng)?;
 
             let public_inputs = collect_public_inputs(&compiled.program, &enriched)?;
 
@@ -718,6 +806,7 @@ impl BackendEngine for ArkworksGroth16Backend {
             metadata.insert("curve".to_string(), "bn254".to_string());
             metadata.insert("scheme".to_string(), "groth16".to_string());
             annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+            append_groth16_prove_key_storage_metadata(&mut metadata, prove_key_storage);
             append_groth16_metal_metadata(&mut metadata, msm_dispatch);
             append_backend_runtime_metadata(&mut metadata, self.kind());
 
@@ -1120,27 +1209,8 @@ pub fn compile_and_prove_arkworks_unchecked_for_test_fixture(
 
         let proving_circuit = IrCircuit::from_witness(compiled.program.clone(), &enriched.values)?;
         let (mut rng, proof_seed_source, proof_seed) = proof_rng_for_witness(&compiled, &enriched);
-        let (proof, verification_key_bytes, msm_dispatch) = if let Some((pk_path, shape_path)) =
-            compiled_streamed_setup_paths(&compiled)
-        {
-            let prove_shape = load_streamed_groth16_prove_shape(&shape_path)?;
-            let (proof, vk, msm_dispatch) = create_local_groth16_proof_with_streamed_pk_path(
-                &pk_path,
-                proving_circuit,
-                &mut rng,
-                &prove_shape,
-            )?;
-            let mut vk_bytes = Vec::new();
-            vk.serialize_compressed(&mut vk_bytes)
-                .map_err(|err| ZkfError::Serialization(err.to_string()))?;
-            (proof, vk_bytes, msm_dispatch)
-        } else {
-            let (pk_bytes, vk_bytes) = unpack_setup_blob(setup_blob)?;
-            let pk = ProvingKey::<Bn254>::deserialize_compressed(pk_bytes.as_slice())
-                .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
-            let (proof, msm_dispatch) = create_local_groth16_proof(&pk, proving_circuit, &mut rng)?;
-            (proof, vk_bytes, msm_dispatch)
-        };
+        let (proof, verification_key_bytes, msm_dispatch, prove_key_storage) =
+            prove_with_compiled_setup(&compiled, setup_blob, proving_circuit, &mut rng)?;
         let public_inputs = collect_public_inputs(&compiled.program, &enriched)?;
 
         let mut proof_bytes = Vec::new();
@@ -1152,6 +1222,7 @@ pub fn compile_and_prove_arkworks_unchecked_for_test_fixture(
         metadata.insert("curve".to_string(), "bn254".to_string());
         metadata.insert("scheme".to_string(), "groth16".to_string());
         annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+        append_groth16_prove_key_storage_metadata(&mut metadata, prove_key_storage);
         append_groth16_metal_metadata(&mut metadata, msm_dispatch);
         append_backend_runtime_metadata(&mut metadata, BackendKind::ArkworksGroth16);
 
@@ -1276,6 +1347,14 @@ impl Groth16MsmDispatch {
             Some("cpu-selected")
         } else {
             None
+        }
+    }
+
+    fn execution_classification(&self) -> &'static str {
+        if self.no_cpu_fallback() {
+            "metal-realized"
+        } else {
+            self.fallback_reason().unwrap_or("cpu-selected")
         }
     }
 
@@ -2366,6 +2445,101 @@ fn ensure_streamed_groth16_pk_header_ready(path: &Path) -> ZkfResult<()> {
     Ok(())
 }
 
+fn read_streamed_g1_query(
+    reader: &mut impl Read,
+    path: &Path,
+    label: &str,
+) -> ZkfResult<Vec<G1Affine>> {
+    let len = read_streamed_query_len(reader, label)?;
+    let mut query = Vec::with_capacity(len);
+    for _ in 0..len {
+        let point = G1Affine::deserialize_uncompressed_unchecked(&mut *reader).map_err(|err| {
+            ZkfError::InvalidArtifact(format!(
+                "failed to deserialize streamed Groth16 {label} base from {}: {err}",
+                path.display()
+            ))
+        })?;
+        query.push(point);
+    }
+    Ok(query)
+}
+
+fn read_streamed_g2_query(
+    reader: &mut impl Read,
+    path: &Path,
+    label: &str,
+) -> ZkfResult<Vec<G2Affine>> {
+    let len = read_streamed_query_len(reader, label)?;
+    let mut query = Vec::with_capacity(len);
+    for _ in 0..len {
+        let point = G2Affine::deserialize_uncompressed_unchecked(&mut *reader).map_err(|err| {
+            ZkfError::InvalidArtifact(format!(
+                "failed to deserialize streamed Groth16 {label} base from {}: {err}",
+                path.display()
+            ))
+        })?;
+        query.push(point);
+    }
+    Ok(query)
+}
+
+fn load_streamed_groth16_proving_key(path: &Path) -> ZkfResult<ProvingKey<Bn254>> {
+    ensure_streamed_groth16_pk_header_ready(path)?;
+    let file = File::open(path).map_err(|err| {
+        ZkfError::Backend(format!(
+            "Failed to open streamed Groth16 proving key {}: {err}",
+            path.display()
+        ))
+    })?;
+    let mut reader = BufReader::new(file);
+    let vk =
+        VerifyingKey::<Bn254>::deserialize_uncompressed_unchecked(&mut reader).map_err(|err| {
+            ZkfError::InvalidArtifact(format!(
+                "failed to deserialize streamed Groth16 verifying key {}: {err}",
+                path.display()
+            ))
+        })?;
+    let beta_g1 = G1Affine::deserialize_uncompressed_unchecked(&mut reader).map_err(|err| {
+        ZkfError::InvalidArtifact(format!(
+            "failed to deserialize streamed Groth16 beta_g1 {}: {err}",
+            path.display()
+        ))
+    })?;
+    let delta_g1 = G1Affine::deserialize_uncompressed_unchecked(&mut reader).map_err(|err| {
+        ZkfError::InvalidArtifact(format!(
+            "failed to deserialize streamed Groth16 delta_g1 {}: {err}",
+            path.display()
+        ))
+    })?;
+    let a_query = read_streamed_g1_query(&mut reader, path, "a_query")?;
+    let b_g1_query = read_streamed_g1_query(&mut reader, path, "b_g1_query")?;
+    let b_g2_query = read_streamed_g2_query(&mut reader, path, "b_g2_query")?;
+    let h_query = read_streamed_g1_query(&mut reader, path, "h_query")?;
+    let l_query = read_streamed_g1_query(&mut reader, path, "l_query")?;
+
+    let mut trailing = [0u8; 1];
+    match reader.read_exact(&mut trailing) {
+        Ok(()) => Err(ZkfError::InvalidArtifact(format!(
+            "streamed Groth16 proving key {} has trailing bytes",
+            path.display()
+        ))),
+        Err(err) if err.kind() == std::io::ErrorKind::UnexpectedEof => Ok(ProvingKey::<Bn254> {
+            vk,
+            beta_g1,
+            delta_g1,
+            a_query,
+            b_g1_query,
+            b_g2_query,
+            h_query,
+            l_query,
+        }),
+        Err(err) => Err(ZkfError::Backend(format!(
+            "Failed to finalize streamed Groth16 proving key load {}: {err}",
+            path.display()
+        ))),
+    }
+}
+
 fn ensure_streamed_groth16_shape_header_ready(path: &Path) -> ZkfResult<()> {
     cleanup_stale_atomic_temp_siblings(path);
     let file = File::open(path).map_err(|err| {
@@ -3189,6 +3363,68 @@ pub(crate) fn create_local_groth16_proof_with_streamed_pk_path<C: ConstraintSynt
 
         Ok((proof, vk, msm_dispatch))
     })
+}
+
+fn prove_with_compiled_setup<C: ConstraintSynthesizer<Fr>>(
+    compiled: &CompiledProgram,
+    setup_blob: &[u8],
+    proving_circuit: C,
+    rng: &mut StdRng,
+) -> ZkfResult<(
+    Proof<Bn254>,
+    Vec<u8>,
+    Groth16MsmDispatch,
+    Groth16ProveKeyStorage,
+)> {
+    if let Some((pk_path, shape_path)) = compiled_streamed_setup_paths(compiled) {
+        let prove_shape = load_streamed_groth16_prove_shape(&shape_path)?;
+        if should_materialize_streamed_groth16_pk_for_prove(&pk_path) {
+            let pk = load_streamed_groth16_proving_key(&pk_path)?;
+            let mut vk_bytes = Vec::new();
+            pk.vk
+                .serialize_compressed(&mut vk_bytes)
+                .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+            let (proof, msm_dispatch) = create_local_groth16_proof_with_cached_shape(
+                &pk,
+                proving_circuit,
+                rng,
+                &prove_shape,
+            )?;
+            Ok((
+                proof,
+                vk_bytes,
+                msm_dispatch,
+                Groth16ProveKeyStorage::MaterializedStreamedPk,
+            ))
+        } else {
+            let (proof, vk, msm_dispatch) = create_local_groth16_proof_with_streamed_pk_path(
+                &pk_path,
+                proving_circuit,
+                rng,
+                &prove_shape,
+            )?;
+            let mut vk_bytes = Vec::new();
+            vk.serialize_compressed(&mut vk_bytes)
+                .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+            Ok((
+                proof,
+                vk_bytes,
+                msm_dispatch,
+                Groth16ProveKeyStorage::StreamedPk,
+            ))
+        }
+    } else {
+        let (pk_bytes, vk_bytes) = unpack_setup_blob(setup_blob)?;
+        let pk = ProvingKey::<Bn254>::deserialize_compressed(pk_bytes.as_slice())
+            .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
+        let (proof, msm_dispatch) = create_local_groth16_proof(&pk, proving_circuit, rng)?;
+        Ok((
+            proof,
+            vk_bytes,
+            msm_dispatch,
+            Groth16ProveKeyStorage::InMemorySetupBlob,
+        ))
+    }
 }
 
 #[allow(dead_code)]
@@ -4237,6 +4473,10 @@ pub(crate) fn append_groth16_metal_metadata(
     metadata.insert("groth16_msm_engine".to_string(), finalized_msm_engine);
     metadata.insert("groth16_msm_reason".to_string(), finalized_msm_reason);
     metadata.insert(
+        "groth16_execution_classification".to_string(),
+        msm_dispatch.execution_classification().to_string(),
+    );
+    metadata.insert(
         "groth16_msm_parallelism".to_string(),
         finalized_msm_parallelism.to_string(),
     );
@@ -4885,6 +5125,8 @@ mod tests {
     use ark_relations::r1cs::{
         ConstraintSynthesizer, ConstraintSystemRef, LinearCombination, SynthesisError,
     };
+    use zkf_core::{FieldElement, WitnessInputs, generate_witness};
+    use zkf_examples::{mul_add_inputs, mul_add_program, recurrence_program};
 
     #[derive(Clone)]
     struct TinyStreamedShapeCircuit;
@@ -4918,7 +5160,11 @@ mod tests {
         let stale_path = base.join(".shape.bin.tmp-999999-1-0");
         fs::write(&stale_path, b"stale").expect("stale temp");
         std::process::Command::new("touch")
-            .args(["-t", "200001010000", stale_path.to_str().expect("utf8 path")])
+            .args([
+                "-t",
+                "200001010000",
+                stale_path.to_str().expect("utf8 path"),
+            ])
             .status()
             .expect("touch stale temp");
 
@@ -5096,6 +5342,12 @@ mod tests {
             Some("metal-dispatch-failed")
         );
         assert_eq!(
+            metadata
+                .get("groth16_execution_classification")
+                .map(String::as_str),
+            Some("metal-dispatch-failed")
+        );
+        assert_eq!(
             metadata.get("groth16_msm_parallelism").map(String::as_str),
             Some("1")
         );
@@ -5135,6 +5387,214 @@ mod tests {
         assert!(dispatch.no_cpu_fallback());
         assert_eq!(dispatch.finalized_msm_engine(), "metal-bn254-msm");
         assert_eq!(dispatch.finalized_msm_fallback_state(), "none");
+        assert_eq!(dispatch.execution_classification(), "metal-realized");
+    }
+
+    #[test]
+    fn groth16_execution_summary_covers_all_fail_closed_outcomes() {
+        let cases = [
+            (
+                Groth16MsmDispatch {
+                    used_metal: true,
+                    metal_available: true,
+                    saw_below_threshold: false,
+                    saw_dispatch_failed: false,
+                    dispatch_failure_detail: None,
+                    total_msm_invocations: 3,
+                    eligible_msm_invocations: 3,
+                    metal_msm_invocations: 3,
+                    max_inflight_jobs: 2,
+                    counter_source: "parallel-msm-estimate",
+                    witness_map_engine: "metal-bn254-ntt+streamed-reduction",
+                    witness_map_reason: "bn254-witness-map-metal-ntt",
+                    witness_map_parallelism: 8,
+                    stage_breakdown: BTreeMap::new(),
+                },
+                crate::Groth16ExecutionClassification::MetalRealized,
+            ),
+            (
+                Groth16MsmDispatch {
+                    used_metal: false,
+                    metal_available: true,
+                    saw_below_threshold: true,
+                    saw_dispatch_failed: false,
+                    dispatch_failure_detail: None,
+                    total_msm_invocations: 2,
+                    eligible_msm_invocations: 0,
+                    metal_msm_invocations: 0,
+                    max_inflight_jobs: 0,
+                    counter_source: "sequential-msm-estimate",
+                    witness_map_engine: "ark-streamed-reduction",
+                    witness_map_reason: "bn254-witness-map-below-threshold",
+                    witness_map_parallelism: 1,
+                    stage_breakdown: BTreeMap::new(),
+                },
+                crate::Groth16ExecutionClassification::BelowThreshold,
+            ),
+            (
+                Groth16MsmDispatch {
+                    used_metal: false,
+                    metal_available: true,
+                    saw_below_threshold: false,
+                    saw_dispatch_failed: true,
+                    dispatch_failure_detail: Some("metal MSM dispatch failed".to_string()),
+                    total_msm_invocations: 2,
+                    eligible_msm_invocations: 2,
+                    metal_msm_invocations: 0,
+                    max_inflight_jobs: 0,
+                    counter_source: "sequential-msm-estimate",
+                    witness_map_engine: "metal-bn254-ntt+streamed-reduction",
+                    witness_map_reason: "bn254-witness-map-metal-ntt",
+                    witness_map_parallelism: 8,
+                    stage_breakdown: BTreeMap::new(),
+                },
+                crate::Groth16ExecutionClassification::MetalDispatchFailed,
+            ),
+            (
+                Groth16MsmDispatch {
+                    used_metal: false,
+                    metal_available: false,
+                    saw_below_threshold: false,
+                    saw_dispatch_failed: false,
+                    dispatch_failure_detail: None,
+                    total_msm_invocations: 2,
+                    eligible_msm_invocations: 0,
+                    metal_msm_invocations: 0,
+                    max_inflight_jobs: 0,
+                    counter_source: "sequential-msm-estimate",
+                    witness_map_engine: "ark-streamed-reduction",
+                    witness_map_reason: "bn254-witness-map-cpu-engine",
+                    witness_map_parallelism: 1,
+                    stage_breakdown: BTreeMap::new(),
+                },
+                crate::Groth16ExecutionClassification::MetalUnavailable,
+            ),
+            (
+                Groth16MsmDispatch {
+                    used_metal: false,
+                    metal_available: true,
+                    saw_below_threshold: false,
+                    saw_dispatch_failed: false,
+                    dispatch_failure_detail: None,
+                    total_msm_invocations: 2,
+                    eligible_msm_invocations: 1,
+                    metal_msm_invocations: 0,
+                    max_inflight_jobs: 0,
+                    counter_source: "sequential-msm-estimate",
+                    witness_map_engine: "hybrid-bn254-ntt+streamed-reduction",
+                    witness_map_reason: "bn254-witness-map-partial-metal-ntt",
+                    witness_map_parallelism: 2,
+                    stage_breakdown: BTreeMap::new(),
+                },
+                crate::Groth16ExecutionClassification::CpuSelected,
+            ),
+        ];
+
+        for (dispatch, expected) in cases {
+            let mut metadata = BTreeMap::new();
+            append_groth16_metal_metadata(&mut metadata, dispatch);
+            let summary =
+                crate::groth16_execution_summary_from_metadata(&metadata).expect("summary");
+            assert_eq!(summary.classification, expected);
+        }
+    }
+
+    #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+    fn prove_live(program: Program, inputs: WitnessInputs) -> Option<ProofArtifact> {
+        crate::init_accelerators();
+        crate::harden_accelerators_for_current_pressure();
+        let runtime = crate::metal_runtime_report();
+        if !runtime.metal_available || runtime.metal_dispatch_circuit_open {
+            eprintln!(
+                "Metal Groth16 lane unavailable in test process, skipping live metadata test: available={} dispatch_circuit_open={} device={:?}",
+                runtime.metal_available, runtime.metal_dispatch_circuit_open, runtime.metal_device,
+            );
+            return None;
+        }
+
+        let compiled = compile_arkworks_unchecked(&program).expect("compile");
+        let source_witness = generate_witness(&program, &inputs).expect("source witness");
+        let prepared = crate::prepare_witness_for_proving(&compiled, &source_witness)
+            .expect("prepared witness");
+        let backend = ArkworksGroth16Backend;
+        Some(backend.prove(&compiled, &prepared).expect("prove"))
+    }
+
+    #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+    #[test]
+    fn live_groth16_metadata_marks_small_circuits_below_threshold() {
+        let Some(artifact) = prove_live(mul_add_program(), mul_add_inputs(3, 5)) else {
+            return;
+        };
+        let summary =
+            crate::groth16_execution_summary_from_metadata(&artifact.metadata).expect("summary");
+
+        assert_eq!(
+            summary.classification,
+            crate::Groth16ExecutionClassification::BelowThreshold
+        );
+        assert_eq!(summary.msm.accelerator.as_deref(), Some("cpu"));
+        assert_eq!(summary.msm.reason, "below-threshold");
+    }
+
+    #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+    #[test]
+    fn live_groth16_metadata_marks_above_threshold_circuits_as_metal_realized() {
+        let steps = crate::current_metal_thresholds()
+            .msm
+            .saturating_add(32)
+            .max(40);
+        let mut inputs = WitnessInputs::new();
+        inputs.insert("x".to_string(), FieldElement::from_u64(3));
+        inputs.insert("y".to_string(), FieldElement::from_u64(5));
+        let Some(artifact) = prove_live(recurrence_program(FieldId::Bn254, steps), inputs) else {
+            return;
+        };
+        let summary =
+            crate::groth16_execution_summary_from_metadata(&artifact.metadata).expect("summary");
+
+        assert_eq!(
+            summary.classification,
+            crate::Groth16ExecutionClassification::MetalRealized
+        );
+        assert_eq!(summary.msm.accelerator.as_deref(), Some("metal"));
+        assert_eq!(summary.msm.reason, "bn254-groth16-metal-msm");
+    }
+
+    #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+    #[test]
+    #[ignore = "manual powered descent GPU regression gate"]
+    fn live_powered_descent_200_step_proves_with_metal_msm() {
+        if zkf_metal::MetalMsmAccelerator::new().is_none() {
+            eprintln!("No Metal GPU, skipping powered descent gate");
+            return;
+        }
+
+        let template =
+            zkf_examples::private_powered_descent_showcase_template().expect("descent template");
+        let compiled = compile_arkworks_unchecked(&template.program).expect("compile descent");
+        let source_witness =
+            zkf_examples::private_powered_descent_showcase_witness(&template.sample_inputs)
+                .expect("descent witness");
+        let prepared = crate::prepare_witness_for_proving(&compiled, &source_witness)
+            .expect("prepared descent witness");
+        let artifact = ArkworksGroth16Backend
+            .prove(&compiled, &prepared)
+            .expect("prove descent");
+        let summary =
+            crate::groth16_execution_summary_from_metadata(&artifact.metadata).expect("summary");
+
+        assert_eq!(
+            summary.classification,
+            crate::Groth16ExecutionClassification::MetalRealized
+        );
+        assert_eq!(
+            artifact
+                .metadata
+                .get("groth16_prove_key_storage")
+                .map(String::as_str),
+            Some(Groth16ProveKeyStorage::MaterializedStreamedPk.as_metadata_value())
+        );
     }
 
     #[test]
@@ -5193,5 +5653,115 @@ mod tests {
             recommended_groth16_setup_thread_cap(55_571, 62_075, &resources),
             Some(1)
         );
+    }
+
+    #[test]
+    fn streamed_groth16_prove_materialization_prefers_metal_hosts_with_headroom() {
+        let resources = SystemResources {
+            total_ram_bytes: FORTY_EIGHT_GIB,
+            available_ram_bytes: 40 * 1024 * 1024 * 1024,
+            cpu_cores_logical: 16,
+            cpu_cores_physical: 16,
+            unified_memory: true,
+            gpu_memory_bytes: Some(FORTY_EIGHT_GIB),
+            pressure: zkf_core::MemoryPressure::default(),
+        };
+
+        assert!(
+            should_materialize_streamed_groth16_pk_for_prove_with_context(
+                5 * 1024 * 1024 * 1024,
+                &resources,
+                true,
+                false,
+                None,
+            )
+        );
+        assert!(
+            !should_materialize_streamed_groth16_pk_for_prove_with_context(
+                13 * 1024 * 1024 * 1024,
+                &resources,
+                true,
+                false,
+                None,
+            )
+        );
+    }
+
+    #[test]
+    fn streamed_groth16_prove_materialization_respects_pressure_and_overrides() {
+        let mut resources = SystemResources {
+            total_ram_bytes: FORTY_EIGHT_GIB,
+            available_ram_bytes: 40 * 1024 * 1024 * 1024,
+            cpu_cores_logical: 16,
+            cpu_cores_physical: 16,
+            unified_memory: true,
+            gpu_memory_bytes: Some(FORTY_EIGHT_GIB),
+            pressure: zkf_core::MemoryPressure::default(),
+        };
+        resources.pressure.level = PressureLevel::High;
+
+        assert!(
+            !should_materialize_streamed_groth16_pk_for_prove_with_context(
+                5 * 1024 * 1024 * 1024,
+                &resources,
+                true,
+                false,
+                None,
+            )
+        );
+        assert!(
+            should_materialize_streamed_groth16_pk_for_prove_with_context(
+                5 * 1024 * 1024 * 1024,
+                &resources,
+                false,
+                true,
+                Some(StreamedGroth16ProveMode::Materialized),
+            )
+        );
+        assert!(
+            !should_materialize_streamed_groth16_pk_for_prove_with_context(
+                5 * 1024 * 1024 * 1024,
+                &resources,
+                true,
+                false,
+                Some(StreamedGroth16ProveMode::Streamed),
+            )
+        );
+    }
+
+    #[test]
+    fn load_streamed_groth16_proving_key_round_trips_small_setup() {
+        let base = std::env::temp_dir().join(format!(
+            "zkf-streamed-pk-load-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        fs::create_dir_all(&base).expect("temp dir");
+        let pk_path = base.join("pk.bin");
+        let shape_path = base.join("shape.bin");
+        let mut rng = StdRng::from_seed([7u8; 32]);
+        write_local_groth16_setup_with_shape_path(
+            TinyStreamedShapeCircuit,
+            &mut rng,
+            &pk_path,
+            &shape_path,
+        )
+        .expect("streamed setup");
+
+        let pk = load_streamed_groth16_proving_key(&pk_path).expect("load streamed pk");
+        let vk_bytes = load_streamed_groth16_vk_bytes(&pk_path).expect("load streamed vk bytes");
+        let mut loaded_vk_bytes = Vec::new();
+        pk.vk
+            .serialize_compressed(&mut loaded_vk_bytes)
+            .expect("serialize loaded vk");
+
+        assert!(!pk.a_query.is_empty(), "a_query should be populated");
+        assert!(!pk.h_query.is_empty(), "h_query should be populated");
+        assert_eq!(loaded_vk_bytes, vk_bytes, "loaded vk must match cached vk");
+
+        let _ = fs::remove_dir_all(base);
     }
 }

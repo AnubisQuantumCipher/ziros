@@ -367,17 +367,38 @@ pub(crate) fn runtime_execution_realization(
 ) -> RuntimeExecutionRealization {
     let execution_regime = metadata.get("runtime_execution_regime").cloned();
     let gpu_stage_busy_ratio = metadata
-        .get("runtime_gpu_stage_busy_ratio")
-        .and_then(|value| value.parse::<f64>().ok());
+        .get("runtime_effective_gpu_stage_busy_ratio")
+        .and_then(|value| value.parse::<f64>().ok())
+        .or_else(|| {
+            metadata
+                .get("runtime_gpu_stage_busy_ratio")
+                .and_then(|value| value.parse::<f64>().ok())
+        });
+    let delegated_classification = metadata
+        .get("runtime_backend_delegated_gpu_classification")
+        .cloned();
     let prover_acceleration_realized = metadata
-        .get("runtime_prover_acceleration_realized")
+        .get("runtime_effective_gpu_participation")
         .and_then(|value| value.parse::<bool>().ok())
+        .or_else(|| {
+            metadata
+                .get("runtime_prover_acceleration_realized")
+                .and_then(|value| value.parse::<bool>().ok())
+        })
         .or_else(|| gpu_stage_busy_ratio.map(|ratio| ratio > 0.0));
-    let acceleration_label = Some(match prover_acceleration_realized {
-        Some(true) => "gpu-realized".to_string(),
-        Some(false) => "cpu-only-realized".to_string(),
-        None => "unknown".to_string(),
-    });
+    let acceleration_label = Some(
+        match (prover_acceleration_realized, delegated_classification) {
+            (Some(true), Some(classification)) if classification == "backend-delegated" => {
+                "gpu-realized-backend-delegated".to_string()
+            }
+            (Some(true), Some(classification)) if classification == "runtime-direct" => {
+                "gpu-realized-runtime-direct".to_string()
+            }
+            (Some(true), _) => "gpu-realized".to_string(),
+            (Some(false), _) => "cpu-only-realized".to_string(),
+            (None, _) => "unknown".to_string(),
+        },
+    );
 
     RuntimeExecutionRealization {
         execution_regime,
@@ -385,6 +406,20 @@ pub(crate) fn runtime_execution_realization(
         prover_acceleration_realized,
         acceleration_label,
     }
+}
+
+fn output_bool(outputs: &Value, key: &str) -> Option<bool> {
+    outputs.get(key).and_then(Value::as_bool)
+}
+
+fn output_f64(outputs: &Value, key: &str) -> Option<f64> {
+    outputs.get(key).and_then(Value::as_f64)
+}
+
+fn output_json_string(outputs: &Value, key: &str) -> Option<String> {
+    outputs
+        .get(key)
+        .and_then(|value| serde_json::to_string(value).ok())
 }
 
 fn path_to_override_string(path: &Path) -> String {
@@ -654,6 +689,49 @@ pub(crate) fn annotate_artifact_with_runtime_report(
         "runtime_gpu_stage_busy_ratio".to_string(),
         format!("{:.6}", report.gpu_stage_busy_ratio()),
     );
+    if let Some(effective_gpu_stage_busy_ratio) =
+        output_f64(&result.outputs, "runtime_effective_gpu_stage_busy_ratio")
+    {
+        artifact.metadata.insert(
+            "runtime_effective_gpu_stage_busy_ratio".to_string(),
+            format!("{effective_gpu_stage_busy_ratio:.6}"),
+        );
+    }
+    if let Some(effective_gpu_participation) =
+        output_bool(&result.outputs, "runtime_effective_gpu_participation")
+    {
+        artifact.metadata.insert(
+            "runtime_effective_gpu_participation".to_string(),
+            effective_gpu_participation.to_string(),
+        );
+    }
+    if let Some(effective_gpu_capable_stages_json) =
+        output_json_string(&result.outputs, "runtime_effective_gpu_capable_stages")
+    {
+        artifact.metadata.insert(
+            "runtime_effective_gpu_capable_stages_json".to_string(),
+            effective_gpu_capable_stages_json,
+        );
+    }
+    if let Some(backend_delegated_gpu_json) =
+        output_json_string(&result.outputs, "runtime_backend_delegated_gpu")
+    {
+        artifact.metadata.insert(
+            "runtime_backend_delegated_gpu_json".to_string(),
+            backend_delegated_gpu_json,
+        );
+        if let Some(classification) = result
+            .outputs
+            .get("runtime_backend_delegated_gpu")
+            .and_then(|value| value.get("classification"))
+            .and_then(Value::as_str)
+        {
+            artifact.metadata.insert(
+                "runtime_backend_delegated_gpu_classification".to_string(),
+                classification.to_string(),
+            );
+        }
+    }
     artifact.metadata.insert(
         "runtime_gpu_wall_time_ms".to_string(),
         format!("{:.3}", report.gpu_wall_time().as_secs_f64() * 1000.0),
@@ -796,7 +874,11 @@ pub(crate) fn annotate_artifact_with_runtime_report(
                 interpretation.clone(),
             );
         }
-        let acceleration_realized = !control_plane.realized_gpu_capable_stages.is_empty();
+        let acceleration_realized = artifact
+            .metadata
+            .get("runtime_effective_gpu_participation")
+            .and_then(|value| value.parse::<bool>().ok())
+            .unwrap_or_else(|| !control_plane.realized_gpu_capable_stages.is_empty());
         artifact.metadata.insert(
             "runtime_prover_acceleration_realized".to_string(),
             acceleration_realized.to_string(),

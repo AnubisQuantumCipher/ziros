@@ -321,3 +321,73 @@ fn cli_prove_rejects_out_of_range_inputs() {
 
     assert!(err.contains("range") || err.contains("constraint"));
 }
+
+#[test]
+fn direct_prove_success_payload_includes_structured_groth16_acceleration() {
+    let proof_path = PathBuf::from("/tmp/proof.json");
+    let compiled_path = PathBuf::from("/tmp/compiled.json");
+    let artifact = ProofArtifact {
+        backend: BackendKind::ArkworksGroth16,
+        program_digest: "demo".to_string(),
+        proof: vec![1, 2, 3],
+        verification_key: vec![4, 5, 6],
+        public_inputs: vec![FieldElement::from_i64(7)],
+        metadata: BTreeMap::from([
+            (
+                "groth16_execution_classification".to_string(),
+                "metal-realized".to_string(),
+            ),
+            (
+                "groth16_msm_engine".to_string(),
+                "metal-bn254-msm".to_string(),
+            ),
+            (
+                "groth16_msm_reason".to_string(),
+                "bn254-groth16-metal-msm".to_string(),
+            ),
+            ("msm_accelerator".to_string(), "metal".to_string()),
+            (
+                "qap_witness_map_engine".to_string(),
+                "metal-bn254-ntt+streamed-reduction".to_string(),
+            ),
+            (
+                "qap_witness_map_reason".to_string(),
+                "bn254-groth16-metal-witness-map".to_string(),
+            ),
+            (
+                "metal_threshold_profile".to_string(),
+                "aggressive".to_string(),
+            ),
+            (
+                "metal_thresholds".to_string(),
+                "msm=64,ntt=64,poseidon2=16".to_string(),
+            ),
+        ]),
+        security_profile: None,
+        hybrid_bundle: None,
+        credential_bundle: None,
+        archive_metadata: None,
+    };
+
+    let payload = cmd::prove::direct_prove_success_payload(
+        "arkworks-groth16",
+        &proof_path,
+        Some(&compiled_path),
+        &artifact,
+        false,
+        false,
+        None,
+        None,
+    );
+    let json = serde_json::to_value(payload).expect("payload json");
+
+    assert_eq!(json["status"], "ok");
+    assert_eq!(json["backend"], "arkworks-groth16");
+    assert_eq!(json["acceleration"]["classification"], "metal-realized");
+    assert_eq!(json["acceleration"]["msm"]["accelerator"], "metal");
+    assert_eq!(
+        json["acceleration"]["witness_map"]["engine"],
+        "metal-bn254-ntt+streamed-reduction"
+    );
+    assert_eq!(json["acceleration"]["thresholds"]["msm"], 64);
+}

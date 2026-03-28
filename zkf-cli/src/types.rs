@@ -1,5 +1,5 @@
 use serde::Serialize;
-use zkf_backends::{GpuSchedulerDecision, GpuStageCoverage};
+use zkf_backends::{GpuSchedulerDecision, GpuStageCoverage, Groth16ExecutionSummary};
 use zkf_core::SupportClass;
 
 #[derive(Debug, Serialize)]
@@ -82,6 +82,8 @@ pub(crate) struct ProveResult {
     pub(crate) metal_no_cpu_fallback: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(crate) metal_counter_source: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(crate) groth16_execution: Option<Groth16ExecutionSummary>,
     #[serde(default)]
     pub(crate) hybrid: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -150,6 +152,8 @@ pub(crate) struct ProveAllEntry {
     pub(crate) metal_no_cpu_fallback: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(crate) metal_counter_source: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(crate) groth16_execution: Option<Groth16ExecutionSummary>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(crate) implementation_type: Option<SupportClass>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

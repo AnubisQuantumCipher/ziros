@@ -12,6 +12,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
+use zkf_backends::{Groth16ExecutionSummary, groth16_execution_summary_from_metadata};
 use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
 
 #[derive(Clone, Copy, Debug)]
@@ -1469,14 +1470,62 @@ pub fn hash_json_value(value: &serde_json::Value) -> ZkfResult<String> {
     Ok(sha256_hex(&bytes))
 }
 
+fn metadata_json_value(
+    artifact_metadata: &BTreeMap<String, String>,
+    key: &str,
+) -> Option<serde_json::Value> {
+    artifact_metadata
+        .get(key)
+        .and_then(|value| serde_json::from_str(value).ok())
+}
+
+fn metadata_json_string_array(
+    artifact_metadata: &BTreeMap<String, String>,
+    key: &str,
+) -> Vec<String> {
+    metadata_json_value(artifact_metadata, key)
+        .and_then(|value| value.as_array().cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|value| value.as_str().map(ToString::to_string))
+        .collect()
+}
+
+fn realized_groth16_gpu_stages(summary: &Groth16ExecutionSummary) -> Vec<String> {
+    let mut stages = BTreeSet::new();
+    if summary.witness_map.realized_on_metal {
+        stages.insert("fft-ntt".to_string());
+        stages.insert("qap-witness-map".to_string());
+    }
+    if summary.msm.realized_on_metal {
+        stages.insert("msm".to_string());
+    }
+    stages.into_iter().collect()
+}
+
 pub fn effective_gpu_attribution_summary(
     runtime_gpu_nodes: usize,
     runtime_gpu_busy_ratio: f64,
     artifact_metadata: &BTreeMap<String, String>,
 ) -> serde_json::Value {
+    effective_gpu_attribution_summary_with_outputs(
+        runtime_gpu_nodes,
+        runtime_gpu_busy_ratio,
+        None,
+        artifact_metadata,
+    )
+}
+
+pub fn effective_gpu_attribution_summary_with_outputs(
+    runtime_gpu_nodes: usize,
+    runtime_gpu_busy_ratio: f64,
+    runtime_outputs: Option<&serde_json::Value>,
+    artifact_metadata: &BTreeMap<String, String>,
+) -> serde_json::Value {
     let mut evidence_sources = BTreeSet::new();
     let mut artifact_metadata_evidence = serde_json::Map::new();
     let mut effective_gpu_busy_ratio = runtime_gpu_busy_ratio.max(0.0);
+    let mut realized_gpu_capable_stages = BTreeSet::new();
 
     if runtime_gpu_nodes > 0 {
         evidence_sources.insert("runtime.gpu_nodes".to_string());
@@ -1485,68 +1534,172 @@ pub fn effective_gpu_attribution_summary(
         evidence_sources.insert("runtime.gpu_busy_ratio".to_string());
     }
 
-    let metadata_keys = [
-        "best_msm_accelerator",
-        "gpu_stage_coverage",
-        "groth16_msm_engine",
-        "metal_available",
-        "metal_compiled",
-        "metal_complete",
-        "metal_gpu_busy_ratio",
-        "qap_witness_map_engine",
-    ];
-    for key in metadata_keys {
-        if let Some(value) = artifact_metadata.get(key) {
-            artifact_metadata_evidence.insert(key.to_string(), json!(value));
+    let groth16_execution = groth16_execution_summary_from_metadata(artifact_metadata);
+    if let Some(summary) = &groth16_execution {
+        artifact_metadata_evidence.insert(
+            "groth16_execution".to_string(),
+            serde_json::to_value(summary).unwrap_or_else(|_| json!({})),
+        );
+        for stage in realized_groth16_gpu_stages(summary) {
+            realized_gpu_capable_stages.insert(stage);
+        }
+        if summary.witness_map.realized_on_metal {
+            evidence_sources.insert("artifact.metadata.groth16_execution.witness_map".to_string());
+        }
+        if summary.msm.realized_on_metal {
+            evidence_sources.insert("artifact.metadata.groth16_execution.msm".to_string());
+        }
+        if let Some(busy_ratio) = summary.metal_gpu_busy_ratio
+            && busy_ratio > 0.0
+        {
+            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
+            evidence_sources.insert("artifact.metadata.groth16_execution.thresholds".to_string());
         }
     }
 
-    let backend_uses_metal = [
-        "best_msm_accelerator",
-        "groth16_msm_engine",
-        "qap_witness_map_engine",
-    ]
-    .iter()
-    .any(|key| {
-        artifact_metadata
-            .get(*key)
-            .map(|value| value.to_ascii_lowercase().contains("metal"))
-            .unwrap_or(false)
-    });
-    if backend_uses_metal {
-        evidence_sources.insert("artifact.metadata.backend_engine".to_string());
+    let metadata_effective_busy_ratio = artifact_metadata
+        .get("runtime_effective_gpu_stage_busy_ratio")
+        .and_then(|value| value.parse::<f64>().ok())
+        .unwrap_or(0.0)
+        .max(0.0);
+    if metadata_effective_busy_ratio > 0.0 {
+        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(metadata_effective_busy_ratio);
+        evidence_sources
+            .insert("artifact.metadata.runtime_effective_gpu_stage_busy_ratio".to_string());
+        artifact_metadata_evidence.insert(
+            "runtime_effective_gpu_stage_busy_ratio".to_string(),
+            json!(metadata_effective_busy_ratio),
+        );
     }
 
-    let gpu_stage_coverage_mentions_metal = artifact_metadata
-        .get("gpu_stage_coverage")
-        .map(|value| value.to_ascii_lowercase().contains("metal"))
-        .unwrap_or(false);
-    if gpu_stage_coverage_mentions_metal {
-        evidence_sources.insert("artifact.metadata.gpu_stage_coverage".to_string());
-    }
-
-    let metal_stack_ready = ["metal_available", "metal_compiled", "metal_complete"]
-        .iter()
-        .all(|key| artifact_metadata.get(*key).map(String::as_str) == Some("true"));
-    if metal_stack_ready {
-        evidence_sources.insert("artifact.metadata.metal_ready".to_string());
-    }
-
-    let artifact_busy_ratio = artifact_metadata
+    let metadata_artifact_busy_ratio = artifact_metadata
         .get("metal_gpu_busy_ratio")
         .and_then(|value| value.parse::<f64>().ok())
         .unwrap_or(0.0)
         .max(0.0);
-    if artifact_busy_ratio > 0.0 {
-        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(artifact_busy_ratio);
+    if metadata_artifact_busy_ratio > 0.0 {
+        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(metadata_artifact_busy_ratio);
         evidence_sources.insert("artifact.metadata.metal_gpu_busy_ratio".to_string());
+        artifact_metadata_evidence.insert(
+            "metal_gpu_busy_ratio".to_string(),
+            json!(metadata_artifact_busy_ratio),
+        );
+    }
+
+    let metadata_effective_gpu_participation = artifact_metadata
+        .get("runtime_effective_gpu_participation")
+        .and_then(|value| value.parse::<bool>().ok())
+        .unwrap_or(false);
+    if metadata_effective_gpu_participation {
+        evidence_sources
+            .insert("artifact.metadata.runtime_effective_gpu_participation".to_string());
+        artifact_metadata_evidence.insert(
+            "runtime_effective_gpu_participation".to_string(),
+            json!(metadata_effective_gpu_participation),
+        );
+    }
+
+    let metadata_gpu_capable_stages = metadata_json_string_array(
+        artifact_metadata,
+        "runtime_effective_gpu_capable_stages_json",
+    );
+    if !metadata_gpu_capable_stages.is_empty() {
+        evidence_sources
+            .insert("artifact.metadata.runtime_effective_gpu_capable_stages_json".to_string());
+        artifact_metadata_evidence.insert(
+            "runtime_effective_gpu_capable_stages".to_string(),
+            json!(metadata_gpu_capable_stages),
+        );
+        for stage in metadata_gpu_capable_stages {
+            realized_gpu_capable_stages.insert(stage);
+        }
+    }
+
+    let metadata_backend_delegated_gpu =
+        metadata_json_value(artifact_metadata, "runtime_backend_delegated_gpu_json");
+    if let Some(summary) = &metadata_backend_delegated_gpu {
+        artifact_metadata_evidence
+            .insert("runtime_backend_delegated_gpu".to_string(), summary.clone());
+        evidence_sources.insert("artifact.metadata.runtime_backend_delegated_gpu_json".to_string());
+        if let Some(stages) = summary
+            .get("realized_gpu_capable_stages")
+            .and_then(serde_json::Value::as_array)
+        {
+            for stage in stages {
+                if let Some(stage) = stage.as_str() {
+                    realized_gpu_capable_stages.insert(stage.to_string());
+                }
+            }
+        }
+        if let Some(busy_ratio) = summary
+            .get("effective_gpu_busy_ratio")
+            .and_then(serde_json::Value::as_f64)
+        {
+            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
+        }
+    }
+
+    let runtime_output_backend_delegated_gpu =
+        runtime_outputs.and_then(|value| value.get("runtime_backend_delegated_gpu").cloned());
+    if let Some(summary) = &runtime_output_backend_delegated_gpu {
+        evidence_sources.insert("runtime.outputs.runtime_backend_delegated_gpu".to_string());
+        if let Some(stages) = summary
+            .get("realized_gpu_capable_stages")
+            .and_then(serde_json::Value::as_array)
+        {
+            for stage in stages {
+                if let Some(stage) = stage.as_str() {
+                    realized_gpu_capable_stages.insert(stage.to_string());
+                }
+            }
+        }
+        if let Some(busy_ratio) = summary
+            .get("effective_gpu_busy_ratio")
+            .and_then(serde_json::Value::as_f64)
+        {
+            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
+        }
+    }
+
+    let runtime_output_effective_gpu_participation = runtime_outputs
+        .and_then(|value| value.get("runtime_effective_gpu_participation"))
+        .and_then(serde_json::Value::as_bool)
+        .unwrap_or(false);
+    if runtime_output_effective_gpu_participation {
+        evidence_sources.insert("runtime.outputs.runtime_effective_gpu_participation".to_string());
+    }
+
+    if let Some(stages) = runtime_outputs
+        .and_then(|value| value.get("runtime_effective_gpu_capable_stages"))
+        .and_then(serde_json::Value::as_array)
+    {
+        if !stages.is_empty() {
+            evidence_sources
+                .insert("runtime.outputs.runtime_effective_gpu_capable_stages".to_string());
+        }
+        for stage in stages {
+            if let Some(stage) = stage.as_str() {
+                realized_gpu_capable_stages.insert(stage.to_string());
+            }
+        }
+    }
+
+    if let Some(busy_ratio) = runtime_outputs
+        .and_then(|value| value.get("runtime_effective_gpu_stage_busy_ratio"))
+        .and_then(serde_json::Value::as_f64)
+        && busy_ratio > 0.0
+    {
+        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
+        evidence_sources
+            .insert("runtime.outputs.runtime_effective_gpu_stage_busy_ratio".to_string());
     }
 
     let effective_gpu_participation = runtime_gpu_nodes > 0
         || runtime_gpu_busy_ratio > 0.0
-        || artifact_busy_ratio > 0.0
-        || backend_uses_metal
-        || gpu_stage_coverage_mentions_metal;
+        || runtime_output_effective_gpu_participation
+        || metadata_effective_gpu_participation
+        || !realized_gpu_capable_stages.is_empty()
+        || effective_gpu_busy_ratio > 0.0;
 
     let classification = if runtime_gpu_nodes > 0 || runtime_gpu_busy_ratio > 0.0 {
         "runtime-direct"
@@ -1560,9 +1713,11 @@ pub fn effective_gpu_attribution_summary(
         "classification": classification,
         "runtime_gpu_nodes": runtime_gpu_nodes,
         "runtime_gpu_busy_ratio": runtime_gpu_busy_ratio,
-        "artifact_metal_gpu_busy_ratio": artifact_busy_ratio,
+        "artifact_metal_gpu_busy_ratio": metadata_artifact_busy_ratio,
         "effective_gpu_busy_ratio": effective_gpu_busy_ratio,
         "effective_gpu_participation": effective_gpu_participation,
+        "realized_gpu_capable_stages": realized_gpu_capable_stages.into_iter().collect::<Vec<_>>(),
+        "groth16_execution": groth16_execution,
         "evidence_sources": evidence_sources.into_iter().collect::<Vec<_>>(),
         "artifact_metadata_evidence": artifact_metadata_evidence,
     })

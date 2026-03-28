@@ -88,6 +88,38 @@ pub struct CapabilityReport {
     pub export_scheme: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct StrictCertificationMatch {
+    pub present: bool,
+    pub matches_current: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub failures: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub certified_at_unix_ms: Option<u128>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub strict_gpu_busy_ratio_peak: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CertifiedLaneStatus {
+    pub id: String,
+    pub hardware_profile: String,
+    pub backend: String,
+    pub strategies: Vec<String>,
+    pub production_ready: bool,
+    pub certification_present: bool,
+    pub certification_match: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_path: Option<String>,
+    pub strict_gpu_stage_coverage: GpuStageCoverage,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operator_action: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub failures: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct GpuSchedulerDecision {
     pub requested_jobs: usize,
@@ -130,7 +162,7 @@ impl GpuStage {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GpuStageCoverage {
     pub coverage_ratio: f64,
     pub required_stages: Vec<String>,
@@ -152,8 +184,9 @@ struct BackendReadiness {
     explicit_compat_alias: Option<String>,
 }
 
-const ARKWORKS_PRODUCTION_DISCLAIMER_REASON: &str =
-    "upstream-ark-groth16-production-disclaimer";
+const ARKWORKS_PRODUCTION_DISCLAIMER_REASON: &str = "upstream-ark-groth16-production-disclaimer";
+const STRICT_CERTIFICATION_SCHEMA_V1: &str = "zkf-strict-certification-v1";
+const CERTIFIED_STRICT_LANE_ID: &str = "apple-silicon-m4-max-48gb:bn254-strict-v1";
 
 const STANDARD_METAL_METADATA_KEYS: [&str; 7] = [
     "metal_gpu_busy_ratio",
