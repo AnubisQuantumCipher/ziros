@@ -90,6 +90,13 @@ pub use app::audit::{audit_program_default, audit_program_with_live_capabilities
 #[cfg(not(hax))]
 pub use app::builder::{BooleanOp, ProgramBuilder};
 #[cfg(not(hax))]
+pub use app::combustion::{
+    COMBUSTION_DEFAULT_SAMPLES, COMBUSTION_PUBLIC_OUTPUTS, CombustionInstabilityRequestV1,
+    build_combustion_instability_program_with_samples, combustion_instability_inputs_from_request,
+    combustion_instability_rayleigh_showcase,
+    combustion_instability_rayleigh_showcase_with_samples,
+};
+#[cfg(not(hax))]
 pub use app::descent::{
     PRIVATE_POWERED_DESCENT_DEFAULT_STEPS, PRIVATE_POWERED_DESCENT_DIMENSIONS,
     PRIVATE_POWERED_DESCENT_PRIVATE_INPUTS, PRIVATE_POWERED_DESCENT_PUBLIC_INPUTS,
@@ -137,6 +144,13 @@ pub use app::multi_satellite::{
     private_multi_satellite_scenario_spec,
 };
 #[cfg(not(hax))]
+pub use app::navier_stokes::{
+    NAVIER_STOKES_DEFAULT_CELLS, NAVIER_STOKES_PUBLIC_OUTPUTS, NavierStokesCellStateV1,
+    NavierStokesInterfaceCertificateV1, NavierStokesStructuredStepRequestV1,
+    build_navier_stokes_structured_step_program, navier_stokes_structured_step_inputs_from_request,
+    navier_stokes_structured_step_showcase, navier_stokes_structured_step_showcase_with_cells,
+};
+#[cfg(not(hax))]
 pub use app::orbital::{
     PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_DIMENSIONS,
     PRIVATE_NBODY_PRIVATE_INPUTS, PRIVATE_NBODY_PUBLIC_OUTPUTS,
@@ -158,6 +172,12 @@ pub use app::private_identity::{
 #[cfg(not(hax))]
 pub use app::progress::{ProofEvent, ProofStage};
 #[cfg(not(hax))]
+pub use app::real_gas::{
+    REAL_GAS_COMPONENTS, REAL_GAS_PUBLIC_OUTPUTS, RealGasModelFamilyV1, RealGasStateRequestV1,
+    build_real_gas_state_program, real_gas_state_inputs_from_request, real_gas_state_showcase,
+    real_gas_state_showcase_for_model,
+};
+#[cfg(not(hax))]
 pub use app::satellite::{
     PRIVATE_SATELLITE_DEFAULT_STEPS, PRIVATE_SATELLITE_DIMENSIONS,
     PRIVATE_SATELLITE_PRIVATE_INPUTS, PRIVATE_SATELLITE_PUBLIC_INPUTS,
@@ -173,10 +193,21 @@ pub use app::spec::{
 };
 #[cfg(not(hax))]
 pub use app::templates::TemplateProgram;
+#[cfg(not(hax))]
+pub use app::thermochemical::{
+    THERMOCHEMICAL_ELEMENTS, THERMOCHEMICAL_PUBLIC_OUTPUTS, THERMOCHEMICAL_SPECIES,
+    ThermochemicalEquilibriumRequestV1, build_thermochemical_equilibrium_program,
+    thermochemical_equilibrium_inputs_from_request, thermochemical_equilibrium_showcase,
+};
 #[cfg(all(not(target_arch = "wasm32"), not(hax)))]
 pub use app::verifier::{export_groth16_solidity_verifier, export_verifier};
 #[cfg(not(hax))]
 pub use zkf_gadgets::{Gadget, GadgetRegistry, GadgetSpec};
+
+#[cfg(not(hax))]
+pub mod combustion {
+    pub use crate::app::combustion::*;
+}
 
 #[cfg(not(hax))]
 pub mod descent {
@@ -191,6 +222,11 @@ pub mod inputs {
 #[cfg(all(not(target_arch = "wasm32"), not(hax)))]
 pub mod evidence {
     pub use crate::app::evidence::*;
+}
+
+#[cfg(not(hax))]
+pub mod navier_stokes {
+    pub use crate::app::navier_stokes::*;
 }
 
 #[cfg(not(hax))]
@@ -215,6 +251,16 @@ pub mod multi_satellite {
 #[cfg(not(hax))]
 pub mod orbital {
     pub use crate::app::orbital::*;
+}
+
+#[cfg(not(hax))]
+pub mod real_gas {
+    pub use crate::app::real_gas::*;
+}
+
+#[cfg(not(hax))]
+pub mod thermochemical {
+    pub use crate::app::thermochemical::*;
 }
 
 #[cfg(not(hax))]

@@ -42,6 +42,19 @@ order.
 Additional trust semantics guidance lives in
 [`WRAPPING_SECURITY.md`](/Users/sicarii/Projects/ZK%20DEV/docs/WRAPPING_SECURITY.md).
 
+## Scientific Certificate Truth
+
+- Scientific app templates in `zkf-lib` are discrete certificate lanes only.
+- `thermochemical-equilibrium` proves gas-phase `T,P` balance/KKT closure for the attested witness
+  surface; it does not prove unrestricted equilibrium theory.
+- `real-gas-state` proves the shipped cubic EOS residual and admissible root checks for attested
+  reduced coefficients; it does not mechanize fugacity logarithms or REFPROP.
+- `navier-stokes-structured` proves the shipped structured finite-volume step relation for the
+  attested state and flux witnesses; it does not prove global existence/smoothness or turbulence
+  closure.
+- `combustion-instability-rayleigh` proves the discrete Rayleigh-window integral and coupled
+  low-order modal growth relation for the attested trace; it does not prove nonlinear combustor CFD.
+
 ## Neural Engine Model Truth
 
 - Repo-local fixture models are deterministic smoke-floor artifacts only.

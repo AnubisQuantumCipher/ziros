@@ -467,6 +467,14 @@ fn parse_u32_arg(args: &BTreeMap<String, String>, key: &str, default: u32) -> Zk
         .unwrap_or(default))
 }
 
+fn parse_string_arg<'a>(
+    args: &'a BTreeMap<String, String>,
+    key: &str,
+    default: &'a str,
+) -> &'a str {
+    args.get(key).map(String::as_str).unwrap_or(default)
+}
+
 fn reject_unknown_args(args: &BTreeMap<String, String>, allowed: &[&str]) -> ZkfResult<()> {
     let allowed = allowed
         .iter()
@@ -793,6 +801,51 @@ pub fn template_registry() -> Vec<TemplateRegistryEntryV1> {
                 required: false,
             }],
         },
+        TemplateRegistryEntryV1 {
+            id: "thermochemical-equilibrium".to_string(),
+            description:
+                "Gas-phase thermochemical-equilibrium certificate with element balance and KKT complementarity."
+                    .to_string(),
+            release_ready: true,
+            template_args: Vec::new(),
+        },
+        TemplateRegistryEntryV1 {
+            id: "real-gas-state".to_string(),
+            description:
+                "Real-gas cubic EOS state certificate for Peng-Robinson or Redlich-Kwong.".to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "model".to_string(),
+                description: "EOS model family: peng-robinson or redlich-kwong.".to_string(),
+                default_value: Some("peng-robinson".to_string()),
+                required: false,
+            }],
+        },
+        TemplateRegistryEntryV1 {
+            id: "navier-stokes-structured".to_string(),
+            description:
+                "Structured-grid 1D Navier-Stokes finite-volume step certificate.".to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "cells".to_string(),
+                description: "Number of structured cells in the attested step surface.".to_string(),
+                default_value: Some("3".to_string()),
+                required: false,
+            }],
+        },
+        TemplateRegistryEntryV1 {
+            id: "combustion-instability-rayleigh".to_string(),
+            description:
+                "Rayleigh-window combustion-instability certificate with coupled modal growth relation."
+                    .to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "samples".to_string(),
+                description: "Number of attested time samples in the trace window.".to_string(),
+                default_value: Some("4".to_string()),
+                required: false,
+            }],
+        },
     ]
 }
 
@@ -860,6 +913,41 @@ pub fn instantiate_template(
                 "steps",
                 8,
             )?)?
+        }
+        "thermochemical-equilibrium" => {
+            reject_unknown_args(template_args, &[])?;
+            super::templates::thermochemical_equilibrium_showcase()?
+        }
+        "real-gas-state" => {
+            reject_unknown_args(template_args, &["model"])?;
+            let model = match parse_string_arg(template_args, "model", "peng-robinson") {
+                "peng-robinson" | "peng_robinson" | "pr" => {
+                    super::templates::RealGasModelFamilyV1::PengRobinson
+                }
+                "redlich-kwong" | "redlich_kwong" | "rk" => {
+                    super::templates::RealGasModelFamilyV1::RedlichKwong
+                }
+                other => {
+                    return Err(ZkfError::InvalidArtifact(format!(
+                        "real-gas-state template arg 'model' must be peng-robinson or redlich-kwong, got '{other}'"
+                    )));
+                }
+            };
+            super::templates::real_gas_state_showcase_for_model(model)?
+        }
+        "navier-stokes-structured" => {
+            reject_unknown_args(template_args, &["cells"])?;
+            super::templates::navier_stokes_structured_step_showcase_with_cells(parse_usize_arg(
+                template_args,
+                "cells",
+                3,
+            )?)?
+        }
+        "combustion-instability-rayleigh" => {
+            reject_unknown_args(template_args, &["samples"])?;
+            super::templates::combustion_instability_rayleigh_showcase_with_samples(
+                parse_usize_arg(template_args, "samples", 4)?,
+            )?
         }
         other => {
             let supported = template_registry()

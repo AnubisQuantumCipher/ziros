@@ -21,6 +21,8 @@ Scaffold a standalone Rust application that embeds `zkf-lib` directly.
 ziros app init my-zk-app --template range-proof
 ziros app init my-zk-app --template poseidon-commitment
 ziros app init my-zk-app --template poseidon-commitment --style tui
+ziros app init my-zk-app --template thermochemical-equilibrium
+ziros app init my-zk-app --template real-gas-state --template-arg model=redlich-kwong
 ```
 
 The scaffold creates its own `[workspace]`, points `zkf-lib` back at the local ZirOS checkout with
@@ -43,6 +45,9 @@ The primary authoring surface is `zirapp.json`; `ProgramBuilder` remains availab
 app dependency graph when the declarative spec is not enough.
 For the declarative schema itself, read
 [`APPSPEC_REFERENCE.md`](/Users/sicarii/Projects/ZK DEV/docs/APPSPEC_REFERENCE.md).
+The scientific templates are discrete certificate lanes. They prove the attested discretized model
+and witness satisfy the shipped equations and residual checks; they do not claim continuous-theory
+closure such as the Clay Navier-Stokes result.
 
 ### `zkf app gallery`
 

@@ -5,6 +5,12 @@ use zkf_core::{
 };
 
 use super::builder::ProgramBuilder;
+pub use super::combustion::{
+    COMBUSTION_DEFAULT_SAMPLES, COMBUSTION_PUBLIC_OUTPUTS, CombustionInstabilityRequestV1,
+    build_combustion_instability_program_with_samples, combustion_instability_inputs_from_request,
+    combustion_instability_rayleigh_showcase,
+    combustion_instability_rayleigh_showcase_with_samples,
+};
 pub use super::descent::{
     PRIVATE_POWERED_DESCENT_DEFAULT_STEPS, PRIVATE_POWERED_DESCENT_DIMENSIONS,
     PRIVATE_POWERED_DESCENT_PRIVATE_INPUTS, PRIVATE_POWERED_DESCENT_PUBLIC_INPUTS,
@@ -30,6 +36,12 @@ pub use super::multi_satellite::{
     private_multi_satellite_conjunction_witness, private_multi_satellite_pair_schedule,
     private_multi_satellite_scenario_spec,
 };
+pub use super::navier_stokes::{
+    NAVIER_STOKES_DEFAULT_CELLS, NAVIER_STOKES_PUBLIC_OUTPUTS, NavierStokesCellStateV1,
+    NavierStokesInterfaceCertificateV1, NavierStokesStructuredStepRequestV1,
+    build_navier_stokes_structured_step_program, navier_stokes_structured_step_inputs_from_request,
+    navier_stokes_structured_step_showcase, navier_stokes_structured_step_showcase_with_cells,
+};
 pub use super::orbital::{
     PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_DIMENSIONS,
     PRIVATE_NBODY_PRIVATE_INPUTS, PRIVATE_NBODY_PUBLIC_OUTPUTS,
@@ -38,12 +50,22 @@ pub use super::orbital::{
     private_nbody_orbital_witness_with_steps,
 };
 use super::private_identity as private_identity_app;
+pub use super::real_gas::{
+    REAL_GAS_COMPONENTS, REAL_GAS_PUBLIC_OUTPUTS, RealGasModelFamilyV1, RealGasStateRequestV1,
+    build_real_gas_state_program, real_gas_state_inputs_from_request, real_gas_state_showcase,
+    real_gas_state_showcase_for_model,
+};
 pub use super::satellite::{
     PRIVATE_SATELLITE_DEFAULT_STEPS, PRIVATE_SATELLITE_DIMENSIONS,
     PRIVATE_SATELLITE_PRIVATE_INPUTS, PRIVATE_SATELLITE_PUBLIC_INPUTS,
     PRIVATE_SATELLITE_PUBLIC_OUTPUTS, PRIVATE_SATELLITE_SPACECRAFT_COUNT,
     private_satellite_conjunction_sample_inputs, private_satellite_conjunction_showcase,
     private_satellite_conjunction_witness,
+};
+pub use super::thermochemical::{
+    THERMOCHEMICAL_ELEMENTS, THERMOCHEMICAL_PUBLIC_OUTPUTS, THERMOCHEMICAL_SPECIES,
+    ThermochemicalEquilibriumRequestV1, build_thermochemical_equilibrium_program,
+    thermochemical_equilibrium_inputs_from_request, thermochemical_equilibrium_showcase,
 };
 
 #[derive(Debug, Clone)]
@@ -516,6 +538,38 @@ mod tests {
         assert_template_roundtrip(
             "private-identity",
             private_identity_kyc().expect("private identity template"),
+        );
+    }
+
+    #[test]
+    fn thermochemical_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "thermochemical",
+            thermochemical_equilibrium_showcase().expect("thermochemical template"),
+        );
+    }
+
+    #[test]
+    fn real_gas_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "real-gas",
+            real_gas_state_showcase().expect("real gas template"),
+        );
+    }
+
+    #[test]
+    fn navier_stokes_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "navier-stokes",
+            navier_stokes_structured_step_showcase().expect("navier-stokes template"),
+        );
+    }
+
+    #[test]
+    fn combustion_template_compiles_proves_and_verifies() {
+        assert_template_roundtrip(
+            "combustion",
+            combustion_instability_rayleigh_showcase().expect("combustion template"),
         );
     }
 }

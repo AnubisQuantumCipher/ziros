@@ -66,6 +66,10 @@ Available templates:
 - `private-multi-satellite-base32`
 - `private-multi-satellite-stress64`
 - `private-nbody-orbital`
+- `thermochemical-equilibrium`
+- `real-gas-state`
+- `navier-stokes-structured`
+- `combustion-instability-rayleigh`
 
 Available styles:
 
@@ -82,10 +86,30 @@ List templates with:
 ziros app templates
 ziros app templates --json
 ziros app init my-zk-app --template merkle-membership --template-arg depth=4
+ziros app init my-zk-app --template real-gas-state --template-arg model=redlich-kwong
+ziros app init my-zk-app --template navier-stokes-structured --template-arg cells=4
 ```
 
 The direct `zirapp.json` route remains available when you want the manual/operator
 path, but the scaffold above is the default new-developer workflow.
+
+## Scientific Certificate Lanes
+
+The scientific templates are discrete certificate surfaces, not claims that ZirOS has solved the
+continuous physics problems themselves.
+
+- `thermochemical-equilibrium`: gas-phase `T,P` equilibrium certificates over an attested species
+  set with element-balance and KKT-style complementarity checks
+- `real-gas-state`: cubic EOS state certificates for Peng-Robinson or Redlich-Kwong with reduced
+  mixing arithmetic and admissible `Z > B` root selection
+- `navier-stokes-structured`: 1D structured finite-volume step certificates using attested
+  Rusanov convective and central viscous flux witnesses
+- `combustion-instability-rayleigh`: Rayleigh-window thermoacoustic certificates with a coupled
+  low-order modal growth relation
+
+These surfaces prove that an attested discretization and witness satisfy the shipped equations and
+residual checks. They do not claim global PDE regularity, universal real-gas closure, or nonlinear
+combustor CFD completeness.
 
 ## Build a Program Explicitly
 
