@@ -149,7 +149,7 @@ mod tests {
             verification_key,
             public_inputs,
         )
-    }
+}
 
     fn make_test_proof(digest: &str) -> (ProofArtifact, CompiledProgram) {
         let program = Program {

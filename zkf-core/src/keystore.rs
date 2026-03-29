@@ -202,7 +202,10 @@ fn store_keychain_item(service: &str, account: &str, data: &[u8]) -> Result<(), 
         let selector = CFDictionary::from_CFType_pairs(&query[..4]);
         let updates = CFDictionary::from_CFType_pairs(&query[4..]);
         cvt_status(unsafe {
-            SecItemUpdate(selector.as_concrete_TypeRef(), updates.as_concrete_TypeRef())
+            SecItemUpdate(
+                selector.as_concrete_TypeRef(),
+                updates.as_concrete_TypeRef(),
+            )
         })
     } else {
         cvt_status(status)

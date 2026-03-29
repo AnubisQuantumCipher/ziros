@@ -1,0 +1,329 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "constraint_eval",
+  "claim": "attested GPU surface from Rust inputs to GPU outputs, bound to the shipped metallib, reflection, and pipeline descriptors; certification status is carried per program by certified_claim",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.constraint_eval_surface_attested",
+      "program_id": "constraint_eval_goldilocks",
+      "family": "constraint_eval",
+      "kernel": "constraint_eval_goldilocks",
+      "variant": "goldilocks_constraint_eval",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "row_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "trace_width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "instruction_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "constraint_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "constant_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "row_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "trace_width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "instruction_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "constraint_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "constant_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "trace",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "row_index"
+              },
+              {
+                "symbol": "trace_width"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "trace_width"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "row_count"
+              },
+              {
+                "symbol": "trace_width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bytecode",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "instruction_count"
+          },
+          "bound": {
+            "symbol": "instruction_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "constants",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "constant_count"
+          },
+          "bound": {
+            "symbol": "constant_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "row_index"
+              },
+              {
+                "symbol": "constraint_count"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "constraint_count"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "row_count"
+              },
+              {
+                "symbol": "constraint_count"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_constraint_eval",
+          "operator": "constraint_eval",
+          "arithmetic_domain": "field",
+          "reads": [
+            "trace",
+            "bytecode",
+            "constants"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/constraint_eval.rs": "92a22cf778de5b67cb04d608da0181377cd7fd9b76f81f9bea3bfa6027b68747",
+          "zkf-metal/src/shaders/constraint_eval.metal": "70676920896d5e3847c102ac0615580993cd267e364908a3f5c5b91b5e602c9c"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/constraint_eval.metal",
+          "zkf-metal/src/constraint_eval.rs"
+        ],
+        "entrypoints": [
+          "constraint_eval_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "constraint_eval_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "28144307ccb006d7f23bd1e94e9e962ca10ab54360c53fe7ec50aeecf71b1cc7",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "c0236e946e8e4ccbbade8248a83520955b5049d17ca081df5db27d4619842e1f",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "trace",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bytecode",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "constants",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "width",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_instructions",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_constraints",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped constraint-eval kernel exactly",
+        "workgroup_policy": "one thread per row; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "constraint_eval_goldilocks",
+            "source_path": "zkf-metal/src/shaders/constraint_eval.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_constraint_eval"
+          }
+        ]
+      },
+      "certified_claim": false
+    }
+  ]
+}

@@ -766,6 +766,8 @@ fn verify_groth16_wrapper(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     engine.verify(&compiled, &artifact)
 }

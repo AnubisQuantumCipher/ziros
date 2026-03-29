@@ -51,7 +51,7 @@ pub(crate) mod hybrid_core;
 pub mod memory;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod memory_plan;
-#[cfg(all(feature = "full", feature = "metal-gpu", target_os = "macos", not(hax)))]
+#[cfg(all(feature = "full", target_os = "macos", not(hax)))]
 mod metal_dispatch_macos;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod metal_driver;
@@ -1588,6 +1588,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         }));
         exec_ctx.compiled = Some(Arc::new(CompiledProgram::new(
             BackendKind::ArkworksGroth16,
@@ -1625,6 +1627,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         }));
         exec_ctx.compiled = Some(std::sync::Arc::new(zkf_core::CompiledProgram::new(
             zkf_core::BackendKind::Plonky3,

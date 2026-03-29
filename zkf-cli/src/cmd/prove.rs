@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use serde::Serialize;
-use zkf_backends::{Groth16ExecutionSummary, groth16_execution_summary_from_metadata};
 use zkf_core::{
     AuditCategory, AuditStatus, CompiledProgram, Program, ProofArtifact, UnderconstrainedAnalysis,
     program_v2_to_zir, solve_and_validate_witness, solver_by_name,
@@ -48,126 +47,6 @@ struct ProveAuditFailurePayload {
     audit_report: zkf_core::AuditReport,
     #[serde(skip_serializing_if = "Option::is_none")]
     underconstraint_analysis: Option<UnderconstrainedAnalysis>,
-}
-
-#[derive(Debug, Serialize)]
-pub(crate) struct ProveSuccessPayload {
-    status: &'static str,
-    backend: String,
-    proof_path: String,
-    public_inputs: usize,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    compiled_path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    export_scheme: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    proof_engine: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    proof_semantics: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    prover_acceleration_scope: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    runtime_execution_regime: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    prover_acceleration_realization: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    acceleration: Option<Groth16ExecutionSummary>,
-    #[serde(default)]
-    hybrid: bool,
-    #[serde(default)]
-    distributed: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    remote_partitions: Option<usize>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    peers: Option<usize>,
-}
-
-pub(crate) fn direct_prove_success_payload(
-    backend: &str,
-    proof_path: &PathBuf,
-    compiled_path: Option<&PathBuf>,
-    artifact: &ProofArtifact,
-    hybrid: bool,
-    distributed: bool,
-    remote_partitions: Option<usize>,
-    peers: Option<usize>,
-) -> ProveSuccessPayload {
-    let runtime_realization = crate::util::runtime_execution_realization(&artifact.metadata);
-    let groth16_execution = groth16_execution_summary_from_metadata(&artifact.metadata);
-
-    ProveSuccessPayload {
-        status: "ok",
-        backend: backend.to_string(),
-        proof_path: proof_path.display().to_string(),
-        public_inputs: artifact.public_inputs.len(),
-        compiled_path: compiled_path.map(|path| path.display().to_string()),
-        export_scheme: artifact.metadata.get("export_scheme").cloned(),
-        proof_engine: artifact.metadata.get("proof_engine").cloned(),
-        proof_semantics: artifact.metadata.get("proof_semantics").cloned(),
-        prover_acceleration_scope: artifact.metadata.get("prover_acceleration_scope").cloned(),
-        runtime_execution_regime: runtime_realization.execution_regime,
-        prover_acceleration_realization: runtime_realization.acceleration_label,
-        acceleration: groth16_execution,
-        hybrid,
-        distributed,
-        remote_partitions,
-        peers,
-    }
-}
-
-fn print_direct_prove_success(
-    json: bool,
-    backend: &str,
-    proof_path: &PathBuf,
-    compiled_path: Option<&PathBuf>,
-    artifact: &ProofArtifact,
-    hybrid: bool,
-    distributed: bool,
-    remote_partitions: Option<usize>,
-    peers: Option<usize>,
-) -> Result<(), String> {
-    if json {
-        let payload = direct_prove_success_payload(
-            backend,
-            proof_path,
-            compiled_path,
-            artifact,
-            hybrid,
-            distributed,
-            remote_partitions,
-            peers,
-        );
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&payload).map_err(|err| err.to_string())?
-        );
-        return Ok(());
-    }
-
-    if hybrid {
-        println!(
-            "hybrid proof generated with plonky3 companion + groth16 primary (public_inputs={}) -> {}",
-            artifact.public_inputs.len(),
-            proof_path.display()
-        );
-    } else if distributed {
-        println!(
-            "distributed proof generated with {} (remote_partitions={}, peers={}) -> {}",
-            backend,
-            remote_partitions.unwrap_or_default(),
-            peers.unwrap_or_default(),
-            proof_path.display()
-        );
-    } else {
-        println!(
-            "proof generated with {} (public_inputs={}) -> {}",
-            backend,
-            artifact.public_inputs.len(),
-            proof_path.display()
-        );
-    }
-
-    Ok(())
 }
 
 pub(crate) fn handle_prove(args: ProveArgs, allow_compat: bool) -> Result<(), String> {
@@ -271,23 +150,16 @@ pub(crate) fn handle_prove(args: ProveArgs, allow_compat: bool) -> Result<(), St
                 .map_err(|err| err.to_string())?,
         );
         write_json(&args.out, &artifact)?;
-        if let Some(path) = args.compiled_out.as_ref() {
-            write_json(path, &compiled)?;
-            if !args.json {
-                println!("wrote compiled program: {}", path.display());
-            }
+        if let Some(path) = args.compiled_out {
+            write_json(&path, &compiled)?;
+            println!("wrote compiled program: {}", path.display());
         }
-        return print_direct_prove_success(
-            args.json,
-            "plonky3",
-            &args.out,
-            args.compiled_out.as_ref(),
-            &artifact,
-            true,
-            false,
-            None,
-            None,
+        println!(
+            "hybrid proof generated with plonky3 companion + groth16 primary (public_inputs={}) -> {}",
+            artifact.public_inputs.len(),
+            args.out.display()
         );
+        return Ok(());
     }
 
     let execution = with_allow_dev_deterministic_groth16_override(
@@ -329,23 +201,18 @@ pub(crate) fn handle_prove(args: ProveArgs, allow_compat: bool) -> Result<(), St
     )?;
 
     write_json(&args.out, &artifact)?;
-    if let Some(path) = args.compiled_out.as_ref() {
-        write_json(path, &compiled)?;
-        if !args.json {
-            println!("wrote compiled program: {}", path.display());
-        }
+    if let Some(path) = args.compiled_out {
+        write_json(&path, &compiled)?;
+        println!("wrote compiled program: {}", path.display());
     }
-    print_direct_prove_success(
-        args.json,
-        &backend.requested_name,
-        &args.out,
-        args.compiled_out.as_ref(),
-        &artifact,
-        false,
-        false,
-        None,
-        None,
-    )
+
+    println!(
+        "proof generated with {} (public_inputs={}) -> {}",
+        backend.requested_name,
+        artifact.public_inputs.len(),
+        args.out.display()
+    );
+    Ok(())
 }
 
 pub(crate) fn handle_distributed_prove(args: ProveArgs, allow_compat: bool) -> Result<(), String> {
@@ -440,23 +307,19 @@ pub(crate) fn handle_distributed_prove(args: ProveArgs, allow_compat: bool) -> R
     )?;
 
     write_json(&args.out, &artifact)?;
-    if let Some(path) = args.compiled_out.as_ref() {
-        write_json(path, &compiled)?;
-        if !args.json {
-            println!("wrote compiled program: {}", path.display());
-        }
+    if let Some(path) = args.compiled_out {
+        write_json(&path, &compiled)?;
+        println!("wrote compiled program: {}", path.display());
     }
-    print_direct_prove_success(
-        args.json,
-        &backend.requested_name,
-        &args.out,
-        args.compiled_out.as_ref(),
-        &artifact,
-        false,
-        true,
-        Some(execution.report.remote_partition_count),
-        Some(execution.report.peer_count),
-    )
+
+    println!(
+        "distributed proof generated with {} (remote_partitions={}, peers={}) -> {}",
+        backend.requested_name,
+        execution.report.remote_partition_count,
+        execution.report.peer_count,
+        args.out.display()
+    );
+    Ok(())
 }
 
 fn ensure_program_passes_fail_closed_audit(
@@ -732,6 +595,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let compiled = CompiledProgram::new(
             BackendKind::ArkworksGroth16,

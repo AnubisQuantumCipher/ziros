@@ -1,0 +1,2632 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "ntt",
+  "claim": "end-to-end mechanized GPU lane from Rust inputs to GPU outputs, assuming the pinned Apple Metal stack executes the attested metallib and pipeline state correctly",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_butterfly_goldilocks",
+      "family": "ntt",
+      "kernel": "ntt_butterfly_goldilocks",
+      "variant": "goldilocks_single",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [
+        {
+          "after_step": 0,
+          "scope": "buffers"
+        }
+      ],
+      "steps": [
+        {
+          "name": "butterfly_stage",
+          "operator": "ntt_butterfly_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2.metal": "1d79b9daff89ecf4f67b7bb4a618d767cfbe4c29cf2e78923d9c04b9ee871dbc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_butterfly_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_butterfly_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "6dd5a56ed9d1e1eea3079f0faef9283e40c86e2b40b8a1ad3e037f93067e4cf5",
+            "public_reflection_sha256": "e83da189852655161f655e22d5d3d84cb22e7ced8207bdac8b4e1103bf9c4c92",
+            "pipeline_descriptor_sha256": "b1970720e632ad2d524e60bd22af785b6d313d039ae849832e68d93ec391b19f",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stage",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_butterfly_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_single"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_butterfly_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_single"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_butterfly_goldilocks_batch",
+      "family": "ntt",
+      "kernel": "ntt_butterfly_goldilocks_batch",
+      "variant": "goldilocks_batch",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "add": [
+            {
+              "mul": [
+                {
+                  "symbol": "row_index"
+                },
+                {
+                  "symbol": "width"
+                }
+              ]
+            },
+            {
+              "symbol": "column_index"
+            }
+          ]
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "column_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "add": [
+              {
+                "mul": [
+                  {
+                    "symbol": "row_index"
+                  },
+                  {
+                    "symbol": "width"
+                  }
+                ]
+              },
+              {
+                "symbol": "column_index"
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "add": [
+              {
+                "mul": [
+                  {
+                    "symbol": "row_index"
+                  },
+                  {
+                    "symbol": "width"
+                  }
+                ]
+              },
+              {
+                "symbol": "column_index"
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [
+        {
+          "after_step": 0,
+          "scope": "buffers"
+        }
+      ],
+      "steps": [
+        {
+          "name": "butterfly_stage",
+          "operator": "ntt_butterfly_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2_batch.metal": "dc798f3d939a72ebcf2a2021a274860dd1f9f81eb973594117fc587de23b28e9"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_butterfly_goldilocks_batch"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_butterfly_goldilocks_batch",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "0d6c471f6b3eb08e807f568175a6817a1c8ad5c4d7ea2b5348f2c5dbf342be9a",
+            "public_reflection_sha256": "4fb621c51d7a8749a6c06b90061095fb40d08802b58e184a94bd0e33b1dd72f2",
+            "pipeline_descriptor_sha256": "42e3bebc258a294565eeaaa7b57e030b80fe5969155a6b788a2e5b2bbf8edf2a",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stage",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stride",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_butterfly_goldilocks_batch",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_batch"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_butterfly_goldilocks_batch",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_batch"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_small_goldilocks",
+      "family": "ntt",
+      "kernel": "ntt_small_goldilocks",
+      "variant": "goldilocks_small",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "small_transform",
+          "operator": "ntt_small_transform",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2.metal": "1d79b9daff89ecf4f67b7bb4a618d767cfbe4c29cf2e78923d9c04b9ee871dbc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_small_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_small_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "d0b63c992e9982461d2a7cc4da46410df358ad684a298bbb9607ead9e70e4ad3",
+            "public_reflection_sha256": "79d8651c0a3f8ecbf709587e1162e013f8cdb42169c7b16ed43faa0a62c80f77",
+            "pipeline_descriptor_sha256": "137969f43f8cf6d999ea003fdf1ea0ac27c334da6462b2c4a6d7364f64ed6f03",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_n",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "shared",
+                "index": 0,
+                "kind": "threadgroup_memory",
+                "access": "read_write"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_small_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_small"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_small_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_small"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_hybrid_goldilocks",
+      "family": "ntt",
+      "kernel": "ntt_hybrid_goldilocks",
+      "variant": "goldilocks_hybrid",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "hybrid_stage",
+          "operator": "ntt_hybrid_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2.metal": "1d79b9daff89ecf4f67b7bb4a618d767cfbe4c29cf2e78923d9c04b9ee871dbc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_hybrid_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_hybrid_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "89d030530671de34b92597f9ce8f6972da07d2e30110ab60f8a7b8326f926a09",
+            "public_reflection_sha256": "956e71e15c3d069f58c60a713db0789f5f8404561b8c5f5aad259025706f7bde",
+            "pipeline_descriptor_sha256": "aa2e514745bf7e09f7baf90acde9a1fd98c98f3b24792992aa292d8182c5e640",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_n",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_tg_size",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "shared",
+                "index": 0,
+                "kind": "threadgroup_memory",
+                "access": "read_write"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_hybrid_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_hybrid"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_hybrid_goldilocks",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_hybrid"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_butterfly_babybear",
+      "family": "ntt",
+      "kernel": "ntt_butterfly_babybear",
+      "variant": "babybear_single",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [
+        {
+          "after_step": 0,
+          "scope": "buffers"
+        }
+      ],
+      "steps": [
+        {
+          "name": "butterfly_stage",
+          "operator": "ntt_butterfly_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2.metal": "1d79b9daff89ecf4f67b7bb4a618d767cfbe4c29cf2e78923d9c04b9ee871dbc"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_butterfly_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_butterfly_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "6dd5a56ed9d1e1eea3079f0faef9283e40c86e2b40b8a1ad3e037f93067e4cf5",
+            "public_reflection_sha256": "e83da189852655161f655e22d5d3d84cb22e7ced8207bdac8b4e1103bf9c4c92",
+            "pipeline_descriptor_sha256": "9a00893708caf7f28af01e7b4acb17e2986148cdf433f9ff48c7a0826f6f0fd2",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stage",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_butterfly_babybear",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_single"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_butterfly_babybear",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_single"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_butterfly_babybear_batch",
+      "family": "ntt",
+      "kernel": "ntt_butterfly_babybear_batch",
+      "variant": "babybear_batch",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "add": [
+            {
+              "mul": [
+                {
+                  "symbol": "row_index"
+                },
+                {
+                  "symbol": "width"
+                }
+              ]
+            },
+            {
+              "symbol": "column_index"
+            }
+          ]
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "column_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "add": [
+              {
+                "mul": [
+                  {
+                    "symbol": "row_index"
+                  },
+                  {
+                    "symbol": "width"
+                  }
+                ]
+              },
+              {
+                "symbol": "column_index"
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "add": [
+              {
+                "mul": [
+                  {
+                    "symbol": "row_index"
+                  },
+                  {
+                    "symbol": "width"
+                  }
+                ]
+              },
+              {
+                "symbol": "column_index"
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [
+        {
+          "after_step": 0,
+          "scope": "buffers"
+        }
+      ],
+      "steps": [
+        {
+          "name": "butterfly_stage",
+          "operator": "ntt_butterfly_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/ntt_radix2_batch.metal": "dc798f3d939a72ebcf2a2021a274860dd1f9f81eb973594117fc587de23b28e9"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_butterfly_babybear_batch"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_butterfly_babybear_batch",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "0d6c471f6b3eb08e807f568175a6817a1c8ad5c4d7ea2b5348f2c5dbf342be9a",
+            "public_reflection_sha256": "4fb621c51d7a8749a6c06b90061095fb40d08802b58e184a94bd0e33b1dd72f2",
+            "pipeline_descriptor_sha256": "968408b3c5ce80fbff8af146d0493540871dcf63420e0c7eb1fd0a0c935d2985",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stage",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stride",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_butterfly_babybear_batch",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_batch"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_butterfly_babybear_batch",
+            "source_path": "zkf-metal/src/shaders/ntt_radix2_batch.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_batch"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_butterfly_bn254",
+      "family": "ntt",
+      "kernel": "ntt_butterfly_bn254",
+      "variant": "bn254_single",
+      "field": "bn254_scalar",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [
+        {
+          "after_step": 0,
+          "scope": "buffers"
+        }
+      ],
+      "steps": [
+        {
+          "name": "butterfly_stage",
+          "operator": "ntt_butterfly_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/field_bn254_fr.metal": "b90708165a10def0e012da2610253be66ff91d3f1836c76736e5b42260fd0d68",
+          "zkf-metal/src/shaders/ntt_bn254.metal": "76af59c4a84cb1df9c8e82366ebed2961f61155ec48e37dd18419d82821d5af1"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/field_bn254_fr.metal",
+          "zkf-metal/src/shaders/ntt_bn254.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_butterfly_bn254"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_butterfly_bn254",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "6dd5a56ed9d1e1eea3079f0faef9283e40c86e2b40b8a1ad3e037f93067e4cf5",
+            "public_reflection_sha256": "e83da189852655161f655e22d5d3d84cb22e7ced8207bdac8b4e1103bf9c4c92",
+            "pipeline_descriptor_sha256": "80b91f5718f8b9f2b544b29e7c55834cee76f69e439569ec84714cb15e093ecf",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "stage",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_butterfly_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_single"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_butterfly_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_single"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_small_bn254",
+      "family": "ntt",
+      "kernel": "ntt_small_bn254",
+      "variant": "bn254_small",
+      "field": "bn254_scalar",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "small_transform",
+          "operator": "ntt_small_transform",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/field_bn254_fr.metal": "b90708165a10def0e012da2610253be66ff91d3f1836c76736e5b42260fd0d68",
+          "zkf-metal/src/shaders/ntt_bn254.metal": "76af59c4a84cb1df9c8e82366ebed2961f61155ec48e37dd18419d82821d5af1"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/field_bn254_fr.metal",
+          "zkf-metal/src/shaders/ntt_bn254.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_small_bn254"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_small_bn254",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "d0b63c992e9982461d2a7cc4da46410df358ad684a298bbb9607ead9e70e4ad3",
+            "public_reflection_sha256": "79d8651c0a3f8ecbf709587e1162e013f8cdb42169c7b16ed43faa0a62c80f77",
+            "pipeline_descriptor_sha256": "7e59067045cfdbf064a81362fb4ff0dd6db9ed48581dfadc78e4792fa364a7f0",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_n",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "shared",
+                "index": 0,
+                "kind": "threadgroup_memory",
+                "access": "read_write"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_small_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_small"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_small_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_small"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.ntt_differential_bounded",
+      "program_id": "ntt_hybrid_bn254",
+      "family": "ntt",
+      "kernel": "ntt_hybrid_bn254",
+      "variant": "bn254_hybrid",
+      "field": "bn254_scalar",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "row_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "height"
+                },
+                {
+                  "nat_const": 2
+                }
+              ]
+            },
+            {
+              "is_power_of_two": {
+                "symbol": "height"
+              }
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "width"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "twiddle_elements"
+                },
+                {
+                  "symbol": "height"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "height",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": true,
+          "multiple_of": null
+        },
+        {
+          "name": "width",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "row_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "column_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "twiddle_elements",
+          "min_value": 2,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_bytes",
+          "min_value": 8,
+          "max_value": 8,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "values",
+          "kind": "global_input",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "twiddles",
+          "kind": "constant",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "symbol": "twiddle_elements"
+          },
+          "bound": {
+            "symbol": "twiddle_elements"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "values",
+          "kind": "global_output",
+          "start": {
+            "symbol": "row_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "height"
+              },
+              {
+                "symbol": "width"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "hybrid_stage",
+          "operator": "ntt_hybrid_stage",
+          "arithmetic_domain": "field",
+          "reads": [
+            "values",
+            "twiddles"
+          ],
+          "writes": [
+            "values"
+          ]
+        },
+        {
+          "name": "writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "values"
+          ],
+          "writes": [
+            "values"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/ntt/bn254.rs": "25d44fdef4ca4ed9dae33d593940c31a70836cfd5b687139f51ee1f927fdc8a0",
+          "zkf-metal/src/ntt/p3_adapter.rs": "d8553fb3165f3c27b0f3802606a875cbaf9d89a6c3906526ef0ec1e5b91c6305",
+          "zkf-metal/src/ntt/radix2.rs": "f6e100f270cc7406ce1cd305034f6ba8fee414678c2e37e5e8742231e466a4a4",
+          "zkf-metal/src/shaders/field_bn254_fr.metal": "b90708165a10def0e012da2610253be66ff91d3f1836c76736e5b42260fd0d68",
+          "zkf-metal/src/shaders/ntt_bn254.metal": "76af59c4a84cb1df9c8e82366ebed2961f61155ec48e37dd18419d82821d5af1"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/field_bn254_fr.metal",
+          "zkf-metal/src/shaders/ntt_bn254.metal",
+          "zkf-metal/src/ntt/p3_adapter.rs",
+          "zkf-metal/src/ntt/radix2.rs",
+          "zkf-metal/src/ntt/bn254.rs"
+        ],
+        "entrypoints": [
+          "ntt_hybrid_bn254"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "ntt_hybrid_bn254",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "89d030530671de34b92597f9ce8f6972da07d2e30110ab60f8a7b8326f926a09",
+            "public_reflection_sha256": "956e71e15c3d069f58c60a713db0789f5f8404561b8c5f5aad259025706f7bde",
+            "pipeline_descriptor_sha256": "41d1a3a5a6e5060f146abdd191a2b5fb8b59ea7b6a83c627a09b431e42d0803e",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "twiddles",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_n",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "log_tg_size",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "shared",
+                "index": 0,
+                "kind": "threadgroup_memory",
+                "access": "read_write"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped single, batch, small, and hybrid NTT entrypoints",
+        "workgroup_policy": "one thread per butterfly with host-enforced buffer barriers between stages",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "ntt_hybrid_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_hybrid"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "ntt_hybrid_bn254",
+            "source_path": "zkf-metal/src/shaders/ntt_bn254.metal",
+            "library": "main_library",
+            "binding_kind": "bn254_hybrid"
+          }
+        ]
+      },
+      "certified_claim": true
+    }
+  ]
+}

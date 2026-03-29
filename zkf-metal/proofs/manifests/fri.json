@@ -1,0 +1,410 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "fri",
+  "claim": "attested GPU surface from Rust inputs to GPU outputs, bound to the shipped metallib, reflection, and pipeline descriptors; certification status is carried per program by certified_claim",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.fri_surface_attested",
+      "program_id": "fri_fold_goldilocks",
+      "family": "fri",
+      "kernel": "fri_fold_goldilocks",
+      "variant": "goldilocks_fold",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "output_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "output_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "evals",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "element_index"
+              },
+              {
+                "nat_const": 2
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 2
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "output_count"
+              },
+              {
+                "nat_const": 2
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "inv_twiddles",
+          "kind": "constant",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "output_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "output_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_fold",
+          "operator": "fri_fold",
+          "arithmetic_domain": "field",
+          "reads": [
+            "evals",
+            "inv_twiddles"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/fri.rs": "a8be2d363dfabe74a79c2ca448b07ac0d351d9081c7ff0795d07a14c5292f6c7",
+          "zkf-metal/src/shaders/fri.metal": "cbd0c9b7b95b6edf1c1d631d07f06964cdae3a75d2409cc8739a66475570a73d"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/fri.metal",
+          "zkf-metal/src/fri.rs"
+        ],
+        "entrypoints": [
+          "fri_fold_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "fri_fold_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "4b5d6e7a872da63fbc1449990a319bbae15d9318b5211d045c2cdc0c59cc5795",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "39d18580b3a84946f84893f6576b19f9d427b013c845635c3c77d5fba6d9cd08",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "evals",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "alpha",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "inv_twiddles",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_output",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped FRI fold kernels exactly",
+        "workgroup_policy": "one thread per folded evaluation; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "fri_fold_goldilocks",
+            "source_path": "zkf-metal/src/shaders/fri.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_fold"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.fri_surface_attested",
+      "program_id": "fri_fold_babybear",
+      "family": "fri",
+      "kernel": "fri_fold_babybear",
+      "variant": "babybear_fold",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "output_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "output_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "evals",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "element_index"
+              },
+              {
+                "nat_const": 2
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 2
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "output_count"
+              },
+              {
+                "nat_const": 2
+              }
+            ]
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "inv_twiddles",
+          "kind": "constant",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "output_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "output_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "babybear_fold",
+          "operator": "fri_fold",
+          "arithmetic_domain": "field",
+          "reads": [
+            "evals",
+            "inv_twiddles"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/fri.rs": "a8be2d363dfabe74a79c2ca448b07ac0d351d9081c7ff0795d07a14c5292f6c7",
+          "zkf-metal/src/shaders/fri.metal": "cbd0c9b7b95b6edf1c1d631d07f06964cdae3a75d2409cc8739a66475570a73d"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/fri.metal",
+          "zkf-metal/src/fri.rs"
+        ],
+        "entrypoints": [
+          "fri_fold_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "fri_fold_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "4b5d6e7a872da63fbc1449990a319bbae15d9318b5211d045c2cdc0c59cc5795",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "d10ce22849a810ad09eb8c15b3e403831ef798014d746afb7f82744b18e403ea",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "evals",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "output",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "alpha",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "inv_twiddles",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "n_output",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped FRI fold kernels exactly",
+        "workgroup_policy": "one thread per folded evaluation; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "fri_fold_babybear",
+            "source_path": "zkf-metal/src/shaders/fri.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_fold"
+          }
+        ]
+      },
+      "certified_claim": false
+    }
+  ]
+}

@@ -69,6 +69,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let err = export_verifier(&artifact, VerifierLanguage::Solidity, None).unwrap_err();
         assert!(matches!(err, ZkfError::UnsupportedBackend { .. }));

@@ -6299,6 +6299,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let trace = build_artifact_runtime_trace(None, &artifact);
@@ -6934,6 +6936,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let trace = build_wrapper_execution_trace(
@@ -7022,6 +7026,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let trace = build_wrapper_execution_trace(&plan, None, None, &artifact, 3.5);
@@ -7077,6 +7083,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let result = zkf_runtime::PlanExecutionResult {
             report: zkf_runtime::GraphExecutionReport {
@@ -7546,6 +7554,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         annotate_wrapper_runtime_metadata(
@@ -7598,6 +7608,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let err = enforce_artifact_trust_lane(&artifact, RequiredTrustLane::StrictCryptographic)
@@ -7624,6 +7636,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let compiled = CompiledProgram::new(BackendKind::Plonky3, zkf_examples::mul_add_program());
         crate::util::write_json(&proof_path, &proof).unwrap();
@@ -7829,6 +7843,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let verification = verify_artifact_plan_provenance(&plan_path, &artifact).unwrap();
@@ -7865,6 +7881,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let err = verify_artifact_plan_provenance(&plan_path, &artifact).unwrap_err();
@@ -7989,6 +8007,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let trace = json!({
             "status": "wrapped-v2",
@@ -8060,6 +8080,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         }
     }
 

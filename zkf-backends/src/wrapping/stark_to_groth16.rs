@@ -1249,6 +1249,8 @@ fn wrap_direct_fri_v2(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -1427,6 +1429,8 @@ fn wrap_nova_compressed_v3(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -4011,7 +4015,7 @@ mod tests {
             vec![],
         )
         .with_metadata(metadata)
-    }
+}
 
     #[derive(Clone)]
     struct TinySetupCircuit;
@@ -4062,7 +4066,7 @@ mod tests {
             ))
             .expect("valid Stark-to-Groth16 wrapped fixture")
         })
-    }
+}
 
     #[test]
     fn wrapper_identifies_backends() {

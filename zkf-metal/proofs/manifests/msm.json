@@ -1,0 +1,3229 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "msm",
+  "claim": "end-to-end mechanized GPU lane from Rust inputs to GPU outputs, assuming the pinned Apple Metal stack executes the attested metallib and pipeline state correctly",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_assign",
+      "family": "msm",
+      "kernel": "msm_bucket_assign",
+      "variant": "classic_assign",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_assign",
+          "operator": "msm_bucket_assign",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars"
+          ],
+          "writes": [
+            "bucket_map"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_bucket_assign"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_assign",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "f0c32adf5230ef361c025072ed5391606ea1f1d7823f4d2ac575baec7a232624",
+            "public_reflection_sha256": "624efea199cec488fe78c5375574faa06c85e4bba498276da40bd4639422fbff",
+            "pipeline_descriptor_sha256": "cd1f10d6066c2514b1c596c758bf02bba1d1c86f963ee1f9fa67ebb5f0a22622",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "scalars",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "window_offset",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_assign",
+            "source_path": "zkf-metal/src/shaders/msm_bn254.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_assign"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_accumulate",
+      "family": "msm",
+      "kernel": "msm_bucket_acc",
+      "variant": "classic_accumulate",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_acc",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "d4e47f1cdb0c200d4115e7b218aa673d1d8cabf94d7e970d28c31394dfdc3f15",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc",
+            "source_path": "zkf-metal/src/shaders/msm_bn254.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_reduce",
+      "family": "msm",
+      "kernel": "msm_bucket_reduce",
+      "variant": "classic_reduce",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "window_results",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "window_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_reduce",
+          "operator": "msm_bucket_reduce",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "buckets"
+          ],
+          "writes": [
+            "window_results"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_bucket_reduce"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_reduce",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "77646a40d8b7cae1383dc3d0a9db7fdb0518d3e290f78b70f6457cb00b44a840",
+            "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
+            "pipeline_descriptor_sha256": "8220fe36e48eaf1f063704e47b6dce267e020d10957b06e15468ef71bd3277aa",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bucket_data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "window_results",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "num_buckets",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_reduce",
+            "source_path": "zkf-metal/src/shaders/msm_reduce.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_reduce"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_combine",
+      "family": "msm",
+      "kernel": "msm_window_combine",
+      "variant": "classic_combine",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "window_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "window_results",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "window_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "num_windows"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "final_result",
+          "kind": "global_output",
+          "start": {
+            "nat_const": 0
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "nat_const": 12
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_combine",
+          "operator": "msm_window_combine",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "window_results"
+          ],
+          "writes": [
+            "final_result"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
+          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_window_combine"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_window_combine",
+            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "reflection_sha256": "e2fe49f8e466eda4fca6fbd0ef5c635a95d1b26a1fe210589e54b56c4b93dd0c",
+            "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
+            "pipeline_descriptor_sha256": "f989e63f2d16aba29ea90a4aa9fbae64c6ba7754824f6ab80facfcd8fadd694b",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "window_results",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "final_result",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "num_windows",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "window_bits",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_window_combine",
+            "source_path": "zkf-metal/src/shaders/msm_reduce.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_combine"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_pallas_classic_assign",
+      "family": "msm",
+      "kernel": "msm_bucket_assign",
+      "variant": "classic_assign",
+      "field": null,
+      "curve": "pallas",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_assign",
+          "operator": "msm_bucket_assign",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars"
+          ],
+          "writes": [
+            "bucket_map"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
+          "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_pallas.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pallas_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_assign"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "pallas_msm_library",
+            "entrypoint": "msm_bucket_assign",
+            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "reflection_sha256": "5f82892d0d7a473db2a5c5e8bb16473cbafff5a805ecbd8c5aed926d5064555b",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "55f416afd92beed4d5f31cf28d634d1232c9bae7a977b2aa4d74149c78692d3d",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "scalars",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_assign",
+            "source_path": "zkf-metal/src/shaders/msm_pallas.metal",
+            "library": "pallas_msm_library",
+            "binding_kind": "classic_assign"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_pallas_classic_accumulate",
+      "family": "msm",
+      "kernel": "msm_bucket_acc",
+      "variant": "classic_accumulate",
+      "field": null,
+      "curve": "pallas",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
+          "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_pallas.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pallas_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "pallas_msm_library",
+            "entrypoint": "msm_bucket_acc",
+            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "7dbd88997ad443aa2c27c6f5e5ddb737ad41c1d241fdf6daea639d42143ef946",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc",
+            "source_path": "zkf-metal/src/shaders/msm_pallas.metal",
+            "library": "pallas_msm_library",
+            "binding_kind": "classic_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_pallas_naf_accumulate",
+      "family": "msm",
+      "kernel": "msm_bucket_acc_naf",
+      "variant": "naf_accumulate",
+      "field": null,
+      "curve": "pallas",
+      "route": "naf",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "naf_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
+          "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_pallas.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pallas_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_naf"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "pallas_msm_library",
+            "entrypoint": "msm_bucket_acc_naf",
+            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "reflection_sha256": "e7e80bf1b4db369e50678fb8f2ba910acd9addd404c2278d2c414c87e50f938f",
+            "public_reflection_sha256": "27086095d7923f2fb726ad734d9e1bb552099b2442a0996932d62f937e1e6773",
+            "pipeline_descriptor_sha256": "ed68b5ba3eb822045e1d6c1b7a1970cdbb23301afa523041fb274be4175c02d5",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "naf_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets_naf",
+                "index": 7,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_naf",
+            "source_path": "zkf-metal/src/shaders/msm_pallas.metal",
+            "library": "pallas_msm_library",
+            "binding_kind": "naf_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_vesta_classic_assign",
+      "family": "msm",
+      "kernel": "msm_bucket_assign",
+      "variant": "classic_assign",
+      "field": null,
+      "curve": "vesta",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "point_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_assign",
+          "operator": "msm_bucket_assign",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars"
+          ],
+          "writes": [
+            "bucket_map"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
+          "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_vesta.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/vesta_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_assign"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "vesta_msm_library",
+            "entrypoint": "msm_bucket_assign",
+            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "reflection_sha256": "5f82892d0d7a473db2a5c5e8bb16473cbafff5a805ecbd8c5aed926d5064555b",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "aa724063fb6f50ce7f39220b481cc885474d12dda342e252dff106fc31f0a5ec",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "scalars",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_assign",
+            "source_path": "zkf-metal/src/shaders/msm_vesta.metal",
+            "library": "vesta_msm_library",
+            "binding_kind": "classic_assign"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_vesta_classic_accumulate",
+      "family": "msm",
+      "kernel": "msm_bucket_acc",
+      "variant": "classic_accumulate",
+      "field": null,
+      "curve": "vesta",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "scalar_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
+          "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_vesta.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/vesta_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "vesta_msm_library",
+            "entrypoint": "msm_bucket_acc",
+            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
+            "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
+            "pipeline_descriptor_sha256": "bf7454b0e69423391b9fa6add59acfaf7ed0d18f33c3c46d8faad2b0fbc062e7",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc",
+            "source_path": "zkf-metal/src/shaders/msm_vesta.metal",
+            "library": "vesta_msm_library",
+            "binding_kind": "classic_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_vesta_naf_accumulate",
+      "family": "msm",
+      "kernel": "msm_bucket_acc_naf",
+      "variant": "naf_accumulate",
+      "field": null,
+      "curve": "vesta",
+      "route": "naf",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "base_limbs"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_index"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "num_windows"
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "naf_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
+          "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_vesta.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/vesta_pippenger.rs"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_naf"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "vesta_msm_library",
+            "entrypoint": "msm_bucket_acc_naf",
+            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "reflection_sha256": "e7e80bf1b4db369e50678fb8f2ba910acd9addd404c2278d2c414c87e50f938f",
+            "public_reflection_sha256": "27086095d7923f2fb726ad734d9e1bb552099b2442a0996932d62f937e1e6773",
+            "pipeline_descriptor_sha256": "a8bcd59eafe6f48bab4195683ab5966408999caa68b6d31720c5efb0bcd9ed02",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "naf_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets_naf",
+                "index": 7,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_naf",
+            "source_path": "zkf-metal/src/shaders/msm_vesta.metal",
+            "library": "vesta_msm_library",
+            "binding_kind": "naf_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    }
+  ]
+}

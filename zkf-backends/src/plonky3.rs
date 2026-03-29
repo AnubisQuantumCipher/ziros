@@ -5,8 +5,8 @@ use crate::blackbox_native::supported_blackbox_ops;
 use crate::metal_runtime::append_backend_runtime_metadata_for_field;
 pub(crate) use crate::proof_plonky3_spec::{AirExpr, LoweredProgram, lower_program};
 use crate::proof_plonky3_spec::{
-    build_trace_row_runtime_fast, eval_air_expr_concrete as spec_eval_air_expr_concrete,
-    lower_program_runtime_fast, max_safe_range_bits, parse_field_u64,
+    build_trace_row, eval_air_expr_concrete as spec_eval_air_expr_concrete, max_safe_range_bits,
+    parse_field_u64,
 };
 use crate::{GpuStage, GpuStageCoverage};
 use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
@@ -29,12 +29,8 @@ use p3_symmetric::{
     TruncatedPermutation,
 };
 use p3_uni_stark::{
-    Proof as StarkProof, ProverConstraintFolder, StarkConfig, StarkGenericConfig,
-    SymbolicAirBuilder, SymbolicExpression, VerifierConstraintFolder, prove as stark_prove,
-    verify as stark_verify,
+    Proof as StarkProof, StarkConfig, prove as stark_prove, verify as stark_verify,
 };
-#[cfg(debug_assertions)]
-use p3_uni_stark::DebugConstraintBuilder;
 use rand09::SeedableRng;
 use rand09::rngs::SmallRng;
 use serde::Serialize;
@@ -156,18 +152,10 @@ struct Plonky3RunTelemetry {
 struct ProgramAir {
     width: usize,
     constraints: Vec<AirExpr>,
-    constraint_degree_multiples: Vec<usize>,
     public_signal_indices: Vec<usize>,
 }
 
 impl NttDispatchTracker {
-    fn record_policy_forced_cpu(&self) {
-        if let Ok(mut state) = self.state.lock() {
-            state.used_metal = false;
-            state.fallback_reason = Some("policy-fixed-cpu");
-        }
-    }
-
     #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
     fn record_unavailable(&self) {
         if let Ok(mut state) = self.state.lock() {
@@ -215,7 +203,7 @@ where
     F: TwoAdicField + PrimeField64 + 'static,
 {
     fn default() -> Self {
-        Self::new(None, false)
+        Self::new(None)
     }
 }
 
@@ -223,13 +211,7 @@ impl<F> RuntimeDft<F>
 where
     F: TwoAdicField + PrimeField64 + 'static,
 {
-    fn new(tracker: Option<NttDispatchTracker>, fixed_policy_cpu_only: bool) -> Self {
-        if fixed_policy_cpu_only {
-            return Self {
-                inner: RuntimeDftInner::Cpu(Radix2DitParallel::default()),
-                tracker,
-            };
-        }
+    fn new(tracker: Option<NttDispatchTracker>) -> Self {
         #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
         {
             if should_use_metal_ntt::<F>() {
@@ -283,11 +265,6 @@ impl ProgramAir {
         Self {
             width: lowered.signal_order.len(),
             constraints: lowered.constraints.clone(),
-            constraint_degree_multiples: lowered
-                .constraints
-                .iter()
-                .map(air_expr_degree_multiple)
-                .collect(),
             public_signal_indices: lowered.public_signal_indices.clone(),
         }
     }
@@ -299,28 +276,24 @@ impl<F> BaseAir<F> for ProgramAir {
     }
 }
 
-impl<F: Field> Air<SymbolicAirBuilder<F>> for ProgramAir {
-    fn eval(&self, builder: &mut SymbolicAirBuilder<F>) {
-        eval_program_air_symbolic(self, builder);
-    }
-}
+impl<AB: AirBuilderWithPublicValues> Air<AB> for ProgramAir {
+    fn eval(&self, builder: &mut AB) {
+        let main = builder.main();
+        let Some(local) = main.row_slice(0) else {
+            return;
+        };
+        let pis = builder.public_values().to_vec();
 
-impl<'a, SC: StarkGenericConfig> Air<ProverConstraintFolder<'a, SC>> for ProgramAir {
-    fn eval(&self, builder: &mut ProverConstraintFolder<'a, SC>) {
-        eval_program_air_exact(self, builder);
-    }
-}
+        for (pi_idx, signal_idx) in self.public_signal_indices.iter().enumerate() {
+            builder
+                .when_first_row()
+                .assert_eq(local[*signal_idx].clone(), pis[pi_idx]);
+        }
 
-impl<'a, SC: StarkGenericConfig> Air<VerifierConstraintFolder<'a, SC>> for ProgramAir {
-    fn eval(&self, builder: &mut VerifierConstraintFolder<'a, SC>) {
-        eval_program_air_exact(self, builder);
-    }
-}
-
-#[cfg(debug_assertions)]
-impl<'a, F: Field> Air<DebugConstraintBuilder<'a, F>> for ProgramAir {
-    fn eval(&self, builder: &mut DebugConstraintBuilder<'a, F>) {
-        eval_program_air_exact(self, builder);
+        for constraint in &self.constraints {
+            let value = eval_air_expr::<AB>(constraint, local.as_ref());
+            builder.when_first_row().assert_zero(value);
+        }
     }
 }
 
@@ -371,7 +344,7 @@ impl BackendEngine for Plonky3Backend {
         let raw_program = program.clone();
         let program = &blackbox_gadgets::lower_blackbox_program(program)?;
         let program = &blackbox_gadgets::lookup_lowering::lower_lookup_constraints(program)?;
-        let lowered = lower_program_runtime_fast(program)?;
+        let lowered = lower_program(program)?;
         if lowered.signal_order.is_empty() {
             return Err(ZkfError::UnsupportedBackend {
                 backend: self.kind().to_string(),
@@ -480,7 +453,7 @@ impl BackendEngine for Plonky3Backend {
 fn prove_for_field<F, P>(
     compiled: &CompiledProgram,
     witness: &Witness,
-    config_builder: fn(u64, bool) -> ConfigBundle<F, P>,
+    config_builder: fn(u64) -> ConfigBundle<F, P>,
 ) -> ZkfResult<ProofArtifact>
 where
     F: Field + PrimeField64 + TwoAdicField + Send + Sync + 'static,
@@ -491,20 +464,18 @@ where
         + Sync
         + 'static,
 {
-    let lowered = lower_program_runtime_fast(&compiled.program)?;
+    let lowered = lower_program(&compiled.program)?;
     let air = ProgramAir::new(&lowered);
-    let fixed_policy_cpu_only = plonky3_fixed_policy_cpu_only(&compiled.program);
-    let trace = adjust_trace_for_program_policy(
+    let trace = ensure_gpu_heavy_trace_rows(
         build_trace::<F>(&lowered, witness, compiled.program.field)?,
         compiled.program.field,
-        fixed_policy_cpu_only,
     );
     let trace_height = trace.height();
     let trace_width = trace.width;
     let public_inputs = collect_public_inputs(&compiled.program, witness)?;
     let public_values = to_field_slice::<F>(&public_inputs, compiled.program.field)?;
     let seed = plonky3_seed(&compiled.program_digest);
-    let config_bundle = config_builder(seed, fixed_policy_cpu_only);
+    let config_bundle = config_builder(seed);
 
     let proof: Proof<F, P> = stark_prove(&config_bundle.config, &air, trace, &public_values);
     let proof_bytes =
@@ -524,21 +495,6 @@ where
     metadata.insert("scheme".to_string(), "stark".to_string());
     metadata.insert("pcs".to_string(), "fri".to_string());
     metadata.insert("seed".to_string(), seed.to_string());
-    metadata.insert(
-        "execution_regime".to_string(),
-        if fixed_policy_cpu_only {
-            "cpu-only"
-        } else {
-            "accelerator-adaptive"
-        }
-        .to_string(),
-    );
-    if fixed_policy_cpu_only {
-        metadata.insert(
-            "execution_policy".to_string(),
-            "fixed-policy-cpu-first".to_string(),
-        );
-    }
     let ntt_summary = config_bundle
         .ntt_tracker
         .as_ref()
@@ -554,7 +510,6 @@ where
         compiled.program.field,
         trace_height,
         trace_width,
-        fixed_policy_cpu_only,
         ntt_summary,
     );
 
@@ -569,13 +524,15 @@ where
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
 fn verify_for_field<F, P>(
     compiled: &CompiledProgram,
     artifact: &ProofArtifact,
-    config_builder: fn(u64, bool) -> ConfigBundle<F, P>,
+    config_builder: fn(u64) -> ConfigBundle<F, P>,
 ) -> ZkfResult<bool>
 where
     F: Field + PrimeField64 + TwoAdicField + Send + Sync + 'static,
@@ -586,7 +543,7 @@ where
         + Sync
         + 'static,
 {
-    let lowered = lower_program_runtime_fast(&compiled.program)?;
+    let lowered = lower_program(&compiled.program)?;
     let expected_vk = verification_key_fingerprint(
         &compiled.program_digest,
         compiled.program.field,
@@ -601,18 +558,14 @@ where
 
     let public_values = to_field_slice::<F>(&artifact.public_inputs, compiled.program.field)?;
     let seed = plonky3_seed(&compiled.program_digest);
-    let config_bundle = config_builder(seed, plonky3_fixed_policy_cpu_only(&compiled.program));
+    let config_bundle = config_builder(seed);
     let air = ProgramAir::new(&lowered);
     let proof: Proof<F, P> = postcard::from_bytes(artifact.proof.as_slice())
         .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
     Ok(stark_verify(&config_bundle.config, &air, &proof, &public_values).is_ok())
 }
 
-fn build_config_generic<F, P>(
-    perm: P,
-    poseidon2_seed: u64,
-    fixed_policy_cpu_only: bool,
-) -> ConfigBundle<F, P>
+fn build_config_generic<F, P>(perm: P, poseidon2_seed: u64) -> ConfigBundle<F, P>
 where
     F: Field + PrimeField64 + TwoAdicField + Send + Sync + 'static,
     P: CryptographicPermutation<[F; 16]>
@@ -626,15 +579,11 @@ where
     let compress: MyCompress<P> = MyCompress::new(perm.clone());
 
     #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
-    let val_mmcs: ValMmcs<F, P> = if fixed_policy_cpu_only {
-        ValMmcs::<F, P>::new(hash, compress)
-    } else {
-        ValMmcs::<F, P>::new_with_gpu(hash, compress, poseidon2_seed)
-    };
+    let val_mmcs: ValMmcs<F, P> = ValMmcs::<F, P>::new_with_gpu(hash, compress, poseidon2_seed);
 
     #[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
     let val_mmcs: ValMmcs<F, P> = {
-        let _ = (poseidon2_seed, fixed_policy_cpu_only);
+        let _ = poseidon2_seed;
         ValMmcs::<F, P>::new(hash, compress)
     };
 
@@ -644,12 +593,7 @@ where
     } else {
         None
     };
-    if fixed_policy_cpu_only {
-        if let Some(observer) = &tracker {
-            observer.record_policy_forced_cpu();
-        }
-    }
-    let dft = RuntimeDft::<F>::new(tracker.clone(), fixed_policy_cpu_only);
+    let dft = RuntimeDft::<F>::new(tracker.clone());
     let fri_params = create_test_fri_params(challenge_mmcs, 0);
     let pcs: Pcs<F, P> = Pcs::new(dft, val_mmcs, fri_params);
     let challenger: Challenger<F, P> = Challenger::new(perm);
@@ -659,27 +603,19 @@ where
     }
 }
 
-fn build_config_goldilocks(
-    seed: u64,
-    fixed_policy_cpu_only: bool,
-) -> ConfigBundle<Goldilocks, Poseidon2Goldilocks<16>> {
+fn build_config_goldilocks(seed: u64) -> ConfigBundle<Goldilocks, Poseidon2Goldilocks<16>> {
     let mut rng = SmallRng::seed_from_u64(seed);
     build_config_generic::<Goldilocks, Poseidon2Goldilocks<16>>(
         Poseidon2Goldilocks::<16>::new_from_rng_128(&mut rng),
         seed,
-        fixed_policy_cpu_only,
     )
 }
 
-fn build_config_babybear(
-    seed: u64,
-    fixed_policy_cpu_only: bool,
-) -> ConfigBundle<BabyBear, Poseidon2BabyBear<16>> {
+fn build_config_babybear(seed: u64) -> ConfigBundle<BabyBear, Poseidon2BabyBear<16>> {
     let mut rng = SmallRng::seed_from_u64(seed);
     build_config_generic::<BabyBear, Poseidon2BabyBear<16>>(
         Poseidon2BabyBear::<16>::new_from_rng_128(&mut rng),
         seed,
-        fixed_policy_cpu_only,
     )
 }
 
@@ -726,7 +662,7 @@ fn append_ntt_metadata(metadata: &mut BTreeMap<String, String>, summary: NttDisp
 }
 
 fn prove_for_mersenne31(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<ProofArtifact> {
-    let lowered = lower_program_runtime_fast(&compiled.program)?;
+    let lowered = lower_program(&compiled.program)?;
     let air = ProgramAir::new(&lowered);
     let trace = ensure_min_trace_rows(
         build_trace::<M31Val>(&lowered, witness, compiled.program.field)?,
@@ -768,7 +704,6 @@ fn prove_for_mersenne31(compiled: &CompiledProgram, witness: &Witness) -> ZkfRes
         compiled.program.field,
         trace_height,
         trace_width,
-        false,
         ntt_cpu_summary(None),
     );
 
@@ -783,11 +718,13 @@ fn prove_for_mersenne31(compiled: &CompiledProgram, witness: &Witness) -> ZkfRes
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
 fn verify_for_mersenne31(compiled: &CompiledProgram, artifact: &ProofArtifact) -> ZkfResult<bool> {
-    let lowered = lower_program_runtime_fast(&compiled.program)?;
+    let lowered = lower_program(&compiled.program)?;
     let expected_vk = verification_key_fingerprint(
         &compiled.program_digest,
         compiled.program.field,
@@ -817,40 +754,9 @@ fn build_trace<F>(
 where
     F: PrimeField64,
 {
-    let row = build_trace_row_runtime_fast(lowered, witness, field).map_err(ZkfError::from)?;
+    let row = build_trace_row(lowered, witness, field).map_err(ZkfError::from)?;
     let row = row.into_iter().map(F::from_u64).collect::<Vec<_>>();
     Ok(RowMajorMatrix::new(row, lowered.signal_order.len()))
-}
-
-fn plonky3_fixed_policy_cpu_only(program: &Program) -> bool {
-    matches!(
-        program.metadata.get("theorem_lane").map(String::as_str),
-        Some("transparent-fixed-policy-cpu")
-    ) || matches!(
-        program.metadata.get("execution_regime").map(String::as_str),
-        Some("cpu-only")
-    ) || matches!(
-        program
-            .metadata
-            .get("fixed_policy_accelerator")
-            .map(String::as_str),
-        Some("cpu-only")
-    )
-}
-
-fn adjust_trace_for_program_policy<F>(
-    trace: RowMajorMatrix<F>,
-    field: FieldId,
-    fixed_policy_cpu_only: bool,
-) -> RowMajorMatrix<F>
-where
-    F: Clone + Send + Sync,
-{
-    if fixed_policy_cpu_only {
-        ensure_min_trace_rows(trace, 4)
-    } else {
-        ensure_gpu_heavy_trace_rows(trace, field)
-    }
 }
 
 fn ensure_min_trace_rows<F>(trace: RowMajorMatrix<F>, min_rows: usize) -> RowMajorMatrix<F>
@@ -902,16 +808,9 @@ fn append_actual_plonky3_run_metadata(
     field: FieldId,
     trace_height: usize,
     trace_width: usize,
-    fixed_policy_cpu_only: bool,
     ntt_summary: NttDispatchSummary,
 ) {
-    let telemetry = plonky3_run_telemetry(
-        field,
-        trace_height,
-        trace_width,
-        fixed_policy_cpu_only,
-        ntt_summary,
-    );
+    let telemetry = plonky3_run_telemetry(field, trace_height, trace_width, ntt_summary);
     metadata.insert(
         "gpu_stage_coverage".to_string(),
         serde_json::to_string(&telemetry.coverage).unwrap_or_else(|_| {
@@ -960,12 +859,8 @@ fn append_actual_plonky3_run_metadata(
         telemetry.hash_accelerator.to_string(),
     );
     if telemetry.hash_accelerator == "cpu" {
-        if let Some(reason) = plonky3_hash_merkle_fallback_reason(
-            field,
-            trace_height,
-            trace_width,
-            fixed_policy_cpu_only,
-        ) {
+        if let Some(reason) = plonky3_hash_merkle_fallback_reason(field, trace_height, trace_width)
+        {
             metadata.insert("hash_fallback_reason".to_string(), reason.to_string());
             metadata.insert("poseidon2_fallback_reason".to_string(), reason.to_string());
         }
@@ -979,15 +874,13 @@ fn plonky3_run_telemetry(
     field: FieldId,
     trace_height: usize,
     trace_width: usize,
-    fixed_policy_cpu_only: bool,
     ntt_summary: NttDispatchSummary,
 ) -> Plonky3RunTelemetry {
-    let required = plonky3_required_gpu_stages(field, fixed_policy_cpu_only);
+    let required = plonky3_required_gpu_stages(field);
     let mut metal_stages = Vec::new();
     let mut cpu_stages = Vec::new();
     let ntt_uses_metal = ntt_summary.accelerator == "metal";
-    let hash_uses_metal =
-        plonky3_hash_merkle_uses_gpu(field, trace_height, trace_width, fixed_policy_cpu_only);
+    let hash_uses_metal = plonky3_hash_merkle_uses_gpu(field, trace_height, trace_width);
 
     for stage in &required {
         let uses_metal = match stage {
@@ -1037,7 +930,6 @@ fn plonky3_run_telemetry(
                         field,
                         trace_height,
                         trace_width,
-                        fixed_policy_cpu_only,
                     )
                     .map(str::to_string),
                     trace_rows: trace_height,
@@ -1051,13 +943,7 @@ fn plonky3_run_telemetry(
     let cpu_math_fallback_reason = if metal_complete {
         None
     } else {
-        plonky3_cpu_math_fallback_reason(
-            field,
-            trace_height,
-            trace_width,
-            fixed_policy_cpu_only,
-            ntt_summary,
-        )
+        plonky3_cpu_math_fallback_reason(field, trace_height, trace_width, ntt_summary)
     };
 
     Plonky3RunTelemetry {
@@ -1084,10 +970,7 @@ fn plonky3_run_telemetry(
     }
 }
 
-fn plonky3_required_gpu_stages(field: FieldId, fixed_policy_cpu_only: bool) -> Vec<GpuStage> {
-    if fixed_policy_cpu_only {
-        return Vec::new();
-    }
+fn plonky3_required_gpu_stages(field: FieldId) -> Vec<GpuStage> {
     match field {
         FieldId::Goldilocks | FieldId::BabyBear => vec![GpuStage::FftNtt, GpuStage::HashMerkle],
         FieldId::Mersenne31 => Vec::new(),
@@ -1099,12 +982,8 @@ fn plonky3_cpu_math_fallback_reason(
     field: FieldId,
     trace_height: usize,
     trace_width: usize,
-    fixed_policy_cpu_only: bool,
     ntt_summary: NttDispatchSummary,
 ) -> Option<String> {
-    if fixed_policy_cpu_only {
-        return None;
-    }
     if field == FieldId::Mersenne31 {
         return Some("mersenne31-circle-path-remains-cpu-classified".to_string());
     }
@@ -1117,17 +996,11 @@ fn plonky3_cpu_math_fallback_reason(
             ntt_summary.fallback_reason.unwrap_or("cpu")
         ));
     }
-    if !plonky3_hash_merkle_uses_gpu(field, trace_height, trace_width, fixed_policy_cpu_only) {
+    if !plonky3_hash_merkle_uses_gpu(field, trace_height, trace_width) {
         reasons.push(format!(
             "{}({})",
             GpuStage::HashMerkle.as_str(),
-            plonky3_hash_merkle_fallback_reason(
-                field,
-                trace_height,
-                trace_width,
-                fixed_policy_cpu_only,
-            )
-            .unwrap_or("cpu")
+            plonky3_hash_merkle_fallback_reason(field, trace_height, trace_width).unwrap_or("cpu")
         ));
     }
     if reasons.is_empty() {
@@ -1137,15 +1010,7 @@ fn plonky3_cpu_math_fallback_reason(
     }
 }
 
-fn plonky3_hash_merkle_uses_gpu(
-    field: FieldId,
-    trace_height: usize,
-    trace_width: usize,
-    fixed_policy_cpu_only: bool,
-) -> bool {
-    if fixed_policy_cpu_only {
-        return false;
-    }
+fn plonky3_hash_merkle_uses_gpu(field: FieldId, trace_height: usize, trace_width: usize) -> bool {
     #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
     {
         if !matches!(field, FieldId::Goldilocks | FieldId::BabyBear)
@@ -1168,11 +1033,7 @@ fn plonky3_hash_merkle_fallback_reason(
     field: FieldId,
     trace_height: usize,
     trace_width: usize,
-    fixed_policy_cpu_only: bool,
 ) -> Option<&'static str> {
-    if fixed_policy_cpu_only {
-        return Some("policy-fixed-cpu");
-    }
     if !matches!(field, FieldId::Goldilocks | FieldId::BabyBear) {
         return Some("field-not-metal-mmcs-backed");
     }
@@ -1196,74 +1057,6 @@ fn plonky3_hash_merkle_fallback_reason(
         let _ = (trace_height, trace_width);
         Some("metal-feature-disabled")
     }
-}
-
-fn air_expr_degree_multiple(expr: &AirExpr) -> usize {
-    match expr {
-        AirExpr::Const(_) => 0,
-        AirExpr::Signal(_) => 1,
-        AirExpr::Add(values) => values.iter().map(air_expr_degree_multiple).max().unwrap_or(0),
-        AirExpr::Sub(left, right) => air_expr_degree_multiple(left).max(air_expr_degree_multiple(right)),
-        AirExpr::Mul(left, right) => air_expr_degree_multiple(left) + air_expr_degree_multiple(right),
-    }
-}
-
-fn eval_program_air_exact<AB: AirBuilderWithPublicValues>(air: &ProgramAir, builder: &mut AB) {
-    let main = builder.main();
-    let Some(local) = main.row_slice(0) else {
-        return;
-    };
-    let pis = builder.public_values().to_vec();
-
-    for (pi_idx, signal_idx) in air.public_signal_indices.iter().enumerate() {
-        builder
-            .when_first_row()
-            .assert_eq(local[*signal_idx].clone(), pis[pi_idx]);
-    }
-
-    for constraint in &air.constraints {
-        let value = eval_air_expr::<AB>(constraint, local.as_ref());
-        builder.when_first_row().assert_zero(value);
-    }
-}
-
-fn eval_program_air_symbolic<F: Field>(air: &ProgramAir, builder: &mut SymbolicAirBuilder<F>) {
-    let main = builder.main();
-    let Some(local) = main.row_slice(0) else {
-        return;
-    };
-    let pis = builder.public_values().to_vec();
-
-    for (pi_idx, signal_idx) in air.public_signal_indices.iter().enumerate() {
-        builder
-            .when_first_row()
-            .assert_eq(local[*signal_idx].clone(), pis[pi_idx].clone());
-    }
-
-    for degree in &air.constraint_degree_multiples {
-        builder
-            .when_first_row()
-            .assert_zero(symbolic_degree_marker(local.as_ref(), *degree));
-    }
-}
-
-fn symbolic_degree_marker<F: Field>(
-    local: &[<SymbolicAirBuilder<F> as AirBuilder>::Var],
-    degree_multiple: usize,
-) -> SymbolicExpression<F> {
-    if degree_multiple == 0 {
-        return SymbolicExpression::from(F::ONE);
-    }
-    let seed = local
-        .first()
-        .cloned()
-        .map(SymbolicExpression::from)
-        .unwrap_or_else(|| SymbolicExpression::from(F::ONE));
-    let mut marker = seed.clone();
-    for _ in 1..degree_multiple {
-        marker *= seed.clone();
-    }
-    marker
 }
 
 fn eval_air_expr<AB: AirBuilderWithPublicValues>(expr: &AirExpr, local: &[AB::Var]) -> AB::Expr {
@@ -1378,36 +1171,5 @@ impl crate::native_field::NativeField for Mersenne31 {
 
     fn field_id() -> FieldId {
         FieldId::Mersenne31
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{adjust_trace_for_program_policy, plonky3_fixed_policy_cpu_only};
-    use p3_goldilocks::Goldilocks;
-    use p3_matrix::Matrix;
-    use p3_matrix::dense::RowMajorMatrix;
-    use std::collections::BTreeMap;
-    use zkf_core::{FieldId, Program};
-
-    #[test]
-    fn fixed_policy_cpu_detection_uses_theorem_lane_metadata() {
-        let mut program = Program {
-            field: FieldId::Goldilocks,
-            ..Program::default()
-        };
-        assert!(!plonky3_fixed_policy_cpu_only(&program));
-        program.metadata = BTreeMap::from([(
-            "theorem_lane".to_string(),
-            "transparent-fixed-policy-cpu".to_string(),
-        )]);
-        assert!(plonky3_fixed_policy_cpu_only(&program));
-    }
-
-    #[test]
-    fn fixed_policy_cpu_trace_uses_min_rows_not_gpu_heavy_padding() {
-        let trace = RowMajorMatrix::new(vec![Goldilocks::new(7)], 1);
-        let adjusted = adjust_trace_for_program_policy(trace, FieldId::Goldilocks, true);
-        assert_eq!(adjusted.height(), 4);
     }
 }

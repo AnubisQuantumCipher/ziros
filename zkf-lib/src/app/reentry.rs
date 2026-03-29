@@ -379,8 +379,8 @@ impl SignedReentryMissionPackV1 {
     }
 
     pub fn verify_signatures(&self) -> bool {
-        if self.signer_public_keys.scheme != SignatureScheme::HybridEd25519MlDsa44
-            || self.signer_signature_bundle.scheme != SignatureScheme::HybridEd25519MlDsa44
+        if self.signer_public_keys.scheme != SignatureScheme::HybridEd25519MlDsa87
+            || self.signer_signature_bundle.scheme != SignatureScheme::HybridEd25519MlDsa87
             || !bundle_has_required_signature_material(
                 &self.signer_public_keys,
                 &self.signer_signature_bundle,
@@ -452,7 +452,7 @@ pub fn validate_signed_reentry_mission_pack(
             signed_pack.signer_identity
         )));
     }
-    if signer.public_keys.scheme != SignatureScheme::HybridEd25519MlDsa44 {
+    if signer.public_keys.scheme != SignatureScheme::HybridEd25519MlDsa87 {
         return Err(ZkfError::InvalidArtifact(
             "reentry signer manifest must pin hybrid Ed25519 + ML-DSA-44 signers".to_string(),
         ));
@@ -10702,7 +10702,7 @@ mod tests {
         json!({
             "scheme": bundle.scheme,
             "ed25519": bundle.ed25519,
-            "ml_dsa44": bundle.ml_dsa44,
+            "ml_dsa87": bundle.ml_dsa87,
         })
     }
 
@@ -10710,7 +10710,7 @@ mod tests {
         json!({
             "scheme": bundle.scheme,
             "ed25519": bundle.ed25519,
-            "ml_dsa44": bundle.ml_dsa44,
+            "ml_dsa87": bundle.ml_dsa87,
         })
     }
 
@@ -10779,17 +10779,17 @@ mod tests {
 
     fn sample_public_key_bundle() -> PublicKeyBundle {
         PublicKeyBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: vec![1, 2, 3, 4],
-            ml_dsa44: vec![5, 6, 7, 8],
+            ml_dsa87: vec![5, 6, 7, 8],
         }
     }
 
     fn sample_signature_bundle() -> SignatureBundle {
         SignatureBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: vec![9, 10, 11, 12],
-            ml_dsa44: vec![13, 14, 15, 16],
+            ml_dsa87: vec![13, 14, 15, 16],
         }
     }
 

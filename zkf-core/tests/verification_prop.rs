@@ -586,6 +586,8 @@ fn proof_artifact_fixture(proof: [u8; 3], vk: [u8; 4], public_value: i16) -> Pro
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     }
 }
 

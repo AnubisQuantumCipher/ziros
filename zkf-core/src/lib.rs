@@ -15,6 +15,7 @@ mod proof_transform_spec;
 mod proof_witness_adapter_spec;
 mod proof_witness_generation_spec;
 pub mod stack_safe_json;
+pub mod swarm_signer;
 #[cfg(kani)]
 mod verification_kani;
 pub mod witness;
@@ -104,6 +105,7 @@ pub use stack_safe_json::{
     from_reader as json_from_reader, from_slice as json_from_slice, to_vec as json_to_vec,
     to_vec_pretty as json_to_vec_pretty,
 };
+pub use swarm_signer::{ReadOnlySwarmSigner, SwarmIdentityKeyBackend};
 pub use witness::{
     Witness, WitnessInputs, check_constraints, collect_public_inputs, ensure_witness_completeness,
     eval_expr, generate_partial_witness, generate_witness, generate_witness_unchecked,

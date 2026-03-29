@@ -1,6 +1,9 @@
-use crate::{CredentialProofBundleV1, FieldElement, FieldId, Program};
+use crate::{
+    CredentialProofBundleV1, FieldElement, FieldId, Program, PublicKeyBundle, SignatureBundle,
+    verify_bundle,
+};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
+use sha2::{Digest, Sha256, Sha384};
 use std::collections::BTreeMap;
 use std::fmt;
 use std::str::FromStr;
@@ -207,6 +210,10 @@ pub struct ProofArtifact {
     pub credential_bundle: Option<Box<CredentialProofBundleV1>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub archive_metadata: Option<ProofArchiveMetadata>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_origin_signature: Option<SignatureBundle>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_origin_public_keys: Option<PublicKeyBundle>,
 }
 
 impl ProofArtifact {
@@ -228,6 +235,8 @@ impl ProofArtifact {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         }
     }
 
@@ -256,6 +265,26 @@ impl ProofArtifact {
             BackendKind::Plonky3 => ProofSecurityProfile::StarkPq,
             _ => ProofSecurityProfile::Classical,
         })
+    }
+
+    pub fn verify_proof_origin(&self) -> Result<bool, String> {
+        let Some(signature_bundle) = self.proof_origin_signature.as_ref() else {
+            return Ok(false);
+        };
+        let Some(public_key_bundle) = self.proof_origin_public_keys.as_ref() else {
+            return Err("proof origin signature present without public keys".to_string());
+        };
+        let proof_digest = Sha384::digest(&self.proof);
+        if verify_bundle(
+            public_key_bundle,
+            proof_digest.as_ref(),
+            signature_bundle,
+            b"zkf-swarm",
+        ) {
+            Ok(true)
+        } else {
+            Err("proof origin signature verification failed".to_string())
+        }
     }
 
     pub fn as_hybrid_leg(&self) -> HybridProofLeg {
@@ -384,6 +413,8 @@ impl HybridProofLeg {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: self.archive_metadata.clone(),
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         }
     }
 }
@@ -705,12 +736,12 @@ mod tests {
                     issuer_public_keys: crate::PublicKeyBundle {
                         scheme: crate::SignatureScheme::Ed25519,
                         ed25519: vec![1; 32],
-                        ml_dsa44: Vec::new(),
+                        ml_dsa87: Vec::new(),
                     },
                     issuer_signature_bundle: crate::SignatureBundle {
                         scheme: crate::SignatureScheme::Ed25519,
                         ed25519: vec![2; 64],
-                        ml_dsa44: Vec::new(),
+                        ml_dsa87: Vec::new(),
                     },
                 },
                 credential_id: FieldElement::from_i64(19),

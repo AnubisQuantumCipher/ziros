@@ -244,6 +244,8 @@ impl ProofWrapper for Halo2ToGroth16Wrapper {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         })
     }
 
@@ -375,6 +377,8 @@ impl Halo2ToGroth16Wrapper {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         groth16_engine.verify(&compiled, &artifact)
@@ -440,7 +444,7 @@ mod tests {
             verification_key,
             public_inputs,
         )
-    }
+}
 
     #[test]
     fn source_and_target_backends() {

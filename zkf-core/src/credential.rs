@@ -1,6 +1,6 @@
 use argon2::{Algorithm, Argon2, Params, Version};
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
-use libcrux_ml_dsa::ml_dsa_44::{MLDSA44Signature, MLDSA44VerificationKey, verify as mldsa_verify};
+use libcrux_ml_dsa::ml_dsa_87::{MLDSA87Signature, MLDSA87VerificationKey, verify as mldsa_verify};
 use num_bigint::{BigInt, Sign};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -19,24 +19,24 @@ const ARGON2_LANES: u32 = 1;
 pub enum SignatureScheme {
     #[default]
     Ed25519,
-    MlDsa44,
-    HybridEd25519MlDsa44,
+    MlDsa87,
+    HybridEd25519MlDsa87,
 }
 
 impl SignatureScheme {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Ed25519 => "ed25519",
-            Self::MlDsa44 => "ml-dsa-44",
-            Self::HybridEd25519MlDsa44 => "hybrid-ed25519-ml-dsa-44",
+            Self::MlDsa87 => "ml-dsa-87",
+            Self::HybridEd25519MlDsa87 => "hybrid-ed25519-ml-dsa-87",
         }
     }
 
     fn canonical_tag(self) -> u8 {
         match self {
             Self::Ed25519 => 1,
-            Self::MlDsa44 => 2,
-            Self::HybridEd25519MlDsa44 => 3,
+            Self::MlDsa87 => 2,
+            Self::HybridEd25519MlDsa87 => 3,
         }
     }
 }
@@ -47,17 +47,17 @@ pub struct PublicKeyBundle {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ed25519: Vec<u8>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub ml_dsa44: Vec<u8>,
+    pub ml_dsa87: Vec<u8>,
 }
 
 impl PublicKeyBundle {
     pub fn canonical_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(1 + self.ed25519.len() + self.ml_dsa44.len() + 16);
+        let mut bytes = Vec::with_capacity(1 + self.ed25519.len() + self.ml_dsa87.len() + 16);
         bytes.push(self.scheme.canonical_tag());
         bytes.extend_from_slice(&(self.ed25519.len() as u32).to_le_bytes());
         bytes.extend_from_slice(&self.ed25519);
-        bytes.extend_from_slice(&(self.ml_dsa44.len() as u32).to_le_bytes());
-        bytes.extend_from_slice(&self.ml_dsa44);
+        bytes.extend_from_slice(&(self.ml_dsa87.len() as u32).to_le_bytes());
+        bytes.extend_from_slice(&self.ml_dsa87);
         bytes
     }
 }
@@ -68,17 +68,17 @@ pub struct SignatureBundle {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ed25519: Vec<u8>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub ml_dsa44: Vec<u8>,
+    pub ml_dsa87: Vec<u8>,
 }
 
 impl SignatureBundle {
     pub fn canonical_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(1 + self.ed25519.len() + self.ml_dsa44.len() + 16);
+        let mut bytes = Vec::with_capacity(1 + self.ed25519.len() + self.ml_dsa87.len() + 16);
         bytes.push(self.scheme.canonical_tag());
         bytes.extend_from_slice(&(self.ed25519.len() as u32).to_le_bytes());
         bytes.extend_from_slice(&self.ed25519);
-        bytes.extend_from_slice(&(self.ml_dsa44.len() as u32).to_le_bytes());
-        bytes.extend_from_slice(&self.ml_dsa44);
+        bytes.extend_from_slice(&(self.ml_dsa87.len() as u32).to_le_bytes());
+        bytes.extend_from_slice(&self.ml_dsa87);
         bytes
     }
 }
@@ -203,14 +203,14 @@ pub fn bundle_has_required_signature_material(
         SignatureScheme::Ed25519 => {
             !public_keys.ed25519.is_empty() && !signatures.ed25519.is_empty()
         }
-        SignatureScheme::MlDsa44 => {
-            !public_keys.ml_dsa44.is_empty() && !signatures.ml_dsa44.is_empty()
+        SignatureScheme::MlDsa87 => {
+            !public_keys.ml_dsa87.is_empty() && !signatures.ml_dsa87.is_empty()
         }
-        SignatureScheme::HybridEd25519MlDsa44 => {
+        SignatureScheme::HybridEd25519MlDsa87 => {
             !public_keys.ed25519.is_empty()
                 && !signatures.ed25519.is_empty()
-                && !public_keys.ml_dsa44.is_empty()
-                && !signatures.ml_dsa44.is_empty()
+                && !public_keys.ml_dsa87.is_empty()
+                && !signatures.ml_dsa87.is_empty()
         }
     }
 }
@@ -247,15 +247,15 @@ pub fn verify_ml_dsa_signature(
     signature: &[u8],
     context: &[u8],
 ) -> bool {
-    let Ok(public_key): Result<[u8; MLDSA44VerificationKey::len()], _> = public_key.try_into()
+    let Ok(public_key): Result<[u8; MLDSA87VerificationKey::len()], _> = public_key.try_into()
     else {
         return false;
     };
-    let Ok(signature): Result<[u8; MLDSA44Signature::len()], _> = signature.try_into() else {
+    let Ok(signature): Result<[u8; MLDSA87Signature::len()], _> = signature.try_into() else {
         return false;
     };
-    let verification_key = MLDSA44VerificationKey::new(public_key);
-    let signature = MLDSA44Signature::new(signature);
+    let verification_key = MLDSA87VerificationKey::new(public_key);
+    let signature = MLDSA87Signature::new(signature);
     mldsa_verify(&verification_key, bytes, context, &signature).is_ok()
 }
 
@@ -272,18 +272,18 @@ pub fn verify_bundle(
         SignatureScheme::Ed25519 => {
             verify_ed25519_signature(&public_keys.ed25519, bytes, &signatures.ed25519)
         }
-        SignatureScheme::MlDsa44 => verify_ml_dsa_signature(
-            &public_keys.ml_dsa44,
+        SignatureScheme::MlDsa87 => verify_ml_dsa_signature(
+            &public_keys.ml_dsa87,
             bytes,
-            &signatures.ml_dsa44,
+            &signatures.ml_dsa87,
             ml_dsa_context,
         ),
-        SignatureScheme::HybridEd25519MlDsa44 => {
+        SignatureScheme::HybridEd25519MlDsa87 => {
             verify_ed25519_signature(&public_keys.ed25519, bytes, &signatures.ed25519)
                 && verify_ml_dsa_signature(
-                    &public_keys.ml_dsa44,
+                    &public_keys.ml_dsa87,
                     bytes,
-                    &signatures.ml_dsa44,
+                    &signatures.ml_dsa87,
                     ml_dsa_context,
                 )
         }
@@ -363,7 +363,7 @@ fn field_element_to_fixed_be_bytes(
 mod tests {
     use super::*;
     use ed25519_dalek::{Signer, SigningKey};
-    use libcrux_ml_dsa::ml_dsa_44::{generate_key_pair, sign as mldsa_sign};
+    use libcrux_ml_dsa::ml_dsa_87::{generate_key_pair, sign as mldsa_sign};
     use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
 
     const TEST_CONTEXT: &[u8] = b"zkf-core-test";
@@ -384,9 +384,9 @@ mod tests {
     #[test]
     fn public_key_bundle_canonical_bytes_are_stable() {
         let bundle = PublicKeyBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: vec![1, 2, 3],
-            ml_dsa44: vec![4, 5],
+            ml_dsa87: vec![4, 5],
         };
         assert_eq!(
             bundle.canonical_bytes(),
@@ -397,14 +397,14 @@ mod tests {
     #[test]
     fn hybrid_bundle_completeness_fails_closed() {
         let public_keys = PublicKeyBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: vec![1; 32],
-            ml_dsa44: vec![2; 16],
+            ml_dsa87: vec![2; 16],
         };
         let missing_ml_dsa = SignatureBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: vec![3; 64],
-            ml_dsa44: vec![],
+            ml_dsa87: vec![],
         };
         assert!(!bundle_has_required_signature_material(
             &public_keys,
@@ -446,14 +446,14 @@ mod tests {
         let credential = IssuerSignedCredentialV1 {
             claims,
             issuer_public_keys: PublicKeyBundle {
-                scheme: SignatureScheme::HybridEd25519MlDsa44,
+                scheme: SignatureScheme::HybridEd25519MlDsa87,
                 ed25519: ed25519_signing_key.verifying_key().to_bytes().to_vec(),
-                ml_dsa44: keypair.verification_key.as_slice().to_vec(),
+                ml_dsa87: keypair.verification_key.as_slice().to_vec(),
             },
             issuer_signature_bundle: SignatureBundle {
-                scheme: SignatureScheme::HybridEd25519MlDsa44,
+                scheme: SignatureScheme::HybridEd25519MlDsa87,
                 ed25519: ed25519_signature,
-                ml_dsa44: ml_dsa_signature.as_slice().to_vec(),
+                ml_dsa87: ml_dsa_signature.as_slice().to_vec(),
             },
         };
 

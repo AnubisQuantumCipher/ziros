@@ -76,6 +76,8 @@ pub struct HandshakeMsg {
     pub threat_epoch_id: Option<u64>,
     #[serde(default)]
     pub threat_epoch_public_key: Option<Vec<u8>>,
+    #[serde(default)]
+    pub threat_epoch_ml_kem_public_key: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -101,6 +103,8 @@ pub struct HandshakeAckMsg {
     pub threat_epoch_id: Option<u64>,
     #[serde(default)]
     pub threat_epoch_public_key: Option<Vec<u8>>,
+    #[serde(default)]
+    pub threat_epoch_ml_kem_public_key: Option<Vec<u8>>,
 }
 
 // ─── Heartbeat ───────────────────────────────────────────────────────────
@@ -116,6 +120,8 @@ pub struct HeartbeatMsg {
     pub threat_epoch_id: Option<u64>,
     #[serde(default)]
     pub threat_epoch_public_key: Option<Vec<u8>>,
+    #[serde(default)]
+    pub threat_epoch_ml_kem_public_key: Option<Vec<u8>>,
     #[serde(default)]
     pub threat_digests: Vec<ThreatDigestMsg>,
     #[serde(default)]
@@ -143,6 +149,8 @@ pub struct HeartbeatAckMsg {
     #[serde(default)]
     pub threat_epoch_public_key: Option<Vec<u8>>,
     #[serde(default)]
+    pub threat_epoch_ml_kem_public_key: Option<Vec<u8>>,
+    #[serde(default)]
     pub threat_digests: Vec<ThreatDigestMsg>,
     #[serde(default)]
     pub activation_level: Option<u8>,
@@ -165,6 +173,8 @@ pub struct EncryptedThreatEnvelopeMsg {
     pub nonce: [u8; 12],
     #[serde(default)]
     pub ciphertext: Vec<u8>,
+    #[serde(default)]
+    pub ml_kem_ciphertext: Vec<u8>,
     #[serde(default)]
     pub payload_version: u32,
 }
@@ -390,6 +400,7 @@ pub fn heartbeat_signing_bytes(heartbeat: &HeartbeatMsg) -> Vec<u8> {
         heartbeat.encrypted_threat_gossip_supported,
         heartbeat.threat_epoch_id,
         heartbeat.threat_epoch_public_key.as_deref(),
+        heartbeat.threat_epoch_ml_kem_public_key.as_deref(),
     );
     bytes.push(heartbeat.activation_level.unwrap_or_default());
     if let Some(root) = &heartbeat.intelligence_root {
@@ -437,6 +448,7 @@ pub fn heartbeat_ack_signing_bytes(heartbeat: &HeartbeatAckMsg) -> Vec<u8> {
         heartbeat.encrypted_threat_gossip_supported,
         heartbeat.threat_epoch_id,
         heartbeat.threat_epoch_public_key.as_deref(),
+        heartbeat.threat_epoch_ml_kem_public_key.as_deref(),
     );
     bytes.push(heartbeat.activation_level.unwrap_or_default());
     if let Some(root) = &heartbeat.intelligence_root {
@@ -481,11 +493,19 @@ pub fn append_threat_epoch_advertisement_bytes(
     encrypted_threat_gossip_supported: bool,
     threat_epoch_id: Option<u64>,
     threat_epoch_public_key: Option<&[u8]>,
+    threat_epoch_ml_kem_public_key: Option<&[u8]>,
 ) {
     bytes.push(u8::from(encrypted_threat_gossip_supported));
     bytes.extend_from_slice(&threat_epoch_id.unwrap_or_default().to_le_bytes());
     bytes.push(u8::from(threat_epoch_id.is_some()));
     match threat_epoch_public_key {
+        Some(public_key) => {
+            bytes.extend_from_slice(&(public_key.len() as u32).to_le_bytes());
+            bytes.extend_from_slice(public_key);
+        }
+        None => bytes.extend_from_slice(&0u32.to_le_bytes()),
+    }
+    match threat_epoch_ml_kem_public_key {
         Some(public_key) => {
             bytes.extend_from_slice(&(public_key.len() as u32).to_le_bytes());
             bytes.extend_from_slice(public_key);
@@ -506,6 +526,8 @@ fn append_encrypted_threat_envelope_bytes(
             bytes.extend_from_slice(&envelope.nonce);
             bytes.extend_from_slice(&(envelope.ciphertext.len() as u32).to_le_bytes());
             bytes.extend_from_slice(&envelope.ciphertext);
+            bytes.extend_from_slice(&(envelope.ml_kem_ciphertext.len() as u32).to_le_bytes());
+            bytes.extend_from_slice(&envelope.ml_kem_ciphertext);
             bytes.extend_from_slice(&envelope.payload_version.to_le_bytes());
         }
         None => bytes.push(0),

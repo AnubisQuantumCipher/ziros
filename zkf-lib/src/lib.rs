@@ -132,13 +132,12 @@ pub use app::evidence::{
     audit_entry_included, audit_entry_omitted_by_default, canonicalize_for_determinism_hash,
     collect_default_formal_evidence, collect_formal_evidence,
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
-    effective_gpu_attribution_summary_with_outputs, ensure_dir_exists, ensure_file_exists,
-    ensure_foundry_layout, foundry_project_dir, generated_app_closure_bundle_summary,
-    generated_app_closure_relative_path, generated_app_formal_script_specs, hash_json_value,
-    json_pretty, load_generated_app_closure, load_generated_implementation_closure_summary,
-    read_json as read_bundle_json, read_text as read_bundle_text, repo_root as bundle_repo_root,
-    sha256_hex, two_tier_audit_record, write_json as write_bundle_json,
-    write_text as write_bundle_text,
+    ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
+    generated_app_closure_bundle_summary, generated_app_closure_relative_path,
+    generated_app_formal_script_specs, hash_json_value, json_pretty, load_generated_app_closure,
+    load_generated_implementation_closure_summary, read_json as read_bundle_json,
+    read_text as read_bundle_text, repo_root as bundle_repo_root, sha256_hex,
+    two_tier_audit_record, write_json as write_bundle_json, write_text as write_bundle_text,
 };
 #[cfg(not(hax))]
 pub use app::inputs::{

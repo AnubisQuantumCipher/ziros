@@ -249,19 +249,19 @@ fn admission_pow_cost_scales_linearly() {
 #[kani::proof]
 fn hybrid_bundle_material_gate_requires_both_signature_systems() {
     let public_keys = PublicKeyBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![1; 32],
-        ml_dsa44: vec![2; 16],
+        ml_dsa87: vec![2; 16],
     };
     let missing_ml_dsa = SignatureBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![3; 64],
-        ml_dsa44: vec![],
+        ml_dsa87: vec![],
     };
     let missing_ed25519 = SignatureBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![],
-        ml_dsa44: vec![4; 32],
+        ml_dsa87: vec![4; 32],
     };
 
     assert!(!bundle_has_required_signature_material(
@@ -278,9 +278,9 @@ fn hybrid_bundle_material_gate_requires_both_signature_systems() {
 fn hybrid_admission_pow_identity_bytes_prefer_hybrid_bundle_encoding() {
     let legacy_public_key = [7u8; 32];
     let public_key_bundle = PublicKeyBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![1; 32],
-        ml_dsa44: vec![2; 16],
+        ml_dsa87: vec![2; 16],
     };
 
     assert_eq!(
@@ -376,14 +376,14 @@ fn distributed_two_party_quorum_rejects_mismatched_remote_digest() {
 #[kani::proof]
 fn distributed_signed_message_bundle_surface_rejects_partial_hybrid_metadata() {
     let public_keys = PublicKeyBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![1; 32],
-        ml_dsa44: vec![2; 16],
+        ml_dsa87: vec![2; 16],
     };
     let signatures = SignatureBundle {
-        scheme: SignatureScheme::HybridEd25519MlDsa44,
+        scheme: SignatureScheme::HybridEd25519MlDsa87,
         ed25519: vec![3; 64],
-        ml_dsa44: vec![4; 32],
+        ml_dsa87: vec![4; 32],
     };
 
     assert!(signed_message_has_complete_bundle_surface(
