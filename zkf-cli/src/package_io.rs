@@ -482,6 +482,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let companion = ProofArtifact {
             backend: BackendKind::Plonky3,
@@ -494,6 +496,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let primary_leg = primary.as_hybrid_leg();
         let companion_leg = companion.as_hybrid_leg();

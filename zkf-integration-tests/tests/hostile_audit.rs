@@ -403,6 +403,8 @@ fn scenario3_malformed_stark_proof_rejected_by_wrapper() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
 
     let wrapper = StarkToGroth16Wrapper;

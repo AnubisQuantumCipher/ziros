@@ -449,6 +449,8 @@ fn proof_artifact_from_receipt(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -497,6 +499,8 @@ fn prove_with_sdk(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<Pr
                 hybrid_bundle: None,
                 credential_bundle: None,
                 archive_metadata: None,
+                proof_origin_signature: None,
+                proof_origin_public_keys: None,
             })
         }
         #[cfg(feature = "native-risc-zero")]
@@ -661,6 +665,8 @@ fn prove_with_external_command(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 

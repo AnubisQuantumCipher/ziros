@@ -221,6 +221,8 @@ fn compose_proof_metadata_match_requires_all_binding_fields() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     assert!(compose_proof_metadata_matches(
         &artifact,
@@ -414,6 +416,8 @@ fn artifact_commitments_change_when_vk_or_public_inputs_change() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
 
     let vk_a = verification_key_digest_for_artifact(&artifact);
@@ -454,6 +458,8 @@ fn render_sp1_solidity_verifier_renders_native_wrapper_when_metadata_present() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     let source = render_sp1_solidity_verifier(&artifact).expect("solidity should render");
     assert!(source.contains("contract ZkfSp1BoundVerifier"));
@@ -482,6 +488,8 @@ fn render_sp1_solidity_verifier_falls_back_to_attestation_without_metadata() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     let source = render_sp1_solidity_verifier(&artifact).expect("solidity should render");
     assert!(source.contains("contract ZkfSp1ProofAttestation"));
@@ -514,6 +522,8 @@ fn render_sp1_solidity_verifier_accepts_public_values_base64_metadata() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     let source = render_sp1_solidity_verifier(&artifact).expect("solidity should render");
     assert!(source.contains("contract ZkfSp1BoundVerifier"));
@@ -627,6 +637,8 @@ fn render_groth16_solidity_verifier_falls_back_to_zeros_for_empty_vk() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     let source = render_groth16_solidity_verifier(&artifact, "EmptyVkVerifier");
 

@@ -734,6 +734,8 @@ impl BackendEngine for ArkworksGroth16Backend {
                 hybrid_bundle: None,
                 credential_bundle: None,
                 archive_metadata: None,
+                proof_origin_signature: None,
+                proof_origin_public_keys: None,
             })
         })
     }
@@ -957,6 +959,8 @@ impl BackendEngine for ArkworksGroth16Backend {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         })
     }
 }
@@ -1170,6 +1174,8 @@ pub fn compile_and_prove_arkworks_unchecked_for_test_fixture(
                 hybrid_bundle: None,
                 credential_bundle: None,
                 archive_metadata: None,
+                proof_origin_signature: None,
+                proof_origin_public_keys: None,
             },
         ))
     })

@@ -524,6 +524,8 @@ where
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -716,6 +718,8 @@ fn prove_for_mersenne31(compiled: &CompiledProgram, witness: &Witness) -> ZkfRes
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 

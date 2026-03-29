@@ -267,6 +267,28 @@ pub(crate) fn handle_demo(out: Option<PathBuf>, json: bool) -> Result<(), String
         eprintln!("  Solidity verifier written to {}", sol_path.display());
     }
 
+    // Store verifier and report to iCloud via CloudFS when available.
+    if let Ok(cloudfs) = zkf_cloudfs::CloudFS::new() {
+        let app_name = contract_name;
+
+        let report_json = serde_json::to_vec_pretty(&report)
+            .map_err(|e| format!("serialize report for icloud: {e}"))?;
+        match cloudfs.store_artifact(app_name, "reports", "report.json", &report_json) {
+            Ok(path) => eprintln!("  iCloud report:   {}", path.display()),
+            Err(err) => eprintln!("  iCloud report failed: {err}"),
+        }
+
+        match cloudfs.store_artifact(
+            app_name,
+            "verifiers",
+            &format!("{app_name}.sol"),
+            solidity_source.as_bytes(),
+        ) {
+            Ok(path) => eprintln!("  iCloud verifier: {}", path.display()),
+            Err(err) => eprintln!("  iCloud verifier failed: {err}"),
+        }
+    }
+
     Ok(())
 }
 

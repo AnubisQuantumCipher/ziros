@@ -726,6 +726,8 @@ fn prove_native(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<Proo
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -1204,6 +1206,8 @@ pub fn fold_native(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
 
     Ok(FoldResult {

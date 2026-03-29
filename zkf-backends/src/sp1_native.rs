@@ -445,6 +445,8 @@ fn prove_with_external_command(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -599,6 +601,8 @@ where
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 

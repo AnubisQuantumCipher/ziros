@@ -513,6 +513,8 @@ fn prove_with_midnight_proof_server(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -651,6 +653,8 @@ fn delegate_prove(
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     })
 }
 
@@ -686,6 +690,8 @@ fn delegate_verify(
         hybrid_bundle: artifact.hybrid_bundle.clone(),
         credential_bundle: artifact.credential_bundle.clone(),
         archive_metadata: artifact.archive_metadata.clone(),
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
     delegated_engine.verify(&delegated, &delegated_artifact)
 }

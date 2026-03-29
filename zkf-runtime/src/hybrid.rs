@@ -661,7 +661,7 @@ mod tests {
             verification_key.to_vec(),
             public_inputs,
         )
-    }
+}
 
     #[test]
     fn verify_decision_is_logical_and() {

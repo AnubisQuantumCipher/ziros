@@ -186,6 +186,7 @@ impl WorkerService {
         remote_support: bool,
         epoch_id: Option<u64>,
         public_key: Option<&[u8]>,
+        ml_kem_public_key: Option<&[u8]>,
         entry_kind: Option<&str>,
     ) {
         if !self.swarm_config.enabled {
@@ -200,6 +201,7 @@ impl WorkerService {
                 remote_support,
                 epoch_id,
                 public_key,
+                ml_kem_public_key,
                 unix_time_now_secs(),
             );
         if let Err(err) = result {
@@ -458,6 +460,7 @@ impl WorkerService {
                 encrypted_threat_gossip_supported: false,
                 threat_epoch_id: None,
                 threat_epoch_public_key: None,
+                threat_epoch_ml_kem_public_key: None,
             }),
         };
         self.sequence += 1;
@@ -650,6 +653,7 @@ impl WorkerService {
                     hs.encrypted_threat_gossip_supported,
                     hs.threat_epoch_id,
                     hs.threat_epoch_public_key.as_deref(),
+                    hs.threat_epoch_ml_kem_public_key.as_deref(),
                 ),
                 &hs.handshake_signature,
                 hs.handshake_signature_bundle.as_ref(),
@@ -679,6 +683,7 @@ impl WorkerService {
             hs.encrypted_threat_gossip_supported,
             hs.threat_epoch_id,
             hs.threat_epoch_public_key.as_deref(),
+            hs.threat_epoch_ml_kem_public_key.as_deref(),
             Some("encrypted-threat-intel-advertisement"),
         );
         let threat_advertisement = self.local_threat_epoch_advertisement();
@@ -688,6 +693,9 @@ impl WorkerService {
             threat_advertisement.encrypted_threat_gossip_supported,
             threat_advertisement.threat_epoch_id,
             threat_advertisement.threat_epoch_public_key.as_deref(),
+            threat_advertisement
+                .threat_epoch_ml_kem_public_key
+                .as_deref(),
         );
         let handshake_signature = self.swarm_identity.sign(&signing_bytes);
         let handshake_signature_bundle = self.swarm_identity.sign_bundle(&signing_bytes);
@@ -724,6 +732,7 @@ impl WorkerService {
                     .encrypted_threat_gossip_supported,
                 threat_epoch_id: threat_advertisement.threat_epoch_id,
                 threat_epoch_public_key: threat_advertisement.threat_epoch_public_key,
+                threat_epoch_ml_kem_public_key: threat_advertisement.threat_epoch_ml_kem_public_key,
             }),
         };
         self.sequence += 1;
@@ -746,6 +755,7 @@ impl WorkerService {
                 .encrypted_threat_gossip_supported,
             threat_epoch_id: threat_advertisement.threat_epoch_id,
             threat_epoch_public_key: threat_advertisement.threat_epoch_public_key,
+            threat_epoch_ml_kem_public_key: threat_advertisement.threat_epoch_ml_kem_public_key,
             threat_digests: threat_surface.threat_digests,
             activation_level: threat_surface.activation_level,
             intelligence_root: threat_surface.intelligence_root,
@@ -1074,6 +1084,7 @@ impl WorkerService {
                 heartbeat.encrypted_threat_gossip_supported,
                 heartbeat.threat_epoch_id,
                 heartbeat.threat_epoch_public_key.as_deref(),
+                heartbeat.threat_epoch_ml_kem_public_key.as_deref(),
                 Some("encrypted-threat-intel-advertisement"),
             );
             if let Some(payload) = self.decode_threat_wire_surface(
@@ -1187,6 +1198,7 @@ fn handshake_signing_bytes(
     encrypted_threat_gossip_supported: bool,
     threat_epoch_id: Option<u64>,
     threat_epoch_public_key: Option<&[u8]>,
+    threat_epoch_ml_kem_public_key: Option<&[u8]>,
 ) -> Vec<u8> {
     let mut bytes = Vec::new();
     bytes.extend_from_slice(capability.peer_id.0.as_bytes());
@@ -1202,6 +1214,7 @@ fn handshake_signing_bytes(
         encrypted_threat_gossip_supported,
         threat_epoch_id,
         threat_epoch_public_key,
+        threat_epoch_ml_kem_public_key,
     );
     bytes
 }

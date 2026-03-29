@@ -1,8 +1,8 @@
 use crate::cli::CredentialCommands;
 use crate::util::{read_json, write_json};
 use ed25519_dalek::{Signer, SigningKey};
-use libcrux_ml_dsa::ml_dsa_44::{
-    MLDSA44SigningKey, MLDSA44VerificationKey, generate_key_pair, sign as mldsa_sign,
+use libcrux_ml_dsa::ml_dsa_87::{
+    MLDSA87SigningKey, MLDSA87VerificationKey, generate_key_pair, sign as mldsa_sign,
 };
 use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
 use serde::{Deserialize, Serialize};
@@ -21,36 +21,36 @@ use zkf_lib::{
 struct CredentialIssuerKeyFileV1 {
     version: u32,
     ed25519_seed: [u8; 32],
-    ml_dsa44_signing_key: Vec<u8>,
-    ml_dsa44_public_key: Vec<u8>,
+    ml_dsa87_signing_key: Vec<u8>,
+    ml_dsa87_public_key: Vec<u8>,
 }
 
 impl CredentialIssuerKeyFileV1 {
     fn public_key_bundle(&self) -> PublicKeyBundle {
         PublicKeyBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: SigningKey::from_bytes(&self.ed25519_seed)
                 .verifying_key()
                 .to_bytes()
                 .to_vec(),
-            ml_dsa44: self.ml_dsa44_public_key.clone(),
+            ml_dsa87: self.ml_dsa87_public_key.clone(),
         }
     }
 
-    fn signing_key(&self) -> Result<MLDSA44SigningKey, String> {
-        let bytes: [u8; MLDSA44SigningKey::len()] = self
-            .ml_dsa44_signing_key
+    fn signing_key(&self) -> Result<MLDSA87SigningKey, String> {
+        let bytes: [u8; MLDSA87SigningKey::len()] = self
+            .ml_dsa87_signing_key
             .clone()
             .try_into()
             .map_err(|_| "issuer ML-DSA signing key file is corrupt".to_string())?;
-        Ok(MLDSA44SigningKey::new(bytes))
+        Ok(MLDSA87SigningKey::new(bytes))
     }
 
     fn validate(&self) -> Result<(), String> {
-        if self.ml_dsa44_signing_key.len() != MLDSA44SigningKey::len() {
+        if self.ml_dsa87_signing_key.len() != MLDSA87SigningKey::len() {
             return Err("issuer ML-DSA signing key file is corrupt".to_string());
         }
-        if self.ml_dsa44_public_key.len() != MLDSA44VerificationKey::len() {
+        if self.ml_dsa87_public_key.len() != MLDSA87VerificationKey::len() {
             return Err("issuer ML-DSA public key file is corrupt".to_string());
         }
         Ok(())
@@ -358,8 +358,8 @@ fn load_or_create_issuer_keys(path: &Path) -> Result<CredentialIssuerKeyFileV1, 
     let key_file = CredentialIssuerKeyFileV1 {
         version: 1,
         ed25519_seed,
-        ml_dsa44_signing_key: keypair.signing_key.as_slice().to_vec(),
-        ml_dsa44_public_key: keypair.verification_key.as_slice().to_vec(),
+        ml_dsa87_signing_key: keypair.signing_key.as_slice().to_vec(),
+        ml_dsa87_public_key: keypair.verification_key.as_slice().to_vec(),
     };
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)
@@ -394,9 +394,9 @@ fn sign_credential_claims(
         claims,
         issuer_public_keys: issuer_keys.public_key_bundle(),
         issuer_signature_bundle: SignatureBundle {
-            scheme: SignatureScheme::HybridEd25519MlDsa44,
+            scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: ed25519_signature,
-            ml_dsa44: ml_dsa_signature.as_slice().to_vec(),
+            ml_dsa87: ml_dsa_signature.as_slice().to_vec(),
         },
     })
 }

@@ -579,6 +579,8 @@ impl ProofAggregator for Halo2IpaAccumulator {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         groth16_engine.verify(&compiled, &artifact)

@@ -1102,7 +1102,7 @@ mod tests {
         routing::{get, post},
     };
     use ed25519_dalek::{Signer, SigningKey};
-    use libcrux_ml_dsa::ml_dsa_44::{generate_key_pair, sign as mldsa_sign};
+    use libcrux_ml_dsa::ml_dsa_87::{generate_key_pair, sign as mldsa_sign};
     use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
     use std::fs;
     use std::sync::{Arc, Mutex, OnceLock};
@@ -1429,12 +1429,12 @@ mod tests {
             issuer_public_keys: zkf_core::PublicKeyBundle {
                 scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa44,
                 ed25519: ed25519_signing_key.verifying_key().to_bytes().to_vec(),
-                ml_dsa44: keypair.verification_key.as_slice().to_vec(),
+                ml_dsa87: keypair.verification_key.as_slice().to_vec(),
             },
             issuer_signature_bundle: zkf_core::SignatureBundle {
                 scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa44,
                 ed25519: ed25519_signing_key.sign(&message).to_bytes().to_vec(),
-                ml_dsa44: ml_dsa_signature.as_slice().to_vec(),
+                ml_dsa87: ml_dsa_signature.as_slice().to_vec(),
             },
         };
 
