@@ -514,9 +514,11 @@ pub const GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY: &str = "groth16_streamed_sha
 pub const GROTH16_IMPORTED_SETUP_PROVENANCE: &str = "trusted-imported-blob";
 pub const GROTH16_DETERMINISTIC_DEV_PROVENANCE: &str = "deterministic-dev";
 pub const GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE: &str = "local-ceremony-phase2-streamed";
+pub const GROTH16_AUTO_CEREMONY_PROVENANCE: &str = "auto-ceremony-cached-entropy";
 pub const GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY: &str = "trusted-imported";
 pub const GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY: &str = "development-only";
 pub const GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY: &str = "trusted-local-ceremony";
+pub const GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY: &str = "auto-ceremony";
 pub const GROTH16_SETUP_BLOB_PATH_ENV: &str = "ZKF_GROTH16_SETUP_BLOB_PATH";
 pub const ALLOW_DEV_DETERMINISTIC_GROTH16_ENV: &str = "ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16";
 
@@ -670,6 +672,20 @@ pub fn compiled_uses_local_ceremony_streamed_groth16_setup(compiled: &CompiledPr
             .contains_key(GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY)
 }
 
+pub fn compiled_uses_auto_ceremony_groth16_setup(compiled: &CompiledProgram) -> bool {
+    compiled.backend == BackendKind::ArkworksGroth16
+        && compiled
+            .metadata
+            .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+            .map(String::as_str)
+            == Some(GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY)
+        && compiled
+            .metadata
+            .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+            .map(String::as_str)
+            == Some(GROTH16_AUTO_CEREMONY_PROVENANCE)
+}
+
 pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfResult<()> {
     if compiled.backend != BackendKind::ArkworksGroth16 {
         return Ok(());
@@ -677,6 +693,7 @@ pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfR
 
     if compiled_uses_trusted_imported_groth16_setup(compiled)
         || compiled_uses_local_ceremony_streamed_groth16_setup(compiled)
+        || compiled_uses_auto_ceremony_groth16_setup(compiled)
         || allow_dev_deterministic_groth16()
     {
         return Ok(());
