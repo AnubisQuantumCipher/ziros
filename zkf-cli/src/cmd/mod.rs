@@ -20,10 +20,12 @@ pub(crate) mod prove;
 pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
+pub(crate) mod storage;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
 pub(crate) mod witness;
+pub(crate) mod keys;
 
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
@@ -44,7 +46,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
         Commands::Capabilities => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
-        Commands::Doctor { json: _ } => capabilities::handle_doctor(),
+        Commands::Doctor { json } => capabilities::handle_doctor(json),
         Commands::MetalDoctor { json, strict } => capabilities::handle_metal_doctor(json, strict),
         Commands::Import {
             frontend,
@@ -370,6 +372,8 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             }
         },
         Commands::Swarm { command } => swarm::handle_swarm(command),
+        Commands::Storage { command } => storage::handle_storage(command),
+        Commands::Keys { command } => keys::handle_keys(command),
         Commands::Retrain {
             input,
             profile,
@@ -497,6 +501,8 @@ fn command_name(command: &Commands) -> String {
             ClusterCommands::Benchmark { .. } => "cluster:benchmark".to_string(),
         },
         Commands::Swarm { command } => format!("swarm:{}", swarm_command_name(command)),
+        Commands::Storage { command } => format!("storage:{}", storage_command_name(command)),
+        Commands::Keys { command } => format!("keys:{}", keys_command_name(command)),
         Commands::Retrain { .. } => "retrain".to_string(),
         Commands::Telemetry { command } => match command {
             TelemetryCommands::Stats { .. } => "telemetry:stats".to_string(),
@@ -524,6 +530,26 @@ fn swarm_command_name(command: &crate::cli::SwarmCommands) -> &'static str {
         crate::cli::SwarmCommands::Reputation { .. } => "reputation",
         crate::cli::SwarmCommands::ReputationLog { .. } => "reputation-log",
         crate::cli::SwarmCommands::ReputationVerify { .. } => "reputation-verify",
+    }
+}
+
+fn storage_command_name(command: &crate::cli::StorageCommands) -> &'static str {
+    match command {
+        crate::cli::StorageCommands::Status { .. } => "status",
+        crate::cli::StorageCommands::MigrateToIcloud => "migrate-to-icloud",
+        crate::cli::StorageCommands::Warm => "warm",
+        crate::cli::StorageCommands::Evict => "evict",
+        crate::cli::StorageCommands::Install => "install",
+    }
+}
+
+fn keys_command_name(command: &crate::cli::KeysCommands) -> &'static str {
+    match command {
+        crate::cli::KeysCommands::List { .. } => "list",
+        crate::cli::KeysCommands::Inspect { .. } => "inspect",
+        crate::cli::KeysCommands::Rotate { .. } => "rotate",
+        crate::cli::KeysCommands::Audit { .. } => "audit",
+        crate::cli::KeysCommands::Revoke { .. } => "revoke",
     }
 }
 

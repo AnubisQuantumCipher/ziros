@@ -371,6 +371,16 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: SwarmCommands,
     },
+    /// iCloud-native persistent storage and local cache management.
+    Storage {
+        #[command(subcommand)]
+        command: StorageCommands,
+    },
+    /// iCloud Keychain-backed private key management.
+    Keys {
+        #[command(subcommand)]
+        command: KeysCommands,
+    },
     /// Retrain the Neural Engine control-plane models from telemetry and publish a fresh bundle.
     Retrain {
         #[arg(long, action = clap::ArgAction::Append)]
@@ -1075,5 +1085,53 @@ pub(crate) enum SwarmCommands {
         all: bool,
         #[arg(long)]
         json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum StorageCommands {
+    /// Show iCloud sync state, local cache usage, and key health.
+    Status {
+        #[arg(long)]
+        json: bool,
+    },
+    /// One-time migration from ~/.zkf to the iCloud-native ZirOS layout.
+    #[command(name = "migrate-to-icloud")]
+    MigrateToIcloud,
+    /// Pre-fetch frequently used files into the local cache.
+    Warm,
+    /// Evict stale files from the local cache while leaving iCloud copies intact.
+    Evict,
+    /// Install the macOS cache-manager launch agent.
+    Install,
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum KeysCommands {
+    /// List all private keys tracked through Keychain metadata.
+    List {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Inspect a single key by id.
+    Inspect {
+        id: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Rotate a key in place and update its metadata.
+    Rotate {
+        id: String,
+    },
+    /// Audit every tracked key for presence and sync health.
+    Audit {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Revoke a key from the backend and metadata index.
+    Revoke {
+        id: String,
+        #[arg(long)]
+        force: bool,
     },
 }

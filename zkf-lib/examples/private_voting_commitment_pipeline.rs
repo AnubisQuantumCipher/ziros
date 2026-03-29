@@ -14,8 +14,8 @@ use zkf_core::{check_constraints, optimize_program};
 use zkf_lib::evidence::{
     audit_entry_included, collect_formal_evidence_for_generated_app,
     effective_gpu_attribution_summary, ensure_file_exists, ensure_foundry_layout,
-    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty, two_tier_audit_record,
-    write_json, write_text,
+    foundry_project_dir, generated_app_closure_bundle_summary, json_pretty,
+    persist_artifacts_to_cloudfs, two_tier_audit_record, write_json, write_text,
 };
 use zkf_lib::templates::private_vote_commitment_three_candidate;
 use zkf_lib::{
@@ -444,6 +444,19 @@ fn main() -> ZkfResult<()> {
     ensure_file_exists(&evidence_manifest_path)?;
     ensure_file_exists(&report_path)?;
     ensure_file_exists(&out_dir.join("formal/STATUS.md"))?;
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        "private_voting_commitment_pipeline",
+        &[
+            ("proofs".to_string(), proof_first_path.clone()),
+            ("proofs".to_string(), proof_second_path.clone()),
+            ("verifiers".to_string(), verifier_path.clone()),
+            ("verifiers".to_string(), calldata_path.clone()),
+            ("reports".to_string(), summary_path.clone()),
+            ("audits".to_string(), audit_path.clone()),
+            ("reports".to_string(), evidence_manifest_path.clone()),
+            ("reports".to_string(), report_path.clone()),
+        ],
+    )?;
 
     println!("{}", summary_path.display());
     println!("{}", verifier_path.display());

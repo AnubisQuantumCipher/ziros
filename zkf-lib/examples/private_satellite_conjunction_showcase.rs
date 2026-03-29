@@ -30,7 +30,7 @@ use zkf_lib::app::satellite::{
 use zkf_lib::evidence::{
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary,
+    generated_app_closure_bundle_summary, persist_artifacts_to_cloudfs,
 };
 use zkf_lib::{
     ZkfError, ZkfResult, audit_program_with_live_capabilities, compile,
@@ -817,6 +817,21 @@ fn export_showcase_bundle(inputs: ShowcaseExportInputs) -> ZkfResult<()> {
     ensure_file_exists(&evidence_manifest_path)?;
     ensure_file_exists(&report_path)?;
     ensure_file_exists(&mission_assurance_path)?;
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        "private_satellite_conjunction_showcase",
+        &[
+            ("proofs".to_string(), proof_path.clone()),
+            ("verifiers".to_string(), verifier_path.clone()),
+            ("verifiers".to_string(), calldata_path.clone()),
+            ("reports".to_string(), summary_path.clone()),
+            ("audits".to_string(), audit_path.clone()),
+            ("audits".to_string(), audit_summary_path.clone()),
+            ("traces".to_string(), runtime_trace_path.clone()),
+            ("reports".to_string(), evidence_manifest_path.clone()),
+            ("reports".to_string(), report_path.clone()),
+            ("reports".to_string(), mission_assurance_path.clone()),
+        ],
+    )?;
 
     println!("{}", summary_path.display());
     println!("{}", verifier_path.display());

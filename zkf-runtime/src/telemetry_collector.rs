@@ -19,6 +19,7 @@ use zkf_core::artifact::{BackendKind, CompiledProgram, ProofArtifact};
 use zkf_core::ccs::program_constraint_degree;
 use zkf_core::ir::{Constraint, Program};
 use zkf_core::{FieldId, PlatformCapability, SystemResources, Witness, WitnessInputs};
+use zkf_cloudfs::CloudFS;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TelemetryRecord {
@@ -506,6 +507,9 @@ fn resolve_telemetry_dir() -> PathBuf {
     if let Some(explicit) = std::env::var_os("ZKF_TELEMETRY_DIR") {
         return PathBuf::from(explicit);
     }
+    if let Ok(cloudfs) = CloudFS::new() {
+        return cloudfs.persistent_root().join("telemetry");
+    }
     if let Some(home) = std::env::var_os("HOME") {
         return PathBuf::from(home).join(".zkf").join("telemetry");
     }
@@ -518,6 +522,15 @@ pub fn telemetry_corpus_stats() -> io::Result<TelemetryCorpusStats> {
 
 pub fn telemetry_corpus_stats_for_dir(dir: &Path) -> io::Result<TelemetryCorpusStats> {
     use sha2::{Digest, Sha256};
+
+    if !dir.exists() {
+        return Ok(TelemetryCorpusStats {
+            schema: "zkf-telemetry-corpus-v1".to_string(),
+            directory: dir.display().to_string(),
+            record_count: 0,
+            corpus_hash: format!("{:x}", Sha256::digest(b"")),
+        });
+    }
 
     let mut entries = fs::read_dir(dir)?
         .filter_map(|entry| entry.ok())
@@ -905,6 +918,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
         };
 
         let path = emit_prove_telemetry_to_dir(
@@ -968,6 +983,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
         };
 
         let path = emit_fold_telemetry_to_dir(
@@ -1005,6 +1022,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
         };
         let preview = zkf_core::wrapping::WrapperPreview {
             wrapper: "stark-to-groth16".to_string(),

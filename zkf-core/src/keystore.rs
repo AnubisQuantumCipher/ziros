@@ -1,35 +1,30 @@
-//! Secure Enclave-backed keychain storage for proving keys.
+//! Service-based proving and swarm key storage.
 //!
-//! On macOS, proving keys can be stored in the SEP-protected keychain
-//! using the Security.framework. This provides hardware-backed key
-//! protection against extraction.
-//!
-//! On non-Apple platforms, keys are stored in a file-based keystore
-//! with restricted permissions (0600).
+//! On macOS, private material is stored in iCloud Keychain-compatible generic
+//! password items. Public metadata lives in the ZirOS iCloud root under
+//! `ZirOS/keys/index.json`. On non-macOS hosts, key bytes fall back to
+//! restricted local files.
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use sha2::Digest;
+use std::path::{Path, PathBuf};
 
-/// A stored proving key entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeystoreEntry {
-    /// Human-readable label for this key.
     pub label: String,
-    /// SHA-256 digest of the key material.
     pub digest: String,
-    /// When the key was stored (Unix timestamp).
     pub stored_at_unix: u64,
-    /// Storage backend used.
     pub backend: KeystoreBackend,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub service: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub account: String,
 }
 
-/// Where the key is stored.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum KeystoreBackend {
-    /// macOS Keychain (Secure Enclave protected on Apple Silicon)
     SecureEnclave,
-    /// File-based storage with restricted permissions
     FileStore,
 }
 
@@ -42,72 +37,41 @@ impl KeystoreBackend {
     }
 }
 
-/// Store a proving key in the platform keystore.
 pub fn store_key(label: &str, key_data: &[u8]) -> Result<KeystoreEntry, String> {
-    let digest = hex_sha256(key_data);
-    let stored_at_unix = unix_now();
-
-    #[cfg(target_os = "macos")]
-    {
-        if store_keychain_item(label, key_data).is_ok() {
-            return Ok(KeystoreEntry {
-                label: label.to_string(),
-                digest,
-                stored_at_unix,
-                backend: KeystoreBackend::SecureEnclave,
-            });
-        }
-    }
-
-    // Fallback: file-based storage
-    store_file_key(label, key_data)?;
-    Ok(KeystoreEntry {
-        label: label.to_string(),
-        digest,
-        stored_at_unix,
-        backend: KeystoreBackend::FileStore,
+    let service = proving_service(label);
+    let account = label.to_string();
+    store_service_key(&service, &account, key_data).map(|mut entry| {
+        entry.label = label.to_string();
+        entry
     })
 }
 
-/// Retrieve a proving key from the platform keystore.
 pub fn retrieve_key(label: &str) -> Result<Vec<u8>, String> {
-    #[cfg(target_os = "macos")]
-    {
-        if let Ok(data) = retrieve_keychain_item(label) {
-            return Ok(data);
-        }
-    }
-
-    retrieve_file_key(label)
+    retrieve_service_key(&proving_service(label), label)
 }
 
-/// Delete a proving key from the platform keystore.
 pub fn delete_key(label: &str) -> Result<(), String> {
-    #[cfg(target_os = "macos")]
-    {
-        let _ = delete_keychain_item(label);
-    }
-
-    delete_file_key(label)
+    delete_service_key(&proving_service(label), label)
 }
 
-/// List all stored proving keys.
 pub fn list_keys() -> Result<Vec<KeystoreEntry>, String> {
-    let dir = keystore_dir()?;
-    let index_path = dir.join("index.json");
+    let index_path = key_index_path();
     if !index_path.exists() {
         return Ok(Vec::new());
     }
-    let data =
+    let bytes =
         std::fs::read(&index_path).map_err(|e| format!("failed to read keystore index: {e}"))?;
-    serde_json::from_slice(&data).map_err(|e| format!("failed to parse keystore index: {e}"))
+    serde_json::from_slice(&bytes).map_err(|e| format!("failed to parse keystore index: {e}"))
 }
 
-/// Get the preferred keystore backend for this platform.
 pub fn preferred_backend() -> KeystoreBackend {
     #[cfg(target_os = "macos")]
     {
-        KeystoreBackend::SecureEnclave
+        if synchronizable_keychain_supported() {
+            KeystoreBackend::SecureEnclave
+        } else {
+            KeystoreBackend::FileStore
+        }
     }
     #[cfg(not(target_os = "macos"))]
     {
@@ -115,112 +79,262 @@ pub fn preferred_backend() -> KeystoreBackend {
     }
 }
 
-// ─── macOS Keychain ─────────────────────────────────────────────────────
+pub fn synchronizable_keychain_supported() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        keychain_write_probe().is_ok()
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        false
+    }
+}
+
+pub fn store_service_key(
+    service: &str,
+    account: &str,
+    key_data: &[u8],
+) -> Result<KeystoreEntry, String> {
+    let digest = hex_sha256(key_data);
+    let stored_at_unix = unix_now();
+
+    #[cfg(target_os = "macos")]
+    {
+        if store_keychain_item(service, account, key_data).is_ok() {
+            let entry = KeystoreEntry {
+                label: account.to_string(),
+                digest,
+                stored_at_unix,
+                backend: KeystoreBackend::SecureEnclave,
+                service: service.to_string(),
+                account: account.to_string(),
+            };
+            update_index(&entry)?;
+            return Ok(entry);
+        }
+    }
+
+    store_file_key(service, account, key_data)?;
+    let entry = KeystoreEntry {
+        label: account.to_string(),
+        digest,
+        stored_at_unix,
+        backend: KeystoreBackend::FileStore,
+        service: service.to_string(),
+        account: account.to_string(),
+    };
+    update_index(&entry)?;
+    Ok(entry)
+}
+
+pub fn retrieve_service_key(service: &str, account: &str) -> Result<Vec<u8>, String> {
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(data) = retrieve_keychain_item(service, account) {
+            return Ok(data);
+        }
+    }
+    retrieve_file_key(service, account)
+}
+
+pub fn delete_service_key(service: &str, account: &str) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = delete_keychain_item(service, account);
+    }
+    let _ = delete_file_key(service, account);
+    remove_index(service, account)
+}
+
+fn proving_service(label: &str) -> String {
+    format!("com.ziros.proving.{label}")
+}
 
 #[cfg(target_os = "macos")]
-fn store_keychain_item(label: &str, data: &[u8]) -> Result<(), String> {
-    use std::process::Command;
-    // Use `security add-generic-password` for CLI-accessible keychain storage
-    let service = format!("zkf-proving-key-{label}");
-    let hex_data = hex::encode(data);
+fn store_keychain_item(service: &str, account: &str, data: &[u8]) -> Result<(), String> {
+    use core_foundation::base::TCFType;
+    use core_foundation::boolean::CFBoolean;
+    use core_foundation::data::CFData;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::CFString;
+    use security_framework_sys::access_control::kSecAttrAccessibleAfterFirstUnlock;
+    use security_framework_sys::base::errSecDuplicateItem;
+    use security_framework_sys::item::{
+        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
+        kSecClassGenericPassword, kSecValueData,
+    };
+    use security_framework_sys::keychain_item::{SecItemAdd, SecItemUpdate};
 
-    let output = Command::new("security")
-        .args([
-            "add-generic-password",
-            "-s",
-            &service,
-            "-a",
-            "zkf",
-            "-w",
-            &hex_data,
-            "-U", // Update if exists
-        ])
-        .output()
-        .map_err(|e| format!("security command failed: {e}"))?;
+    unsafe extern "C" {
+        static kSecAttrAccessible: *const core_foundation::string::__CFString;
+    }
 
-    if output.status.success() {
+    let query = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(true).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccessible.cast()) },
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccessibleAfterFirstUnlock) }
+                .into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecValueData) },
+            CFData::from_buffer(data).into_CFType(),
+        ),
+    ];
+    let dict = CFDictionary::from_CFType_pairs(&query);
+    let status = unsafe { SecItemAdd(dict.as_concrete_TypeRef(), std::ptr::null_mut()) };
+    if status == errSecDuplicateItem {
+        let selector = CFDictionary::from_CFType_pairs(&query[..4]);
+        let updates = CFDictionary::from_CFType_pairs(&query[4..]);
+        cvt_status(unsafe {
+            SecItemUpdate(selector.as_concrete_TypeRef(), updates.as_concrete_TypeRef())
+        })
+    } else {
+        cvt_status(status)
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn retrieve_keychain_item(service: &str, account: &str) -> Result<Vec<u8>, String> {
+    use core_foundation::base::{CFTypeRef, TCFType};
+    use core_foundation::boolean::CFBoolean;
+    use core_foundation::data::CFData;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::CFString;
+    use security_framework_sys::item::{
+        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
+        kSecClassGenericPassword, kSecReturnData,
+    };
+    use security_framework_sys::keychain_item::SecItemCopyMatching;
+
+    let query = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(true).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecReturnData) },
+            CFBoolean::from(true).into_CFType(),
+        ),
+    ];
+    let params = CFDictionary::from_CFType_pairs(&query);
+    let mut result: CFTypeRef = std::ptr::null();
+    cvt_status(unsafe { SecItemCopyMatching(params.as_concrete_TypeRef(), &mut result) })?;
+    if result.is_null() {
+        return Err(format!("missing keychain item {service}/{account}"));
+    }
+    let data = unsafe { CFData::wrap_under_create_rule(result as _) };
+    Ok(data.bytes().to_vec())
+}
+
+#[cfg(target_os = "macos")]
+fn delete_keychain_item(service: &str, account: &str) -> Result<(), String> {
+    use core_foundation::base::TCFType;
+    use core_foundation::boolean::CFBoolean;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::CFString;
+    use security_framework_sys::item::{
+        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
+        kSecClassGenericPassword,
+    };
+    use security_framework_sys::keychain_item::SecItemDelete;
+
+    let query = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(true).into_CFType(),
+        ),
+    ];
+    let params = CFDictionary::from_CFType_pairs(&query);
+    cvt_status(unsafe { SecItemDelete(params.as_concrete_TypeRef()) })
+}
+
+#[cfg(target_os = "macos")]
+fn keychain_write_probe() -> Result<(), String> {
+    let account = format!("probe-{}", unix_now());
+    store_keychain_item("com.ziros.keychain.probe", &account, b"probe")?;
+    delete_keychain_item("com.ziros.keychain.probe", &account)
+}
+
+#[cfg(target_os = "macos")]
+fn cvt_status(status: i32) -> Result<(), String> {
+    if status == 0 {
         Ok(())
     } else {
         Err(format!(
-            "keychain store failed: {}",
-            String::from_utf8_lossy(&output.stderr)
+            "Security.framework error {}",
+            security_framework::base::Error::from_code(status)
         ))
     }
 }
 
-#[cfg(target_os = "macos")]
-fn retrieve_keychain_item(label: &str) -> Result<Vec<u8>, String> {
-    use std::process::Command;
-    let service = format!("zkf-proving-key-{label}");
-
-    let output = Command::new("security")
-        .args(["find-generic-password", "-s", &service, "-a", "zkf", "-w"])
-        .output()
-        .map_err(|e| format!("security command failed: {e}"))?;
-
-    if output.status.success() {
-        let hex = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        hex::decode(&hex).map_err(|e| format!("invalid hex in keychain: {e}"))
-    } else {
-        Err("key not found in keychain".to_string())
-    }
-}
-
-#[cfg(target_os = "macos")]
-fn delete_keychain_item(label: &str) -> Result<(), String> {
-    use std::process::Command;
-    let service = format!("zkf-proving-key-{label}");
-
-    let output = Command::new("security")
-        .args(["delete-generic-password", "-s", &service, "-a", "zkf"])
-        .output()
-        .map_err(|e| format!("security command failed: {e}"))?;
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        Err("key not found in keychain".to_string())
-    }
-}
-
-// ─── File-based keystore ────────────────────────────────────────────────
-
-fn keystore_dir() -> Result<PathBuf, String> {
+fn local_keystore_dir() -> Result<PathBuf, String> {
     let dir = std::env::var_os("HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("."))
         .join(".zkf")
-        .join("keystore");
+        .join("keys");
     std::fs::create_dir_all(&dir).map_err(|e| format!("failed to create keystore dir: {e}"))?;
     Ok(dir)
 }
 
-fn store_file_key(label: &str, data: &[u8]) -> Result<(), String> {
-    let dir = keystore_dir()?;
-    let path = dir.join(format!("{label}.key"));
+fn key_index_path() -> PathBuf {
+    persistent_root().join("keys").join("index.json")
+}
 
+fn store_file_key(service: &str, account: &str, data: &[u8]) -> Result<(), String> {
+    let path = local_keystore_dir()?.join(file_name_for(service, account));
     std::fs::write(&path, data).map_err(|e| format!("failed to write key file: {e}"))?;
-
-    // Set restrictive permissions (0600)
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        let perms = std::fs::Permissions::from_mode(0o600);
-        std::fs::set_permissions(&path, perms)
-            .map_err(|e| format!("failed to set key file permissions: {e}"))?;
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600))
+            .map_err(|e| format!("failed to set key permissions: {e}"))?;
     }
-
-    // Update index
-    update_index(label, data, KeystoreBackend::FileStore)?;
-
     Ok(())
 }
 
-fn retrieve_file_key(label: &str) -> Result<Vec<u8>, String> {
-    let dir = keystore_dir()?;
-    let path = dir.join(format!("{label}.key"));
-
-    // Verify permissions before reading
+fn retrieve_file_key(service: &str, account: &str) -> Result<Vec<u8>, String> {
+    let path = local_keystore_dir()?.join(file_name_for(service, account));
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
@@ -233,56 +347,80 @@ fn retrieve_file_key(label: &str) -> Result<Vec<u8>, String> {
             }
         }
     }
-
-    std::fs::read(&path).map_err(|e| format!("failed to read key file: {e}"))
+    std::fs::read(path).map_err(|e| format!("failed to read key file: {e}"))
 }
 
-fn delete_file_key(label: &str) -> Result<(), String> {
-    let dir = keystore_dir()?;
-    let path = dir.join(format!("{label}.key"));
+fn delete_file_key(service: &str, account: &str) -> Result<(), String> {
+    let path = local_keystore_dir()?.join(file_name_for(service, account));
     if path.exists() {
-        // Overwrite with zeros before deleting
         if let Ok(len) = std::fs::metadata(&path).map(|m| m.len()) {
             let _ = std::fs::write(&path, vec![0u8; len as usize]);
         }
-        std::fs::remove_file(&path).map_err(|e| format!("failed to delete key file: {e}"))?;
+        std::fs::remove_file(path).map_err(|e| format!("failed to delete key file: {e}"))?;
     }
     Ok(())
 }
 
-fn update_index(label: &str, data: &[u8], backend: KeystoreBackend) -> Result<(), String> {
-    let dir = keystore_dir()?;
-    let index_path = dir.join("index.json");
+fn file_name_for(service: &str, account: &str) -> String {
+    let mut hasher = sha2::Sha256::new();
+    hasher.update(service.as_bytes());
+    hasher.update([0u8]);
+    hasher.update(account.as_bytes());
+    format!("{:x}.key", hasher.finalize())
+}
 
-    let mut entries: Vec<KeystoreEntry> = if index_path.exists() {
-        let raw = std::fs::read(&index_path).unwrap_or_default();
-        serde_json::from_slice(&raw).unwrap_or_default()
-    } else {
-        Vec::new()
-    };
-
-    entries.retain(|e| e.label != label);
-    entries.push(KeystoreEntry {
-        label: label.to_string(),
-        digest: hex_sha256(data),
-        stored_at_unix: unix_now(),
-        backend,
+fn update_index(entry: &KeystoreEntry) -> Result<(), String> {
+    let index_path = key_index_path();
+    if let Some(parent) = index_path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("failed to create index dir: {e}"))?;
+    }
+    let mut entries = list_keys().unwrap_or_default();
+    entries.retain(|candidate| {
+        !(candidate.service == entry.service && candidate.account == entry.account)
     });
-
+    entries.push(entry.clone());
     let json = serde_json::to_vec_pretty(&entries)
         .map_err(|e| format!("failed to serialize index: {e}"))?;
-    std::fs::write(&index_path, json).map_err(|e| format!("failed to write index: {e}"))
+    std::fs::write(index_path, json).map_err(|e| format!("failed to write index: {e}"))
+}
+
+fn remove_index(service: &str, account: &str) -> Result<(), String> {
+    let index_path = key_index_path();
+    if !index_path.exists() {
+        return Ok(());
+    }
+    let mut entries = list_keys().unwrap_or_default();
+    entries.retain(|entry| !(entry.service == service && entry.account == account));
+    let json = serde_json::to_vec_pretty(&entries)
+        .map_err(|e| format!("failed to serialize index: {e}"))?;
+    std::fs::write(index_path, json).map_err(|e| format!("failed to write index: {e}"))
+}
+
+fn persistent_root() -> PathBuf {
+    let home = std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("."));
+    let cloud_docs = home
+        .join("Library")
+        .join("Mobile Documents")
+        .join("com~apple~CloudDocs");
+    let zir_root = cloud_docs.join("ZirOS");
+    if cfg!(target_os = "macos") && cloud_docs.exists() && directory_is_writable(&cloud_docs) {
+        zir_root
+    } else {
+        home.join(".zkf")
+    }
+}
+
+fn directory_is_writable(path: &Path) -> bool {
+    std::fs::metadata(path)
+        .map(|metadata| !metadata.permissions().readonly())
+        .unwrap_or(false)
 }
 
 fn hex_sha256(data: &[u8]) -> String {
     use sha2::{Digest, Sha256};
-    let mut hasher = Sha256::new();
-    hasher.update(data);
-    let result = hasher.finalize();
-    result
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect::<String>()
+    format!("{:x}", Sha256::digest(data))
 }
 
 fn unix_now() -> u64 {
@@ -290,26 +428,6 @@ fn unix_now() -> u64 {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs()
-}
-
-// hex encode/decode helpers (avoiding external dep for this simple case)
-mod hex {
-    pub fn encode(data: &[u8]) -> String {
-        data.iter().map(|b| format!("{b:02x}")).collect()
-    }
-
-    pub fn decode(s: &str) -> Result<Vec<u8>, String> {
-        if !s.len().is_multiple_of(2) {
-            return Err("odd-length hex string".to_string());
-        }
-        (0..s.len())
-            .step_by(2)
-            .map(|i| {
-                u8::from_str_radix(&s[i..i + 2], 16)
-                    .map_err(|e| format!("invalid hex at position {i}: {e}"))
-            })
-            .collect()
-    }
 }
 
 #[cfg(test)]
@@ -323,11 +441,10 @@ mod tests {
     }
 
     #[test]
-    fn hex_roundtrip() {
-        let data = b"hello world";
-        let encoded = hex::encode(data);
-        let decoded = hex::decode(&encoded).unwrap();
-        assert_eq!(decoded, data);
+    fn service_roundtrip_helpers_are_stable() {
+        let service = proving_service("digest-123");
+        assert_eq!(service, "com.ziros.proving.digest-123");
+        assert!(file_name_for(&service, "digest-123").ends_with(".key"));
     }
 
     #[test]
@@ -335,6 +452,6 @@ mod tests {
         let d1 = hex_sha256(b"test");
         let d2 = hex_sha256(b"test");
         assert_eq!(d1, d2);
-        assert_eq!(d1.len(), 64); // 32 bytes * 2 hex chars
+        assert_eq!(d1.len(), 64);
     }
 }

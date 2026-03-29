@@ -21,6 +21,7 @@ use zkf_core::{
 };
 use zkf_lib::evidence::{
     collect_formal_evidence_for_generated_app, generated_app_closure_bundle_summary,
+    persist_artifacts_to_cloudfs,
 };
 use zkf_lib::orbital::{
     PRIVATE_NBODY_BODY_COUNT, PRIVATE_NBODY_DEFAULT_STEPS, PRIVATE_NBODY_PRIVATE_INPUTS,
@@ -956,6 +957,19 @@ fn export_showcase_bundle(inputs: ShowcaseExportInputs) -> ZkfResult<()> {
             report_path.display()
         )));
     }
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        "private_nbody_orbital_showcase",
+        &[
+            ("proofs".to_string(), proof_path.clone()),
+            ("verifiers".to_string(), verifier_path.clone()),
+            ("verifiers".to_string(), calldata_path.clone()),
+            ("reports".to_string(), summary_path.clone()),
+            ("audits".to_string(), audit_path.clone()),
+            ("traces".to_string(), runtime_trace_path.clone()),
+            ("reports".to_string(), evidence_manifest_path.clone()),
+            ("reports".to_string(), report_path.clone()),
+        ],
+    )?;
 
     println!("{}", summary_path.display());
     println!("{}", verifier_path.display());

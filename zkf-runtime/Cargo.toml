@@ -7,6 +7,7 @@ authors.workspace = true
 
 [dependencies]
 zkf-backends = { path = "../zkf-backends", optional = true }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
 zkf-core = { path = "../zkf-core" }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -36,6 +37,8 @@ hax-lib = { git = "https://github.com/cryspen/hax", rev = "1f0259212fa994fb35185
 
 [dev-dependencies]
 proptest.workspace = true
+libcrux-ml-dsa = { workspace = true }
+tempfile = "3"
 
 [features]
 default = ["full"]

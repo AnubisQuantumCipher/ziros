@@ -13,6 +13,7 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_cloudfs::CloudFS;
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -1358,6 +1359,36 @@ pub fn write_text(path: &Path, value: &str) -> ZkfResult<()> {
     fs::write(path, value)
         .map_err(|error| ZkfError::Io(format!("write {}: {error}", path.display())))?;
     Ok(())
+}
+
+pub fn persist_artifacts_to_cloudfs(
+    app_id: &str,
+    artifacts: &[(String, PathBuf)],
+) -> ZkfResult<Vec<PathBuf>> {
+    let cloudfs = CloudFS::new()
+        .map_err(|error| ZkfError::Io(format!("initialize CloudFS for {app_id}: {error}")))?;
+    let mut stored = Vec::new();
+    for (artifact_type, path) in artifacts {
+        ensure_file_exists(path)?;
+        let filename = path.file_name().and_then(|value| value.to_str()).ok_or_else(|| {
+            ZkfError::InvalidArtifact(format!(
+                "artifact path {} has no terminal file name",
+                path.display()
+            ))
+        })?;
+        let bytes = fs::read(path)
+            .map_err(|error| ZkfError::Io(format!("read {}: {error}", path.display())))?;
+        let destination = cloudfs.store_artifact(app_id, artifact_type, filename, &bytes).map_err(
+            |error| {
+                ZkfError::Io(format!(
+                    "persist {} as {artifact_type} for {app_id}: {error}",
+                    path.display()
+                ))
+            },
+        )?;
+        stored.push(destination);
+    }
+    Ok(stored)
 }
 
 pub fn read_json<T: DeserializeOwned>(path: &Path) -> ZkfResult<T> {

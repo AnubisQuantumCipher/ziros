@@ -1,0 +1,14 @@
+[package]
+name = "zkf-storage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-keymanager = { path = "../zkf-keymanager" }
+

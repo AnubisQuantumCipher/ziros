@@ -4,6 +4,8 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 use crate::cmd::runtime::installed_strict_certification_match;
+use zkf_keymanager::{KeyBackend, KeyManager};
+use zkf_storage::StorageStatusReport;
 use zkf_backends::{
     backend_for, capabilities_report, metal_runtime::capability_notes, metal_runtime_report,
     runtime_hardware_profile, strict_bn254_auto_route_ready_with_runtime,
@@ -107,6 +109,8 @@ struct DoctorReport {
     backends: Vec<zkf_backends::CapabilityReport>,
     metal: zkf_backends::metal_runtime::MetalRuntimeReport,
     tools: Vec<ToolCheck>,
+    storage: StorageDoctorReport,
+    keychain: KeychainDoctorReport,
 }
 
 #[derive(Debug, Serialize)]
@@ -119,11 +123,67 @@ struct ToolCheck {
     note: Option<String>,
 }
 
-pub(crate) fn handle_doctor() -> Result<(), String> {
+#[derive(Debug, Serialize)]
+struct StorageDoctorReport {
+    icloud_drive_available: bool,
+    ziros_directory_present: bool,
+    mode: String,
+    persistent_root: String,
+    cache_root: String,
+    sync_state: String,
+    local_cache_usage_bytes: u64,
+    local_cache_max_gb: u64,
+    auto_evict_after_hours: u64,
+    swarm_sqlite_live_path: String,
+    swarm_sqlite_snapshot_path: String,
+    swarm_sqlite_snapshot_present: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    note: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct KeychainDoctorReport {
+    backend: String,
+    enabled: bool,
+    accessible: bool,
+    key_count: usize,
+    healthy: bool,
+    advanced_data_protection_status: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    note: Option<String>,
+}
+
+pub(crate) fn handle_doctor(json: bool) -> Result<(), String> {
+    let report = build_doctor_report();
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
+
     println!(
-        "{}",
-        serde_json::to_string_pretty(&build_doctor_report()).map_err(|e| e.to_string())?
+        "doctor: metal_available={} icloud_drive={} ziros_dir={} keychain_accessible={} cache_bytes={}",
+        report.metal.metal_available,
+        report.storage.icloud_drive_available,
+        report.storage.ziros_directory_present,
+        report.keychain.accessible,
+        report.storage.local_cache_usage_bytes
     );
+    println!("persistent root: {}", report.storage.persistent_root);
+    println!("cache root: {}", report.storage.cache_root);
+    println!("swarm sqlite live: {}", report.storage.swarm_sqlite_live_path);
+    println!(
+        "swarm sqlite snapshot: {}",
+        report.storage.swarm_sqlite_snapshot_path
+    );
+    if let Some(note) = report.storage.note.as_deref() {
+        println!("storage note: {note}");
+    }
+    if let Some(note) = report.keychain.note.as_deref() {
+        println!("keychain note: {note}");
+    }
     Ok(())
 }
 
@@ -172,6 +232,105 @@ fn build_doctor_report() -> DoctorReport {
         backends: capabilities_report(),
         metal: metal_runtime_report(),
         tools,
+        storage: build_storage_doctor_report(),
+        keychain: build_keychain_doctor_report(),
+    }
+}
+
+fn build_storage_doctor_report() -> StorageDoctorReport {
+    match zkf_storage::status() {
+        Ok(report) => storage_report_from_status(report),
+        Err(err) => StorageDoctorReport {
+            icloud_drive_available: false,
+            ziros_directory_present: false,
+            mode: "unavailable".to_string(),
+            persistent_root: String::new(),
+            cache_root: String::new(),
+            sync_state: "unavailable".to_string(),
+            local_cache_usage_bytes: 0,
+            local_cache_max_gb: 0,
+            auto_evict_after_hours: 0,
+            swarm_sqlite_live_path: String::new(),
+            swarm_sqlite_snapshot_path: String::new(),
+            swarm_sqlite_snapshot_present: false,
+            note: Some(err.to_string()),
+        },
+    }
+}
+
+fn storage_report_from_status(report: StorageStatusReport) -> StorageDoctorReport {
+    let snapshot_present = PathBuf::from(&report.swarm_sqlite_snapshot_path).exists();
+    let note = if report.icloud_available {
+        Some(
+            "iCloud-native mode is active; swarm SQLite runs locally and syncs through snapshots."
+                .to_string(),
+        )
+    } else {
+        Some("iCloud Drive is unavailable; ZirOS is operating in local-only mode.".to_string())
+    };
+    StorageDoctorReport {
+        icloud_drive_available: report.icloud_available,
+        ziros_directory_present: report.ziros_directory_present,
+        mode: report.mode,
+        persistent_root: report.persistent_root,
+        cache_root: report.cache_root,
+        sync_state: report.sync_state,
+        local_cache_usage_bytes: report.local_cache_usage_bytes,
+        local_cache_max_gb: report.local_cache_max_gb,
+        auto_evict_after_hours: report.auto_evict_after_hours,
+        swarm_sqlite_live_path: report.swarm_sqlite_live_path,
+        swarm_sqlite_snapshot_path: report.swarm_sqlite_snapshot_path,
+        swarm_sqlite_snapshot_present: snapshot_present,
+        note,
+    }
+}
+
+fn build_keychain_doctor_report() -> KeychainDoctorReport {
+    match KeyManager::new() {
+        Ok(manager) => {
+            let backend = manager.backend();
+            let enabled = backend == KeyBackend::IcloudKeychain;
+            let accessible = if enabled {
+                manager.keychain_probe().unwrap_or(false)
+            } else {
+                true
+            };
+            let audit = manager.audit();
+            let key_count = audit.as_ref().map(|report| report.key_count).unwrap_or_else(|_| {
+                manager.list_all().map(|entries| entries.len()).unwrap_or_default()
+            });
+            let healthy = audit.as_ref().map(|report| report.healthy).unwrap_or(false);
+            let note = match audit {
+                Ok(_) if enabled => Some(
+                    "Advanced Data Protection status requires manual verification in System Settings."
+                        .to_string(),
+                ),
+                Ok(_) => None,
+                Err(err) => Some(err.to_string()),
+            };
+            KeychainDoctorReport {
+                backend: backend.as_str().to_string(),
+                enabled,
+                accessible,
+                key_count,
+                healthy,
+                advanced_data_protection_status: if enabled {
+                    "unknown".to_string()
+                } else {
+                    "not-applicable".to_string()
+                },
+                note,
+            }
+        }
+        Err(err) => KeychainDoctorReport {
+            backend: "unavailable".to_string(),
+            enabled: false,
+            accessible: false,
+            key_count: 0,
+            healthy: false,
+            advanced_data_protection_status: "unknown".to_string(),
+            note: Some(err.to_string()),
+        },
     }
 }
 

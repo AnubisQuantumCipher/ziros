@@ -28,12 +28,14 @@ use crate::telemetry::PlanExecutionResult;
 use crate::telemetry_collector;
 use crate::trust::{ExecutionMode, RequiredTrustLane, TrustModel};
 use crate::watchdog::ProofWatchdog;
+use sha2::{Digest, Sha384};
 use std::sync::Arc;
 use std::sync::mpsc;
 use zkf_backends::{
     BackendRoute, backend_for_route, capability_report_for_backend,
     ensure_security_covered_groth16_setup, prepare_witness_for_proving,
 };
+use zkf_cloudfs::CloudFS;
 use zkf_core::SupportClass;
 use zkf_core::Visibility;
 use zkf_core::Witness;
@@ -41,6 +43,7 @@ use zkf_core::artifact::{CompiledProgram, ProofArtifact};
 use zkf_core::ir::Program;
 use zkf_core::witness::{WitnessInputs, ensure_witness_completeness};
 use zkf_core::wrapping::{WrapperExecutionPolicy, WrapperPreview};
+use zkf_core::{ReadOnlySwarmSigner, SwarmIdentityKeyBackend};
 
 /// Compiles a program description into a ProverGraph plan.
 pub struct RuntimeCompiler;
@@ -350,6 +353,132 @@ pub struct WrapperExecutionResult {
     pub artifact: ProofArtifact,
 }
 
+fn swarm_identity_backend(key_backend: crate::swarm::SwarmKeyBackend) -> SwarmIdentityKeyBackend {
+    match key_backend {
+        crate::swarm::SwarmKeyBackend::File => SwarmIdentityKeyBackend::File,
+        crate::swarm::SwarmKeyBackend::Enclave => SwarmIdentityKeyBackend::Enclave,
+    }
+}
+
+fn sign_proof_origin_if_configured(artifact: &mut ProofArtifact, swarm_config: &SwarmConfig) {
+    if !swarm_config.enabled {
+        return;
+    }
+    let Some(label) = swarm_config.proof_origin_identity_label.as_deref() else {
+        return;
+    };
+    let signer = match ReadOnlySwarmSigner::load_existing(
+        &swarm_config.identity_path,
+        label,
+        swarm_identity_backend(swarm_config.key_backend),
+    ) {
+        Ok(signer) => signer,
+        Err(err) => {
+            log::warn!("failed to load proof-origin swarm identity '{label}': {err}");
+            return;
+        }
+    };
+    let proof_hash = Sha384::digest(&artifact.proof);
+    match signer.sign_bundle(proof_hash.as_slice()) {
+        Ok(signature_bundle) => {
+            artifact.proof_origin_signature = Some(signature_bundle);
+            artifact.proof_origin_public_keys = Some(signer.public_key_bundle());
+        }
+        Err(err) => {
+            log::warn!(
+                "failed to sign proof artifact with swarm identity '{}': {err}",
+                signer.label()
+            );
+        }
+    }
+}
+
+fn storage_app_name(program: &Program) -> String {
+    let trimmed = program.name.trim();
+    if trimmed.is_empty() {
+        "unnamed-program".to_string()
+    } else {
+        trimmed
+            .chars()
+            .map(|ch| {
+                if ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.') {
+                    ch
+                } else {
+                    '-'
+                }
+            })
+            .collect()
+    }
+}
+
+fn persist_local_witness_cache(
+    program: &Program,
+    witness: Option<&Witness>,
+    inputs: Option<&WitnessInputs>,
+) -> Option<String> {
+    let payload = witness
+        .and_then(|value| serde_json::to_vec_pretty(value).ok())
+        .or_else(|| inputs.and_then(|value| serde_json::to_vec_pretty(value).ok()))?;
+    let digest = Sha384::digest(&payload);
+    let relative = format!(
+        "cache/witness_{}_{}.json",
+        storage_app_name(program),
+        digest
+            .iter()
+            .take(8)
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    );
+    let cloudfs = CloudFS::new().ok()?;
+    if cloudfs.write_local_only(&relative, &payload).is_ok() {
+        Some(relative)
+    } else {
+        None
+    }
+}
+
+fn cleanup_local_witness_cache(relative_path: Option<&str>) {
+    if let Some(relative_path) = relative_path
+        && let Ok(cloudfs) = CloudFS::new()
+    {
+        let _ = cloudfs.delete_local(relative_path, true);
+    }
+}
+
+fn persist_cloud_artifacts(
+    program: &Program,
+    report: &crate::telemetry::GraphExecutionReport,
+    artifact: &ProofArtifact,
+) {
+    let Ok(cloudfs) = CloudFS::new() else {
+        return;
+    };
+    let app_name = storage_app_name(program);
+
+    if let Ok(payload) = serde_json::to_vec_pretty(artifact) {
+        let _ = cloudfs.store_artifact(&app_name, "proofs", "proof.json", &payload);
+    }
+
+    let trace_payload = serde_json::json!({
+        "schema": "ziros-runtime-trace-v1",
+        "app": app_name,
+        "program_digest": artifact.program_digest,
+        "total_wall_time_ms": report.total_wall_time.as_secs_f64() * 1_000.0,
+        "peak_memory_bytes": report.peak_memory_bytes,
+        "gpu_nodes": report.gpu_nodes,
+        "cpu_nodes": report.cpu_nodes,
+        "delegated_nodes": report.delegated_nodes,
+        "fallback_nodes": report.fallback_nodes,
+        "final_trust_model": format!("{:?}", report.final_trust_model),
+        "gpu_busy_ratio": report.gpu_stage_busy_ratio(),
+        "stage_breakdown": report.stage_breakdown(),
+        "watchdog_alert_count": report.watchdog_alerts.len(),
+    });
+    if let Ok(payload) = serde_json::to_vec_pretty(&trace_payload) {
+        let _ = cloudfs.store_artifact(&app_name, "traces", "execution_trace.json", &payload);
+    }
+}
+
 pub struct BatchBackendProofRequest {
     pub job_id: String,
     pub backend: zkf_core::artifact::BackendKind,
@@ -639,13 +768,14 @@ impl RuntimeExecutor {
         exec_ctx.compiled = Some(Arc::clone(&compiled));
         exec_ctx.set_wrapper_policy(policy);
         let result = Self::run_with_context(emission.graph, &mut exec_ctx)?;
-        let artifact = preserve_successful_proof_artifact(
+        let mut artifact = preserve_successful_proof_artifact(
             exec_ctx.take_wrapped_artifact().ok_or_else(|| {
                 RuntimeError::Execution(
                     "runtime wrapper job did not materialize a wrapped artifact".into(),
                 )
             })?,
         );
+        sign_proof_origin_if_configured(&mut artifact, &SwarmConfig::from_env());
         if let Err(err) = telemetry_collector::emit_wrap_telemetry(
             preview,
             exec_ctx.compiled.as_deref().unwrap_or(compiled.as_ref()),
@@ -715,69 +845,77 @@ impl RuntimeExecutor {
             witness,
             compiled,
         )?;
-        let mut pool = UnifiedBufferPool::new(planner_pool_limit(
-            program.constraints.len(),
-            estimate_job_bytes_from_constraint_count(program.constraints.len()),
-            None,
-        ));
-        let mut emission = emit_backend_prove_graph_with_context(
-            &mut pool,
-            backend,
-            route,
-            Arc::clone(&program),
-            inputs,
-            witness,
-            declared_trust,
-            deterministic,
-        )?;
-        emission.exec_ctx.requested_backend = Some(backend);
-        emission.exec_ctx.requested_backend_route = Some(route);
-        emission.exec_ctx.requested_backend_candidates = Some(vec![backend]);
-        if let Some(compiled) = compiled {
-            emission.exec_ctx.compiled = Some(compiled);
-        }
-        emission.exec_ctx.optimization_objective = objective;
-        let result = Self::run_with_context(emission.graph, &mut emission.exec_ctx)?;
-        let compiled = emission
-            .exec_ctx
-            .compiled
-            .as_ref()
-            .map(|value| value.as_ref().clone())
-            .ok_or_else(|| {
-                RuntimeError::Execution(
-                    "runtime backend prove did not materialize a compiled artifact".into(),
-                )
-            })?;
-        if trust == RequiredTrustLane::StrictCryptographic {
-            ensure_security_covered_groth16_setup(&compiled)
-                .map_err(|err| RuntimeError::Execution(err.to_string()))?;
-        }
-        let artifact = preserve_successful_proof_artifact(
-            emission.exec_ctx.take_proof_artifact().ok_or_else(|| {
-                RuntimeError::Execution(
-                    "runtime backend prove did not materialize a proof artifact".into(),
-                )
-            })?,
-        );
-        if let Err(err) = telemetry_collector::emit_prove_telemetry(
-            program.as_ref(),
-            &compiled,
-            emission.exec_ctx.witness.as_deref(),
-            emission.exec_ctx.witness_inputs.as_deref(),
-            &result.report,
-            &artifact,
-            result.control_plane.as_ref(),
-            result.security.as_ref(),
-            result.model_integrity.as_ref(),
-            result.swarm.as_ref(),
-        ) {
-            log::warn!("failed to persist prove telemetry: {err}");
-        }
-        Ok(BackendProofExecutionResult {
-            result,
-            compiled,
-            artifact,
-        })
+        let witness_cache =
+            persist_local_witness_cache(program.as_ref(), witness.as_deref(), inputs.as_deref());
+        let outcome = (|| -> Result<BackendProofExecutionResult, RuntimeError> {
+            let mut pool = UnifiedBufferPool::new(planner_pool_limit(
+                program.constraints.len(),
+                estimate_job_bytes_from_constraint_count(program.constraints.len()),
+                None,
+            ));
+            let mut emission = emit_backend_prove_graph_with_context(
+                &mut pool,
+                backend,
+                route,
+                Arc::clone(&program),
+                inputs,
+                witness,
+                declared_trust,
+                deterministic,
+            )?;
+            emission.exec_ctx.requested_backend = Some(backend);
+            emission.exec_ctx.requested_backend_route = Some(route);
+            emission.exec_ctx.requested_backend_candidates = Some(vec![backend]);
+            if let Some(compiled) = compiled {
+                emission.exec_ctx.compiled = Some(compiled);
+            }
+            emission.exec_ctx.optimization_objective = objective;
+            let result = Self::run_with_context(emission.graph, &mut emission.exec_ctx)?;
+            let compiled = emission
+                .exec_ctx
+                .compiled
+                .as_ref()
+                .map(|value| value.as_ref().clone())
+                .ok_or_else(|| {
+                    RuntimeError::Execution(
+                        "runtime backend prove did not materialize a compiled artifact".into(),
+                    )
+                })?;
+            if trust == RequiredTrustLane::StrictCryptographic {
+                ensure_security_covered_groth16_setup(&compiled)
+                    .map_err(|err| RuntimeError::Execution(err.to_string()))?;
+            }
+            let mut artifact = preserve_successful_proof_artifact(
+                emission.exec_ctx.take_proof_artifact().ok_or_else(|| {
+                    RuntimeError::Execution(
+                        "runtime backend prove did not materialize a proof artifact".into(),
+                    )
+                })?,
+            );
+            sign_proof_origin_if_configured(&mut artifact, &SwarmConfig::from_env());
+            if let Err(err) = telemetry_collector::emit_prove_telemetry(
+                program.as_ref(),
+                &compiled,
+                emission.exec_ctx.witness.as_deref(),
+                emission.exec_ctx.witness_inputs.as_deref(),
+                &result.report,
+                &artifact,
+                result.control_plane.as_ref(),
+                result.security.as_ref(),
+                result.model_integrity.as_ref(),
+                result.swarm.as_ref(),
+            ) {
+                log::warn!("failed to persist prove telemetry: {err}");
+            }
+            persist_cloud_artifacts(program.as_ref(), &result.report, &artifact);
+            Ok(BackendProofExecutionResult {
+                result,
+                compiled,
+                artifact,
+            })
+        })();
+        cleanup_local_witness_cache(witness_cache.as_deref());
+        outcome
     }
 
     /// Execute a batch of backend proving jobs and return per-job proof artifacts
@@ -951,13 +1089,14 @@ impl RuntimeExecutor {
                     "runtime backend fold did not retain the compiled artifact".into(),
                 )
             })?;
-        let artifact = preserve_successful_proof_artifact(
+        let mut artifact = preserve_successful_proof_artifact(
             emission.exec_ctx.take_proof_artifact().ok_or_else(|| {
                 RuntimeError::Execution(
                     "runtime backend fold did not materialize a proof artifact".into(),
                 )
             })?,
         );
+        sign_proof_origin_if_configured(&mut artifact, &SwarmConfig::from_env());
         if let Err(err) = telemetry_collector::emit_fold_telemetry(
             &compiled,
             emission
@@ -1114,10 +1253,18 @@ mod tests {
     use super::*;
     use crate::adapters::emit_backend_prove_graph_with_context;
     use crate::memory::UnifiedBufferPool;
+    use crate::swarm::SwarmConfig;
     use crate::trust::TrustModel;
+    use libcrux_ml_dsa::KEY_GENERATION_RANDOMNESS_SIZE;
+    use libcrux_ml_dsa::ml_dsa_87::generate_key_pair;
+    use std::fs;
+    use std::path::Path;
+    use std::sync::{Mutex, OnceLock};
     use zkf_backends::backend_for_route;
     use zkf_core::ir::{Constraint, Expr, Signal, Visibility, WitnessPlan};
     use zkf_core::{FieldElement, FieldId, SupportClass};
+
+    static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 
     fn sample_program() -> Program {
         Program {
@@ -1160,6 +1307,81 @@ mod tests {
                 ("y".to_string(), FieldElement::from_i64(y)),
                 ("sum".to_string(), FieldElement::from_i64(x + y)),
             ]),
+        }
+    }
+
+    fn with_proof_origin_swarm_env<T>(f: impl FnOnce(&SwarmConfig) -> T) -> T {
+        let _guard = ENV_LOCK
+            .get_or_init(|| Mutex::new(()))
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let temp = tempfile::tempdir().expect("tempdir");
+        let old_home = std::env::var_os("HOME");
+        let old_swarm = std::env::var_os("ZKF_SWARM");
+        let old_backend = std::env::var_os("ZKF_SWARM_KEY_BACKEND");
+        let old_label = std::env::var_os("ZKF_SWARM_IDENTITY_LABEL");
+        let old_policy = std::env::var_os("ZKF_SECURITY_POLICY_MODE");
+        unsafe {
+            std::env::set_var("HOME", temp.path());
+            std::env::set_var("ZKF_SWARM", "1");
+            std::env::set_var("ZKF_SWARM_KEY_BACKEND", "file");
+            std::env::set_var("ZKF_SWARM_IDENTITY_LABEL", "proof-origin");
+            std::env::set_var("ZKF_SECURITY_POLICY_MODE", "observe");
+        }
+        let config = SwarmConfig::from_env();
+        fs::create_dir_all(&config.identity_path).expect("create identity path");
+        write_test_swarm_identity(&config.identity_path, "proof-origin");
+        let result = f(&config);
+        unsafe {
+            if let Some(old_home) = old_home {
+                std::env::set_var("HOME", old_home);
+            } else {
+                std::env::remove_var("HOME");
+            }
+            if let Some(old_swarm) = old_swarm {
+                std::env::set_var("ZKF_SWARM", old_swarm);
+            } else {
+                std::env::remove_var("ZKF_SWARM");
+            }
+            if let Some(old_backend) = old_backend {
+                std::env::set_var("ZKF_SWARM_KEY_BACKEND", old_backend);
+            } else {
+                std::env::remove_var("ZKF_SWARM_KEY_BACKEND");
+            }
+            if let Some(old_label) = old_label {
+                std::env::set_var("ZKF_SWARM_IDENTITY_LABEL", old_label);
+            } else {
+                std::env::remove_var("ZKF_SWARM_IDENTITY_LABEL");
+            }
+            if let Some(old_policy) = old_policy {
+                std::env::set_var("ZKF_SECURITY_POLICY_MODE", old_policy);
+            } else {
+                std::env::remove_var("ZKF_SECURITY_POLICY_MODE");
+            }
+        }
+        result
+    }
+
+    fn write_test_swarm_identity(identity_path: &Path, label: &str) {
+        let ed25519_path = identity_path.join(format!("{label}.ed25519"));
+        let ml_dsa_path = identity_path.join(format!("{label}.mldsa87"));
+        let ml_dsa_public_path = identity_path.join(format!("{label}.mldsa87.pub"));
+        write_private_file(&ed25519_path, &[3u8; 32]);
+        let ml_dsa_keypair = generate_key_pair([5u8; KEY_GENERATION_RANDOMNESS_SIZE]);
+        write_private_file(&ml_dsa_path, ml_dsa_keypair.signing_key.as_slice());
+        fs::write(
+            &ml_dsa_public_path,
+            ml_dsa_keypair.verification_key.as_slice(),
+        )
+        .expect("write ML-DSA public key");
+    }
+
+    fn write_private_file(path: &Path, bytes: &[u8]) {
+        fs::write(path, bytes).expect("write private key");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(path, fs::Permissions::from_mode(0o600)).expect("set permissions");
         }
     }
 
@@ -1221,6 +1443,44 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn backend_prove_artifact_is_signed_with_configured_swarm_identity() {
+        with_proof_origin_swarm_env(|config| {
+            assert_eq!(
+                config.proof_origin_identity_label.as_deref(),
+                Some("proof-origin")
+            );
+            let program = Arc::new(sample_program());
+            let execution =
+                zkf_backends::with_allow_dev_deterministic_groth16_override(Some(true), || {
+                    RuntimeExecutor::run_backend_prove_job_with_objective(
+                        zkf_core::artifact::BackendKind::ArkworksGroth16,
+                        BackendRoute::Auto,
+                        program,
+                        None,
+                        Some(Arc::new(witness(2, 5))),
+                        None,
+                        OptimizationObjective::FastestProve,
+                        RequiredTrustLane::StrictCryptographic,
+                        ExecutionMode::Deterministic,
+                    )
+                })
+                .expect("runtime backend prove");
+
+            assert!(execution.artifact.proof_origin_signature.is_some());
+            assert!(execution.artifact.proof_origin_public_keys.is_some());
+            assert!(
+                execution
+                    .artifact
+                    .verify_proof_origin()
+                    .expect("proof-origin verify")
+            );
+            let mut tampered = execution.artifact.clone();
+            tampered.proof[0] ^= 0x01;
+            assert!(tampered.verify_proof_origin().is_err());
+        });
     }
 
     #[test]

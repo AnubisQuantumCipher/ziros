@@ -4,12 +4,21 @@ use crate::swarm_epoch_core;
 use chacha20poly1305::aead::{Aead, Payload};
 use chacha20poly1305::{ChaCha20Poly1305, KeyInit, Nonce};
 use hkdf::Hkdf;
+use libcrux_ml_kem::mlkem1024::{
+    MlKem1024Ciphertext, MlKem1024PrivateKey, MlKem1024PublicKey, decapsulate as kem_decapsulate,
+    encapsulate as kem_encapsulate, generate_key_pair as kem_generate,
+};
+use libcrux_ml_kem::{
+    KEY_GENERATION_SEED_SIZE as ML_KEM_KEY_GENERATION_SEED_SIZE,
+    SHARED_SECRET_SIZE as ML_KEM_SHARED_SECRET_SIZE,
+};
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
-use sha2::Sha256;
+use sha2::Sha384;
 use std::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use x25519_dalek::{PublicKey, StaticSecret};
+use zkf_keymanager::{MlKem1024DecapsulationKey, X25519Secret};
 
 const THREAT_GOSSIP_INFO: &[u8] = b"zkf-swarm-threat-gossip-v1";
 pub const THREAT_GOSSIP_PAYLOAD_VERSION: u32 = 1;
@@ -77,13 +86,31 @@ pub struct ThreatEpochAdvertisement {
     pub encrypted_threat_gossip_supported: bool,
     pub threat_epoch_id: Option<u64>,
     pub threat_epoch_public_key: Option<Vec<u8>>,
+    pub threat_epoch_ml_kem_public_key: Option<Vec<u8>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct RemoteThreatEpochKeys {
+    x25519_public_key: [u8; 32],
+    ml_kem_public_key: Vec<u8>,
+}
+
+impl RemoteThreatEpochKeys {
+    fn ml_kem_public_key(&self) -> Result<MlKem1024PublicKey, ThreatEpochError> {
+        MlKem1024PublicKey::try_from(self.ml_kem_public_key.as_slice()).map_err(|_| {
+            ThreatEpochError::new(
+                ThreatEpochErrorKind::InvalidPublicKey,
+                "remote threat epoch ML-KEM public key must be exactly 1568 bytes",
+            )
+        })
+    }
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct PeerThreatChannel {
     pub remote_supports_encryption: bool,
     pub encrypted_negotiated: bool,
-    remote_epoch_public_keys: BTreeMap<u64, [u8; 32]>,
+    remote_epoch_keys: BTreeMap<u64, RemoteThreatEpochKeys>,
 }
 
 impl PeerThreatChannel {
@@ -93,12 +120,13 @@ impl PeerThreatChannel {
         remote_support: bool,
         epoch_id: Option<u64>,
         public_key: Option<&[u8]>,
+        ml_kem_public_key: Option<&[u8]>,
         now_unix_secs: u64,
     ) -> Result<(), ThreatEpochError> {
         self.remote_supports_encryption = remote_support;
         if !remote_support {
             self.encrypted_negotiated = false;
-            self.remote_epoch_public_keys.clear();
+            self.remote_epoch_keys.clear();
             return Ok(());
         }
 
@@ -114,52 +142,85 @@ impl PeerThreatChannel {
                 "remote peer advertised encrypted gossip without an epoch public key",
             )
         })?;
+        let ml_kem_public_key = ml_kem_public_key.ok_or_else(|| {
+            ThreatEpochError::new(
+                ThreatEpochErrorKind::MissingEpochMaterial,
+                "remote peer advertised encrypted gossip without an ML-KEM public key",
+            )
+        })?;
         let public_key: [u8; 32] = public_key.try_into().map_err(|_| {
             ThreatEpochError::new(
                 ThreatEpochErrorKind::InvalidPublicKey,
                 "remote threat epoch public key must be exactly 32 bytes",
             )
         })?;
+        MlKem1024PublicKey::try_from(ml_kem_public_key).map_err(|_| {
+            ThreatEpochError::new(
+                ThreatEpochErrorKind::InvalidPublicKey,
+                "remote threat epoch ML-KEM public key must be exactly 1568 bytes",
+            )
+        })?;
 
-        self.remote_epoch_public_keys.insert(epoch_id, public_key);
+        self.remote_epoch_keys.insert(
+            epoch_id,
+            RemoteThreatEpochKeys {
+                x25519_public_key: public_key,
+                ml_kem_public_key: ml_kem_public_key.to_vec(),
+            },
+        );
         let current_epoch = current_unix_hour(now_unix_secs);
         let previous_epoch = current_epoch.saturating_sub(1);
-        self.remote_epoch_public_keys.retain(|candidate_epoch, _| {
+        self.remote_epoch_keys.retain(|candidate_epoch, _| {
             *candidate_epoch == current_epoch || *candidate_epoch == previous_epoch
         });
         self.encrypted_negotiated = swarm_epoch_core::negotiate_encrypted_gossip(
             local_support,
             self.remote_supports_encryption,
-            !self.remote_epoch_public_keys.is_empty(),
+            !self.remote_epoch_keys.is_empty(),
         );
         Ok(())
     }
 
-    pub fn remote_public_key(&self, epoch_id: u64) -> Option<[u8; 32]> {
-        self.remote_epoch_public_keys.get(&epoch_id).copied()
+    fn remote_epoch_keys(&self, epoch_id: u64) -> Option<RemoteThreatEpochKeys> {
+        self.remote_epoch_keys.get(&epoch_id).cloned()
     }
 }
 
 #[derive(Debug, Clone)]
 struct LocalThreatEpochKeys {
-    secret_bytes: [u8; 32],
-    public_key: [u8; 32],
+    x25519_secret: X25519Secret,
+    x25519_public_key: [u8; 32],
+    ml_kem_decapsulation_key: MlKem1024DecapsulationKey,
+    ml_kem_encapsulation_key: Vec<u8>,
 }
 
 impl LocalThreatEpochKeys {
     fn generate() -> Self {
-        let mut secret_bytes = [0u8; 32];
-        rand::rngs::OsRng.fill_bytes(&mut secret_bytes);
-        let secret = StaticSecret::from(secret_bytes);
-        let public_key = PublicKey::from(&secret).to_bytes();
+        let x25519_secret_bytes = secure_random_array::<32>();
+        let x25519_secret = X25519Secret(x25519_secret_bytes);
+        let x25519_secret_key = StaticSecret::from(x25519_secret.0);
+        let x25519_public_key = PublicKey::from(&x25519_secret_key).to_bytes();
+        let ml_kem_key_pair =
+            kem_generate(secure_random_array::<ML_KEM_KEY_GENERATION_SEED_SIZE>());
         Self {
-            secret_bytes,
-            public_key,
+            x25519_secret,
+            x25519_public_key,
+            ml_kem_decapsulation_key: MlKem1024DecapsulationKey(ml_kem_key_pair.sk().to_vec()),
+            ml_kem_encapsulation_key: ml_kem_key_pair.pk().to_vec(),
         }
     }
 
-    fn secret(&self) -> StaticSecret {
-        StaticSecret::from(self.secret_bytes)
+    fn x25519_secret(&self) -> StaticSecret {
+        StaticSecret::from(self.x25519_secret.0)
+    }
+
+    fn ml_kem_private_key(&self) -> Result<MlKem1024PrivateKey, ThreatEpochError> {
+        MlKem1024PrivateKey::try_from(self.ml_kem_decapsulation_key.0.as_slice()).map_err(|_| {
+            ThreatEpochError::new(
+                ThreatEpochErrorKind::MissingEpochMaterial,
+                "local threat epoch ML-KEM private key must be exactly 3168 bytes",
+            )
+        })
     }
 }
 
@@ -187,7 +248,8 @@ impl SwarmEpochManager {
         ThreatEpochAdvertisement {
             encrypted_threat_gossip_supported: true,
             threat_epoch_id: Some(epoch_id),
-            threat_epoch_public_key: Some(keys.public_key.to_vec()),
+            threat_epoch_public_key: Some(keys.x25519_public_key.to_vec()),
+            threat_epoch_ml_kem_public_key: Some(keys.ml_kem_encapsulation_key.clone()),
         }
     }
 
@@ -222,19 +284,14 @@ impl SwarmEpochManager {
             .local_epochs
             .get(&epoch_id)
             .expect("shared threat epoch must resolve locally");
-        let remote_public = channel.remote_public_key(epoch_id).ok_or_else(|| {
+        let remote_epoch_keys = channel.remote_epoch_keys(epoch_id).ok_or_else(|| {
             ThreatEpochError::new(
                 ThreatEpochErrorKind::MissingEpochMaterial,
                 format!("remote epoch public key missing for epoch {epoch_id}"),
             )
         })?;
-        let key = derive_peer_key(
-            &local_keys.secret(),
-            &remote_public,
-            epoch_id,
-            sender,
-            receiver,
-        )?;
+        let (key, ml_kem_ciphertext) =
+            derive_sender_peer_key(local_keys, &remote_epoch_keys, epoch_id, sender, receiver)?;
         let plaintext = postcard::to_allocvec(payload).map_err(|err| {
             ThreatEpochError::new(
                 ThreatEpochErrorKind::SerializeFailed,
@@ -264,6 +321,7 @@ impl SwarmEpochManager {
             epoch_id,
             nonce: nonce_bytes,
             ciphertext,
+            ml_kem_ciphertext,
             payload_version: THREAT_GOSSIP_PAYLOAD_VERSION,
         })
     }
@@ -314,8 +372,8 @@ impl SwarmEpochManager {
                 ),
             )
         })?;
-        let remote_public = channel
-            .remote_public_key(envelope.epoch_id)
+        let remote_epoch_keys = channel
+            .remote_epoch_keys(envelope.epoch_id)
             .ok_or_else(|| {
                 ThreatEpochError::new(
                     ThreatEpochErrorKind::MissingEpochMaterial,
@@ -325,9 +383,10 @@ impl SwarmEpochManager {
                     ),
                 )
             })?;
-        let key = derive_peer_key(
-            &local_keys.secret(),
-            &remote_public,
+        let key = derive_receiver_peer_key(
+            local_keys,
+            &remote_epoch_keys,
+            &envelope.ml_kem_ciphertext,
             envelope.epoch_id,
             sender,
             receiver,
@@ -377,7 +436,7 @@ impl SwarmEpochManager {
             .into_iter()
             .find(|candidate_epoch| {
                 self.local_epochs.contains_key(candidate_epoch)
-                    && channel.remote_public_key(*candidate_epoch).is_some()
+                    && channel.remote_epoch_keys(*candidate_epoch).is_some()
             })
     }
 }
@@ -398,17 +457,69 @@ pub fn has_plaintext_threat_surface(
     )
 }
 
-fn derive_peer_key(
-    local_secret: &StaticSecret,
-    remote_public: &[u8; 32],
+fn derive_sender_peer_key(
+    local_keys: &LocalThreatEpochKeys,
+    remote_epoch_keys: &RemoteThreatEpochKeys,
+    epoch_id: u64,
+    sender: &PeerId,
+    receiver: &PeerId,
+) -> Result<([u8; 32], Vec<u8>), ThreatEpochError> {
+    let remote_public = PublicKey::from(remote_epoch_keys.x25519_public_key);
+    let shared_secret_x25519 = local_keys.x25519_secret().diffie_hellman(&remote_public);
+    let remote_ml_kem_public_key = remote_epoch_keys.ml_kem_public_key()?;
+    let (ml_kem_ciphertext, shared_secret_kem) = kem_encapsulate(
+        &remote_ml_kem_public_key,
+        secure_random_array::<ML_KEM_SHARED_SECRET_SIZE>(),
+    );
+    let key = derive_combined_peer_key(
+        shared_secret_x25519.as_bytes(),
+        shared_secret_kem.as_slice(),
+        epoch_id,
+        sender,
+        receiver,
+    )?;
+    Ok((key, ml_kem_ciphertext.as_slice().to_vec()))
+}
+
+fn derive_receiver_peer_key(
+    local_keys: &LocalThreatEpochKeys,
+    remote_epoch_keys: &RemoteThreatEpochKeys,
+    ml_kem_ciphertext: &[u8],
     epoch_id: u64,
     sender: &PeerId,
     receiver: &PeerId,
 ) -> Result<[u8; 32], ThreatEpochError> {
-    let remote_public = PublicKey::from(*remote_public);
-    let shared_secret = local_secret.diffie_hellman(&remote_public);
+    let remote_public = PublicKey::from(remote_epoch_keys.x25519_public_key);
+    let shared_secret_x25519 = local_keys.x25519_secret().diffie_hellman(&remote_public);
+    let local_ml_kem_private_key = local_keys.ml_kem_private_key()?;
+    let ml_kem_ciphertext = MlKem1024Ciphertext::try_from(ml_kem_ciphertext).map_err(|_| {
+        ThreatEpochError::new(
+            ThreatEpochErrorKind::DecryptFailed,
+            "received ML-KEM ciphertext must be exactly 1568 bytes",
+        )
+    })?;
+    let shared_secret_kem = kem_decapsulate(&local_ml_kem_private_key, &ml_kem_ciphertext);
+    derive_combined_peer_key(
+        shared_secret_x25519.as_bytes(),
+        shared_secret_kem.as_slice(),
+        epoch_id,
+        sender,
+        receiver,
+    )
+}
+
+fn derive_combined_peer_key(
+    shared_secret_x25519: &[u8],
+    shared_secret_kem: &[u8],
+    epoch_id: u64,
+    sender: &PeerId,
+    receiver: &PeerId,
+) -> Result<[u8; 32], ThreatEpochError> {
+    let mut combined_secret = [0u8; 32 + ML_KEM_SHARED_SECRET_SIZE];
+    combined_secret[..32].copy_from_slice(shared_secret_x25519);
+    combined_secret[32..].copy_from_slice(shared_secret_kem);
     let salt = epoch_id.to_le_bytes();
-    let hkdf = Hkdf::<Sha256>::new(Some(&salt), shared_secret.as_bytes());
+    let hkdf = Hkdf::<Sha384>::new(Some(&salt), &combined_secret);
     let mut key = [0u8; 32];
     let mut info =
         Vec::with_capacity(THREAT_GOSSIP_INFO.len() + sender.0.len() + receiver.0.len() + 16);
@@ -424,6 +535,12 @@ fn derive_peer_key(
         )
     })?;
     Ok(key)
+}
+
+fn secure_random_array<const N: usize>() -> [u8; N] {
+    let mut bytes = [0u8; N];
+    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    bytes
 }
 
 fn associated_data(
@@ -496,6 +613,7 @@ mod tests {
                 right_adv.encrypted_threat_gossip_supported,
                 right_adv.threat_epoch_id,
                 right_adv.threat_epoch_public_key.as_deref(),
+                right_adv.threat_epoch_ml_kem_public_key.as_deref(),
                 now_unix_secs,
             )
             .expect("right advert");
@@ -505,10 +623,61 @@ mod tests {
                 left_adv.encrypted_threat_gossip_supported,
                 left_adv.threat_epoch_id,
                 left_adv.threat_epoch_public_key.as_deref(),
+                left_adv.threat_epoch_ml_kem_public_key.as_deref(),
                 now_unix_secs,
             )
             .expect("left advert");
         (left_channel, right_channel)
+    }
+
+    #[test]
+    fn hybrid_ml_kem_exchange_derives_matching_keys_in_both_directions() {
+        let epoch_id = 9;
+        let left_peer = PeerId("peer-left".to_string());
+        let right_peer = PeerId("peer-right".to_string());
+        let left_keys = LocalThreatEpochKeys::generate();
+        let right_keys = LocalThreatEpochKeys::generate();
+        let left_remote = RemoteThreatEpochKeys {
+            x25519_public_key: right_keys.x25519_public_key,
+            ml_kem_public_key: right_keys.ml_kem_encapsulation_key.clone(),
+        };
+        let right_remote = RemoteThreatEpochKeys {
+            x25519_public_key: left_keys.x25519_public_key,
+            ml_kem_public_key: left_keys.ml_kem_encapsulation_key.clone(),
+        };
+
+        let (left_send_key, left_ciphertext) =
+            derive_sender_peer_key(&left_keys, &left_remote, epoch_id, &left_peer, &right_peer)
+                .expect("left sender key");
+        let right_receive_key = derive_receiver_peer_key(
+            &right_keys,
+            &right_remote,
+            &left_ciphertext,
+            epoch_id,
+            &left_peer,
+            &right_peer,
+        )
+        .expect("right receiver key");
+        assert_eq!(left_send_key, right_receive_key);
+
+        let (right_send_key, right_ciphertext) = derive_sender_peer_key(
+            &right_keys,
+            &right_remote,
+            epoch_id,
+            &right_peer,
+            &left_peer,
+        )
+        .expect("right sender key");
+        let left_receive_key = derive_receiver_peer_key(
+            &left_keys,
+            &left_remote,
+            &right_ciphertext,
+            epoch_id,
+            &right_peer,
+            &left_peer,
+        )
+        .expect("left receiver key");
+        assert_eq!(right_send_key, left_receive_key);
     }
 
     #[test]
@@ -577,6 +746,9 @@ mod tests {
                 right_adv_epoch_one.encrypted_threat_gossip_supported,
                 right_adv_epoch_one.threat_epoch_id,
                 right_adv_epoch_one.threat_epoch_public_key.as_deref(),
+                right_adv_epoch_one
+                    .threat_epoch_ml_kem_public_key
+                    .as_deref(),
                 epoch_one,
             )
             .expect("update right");
@@ -586,6 +758,7 @@ mod tests {
                 left_adv_epoch_one.encrypted_threat_gossip_supported,
                 left_adv_epoch_one.threat_epoch_id,
                 left_adv_epoch_one.threat_epoch_public_key.as_deref(),
+                left_adv_epoch_one.threat_epoch_ml_kem_public_key.as_deref(),
                 epoch_one,
             )
             .expect("update left");

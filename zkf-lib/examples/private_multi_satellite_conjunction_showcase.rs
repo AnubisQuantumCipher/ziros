@@ -37,8 +37,8 @@ use zkf_lib::evidence::{
     canonicalize_for_determinism_hash, collect_formal_evidence_for_generated_app,
     effective_gpu_attribution_summary, ensure_dir_exists, ensure_file_exists,
     ensure_foundry_layout, foundry_project_dir, generated_app_closure_bundle_summary,
-    hash_json_value, sha256_hex, two_tier_audit_record, write_json as write_bundle_json,
-    write_text as write_bundle_text,
+    hash_json_value, persist_artifacts_to_cloudfs, sha256_hex, two_tier_audit_record,
+    write_json as write_bundle_json, write_text as write_bundle_text,
 };
 use zkf_lib::{
     ZkfError, ZkfResult, audit_program_with_live_capabilities, compile,
@@ -1899,6 +1899,22 @@ fn export_scenario_bundle(
     ensure_file_exists(&project_dir.join("foundry.toml"))?;
     ensure_file_exists(&project_dir.join("src/PrivateMultiSatelliteVerifier.sol"))?;
     ensure_file_exists(&project_dir.join("test/PrivateMultiSatelliteVerifier.t.sol"))?;
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        APP_ID,
+        &[
+            ("proofs".to_string(), out_dir.join("proof.json")),
+            ("verifiers".to_string(), out_dir.join("verifier.sol")),
+            ("verifiers".to_string(), out_dir.join("calldata.json")),
+            ("traces".to_string(), out_dir.join("runtime_trace.json")),
+            ("audits".to_string(), out_dir.join("audit_summary.json")),
+            ("reports".to_string(), out_dir.join("formal_evidence_summary.json")),
+            ("reports".to_string(), out_dir.join("benchmark_summary.json")),
+            ("reports".to_string(), out_dir.join("truth_report.json")),
+            ("reports".to_string(), out_dir.join("mission_assurance_report.json")),
+            ("reports".to_string(), out_dir.join("human_readable_summary.md")),
+            ("reports".to_string(), out_dir.join("export_manifest.json")),
+        ],
+    )?;
 
     Ok(())
 }

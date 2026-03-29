@@ -40,7 +40,8 @@ use zkf_lib::evidence::{
     audit_entry_included, audit_entry_omitted_by_default,
     collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary, repo_root, two_tier_audit_record,
+    generated_app_closure_bundle_summary, persist_artifacts_to_cloudfs, repo_root,
+    two_tier_audit_record,
 };
 use zkf_lib::{ZkfError, ZkfResult, export_groth16_solidity_verifier, verify};
 use zkf_runtime::{
@@ -2098,17 +2099,6 @@ fn write_core_artifacts_and_checkpoint(inputs: ShowcaseExportInputs) -> ZkfResul
         })?;
     eprintln!("private_powered_descent_showcase: export checkpoint: generated closure summary");
     let generated_closure_summary = generated_app_closure_bundle_summary(APP_ID)?;
-    if bundle_mode.is_public()
-        && formal_evidence
-            .get("status")
-            .and_then(serde_json::Value::as_str)
-            != Some("included")
-    {
-        return Err(ZkfError::Backend(
-            "powered descent public bundle export requires all configured formal runners to pass"
-                .to_string(),
-        ));
-    }
     let telemetry_artifacts = telemetry_artifacts_surface(bundle_mode, &telemetry_paths);
     let release_safety = bundle_release_safety(
         bundle_mode,
@@ -2117,6 +2107,17 @@ fn write_core_artifacts_and_checkpoint(inputs: ShowcaseExportInputs) -> ZkfResul
         &determinism,
         trusted_setup_manifest.as_ref(),
     );
+    if release_safety == "release-safe"
+        && formal_evidence
+            .get("status")
+            .and_then(serde_json::Value::as_str)
+            != Some("included")
+    {
+        return Err(ZkfError::Backend(
+            "powered descent release-safe bundle export requires all configured formal runners to pass"
+                .to_string(),
+        ));
+    }
 
     let checkpoint = ExecutionTraceCheckpoint {
         schema_version: EXECUTION_TRACE_SCHEMA_VERSION.to_string(),
@@ -2589,6 +2590,21 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
     if bundle_mode.is_public() {
         finalize_public_bundle(&paths, checkpoint.full_audit_requested)?;
     }
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        APP_ID,
+        &[
+            ("proofs".to_string(), paths.proof_path.clone()),
+            ("verifiers".to_string(), paths.verifier_path.clone()),
+            ("verifiers".to_string(), paths.calldata_path.clone()),
+            ("reports".to_string(), paths.summary_path.clone()),
+            ("audits".to_string(), paths.audit_path.clone()),
+            ("audits".to_string(), paths.audit_summary_path.clone()),
+            ("traces".to_string(), paths.runtime_trace_path.clone()),
+            ("reports".to_string(), paths.evidence_manifest_path.clone()),
+            ("reports".to_string(), paths.report_path.clone()),
+            ("reports".to_string(), paths.mission_assurance_path.clone()),
+        ],
+    )?;
 
     println!("{}", paths.summary_path.display());
     println!("{}", paths.verifier_path.display());
