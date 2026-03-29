@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
+use std::sync::{Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -84,9 +85,45 @@ fn with_dev_groth16<T>(f: impl FnOnce() -> T) -> T {
     with_allow_dev_deterministic_groth16_override(Some(true), f)
 }
 
+static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+
+fn with_file_swarm_keys<T>(f: impl FnOnce() -> T) -> T {
+    let _guard = ENV_LOCK
+        .get_or_init(|| Mutex::new(()))
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let old_backend = std::env::var_os("ZKF_SWARM_KEY_BACKEND");
+    let old_swarm = std::env::var_os("ZKF_SWARM");
+    let old_policy = std::env::var_os("ZKF_SECURITY_POLICY_MODE");
+    unsafe {
+        std::env::set_var("ZKF_SWARM_KEY_BACKEND", "file");
+        std::env::set_var("ZKF_SWARM", "1");
+        std::env::set_var("ZKF_SECURITY_POLICY_MODE", "observe");
+    }
+    let result = f();
+    unsafe {
+        if let Some(value) = old_backend {
+            std::env::set_var("ZKF_SWARM_KEY_BACKEND", value);
+        } else {
+            std::env::remove_var("ZKF_SWARM_KEY_BACKEND");
+        }
+        if let Some(value) = old_swarm {
+            std::env::set_var("ZKF_SWARM", value);
+        } else {
+            std::env::remove_var("ZKF_SWARM");
+        }
+        if let Some(value) = old_policy {
+            std::env::set_var("ZKF_SECURITY_POLICY_MODE", value);
+        } else {
+            std::env::remove_var("ZKF_SECURITY_POLICY_MODE");
+        }
+    }
+    result
+}
+
 #[test]
 fn loopback_distributed_backend_prove_returns_real_artifact() {
-    with_dev_groth16(|| {
+    with_file_swarm_keys(|| with_dev_groth16(|| {
         let worker_addr = free_local_addr();
         let mut worker = WorkerService::new(worker_config(worker_addr)).unwrap();
         let shutdown = worker.shutdown_handle();
@@ -135,12 +172,12 @@ fn loopback_distributed_backend_prove_returns_real_artifact() {
             .join()
             .expect("worker thread")
             .expect("worker run");
-    });
+    }));
 }
 
 #[test]
 fn loopback_distributed_backend_prove_survives_heartbeat_timeout_enforcement() {
-    with_dev_groth16(|| {
+    with_file_swarm_keys(|| with_dev_groth16(|| {
         let worker_addr = free_local_addr();
         let mut worker_cfg = worker_config(worker_addr);
         worker_cfg.heartbeat_interval = Duration::from_millis(5);
@@ -185,12 +222,12 @@ fn loopback_distributed_backend_prove_survives_heartbeat_timeout_enforcement() {
             .join()
             .expect("worker thread")
             .expect("worker run");
-    });
+    }));
 }
 
 #[test]
 fn loopback_distributed_backend_prove_transfers_partition_boundaries() {
-    with_dev_groth16(|| {
+    with_file_swarm_keys(|| with_dev_groth16(|| {
         let worker_addr = free_local_addr();
         let mut worker = WorkerService::new(worker_config(worker_addr)).unwrap();
         let shutdown = worker.shutdown_handle();
@@ -264,12 +301,12 @@ fn loopback_distributed_backend_prove_transfers_partition_boundaries() {
             .join()
             .expect("worker thread")
             .expect("worker run");
-    });
+    }));
 }
 
 #[test]
 fn loopback_distributed_backend_prove_retries_only_failed_partition_locally() {
-    with_dev_groth16(|| {
+    with_file_swarm_keys(|| with_dev_groth16(|| {
         let worker_addr = free_local_addr();
         let program = Arc::new(zkf_examples::recurrence_program(FieldId::Bn254, 512));
         let inputs: WitnessInputs = [
@@ -326,5 +363,5 @@ fn loopback_distributed_backend_prove_retries_only_failed_partition_locally() {
             .join()
             .expect("worker thread")
             .expect("worker run");
-    });
+    }));
 }

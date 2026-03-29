@@ -12,15 +12,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
-use zkf_backends::{
-    ALLOW_DEV_DETERMINISTIC_GROTH16_ENV, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
-    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
-    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_ENV,
-    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, Groth16ExecutionSummary, allow_dev_deterministic_groth16,
-    groth16_execution_summary_from_metadata, requested_groth16_setup_blob_path,
-    with_allow_dev_deterministic_groth16_override,
-};
-use zkf_core::{Program, ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_cloudfs::CloudFS;
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -121,72 +114,6 @@ const MULTI_SATELLITE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 2] = [
         log_file_name: "protocol_lean.log",
     },
 ];
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ShowcaseGroth16TrustMode {
-    TrustedImportedSetup,
-    ExplicitDevDeterministic,
-}
-
-impl ShowcaseGroth16TrustMode {
-    pub fn trusted_setup_requested(self) -> bool {
-        matches!(self, Self::TrustedImportedSetup)
-    }
-
-    pub fn trusted_setup_used(self) -> bool {
-        matches!(self, Self::TrustedImportedSetup)
-    }
-
-    pub fn uses_explicit_dev_deterministic(self) -> bool {
-        matches!(self, Self::ExplicitDevDeterministic)
-    }
-
-    pub fn setup_provenance(self) -> &'static str {
-        match self {
-            Self::TrustedImportedSetup => GROTH16_IMPORTED_SETUP_PROVENANCE,
-            Self::ExplicitDevDeterministic => GROTH16_DETERMINISTIC_DEV_PROVENANCE,
-        }
-    }
-
-    pub fn security_boundary(self) -> &'static str {
-        match self {
-            Self::TrustedImportedSetup => GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
-            Self::ExplicitDevDeterministic => GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
-        }
-    }
-}
-
-pub fn resolve_showcase_groth16_trust_mode(
-    app_id: &str,
-    program: &Program,
-) -> ZkfResult<ShowcaseGroth16TrustMode> {
-    if requested_groth16_setup_blob_path(program).is_some() {
-        return Ok(ShowcaseGroth16TrustMode::TrustedImportedSetup);
-    }
-
-    if allow_dev_deterministic_groth16() {
-        return Ok(ShowcaseGroth16TrustMode::ExplicitDevDeterministic);
-    }
-
-    Err(ZkfError::Backend(format!(
-        "{app_id} is missing Groth16 trust configuration. Provide program metadata key '{}' or env '{}' pointing to an imported trusted setup blob. For explicit development-only reproducibility, set '{}' only for local testing and never for public or production artifacts.",
-        GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
-        GROTH16_SETUP_BLOB_PATH_ENV,
-        ALLOW_DEV_DETERMINISTIC_GROTH16_ENV,
-    )))
-}
-
-pub fn with_showcase_groth16_trust_mode<T, F: FnOnce() -> ZkfResult<T>>(
-    mode: ShowcaseGroth16TrustMode,
-    f: F,
-) -> ZkfResult<T> {
-    match mode {
-        ShowcaseGroth16TrustMode::TrustedImportedSetup => f(),
-        ShowcaseGroth16TrustMode::ExplicitDevDeterministic => {
-            with_allow_dev_deterministic_groth16_override(Some(true), f)
-        }
-    }
-}
 
 #[derive(Debug, Deserialize)]
 struct VerificationLedgerFile {
@@ -1434,6 +1361,36 @@ pub fn write_text(path: &Path, value: &str) -> ZkfResult<()> {
     Ok(())
 }
 
+pub fn persist_artifacts_to_cloudfs(
+    app_id: &str,
+    artifacts: &[(String, PathBuf)],
+) -> ZkfResult<Vec<PathBuf>> {
+    let cloudfs = CloudFS::new()
+        .map_err(|error| ZkfError::Io(format!("initialize CloudFS for {app_id}: {error}")))?;
+    let mut stored = Vec::new();
+    for (artifact_type, path) in artifacts {
+        ensure_file_exists(path)?;
+        let filename = path.file_name().and_then(|value| value.to_str()).ok_or_else(|| {
+            ZkfError::InvalidArtifact(format!(
+                "artifact path {} has no terminal file name",
+                path.display()
+            ))
+        })?;
+        let bytes = fs::read(path)
+            .map_err(|error| ZkfError::Io(format!("read {}: {error}", path.display())))?;
+        let destination = cloudfs.store_artifact(app_id, artifact_type, filename, &bytes).map_err(
+            |error| {
+                ZkfError::Io(format!(
+                    "persist {} as {artifact_type} for {app_id}: {error}",
+                    path.display()
+                ))
+            },
+        )?;
+        stored.push(destination);
+    }
+    Ok(stored)
+}
+
 pub fn read_json<T: DeserializeOwned>(path: &Path) -> ZkfResult<T> {
     let bytes = fs::read(path)
         .map_err(|error| ZkfError::Io(format!("read {}: {error}", path.display())))?;
@@ -1543,62 +1500,14 @@ pub fn hash_json_value(value: &serde_json::Value) -> ZkfResult<String> {
     Ok(sha256_hex(&bytes))
 }
 
-fn metadata_json_value(
-    artifact_metadata: &BTreeMap<String, String>,
-    key: &str,
-) -> Option<serde_json::Value> {
-    artifact_metadata
-        .get(key)
-        .and_then(|value| serde_json::from_str(value).ok())
-}
-
-fn metadata_json_string_array(
-    artifact_metadata: &BTreeMap<String, String>,
-    key: &str,
-) -> Vec<String> {
-    metadata_json_value(artifact_metadata, key)
-        .and_then(|value| value.as_array().cloned())
-        .unwrap_or_default()
-        .into_iter()
-        .filter_map(|value| value.as_str().map(ToString::to_string))
-        .collect()
-}
-
-fn realized_groth16_gpu_stages(summary: &Groth16ExecutionSummary) -> Vec<String> {
-    let mut stages = BTreeSet::new();
-    if summary.witness_map.realized_on_metal {
-        stages.insert("fft-ntt".to_string());
-        stages.insert("qap-witness-map".to_string());
-    }
-    if summary.msm.realized_on_metal {
-        stages.insert("msm".to_string());
-    }
-    stages.into_iter().collect()
-}
-
 pub fn effective_gpu_attribution_summary(
     runtime_gpu_nodes: usize,
     runtime_gpu_busy_ratio: f64,
     artifact_metadata: &BTreeMap<String, String>,
 ) -> serde_json::Value {
-    effective_gpu_attribution_summary_with_outputs(
-        runtime_gpu_nodes,
-        runtime_gpu_busy_ratio,
-        None,
-        artifact_metadata,
-    )
-}
-
-pub fn effective_gpu_attribution_summary_with_outputs(
-    runtime_gpu_nodes: usize,
-    runtime_gpu_busy_ratio: f64,
-    runtime_outputs: Option<&serde_json::Value>,
-    artifact_metadata: &BTreeMap<String, String>,
-) -> serde_json::Value {
     let mut evidence_sources = BTreeSet::new();
     let mut artifact_metadata_evidence = serde_json::Map::new();
     let mut effective_gpu_busy_ratio = runtime_gpu_busy_ratio.max(0.0);
-    let mut realized_gpu_capable_stages = BTreeSet::new();
 
     if runtime_gpu_nodes > 0 {
         evidence_sources.insert("runtime.gpu_nodes".to_string());
@@ -1607,172 +1516,68 @@ pub fn effective_gpu_attribution_summary_with_outputs(
         evidence_sources.insert("runtime.gpu_busy_ratio".to_string());
     }
 
-    let groth16_execution = groth16_execution_summary_from_metadata(artifact_metadata);
-    if let Some(summary) = &groth16_execution {
-        artifact_metadata_evidence.insert(
-            "groth16_execution".to_string(),
-            serde_json::to_value(summary).unwrap_or_else(|_| json!({})),
-        );
-        for stage in realized_groth16_gpu_stages(summary) {
-            realized_gpu_capable_stages.insert(stage);
-        }
-        if summary.witness_map.realized_on_metal {
-            evidence_sources.insert("artifact.metadata.groth16_execution.witness_map".to_string());
-        }
-        if summary.msm.realized_on_metal {
-            evidence_sources.insert("artifact.metadata.groth16_execution.msm".to_string());
-        }
-        if let Some(busy_ratio) = summary.metal_gpu_busy_ratio
-            && busy_ratio > 0.0
-        {
-            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
-            evidence_sources.insert("artifact.metadata.groth16_execution.thresholds".to_string());
+    let metadata_keys = [
+        "best_msm_accelerator",
+        "gpu_stage_coverage",
+        "groth16_msm_engine",
+        "metal_available",
+        "metal_compiled",
+        "metal_complete",
+        "metal_gpu_busy_ratio",
+        "qap_witness_map_engine",
+    ];
+    for key in metadata_keys {
+        if let Some(value) = artifact_metadata.get(key) {
+            artifact_metadata_evidence.insert(key.to_string(), json!(value));
         }
     }
 
-    let metadata_effective_busy_ratio = artifact_metadata
-        .get("runtime_effective_gpu_stage_busy_ratio")
-        .and_then(|value| value.parse::<f64>().ok())
-        .unwrap_or(0.0)
-        .max(0.0);
-    if metadata_effective_busy_ratio > 0.0 {
-        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(metadata_effective_busy_ratio);
-        evidence_sources
-            .insert("artifact.metadata.runtime_effective_gpu_stage_busy_ratio".to_string());
-        artifact_metadata_evidence.insert(
-            "runtime_effective_gpu_stage_busy_ratio".to_string(),
-            json!(metadata_effective_busy_ratio),
-        );
+    let backend_uses_metal = [
+        "best_msm_accelerator",
+        "groth16_msm_engine",
+        "qap_witness_map_engine",
+    ]
+    .iter()
+    .any(|key| {
+        artifact_metadata
+            .get(*key)
+            .map(|value| value.to_ascii_lowercase().contains("metal"))
+            .unwrap_or(false)
+    });
+    if backend_uses_metal {
+        evidence_sources.insert("artifact.metadata.backend_engine".to_string());
     }
 
-    let metadata_artifact_busy_ratio = artifact_metadata
+    let gpu_stage_coverage_mentions_metal = artifact_metadata
+        .get("gpu_stage_coverage")
+        .map(|value| value.to_ascii_lowercase().contains("metal"))
+        .unwrap_or(false);
+    if gpu_stage_coverage_mentions_metal {
+        evidence_sources.insert("artifact.metadata.gpu_stage_coverage".to_string());
+    }
+
+    let metal_stack_ready = ["metal_available", "metal_compiled", "metal_complete"]
+        .iter()
+        .all(|key| artifact_metadata.get(*key).map(String::as_str) == Some("true"));
+    if metal_stack_ready {
+        evidence_sources.insert("artifact.metadata.metal_ready".to_string());
+    }
+
+    let artifact_busy_ratio = artifact_metadata
         .get("metal_gpu_busy_ratio")
         .and_then(|value| value.parse::<f64>().ok())
         .unwrap_or(0.0)
         .max(0.0);
-    if metadata_artifact_busy_ratio > 0.0 {
-        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(metadata_artifact_busy_ratio);
+    if artifact_busy_ratio > 0.0 {
+        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(artifact_busy_ratio);
         evidence_sources.insert("artifact.metadata.metal_gpu_busy_ratio".to_string());
-        artifact_metadata_evidence.insert(
-            "metal_gpu_busy_ratio".to_string(),
-            json!(metadata_artifact_busy_ratio),
-        );
-    }
-
-    let metadata_effective_gpu_participation = artifact_metadata
-        .get("runtime_effective_gpu_participation")
-        .and_then(|value| value.parse::<bool>().ok())
-        .unwrap_or(false);
-    if metadata_effective_gpu_participation {
-        evidence_sources
-            .insert("artifact.metadata.runtime_effective_gpu_participation".to_string());
-        artifact_metadata_evidence.insert(
-            "runtime_effective_gpu_participation".to_string(),
-            json!(metadata_effective_gpu_participation),
-        );
-    }
-
-    let metadata_gpu_capable_stages = metadata_json_string_array(
-        artifact_metadata,
-        "runtime_effective_gpu_capable_stages_json",
-    );
-    if !metadata_gpu_capable_stages.is_empty() {
-        evidence_sources
-            .insert("artifact.metadata.runtime_effective_gpu_capable_stages_json".to_string());
-        artifact_metadata_evidence.insert(
-            "runtime_effective_gpu_capable_stages".to_string(),
-            json!(metadata_gpu_capable_stages),
-        );
-        for stage in metadata_gpu_capable_stages {
-            realized_gpu_capable_stages.insert(stage);
-        }
-    }
-
-    let metadata_backend_delegated_gpu =
-        metadata_json_value(artifact_metadata, "runtime_backend_delegated_gpu_json");
-    if let Some(summary) = &metadata_backend_delegated_gpu {
-        artifact_metadata_evidence
-            .insert("runtime_backend_delegated_gpu".to_string(), summary.clone());
-        evidence_sources.insert("artifact.metadata.runtime_backend_delegated_gpu_json".to_string());
-        if let Some(stages) = summary
-            .get("realized_gpu_capable_stages")
-            .and_then(serde_json::Value::as_array)
-        {
-            for stage in stages {
-                if let Some(stage) = stage.as_str() {
-                    realized_gpu_capable_stages.insert(stage.to_string());
-                }
-            }
-        }
-        if let Some(busy_ratio) = summary
-            .get("effective_gpu_busy_ratio")
-            .and_then(serde_json::Value::as_f64)
-        {
-            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
-        }
-    }
-
-    let runtime_output_backend_delegated_gpu =
-        runtime_outputs.and_then(|value| value.get("runtime_backend_delegated_gpu").cloned());
-    if let Some(summary) = &runtime_output_backend_delegated_gpu {
-        evidence_sources.insert("runtime.outputs.runtime_backend_delegated_gpu".to_string());
-        if let Some(stages) = summary
-            .get("realized_gpu_capable_stages")
-            .and_then(serde_json::Value::as_array)
-        {
-            for stage in stages {
-                if let Some(stage) = stage.as_str() {
-                    realized_gpu_capable_stages.insert(stage.to_string());
-                }
-            }
-        }
-        if let Some(busy_ratio) = summary
-            .get("effective_gpu_busy_ratio")
-            .and_then(serde_json::Value::as_f64)
-        {
-            effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
-        }
-    }
-
-    let runtime_output_effective_gpu_participation = runtime_outputs
-        .and_then(|value| value.get("runtime_effective_gpu_participation"))
-        .and_then(serde_json::Value::as_bool)
-        .unwrap_or(false);
-    if runtime_output_effective_gpu_participation {
-        evidence_sources.insert("runtime.outputs.runtime_effective_gpu_participation".to_string());
-    }
-
-    if let Some(stages) = runtime_outputs
-        .and_then(|value| value.get("runtime_effective_gpu_capable_stages"))
-        .and_then(serde_json::Value::as_array)
-    {
-        if !stages.is_empty() {
-            evidence_sources
-                .insert("runtime.outputs.runtime_effective_gpu_capable_stages".to_string());
-        }
-        for stage in stages {
-            if let Some(stage) = stage.as_str() {
-                realized_gpu_capable_stages.insert(stage.to_string());
-            }
-        }
-    }
-
-    if let Some(busy_ratio) = runtime_outputs
-        .and_then(|value| value.get("runtime_effective_gpu_stage_busy_ratio"))
-        .and_then(serde_json::Value::as_f64)
-        && busy_ratio > 0.0
-    {
-        effective_gpu_busy_ratio = effective_gpu_busy_ratio.max(busy_ratio);
-        evidence_sources
-            .insert("runtime.outputs.runtime_effective_gpu_stage_busy_ratio".to_string());
     }
 
     let effective_gpu_participation = runtime_gpu_nodes > 0
         || runtime_gpu_busy_ratio > 0.0
-        || runtime_output_effective_gpu_participation
-        || metadata_effective_gpu_participation
-        || !realized_gpu_capable_stages.is_empty()
-        || effective_gpu_busy_ratio > 0.0;
+        || artifact_busy_ratio > 0.0
+        || backend_uses_metal
+        || gpu_stage_coverage_mentions_metal;
 
     let classification = if runtime_gpu_nodes > 0 || runtime_gpu_busy_ratio > 0.0 {
         "runtime-direct"
@@ -1786,11 +1591,9 @@ pub fn effective_gpu_attribution_summary_with_outputs(
         "classification": classification,
         "runtime_gpu_nodes": runtime_gpu_nodes,
         "runtime_gpu_busy_ratio": runtime_gpu_busy_ratio,
-        "artifact_metal_gpu_busy_ratio": metadata_artifact_busy_ratio,
+        "artifact_metal_gpu_busy_ratio": artifact_busy_ratio,
         "effective_gpu_busy_ratio": effective_gpu_busy_ratio,
         "effective_gpu_participation": effective_gpu_participation,
-        "realized_gpu_capable_stages": realized_gpu_capable_stages.into_iter().collect::<Vec<_>>(),
-        "groth16_execution": groth16_execution,
         "evidence_sources": evidence_sources.into_iter().collect::<Vec<_>>(),
         "artifact_metadata_evidence": artifact_metadata_evidence,
     })
@@ -2065,8 +1868,6 @@ pub fn two_tier_audit_record(
 mod tests {
     use super::*;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use zkf_backends::with_allow_dev_deterministic_groth16_override;
-    use zkf_core::Program;
 
     #[test]
     fn implementation_closure_generated_outputs_match_repo_files() {
@@ -2194,59 +1995,5 @@ mod tests {
         let written: serde_json::Value = read_json(&json_path).expect("read json");
         assert_eq!(written, json!({ "status": "included" }));
         let _ = fs::remove_dir_all(&dir);
-    }
-
-    #[test]
-    fn showcase_trust_mode_prefers_imported_setup_metadata() {
-        let mut program = Program::default();
-        program.metadata.insert(
-            GROTH16_SETUP_BLOB_PATH_METADATA_KEY.to_string(),
-            "/tmp/imported-setup.blob".to_string(),
-        );
-
-        let mode = resolve_showcase_groth16_trust_mode("test-showcase", &program)
-            .expect("imported setup should satisfy showcase trust contract");
-        assert_eq!(mode, ShowcaseGroth16TrustMode::TrustedImportedSetup);
-        assert!(mode.trusted_setup_used());
-        assert_eq!(mode.setup_provenance(), GROTH16_IMPORTED_SETUP_PROVENANCE);
-        assert_eq!(
-            mode.security_boundary(),
-            GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY
-        );
-    }
-
-    #[test]
-    fn showcase_trust_mode_accepts_explicit_dev_opt_in() {
-        let program = Program::default();
-
-        let mode = with_allow_dev_deterministic_groth16_override(Some(true), || {
-            resolve_showcase_groth16_trust_mode("test-showcase", &program)
-        })
-        .expect("explicit dev opt-in should be honored");
-        assert_eq!(mode, ShowcaseGroth16TrustMode::ExplicitDevDeterministic);
-        assert!(mode.uses_explicit_dev_deterministic());
-        assert_eq!(
-            mode.setup_provenance(),
-            GROTH16_DETERMINISTIC_DEV_PROVENANCE
-        );
-        assert_eq!(
-            mode.security_boundary(),
-            GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY
-        );
-    }
-
-    #[test]
-    fn showcase_trust_mode_rejects_implicit_dev_fallback() {
-        let program = Program::default();
-
-        let error = with_allow_dev_deterministic_groth16_override(Some(false), || {
-            resolve_showcase_groth16_trust_mode("test-showcase", &program)
-        })
-        .expect_err("showcase without trust config should fail closed");
-        assert!(
-            error
-                .to_string()
-                .contains("missing Groth16 trust configuration")
-        );
     }
 }

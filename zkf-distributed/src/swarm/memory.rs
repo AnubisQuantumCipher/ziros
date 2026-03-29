@@ -128,8 +128,12 @@ pub fn append_memory_entry(
     signature: &[u8],
     payload: &Value,
 ) -> Result<SwarmMemoryEntry, DistributedError> {
-    let conn = open_memory_db(config)?;
-    append_memory_entry_with_conn(&conn, entry_kind, signer_peer_id, signature, payload)
+    let entry = {
+        let conn = open_memory_db(config)?;
+        append_memory_entry_with_conn(&conn, entry_kind, signer_peer_id, signature, payload)?
+    };
+    sync_memory_db_to_cloud(config)?;
+    Ok(entry)
 }
 
 pub fn load_memory_entries(
@@ -307,28 +311,30 @@ pub fn import_memory_snapshot_verified(
         .cloned()
         .unwrap_or_else(|| Value::Array(Vec::new()));
 
-    let conn = open_memory_db(config)?;
-    conn.execute("DELETE FROM swarm_memory_log", [])
-        .map_err(|err| DistributedError::Io(err.to_string()))?;
-    for entry in entries {
-        let parsed: SwarmMemoryEntry = serde_json::from_value(entry)
-            .map_err(|err| DistributedError::Serialization(err.to_string()))?;
-        conn.execute(
-            "INSERT INTO swarm_memory_log
-             (sequence_id, entry_kind, signer_peer_id, recorded_unix_ms, previous_hash, entry_hash, payload_json, signature)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-            params![
-                parsed.sequence_id,
-                parsed.entry_kind,
-                parsed.signer_peer_id,
-                parsed.recorded_unix_ms as i64,
-                parsed.previous_hash,
-                parsed.entry_hash,
-                parsed.payload_json,
-                parsed.signature,
-            ],
-        )
-        .map_err(|err| DistributedError::Io(err.to_string()))?;
+    {
+        let conn = open_memory_db(config)?;
+        conn.execute("DELETE FROM swarm_memory_log", [])
+            .map_err(|err| DistributedError::Io(err.to_string()))?;
+        for entry in entries {
+            let parsed: SwarmMemoryEntry = serde_json::from_value(entry)
+                .map_err(|err| DistributedError::Serialization(err.to_string()))?;
+            conn.execute(
+                "INSERT INTO swarm_memory_log
+                 (sequence_id, entry_kind, signer_peer_id, recorded_unix_ms, previous_hash, entry_hash, payload_json, signature)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                params![
+                    parsed.sequence_id,
+                    parsed.entry_kind,
+                    parsed.signer_peer_id,
+                    parsed.recorded_unix_ms as i64,
+                    parsed.previous_hash,
+                    parsed.entry_hash,
+                    parsed.payload_json,
+                    parsed.signature,
+                ],
+            )
+            .map_err(|err| DistributedError::Io(err.to_string()))?;
+        }
     }
 
     fs::create_dir_all(attestation_dir(config))?;
@@ -346,6 +352,7 @@ pub fn import_memory_snapshot_verified(
     restore_snapshot_directory_entries(&config.rules_path, rules)?;
     restore_snapshot_directory_entries(&config.swarm_root().join("baselines"), baselines)?;
     restore_snapshot_directory_entries(&config.reputation_log_path, reputation)?;
+    sync_memory_db_to_cloud(config)?;
     if memory_chain_head(config)? != snapshot.chain_head {
         return Err(DistributedError::Config(
             "imported snapshot did not preserve the exported memory chain head".to_string(),
@@ -393,6 +400,9 @@ pub fn snapshot_signing_bytes(snapshot: &MemorySnapshot) -> Vec<u8> {
 
 fn open_memory_db(config: &SwarmConfig) -> Result<Connection, DistributedError> {
     let path = memory_db_path(config);
+    // SQLite never opens against the iCloud path directly. We pull the newest
+    // snapshot into the local cache first, then open the local cache copy.
+    sync_memory_db_from_cloud(config)?;
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
@@ -527,8 +537,59 @@ fn attestation_dir(config: &SwarmConfig) -> PathBuf {
     config.swarm_root().join("attestations")
 }
 
-fn memory_db_path(config: &SwarmConfig) -> PathBuf {
-    config.swarm_root().join("swarm_memory.sqlite3")
+fn memory_db_path(_config: &SwarmConfig) -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join(".zkf")
+        .join("cache")
+        .join("swarm_memory.sqlite3")
+}
+
+fn memory_snapshot_path(config: &SwarmConfig) -> PathBuf {
+    config.swarm_root().join("swarm_memory.snapshot.sqlite3")
+}
+
+fn sync_memory_db_from_cloud(config: &SwarmConfig) -> Result<(), DistributedError> {
+    let local = memory_db_path(config);
+    let snapshot = memory_snapshot_path(config);
+    if !snapshot.exists() {
+        return Ok(());
+    }
+    let should_pull = if !local.exists() {
+        true
+    } else {
+        let local_modified = fs::metadata(&local)
+            .and_then(|metadata| metadata.modified())
+            .ok();
+        let snapshot_modified = fs::metadata(&snapshot)
+            .and_then(|metadata| metadata.modified())
+            .ok();
+        match (local_modified, snapshot_modified) {
+            (Some(local_modified), Some(snapshot_modified)) => snapshot_modified > local_modified,
+            _ => false,
+        }
+    };
+    if should_pull {
+        if let Some(parent) = local.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::copy(snapshot, local).map_err(|err| DistributedError::Io(err.to_string()))?;
+    }
+    Ok(())
+}
+
+fn sync_memory_db_to_cloud(config: &SwarmConfig) -> Result<(), DistributedError> {
+    let local = memory_db_path(config);
+    if !local.exists() {
+        return Ok(());
+    }
+    let snapshot = memory_snapshot_path(config);
+    if let Some(parent) = snapshot.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::copy(local, snapshot).map_err(|err| DistributedError::Io(err.to_string()))?;
+    Ok(())
 }
 
 fn read_json_entries<T>(dir: &Path) -> Result<Vec<T>, DistributedError>
@@ -856,6 +917,93 @@ mod tests {
             let matches = anomaly_archaeology_scan(config, 9, "runtime-anomaly").expect("scan");
             assert_eq!(matches.len(), 1);
             assert_eq!(matches[0].entry_kind, "threat-digest");
+        });
+    }
+
+    #[test]
+    fn swarm_sqlite_runs_from_local_cache_and_persists_snapshot() {
+        with_swarm_home(|config| {
+            append_memory_entry(
+                config,
+                "attestation-chain",
+                "peer-a",
+                &[],
+                &serde_json::json!({"entry": 1}),
+            )
+            .expect("append");
+
+            let live = memory_db_path(config);
+            let snapshot = memory_snapshot_path(config);
+            let expected_live = std::env::var_os("HOME")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."))
+                .join(".zkf")
+                .join("cache")
+                .join("swarm_memory.sqlite3");
+
+            assert_eq!(live, expected_live);
+            assert!(live.exists(), "live sqlite db should exist in local cache");
+            assert!(
+                snapshot.exists(),
+                "persistent snapshot should exist under the iCloud-backed swarm root"
+            );
+            assert_eq!(
+                fs::read(&live).expect("live bytes"),
+                fs::read(&snapshot).expect("snapshot bytes"),
+                "persistent snapshot should mirror the local cache database"
+            );
+        });
+    }
+
+    #[test]
+    fn newer_persistent_snapshot_is_pulled_before_open() {
+        with_swarm_home(|config| {
+            let live = memory_db_path(config);
+            let snapshot = memory_snapshot_path(config);
+
+            append_memory_entry(
+                config,
+                "attestation-chain",
+                "peer-a",
+                &[],
+                &serde_json::json!({"entry": 1}),
+            )
+            .expect("append");
+            assert_eq!(load_memory_entries(config).expect("initial load").len(), 1);
+
+            let replacement = live
+                .parent()
+                .expect("live parent")
+                .join("swarm_memory.replacement.sqlite3");
+            let replacement_conn = Connection::open(&replacement).expect("replacement db");
+            ensure_memory_schema(&replacement_conn).expect("replacement schema");
+            append_memory_entry_with_conn(
+                &replacement_conn,
+                "attestation-chain",
+                "peer-a",
+                &[],
+                &serde_json::json!({"entry": 1}),
+            )
+            .expect("replacement entry 1");
+            append_memory_entry_with_conn(
+                &replacement_conn,
+                "threat-digest",
+                "peer-b",
+                &[],
+                &serde_json::json!({"entry": 2}),
+            )
+            .expect("replacement entry 2");
+            drop(replacement_conn);
+
+            std::thread::sleep(std::time::Duration::from_millis(1100));
+            fs::copy(&replacement, &snapshot).expect("overwrite snapshot");
+            let entries = load_memory_entries(config).expect("load after pull");
+            assert_eq!(entries.len(), 2, "newer persistent snapshot should replace local cache");
+            assert_eq!(
+                fs::read(&live).expect("live bytes"),
+                fs::read(&snapshot).expect("snapshot bytes"),
+                "local cache should be refreshed from the newer persistent snapshot"
+            );
         });
     }
 }

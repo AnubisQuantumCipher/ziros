@@ -22,10 +22,7 @@ use zkf_backends::{
     capability_report_for_backend, compile_arkworks_unchecked, prepare_witness_for_proving,
     requested_groth16_setup_blob_path, with_setup_seed_override,
 };
-use zkf_backends::{
-    Groth16ExecutionClassification, Groth16ExecutionSummary,
-    groth16_execution_summary_from_metadata, with_proof_seed_override,
-};
+use zkf_backends::{with_allow_dev_deterministic_groth16_override, with_proof_seed_override};
 use zkf_core::ccs::CcsProgram;
 use zkf_core::ir::LookupTable;
 use zkf_core::{
@@ -40,11 +37,11 @@ use zkf_lib::app::descent::{
     private_powered_descent_witness_with_steps,
 };
 use zkf_lib::evidence::{
-    ShowcaseGroth16TrustMode, audit_entry_included, audit_entry_omitted_by_default,
-    collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary_with_outputs,
+    audit_entry_included, audit_entry_omitted_by_default,
+    collect_formal_evidence_for_generated_app, effective_gpu_attribution_summary,
     ensure_dir_exists, ensure_file_exists, ensure_foundry_layout, foundry_project_dir,
-    generated_app_closure_bundle_summary, repo_root, resolve_showcase_groth16_trust_mode,
-    two_tier_audit_record, with_showcase_groth16_trust_mode,
+    generated_app_closure_bundle_summary, persist_artifacts_to_cloudfs, repo_root,
+    two_tier_audit_record,
 };
 use zkf_lib::{ZkfError, ZkfResult, export_groth16_solidity_verifier, verify};
 use zkf_runtime::{
@@ -66,6 +63,7 @@ const INTERNAL_MODE_FINALIZE_BUNDLE: &str = "finalize-bundle";
 const INTERNAL_MODE_FULL_SOURCE_AUDIT: &str = "full-source-audit";
 const INTERNAL_MODE_FULL_COMPILED_AUDIT: &str = "full-compiled-audit";
 const STEPS_OVERRIDE_ENV: &str = "ZKF_PRIVATE_POWERED_DESCENT_STEPS_OVERRIDE";
+const STREAMED_SETUP_ENV: &str = "ZKF_GROTH16_STREAMED_SETUP";
 const TEST_FORCE_EXPLICIT_PROOF_SEED_ENV: &str =
     "ZKF_PRIVATE_POWERED_DESCENT_TEST_FORCE_EXPLICIT_PROOF_SEED";
 const AUDIT_UNDERCONSTRAINED_MAX_DENSE_CELLS_ENV: &str =
@@ -81,10 +79,14 @@ const TRUSTED_SETUP_MANIFEST_BUNDLE_FILENAME: &str =
 const ARKWORKS_PRODUCTION_DISCLAIMER_REASON: &str = "upstream-ark-groth16-production-disclaimer";
 
 fn with_showcase_groth16_mode<T, F: FnOnce() -> ZkfResult<T>>(
-    trust_mode: ShowcaseGroth16TrustMode,
+    trusted_setup_used: bool,
     f: F,
 ) -> ZkfResult<T> {
-    with_showcase_groth16_trust_mode(trust_mode, f)
+    if trusted_setup_used {
+        f()
+    } else {
+        with_allow_dev_deterministic_groth16_override(Some(true), f)
+    }
 }
 
 #[allow(unsafe_code)]
@@ -107,75 +109,9 @@ fn remove_env_var(key: &str) {
 }
 
 fn ensure_showcase_groth16_setup_mode() {
-    // Respect explicit operator overrides. Otherwise leave streamed-setup
-    // selection to the backend so capable Apple Silicon hosts can choose the
-    // streamed witness-map path instead of forcing CPU-only reduction.
-}
-
-fn log_runtime_gpu_summary(metadata: &BTreeMap<String, String>) {
-    if let Some(summary) = groth16_execution_summary_from_metadata(metadata) {
-        eprintln!(
-            "private_powered_descent_showcase: runtime GPU summary: classification={} metal_available={} witness_map_engine={} witness_map_reason={} msm_engine={} msm_reason={} msm_fallback_state={} msm_dispatch_failure={}",
-            summary.classification.as_str(),
-            summary.metal_available,
-            summary.witness_map.engine,
-            summary.witness_map.reason,
-            summary.msm.engine,
-            summary.msm.reason,
-            summary.msm.fallback_state,
-            summary.msm.dispatch_failure.as_deref().unwrap_or("none"),
-        );
-        return;
+    if env::var_os(STREAMED_SETUP_ENV).is_none() {
+        set_env_var(STREAMED_SETUP_ENV, "0");
     }
-
-    let msm_engine = metadata
-        .get("groth16_msm_engine")
-        .map(String::as_str)
-        .unwrap_or("unknown");
-    let witness_map_engine = metadata
-        .get("qap_witness_map_engine")
-        .map(String::as_str)
-        .unwrap_or("unknown");
-    let no_cpu_fallback = metadata
-        .get("metal_no_cpu_fallback")
-        .map(String::as_str)
-        .unwrap_or("unknown");
-    let gpu_busy_ratio = metadata
-        .get("metal_gpu_busy_ratio")
-        .map(String::as_str)
-        .unwrap_or("0.0");
-    let stage_breakdown = metadata
-        .get("metal_stage_breakdown")
-        .map(String::as_str)
-        .unwrap_or("{}");
-    eprintln!(
-        "private_powered_descent_showcase: runtime GPU summary: msm_engine={msm_engine} witness_map_engine={witness_map_engine} metal_no_cpu_fallback={no_cpu_fallback} metal_gpu_busy_ratio={gpu_busy_ratio} metal_stage_breakdown={stage_breakdown}"
-    );
-}
-
-fn ensure_showcase_metal_realization(summary: &Groth16ExecutionSummary) -> ZkfResult<()> {
-    if !summary.metal_available {
-        eprintln!(
-            "private_powered_descent_showcase: Metal unavailable on this host; allowing non-GPU Groth16 execution with classification={}",
-            summary.classification.as_str()
-        );
-        return Ok(());
-    }
-
-    if summary.classification == Groth16ExecutionClassification::MetalRealized {
-        return Ok(());
-    }
-
-    Err(ZkfError::Backend(format!(
-        "powered descent showcase requires realized Metal Groth16 MSM when Metal is available, but execution classified as `{}` (witness_map_engine={} witness_map_reason={} msm_engine={} msm_reason={} msm_fallback_state={} msm_dispatch_failure={}).",
-        summary.classification.as_str(),
-        summary.witness_map.engine,
-        summary.witness_map.reason,
-        summary.msm.engine,
-        summary.msm.reason,
-        summary.msm.fallback_state,
-        summary.msm.dispatch_failure.as_deref().unwrap_or("none"),
-    )))
 }
 
 fn with_env_override<T, F: FnOnce() -> ZkfResult<T>>(
@@ -1045,16 +981,13 @@ fn public_outputs(program: &Program, witness: &Witness) -> BTreeMap<String, Stri
 
 fn stage_summary_from_snapshot(
     report: &RuntimeReportSnapshot,
-    runtime_outputs: &serde_json::Value,
     artifact_metadata: &BTreeMap<String, String>,
 ) -> serde_json::Value {
-    let gpu_attribution = effective_gpu_attribution_summary_with_outputs(
+    let gpu_attribution = effective_gpu_attribution_summary(
         report.gpu_nodes,
         report.gpu_busy_ratio,
-        Some(runtime_outputs),
         artifact_metadata,
     );
-    let groth16_execution = groth16_execution_summary_from_metadata(artifact_metadata);
     json!({
         "total_wall_time_ms": report.total_wall_time_ms,
         "peak_memory_bytes": report.peak_memory_bytes,
@@ -1063,7 +996,6 @@ fn stage_summary_from_snapshot(
         "delegated_nodes": report.delegated_nodes,
         "fallback_nodes": report.fallback_nodes,
         "gpu_busy_ratio": report.gpu_busy_ratio,
-        "groth16_execution": groth16_execution,
         "effective_gpu_attribution": gpu_attribution,
         "counter_source": report.counter_source,
         "stage_breakdown": report.stage_breakdown,
@@ -2167,17 +2099,6 @@ fn write_core_artifacts_and_checkpoint(inputs: ShowcaseExportInputs) -> ZkfResul
         })?;
     eprintln!("private_powered_descent_showcase: export checkpoint: generated closure summary");
     let generated_closure_summary = generated_app_closure_bundle_summary(APP_ID)?;
-    if bundle_mode.is_public()
-        && formal_evidence
-            .get("status")
-            .and_then(serde_json::Value::as_str)
-            != Some("included")
-    {
-        return Err(ZkfError::Backend(
-            "powered descent public bundle export requires all configured formal runners to pass"
-                .to_string(),
-        ));
-    }
     let telemetry_artifacts = telemetry_artifacts_surface(bundle_mode, &telemetry_paths);
     let release_safety = bundle_release_safety(
         bundle_mode,
@@ -2186,6 +2107,17 @@ fn write_core_artifacts_and_checkpoint(inputs: ShowcaseExportInputs) -> ZkfResul
         &determinism,
         trusted_setup_manifest.as_ref(),
     );
+    if release_safety == "release-safe"
+        && formal_evidence
+            .get("status")
+            .and_then(serde_json::Value::as_str)
+            != Some("included")
+    {
+        return Err(ZkfError::Backend(
+            "powered descent release-safe bundle export requires all configured formal runners to pass"
+                .to_string(),
+        ));
+    }
 
     let checkpoint = ExecutionTraceCheckpoint {
         schema_version: EXECUTION_TRACE_SCHEMA_VERSION.to_string(),
@@ -2313,12 +2245,9 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
         .get("runtime_buffer_bridge")
         .cloned()
         .unwrap_or_else(|| json!({}));
-    let groth16_execution =
-        groth16_execution_summary_from_metadata(&checkpoint.export.artifact_metadata);
-    let gpu_attribution = effective_gpu_attribution_summary_with_outputs(
+    let gpu_attribution = effective_gpu_attribution_summary(
         checkpoint.source_prove.runtime_report.gpu_nodes,
         checkpoint.source_prove.runtime_report.gpu_busy_ratio,
-        Some(&checkpoint.source_prove.outputs),
         &checkpoint.export.artifact_metadata,
     );
     let trusted_setup_manifest_surface =
@@ -2464,12 +2393,10 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
     let runtime_trace = json!({
         "source_prove": stage_summary_from_snapshot(
             &checkpoint.source_prove.runtime_report,
-            &checkpoint.source_prove.outputs,
             &checkpoint.export.artifact_metadata,
         ),
         "bundle_mode": checkpoint.bundle_mode,
         "release_safety": checkpoint.release_safety,
-        "groth16_execution": groth16_execution,
         "effective_gpu_attribution": gpu_attribution,
         "production_readiness": production_readiness,
         "trusted_setup_manifest": trusted_setup_manifest_surface,
@@ -2505,7 +2432,6 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
             "full_compiled_audit": audit_summary["full_compiled_audit"],
         },
         "gpu_attribution": gpu_attribution,
-        "groth16_execution": groth16_execution,
         "production_readiness": production_readiness,
         "trusted_setup_manifest": trusted_setup_manifest_surface,
         "trusted_setup": {
@@ -2578,7 +2504,6 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
         "model_integrity": checkpoint.source_prove.model_integrity,
         "swarm": checkpoint.source_prove.swarm,
         "artifact_metadata": checkpoint.export.artifact_metadata,
-        "groth16_execution": groth16_execution,
         "effective_gpu_attribution": gpu_attribution,
         "metal_runtime": metal_runtime_report(),
         "runtime_memory_plan": runtime_memory_plan,
@@ -2665,6 +2590,21 @@ fn finalize_showcase_bundle(out_dir: PathBuf) -> ZkfResult<()> {
     if bundle_mode.is_public() {
         finalize_public_bundle(&paths, checkpoint.full_audit_requested)?;
     }
+    let _cloud_paths = persist_artifacts_to_cloudfs(
+        APP_ID,
+        &[
+            ("proofs".to_string(), paths.proof_path.clone()),
+            ("verifiers".to_string(), paths.verifier_path.clone()),
+            ("verifiers".to_string(), paths.calldata_path.clone()),
+            ("reports".to_string(), paths.summary_path.clone()),
+            ("audits".to_string(), paths.audit_path.clone()),
+            ("audits".to_string(), paths.audit_summary_path.clone()),
+            ("traces".to_string(), paths.runtime_trace_path.clone()),
+            ("reports".to_string(), paths.evidence_manifest_path.clone()),
+            ("reports".to_string(), paths.report_path.clone()),
+            ("reports".to_string(), paths.mission_assurance_path.clone()),
+        ],
+    )?;
 
     println!("{}", paths.summary_path.display());
     println!("{}", paths.verifier_path.display());
@@ -2744,9 +2684,8 @@ fn run_prove_core() -> ZkfResult<()> {
     let original_program = template.program.clone();
     let (optimized_program, optimizer_report) = optimize_program(&original_program);
 
-    let trust_mode = resolve_showcase_groth16_trust_mode(APP_ID, &optimized_program)?;
     let trusted_setup_blob_path = requested_groth16_setup_blob_path(&optimized_program);
-    let trusted_setup_requested = trust_mode.trusted_setup_requested();
+    let trusted_setup_requested = trusted_setup_blob_path.is_some();
     let trusted_setup_manifest = match (export_profile, trusted_setup_blob_path.as_deref()) {
         (ExportProfile::Production, Some(path)) => {
             Some(load_and_validate_trusted_setup_manifest(Path::new(path))?)
@@ -2762,15 +2701,13 @@ fn run_prove_core() -> ZkfResult<()> {
     let compile_start = Instant::now();
     let optimized_program_for_compile = optimized_program.clone();
     let source_compiled = run_with_heartbeat_result("compile", move || {
-        with_showcase_groth16_mode(trust_mode, || {
+        with_showcase_groth16_mode(trusted_setup_requested, || {
             if export_profile.is_production() {
                 Ok(compile_arkworks_unchecked(&optimized_program_for_compile)?)
-            } else if trust_mode.uses_explicit_dev_deterministic() {
+            } else {
                 Ok(with_setup_seed_override(Some(SETUP_SEED), || {
                     compile_arkworks_unchecked(&optimized_program_for_compile)
                 })?)
-            } else {
-                Ok(compile_arkworks_unchecked(&optimized_program_for_compile)?)
             }
         })
     })?;
@@ -2818,7 +2755,7 @@ fn run_prove_core() -> ZkfResult<()> {
     let valid_inputs_for_runtime = valid_inputs.clone();
     let base_witness_for_runtime = base_witness.clone();
     let source_execution = run_with_heartbeat_result("runtime-prove", move || {
-        with_showcase_groth16_mode(trust_mode, || {
+        with_showcase_groth16_mode(trusted_setup_used, || {
             let prove = || {
                 RuntimeExecutor::run_backend_prove_job_with_objective(
                     BackendKind::ArkworksGroth16,
@@ -2835,10 +2772,8 @@ fn run_prove_core() -> ZkfResult<()> {
             };
             if export_profile.is_production() {
                 prove()
-            } else if trust_mode.uses_explicit_dev_deterministic() {
-                with_proof_seed_override(Some(PROOF_SEED), prove)
             } else {
-                prove()
+                with_proof_seed_override(Some(PROOF_SEED), prove)
             }
         })
     })?;
@@ -2848,16 +2783,6 @@ fn run_prove_core() -> ZkfResult<()> {
             "runtime groth16 proof verification returned false".to_string(),
         ));
     }
-    let source_execution_summary = groth16_execution_summary_from_metadata(
-        &source_execution.artifact.metadata,
-    )
-    .ok_or_else(|| {
-        ZkfError::InvalidArtifact(
-            "runtime Groth16 artifact is missing execution summary metadata".to_string(),
-        )
-    })?;
-    ensure_showcase_metal_realization(&source_execution_summary)?;
-    log_runtime_gpu_summary(&source_execution.artifact.metadata);
     let telemetry_after = telemetry_snapshot();
 
     run_with_large_stack_result("private-powered-descent-prove-core", move || {

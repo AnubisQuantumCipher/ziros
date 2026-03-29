@@ -1,36 +1,55 @@
-        [workspace]
-        members = [
-          "zkf-core",
+[workspace]
+members = [
+  "zkf-core",
+  "zkf-cloudfs",
+  "zkf-crypto-accel",
   "zkf-frontends",
   "zkf-backends",
+  "zkf-backends-pro",
   "zkf-gadgets",
+  "zkf-dsl",
   "zkf-registry",
   "zkf-ir-spec",
   "zkf-conformance",
   "zkf-cli",
+  "zkf-metal-public-cli",
+  "zkf-verify",
   "zkf-lib",
+  "zkf-ffi",
+  "zkf-api",
+  "zkf-python",
+  "zkf-gpu",
+  "zkf-lsp",
+  "zkf-frontend-sdk",
   "zkf-examples",
+  "zkf-integration-tests",
+  "zkf-metal",
+  "zkf-keymanager",
   "zkf-runtime",
+  "zkf-storage",
   "zkf-distributed",
   "zkf-ui",
-        ]
-        exclude = [
-          "vendor/ark-relations-patched",
-          "vendor/nova-snark-patched",
-          "vendor/p3-merkle-tree-gpu",
-        ]
-        resolver = "2"
+  "zkf-tui",
+  "zk_rollup",
+  "zkCarbon",
+]
+exclude = [
+  "vendor/ark-relations-patched",
+  "vendor/nova-snark-patched",
+  "vendor/p3-merkle-tree-gpu",
+]
+resolver = "2"
 
-        [workspace.package]
-        version = "0.1.0"
-        edition = "2024"
-        license = "Apache-2.0"
-        authors = ["AnubisQuantumCipher"]
-        repository = "https://github.com/AnubisQuantumCipher/ziros"
-        homepage = "https://github.com/AnubisQuantumCipher/ziros"
-        documentation = "https://github.com/AnubisQuantumCipher/ziros"
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "LicenseRef-ZirOS-Proprietary"
+authors = ["AnubisQuantumCipher"]
+repository = "https://github.com/anubisquantumcipher/ziros"
+homepage = "https://github.com/anubisquantumcipher/ziros"
+documentation = "https://github.com/anubisquantumcipher/ziros"
 
-        [workspace.lints.rust]
+[workspace.lints.rust]
 unsafe_code = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)', 'cfg(kani_ra)'] }
 
@@ -54,6 +73,7 @@ base64 = "0.22"
 bincode = "1.3"
 clap = { version = "4.5", features = ["derive"] }
 cfg-if = "1.0"
+chrono = { version = "0.4", features = ["clock", "serde"] }
 argon2 = "0.5"
 ed25519-dalek = "2"
 libc = "0.2"
@@ -76,7 +96,8 @@ crossterm = "0.28"
 indicatif = "0.17"
 owo-colors = "4"
 ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
-libcrux-ml-dsa = { version = "0.0.8", default-features = false, features = ["std", "mldsa44"] }
+libcrux-ml-dsa = { version = "0.0.8", default-features = false, features = ["std", "mldsa87"] }
+libcrux-ml-kem = { version = "0.0.8", default-features = false, features = ["std", "mlkem1024"] }
 proptest = "1.6"
 ff = "0.13"
 group = "0.13"
@@ -87,6 +108,7 @@ rand_chacha = "0.3"
 ureq = { version = "2.10", features = ["json"] }
 k256 = { version = "0.13.4", features = ["ecdsa"] }
 p256 = { version = "0.13.2", features = ["ecdsa"] }
+zeroize = { version = "1", features = ["derive"] }
 
 ark-bn254 = "0.5"
 ark-bls12-381 = "0.5"
@@ -184,4 +206,3 @@ opt-level = 3
 
 [profile.test.package.zkf-backends]
 opt-level = 3
-

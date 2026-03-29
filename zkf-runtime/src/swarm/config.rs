@@ -3,6 +3,7 @@ use super::sentinel::SentinelConfig;
 use super::warrior::QuorumConfig;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use zkf_cloudfs::CloudFS;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -40,12 +41,12 @@ pub struct SwarmConfig {
     pub reputation_log_path: PathBuf,
     pub identity_path: PathBuf,
     pub key_backend: SwarmKeyBackend,
+    pub proof_origin_identity_label: Option<String>,
 }
 
 impl Default for SwarmConfig {
     fn default() -> Self {
-        let home = home_dir();
-        let swarm_root = home.join(".zkf").join("swarm");
+        let swarm_root = persistent_swarm_root();
         Self {
             enabled: true,
             sentinel: SentinelConfig::default(),
@@ -65,6 +66,7 @@ impl Default for SwarmConfig {
             reputation_log_path: swarm_root.join("reputation-log"),
             identity_path: swarm_root.join("identity"),
             key_backend: default_key_backend(),
+            proof_origin_identity_label: None,
         }
     }
 }
@@ -127,6 +129,12 @@ impl SwarmConfig {
                 _ => config.key_backend,
             };
         }
+        if let Ok(value) = std::env::var("ZKF_SWARM_IDENTITY_LABEL") {
+            let value = value.trim();
+            if !value.is_empty() {
+                config.proof_origin_identity_label = Some(value.to_string());
+            }
+        }
         config.sentinel.enabled = config.enabled;
         config
     }
@@ -145,10 +153,20 @@ fn home_dir() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."))
 }
 
+fn persistent_swarm_root() -> PathBuf {
+    CloudFS::new()
+        .map(|cloudfs| cloudfs.persistent_root().join("swarm"))
+        .unwrap_or_else(|_| home_dir().join(".zkf").join("swarm"))
+}
+
 fn default_key_backend() -> SwarmKeyBackend {
     #[cfg(target_os = "macos")]
     {
-        SwarmKeyBackend::Enclave
+        if zkf_core::keystore::synchronizable_keychain_supported() {
+            SwarmKeyBackend::Enclave
+        } else {
+            SwarmKeyBackend::File
+        }
     }
     #[cfg(not(target_os = "macos"))]
     {
