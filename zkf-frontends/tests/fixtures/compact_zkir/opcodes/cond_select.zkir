@@ -1,0 +1,9 @@
+{
+  "version": { "major": 2, "minor": 0 },
+  "do_communications_commitment": false,
+  "num_inputs": 3,
+  "instructions": [
+    { "op": "cond_select", "guard": 0, "then": 1, "else": 2 },
+    { "op": "output", "var": 3 }
+  ]
+}

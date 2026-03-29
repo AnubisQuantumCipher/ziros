@@ -1,0 +1,420 @@
+DIGEST 085c16fcba498def864606b653462310
+FZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R365:376 KernelCompat <> <> lib
+ind 415:435 <> t_ProofRuntimeFieldId
+constr 449:473 <> ProofRuntimeFieldId_Bn254
+constr 477:506 <> ProofRuntimeFieldId_Bls12_381_
+constr 510:536 <> ProofRuntimeFieldId_PastaFp
+constr 540:566 <> ProofRuntimeFieldId_PastaFq
+constr 570:599 <> ProofRuntimeFieldId_Goldilocks
+constr 603:630 <> ProofRuntimeFieldId_BabyBear
+constr 634:663 <> ProofRuntimeFieldId_Mersenne31
+scheme 415:435 <> t_ProofRuntimeFieldId_rect
+scheme 415:435 <> t_ProofRuntimeFieldId_ind
+scheme 415:435 <> t_ProofRuntimeFieldId_rec
+scheme 415:435 <> t_ProofRuntimeFieldId_sind
+ind 684:708 <> t_ProofRuntimeBackendKind
+constr 722:760 <> ProofRuntimeBackendKind_ArkworksGroth16
+constr 764:794 <> ProofRuntimeBackendKind_Plonky3
+constr 798:825 <> ProofRuntimeBackendKind_Nova
+constr 829:861 <> ProofRuntimeBackendKind_HyperNova
+constr 865:893 <> ProofRuntimeBackendKind_Halo2
+constr 897:933 <> ProofRuntimeBackendKind_Halo2Bls12381
+constr 937:963 <> ProofRuntimeBackendKind_Sp1
+constr 967:998 <> ProofRuntimeBackendKind_RiscZero
+constr 1002:1040 <> ProofRuntimeBackendKind_MidnightCompact
+scheme 684:708 <> t_ProofRuntimeBackendKind_rect
+scheme 684:708 <> t_ProofRuntimeBackendKind_ind
+scheme 684:708 <> t_ProofRuntimeBackendKind_rec
+scheme 684:708 <> t_ProofRuntimeBackendKind_sind
+def 1064:1101 <> preferred_backend_for_proof_field_spec
+R1112:1132 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeFieldId ind
+binder 1104:1108 <> field:5
+R1137:1161 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeBackendKind ind
+R1174:1178 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> field:5 var
+R1189:1213 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bn254 constr
+R1222:1260 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R1266:1295 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bls12_381_ constr
+R1304:1340 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R1346:1372 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFp constr
+R1378:1404 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFq constr
+R1413:1441 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R1413:1441 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R1447:1476 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Goldilocks constr
+R1482:1509 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_BabyBear constr
+R1515:1544 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Mersenne31 constr
+R1553:1583 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R1553:1583 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R1553:1583 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+def 1604:1645 <> default_backend_candidates_for_proof_field
+R1656:1676 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeFieldId ind
+binder 1648:1652 <> field:7
+R1681:1685 KernelCompat <> t_Vec def
+R1689:1713 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeBackendKind ind
+R1719:1726 KernelCompat <> t_Global constr
+R1741:1745 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> field:7 var
+R1756:1780 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bn254 constr
+R1789:1802 KernelCompat <> impl__into_vec def
+R1805:1810 KernelCompat <> unsize def
+R1813:1813 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1853:1854 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1886:1887 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1916:1917 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1951:1952 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1982:1983 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2021:2022 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2050:2051 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2084:2085 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2125:2125 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1814:1852 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R1855:1885 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R1888:1915 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R1918:1950 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R1953:1981 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R1984:2020 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R2023:2049 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R2052:2083 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R2086:2124 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R2133:2162 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bls12_381_ constr
+R2171:2184 KernelCompat <> impl__into_vec def
+R2187:2192 KernelCompat <> unsize def
+R2195:2195 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2233:2234 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2274:2275 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2307:2308 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2337:2338 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2372:2373 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2403:2404 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2432:2433 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2466:2467 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2507:2507 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2196:2232 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R2235:2273 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R2276:2306 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R2309:2336 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R2339:2371 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R2374:2402 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R2405:2431 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R2434:2465 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R2468:2506 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R2515:2541 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFp constr
+R2547:2573 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFq constr
+R2582:2595 KernelCompat <> impl__into_vec def
+R2598:2603 KernelCompat <> unsize def
+R2606:2606 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2636:2637 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2677:2678 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2710:2711 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2740:2741 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2775:2776 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2814:2815 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2843:2844 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2877:2878 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2918:2918 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2607:2635 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R2638:2676 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R2679:2709 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R2712:2739 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R2742:2774 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R2777:2813 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R2816:2842 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R2845:2876 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R2879:2917 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R2582:2595 KernelCompat <> impl__into_vec def
+R2598:2603 KernelCompat <> unsize def
+R2606:2606 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2636:2637 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2677:2678 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2710:2711 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2740:2741 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2775:2776 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2814:2815 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2843:2844 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2877:2878 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2918:2918 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R2607:2635 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R2638:2676 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R2679:2709 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R2712:2739 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R2742:2774 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R2777:2813 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R2816:2842 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R2845:2876 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R2879:2917 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R2926:2955 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Goldilocks constr
+R2961:2988 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_BabyBear constr
+R2994:3023 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Mersenne31 constr
+R3032:3045 KernelCompat <> impl__into_vec def
+R3048:3053 KernelCompat <> unsize def
+R3056:3056 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3088:3089 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3129:3130 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3159:3160 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3194:3195 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3225:3226 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3264:3265 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3293:3294 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3327:3328 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3368:3368 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3057:3087 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R3090:3128 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R3131:3158 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R3161:3193 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R3196:3224 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R3227:3263 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R3266:3292 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R3295:3326 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R3329:3367 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R3032:3045 KernelCompat <> impl__into_vec def
+R3048:3053 KernelCompat <> unsize def
+R3056:3056 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3088:3089 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3129:3130 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3159:3160 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3194:3195 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3225:3226 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3264:3265 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3293:3294 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3327:3328 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3368:3368 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3057:3087 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R3090:3128 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R3131:3158 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R3161:3193 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R3196:3224 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R3227:3263 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R3266:3292 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R3295:3326 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R3329:3367 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+R3032:3045 KernelCompat <> impl__into_vec def
+R3048:3053 KernelCompat <> unsize def
+R3056:3056 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3088:3089 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3129:3130 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3159:3160 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3194:3195 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3225:3226 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3264:3265 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3293:3294 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3327:3328 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3368:3368 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R3057:3087 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Plonky3 constr
+R3090:3128 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_ArkworksGroth16 constr
+R3131:3158 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Nova constr
+R3161:3193 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_HyperNova constr
+R3196:3224 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2 constr
+R3227:3263 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Halo2Bls12381 constr
+R3266:3292 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_Sp1 constr
+R3295:3326 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_RiscZero constr
+R3329:3367 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeBackendKind_MidnightCompact constr
+def 3391:3437 <> runtime_default_backend_candidates_are_nonempty
+R3450:3470 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeFieldId ind
+binder 3440:3446 <> e_field:9
+R3475:3478 Corelib.Init.Datatypes <> bool ind
+R3493:3496 Corelib.Init.Datatypes <> bool ind
+R3486:3489 Corelib.Init.Datatypes <> true constr
+def 3512:3538 <> hybrid_verify_decision_spec
+R3554:3557 Corelib.Init.Datatypes <> bool ind
+binder 3541:3550 <> primary_ok:10
+R3576:3579 Corelib.Init.Datatypes <> bool ind
+binder 3561:3572 <> companion_ok:11
+R3584:3587 Corelib.Init.Datatypes <> bool ind
+R3594:3597 Corelib.Init.Datatypes <> andb def
+R3613:3624 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> companion_ok:11 var
+R3600:3609 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> primary_ok:10 var
+rec 3636:3674 <> ProofRuntimeHardwareProbeSummary_record
+proj 3694:3730 <> ProofRuntimeHardwareProbeSummary_f_ok
+proj 3744:3791 <> ProofRuntimeHardwareProbeSummary_f_mismatch_free
+R3734:3737 Corelib.Init.Datatypes <> bool ind
+R3795:3798 Corelib.Init.Datatypes <> bool ind
+def 3817:3850 <> t_ProofRuntimeHardwareProbeSummary
+R3855:3893 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_record rec
+inst 3918:3965 <> settable_ProofRuntimeHardwareProbeSummary_record
+R3969:3976 RecordUpdate.RecordSet <> Settable class
+R3985:3995 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4041:4043 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4081:4082 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4131:4131 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4083:4130 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_mismatch_free proj
+R4044:4080 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_ok proj
+R3996:4040 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeHardwareProbeSummary_record constr
+R3996:4040 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeHardwareProbeSummary_record constr
+def 4145:4176 <> ProofRuntimeHardwareProbeSummary
+R4181:4225 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeHardwareProbeSummary_record constr
+abbrev 4237:4240 <> f_ok
+R4245:4281 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_ok proj
+abbrev 4293:4330 <> t_ProofRuntimeHardwareProbeSummaryf_ok
+R4335:4371 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_ok proj
+abbrev 4383:4397 <> f_mismatch_free
+R4402:4449 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_mismatch_free proj
+abbrev 4461:4509 <> t_ProofRuntimeHardwareProbeSummaryf_mismatch_free
+R4514:4561 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeHardwareProbeSummary_f_mismatch_free proj
+def 4576:4601 <> hardware_probes_clean_spec
+R4614:4647 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeHardwareProbeSummary def
+binder 4604:4610 <> summary:15
+R4652:4655 Corelib.Init.Datatypes <> bool ind
+R4662:4665 Corelib.Init.Datatypes <> andb def
+R4683:4697 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> f_mismatch_free abbrev
+R4699:4705 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> summary:15 var
+R4668:4671 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> f_ok abbrev
+R4673:4679 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> summary:15 var
+rec 4717:4757 <> ProofRuntimeReplayManifestIdentity_record
+proj 4777:4822 <> ProofRuntimeReplayManifestIdentity_f_replay_id
+proj 4840:4891 <> ProofRuntimeReplayManifestIdentity_f_transcript_hash
+proj 4909:4958 <> ProofRuntimeReplayManifestIdentity_f_backend_route
+proj 4976:5028 <> ProofRuntimeReplayManifestIdentity_f_hardware_profile
+proj 5046:5103 <> ProofRuntimeReplayManifestIdentity_f_stage_manifest_digest
+R4826:4833 Core.TODO <> t_String def
+R4895:4902 Core.TODO <> t_String def
+R4962:4969 Core.TODO <> t_String def
+R5032:5039 Core.TODO <> t_String def
+R5107:5114 Core.TODO <> t_String def
+def 5133:5168 <> t_ProofRuntimeReplayManifestIdentity
+R5173:5213 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_record rec
+inst 5241:5290 <> settable_ProofRuntimeReplayManifestIdentity_record
+R5294:5301 RecordUpdate.RecordSet <> Settable class
+R5310:5320 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5368:5370 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5417:5418 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5471:5472 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5523:5524 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5578:5579 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5638:5638 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5580:5637 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_stage_manifest_digest proj
+R5525:5577 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_hardware_profile proj
+R5473:5522 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_backend_route proj
+R5419:5470 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_transcript_hash proj
+R5371:5416 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_replay_id proj
+R5321:5367 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeReplayManifestIdentity_record constr
+R5321:5367 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeReplayManifestIdentity_record constr
+def 5652:5685 <> ProofRuntimeReplayManifestIdentity
+R5690:5736 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> Build_ProofRuntimeReplayManifestIdentity_record constr
+abbrev 5748:5758 <> f_replay_id
+R5763:5808 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_replay_id proj
+abbrev 5820:5866 <> t_ProofRuntimeReplayManifestIdentityf_replay_id
+R5871:5916 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_replay_id proj
+abbrev 5928:5944 <> f_transcript_hash
+R5949:6000 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_transcript_hash proj
+abbrev 6012:6064 <> t_ProofRuntimeReplayManifestIdentityf_transcript_hash
+R6069:6120 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_transcript_hash proj
+abbrev 6132:6146 <> f_backend_route
+R6151:6200 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_backend_route proj
+abbrev 6212:6262 <> t_ProofRuntimeReplayManifestIdentityf_backend_route
+R6267:6316 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_backend_route proj
+abbrev 6328:6345 <> f_hardware_profile
+R6350:6402 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_hardware_profile proj
+abbrev 6414:6467 <> t_ProofRuntimeReplayManifestIdentityf_hardware_profile
+R6472:6524 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_hardware_profile proj
+abbrev 6536:6558 <> f_stage_manifest_digest
+R6563:6620 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_stage_manifest_digest proj
+abbrev 6632:6690 <> t_ProofRuntimeReplayManifestIdentityf_stage_manifest_digest
+R6695:6752 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeReplayManifestIdentity_f_stage_manifest_digest proj
+def 6767:6812 <> replay_manifest_identity_is_deterministic_spec
+R6828:6863 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeReplayManifestIdentity def
+binder 6815:6824 <> e_manifest:22
+R6868:6871 Corelib.Init.Datatypes <> bool ind
+R6886:6889 Corelib.Init.Datatypes <> bool ind
+R6879:6882 Corelib.Init.Datatypes <> true constr
+def 6903:6934 <> runtime_digest_bytes_match_lists
+R6948:6951 Corelib.Init.Datatypes <> list ind
+R6953:6956 Core.Core_Primitive <> :::'t_u8' not
+binder 6937:6944 <> expected:23
+R6968:6971 Corelib.Init.Datatypes <> list ind
+R6973:6976 Core.Core_Primitive <> :::'t_u8' not
+binder 6960:6964 <> found:24
+R6981:6984 Corelib.Init.Datatypes <> bool ind
+R7007:7011 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> found:24 var
+R6997:7004 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> expected:23 var
+R7022:7023 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7026:7027 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7044:7047 Corelib.Init.Datatypes <> bool ind
+R7037:7040 Corelib.Init.Datatypes <> true constr
+R7067:7070 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7096:7099 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7118:7121 Corelib.Init.Datatypes <> andb def
+R7201:7232 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match_lists:25 def
+R7130:7134 Stdlib.NArith.BinNat N eqb def
+R7137:7142 Core.Core_Base_interface_Int <> U8_f_v proj
+R7145:7162 Core.Core_Primitive <> :::'u8_0' not
+R7167:7172 Core.Core_Base_interface_Int <> U8_f_v proj
+R7175:7189 Core.Core_Primitive <> :::'u8_0' not
+R7285:7288 Corelib.Init.Datatypes <> bool ind
+R7277:7281 Corelib.Init.Datatypes <> false constr
+def 7310:7342 <> runtime_digest_bytes_match_slices
+R7356:7367 Core.Core_Primitive <> :::'t_Slice' not
+R7364:7367 Core.Core_Primitive <> :::'t_u8' not
+binder 7345:7352 <> expected:28
+R7379:7390 Core.Core_Primitive <> :::'t_Slice' not
+R7387:7390 Core.Core_Primitive <> :::'t_u8' not
+binder 7371:7375 <> found:29
+R7395:7398 Corelib.Init.Datatypes <> bool ind
+R7405:7436 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match_lists def
+R7439:7456 Core.Core_Primitive <> :::'Slice_f_v' not
+R7449:7456 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> expected:28 var
+R7460:7474 Core.Core_Primitive <> :::'Slice_f_v' not
+R7470:7474 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> found:29 var
+def 7490:7515 <> runtime_digest_bytes_match
+R7529:7533 KernelCompat <> t_Vec def
+R7537:7540 Core.Core_Primitive <> :::'t_u8' not
+R7546:7553 KernelCompat <> t_Global constr
+binder 7518:7525 <> expected:30
+R7567:7571 KernelCompat <> t_Vec def
+R7575:7578 Core.Core_Primitive <> :::'t_u8' not
+R7584:7591 KernelCompat <> t_Global constr
+binder 7559:7563 <> found:31
+R7598:7601 Corelib.Init.Datatypes <> bool ind
+R7608:7639 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match_lists def
+R7641:7648 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> expected:30 var
+R7650:7654 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> found:31 var
+def 7669:7701 <> digest_matches_recorded_hash_spec
+R7720:7727 Core.Core_Option <> t_Option ind
+R7731:7735 KernelCompat <> t_Vec def
+R7739:7742 Core.Core_Primitive <> :::'t_u8' not
+R7748:7755 KernelCompat <> t_Global constr
+binder 7704:7716 <> recorded_hash:32
+R7779:7783 KernelCompat <> t_Vec def
+R7787:7790 Core.Core_Primitive <> :::'t_u8' not
+R7796:7803 KernelCompat <> t_Global constr
+binder 7763:7775 <> expected_hash:33
+R7810:7813 Corelib.Init.Datatypes <> bool ind
+R7826:7838 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> recorded_hash:32 var
+R7849:7859 Core.Core_Option <> Option_Some constr
+R7879:7904 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R7918:7930 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> expected_hash:33 var
+R7937:7947 Core.Core_Option <> Option_None constr
+R7965:7968 Corelib.Init.Datatypes <> bool ind
+R7957:7961 Corelib.Init.Datatypes <> false constr
+def 7990:8034 <> hybrid_primary_leg_byte_components_match_spec
+R8054:8058 KernelCompat <> t_Vec def
+R8062:8065 Core.Core_Primitive <> :::'t_u8' not
+R8071:8078 KernelCompat <> t_Global constr
+binder 8037:8050 <> artifact_proof:35
+R8112:8116 KernelCompat <> t_Vec def
+R8120:8123 Core.Core_Primitive <> :::'t_u8' not
+R8129:8136 KernelCompat <> t_Global constr
+binder 8084:8108 <> artifact_verification_key:36
+R8162:8166 KernelCompat <> t_Vec def
+R8170:8173 Core.Core_Primitive <> :::'t_u8' not
+R8179:8186 KernelCompat <> t_Global constr
+binder 8142:8158 <> primary_leg_proof:37
+R8223:8227 KernelCompat <> t_Vec def
+R8231:8234 Core.Core_Primitive <> :::'t_u8' not
+R8240:8247 KernelCompat <> t_Global constr
+binder 8192:8219 <> primary_leg_verification_key:38
+R8254:8257 Corelib.Init.Datatypes <> bool ind
+R8264:8267 Corelib.Init.Datatypes <> andb def
+R8336:8361 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R8364:8388 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> artifact_verification_key:36 var
+R8392:8419 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> primary_leg_verification_key:38 var
+R8270:8295 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R8298:8311 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> artifact_proof:35 var
+R8315:8331 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> primary_leg_proof:37 var

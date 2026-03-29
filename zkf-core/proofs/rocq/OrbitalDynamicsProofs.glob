@@ -1,0 +1,156 @@
+DIGEST 0d6992122c943d8521f35ab724bf9156
+FOrbitalDynamicsProofs
+R15:20 Stdlib.ZArith.ZArith <> <> lib
+R22:24 Stdlib.micromega.Lia <> <> lib
+def 60:77 <> orbital_body_count
+R81:81 Corelib.Numbers.BinNums <> Z ind
+def 100:117 <> orbital_step_count
+R121:121 Corelib.Numbers.BinNums <> Z ind
+def 143:169 <> orbital_private_input_count
+R173:173 Corelib.Numbers.BinNums <> Z ind
+def 193:219 <> orbital_public_output_count
+R223:223 Corelib.Numbers.BinNums <> Z ind
+def 242:259 <> orbital_pair_count
+R263:263 Corelib.Numbers.BinNums <> Z ind
+R315:317 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R288:291 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R314:314 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R270:287 OrbitalDynamicsProofs <> orbital_body_count def
+R310:312 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R292:309 OrbitalDynamicsProofs <> orbital_body_count def
+def 333:346 <> pairwise_delta
+R357:357 Corelib.Numbers.BinNums <> Z ind
+binder 349:350 <> ri:1
+binder 352:353 <> rj:2
+R362:362 Corelib.Numbers.BinNums <> Z ind
+R369:371 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R367:368 OrbitalDynamicsProofs <> rj:2 var
+R372:373 OrbitalDynamicsProofs <> ri:1 var
+def 388:416 <> velocity_verlet_position_next
+R427:427 Corelib.Numbers.BinNums <> Z ind
+binder 419:419 <> x:3
+binder 421:421 <> v:4
+binder 423:423 <> a:5
+R432:432 Corelib.Numbers.BinNums <> Z ind
+R444:446 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R440:442 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R439:439 OrbitalDynamicsProofs <> x:3 var
+R443:443 OrbitalDynamicsProofs <> v:4 var
+R448:450 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R447:447 OrbitalDynamicsProofs <> a:5 var
+def 466:494 <> velocity_verlet_velocity_next
+R514:514 Corelib.Numbers.BinNums <> Z ind
+binder 497:497 <> v:6
+binder 499:503 <> a_now:7
+binder 505:510 <> a_next:8
+R519:519 Corelib.Numbers.BinNums <> Z ind
+R527:529 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R526:526 OrbitalDynamicsProofs <> v:6 var
+R530:530 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R545:548 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R536:538 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R531:535 OrbitalDynamicsProofs <> a_now:7 var
+R539:544 OrbitalDynamicsProofs <> a_next:8 var
+def 564:589 <> orbital_commitment_payload
+R604:604 Corelib.Numbers.BinNums <> Z ind
+binder 592:592 <> x:9
+binder 594:594 <> y:10
+binder 596:596 <> z:11
+binder 598:600 <> tag:12
+R618:620 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R614:616 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R610:612 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R609:609 Corelib.Numbers.BinNums <> Z ind
+R613:613 Corelib.Numbers.BinNums <> Z ind
+R617:617 Corelib.Numbers.BinNums <> Z ind
+R621:621 Corelib.Numbers.BinNums <> Z ind
+R628:628 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R630:631 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R633:634 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R636:637 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R641:641 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R629:629 OrbitalDynamicsProofs <> x:9 var
+R632:632 OrbitalDynamicsProofs <> y:10 var
+R635:635 OrbitalDynamicsProofs <> z:11 var
+R638:640 OrbitalDynamicsProofs <> tag:12 var
+prf 651:674 <> orbital_body_count_exact
+R698:700 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R680:697 OrbitalDynamicsProofs <> orbital_body_count def
+prf 736:759 <> orbital_step_count_exact
+R783:785 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R765:782 OrbitalDynamicsProofs <> orbital_step_count def
+prf 824:856 <> orbital_private_input_count_exact
+R889:891 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R862:888 OrbitalDynamicsProofs <> orbital_private_input_count def
+prf 928:960 <> orbital_public_output_count_exact
+R993:995 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R966:992 OrbitalDynamicsProofs <> orbital_public_output_count def
+prf 1031:1054 <> orbital_pair_count_exact
+R1078:1080 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1060:1077 OrbitalDynamicsProofs <> orbital_pair_count def
+prf 1117:1148 <> orbital_pairwise_delta_zero_self
+binder 1161:1161 <> r:13
+R1182:1184 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1164:1177 OrbitalDynamicsProofs <> pairwise_delta def
+R1179:1179 OrbitalDynamicsProofs <> r:13 var
+R1181:1181 OrbitalDynamicsProofs <> r:13 var
+R1216:1229 OrbitalDynamicsProofs <> pairwise_delta def
+prf 1251:1286 <> orbital_pairwise_delta_antisymmetric
+binder 1299:1300 <> ri:14
+binder 1302:1303 <> rj:15
+R1349:1351 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1326:1328 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R1306:1319 OrbitalDynamicsProofs <> pairwise_delta def
+R1321:1322 OrbitalDynamicsProofs <> ri:14 var
+R1324:1325 OrbitalDynamicsProofs <> rj:15 var
+R1329:1342 OrbitalDynamicsProofs <> pairwise_delta def
+R1344:1345 OrbitalDynamicsProofs <> rj:15 var
+R1347:1348 OrbitalDynamicsProofs <> ri:14 var
+R1387:1400 OrbitalDynamicsProofs <> pairwise_delta def
+prf 1422:1464 <> velocity_verlet_position_next_deterministic
+binder 1477:1477 <> x:16
+binder 1479:1479 <> v:17
+binder 1481:1481 <> a:18
+R1523:1529 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1488:1516 OrbitalDynamicsProofs <> velocity_verlet_position_next def
+R1518:1518 OrbitalDynamicsProofs <> x:16 var
+R1520:1520 OrbitalDynamicsProofs <> v:17 var
+R1522:1522 OrbitalDynamicsProofs <> a:18 var
+R1530:1558 OrbitalDynamicsProofs <> velocity_verlet_position_next def
+R1560:1560 OrbitalDynamicsProofs <> x:16 var
+R1562:1562 OrbitalDynamicsProofs <> v:17 var
+R1564:1564 OrbitalDynamicsProofs <> a:18 var
+prf 1609:1651 <> velocity_verlet_velocity_next_deterministic
+binder 1664:1664 <> v:19
+binder 1666:1670 <> a_now:20
+binder 1672:1677 <> a_next:21
+R1728:1734 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1684:1712 OrbitalDynamicsProofs <> velocity_verlet_velocity_next def
+R1714:1714 OrbitalDynamicsProofs <> v:19 var
+R1716:1720 OrbitalDynamicsProofs <> a_now:20 var
+R1722:1727 OrbitalDynamicsProofs <> a_next:21 var
+R1735:1763 OrbitalDynamicsProofs <> velocity_verlet_velocity_next def
+R1765:1765 OrbitalDynamicsProofs <> v:19 var
+R1767:1771 OrbitalDynamicsProofs <> a_now:20 var
+R1773:1778 OrbitalDynamicsProofs <> a_next:21 var
+prf 1823:1865 <> orbital_commitment_payload_domain_separated
+binder 1878:1878 <> x:22
+binder 1880:1880 <> y:23
+binder 1882:1882 <> z:24
+binder 1884:1887 <> tag1:25
+binder 1889:1892 <> tag2:26
+R1911:1918 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1903:1906 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R1899:1902 OrbitalDynamicsProofs <> tag1:25 var
+R1907:1910 OrbitalDynamicsProofs <> tag2:26 var
+R1956:1963 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R1919:1944 OrbitalDynamicsProofs <> orbital_commitment_payload def
+R1946:1946 OrbitalDynamicsProofs <> x:22 var
+R1948:1948 OrbitalDynamicsProofs <> y:23 var
+R1950:1950 OrbitalDynamicsProofs <> z:24 var
+R1952:1955 OrbitalDynamicsProofs <> tag1:25 var
+R1964:1989 OrbitalDynamicsProofs <> orbital_commitment_payload def
+R1991:1991 OrbitalDynamicsProofs <> x:22 var
+R1993:1993 OrbitalDynamicsProofs <> y:23 var
+R1995:1995 OrbitalDynamicsProofs <> z:24 var
+R1997:2000 OrbitalDynamicsProofs <> tag2:26 var

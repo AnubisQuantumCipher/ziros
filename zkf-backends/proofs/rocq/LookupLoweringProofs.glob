@@ -1,0 +1,30 @@
+DIGEST db93b3d80b0d87fd8881376a6bba027f
+FLookupLoweringProofs
+R15:27 BackendCompat <> <> lib
+R45:67 LookupLoweringSemantics <> <> lib
+R112:150 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> <> lib
+prf 162:200 <> lookup_lowering_witness_preservation_ok
+binder 213:223 <> input_count:1
+binder 225:236 <> output_count:2
+binder 238:247 <> table_rows:3
+binder 249:261 <> table_columns:4
+binder 263:269 <> surface:5
+R405:412 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R383:385 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R276:308 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> supported_lookup_lowering_surface def
+R316:326 LookupLoweringProofs <> input_count:1 var
+R334:345 LookupLoweringProofs <> output_count:2 var
+R353:362 LookupLoweringProofs <> table_rows:3 var
+R370:382 LookupLoweringProofs <> table_columns:4 var
+R386:396 Core.Core_Option <> Option_Some constr
+R398:404 LookupLoweringProofs <> surface:5 var
+R413:445 LookupLoweringSemantics <> LookupLoweringWitnessPreservation def
+R453:463 LookupLoweringProofs <> input_count:1 var
+R471:482 LookupLoweringProofs <> output_count:2 var
+R490:499 LookupLoweringProofs <> table_rows:3 var
+R507:519 LookupLoweringProofs <> table_columns:4 var
+R527:533 LookupLoweringProofs <> surface:5 var
+R629:661 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> supported_lookup_lowering_surface def
+R692:724 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_surface_supported def
+R692:724 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_surface_supported def
+R840:872 LookupLoweringSemantics <> LookupLoweringWitnessPreservation def

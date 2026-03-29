@@ -1,0 +1,1719 @@
+DIGEST 06b1c896122bdd2cdbbb4128c0b1fe9c
+FZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R388:401 ZkfCoreExtraction.Zkf_core_Field <> <> lib
+R419:430 KernelCompat <> <> lib
+rec 441:461 <> SpecFieldValue_record
+proj 481:502 <> SpecFieldValue_f_bytes
+proj 543:562 <> SpecFieldValue_f_len
+proj 576:600 <> SpecFieldValue_f_negative
+R506:536 Core.Core_Primitive <> :::'t_Array' not
+R528:534 Core.Core_Primitive <> :::'t_usize' not
+R515:518 Core.Core_Primitive <> :::'t_u8' not
+R566:569 Core.Core_Primitive <> :::'t_u8' not
+R604:607 Corelib.Init.Datatypes <> bool ind
+inst 638:667 <> settable_SpecFieldValue_record
+R671:678 RecordUpdate.RecordSet <> Settable class
+R687:697 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R725:727 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R750:751 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R772:773 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R799:799 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R774:798 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_negative proj
+R752:771 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_len proj
+R728:749 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_bytes proj
+R698:724 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecFieldValue_record constr
+R698:724 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecFieldValue_record constr
+R836:856 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_record rec
+not 811:811 <> :::'t_SpecFieldValue'
+rec 868:895 <> SpecKernelLookupTable_record
+proj 915:950 <> SpecKernelLookupTable_f_column_count
+proj 967:994 <> SpecKernelLookupTable_f_rows
+R954:960 Core.Core_Primitive <> :::'t_usize' not
+R998:1002 KernelCompat <> t_Vec def
+R1006:1010 KernelCompat <> t_Vec def
+R1014:1029 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R1035:1042 KernelCompat <> t_Global constr
+R1050:1057 KernelCompat <> t_Global constr
+inst 1089:1125 <> settable_SpecKernelLookupTable_record
+R1129:1136 RecordUpdate.RecordSet <> Settable class
+R1145:1155 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1190:1192 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1229:1230 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1259:1259 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1231:1258 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_f_rows proj
+R1193:1228 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_f_column_count proj
+R1156:1189 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelLookupTable_record constr
+R1156:1189 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelLookupTable_record constr
+R1303:1330 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_record rec
+not 1271:1271 <> :::'t_SpecKernelLookupTable'
+R1366:1401 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_f_column_count proj
+not 1343:1343 <> :::'f_column_count'
+R1429:1456 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelLookupTable_f_rows proj
+not 1414:1414 <> :::'f_rows'
+rec 1468:1491 <> SpecKernelWitness_record
+proj 1511:1536 <> SpecKernelWitness_f_values
+R1540:1544 KernelCompat <> t_Vec def
+R1548:1555 Core.Core_Option <> t_Option ind
+R1559:1574 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R1582:1589 KernelCompat <> t_Global constr
+inst 1620:1652 <> settable_SpecKernelWitness_record
+R1656:1663 RecordUpdate.RecordSet <> Settable class
+R1672:1682 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1713:1715 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1742:1742 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1716:1741 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelWitness_f_values proj
+R1683:1712 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelWitness_record constr
+R1683:1712 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelWitness_record constr
+R1782:1805 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelWitness_record rec
+not 1754:1754 <> :::'t_SpecKernelWitness'
+R1835:1860 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelWitness_f_values proj
+not 1818:1818 <> :::'f_values'
+rec 1872:1918 <> SpecLookupFailureKind_InputArityMismatch_record
+proj 1938:1988 <> SpecLookupFailureKind_InputArityMismatch_f_provided
+proj 2005:2056 <> SpecLookupFailureKind_InputArityMismatch_f_available
+R1992:1998 Core.Core_Primitive <> :::'t_usize' not
+R2060:2066 Core.Core_Primitive <> :::'t_usize' not
+inst 2096:2151 <> settable_SpecLookupFailureKind_InputArityMismatch_record
+R2155:2162 RecordUpdate.RecordSet <> Settable class
+R2171:2181 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2235:2237 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2289:2290 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2343:2343 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2291:2342 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_available proj
+R2238:2288 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R2182:2234 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecLookupFailureKind_InputArityMismatch_record constr
+R2182:2234 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecLookupFailureKind_InputArityMismatch_record constr
+ind 2356:2378 <> t_SpecLookupFailureKind
+constr 2392:2431 <> SpecLookupFailureKind_InputArityMismatch
+constr 2491:2525 <> SpecLookupFailureKind_NoMatchingRow
+R2482:2486 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2435:2481 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_record rec
+scheme 2356:2378 <> t_SpecLookupFailureKind_rect
+scheme 2356:2378 <> t_SpecLookupFailureKind_ind
+scheme 2356:2378 <> t_SpecLookupFailureKind_rec
+scheme 2356:2378 <> t_SpecLookupFailureKind_sind
+rec 2538:2578 <> SpecKernelCheckError_MissingSignal_record
+proj 2598:2646 <> SpecKernelCheckError_MissingSignal_f_signal_index
+R2650:2656 Core.Core_Primitive <> :::'t_usize' not
+inst 2685:2734 <> settable_SpecKernelCheckError_MissingSignal_record
+R2738:2745 RecordUpdate.RecordSet <> Settable class
+R2754:2764 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2812:2814 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2864:2864 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2815:2863 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal_f_signal_index proj
+R2765:2811 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_MissingSignal_record constr
+R2765:2811 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_MissingSignal_record constr
+rec 2874:2919 <> SpecKernelCheckError_UnknownLookupTable_record
+proj 2939:2991 <> SpecKernelCheckError_UnknownLookupTable_f_table_index
+R2995:3001 Core.Core_Primitive <> :::'t_usize' not
+inst 3030:3084 <> settable_SpecKernelCheckError_UnknownLookupTable_record
+R3088:3095 RecordUpdate.RecordSet <> Settable class
+R3104:3114 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3167:3169 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3223:3223 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3170:3222 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable_f_table_index proj
+R3115:3166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_UnknownLookupTable_record constr
+R3115:3166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_UnknownLookupTable_record constr
+rec 3233:3274 <> SpecKernelCheckError_EqualViolation_record
+proj 3294:3347 <> SpecKernelCheckError_EqualViolation_f_constraint_index
+proj 3364:3404 <> SpecKernelCheckError_EqualViolation_f_lhs
+proj 3430:3470 <> SpecKernelCheckError_EqualViolation_f_rhs
+R3351:3357 Core.Core_Primitive <> :::'t_usize' not
+R3408:3423 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R3474:3489 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+inst 3520:3570 <> settable_SpecKernelCheckError_EqualViolation_record
+R3574:3581 RecordUpdate.RecordSet <> Settable class
+R3590:3600 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3649:3651 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3706:3707 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3749:3750 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3792:3792 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3751:3791 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_rhs proj
+R3708:3748 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_lhs proj
+R3652:3705 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_constraint_index proj
+R3601:3648 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_EqualViolation_record constr
+R3601:3648 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_EqualViolation_record constr
+rec 3802:3845 <> SpecKernelCheckError_BooleanViolation_record
+proj 3865:3920 <> SpecKernelCheckError_BooleanViolation_f_constraint_index
+proj 3937:3988 <> SpecKernelCheckError_BooleanViolation_f_signal_index
+proj 4005:4049 <> SpecKernelCheckError_BooleanViolation_f_value
+R3924:3930 Core.Core_Primitive <> :::'t_usize' not
+R3992:3998 Core.Core_Primitive <> :::'t_usize' not
+R4053:4068 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+inst 4099:4151 <> settable_SpecKernelCheckError_BooleanViolation_record
+R4155:4162 RecordUpdate.RecordSet <> Settable class
+R4171:4181 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4232:4234 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4291:4292 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4345:4346 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4392:4392 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4347:4391 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_value proj
+R4293:4344 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_signal_index proj
+R4235:4290 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_constraint_index proj
+R4182:4231 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_BooleanViolation_record constr
+R4182:4231 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_BooleanViolation_record constr
+rec 4402:4443 <> SpecKernelCheckError_RangeViolation_record
+proj 4463:4516 <> SpecKernelCheckError_RangeViolation_f_constraint_index
+proj 4533:4582 <> SpecKernelCheckError_RangeViolation_f_signal_index
+proj 4599:4640 <> SpecKernelCheckError_RangeViolation_f_bits
+proj 4655:4697 <> SpecKernelCheckError_RangeViolation_f_value
+R4520:4526 Core.Core_Primitive <> :::'t_usize' not
+R4586:4592 Core.Core_Primitive <> :::'t_usize' not
+R4644:4648 Core.Core_Primitive <> :::'t_u32' not
+R4701:4716 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+inst 4748:4798 <> settable_SpecKernelCheckError_RangeViolation_record
+R4802:4809 RecordUpdate.RecordSet <> Settable class
+R4818:4828 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4877:4879 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4934:4935 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4986:4987 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5030:5031 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5075:5075 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5032:5074 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_value proj
+R4988:5029 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_bits proj
+R4936:4985 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_signal_index proj
+R4880:4933 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_constraint_index proj
+R4829:4876 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_RangeViolation_record constr
+R4829:4876 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_RangeViolation_record constr
+rec 5085:5127 <> SpecKernelCheckError_LookupViolation_record
+proj 5147:5201 <> SpecKernelCheckError_LookupViolation_f_constraint_index
+proj 5218:5267 <> SpecKernelCheckError_LookupViolation_f_table_index
+proj 5284:5328 <> SpecKernelCheckError_LookupViolation_f_inputs
+proj 5377:5422 <> SpecKernelCheckError_LookupViolation_f_outputs
+proj 5484:5526 <> SpecKernelCheckError_LookupViolation_f_kind
+R5205:5211 Core.Core_Primitive <> :::'t_usize' not
+R5271:5277 Core.Core_Primitive <> :::'t_usize' not
+R5332:5336 KernelCompat <> t_Vec def
+R5340:5355 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R5361:5368 KernelCompat <> t_Global constr
+R5426:5433 Core.Core_Option <> t_Option ind
+R5437:5441 KernelCompat <> t_Vec def
+R5445:5460 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R5466:5473 KernelCompat <> t_Global constr
+R5530:5552 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecLookupFailureKind ind
+inst 5585:5636 <> settable_SpecKernelCheckError_LookupViolation_record
+R5640:5647 RecordUpdate.RecordSet <> Settable class
+R5656:5666 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5716:5718 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5774:5775 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5826:5827 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5873:5874 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5921:5922 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5966:5966 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5923:5965 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R5875:5920 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R5828:5872 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R5776:5825 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R5719:5773 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R5667:5715 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_LookupViolation_record constr
+R5667:5715 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelCheckError_LookupViolation_record constr
+ind 5979:6000 <> t_SpecKernelCheckError
+constr 6014:6047 <> SpecKernelCheckError_MissingSignal
+constr 6101:6135 <> SpecKernelCheckError_DivisionByZero
+constr 6139:6177 <> SpecKernelCheckError_UnknownLookupTable
+constr 6236:6270 <> SpecKernelCheckError_EqualViolation
+constr 6325:6361 <> SpecKernelCheckError_BooleanViolation
+constr 6418:6452 <> SpecKernelCheckError_RangeViolation
+constr 6507:6542 <> SpecKernelCheckError_LookupViolation
+R6092:6096 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6051:6091 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal_record rec
+R6227:6231 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6181:6226 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable_record rec
+R6316:6320 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6274:6315 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_record rec
+R6409:6413 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6365:6408 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_record rec
+R6498:6502 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6456:6497 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_record rec
+R6589:6593 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R6546:6588 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_record rec
+scheme 5979:6000 <> t_SpecKernelCheckError_rect
+scheme 5979:6000 <> t_SpecKernelCheckError_ind
+scheme 5979:6000 <> t_SpecKernelCheckError_rec
+scheme 5979:6000 <> t_SpecKernelCheckError_sind
+def 6617:6634 <> spec_field_modulus
+R6645:6653 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 6637:6641 <> field:40
+R6658:6658 Corelib.Numbers.BinNums <> Z ind
+R6671:6675 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:40 var
+R6686:6698 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bn254 constr
+R6791:6808 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bls12_381_ constr
+R6901:6915 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFp constr
+R7008:7022 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFq constr
+R7115:7132 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Goldilocks constr
+R7168:7183 ZkfCoreExtraction.Zkf_core_Field <> FieldId_BabyBear constr
+R7209:7226 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Mersenne31 constr
+def 7267:7282 <> spec_normalize_z
+R7301:7301 Corelib.Numbers.BinNums <> Z ind
+binder 7285:7289 <> value:42
+binder 7291:7297 <> modulus:43
+R7306:7306 Corelib.Numbers.BinNums <> Z ind
+R7313:7313 Stdlib.ZArith.BinInt <> ::Z_scope:x_'mod'_x not
+R7343:7348 Stdlib.ZArith.BinInt <> ::Z_scope:x_'mod'_x not
+R7314:7314 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R7332:7335 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R7320:7324 Stdlib.ZArith.BinInt <> ::Z_scope:x_'mod'_x not
+R7315:7319 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:42 var
+R7325:7331 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:43 var
+R7336:7342 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:43 var
+R7349:7355 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:43 var
+def 7370:7381 <> spec_u8_of_z
+R7392:7392 Corelib.Numbers.BinNums <> Z ind
+binder 7384:7388 <> value:44
+R7397:7400 Core.Core_Primitive <> :::'t_u8' not
+R7407:7424 Core.Core_Array_Rec_bundle_579704328 <> :::'u8' not
+R7416:7420 Stdlib.ZArith.BinInt <> ::Z_scope:x_'mod'_x not
+R7411:7415 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:44 var
+def 7437:7454 <> spec_bytes_to_z_le
+R7465:7468 Corelib.Init.Datatypes <> list ind
+R7470:7473 Core.Core_Primitive <> :::'t_u8' not
+binder 7457:7461 <> bytes:45
+R7486:7486 Corelib.Numbers.BinNums <> Z ind
+binder 7477:7482 <> weight:46
+R7491:7491 Corelib.Numbers.BinNums <> Z ind
+R7504:7508 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bytes:45 var
+R7519:7520 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7541:7544 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7601:7603 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R7563:7563 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R7591:7594 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R7564:7569 Stdlib.ZArith.BinInt Z of_N def
+R7572:7577 Core.Core_Base_interface_Int <> U8_f_v proj
+R7580:7588 Core.Core_Primitive <> :::'u8_0' not
+R7595:7600 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> weight:46 var
+R7604:7621 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_bytes_to_z_le:47 def
+R7640:7642 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R7634:7639 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> weight:46 var
+def 7670:7690 <> spec_field_value_to_z
+R7701:7716 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 7693:7697 <> value:49
+R7721:7721 Corelib.Numbers.BinNums <> Z ind
+R7745:7762 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_bytes_to_z_le def
+R7765:7816 Core.Core_Primitive <> :::'Slice_f_v' not
+R7776:7815 Core.Core_Primitive <> :::'Array_f_v' not
+R7787:7808 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_bytes proj
+R7810:7814 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:49 var
+binder 7732:7740 <> magnitude:50
+R7829:7853 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_negative proj
+R7855:7859 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:49 var
+R7897:7905 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> magnitude:50 var
+R7871:7872 Stdlib.ZArith.BinInt <> ::Z_scope:'-'_x not
+R7873:7881 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> magnitude:50 var
+def 7918:7935 <> spec_z_to_bytes_le
+R7946:7948 Corelib.Init.Datatypes <> nat ind
+binder 7938:7942 <> count:51
+R7960:7960 Corelib.Numbers.BinNums <> Z ind
+binder 7952:7956 <> value:52
+R7965:7968 Corelib.Init.Datatypes <> list ind
+R7970:7973 Core.Core_Primitive <> :::'t_u8' not
+R7986:7990 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> count:51 var
+R8001:8001 Corelib.Init.Datatypes <> O constr
+R8010:8011 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8017:8017 Corelib.Init.Datatypes <> S constr
+R8054:8057 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R8036:8047 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_u8_of_z def
+R8049:8053 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:52 var
+R8058:8075 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_z_to_bytes_le:53 def
+R8093:8095 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R8088:8092 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:52 var
+def 8118:8139 <> spec_canonical_len_aux
+R8150:8153 Corelib.Init.Datatypes <> list ind
+R8155:8158 Core.Core_Primitive <> :::'t_u8' not
+binder 8142:8146 <> bytes:55
+R8178:8178 Corelib.Numbers.BinNums <> Z ind
+binder 8162:8166 <> index:56
+binder 8168:8174 <> current:57
+R8183:8183 Corelib.Numbers.BinNums <> Z ind
+R8196:8200 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bytes:55 var
+R8211:8212 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8221:8227 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current:57 var
+R8237:8240 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R8273:8277 Stdlib.ZArith.BinInt Z eqb def
+R8280:8285 Stdlib.ZArith.BinInt Z of_N def
+R8288:8293 Core.Core_Base_interface_Int <> U8_f_v proj
+R8296:8304 Core.Core_Primitive <> :::'u8_0' not
+R8335:8337 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R8330:8334 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:56 var
+R8316:8322 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current:57 var
+binder 8262:8265 <> next:60
+R8350:8371 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_canonical_len_aux:58 def
+R8397:8400 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> next:60 var
+R8389:8391 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R8384:8388 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:56 var
+def 8421:8441 <> spec_bytes_to_array32
+R8452:8455 Corelib.Init.Datatypes <> list ind
+R8457:8460 Core.Core_Primitive <> :::'t_u8' not
+binder 8444:8448 <> bytes:61
+R8465:8495 Core.Core_Primitive <> :::'t_Array' not
+R8487:8493 Core.Core_Primitive <> :::'t_usize' not
+R8474:8477 Core.Core_Primitive <> :::'t_u8' not
+R8502:8514 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Array constr
+R8517:8529 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R8533:8537 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bytes:61 var
+def 8553:8573 <> spec_field_value_of_z
+R8584:8584 Corelib.Numbers.BinNums <> Z ind
+binder 8576:8580 <> value:62
+R8589:8604 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R8629:8633 Stdlib.ZArith.BinInt Z ltb def
+R8635:8639 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:62 var
+R8657:8661 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:62 var
+binder 8615:8621 <> bounded:63
+R8681:8698 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_z_to_bytes_le def
+R8703:8709 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bounded:63 var
+binder 8672:8676 <> bytes:64
+R8719:8740 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_bytes proj
+R8719:8740 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_bytes proj
+R8719:8740 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_bytes proj
+R8779:8798 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_len proj
+R8779:8798 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_len proj
+R8851:8875 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_negative proj
+R8851:8875 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecFieldValue_f_negative proj
+R8745:8765 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_bytes_to_array32 def
+R8767:8771 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bytes:64 var
+R8803:8843 Core.Core_Array_Rec_bundle_579704328 <> :::'u8' not
+R8807:8828 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_canonical_len_aux def
+R8830:8834 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bytes:64 var
+R8880:8884 Corelib.Init.Datatypes <> false constr
+def 8902:8917 <> spec_mod_inverse
+R8936:8936 Corelib.Numbers.BinNums <> Z ind
+binder 8920:8924 <> value:65
+binder 8926:8932 <> modulus:66
+R8941:8946 Corelib.Init.Datatypes <> option ind
+R8948:8948 Corelib.Numbers.BinNums <> Z ind
+R8981:8986 Stdlib.ZArith.BinInt Z ggcd def
+R8988:8992 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:65 var
+R8994:9000 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:66 var
+R8960:8960 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8962:8963 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8976:8976 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9012:9012 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9024:9025 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9027:9027 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9053:9057 Stdlib.ZArith.BinInt Z eqb def
+R9129:9132 Corelib.Init.Datatypes <> None constr
+R9074:9077 Corelib.Init.Datatypes <> Some constr
+R9080:9095 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R9109:9115 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:66 var
+def 9147:9150 <> zero
+R9158:9161 Corelib.Init.Datatypes <> unit ind
+R9158:9161 Corelib.Init.Datatypes <> unit ind
+binder 9154:9161 <> pat:68
+R9166:9181 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R9188:9208 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+def 9227:9235 <> normalize
+R9246:9261 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 9238:9242 <> value:69
+R9273:9281 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 9265:9269 <> field:70
+R9286:9301 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R9308:9328 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R9331:9346 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R9349:9369 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R9371:9375 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:69 var
+R9379:9396 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R9398:9402 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:70 var
+def 9419:9437 <> kernel_signal_value
+R9450:9468 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 9440:9446 <> witness:71
+R9487:9493 Core.Core_Primitive <> :::'t_usize' not
+binder 9472:9483 <> signal_index:72
+R9505:9513 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 9497:9501 <> field:73
+R9518:9525 KernelCompat <> t_Result ind
+R9529:9544 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R9550:9571 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R9586:9594 KernelCompat <> impl__get def
+R9626:9637 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal_index:72 var
+R9597:9603 KernelCompat <> f_deref def
+R9606:9621 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_values' not
+R9615:9621 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:71 var
+R9649:9659 Core.Core_Option <> Option_Some constr
+R9662:9672 Core.Core_Option <> Option_Some constr
+R9690:9698 KernelCompat <> Result_Ok constr
+R9701:9709 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalize def
+R9720:9724 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:73 var
+R9741:9750 KernelCompat <> Result_Err constr
+R9753:9786 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal constr
+R9791:9839 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal_f_signal_index proj
+R9791:9839 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal_f_signal_index proj
+R9791:9839 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal_f_signal_index proj
+R9845:9856 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal_index:72 var
+def 9882:9890 <> Add_f_add
+R9899:9914 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 9893:9895 <> lhs:74
+R9924:9939 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 9918:9920 <> rhs:75
+R9951:9959 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 9943:9947 <> field:76
+R9964:9979 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R10001:10018 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R10020:10024 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:76 var
+binder 9990:9996 <> modulus:77
+R10031:10051 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R10058:10073 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10134:10143 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R10082:10097 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10100:10120 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10122:10124 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:74 var
+R10127:10133 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:77 var
+R10144:10159 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10162:10182 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10184:10186 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:75 var
+R10189:10195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:77 var
+R10204:10210 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:77 var
+def 10226:10234 <> Sub_f_sub
+R10243:10258 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10237:10239 <> lhs:78
+R10268:10283 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10262:10264 <> rhs:79
+R10295:10303 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 10287:10291 <> field:80
+R10308:10323 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R10345:10362 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R10364:10368 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:80 var
+binder 10334:10340 <> modulus:81
+R10375:10395 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R10402:10417 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10478:10487 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R10426:10441 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10444:10464 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10466:10468 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:78 var
+R10471:10477 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:81 var
+R10488:10503 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10506:10526 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10528:10530 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:79 var
+R10533:10539 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:81 var
+R10548:10554 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:81 var
+def 10570:10578 <> Mul_f_mul
+R10587:10602 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10581:10583 <> lhs:82
+R10612:10627 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10606:10608 <> rhs:83
+R10639:10647 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 10631:10635 <> field:84
+R10652:10667 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R10689:10706 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R10708:10712 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:84 var
+binder 10678:10684 <> modulus:85
+R10719:10739 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R10746:10761 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10822:10831 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R10770:10785 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10788:10808 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10810:10812 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:82 var
+R10815:10821 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:85 var
+R10832:10847 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R10850:10870 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R10872:10874 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:83 var
+R10877:10883 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:85 var
+R10892:10898 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:85 var
+def 10914:10922 <> Div_f_div
+R10931:10946 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10925:10927 <> lhs:86
+R10956:10971 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 10950:10952 <> rhs:87
+R10983:10991 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 10975:10979 <> field:88
+R10996:11003 Core.Core_Option <> t_Option ind
+R11007:11022 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R11046:11063 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R11065:11069 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:88 var
+binder 11035:11041 <> modulus:89
+R11093:11108 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11111:11131 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R11133:11135 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:86 var
+R11138:11144 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:89 var
+binder 11080:11088 <> lhs_value:90
+R11168:11183 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11186:11206 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R11208:11210 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:87 var
+R11213:11219 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:89 var
+binder 11155:11163 <> rhs_value:91
+R11232:11247 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_mod_inverse def
+R11249:11257 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs_value:91 var
+R11259:11265 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:89 var
+R11276:11279 Corelib.Init.Datatypes <> Some constr
+R11296:11306 Core.Core_Option <> Option_Some constr
+R11315:11335 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R11346:11361 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11373:11375 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R11364:11372 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs_value:90 var
+R11385:11391 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:89 var
+R11399:11402 Corelib.Init.Datatypes <> None constr
+R11411:11421 Core.Core_Option <> Option_None constr
+def 11442:11455 <> PartialEq_f_eq
+R11464:11479 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 11458:11460 <> lhs:92
+R11489:11504 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 11483:11485 <> rhs:93
+R11516:11524 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 11508:11512 <> field:94
+R11529:11532 Corelib.Init.Datatypes <> bool ind
+R11539:11543 Stdlib.ZArith.BinInt Z eqb def
+R11550:11565 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11568:11588 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R11590:11592 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:92 var
+R11596:11613 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R11615:11619 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:94 var
+R11628:11643 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11646:11666 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R11668:11670 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:93 var
+R11674:11691 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R11693:11697 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:94 var
+def 11714:11723 <> is_boolean
+R11734:11749 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 11726:11730 <> value:95
+R11761:11769 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 11753:11757 <> field:96
+R11774:11777 Corelib.Init.Datatypes <> bool ind
+R11802:11817 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R11820:11840 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R11842:11846 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:95 var
+R11850:11867 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R11869:11873 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:96 var
+binder 11788:11797 <> normalized:97
+R11881:11883 Corelib.Init.Datatypes <> orb def
+R11909:11913 Stdlib.ZArith.BinInt Z eqb def
+R11915:11924 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalized:97 var
+R11886:11890 Stdlib.ZArith.BinInt Z eqb def
+R11892:11901 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalized:97 var
+def 11944:11952 <> fits_bits
+R11963:11978 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 11955:11959 <> value:98
+R11989:11993 Core.Core_Primitive <> :::'t_u32' not
+binder 11982:11985 <> bits:99
+R12005:12013 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 11997:12001 <> field:100
+R12018:12021 Corelib.Init.Datatypes <> bool ind
+R12046:12061 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R12064:12084 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R12086:12090 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:98 var
+R12094:12111 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R12113:12117 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:100 var
+binder 12032:12041 <> normalized:101
+R12125:12129 Stdlib.ZArith.BinInt Z ltb def
+R12131:12140 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalized:101 var
+R12144:12147 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R12177:12177 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R12148:12153 Stdlib.ZArith.BinInt Z of_N def
+R12156:12162 Core.Core_Base_interface_Int <> U32_f_v proj
+R12165:12174 Core.Core_Primitive <> :::'u32_0' not
+R12171:12174 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bits:99 var
+def 12193:12200 <> t_BigInt
+R12205:12205 Corelib.Numbers.BinNums <> Z ind
+def 12220:12240 <> impl_FieldId__modulus
+R12251:12259 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 12243:12247 <> field:102
+R12264:12271 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R12278:12295 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R12297:12301 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:102 var
+def 12316:12328 <> normalize_mod
+R12347:12354 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 12331:12335 <> value:103
+binder 12337:12343 <> modulus:104
+R12359:12366 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R12373:12388 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R12390:12394 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:103 var
+R12396:12402 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:104 var
+def 12417:12434 <> mod_inverse_bigint
+R12453:12460 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 12437:12441 <> value:105
+binder 12443:12449 <> modulus:106
+R12465:12472 Core.Core_Option <> t_Option ind
+R12476:12483 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R12498:12513 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_mod_inverse def
+R12515:12519 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:105 var
+R12521:12527 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:106 var
+R12538:12541 Corelib.Init.Datatypes <> Some constr
+R12558:12568 Core.Core_Option <> Option_Some constr
+R12582:12585 Corelib.Init.Datatypes <> None constr
+R12594:12604 Core.Core_Option <> Option_None constr
+def 12625:12651 <> spec_field_value_raw_bigint
+R12662:12677 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 12654:12658 <> value:107
+R12682:12689 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R12696:12716 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R12718:12722 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:107 var
+def 12737:12775 <> spec_field_value_from_bigint_with_field
+R12786:12793 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 12778:12782 <> value:108
+R12805:12813 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 12797:12801 <> field:109
+R12818:12833 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R12840:12860 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R12863:12878 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R12880:12884 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:108 var
+R12887:12904 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R12906:12910 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:109 var
+def 12927:12947 <> spec_field_value_zero
+R12955:12958 Corelib.Init.Datatypes <> unit ind
+R12955:12958 Corelib.Init.Datatypes <> unit ind
+binder 12951:12958 <> pat:110
+R12963:12978 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R12985:13005 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+def 13024:13051 <> spec_field_value_is_zero_raw
+R13062:13077 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 13054:13058 <> value:111
+R13082:13085 Corelib.Init.Datatypes <> bool ind
+R13092:13096 Stdlib.ZArith.BinInt Z eqb def
+R13099:13119 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R13121:13125 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:111 var
+def 13145:13171 <> spec_field_value_is_one_raw
+R13182:13197 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 13174:13178 <> value:112
+R13202:13205 Corelib.Init.Datatypes <> bool ind
+R13212:13216 Stdlib.ZArith.BinInt Z eqb def
+R13219:13239 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R13241:13245 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:112 var
+def 13265:13289 <> spec_normalize_mod_bigint
+R13300:13307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 13292:13296 <> value:113
+R13321:13328 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 13311:13317 <> modulus:114
+R13333:13340 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R13347:13362 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R13364:13368 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:113 var
+R13370:13376 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:114 var
+def 13391:13413 <> spec_mod_inverse_bigint
+R13424:13431 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 13416:13420 <> value:115
+R13445:13452 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+binder 13435:13441 <> modulus:116
+R13457:13464 Core.Core_Option <> t_Option ind
+R13468:13475 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_BigInt def
+R13490:13505 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_mod_inverse def
+R13507:13511 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> value:115 var
+R13513:13519 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> modulus:116 var
+R13530:13533 Corelib.Init.Datatypes <> Some constr
+R13550:13560 Core.Core_Option <> Option_Some constr
+R13574:13577 Corelib.Init.Datatypes <> None constr
+R13586:13596 Core.Core_Option <> Option_None constr
+ind 13616:13631 <> t_SpecKernelExpr
+constr 13645:13664 <> SpecKernelExpr_Const
+constr 13692:13712 <> SpecKernelExpr_Signal
+constr 13731:13748 <> SpecKernelExpr_Add
+constr 13796:13813 <> SpecKernelExpr_Sub
+constr 13861:13878 <> SpecKernelExpr_Mul
+constr 13926:13943 <> SpecKernelExpr_Div
+R13684:13687 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13668:13683 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R13723:13726 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13716:13722 Core.Core_Primitive <> :::'t_usize' not
+R13768:13771 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13752:13767 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13788:13791 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13772:13787 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13833:13836 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13817:13832 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13853:13856 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13837:13852 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13898:13901 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13882:13897 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13918:13921 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13902:13917 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13963:13966 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13947:13962 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+R13983:13986 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R13967:13982 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr:117 ind
+scheme 13616:13631 <> t_SpecKernelExpr_rect
+scheme 13616:13631 <> t_SpecKernelExpr_ind
+scheme 13616:13631 <> t_SpecKernelExpr_rec
+scheme 13616:13631 <> t_SpecKernelExpr_sind
+def 14007:14037 <> render_lookup_outputs_from_list
+R14057:14060 Corelib.Init.Datatypes <> list ind
+R14062:14068 Core.Core_Primitive <> :::'t_usize' not
+binder 14040:14053 <> signal_indices:119
+R14089:14095 Core.Core_Primitive <> :::'t_usize' not
+binder 14072:14085 <> current_column:120
+R14114:14136 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelLookupTable' not
+binder 14099:14110 <> lookup_table:121
+R14150:14168 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 14140:14146 <> witness:122
+R14180:14188 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 14172:14176 <> field:123
+R14198:14202 KernelCompat <> t_Vec def
+R14206:14221 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R14227:14234 KernelCompat <> t_Global constr
+binder 14192:14194 <> acc:124
+R14241:14248 KernelCompat <> t_Result ind
+R14252:14256 KernelCompat <> t_Vec def
+R14260:14275 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R14281:14288 KernelCompat <> t_Global constr
+R14296:14317 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R14332:14345 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal_indices:119 var
+R14356:14357 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R14366:14374 KernelCompat <> Result_Ok constr
+R14377:14379 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:124 var
+R14398:14401 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R14443:14446 KernelCompat <> f_lt def
+R14449:14462 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current_column:120 var
+R14466:14492 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R14481:14492 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_table:121 var
+R14881:14911 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from_list:125 def
+R15015:15017 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:124 var
+R15007:15011 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:123 var
+R14997:15003 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:122 var
+R14982:14993 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_table:121 var
+R14941:14945 KernelCompat <> f_add def
+R14948:14961 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current_column:120 var
+R14970:14976 Core.Core_Primitive <> :::'t_usize' not
+R14516:14534 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> kernel_signal_value def
+R14537:14543 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:122 var
+R14562:14566 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:123 var
+R14582:14590 KernelCompat <> Result_Ok constr
+R14622:14633 KernelCompat <> impl_1__push def
+R14636:14638 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:124 var
+binder 14615:14617 <> acc:127
+R14660:14690 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from_list:125 def
+R14794:14796 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:127 var
+R14786:14790 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:123 var
+R14776:14782 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:122 var
+R14761:14772 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_table:121 var
+R14720:14724 KernelCompat <> f_add def
+R14727:14740 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current_column:120 var
+R14749:14755 Core.Core_Primitive <> :::'t_usize' not
+R14807:14816 KernelCompat <> Result_Err constr
+R14837:14846 KernelCompat <> Result_Err constr
+def 15039:15064 <> render_lookup_outputs_from
+R15084:15098 Core.Core_Primitive <> :::'t_Slice' not
+R15092:15098 Core.Core_Primitive <> :::'t_usize' not
+binder 15067:15080 <> signal_indices:128
+R15119:15125 Core.Core_Primitive <> :::'t_usize' not
+binder 15102:15115 <> current_column:129
+R15144:15166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelLookupTable' not
+binder 15129:15140 <> lookup_table:130
+R15180:15198 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 15170:15176 <> witness:131
+R15210:15218 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 15202:15206 <> field:132
+R15228:15232 KernelCompat <> t_Vec def
+R15236:15251 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R15257:15264 KernelCompat <> t_Global constr
+binder 15222:15224 <> acc:133
+R15271:15278 KernelCompat <> t_Result ind
+R15282:15286 KernelCompat <> t_Vec def
+R15290:15305 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R15311:15318 KernelCompat <> t_Global constr
+R15326:15347 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R15356:15386 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from_list def
+R15389:15412 Core.Core_Primitive <> :::'Slice_f_v' not
+R15399:15412 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal_indices:128 var
+R15416:15429 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> current_column:129 var
+R15433:15444 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_table:130 var
+R15448:15454 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:131 var
+R15458:15462 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:132 var
+R15466:15468 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:133 var
+def 15483:15510 <> row_matches_inputs_from_list
+R15519:15522 Corelib.Init.Datatypes <> list ind
+R15524:15539 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 15513:15515 <> row:134
+R15562:15565 Corelib.Init.Datatypes <> list ind
+R15567:15582 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 15543:15558 <> evaluated_inputs:135
+R15594:15602 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 15586:15590 <> field:136
+R15607:15610 Corelib.Init.Datatypes <> bool ind
+R15623:15638 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:135 var
+R15649:15650 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R15667:15670 Corelib.Init.Datatypes <> bool ind
+R15660:15663 Corelib.Init.Datatypes <> true constr
+R15688:15691 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R15740:15742 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:134 var
+R15755:15756 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R15767:15767 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15777:15778 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15781:15781 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15768:15771 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> zero def
+R15774:15775 Corelib.Init.Datatypes <> tt constr
+R15779:15780 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R15794:15797 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R15821:15821 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15837:15838 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15852:15852 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15822:15828 KernelCompat <> f_clone def
+binder 15720:15729 <> row_result:140
+R15886:15888 Corelib.Init.Datatypes <> fst def
+R15890:15899 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_result:140 var
+binder 15873:15881 <> row_value:141
+R15929:15931 Corelib.Init.Datatypes <> snd def
+R15933:15942 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_result:140 var
+binder 15912:15924 <> remaining_row:142
+R15951:15954 Corelib.Init.Datatypes <> andb def
+R16008:16035 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from_list:137 def
+R16073:16077 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:136 var
+R16038:16050 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> remaining_row:142 var
+R15957:15970 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> PartialEq_f_eq def
+R15973:15981 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_value:141 var
+R15999:16003 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:136 var
+def 16100:16122 <> row_matches_inputs_from
+R16131:16154 Core.Core_Primitive <> :::'t_Slice' not
+R16139:16154 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16125:16127 <> row:143
+R16177:16200 Core.Core_Primitive <> :::'t_Slice' not
+R16185:16200 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16158:16173 <> evaluated_inputs:144
+R16212:16220 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 16204:16208 <> field:145
+R16225:16228 Corelib.Init.Datatypes <> bool ind
+R16235:16262 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from_list def
+R16265:16277 Core.Core_Primitive <> :::'Slice_f_v' not
+R16275:16277 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:143 var
+R16281:16306 Core.Core_Primitive <> :::'Slice_f_v' not
+R16291:16306 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:144 var
+R16310:16314 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:145 var
+def 16329:16348 <> skip_row_prefix_list
+R16357:16360 Corelib.Init.Datatypes <> list ind
+R16362:16377 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16351:16353 <> row:146
+R16401:16407 Core.Core_Primitive <> :::'t_usize' not
+binder 16381:16397 <> remaining_to_skip:147
+R16412:16415 Corelib.Init.Datatypes <> list ind
+R16417:16432 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R16446:16449 KernelCompat <> f_eq def
+R16452:16468 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> remaining_to_skip:147 var
+R16477:16483 Core.Core_Primitive <> :::'t_usize' not
+R16519:16521 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:146 var
+R16534:16535 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R16546:16548 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:146 var
+R16562:16565 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R16589:16608 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix_list:148 def
+R16627:16631 KernelCompat <> f_sub def
+R16634:16650 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> remaining_to_skip:147 var
+R16659:16665 Core.Core_Primitive <> :::'t_usize' not
+R16498:16500 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:146 var
+def 16691:16705 <> skip_row_prefix
+R16714:16737 Core.Core_Primitive <> :::'t_Slice' not
+R16722:16737 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16708:16710 <> row:150
+R16761:16767 Core.Core_Primitive <> :::'t_usize' not
+binder 16741:16757 <> remaining_to_skip:151
+R16772:16795 Core.Core_Primitive <> :::'t_Slice' not
+R16780:16795 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R16802:16814 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R16819:16838 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix_list def
+R16841:16853 Core.Core_Primitive <> :::'Slice_f_v' not
+R16851:16853 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:150 var
+R16857:16873 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> remaining_to_skip:151 var
+def 16889:16917 <> row_matches_outputs_from_list
+R16926:16929 Corelib.Init.Datatypes <> list ind
+R16931:16946 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16920:16922 <> row:152
+R16969:16972 Corelib.Init.Datatypes <> list ind
+R16974:16989 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 16950:16965 <> expected_outputs:153
+R17001:17009 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 16993:16997 <> field:154
+R17014:17017 Corelib.Init.Datatypes <> bool ind
+R17030:17045 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:153 var
+R17056:17057 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R17074:17077 Corelib.Init.Datatypes <> bool ind
+R17067:17070 Corelib.Init.Datatypes <> true constr
+R17096:17099 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R17149:17151 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:152 var
+R17164:17165 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R17176:17176 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17186:17187 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17190:17190 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17177:17180 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> zero def
+R17183:17184 Corelib.Init.Datatypes <> tt constr
+R17188:17189 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R17203:17206 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R17230:17230 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17246:17247 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17261:17261 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17231:17237 KernelCompat <> f_clone def
+binder 17129:17138 <> row_result:158
+R17295:17297 Corelib.Init.Datatypes <> fst def
+R17299:17308 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_result:158 var
+binder 17282:17290 <> row_value:159
+R17338:17340 Corelib.Init.Datatypes <> snd def
+R17342:17351 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_result:158 var
+binder 17321:17333 <> remaining_row:160
+R17360:17363 Corelib.Init.Datatypes <> andb def
+R17418:17446 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from_list:155 def
+R17485:17489 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:154 var
+R17449:17461 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> remaining_row:160 var
+R17366:17379 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> PartialEq_f_eq def
+R17382:17390 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_value:159 var
+R17409:17413 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:154 var
+def 17512:17535 <> row_matches_outputs_from
+R17544:17567 Core.Core_Primitive <> :::'t_Slice' not
+R17552:17567 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 17538:17540 <> row:161
+R17590:17613 Core.Core_Primitive <> :::'t_Slice' not
+R17598:17613 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 17571:17586 <> expected_outputs:162
+R17625:17633 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 17617:17621 <> field:163
+R17638:17641 Corelib.Init.Datatypes <> bool ind
+R17648:17676 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from_list def
+R17679:17691 Core.Core_Primitive <> :::'Slice_f_v' not
+R17689:17691 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:161 var
+R17695:17720 Core.Core_Primitive <> :::'Slice_f_v' not
+R17705:17720 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:162 var
+R17724:17728 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:163 var
+rec 17740:17772 <> SpecKernelConstraint_Equal_record
+proj 17792:17825 <> SpecKernelConstraint_Equal_f_index
+proj 17842:17873 <> SpecKernelConstraint_Equal_f_lhs
+proj 17899:17930 <> SpecKernelConstraint_Equal_f_rhs
+R17829:17835 Core.Core_Primitive <> :::'t_usize' not
+R17877:17892 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+R17934:17949 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+inst 17980:18021 <> settable_SpecKernelConstraint_Equal_record
+R18025:18032 RecordUpdate.RecordSet <> Settable class
+R18041:18051 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18091:18093 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18128:18129 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18162:18163 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18196:18196 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18164:18195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_rhs proj
+R18130:18161 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_lhs proj
+R18094:18127 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_index proj
+R18052:18090 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Equal_record constr
+R18052:18090 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Equal_record constr
+rec 18206:18240 <> SpecKernelConstraint_Boolean_record
+proj 18260:18295 <> SpecKernelConstraint_Boolean_f_index
+proj 18312:18348 <> SpecKernelConstraint_Boolean_f_signal
+R18299:18305 Core.Core_Primitive <> :::'t_usize' not
+R18352:18358 Core.Core_Primitive <> :::'t_usize' not
+inst 18388:18431 <> settable_SpecKernelConstraint_Boolean_record
+R18435:18442 RecordUpdate.RecordSet <> Settable class
+R18451:18461 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18503:18505 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18542:18543 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18581:18581 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18544:18580 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_signal proj
+R18506:18541 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_index proj
+R18462:18502 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Boolean_record constr
+R18462:18502 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Boolean_record constr
+rec 18591:18623 <> SpecKernelConstraint_Range_record
+proj 18643:18676 <> SpecKernelConstraint_Range_f_index
+proj 18693:18727 <> SpecKernelConstraint_Range_f_signal
+proj 18744:18776 <> SpecKernelConstraint_Range_f_bits
+R18680:18686 Core.Core_Primitive <> :::'t_usize' not
+R18731:18737 Core.Core_Primitive <> :::'t_usize' not
+R18780:18784 Core.Core_Primitive <> :::'t_u32' not
+inst 18815:18856 <> settable_SpecKernelConstraint_Range_record
+R18860:18867 RecordUpdate.RecordSet <> Settable class
+R18876:18886 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18926:18928 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R18963:18964 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19000:19001 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19035:19035 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19002:19034 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_bits proj
+R18965:18999 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_signal proj
+R18929:18962 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_index proj
+R18887:18925 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Range_record constr
+R18887:18925 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Range_record constr
+rec 19045:19078 <> SpecKernelConstraint_Lookup_record
+proj 19098:19132 <> SpecKernelConstraint_Lookup_f_index
+proj 19149:19184 <> SpecKernelConstraint_Lookup_f_inputs
+proj 19233:19273 <> SpecKernelConstraint_Lookup_f_table_index
+proj 19290:19326 <> SpecKernelConstraint_Lookup_f_outputs
+R19136:19142 Core.Core_Primitive <> :::'t_usize' not
+R19188:19192 KernelCompat <> t_Vec def
+R19196:19211 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+R19217:19224 KernelCompat <> t_Global constr
+R19277:19283 Core.Core_Primitive <> :::'t_usize' not
+R19330:19337 Core.Core_Option <> t_Option ind
+R19341:19345 KernelCompat <> t_Vec def
+R19349:19355 Core.Core_Primitive <> :::'t_usize' not
+R19361:19368 KernelCompat <> t_Global constr
+inst 19404:19446 <> settable_SpecKernelConstraint_Lookup_record
+R19450:19457 RecordUpdate.RecordSet <> Settable class
+R19466:19476 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19517:19519 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19555:19556 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19593:19594 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19636:19637 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19675:19675 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R19638:19674 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_outputs proj
+R19595:19635 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+R19557:19592 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+R19520:19554 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_index proj
+R19477:19516 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Lookup_record constr
+R19477:19516 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelConstraint_Lookup_record constr
+ind 19688:19709 <> t_SpecKernelConstraint
+constr 19723:19748 <> SpecKernelConstraint_Equal
+constr 19794:19821 <> SpecKernelConstraint_Boolean
+constr 19869:19894 <> SpecKernelConstraint_Range
+constr 19940:19966 <> SpecKernelConstraint_Lookup
+R19785:19789 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R19752:19784 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_record rec
+R19860:19864 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R19825:19859 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_record rec
+R19931:19935 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R19898:19930 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_record rec
+R20004:20008 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R19970:20003 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_record rec
+scheme 19688:19709 <> t_SpecKernelConstraint_rect
+scheme 19688:19709 <> t_SpecKernelConstraint_ind
+scheme 19688:19709 <> t_SpecKernelConstraint_rec
+scheme 19688:19709 <> t_SpecKernelConstraint_sind
+rec 20024:20047 <> SpecKernelProgram_record
+proj 20067:20091 <> SpecKernelProgram_f_field
+proj 20110:20140 <> SpecKernelProgram_f_constraints
+proj 20195:20227 <> SpecKernelProgram_f_lookup_tables
+R20095:20103 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+R20144:20148 KernelCompat <> t_Vec def
+R20152:20173 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelConstraint ind
+R20179:20186 KernelCompat <> t_Global constr
+R20231:20235 KernelCompat <> t_Vec def
+R20239:20261 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelLookupTable' not
+R20267:20274 KernelCompat <> t_Global constr
+inst 20307:20339 <> settable_SpecKernelProgram_record
+R20343:20350 RecordUpdate.RecordSet <> Settable class
+R20359:20369 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R20400:20402 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R20428:20429 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R20461:20462 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R20496:20496 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R20463:20495 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_lookup_tables proj
+R20430:20460 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+R20403:20427 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+R20370:20399 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelProgram_record constr
+R20370:20399 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Build_SpecKernelProgram_record constr
+R20536:20559 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_record rec
+not 20508:20508 <> :::'t_SpecKernelProgram'
+R20588:20612 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_field proj
+not 20572:20572 <> :::'f_field'
+R20647:20677 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_constraints proj
+not 20625:20625 <> :::'f_constraints'
+R20714:20746 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelProgram_f_lookup_tables proj
+not 20690:20690 <> :::'f_lookup_tables'
+def 20762:20782 <> render_lookup_outputs
+R20802:20816 Core.Core_Primitive <> :::'t_Slice' not
+R20810:20816 Core.Core_Primitive <> :::'t_usize' not
+binder 20785:20798 <> signal_indices:186
+R20832:20838 Core.Core_Primitive <> :::'t_usize' not
+binder 20820:20828 <> input_len:187
+R20857:20879 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelLookupTable' not
+binder 20842:20853 <> lookup_table:188
+R20893:20911 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 20883:20889 <> witness:189
+R20923:20931 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 20915:20919 <> field:190
+R20936:20943 KernelCompat <> t_Result ind
+R20947:20951 KernelCompat <> t_Vec def
+R20955:20970 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R20976:20983 KernelCompat <> t_Global constr
+R20991:21012 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R21021:21046 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from def
+R21049:21062 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal_indices:186 var
+R21066:21074 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> input_len:187 var
+R21078:21089 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_table:188 var
+R21093:21099 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:189 var
+R21103:21107 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:190 var
+R21111:21119 KernelCompat <> impl__new def
+R21122:21123 Corelib.Init.Datatypes <> tt constr
+def 21140:21157 <> row_matches_inputs
+R21166:21189 Core.Core_Primitive <> :::'t_Slice' not
+R21174:21189 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 21160:21162 <> row:191
+R21212:21235 Core.Core_Primitive <> :::'t_Slice' not
+R21220:21235 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 21193:21208 <> evaluated_inputs:192
+R21247:21255 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 21239:21243 <> field:193
+R21260:21263 Corelib.Init.Datatypes <> bool ind
+R21270:21292 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from def
+R21295:21297 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:191 var
+R21301:21316 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:192 var
+R21320:21324 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:193 var
+def 21340:21358 <> row_matches_outputs
+R21367:21390 Core.Core_Primitive <> :::'t_Slice' not
+R21375:21390 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 21361:21363 <> row:194
+R21406:21412 Core.Core_Primitive <> :::'t_usize' not
+binder 21394:21402 <> input_len:195
+R21435:21458 Core.Core_Primitive <> :::'t_Slice' not
+R21443:21458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 21416:21431 <> expected_outputs:196
+R21470:21478 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 21462:21466 <> field:197
+R21483:21486 Corelib.Init.Datatypes <> bool ind
+R21493:21516 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from def
+R21519:21533 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix def
+R21536:21538 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row:194 var
+R21542:21550 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> input_len:195 var
+R21555:21570 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:196 var
+R21574:21578 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:197 var
+def 21593:21625 <> lookup_has_matching_row_from_list
+R21635:21638 Corelib.Init.Datatypes <> list ind
+R21641:21645 KernelCompat <> t_Vec def
+R21649:21664 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R21670:21677 KernelCompat <> t_Global constr
+binder 21628:21631 <> rows:198
+R21703:21706 Corelib.Init.Datatypes <> list ind
+R21708:21723 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 21684:21699 <> evaluated_inputs:199
+R21746:21753 Core.Core_Option <> t_Option ind
+R21757:21761 KernelCompat <> t_Vec def
+R21765:21780 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R21786:21793 KernelCompat <> t_Global constr
+binder 21727:21742 <> expected_outputs:200
+R21813:21819 Core.Core_Primitive <> :::'t_usize' not
+binder 21801:21809 <> input_len:201
+R21831:21839 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 21823:21827 <> field:202
+R21844:21847 Corelib.Init.Datatypes <> bool ind
+R21860:21863 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rows:198 var
+R21874:21875 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R21893:21896 Corelib.Init.Datatypes <> bool ind
+R21885:21889 Corelib.Init.Datatypes <> false constr
+R21906:21909 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R21960:21987 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from_list def
+R21996:22011 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:199 var
+R22015:22019 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:202 var
+R22274:22277 Corelib.Init.Datatypes <> bool ind
+R22266:22270 Corelib.Init.Datatypes <> false constr
+R22043:22058 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:200 var
+R22073:22083 Core.Core_Option <> Option_Some constr
+R22106:22134 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from_list def
+R22137:22156 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix_list def
+R22165:22173 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> input_len:201 var
+R22188:22192 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:202 var
+R22203:22213 Core.Core_Option <> Option_None constr
+R22234:22237 Corelib.Init.Datatypes <> bool ind
+R22227:22230 Corelib.Init.Datatypes <> true constr
+binder 21936:21946 <> row_matches:206
+R22287:22289 Corelib.Init.Datatypes <> orb def
+R22306:22338 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_has_matching_row_from_list:203 def
+R22408:22412 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:202 var
+R22396:22404 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> input_len:201 var
+R22377:22392 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:200 var
+R22358:22373 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:199 var
+R22292:22302 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches:206 var
+def 22435:22462 <> lookup_has_matching_row_from
+R22472:22520 Core.Core_Primitive <> :::'t_Slice' not
+R22481:22485 KernelCompat <> t_Vec def
+R22489:22504 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R22510:22517 KernelCompat <> t_Global constr
+binder 22465:22468 <> rows:207
+R22543:22566 Core.Core_Primitive <> :::'t_Slice' not
+R22551:22566 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 22524:22539 <> evaluated_inputs:208
+R22589:22596 Core.Core_Option <> t_Option ind
+R22600:22604 KernelCompat <> t_Vec def
+R22608:22623 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R22629:22636 KernelCompat <> t_Global constr
+binder 22570:22585 <> expected_outputs:209
+R22656:22662 Core.Core_Primitive <> :::'t_usize' not
+binder 22644:22652 <> input_len:210
+R22674:22682 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 22666:22670 <> field:211
+R22687:22690 Corelib.Init.Datatypes <> bool ind
+R22697:22729 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_has_matching_row_from_list def
+R22732:22745 Core.Core_Primitive <> :::'Slice_f_v' not
+R22742:22745 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rows:207 var
+R22749:22774 Core.Core_Primitive <> :::'Slice_f_v' not
+R22759:22774 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> evaluated_inputs:208 var
+R22778:22793 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:209 var
+R22797:22805 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> input_len:210 var
+R22809:22813 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:211 var
+def 22827:22835 <> eval_expr
+R22845:22860 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+binder 22838:22841 <> expr:212
+R22874:22892 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 22864:22870 <> witness:213
+R22904:22912 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 22896:22900 <> field:214
+R22917:22924 KernelCompat <> t_Result ind
+R22928:22943 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R22949:22970 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R22985:22988 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expr:212 var
+R22999:23018 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Const constr
+R23035:23043 KernelCompat <> Result_Ok constr
+R23046:23054 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> normalize def
+R23065:23069 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23077:23097 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Signal constr
+R23121:23139 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> kernel_signal_value def
+R23142:23148 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R23167:23171 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23178:23195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Add constr
+R23222:23230 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R23249:23253 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23239:23245 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R23267:23275 KernelCompat <> Result_Ok constr
+R23304:23312 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R23331:23335 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23321:23327 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R23351:23359 KernelCompat <> Result_Ok constr
+R23384:23392 KernelCompat <> Result_Ok constr
+R23395:23403 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Add_f_add def
+R23430:23434 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23446:23455 KernelCompat <> Result_Err constr
+R23476:23485 KernelCompat <> Result_Err constr
+R23511:23520 KernelCompat <> Result_Err constr
+R23539:23548 KernelCompat <> Result_Err constr
+R23570:23587 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Sub constr
+R23614:23622 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R23641:23645 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23631:23637 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R23659:23667 KernelCompat <> Result_Ok constr
+R23696:23704 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R23723:23727 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23713:23719 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R23743:23751 KernelCompat <> Result_Ok constr
+R23776:23784 KernelCompat <> Result_Ok constr
+R23787:23795 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Sub_f_sub def
+R23822:23826 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R23838:23847 KernelCompat <> Result_Err constr
+R23868:23877 KernelCompat <> Result_Err constr
+R23903:23912 KernelCompat <> Result_Err constr
+R23931:23940 KernelCompat <> Result_Err constr
+R23962:23979 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Mul constr
+R24006:24014 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R24033:24037 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24023:24029 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R24051:24059 KernelCompat <> Result_Ok constr
+R24088:24096 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R24115:24119 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24105:24111 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R24135:24143 KernelCompat <> Result_Ok constr
+R24168:24176 KernelCompat <> Result_Ok constr
+R24179:24187 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Mul_f_mul def
+R24214:24218 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24230:24239 KernelCompat <> Result_Err constr
+R24260:24269 KernelCompat <> Result_Err constr
+R24295:24304 KernelCompat <> Result_Err constr
+R24323:24332 KernelCompat <> Result_Err constr
+R24354:24371 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Div constr
+R24398:24406 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R24425:24429 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24415:24421 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R24443:24451 KernelCompat <> Result_Ok constr
+R24480:24488 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr:215 def
+R24507:24511 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24497:24503 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:213 var
+R24527:24535 KernelCompat <> Result_Ok constr
+R24566:24574 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> Div_f_div def
+R24601:24605 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:214 var
+R24623:24633 Core.Core_Option <> Option_Some constr
+R24656:24664 KernelCompat <> Result_Ok constr
+R24684:24694 Core.Core_Option <> Option_None constr
+R24709:24718 KernelCompat <> Result_Err constr
+R24721:24755 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_DivisionByZero constr
+R24778:24787 KernelCompat <> Result_Err constr
+R24808:24817 KernelCompat <> Result_Err constr
+R24843:24852 KernelCompat <> Result_Err constr
+R24871:24880 KernelCompat <> Result_Err constr
+def 24916:24949 <> collect_evaluated_inputs_from_list
+R24961:24964 Corelib.Init.Datatypes <> list ind
+R24966:24981 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+binder 24952:24957 <> inputs:217
+R24995:25013 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 24985:24991 <> witness:218
+R25025:25033 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 25017:25021 <> field:219
+R25043:25047 KernelCompat <> t_Vec def
+R25051:25066 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R25072:25079 KernelCompat <> t_Global constr
+binder 25037:25039 <> acc:220
+R25086:25093 KernelCompat <> t_Result ind
+R25097:25101 KernelCompat <> t_Vec def
+R25105:25120 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R25126:25133 KernelCompat <> t_Global constr
+R25141:25162 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R25177:25182 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:217 var
+R25193:25194 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R25203:25211 KernelCompat <> Result_Ok constr
+R25214:25216 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:220 var
+R25228:25231 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R25262:25270 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr def
+R25281:25287 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:218 var
+R25291:25295 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:219 var
+R25309:25317 KernelCompat <> Result_Ok constr
+R25347:25358 KernelCompat <> impl_1__push def
+R25361:25363 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:220 var
+binder 25340:25342 <> acc:223
+R25383:25416 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from_list:221 def
+R25456:25458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:223 var
+R25448:25452 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:219 var
+R25438:25444 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:218 var
+R25467:25476 KernelCompat <> Result_Err constr
+R25495:25504 KernelCompat <> Result_Err constr
+def 25541:25569 <> collect_evaluated_inputs_from
+R25581:25604 Core.Core_Primitive <> :::'t_Slice' not
+R25589:25604 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+binder 25572:25577 <> inputs:224
+R25618:25636 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 25608:25614 <> witness:225
+R25648:25656 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 25640:25644 <> field:226
+R25666:25670 KernelCompat <> t_Vec def
+R25674:25689 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R25695:25702 KernelCompat <> t_Global constr
+binder 25660:25662 <> acc:227
+R25709:25716 KernelCompat <> t_Result ind
+R25720:25724 KernelCompat <> t_Vec def
+R25728:25743 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R25749:25756 KernelCompat <> t_Global constr
+R25764:25785 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R25794:25827 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from_list def
+R25830:25845 Core.Core_Primitive <> :::'Slice_f_v' not
+R25840:25845 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:224 var
+R25849:25855 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:225 var
+R25859:25863 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:226 var
+R25867:25869 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> acc:227 var
+def 25885:25908 <> collect_evaluated_inputs
+R25920:25943 Core.Core_Primitive <> :::'t_Slice' not
+R25928:25943 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+binder 25911:25916 <> inputs:228
+R25957:25975 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 25947:25953 <> witness:229
+R25987:25995 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 25979:25983 <> field:230
+R26000:26007 KernelCompat <> t_Result ind
+R26011:26015 KernelCompat <> t_Vec def
+R26019:26034 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R26040:26047 KernelCompat <> t_Global constr
+R26055:26076 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R26085:26113 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from def
+R26116:26121 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:228 var
+R26125:26131 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:229 var
+R26135:26139 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> field:230 var
+R26143:26151 KernelCompat <> impl__new def
+R26154:26155 Corelib.Init.Datatypes <> tt constr
+def 26171:26197 <> check_constraints_from_list
+R26214:26217 Corelib.Init.Datatypes <> list ind
+R26219:26240 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelConstraint ind
+binder 26200:26210 <> constraints:231
+R26254:26272 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelProgram' not
+binder 26244:26250 <> program:232
+R26286:26304 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 26276:26282 <> witness:233
+R26309:26316 KernelCompat <> t_Result ind
+R26320:26323 Corelib.Init.Datatypes <> unit ind
+R26329:26350 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R26365:26375 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> constraints:231 var
+R26386:26387 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R26396:26404 KernelCompat <> Result_Ok constr
+R26407:26408 Corelib.Init.Datatypes <> tt constr
+R26425:26428 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R26486:26511 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal constr
+R26554:26587 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_index proj
+binder 26545:26549 <> index:237
+R26626:26657 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_lhs proj
+binder 26619:26621 <> lhs:238
+R26696:26727 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal_f_rhs proj
+binder 26689:26691 <> rhs:239
+R26761:26769 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr def
+R26772:26774 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lhs:238 var
+R26778:26784 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R26788:26802 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R26796:26802 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R26818:26826 KernelCompat <> Result_Ok constr
+R26857:26865 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr def
+R26868:26870 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> rhs:239 var
+R26874:26880 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R26884:26898 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R26892:26898 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R26916:26924 KernelCompat <> Result_Ok constr
+R26966:26979 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> PartialEq_f_eq def
+R27006:27020 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R27014:27020 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R27149:27158 KernelCompat <> Result_Err constr
+R27161:27195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation constr
+R27200:27253 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_constraint_index proj
+R27200:27253 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_constraint_index proj
+R27200:27253 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_constraint_index proj
+R27267:27307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_lhs proj
+R27267:27307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_lhs proj
+R27325:27365 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_rhs proj
+R27325:27365 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation_f_rhs proj
+R27259:27263 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:237 var
+R27050:27076 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list:234 def
+R27113:27119 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R27103:27109 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R27396:27405 KernelCompat <> Result_Err constr
+R27428:27437 KernelCompat <> Result_Err constr
+R27467:27476 KernelCompat <> Result_Err constr
+R27497:27506 KernelCompat <> Result_Err constr
+R27532:27559 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean constr
+R27604:27639 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_index proj
+binder 27595:27599 <> index:240
+R27683:27719 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean_f_signal proj
+binder 27673:27678 <> signal:241
+R27755:27773 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> kernel_signal_value def
+R27776:27782 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R27786:27791 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal:241 var
+R27795:27809 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R27803:27809 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R27825:27833 KernelCompat <> Result_Ok constr
+R27867:27876 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> is_boolean def
+R27887:27901 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R27895:27901 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R28022:28031 KernelCompat <> Result_Err constr
+R28034:28070 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation constr
+R28075:28130 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_constraint_index proj
+R28075:28130 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_constraint_index proj
+R28075:28130 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_constraint_index proj
+R28144:28195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_signal_index proj
+R28144:28195 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_signal_index proj
+R28210:28254 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_value proj
+R28210:28254 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation_f_value proj
+R28136:28140 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:240 var
+R28201:28206 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal:241 var
+R27927:27953 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list:234 def
+R27990:27996 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R27980:27986 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R28279:28288 KernelCompat <> Result_Err constr
+R28309:28318 KernelCompat <> Result_Err constr
+R28344:28369 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range constr
+R28412:28445 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_index proj
+binder 28403:28407 <> index:242
+R28487:28521 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_signal proj
+binder 28477:28482 <> signal:243
+R28561:28593 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range_f_bits proj
+binder 28553:28556 <> bits:244
+R28627:28645 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> kernel_signal_value def
+R28648:28654 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R28658:28663 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal:243 var
+R28667:28681 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R28675:28681 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R28697:28705 KernelCompat <> Result_Ok constr
+R28739:28747 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> fits_bits def
+R28758:28761 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bits:244 var
+R28765:28779 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R28773:28779 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R28900:28909 KernelCompat <> Result_Err constr
+R28912:28946 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation constr
+R28951:29004 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_constraint_index proj
+R28951:29004 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_constraint_index proj
+R28951:29004 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_constraint_index proj
+R29018:29067 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_signal_index proj
+R29018:29067 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_signal_index proj
+R29082:29123 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_bits proj
+R29082:29123 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_bits proj
+R29136:29178 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_value proj
+R29136:29178 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation_f_value proj
+R29010:29014 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:242 var
+R29073:29078 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> signal:243 var
+R29129:29132 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> bits:244 var
+R28805:28831 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list:234 def
+R28868:28874 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R28858:28864 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R29203:29212 KernelCompat <> Result_Err constr
+R29233:29242 KernelCompat <> Result_Err constr
+R29268:29294 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup constr
+R29338:29372 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_index proj
+binder 29329:29333 <> index:245
+R29415:29450 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_inputs proj
+binder 29405:29410 <> inputs:246
+R29498:29538 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_table_index proj
+binder 29483:29493 <> table_index:247
+R29582:29618 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup_f_outputs proj
+binder 29571:29577 <> outputs:248
+R29653:29661 KernelCompat <> impl__get def
+R29700:29710 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+R29664:29670 KernelCompat <> f_deref def
+R29673:29695 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_lookup_tables' not
+R29689:29695 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R29726:29736 Core.Core_Option <> Option_Some constr
+R29777:29780 KernelCompat <> f_gt def
+R29783:29793 KernelCompat <> impl_1__len def
+R29796:29801 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R29806:29832 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R31730:31763 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from_list def
+R31766:31771 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R31775:31781 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R31785:31799 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R31793:31799 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R31803:31811 KernelCompat <> impl__new def
+R31814:31815 Corelib.Init.Datatypes <> tt constr
+R31836:31844 KernelCompat <> Result_Ok constr
+R31886:31892 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> outputs:248 var
+R31913:31923 Core.Core_Option <> Option_Some constr
+R31965:31995 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from_list def
+R32015:32025 KernelCompat <> impl_1__len def
+R32028:32033 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R32053:32059 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R32063:32077 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R32071:32077 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R32081:32089 KernelCompat <> impl__new def
+R32092:32093 Corelib.Init.Datatypes <> tt constr
+R32118:32126 KernelCompat <> Result_Ok constr
+R32180:32190 Core.Core_Option <> Option_Some constr
+binder 32160:32175 <> expected_outputs:250
+R32241:32273 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_has_matching_row_from_list def
+R32276:32294 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_rows' not
+R32317:32332 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:250 var
+R32336:32346 KernelCompat <> impl_1__len def
+R32349:32354 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R32359:32373 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R32367:32373 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R32526:32535 KernelCompat <> Result_Err constr
+R32538:32573 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation constr
+R32578:32632 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R32578:32632 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R32578:32632 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R32646:32695 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R32646:32695 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R32715:32759 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R32715:32759 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R32784:32829 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R32784:32829 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R32854:32896 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R32854:32896 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R32638:32642 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:245 var
+R32701:32711 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+R32835:32850 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:250 var
+R32902:32936 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_NoMatchingRow constr
+R32415:32441 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list:234 def
+R32478:32484 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R32468:32474 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R32959:32968 KernelCompat <> Result_Err constr
+R32997:33006 KernelCompat <> Result_Err constr
+R33048:33058 Core.Core_Option <> Option_None constr
+R33101:33111 Core.Core_Option <> Option_None constr
+binder 33081:33096 <> expected_outputs:251
+R33149:33181 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_has_matching_row_from_list def
+R33184:33202 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_rows' not
+R33225:33240 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:251 var
+R33244:33254 KernelCompat <> impl_1__len def
+R33257:33262 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R33267:33281 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R33275:33281 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R33426:33435 KernelCompat <> Result_Err constr
+R33438:33473 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation constr
+R33478:33532 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R33478:33532 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R33478:33532 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R33546:33595 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R33546:33595 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R33615:33659 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R33615:33659 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R33684:33729 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R33684:33729 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R33754:33796 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R33754:33796 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R33538:33542 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:245 var
+R33601:33611 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+R33735:33750 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> expected_outputs:251 var
+R33802:33836 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_NoMatchingRow constr
+R33319:33345 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list:234 def
+R33382:33388 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R33372:33378 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R33871:33880 KernelCompat <> Result_Err constr
+R33905:33914 KernelCompat <> Result_Err constr
+R29864:29897 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from_list def
+R29900:29905 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R29909:29915 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R29919:29933 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R29927:29933 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R29937:29945 KernelCompat <> impl__new def
+R29948:29949 Corelib.Init.Datatypes <> tt constr
+R29970:29978 KernelCompat <> Result_Ok constr
+R30019:30025 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> outputs:248 var
+R30046:30056 Core.Core_Option <> Option_Some constr
+R30098:30128 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from_list def
+R30148:30158 KernelCompat <> impl_1__len def
+R30161:30166 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R30186:30192 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:233 var
+R30196:30210 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_field' not
+R30204:30210 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:232 var
+R30214:30222 KernelCompat <> impl__new def
+R30225:30226 Corelib.Init.Datatypes <> tt constr
+R30251:30259 KernelCompat <> Result_Ok constr
+R30289:30298 KernelCompat <> Result_Err constr
+R30301:30336 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation constr
+R30341:30395 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R30341:30395 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R30341:30395 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R30409:30458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R30409:30458 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R30478:30522 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R30478:30522 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R30546:30591 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R30546:30591 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R30620:30662 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R30620:30662 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R30401:30405 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:245 var
+R30464:30474 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+R30597:30607 Core.Core_Option <> Option_Some constr
+R30668:30707 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch constr
+R30712:30762 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R30712:30762 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R30712:30762 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R30791:30842 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_available proj
+R30791:30842 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_available proj
+R30768:30778 KernelCompat <> impl_1__len def
+R30781:30786 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R30848:30874 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R30901:30910 KernelCompat <> Result_Err constr
+R30939:30948 KernelCompat <> Result_Err constr
+R30990:31000 Core.Core_Option <> Option_None constr
+R31019:31028 KernelCompat <> Result_Err constr
+R31031:31066 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation constr
+R31071:31125 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R31071:31125 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R31071:31125 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_constraint_index proj
+R31139:31188 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R31139:31188 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_table_index proj
+R31208:31252 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R31208:31252 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_inputs proj
+R31276:31321 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R31276:31321 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_outputs proj
+R31341:31383 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R31341:31383 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation_f_kind proj
+R31131:31135 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> index:245 var
+R31194:31204 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+R31327:31337 Core.Core_Option <> Option_None constr
+R31389:31428 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch constr
+R31433:31483 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R31433:31483 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R31433:31483 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_provided proj
+R31512:31563 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_available proj
+R31512:31563 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch_f_available proj
+R31489:31499 KernelCompat <> impl_1__len def
+R31502:31507 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> inputs:246 var
+R31569:31595 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_column_count' not
+R31634:31643 KernelCompat <> Result_Err constr
+R31668:31677 KernelCompat <> Result_Err constr
+R33946:33956 Core.Core_Option <> Option_None constr
+R33969:33978 KernelCompat <> Result_Err constr
+R33981:34019 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable constr
+R34024:34076 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable_f_table_index proj
+R34024:34076 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable_f_table_index proj
+R34024:34076 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable_f_table_index proj
+R34082:34092 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> table_index:247 var
+def 34136:34157 <> check_constraints_from
+R34174:34203 Core.Core_Primitive <> :::'t_Slice' not
+R34182:34203 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelConstraint ind
+binder 34160:34170 <> constraints:253
+R34217:34235 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelProgram' not
+binder 34207:34213 <> program:254
+R34249:34267 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 34239:34245 <> witness:255
+R34272:34279 KernelCompat <> t_Result ind
+R34283:34286 Corelib.Init.Datatypes <> unit ind
+R34292:34313 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R34322:34348 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from_list def
+R34351:34371 Core.Core_Primitive <> :::'Slice_f_v' not
+R34361:34371 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> constraints:253 var
+R34375:34381 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:254 var
+R34385:34391 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:255 var
+def 34407:34419 <> check_program
+R34432:34450 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelProgram' not
+binder 34422:34428 <> program:256
+R34464:34482 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+binder 34454:34460 <> witness:257
+R34487:34494 KernelCompat <> t_Result ind
+R34498:34501 Corelib.Init.Datatypes <> unit ind
+R34507:34528 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+R34537:34558 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from def
+R34561:34567 KernelCompat <> f_deref def
+R34570:34590 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'f_constraints' not
+R34584:34590 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:256 var
+R34595:34601 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> program:256 var
+R34605:34611 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> witness:257 var

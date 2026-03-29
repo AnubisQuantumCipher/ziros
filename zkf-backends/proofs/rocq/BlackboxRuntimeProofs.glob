@@ -1,0 +1,151 @@
+DIGEST ba95c23e7b0b3b3fb4af0f5e1aecc46b
+FBlackboxRuntimeProofs
+R15:27 BackendCompat <> <> lib
+R45:57 BackendCompat <> <> lib
+R75:95 BlackboxHashSemantics <> <> lib
+R113:130 BlackboxHashProofs <> <> lib
+R148:169 BlackboxEcdsaSemantics <> <> lib
+R187:205 BlackboxEcdsaProofs <> <> lib
+R250:286 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> <> lib
+R331:368 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> <> lib
+prf 380:422 <> blackbox_runtime_checks_critical_surface_ok
+R428:428 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R679:685 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 436:444 <> semantics:1
+R623:632 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R599:601 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R453:484 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> critical_hash_lowering_semantics def
+R494:528 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashBlackBoxOp_Poseidon constr
+R538:566 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashFieldId_Bn254 constr
+R576:582 BlackboxHashSemantics <> usize_4 def
+R592:598 BlackboxHashSemantics <> usize_4 def
+R602:612 Core.Core_Option <> Option_Some constr
+R614:622 BlackboxRuntimeProofs <> semantics:1 var
+R633:668 BlackboxHashSemantics <> PoseidonBn254Width4LoweringSemantics def
+R670:678 BlackboxRuntimeProofs <> semantics:1 var
+R686:686 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1010:1016 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 694:702 <> semantics:2
+R881:890 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R857:859 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R711:742 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> critical_hash_lowering_semantics def
+R752:786 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashBlackBoxOp_Poseidon constr
+R796:824 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashFieldId_Bn254 constr
+R834:840 BlackboxHashSemantics <> usize_4 def
+R850:856 BlackboxHashSemantics <> usize_4 def
+R860:870 Core.Core_Option <> Option_Some constr
+R872:880 BlackboxRuntimeProofs <> semantics:2 var
+R949:959 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R891:938 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashLoweringSemantics_f_aux_witness_mode proj
+R940:948 BlackboxRuntimeProofs <> semantics:2 var
+R960:1009 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashAuxWitnessMode_ConstraintSolverDerived constr
+R1017:1017 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1274:1280 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 1025:1029 <> field:3
+binder 1031:1040 <> inputs_len:4
+binder 1042:1050 <> semantics:5
+R1207:1216 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1183:1185 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1059:1090 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> critical_hash_lowering_semantics def
+R1100:1132 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashBlackBoxOp_Sha256 constr
+R1142:1146 BlackboxRuntimeProofs <> field:3 var
+R1156:1165 BlackboxRuntimeProofs <> inputs_len:4 var
+R1175:1182 BlackboxHashSemantics <> usize_32 def
+R1186:1196 Core.Core_Option <> Option_Some constr
+R1198:1206 BlackboxRuntimeProofs <> semantics:5 var
+R1217:1252 BlackboxHashSemantics <> Sha256BytesToDigestLoweringSemantics def
+R1254:1263 BlackboxRuntimeProofs <> inputs_len:4 var
+R1265:1273 BlackboxRuntimeProofs <> semantics:5 var
+R1281:1281 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1600:1606 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 1289:1293 <> field:6
+binder 1295:1304 <> inputs_len:7
+binder 1306:1314 <> semantics:8
+R1471:1480 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1447:1449 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1323:1354 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> critical_hash_lowering_semantics def
+R1364:1396 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> SpecCriticalHashBlackBoxOp_Sha256 constr
+R1406:1410 BlackboxRuntimeProofs <> field:6 var
+R1420:1429 BlackboxRuntimeProofs <> inputs_len:7 var
+R1439:1446 BlackboxHashSemantics <> usize_32 def
+R1450:1460 Core.Core_Option <> Option_Some constr
+R1462:1470 BlackboxRuntimeProofs <> semantics:8 var
+R1539:1549 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1481:1528 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashLoweringSemantics_f_aux_witness_mode proj
+R1530:1538 BlackboxRuntimeProofs <> semantics:8 var
+R1550:1599 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_hash_spec <> CriticalHashAuxWitnessMode_ConstraintSolverDerived constr
+R1607:1607 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1850:1856 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 1615:1623 <> semantics:9
+R1800:1809 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1776:1778 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1632:1664 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_byte_abi_semantics def
+R1674:1702 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256k1 constr
+R1712:1741 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R1751:1759 BlackboxEcdsaSemantics <> usize_160 def
+R1769:1775 BlackboxEcdsaSemantics <> usize_1 def
+R1779:1789 Core.Core_Option <> Option_Some constr
+R1791:1799 BlackboxRuntimeProofs <> semantics:9 var
+R1810:1839 BlackboxEcdsaSemantics <> EcdsaSecp256k1ByteAbiSemantics def
+R1841:1849 BlackboxRuntimeProofs <> semantics:9 var
+R1857:1857 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R2177:2183 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 1865:1873 <> semantics:10
+R2050:2059 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2026:2028 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1882:1914 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_byte_abi_semantics def
+R1924:1952 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256k1 constr
+R1962:1991 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R2001:2009 BlackboxEcdsaSemantics <> usize_160 def
+R2019:2025 BlackboxEcdsaSemantics <> usize_1 def
+R2029:2039 Core.Core_Option <> Option_Some constr
+R2041:2049 BlackboxRuntimeProofs <> semantics:10 var
+R2118:2128 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2060:2107 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode proj
+R2109:2117 BlackboxRuntimeProofs <> semantics:10 var
+R2129:2176 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness constr
+R2184:2184 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R2427:2434 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R2754:2754 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+binder 2192:2200 <> semantics:11
+R2377:2386 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2353:2355 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2209:2241 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_byte_abi_semantics def
+R2251:2279 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256r1 constr
+R2289:2318 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R2328:2336 BlackboxEcdsaSemantics <> usize_160 def
+R2346:2352 BlackboxEcdsaSemantics <> usize_1 def
+R2356:2366 Core.Core_Option <> Option_Some constr
+R2368:2376 BlackboxRuntimeProofs <> semantics:11 var
+R2387:2416 BlackboxEcdsaSemantics <> EcdsaSecp256r1ByteAbiSemantics def
+R2418:2426 BlackboxRuntimeProofs <> semantics:11 var
+binder 2442:2450 <> semantics:12
+R2627:2636 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2603:2605 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2459:2491 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> critical_ecdsa_byte_abi_semantics def
+R2501:2529 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaOp_Secp256r1 constr
+R2539:2568 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R2578:2586 BlackboxEcdsaSemantics <> usize_160 def
+R2596:2602 BlackboxEcdsaSemantics <> usize_1 def
+R2606:2616 Core.Core_Option <> Option_Some constr
+R2618:2626 BlackboxRuntimeProofs <> semantics:12 var
+R2695:2705 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2637:2684 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaByteAbiSemantics_f_aux_witness_mode proj
+R2686:2694 BlackboxRuntimeProofs <> semantics:12 var
+R2706:2753 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness constr
+R2808:2846 BlackboxHashProofs <> poseidon_bn254_width4_lowering_sound_ok thm
+R2808:2846 BlackboxHashProofs <> poseidon_bn254_width4_lowering_sound_ok thm
+R2906:2947 BlackboxHashProofs <> poseidon_bn254_width4_aux_witness_sound_ok thm
+R2906:2947 BlackboxHashProofs <> poseidon_bn254_width4_aux_witness_sound_ok thm
+R3030:3069 BlackboxHashProofs <> sha256_bytes_to_digest_lowering_sound_ok thm
+R3030:3069 BlackboxHashProofs <> sha256_bytes_to_digest_lowering_sound_ok thm
+R3160:3202 BlackboxHashProofs <> sha256_bytes_to_digest_aux_witness_sound_ok thm
+R3160:3202 BlackboxHashProofs <> sha256_bytes_to_digest_aux_witness_sound_ok thm
+R3285:3326 BlackboxEcdsaProofs <> ecdsa_secp256k1_byte_abi_lowering_sound_ok thm
+R3285:3326 BlackboxEcdsaProofs <> ecdsa_secp256k1_byte_abi_lowering_sound_ok thm
+R3418:3462 BlackboxEcdsaProofs <> ecdsa_secp256k1_byte_abi_aux_witness_sound_ok thm
+R3418:3462 BlackboxEcdsaProofs <> ecdsa_secp256k1_byte_abi_aux_witness_sound_ok thm
+R3565:3606 BlackboxEcdsaProofs <> ecdsa_secp256r1_byte_abi_lowering_sound_ok thm
+R3565:3606 BlackboxEcdsaProofs <> ecdsa_secp256r1_byte_abi_lowering_sound_ok thm
+R3685:3729 BlackboxEcdsaProofs <> ecdsa_secp256r1_byte_abi_aux_witness_sound_ok thm
+R3685:3729 BlackboxEcdsaProofs <> ecdsa_secp256r1_byte_abi_aux_witness_sound_ok thm

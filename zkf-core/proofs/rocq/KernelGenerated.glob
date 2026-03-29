@@ -1,0 +1,8 @@
+DIGEST f15f1a023e3a590272d6a25d7594c997
+FKernelGenerated
+R95:108 ZkfCoreExtraction.Zkf_core_Field <> <> lib
+R149:181 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> <> lib
+R222:247 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> <> lib
+R288:328 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Spec_field_ops <> <> lib
+R369:391 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> <> lib
+R432:460 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> <> lib

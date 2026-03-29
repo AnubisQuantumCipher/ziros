@@ -1,0 +1,130 @@
+DIGEST f3f6a6e476bfc224dc607a7daf711b38
+FCcsProofs
+R15:18 Stdlib.Lists.List <> <> lib
+R36:41 Stdlib.NArith.NArith <> <> lib
+R51:68 Stdlib.Lists.List ListNotations <> mod
+R87:98 KernelCompat <> <> lib
+R116:127 CcsSemantics <> <> lib
+R168:190 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> <> lib
+prf 200:242 <> encode_constraint_runtime_success_supported
+binder 255:261 <> builder:1
+binder 263:272 <> constraint:2
+binder 274:289 <> constraint_index:3
+binder 291:302 <> next_builder:4
+R407:414 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R370:378 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R309:333 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> encode_constraint_runtime def
+R335:341 CcsProofs <> builder:1 var
+R343:352 CcsProofs <> constraint:2 var
+R354:369 CcsProofs <> constraint_index:3 var
+R379:379 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R392:393 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R406:406 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R380:391 CcsProofs <> next_builder:4 var
+R394:402 KernelCompat <> Result_Ok constr
+R404:405 Corelib.Init.Datatypes <> tt constr
+R415:433 CcsSemantics <> ConstraintSupported def
+R435:444 CcsProofs <> constraint:2 var
+R554:554 Corelib.Init.Logic <> I constr
+R554:554 Corelib.Init.Logic <> I constr
+R567:567 Corelib.Init.Logic <> I constr
+R567:567 Corelib.Init.Logic <> I constr
+R580:580 Corelib.Init.Logic <> I constr
+R580:580 Corelib.Init.Logic <> I constr
+R643:675 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_f_kind proj
+R643:675 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_f_kind proj
+R704:722 CcsSemantics <> ConstraintSupported def
+R758:758 Corelib.Init.Logic <> I constr
+R758:758 Corelib.Init.Logic <> I constr
+prf 857:901 <> synthesize_constraints_from_success_supported
+binder 914:920 <> builder:5
+binder 922:932 <> constraints:6
+binder 934:949 <> constraint_index:7
+binder 951:969 <> synthesized_builder:8
+R1078:1085 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1040:1048 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R976:1002 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R1004:1010 CcsProofs <> builder:5 var
+R1012:1022 CcsProofs <> constraints:6 var
+R1024:1039 CcsProofs <> constraint_index:7 var
+R1049:1057 KernelCompat <> Result_Ok constr
+R1059:1077 CcsProofs <> synthesized_builder:8 var
+R1086:1091 Corelib.Lists.ListDef <> Forall ind
+R1113:1123 CcsProofs <> constraints:6 var
+R1093:1111 CcsSemantics <> ConstraintSupported def
+R1502:1526 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> encode_constraint_runtime def
+R1502:1526 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> encode_constraint_runtime def
+R1729:1771 CcsProofs <> encode_constraint_runtime_success_supported thm
+R1729:1771 CcsProofs <> encode_constraint_runtime_success_supported thm
+prf 1851:1887 <> synthesize_ccs_program_fail_closed_ok
+binder 1900:1906 <> program:9
+binder 1908:1918 <> ccs_program:10
+R1979:1986 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1955:1957 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1925:1946 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_ccs_program def
+R1948:1954 CcsProofs <> program:9 var
+R1958:1966 KernelCompat <> Result_Ok constr
+R1968:1978 CcsProofs <> ccs_program:10 var
+R1987:2002 CcsSemantics <> ProgramSupported def
+R2004:2010 CcsProofs <> program:9 var
+R2071:2092 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_ccs_program def
+R2126:2152 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R2161:2171 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R2189:2226 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R2126:2152 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R2161:2171 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R2189:2226 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R2360:2404 CcsProofs <> synthesize_constraints_from_success_supported thm
+R2415:2425 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R2445:2482 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R2360:2404 CcsProofs <> synthesize_constraints_from_success_supported thm
+R2415:2425 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R2445:2482 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+prf 2651:2683 <> builder_finish_canonical_shape_ok
+binder 2696:2702 <> builder:11
+binder 2704:2708 <> field:12
+R2715:2731 CcsSemantics <> CanonicalCcsShape def
+R2734:2747 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_finish def
+R2749:2755 CcsProofs <> builder:11 var
+R2757:2761 CcsProofs <> field:12 var
+R2805:2821 CcsSemantics <> CanonicalCcsShape def
+R2824:2842 CcsSemantics <> canonical_multisets def
+R2845:2872 CcsSemantics <> MatrixDimensionsMatchProgram def
+prf 3138:3178 <> synthesize_ccs_program_supported_shape_ok
+binder 3191:3197 <> program:13
+binder 3199:3209 <> ccs_program:14
+R3270:3277 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3246:3248 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3216:3237 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_ccs_program def
+R3239:3245 CcsProofs <> program:13 var
+R3249:3257 KernelCompat <> Result_Ok constr
+R3259:3269 CcsProofs <> ccs_program:14 var
+R3278:3294 CcsSemantics <> CanonicalCcsShape def
+R3296:3306 CcsProofs <> ccs_program:14 var
+R3367:3388 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_ccs_program def
+R3422:3448 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R3457:3467 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R3485:3522 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R3422:3448 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R3457:3467 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R3485:3522 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R3691:3723 CcsProofs <> builder_finish_canonical_shape_ok thm
+R3691:3723 CcsProofs <> builder_finish_canonical_shape_ok thm
+prf 3835:3880 <> synthesize_ccs_program_supported_conversion_ok
+binder 3893:3899 <> program:15
+binder 3901:3911 <> ccs_program:16
+R3972:3979 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3948:3950 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3918:3939 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_ccs_program def
+R3941:3947 CcsProofs <> program:15 var
+R3951:3959 KernelCompat <> Result_Ok constr
+R3961:3971 CcsProofs <> ccs_program:16 var
+R4004:4007 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R3980:3995 CcsSemantics <> ProgramSupported def
+R3997:4003 CcsProofs <> program:15 var
+R4008:4024 CcsSemantics <> CanonicalCcsShape def
+R4026:4036 CcsProofs <> ccs_program:16 var
+R4108:4144 CcsProofs <> synthesize_ccs_program_fail_closed_ok thm
+R4108:4144 CcsProofs <> synthesize_ccs_program_fail_closed_ok thm
+R4181:4221 CcsProofs <> synthesize_ccs_program_supported_shape_ok thm
+R4181:4221 CcsProofs <> synthesize_ccs_program_supported_shape_ok thm

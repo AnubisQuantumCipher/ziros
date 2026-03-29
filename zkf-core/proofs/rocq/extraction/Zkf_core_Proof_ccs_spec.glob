@@ -1,0 +1,1645 @@
+DIGEST bb292abd45f3e1df74b7ee4c9d42d9a8
+FZkfCoreExtraction.Zkf_core_Proof_ccs_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R388:401 ZkfCoreExtraction.Zkf_core_Field <> <> lib
+R442:474 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> <> lib
+R492:503 KernelCompat <> <> lib
+def 517:524 <> t_BigInt
+R529:529 Corelib.Numbers.BinNums <> Z ind
+def 543:552 <> t_BTreeMap
+binder 555:555 <> A:1
+binder 557:557 <> B:2
+R572:580 KernelCompat <> globality ind
+R586:589 Corelib.Init.Datatypes <> list ind
+R593:595 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R592:592 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> A:1 var
+R596:596 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> B:2 var
+def 612:623 <> impl_18__new
+R631:634 Corelib.Init.Datatypes <> unit ind
+R631:634 Corelib.Init.Datatypes <> unit ind
+binder 627:634 <> pat:3
+R639:648 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R650:656 Core.Core_Primitive <> :::'t_usize' not
+R658:665 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R667:674 KernelCompat <> t_Global constr
+R679:680 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+def 693:707 <> impl_20__remove
+R721:730 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R732:738 Core.Core_Primitive <> :::'t_usize' not
+R740:747 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R749:756 KernelCompat <> t_Global constr
+binder 712:717 <> target:4
+R768:774 Core.Core_Primitive <> :::'t_usize' not
+binder 762:764 <> key:5
+R817:819 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R781:790 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R792:798 Core.Core_Primitive <> :::'t_usize' not
+R800:807 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R809:816 KernelCompat <> t_Global constr
+R820:827 Core.Core_Option <> t_Option ind
+R829:836 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R849:854 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:4 var
+R865:866 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R877:877 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R880:881 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R893:893 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R878:879 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R882:892 Core.Core_Option <> Option_None constr
+R927:930 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R899:899 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R911:912 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R926:926 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R953:956 KernelCompat <> f_eq def
+R970:972 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> key:5 var
+R1072:1086 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_20__remove:6 def
+R1098:1100 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> key:5 var
+R1050:1050 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1058:1059 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1067:1067 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1113:1113 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1153:1154 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1162:1162 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1142:1145 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R1114:1114 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1126:1127 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1141:1141 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R987:987 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R997:998 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1024:1024 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R999:1009 Core.Core_Option <> Option_Some constr
+def 1183:1197 <> impl_20__insert
+R1211:1220 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R1222:1228 Core.Core_Primitive <> :::'t_usize' not
+R1230:1237 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1239:1246 KernelCompat <> t_Global constr
+binder 1202:1207 <> target:8
+R1258:1264 Core.Core_Primitive <> :::'t_usize' not
+binder 1252:1254 <> key:9
+R1278:1285 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 1270:1274 <> value:10
+R1328:1330 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R1292:1301 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R1303:1309 Core.Core_Primitive <> :::'t_usize' not
+R1311:1318 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1320:1327 KernelCompat <> t_Global constr
+R1331:1338 Core.Core_Option <> t_Option ind
+R1340:1347 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1354:1354 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1377:1378 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1390:1390 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1367:1370 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R1355:1355 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1359:1360 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1366:1366 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R1356:1358 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> key:9 var
+R1361:1365 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:10 var
+R1371:1376 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:8 var
+R1379:1389 Core.Core_Option <> Option_None constr
+def 1405:1425 <> impl_FieldId__modulus
+R1436:1444 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 1428:1432 <> field:11
+R1449:1456 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1463:1480 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R1482:1486 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:11 var
+def 1501:1513 <> normalize_mod
+R1532:1539 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 1516:1520 <> value:12
+binder 1522:1528 <> modulus:13
+R1544:1551 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1558:1573 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R1575:1579 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:12 var
+R1581:1587 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> modulus:13 var
+def 1602:1606 <> f_one
+R1614:1617 Corelib.Init.Datatypes <> unit ind
+R1614:1617 Corelib.Init.Datatypes <> unit ind
+binder 1610:1617 <> pat:14
+R1622:1629 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+def 1650:1654 <> f_neg
+R1665:1672 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 1657:1661 <> value:15
+R1677:1684 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1689:1693 Stdlib.ZArith.BinInt Z opp def
+R1695:1699 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:15 var
+def 1713:1721 <> f_is_zero
+R1732:1739 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 1724:1728 <> value:16
+R1744:1747 Corelib.Init.Datatypes <> bool ind
+R1752:1756 Stdlib.ZArith.BinInt Z eqb def
+R1758:1762 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:16 var
+def 1780:1784 <> f_shl
+R1795:1802 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 1787:1791 <> value:17
+R1815:1821 Core.Core_Primitive <> :::'t_usize' not
+binder 1806:1811 <> amount:18
+R1826:1833 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R1840:1847 Stdlib.ZArith.BinInt Z shiftl def
+R1849:1853 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:17 var
+R1856:1861 Stdlib.ZArith.BinInt Z of_N def
+R1864:1870 Core.Core_Base_interface_Int <> U64_f_v proj
+R1873:1886 Core.Core_Primitive <> :::'usize_0' not
+R1881:1886 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> amount:18 var
+ind 1903:1921 <> t_SpecCcsVisibility
+constr 1935:1958 <> SpecCcsVisibility_Public
+constr 1962:1988 <> SpecCcsVisibility_NonPublic
+scheme 1903:1921 <> t_SpecCcsVisibility_rect
+scheme 1903:1921 <> t_SpecCcsVisibility_ind
+scheme 1903:1921 <> t_SpecCcsVisibility_rec
+scheme 1903:1921 <> t_SpecCcsVisibility_sind
+rec 2001:2020 <> SpecCcsSignal_record
+proj 2040:2065 <> SpecCcsSignal_f_visibility
+R2069:2087 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsVisibility ind
+inst 2116:2144 <> settable_SpecCcsSignal_record
+R2148:2155 RecordUpdate.RecordSet <> Settable class
+R2164:2174 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2201:2203 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2230:2230 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2204:2229 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSignal_f_visibility proj
+R2175:2200 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsSignal_record constr
+R2175:2200 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsSignal_record constr
+R2266:2285 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSignal_record rec
+not 2242:2242 <> :::'t_SpecCcsSignal'
+ind 2300:2320 <> t_SpecCcsBlackBoxKind
+constr 2334:2379 <> SpecCcsBlackBoxKind_RecursiveAggregationMarker
+constr 2383:2407 <> SpecCcsBlackBoxKind_Other
+scheme 2300:2320 <> t_SpecCcsBlackBoxKind_rect
+scheme 2300:2320 <> t_SpecCcsBlackBoxKind_ind
+scheme 2300:2320 <> t_SpecCcsBlackBoxKind_rec
+scheme 2300:2320 <> t_SpecCcsBlackBoxKind_sind
+rec 2420:2444 <> SpecCcsMatrixEntry_record
+proj 2464:2487 <> SpecCcsMatrixEntry_f_row
+proj 2504:2527 <> SpecCcsMatrixEntry_f_col
+proj 2544:2569 <> SpecCcsMatrixEntry_f_value
+R2491:2497 Core.Core_Primitive <> :::'t_usize' not
+R2531:2537 Core.Core_Primitive <> :::'t_usize' not
+R2573:2588 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+inst 2619:2652 <> settable_SpecCcsMatrixEntry_record
+R2656:2663 RecordUpdate.RecordSet <> Settable class
+R2672:2682 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2714:2716 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2741:2742 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2767:2768 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2795:2795 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2769:2794 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrixEntry_f_value proj
+R2743:2766 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrixEntry_f_col proj
+R2717:2740 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrixEntry_f_row proj
+R2683:2713 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrixEntry_record constr
+R2683:2713 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrixEntry_record constr
+def 2809:2826 <> SpecCcsMatrixEntry
+R2831:2861 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrixEntry_record constr
+R2902:2926 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrixEntry_record rec
+not 2873:2873 <> :::'t_SpecCcsMatrixEntry'
+rec 2938:2957 <> SpecCcsMatrix_record
+proj 2977:2996 <> SpecCcsMatrix_f_rows
+proj 3013:3032 <> SpecCcsMatrix_f_cols
+proj 3049:3071 <> SpecCcsMatrix_f_entries
+R3000:3006 Core.Core_Primitive <> :::'t_usize' not
+R3036:3042 Core.Core_Primitive <> :::'t_usize' not
+R3075:3079 KernelCompat <> t_Vec def
+R3083:3102 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R3108:3115 KernelCompat <> t_Global constr
+inst 3148:3176 <> settable_SpecCcsMatrix_record
+R3180:3187 RecordUpdate.RecordSet <> Settable class
+R3196:3206 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3233:3235 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3256:3257 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3278:3279 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3303:3303 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3280:3302 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_f_entries proj
+R3258:3277 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_f_cols proj
+R3236:3255 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_f_rows proj
+R3207:3232 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrix_record constr
+R3207:3232 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrix_record constr
+def 3317:3329 <> SpecCcsMatrix
+R3334:3359 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMatrix_record constr
+R3395:3414 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_record rec
+not 3371:3371 <> :::'t_SpecCcsMatrix'
+rec 3426:3447 <> SpecCcsMultiset_record
+proj 3467:3498 <> SpecCcsMultiset_f_matrix_indices
+proj 3538:3566 <> SpecCcsMultiset_f_coefficient
+R3502:3506 KernelCompat <> t_Vec def
+R3510:3516 Core.Core_Primitive <> :::'t_usize' not
+R3522:3529 KernelCompat <> t_Global constr
+R3570:3585 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+inst 3615:3645 <> settable_SpecCcsMultiset_record
+R3649:3656 RecordUpdate.RecordSet <> Settable class
+R3665:3675 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3704:3706 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3739:3740 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3770:3770 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R3741:3769 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset_f_coefficient proj
+R3707:3738 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset_f_matrix_indices proj
+R3676:3703 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMultiset_record constr
+R3676:3703 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMultiset_record constr
+def 3784:3798 <> SpecCcsMultiset
+R3803:3830 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsMultiset_record constr
+R3868:3889 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset_record rec
+not 3842:3842 <> :::'t_SpecCcsMultiset'
+rec 3901:3921 <> SpecCcsProgram_record
+proj 3941:3962 <> SpecCcsProgram_f_field
+proj 3981:4012 <> SpecCcsProgram_f_num_constraints
+proj 4029:4058 <> SpecCcsProgram_f_num_variables
+proj 4075:4101 <> SpecCcsProgram_f_num_public
+proj 4118:4142 <> SpecCcsProgram_f_matrices
+proj 4190:4215 <> SpecCcsProgram_f_multisets
+R3966:3974 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+R4016:4022 Core.Core_Primitive <> :::'t_usize' not
+R4062:4068 Core.Core_Primitive <> :::'t_usize' not
+R4105:4111 Core.Core_Primitive <> :::'t_usize' not
+R4146:4150 KernelCompat <> t_Vec def
+R4154:4168 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrix' not
+R4174:4181 KernelCompat <> t_Global constr
+R4219:4223 KernelCompat <> t_Vec def
+R4227:4243 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMultiset' not
+R4249:4256 KernelCompat <> t_Global constr
+inst 4292:4321 <> settable_SpecCcsProgram_record
+R4325:4332 RecordUpdate.RecordSet <> Settable class
+R4341:4351 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4379:4381 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4404:4405 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4438:4439 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4470:4471 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4499:4500 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4526:4527 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4554:4554 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R4528:4553 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_multisets proj
+R4501:4525 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_matrices proj
+R4472:4498 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_num_public proj
+R4440:4469 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_num_variables proj
+R4406:4437 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_num_constraints proj
+R4382:4403 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_field proj
+R4352:4378 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsProgram_record constr
+R4352:4378 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsProgram_record constr
+def 4568:4581 <> SpecCcsProgram
+R4586:4612 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsProgram_record constr
+R4649:4669 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_record rec
+not 4624:4624 <> :::'t_SpecCcsProgram'
+ind 4684:4710 <> t_SpecCcsSynthesisErrorKind
+constr 4724:4767 <> SpecCcsSynthesisErrorKind_InvalidSignalIndex
+constr 4771:4818 <> SpecCcsSynthesisErrorKind_LookupRequiresLowering
+constr 4822:4871 <> SpecCcsSynthesisErrorKind_BlackBoxRequiresLowering
+scheme 4684:4710 <> t_SpecCcsSynthesisErrorKind_rect
+scheme 4684:4710 <> t_SpecCcsSynthesisErrorKind_ind
+scheme 4684:4710 <> t_SpecCcsSynthesisErrorKind_rec
+scheme 4684:4710 <> t_SpecCcsSynthesisErrorKind_sind
+rec 4885:4912 <> SpecCcsSynthesisError_record
+proj 4932:4971 <> SpecCcsSynthesisError_f_constraint_index
+proj 4988:5015 <> SpecCcsSynthesisError_f_kind
+R4975:4981 Core.Core_Primitive <> :::'t_usize' not
+R5019:5045 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsSynthesisErrorKind ind
+inst 5075:5111 <> settable_SpecCcsSynthesisError_record
+R5115:5122 RecordUpdate.RecordSet <> Settable class
+R5131:5141 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5176:5178 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5219:5220 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5249:5249 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R5221:5248 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError_f_kind proj
+R5179:5218 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError_f_constraint_index proj
+R5142:5175 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsSynthesisError_record constr
+R5142:5175 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsSynthesisError_record constr
+def 5263:5283 <> SpecCcsSynthesisError
+R5288:5321 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsSynthesisError_record constr
+R5365:5392 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError_record rec
+not 5333:5333 <> :::'t_SpecCcsSynthesisError'
+def 5409:5428 <> spec_value_to_bigint
+R5439:5454 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+binder 5431:5435 <> value:48
+R5466:5474 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5458:5462 <> field:49
+R5479:5486 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R5493:5508 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R5511:5531 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_to_z def
+R5533:5537 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:48 var
+R5541:5558 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R5560:5564 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:49 var
+def 5580:5599 <> bigint_to_spec_value
+R5610:5617 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 5602:5606 <> value:50
+R5629:5637 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 5621:5625 <> field:51
+R5642:5657 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R5664:5684 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_of_z def
+R5687:5702 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_z def
+R5704:5708 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:50 var
+R5711:5728 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_modulus def
+R5730:5734 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:51 var
+rec 5747:5767 <> SpecCcsBuilder_record
+proj 5787:5808 <> SpecCcsBuilder_f_field
+proj 5827:5857 <> SpecCcsBuilder_f_signal_columns
+proj 5897:5921 <> SpecCcsBuilder_f_next_col
+proj 5938:5964 <> SpecCcsBuilder_f_num_public
+proj 5981:6000 <> SpecCcsBuilder_f_row
+proj 6017:6042 <> SpecCcsBuilder_f_a_entries
+proj 6095:6120 <> SpecCcsBuilder_f_b_entries
+proj 6173:6198 <> SpecCcsBuilder_f_c_entries
+R5812:5820 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+R5861:5865 KernelCompat <> t_Vec def
+R5869:5875 Core.Core_Primitive <> :::'t_usize' not
+R5881:5888 KernelCompat <> t_Global constr
+R5925:5931 Core.Core_Primitive <> :::'t_usize' not
+R5968:5974 Core.Core_Primitive <> :::'t_usize' not
+R6004:6010 Core.Core_Primitive <> :::'t_usize' not
+R6046:6050 KernelCompat <> t_Vec def
+R6054:6073 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R6079:6086 KernelCompat <> t_Global constr
+R6124:6128 KernelCompat <> t_Vec def
+R6132:6151 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R6157:6164 KernelCompat <> t_Global constr
+R6202:6206 KernelCompat <> t_Vec def
+R6210:6229 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R6235:6242 KernelCompat <> t_Global constr
+inst 6280:6309 <> settable_SpecCcsBuilder_record
+R6313:6320 RecordUpdate.RecordSet <> Settable class
+R6329:6339 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6367:6369 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6392:6393 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6425:6426 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6452:6453 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6481:6482 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6503:6504 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6531:6532 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6559:6560 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6587:6587 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R6561:6586 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_c_entries proj
+R6533:6558 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_b_entries proj
+R6505:6530 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_a_entries proj
+R6483:6502 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_row proj
+R6454:6480 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_num_public proj
+R6427:6451 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_next_col proj
+R6394:6424 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_signal_columns proj
+R6370:6391 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R6340:6366 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsBuilder_record constr
+R6340:6366 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsBuilder_record constr
+def 6601:6614 <> SpecCcsBuilder
+R6619:6645 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsBuilder_record constr
+R6682:6702 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_record rec
+not 6657:6657 <> :::'t_SpecCcsBuilder'
+def 6719:6732 <> builder_finish
+R6745:6760 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 6735:6741 <> builder:61
+R6772:6780 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 6764:6768 <> field:62
+R6785:6800 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsProgram' not
+R6830:6849 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_row proj
+R6851:6857 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+binder 6811:6825 <> num_constraints:63
+R6876:6890 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> num_constraints:63 var
+binder 6868:6871 <> rows:64
+R6909:6933 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_next_col proj
+R6935:6941 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+binder 6901:6904 <> cols:65
+R6948:6961 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram def
+R6967:6971 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:62 var
+R6977:6991 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> num_constraints:63 var
+R6997:7000 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> cols:65 var
+R7007:7033 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_num_public proj
+R7035:7041 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+R7048:7049 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7110:7116 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7177:7183 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7244:7249 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7050:7062 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix def
+R7064:7067 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rows:64 var
+R7069:7072 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> cols:65 var
+R7075:7100 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_a_entries proj
+R7102:7108 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+R7117:7129 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix def
+R7131:7134 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rows:64 var
+R7136:7139 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> cols:65 var
+R7142:7167 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_b_entries proj
+R7169:7175 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+R7184:7196 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix def
+R7198:7201 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rows:64 var
+R7203:7206 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> cols:65 var
+R7209:7234 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_c_entries proj
+R7236:7242 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:61 var
+R7255:7256 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7336:7342 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7410:7415 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7257:7271 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset def
+R7273:7274 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7286:7289 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7301:7302 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R7279:7285 Core.Core_Primitive <> :::'t_usize' not
+R7294:7300 Core.Core_Primitive <> :::'t_usize' not
+R7305:7324 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bigint_to_spec_value def
+R7330:7334 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:62 var
+R7343:7357 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset def
+R7359:7360 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R7372:7373 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R7365:7371 Core.Core_Primitive <> :::'t_usize' not
+R7376:7395 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bigint_to_spec_value def
+R7404:7408 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:62 var
+def 7430:7449 <> builder_allocate_aux
+R7462:7477 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 7452:7458 <> builder:66
+R7499:7499 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R7483:7498 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R7500:7506 Core.Core_Primitive <> :::'t_usize' not
+R7525:7549 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_next_col proj
+R7551:7557 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+binder 7518:7520 <> col:67
+R7583:7596 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder def
+R7605:7626 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R7628:7634 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7644:7674 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_signal_columns proj
+R7676:7682 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7692:7696 KernelCompat <> f_add def
+R7699:7723 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_next_col proj
+R7725:7731 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7740:7746 Core.Core_Primitive <> :::'t_usize' not
+R7758:7784 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_num_public proj
+R7786:7792 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7802:7821 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_row proj
+R7823:7829 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7839:7864 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_a_entries proj
+R7866:7872 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7882:7907 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_b_entries proj
+R7909:7915 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+R7925:7950 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_c_entries proj
+R7952:7958 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:66 var
+binder 7568:7574 <> builder:68
+R7966:7966 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7974:7975 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7979:7979 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7967:7973 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:68 var
+R7976:7978 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> col:67 var
+def 7994:8004 <> lc_add_term
+R8016:8025 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8029:8035 Core.Core_Primitive <> :::'t_usize' not
+R8041:8048 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8054:8061 KernelCompat <> t_Global constr
+binder 8007:8012 <> target:69
+R8073:8079 Core.Core_Primitive <> :::'t_usize' not
+binder 8067:8069 <> col:70
+R8091:8098 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 8083:8087 <> coeff:71
+R8103:8112 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8116:8122 Core.Core_Primitive <> :::'t_usize' not
+R8128:8135 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8141:8148 KernelCompat <> t_Global constr
+R8160:8164 Stdlib.ZArith.BinInt Z eqb def
+R8166:8170 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> coeff:71 var
+R8230:8244 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_20__remove def
+R8246:8251 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:69 var
+R8253:8255 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> col:70 var
+R8208:8208 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8215:8216 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8225:8225 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8313:8323 Core.Core_Option <> Option_Some constr
+R8334:8338 Stdlib.ZArith.BinInt Z add def
+R8346:8350 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> coeff:71 var
+R8360:8370 Core.Core_Option <> Option_None constr
+R8375:8379 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> coeff:71 var
+binder 8268:8274 <> updated:73
+R8401:8405 Stdlib.ZArith.BinInt Z eqb def
+R8407:8413 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> updated:73 var
+R8466:8469 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R8452:8452 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8456:8457 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8465:8465 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R8453:8455 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> col:70 var
+R8458:8464 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> updated:73 var
+R8470:8475 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:69 var
+R8430:8435 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:69 var
+R8185:8190 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:69 var
+def 8490:8497 <> lc_const
+R8508:8515 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+binder 8500:8504 <> value:74
+R8520:8529 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8533:8539 Core.Core_Primitive <> :::'t_usize' not
+R8545:8552 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8558:8565 KernelCompat <> t_Global constr
+R8574:8584 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R8586:8587 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8594:8600 Core.Core_Primitive <> :::'t_usize' not
+R8603:8607 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:74 var
+def 8622:8627 <> lc_var
+R8636:8642 Core.Core_Primitive <> :::'t_usize' not
+binder 8630:8632 <> col:75
+R8647:8656 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8660:8666 Core.Core_Primitive <> :::'t_usize' not
+R8672:8679 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8685:8692 KernelCompat <> t_Global constr
+R8701:8711 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R8713:8714 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R8716:8718 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> col:75 var
+def 8737:8742 <> lc_one
+R8750:8753 Corelib.Init.Datatypes <> unit ind
+R8750:8753 Corelib.Init.Datatypes <> unit ind
+binder 8746:8753 <> pat:76
+R8758:8767 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8771:8777 Core.Core_Primitive <> :::'t_usize' not
+R8783:8790 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8796:8803 KernelCompat <> t_Global constr
+R8812:8819 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_const def
+def 8838:8853 <> lc_one_minus_var
+R8862:8868 Core.Core_Primitive <> :::'t_usize' not
+binder 8856:8858 <> col:77
+R8873:8882 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R8886:8892 Core.Core_Primitive <> :::'t_usize' not
+R8898:8905 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R8911:8918 KernelCompat <> t_Global constr
+R8927:8937 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R8940:8945 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one def
+R8947:8948 Corelib.Init.Datatypes <> tt constr
+R8951:8953 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> col:77 var
+def 8975:8987 <> lc_add_assign
+R8999:9008 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9012:9018 Core.Core_Primitive <> :::'t_usize' not
+R9024:9031 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9037:9044 KernelCompat <> t_Global constr
+binder 8990:8995 <> target:78
+R9058:9067 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9071:9077 Core.Core_Primitive <> :::'t_usize' not
+R9083:9090 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9096:9103 KernelCompat <> t_Global constr
+binder 9050:9054 <> other:79
+R9110:9119 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9123:9129 Core.Core_Primitive <> :::'t_usize' not
+R9135:9142 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9148:9155 KernelCompat <> t_Global constr
+R9164:9177 Stdlib.Lists.List <> fold_left def
+R9244:9249 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:78 var
+R9238:9242 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> other:79 var
+binder 9184:9186 <> acc:80
+binder 9188:9192 <> entry:81
+R9197:9207 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R9209:9211 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:80 var
+R9214:9216 Corelib.Init.Datatypes <> fst def
+R9218:9222 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entry:81 var
+R9226:9228 Corelib.Init.Datatypes <> snd def
+R9230:9234 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entry:81 var
+def 9264:9276 <> lc_sub_assign
+R9288:9297 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9301:9307 Core.Core_Primitive <> :::'t_usize' not
+R9313:9320 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9326:9333 KernelCompat <> t_Global constr
+binder 9279:9284 <> target:82
+R9347:9356 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9360:9366 Core.Core_Primitive <> :::'t_usize' not
+R9372:9379 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9385:9392 KernelCompat <> t_Global constr
+binder 9339:9343 <> other:83
+R9399:9408 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9412:9418 Core.Core_Primitive <> :::'t_usize' not
+R9424:9431 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9437:9444 KernelCompat <> t_Global constr
+R9453:9466 Stdlib.Lists.List <> fold_left def
+R9541:9546 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> target:82 var
+R9535:9539 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> other:83 var
+binder 9473:9475 <> acc:84
+binder 9477:9481 <> entry:85
+R9486:9496 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R9498:9500 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:84 var
+R9503:9505 Corelib.Init.Datatypes <> fst def
+R9507:9511 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entry:85 var
+R9515:9519 Stdlib.ZArith.BinInt Z opp def
+R9522:9524 Corelib.Init.Datatypes <> snd def
+R9526:9530 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entry:85 var
+def 9561:9575 <> push_lc_entries
+R9586:9594 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 9578:9582 <> field:86
+R9608:9612 KernelCompat <> t_Vec def
+R9616:9635 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R9641:9648 KernelCompat <> t_Global constr
+binder 9598:9604 <> entries:87
+R9660:9666 Core.Core_Primitive <> :::'t_usize' not
+binder 9654:9656 <> row:88
+R9675:9684 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R9688:9694 Core.Core_Primitive <> :::'t_usize' not
+R9700:9707 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R9713:9720 KernelCompat <> t_Global constr
+binder 9670:9671 <> lc:89
+R9727:9731 KernelCompat <> t_Vec def
+R9735:9754 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsMatrixEntry' not
+R9760:9767 KernelCompat <> t_Global constr
+R9776:9789 Stdlib.Lists.List <> fold_left def
+R10080:10086 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entries:87 var
+R10073:10074 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc:89 var
+binder 9800:9802 <> acc:90
+binder 9804:9808 <> entry:91
+R9840:9844 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> entry:91 var
+R9824:9824 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9828:9829 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9835:9835 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R9873:9885 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> normalize_mod def
+R9894:9914 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_FieldId__modulus def
+R9916:9920 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:86 var
+binder 9859:9868 <> normalized:93
+R9935:9939 Stdlib.ZArith.BinInt Z eqb def
+R9941:9950 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> normalized:93 var
+R9995:9998 Corelib.Init.Datatypes <> ::list_scope:x_'++'_x not
+R9992:9994 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:90 var
+R9999:9999 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R10066:10066 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R10000:10017 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrixEntry def
+R10019:10021 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> row:88 var
+R10028:10047 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bigint_to_spec_value def
+R10049:10058 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> normalized:93 var
+R10060:10064 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> field:86 var
+R9969:9971 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:90 var
+ind 10100:10112 <> t_SpecCcsExpr
+constr 10126:10142 <> SpecCcsExpr_Const
+constr 10170:10187 <> SpecCcsExpr_Signal
+constr 10206:10220 <> SpecCcsExpr_Add
+constr 10268:10282 <> SpecCcsExpr_Sub
+constr 10324:10338 <> SpecCcsExpr_Mul
+constr 10380:10394 <> SpecCcsExpr_Div
+R10162:10165 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10146:10161 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+R10198:10201 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10191:10197 Core.Core_Primitive <> :::'t_usize' not
+R10260:10263 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10224:10228 KernelCompat <> t_Vec def
+R10232:10244 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10250:10257 KernelCompat <> t_Global constr
+R10299:10302 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10286:10298 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10316:10319 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10303:10315 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10355:10358 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10342:10354 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10372:10375 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10359:10371 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10411:10414 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10398:10410 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+R10428:10431 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10415:10427 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr:94 ind
+scheme 10100:10112 <> t_SpecCcsExpr_rect
+scheme 10100:10112 <> t_SpecCcsExpr_ind
+scheme 10100:10112 <> t_SpecCcsExpr_rec
+scheme 10100:10112 <> t_SpecCcsExpr_sind
+rec 10449:10478 <> SpecCcsConstraint_Equal_record
+proj 10498:10526 <> SpecCcsConstraint_Equal_f_lhs
+proj 10549:10577 <> SpecCcsConstraint_Equal_f_rhs
+R10530:10542 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr ind
+R10581:10593 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr ind
+inst 10623:10661 <> settable_SpecCcsConstraint_Equal_record
+R10665:10672 RecordUpdate.RecordSet <> Settable class
+R10681:10691 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R10728:10730 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R10760:10761 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R10791:10791 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R10762:10790 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal_f_rhs proj
+R10731:10759 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal_f_lhs proj
+R10692:10727 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Equal_record constr
+R10692:10727 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Equal_record constr
+rec 10801:10832 <> SpecCcsConstraint_Boolean_record
+proj 10852:10891 <> SpecCcsConstraint_Boolean_f_signal_index
+R10895:10901 Core.Core_Primitive <> :::'t_usize' not
+inst 10930:10970 <> settable_SpecCcsConstraint_Boolean_record
+R10974:10981 RecordUpdate.RecordSet <> Settable class
+R10990:11000 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11039:11041 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11082:11082 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11042:11081 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Boolean_f_signal_index proj
+R11001:11038 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Boolean_record constr
+R11001:11038 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Boolean_record constr
+rec 11092:11121 <> SpecCcsConstraint_Range_record
+proj 11141:11178 <> SpecCcsConstraint_Range_f_signal_index
+proj 11195:11224 <> SpecCcsConstraint_Range_f_bits
+R11182:11188 Core.Core_Primitive <> :::'t_usize' not
+R11228:11232 Core.Core_Primitive <> :::'t_u32' not
+inst 11262:11300 <> settable_SpecCcsConstraint_Range_record
+R11304:11311 RecordUpdate.RecordSet <> Settable class
+R11320:11330 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11367:11369 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11408:11409 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11440:11440 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11410:11439 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range_f_bits proj
+R11370:11407 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range_f_signal_index proj
+R11331:11366 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Range_record constr
+R11331:11366 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_Range_record constr
+rec 11450:11482 <> SpecCcsConstraint_BlackBox_record
+proj 11502:11534 <> SpecCcsConstraint_BlackBox_f_kind
+R11538:11558 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsBlackBoxKind ind
+inst 11587:11628 <> settable_SpecCcsConstraint_BlackBox_record
+R11632:11639 RecordUpdate.RecordSet <> Settable class
+R11648:11658 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11698:11700 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11734:11734 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R11701:11733 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_f_kind proj
+R11659:11697 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_BlackBox_record constr
+R11659:11697 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraint_BlackBox_record constr
+ind 11747:11765 <> t_SpecCcsConstraint
+constr 11779:11801 <> SpecCcsConstraint_Equal
+constr 11844:11868 <> SpecCcsConstraint_Boolean
+constr 11913:11935 <> SpecCcsConstraint_Range
+constr 11978:12001 <> SpecCcsConstraint_Lookup
+constr 12005:12030 <> SpecCcsConstraint_BlackBox
+R11835:11839 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R11805:11834 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal_record rec
+R11904:11908 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R11872:11903 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Boolean_record rec
+R11969:11973 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R11939:11968 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range_record rec
+R12067:12071 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R12034:12066 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_record rec
+scheme 11747:11765 <> t_SpecCcsConstraint_rect
+scheme 11747:11765 <> t_SpecCcsConstraint_ind
+scheme 11747:11765 <> t_SpecCcsConstraint_rec
+scheme 11747:11765 <> t_SpecCcsConstraint_sind
+rec 12088:12118 <> SpecCcsConstraintProgram_record
+proj 12138:12169 <> SpecCcsConstraintProgram_f_field
+proj 12188:12221 <> SpecCcsConstraintProgram_f_signals
+proj 12269:12306 <> SpecCcsConstraintProgram_f_constraints
+R12173:12181 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+R12225:12229 KernelCompat <> t_Vec def
+R12233:12247 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSignal' not
+R12253:12260 KernelCompat <> t_Global constr
+R12310:12314 KernelCompat <> t_Vec def
+R12318:12336 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsConstraint ind
+R12342:12349 KernelCompat <> t_Global constr
+inst 12382:12421 <> settable_SpecCcsConstraintProgram_record
+R12425:12432 RecordUpdate.RecordSet <> Settable class
+R12441:12451 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R12489:12491 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R12524:12525 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R12560:12561 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R12600:12600 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R12562:12599 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R12526:12559 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_signals proj
+R12492:12523 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_field proj
+R12452:12488 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraintProgram_record constr
+R12452:12488 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> Build_SpecCcsConstraintProgram_record constr
+R12647:12677 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_record rec
+not 12612:12612 <> :::'t_SpecCcsConstraintProgram'
+def 12692:12719 <> assign_public_signal_columns
+R12734:12738 KernelCompat <> t_Vec def
+R12742:12756 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSignal' not
+R12762:12769 KernelCompat <> t_Global constr
+binder 12724:12730 <> signals:112
+R12792:12798 Core.Core_Primitive <> :::'t_usize' not
+binder 12777:12788 <> signal_index:113
+R12815:12821 Core.Core_Primitive <> :::'t_usize' not
+binder 12804:12811 <> next_col:114
+R12840:12846 Core.Core_Primitive <> :::'t_usize' not
+binder 12827:12836 <> num_public:115
+R12869:12873 KernelCompat <> t_Vec def
+R12877:12883 Core.Core_Primitive <> :::'t_usize' not
+R12889:12896 KernelCompat <> t_Global constr
+binder 12852:12865 <> signal_columns:116
+R12922:12924 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R12912:12914 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R12905:12911 Core.Core_Primitive <> :::'t_usize' not
+R12915:12921 Core.Core_Primitive <> :::'t_usize' not
+R12925:12929 KernelCompat <> t_Vec def
+R12933:12939 Core.Core_Primitive <> :::'t_usize' not
+R12945:12952 KernelCompat <> t_Global constr
+R12967:12973 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signals:112 var
+R12984:12985 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R12996:12996 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13005:13006 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13017:13018 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R13033:13033 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R12997:13004 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:114 var
+R13007:13016 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> num_public:115 var
+R13019:13032 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:116 var
+R13045:13048 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R13082:13107 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSignal_f_visibility proj
+R13129:13152 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsVisibility_Public constr
+R13201:13212 KernelCompat <> impl__to_vec def
+R13229:13243 KernelCompat <> update_at_usize def
+R13340:13347 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:114 var
+R13311:13322 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:113 var
+R13262:13277 KernelCompat <> impl_1__as_slice def
+R13279:13292 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:116 var
+binder 13171:13184 <> signal_columns:119
+R13363:13390 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_public_signal_columns:117 def
+R13575:13588 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:119 var
+R13529:13533 KernelCompat <> f_add def
+R13535:13544 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> num_public:115 var
+R13552:13558 Core.Core_Primitive <> :::'t_usize' not
+R13484:13488 KernelCompat <> f_add def
+R13490:13497 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:114 var
+R13505:13511 Core.Core_Primitive <> :::'t_usize' not
+R13435:13439 KernelCompat <> f_add def
+R13441:13452 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:113 var
+R13460:13466 Core.Core_Primitive <> :::'t_usize' not
+R13598:13624 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsVisibility_NonPublic constr
+R13639:13666 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_public_signal_columns:117 def
+R13803:13816 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:116 var
+R13780:13789 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> num_public:115 var
+R13759:13766 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:114 var
+R13711:13715 KernelCompat <> f_add def
+R13717:13728 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:113 var
+R13736:13742 Core.Core_Primitive <> :::'t_usize' not
+def 13845:13876 <> assign_non_public_signal_columns
+R13891:13895 KernelCompat <> t_Vec def
+R13899:13913 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSignal' not
+R13919:13926 KernelCompat <> t_Global constr
+binder 13881:13887 <> signals:120
+R13949:13955 Core.Core_Primitive <> :::'t_usize' not
+binder 13934:13945 <> signal_index:121
+R13972:13978 Core.Core_Primitive <> :::'t_usize' not
+binder 13961:13968 <> next_col:122
+R14001:14005 KernelCompat <> t_Vec def
+R14009:14015 Core.Core_Primitive <> :::'t_usize' not
+R14021:14028 KernelCompat <> t_Global constr
+binder 13984:13997 <> signal_columns:123
+R14044:14046 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R14037:14043 Core.Core_Primitive <> :::'t_usize' not
+R14047:14051 KernelCompat <> t_Vec def
+R14055:14061 Core.Core_Primitive <> :::'t_usize' not
+R14067:14074 KernelCompat <> t_Global constr
+R14089:14095 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signals:120 var
+R14106:14107 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R14118:14118 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14127:14128 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14143:14143 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R14119:14126 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:122 var
+R14129:14142 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:123 var
+R14155:14158 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R14192:14217 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSignal_f_visibility proj
+R14239:14262 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsVisibility_Public constr
+R14277:14308 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_non_public_signal_columns:124 def
+R14422:14435 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:123 var
+R14401:14408 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:122 var
+R14353:14357 KernelCompat <> f_add def
+R14359:14370 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:121 var
+R14378:14384 Core.Core_Primitive <> :::'t_usize' not
+R14445:14471 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsVisibility_NonPublic constr
+R14520:14531 KernelCompat <> impl__to_vec def
+R14548:14562 KernelCompat <> update_at_usize def
+R14659:14666 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:122 var
+R14630:14641 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:121 var
+R14581:14596 KernelCompat <> impl_1__as_slice def
+R14598:14611 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:123 var
+binder 14490:14503 <> signal_columns:126
+R14682:14713 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_non_public_signal_columns:124 def
+R14851:14864 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:126 var
+R14807:14811 KernelCompat <> f_add def
+R14813:14820 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> next_col:122 var
+R14828:14834 Core.Core_Primitive <> :::'t_usize' not
+R14758:14762 KernelCompat <> f_add def
+R14764:14775 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:121 var
+R14783:14789 Core.Core_Primitive <> :::'t_usize' not
+def 14895:14905 <> builder_new
+R14918:14943 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsConstraintProgram' not
+binder 14908:14914 <> program:127
+R14948:14963 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R14996:15004 KernelCompat <> from_elem def
+R15035:15045 KernelCompat <> impl_1__len def
+R15048:15081 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_signals proj
+R15083:15089 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:127 var
+R15018:15024 Core.Core_Primitive <> :::'t_usize' not
+binder 14974:14987 <> signal_columns:128
+R15149:15176 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_public_signal_columns def
+R15185:15218 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_signals proj
+R15220:15226 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:127 var
+R15240:15246 Core.Core_Primitive <> :::'t_usize' not
+R15260:15266 Core.Core_Primitive <> :::'t_usize' not
+R15280:15286 Core.Core_Primitive <> :::'t_usize' not
+R15295:15308 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:128 var
+R15103:15103 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15112:15113 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15124:15125 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15140:15140 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15354:15385 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> assign_non_public_signal_columns def
+R15394:15427 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_signals proj
+R15429:15435 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:127 var
+R15449:15455 Core.Core_Primitive <> :::'t_usize' not
+R15479:15492 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:128 var
+R15320:15320 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15329:15330 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15345:15345 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R15499:15512 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder def
+R15519:15550 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_field proj
+R15552:15558 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:127 var
+R15565:15578 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_columns:128 var
+R15617:15623 Core.Core_Primitive <> :::'t_usize' not
+R15631:15639 KernelCompat <> impl__new def
+R15641:15642 Corelib.Init.Datatypes <> tt constr
+R15650:15658 KernelCompat <> impl__new def
+R15660:15661 Corelib.Init.Datatypes <> tt constr
+R15669:15677 KernelCompat <> impl__new def
+R15679:15680 Corelib.Init.Datatypes <> tt constr
+def 15696:15712 <> builder_signal_lc
+R15727:15742 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 15717:15723 <> builder:129
+R15763:15769 Core.Core_Primitive <> :::'t_usize' not
+binder 15748:15759 <> signal_index:130
+R15794:15800 Core.Core_Primitive <> :::'t_usize' not
+binder 15775:15790 <> constraint_index:131
+R15807:15814 KernelCompat <> t_Result ind
+R15818:15827 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R15831:15837 Core.Core_Primitive <> :::'t_usize' not
+R15843:15850 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R15856:15863 KernelCompat <> t_Global constr
+R15871:15893 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R15908:15916 KernelCompat <> impl__get def
+R15979:15990 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:130 var
+R15919:15934 KernelCompat <> impl_1__as_slice def
+R15937:15967 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_signal_columns proj
+R15969:15975 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:129 var
+R16001:16011 Core.Core_Option <> Option_Some constr
+R16026:16034 KernelCompat <> Result_Ok constr
+R16037:16042 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R16053:16063 Core.Core_Option <> Option_None constr
+R16074:16083 KernelCompat <> Result_Err constr
+R16094:16114 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError def
+R16126:16141 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:131 var
+R16153:16196 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisErrorKind_InvalidSignalIndex constr
+def 16218:16232 <> builder_add_row
+R16247:16262 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 16237:16243 <> builder:132
+R16272:16281 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R16285:16291 Core.Core_Primitive <> :::'t_usize' not
+R16297:16304 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R16310:16317 KernelCompat <> t_Global constr
+binder 16268:16268 <> a:133
+R16329:16338 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R16342:16348 Core.Core_Primitive <> :::'t_usize' not
+R16354:16361 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R16367:16374 KernelCompat <> t_Global constr
+binder 16325:16325 <> b:134
+R16386:16395 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R16399:16405 Core.Core_Primitive <> :::'t_usize' not
+R16411:16418 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R16424:16431 KernelCompat <> t_Global constr
+binder 16382:16382 <> c:135
+R16440:16455 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R16473:16492 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_row proj
+R16494:16500 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+binder 16466:16468 <> row:136
+R16528:16542 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> push_lc_entries def
+R16551:16572 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R16574:16580 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16590:16615 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_a_entries proj
+R16617:16623 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16632:16634 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> row:136 var
+R16642:16642 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> a:133 var
+binder 16511:16519 <> a_entries:137
+R16670:16684 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> push_lc_entries def
+R16693:16714 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R16716:16722 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16732:16757 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_b_entries proj
+R16759:16765 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16774:16776 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> row:136 var
+R16784:16784 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> b:134 var
+binder 16653:16661 <> b_entries:138
+R16812:16826 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> push_lc_entries def
+R16835:16856 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R16858:16864 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16874:16899 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_c_entries proj
+R16901:16907 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16916:16918 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> row:136 var
+R16926:16926 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> c:135 var
+binder 16795:16803 <> c_entries:139
+R16933:16946 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder def
+R16953:16974 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R16976:16982 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R16990:17020 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_signal_columns proj
+R17022:17028 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R17036:17060 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_next_col proj
+R17062:17068 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R17076:17102 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_num_public proj
+R17104:17110 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:132 var
+R17118:17122 KernelCompat <> f_add def
+R17124:17126 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> row:136 var
+R17134:17140 Core.Core_Primitive <> :::'t_usize' not
+R17149:17157 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> a_entries:137 var
+R17163:17171 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> b_entries:138 var
+R17177:17185 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> c_entries:139 var
+def 17200:17223 <> builder_expr_fuel_budget
+R17227:17229 Corelib.Init.Datatypes <> nat ind
+def 17256:17283 <> builder_fuel_exhausted_error
+R17307:17313 Core.Core_Primitive <> :::'t_usize' not
+binder 17288:17303 <> constraint_index:140
+R17318:17340 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R17347:17367 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError def
+R17369:17384 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:140 var
+R17386:17429 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisErrorKind_InvalidSignalIndex constr
+def 17442:17466 <> builder_expr_to_lc_fueled
+def 20714:20743 <> builder_terms_to_lc_acc_fueled
+R17478:17480 Corelib.Init.Datatypes <> nat ind
+binder 17471:17474 <> fuel:141
+R17496:17511 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 17486:17492 <> builder:142
+R17524:17536 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr ind
+binder 17517:17520 <> expr:143
+R17561:17567 Core.Core_Primitive <> :::'t_usize' not
+binder 17542:17557 <> constraint_index:144
+R20755:20757 Corelib.Init.Datatypes <> nat ind
+binder 20748:20751 <> fuel:145
+R20773:20788 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 20763:20769 <> builder:146
+R20802:20806 KernelCompat <> t_Vec def
+R20810:20822 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr ind
+R20828:20835 KernelCompat <> t_Global constr
+binder 20794:20798 <> terms:147
+R20862:20868 Core.Core_Primitive <> :::'t_usize' not
+binder 20843:20858 <> constraint_index:148
+R20880:20889 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R20893:20899 Core.Core_Primitive <> :::'t_usize' not
+R20905:20912 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R20918:20925 KernelCompat <> t_Global constr
+binder 20874:20876 <> acc:149
+R17606:17608 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R17590:17605 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R17609:17616 KernelCompat <> t_Result ind
+R17620:17629 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R17633:17639 Core.Core_Primitive <> :::'t_usize' not
+R17645:17652 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R17658:17665 KernelCompat <> t_Global constr
+R17673:17695 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R20966:20968 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R20950:20965 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R20969:20976 KernelCompat <> t_Result ind
+R20980:20989 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R20993:20999 Core.Core_Primitive <> :::'t_usize' not
+R21005:21012 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R21018:21025 KernelCompat <> t_Global constr
+R21033:21055 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R17710:17713 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R17724:17724 Corelib.Init.Datatypes <> O constr
+R17735:17735 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17743:17744 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17803:17803 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17736:17742 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R17745:17754 KernelCompat <> Result_Err constr
+R17757:17784 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_fuel_exhausted_error def
+R17786:17801 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R17809:17809 Corelib.Init.Datatypes <> S constr
+R17831:17834 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> expr:143 var
+R17849:17865 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Const constr
+R17886:17886 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17894:17895 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17978:17978 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R17887:17893 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R17896:17904 KernelCompat <> Result_Ok constr
+R17907:17914 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_const def
+R17917:17936 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> spec_value_to_bigint def
+R17945:17966 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_field proj
+R17968:17974 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R17988:18005 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Signal constr
+R18033:18033 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18041:18042 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18098:18098 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18034:18040 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18043:18059 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_signal_lc def
+R18061:18067 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18082:18097 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R18108:18122 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Add constr
+R18143:18172 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_terms_to_lc_acc_fueled:151 def
+R18211:18222 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_18__new def
+R18224:18225 Corelib.Init.Datatypes <> tt constr
+R18193:18208 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R18179:18185 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18174:18177 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R18236:18250 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Sub constr
+R18303:18327 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R18346:18361 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R18334:18340 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18329:18332 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R18278:18278 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18286:18287 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18298:18298 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18410:18419 KernelCompat <> Result_Err constr
+R18444:18444 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18452:18453 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18470:18470 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18445:18451 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18454:18463 KernelCompat <> Result_Err constr
+R18484:18492 KernelCompat <> Result_Ok constr
+R18548:18572 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R18591:18606 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R18579:18585 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18574:18577 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R18523:18523 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18531:18532 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18543:18543 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18663:18672 KernelCompat <> Result_Err constr
+R18701:18701 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18709:18710 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18727:18727 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18702:18708 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18711:18720 KernelCompat <> Result_Err constr
+R18745:18753 KernelCompat <> Result_Ok constr
+R18783:18783 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18791:18792 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18832:18832 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18784:18790 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18793:18801 KernelCompat <> Result_Ok constr
+R18804:18816 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_sub_assign def
+R18874:18888 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Mul constr
+R18941:18965 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R18984:18999 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R18972:18978 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R18967:18970 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R18916:18916 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18924:18925 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18936:18936 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19048:19057 KernelCompat <> Result_Err constr
+R19082:19082 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19090:19091 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19108:19108 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19083:19089 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19092:19101 KernelCompat <> Result_Err constr
+R19122:19130 KernelCompat <> Result_Ok constr
+R19186:19210 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R19229:19244 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R19217:19223 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19212:19215 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R19161:19161 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19169:19170 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19181:19181 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19301:19310 KernelCompat <> Result_Err constr
+R19339:19339 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19347:19348 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19365:19365 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19340:19346 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19349:19358 KernelCompat <> Result_Err constr
+R19383:19391 KernelCompat <> Result_Ok constr
+R19448:19467 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_allocate_aux def
+R19469:19475 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19426:19426 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19434:19435 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19443:19443 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19498:19498 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19553:19554 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19581:19581 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19499:19513 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R19515:19521 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19538:19543 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R19555:19563 KernelCompat <> Result_Ok constr
+R19566:19571 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R19623:19637 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Div constr
+R19696:19720 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R19739:19754 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R19727:19733 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19722:19725 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R19665:19665 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19673:19674 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19691:19691 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19809:19818 KernelCompat <> Result_Err constr
+R19843:19843 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19851:19852 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19869:19869 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19844:19850 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19853:19862 KernelCompat <> Result_Err constr
+R19883:19891 KernelCompat <> Result_Ok constr
+R19958:19982 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R20001:20016 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:144 var
+R19989:19995 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R19984:19987 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:141 var
+R19925:19925 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19933:19934 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R19953:19953 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20081:20090 KernelCompat <> Result_Err constr
+R20119:20119 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20127:20128 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20145:20145 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20120:20126 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R20129:20138 KernelCompat <> Result_Err constr
+R20163:20171 KernelCompat <> Result_Ok constr
+R20238:20257 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_allocate_aux def
+R20259:20265 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R20211:20211 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20219:20220 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20233:20233 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20319:20338 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_allocate_aux def
+R20340:20346 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R20293:20293 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20301:20302 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20314:20314 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20404:20418 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R20420:20426 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:142 var
+R20441:20446 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R20462:20467 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one def
+R20469:20470 Corelib.Init.Datatypes <> tt constr
+binder 20373:20379 <> builder:160
+R20529:20543 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R20545:20551 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:160 var
+R20554:20559 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+binder 20498:20504 <> builder:161
+R20618:20618 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20626:20627 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20659:20659 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R20619:20625 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:161 var
+R20628:20636 KernelCompat <> Result_Ok constr
+R20639:20644 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R21070:21073 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:145 var
+R21084:21084 Corelib.Init.Datatypes <> O constr
+R21095:21095 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21103:21104 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21163:21163 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21096:21102 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:146 var
+R21105:21114 KernelCompat <> Result_Err constr
+R21117:21144 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_fuel_exhausted_error def
+R21146:21161 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:148 var
+R21169:21169 Corelib.Init.Datatypes <> S constr
+R21191:21195 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> terms:147 var
+R21210:21211 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R21226:21226 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21234:21235 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21249:21249 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21227:21233 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:146 var
+R21236:21244 KernelCompat <> Result_Ok constr
+R21246:21248 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:149 var
+R21263:21266 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R21327:21351 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled:150 def
+R21371:21386 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:148 var
+R21358:21364 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:146 var
+R21353:21356 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:145 var
+R21301:21301 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21309:21310 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21322:21322 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21436:21445 KernelCompat <> Result_Err constr
+R21470:21470 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21478:21479 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21496:21496 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R21471:21477 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:146 var
+R21480:21489 KernelCompat <> Result_Err constr
+R21510:21518 KernelCompat <> Result_Ok constr
+R21545:21574 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_terms_to_lc_acc_fueled:151 def
+R21703:21715 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_assign def
+R21717:21719 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> acc:149 var
+R21669:21684 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:148 var
+R21613:21619 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:146 var
+R21592:21595 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> fuel:145 var
+def 21773:21790 <> builder_expr_to_lc
+R21805:21820 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 21795:21801 <> builder:165
+R21833:21845 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsExpr ind
+binder 21826:21829 <> expr:166
+R21870:21876 Core.Core_Primitive <> :::'t_usize' not
+binder 21851:21866 <> constraint_index:167
+R21899:21901 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R21883:21898 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R21902:21909 KernelCompat <> t_Result ind
+R21913:21922 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R21926:21932 Core.Core_Primitive <> :::'t_usize' not
+R21938:21945 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R21951:21958 KernelCompat <> t_Global constr
+R21966:21988 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R21997:22021 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc_fueled def
+R22023:22046 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_fuel_budget def
+R22048:22054 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:165 var
+R22056:22059 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> expr:166 var
+R22061:22076 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:167 var
+def 22089:22104 <> range_bits_to_lc
+R22121:22123 Corelib.Init.Datatypes <> nat ind
+binder 22109:22117 <> remaining:168
+R22141:22143 Corelib.Init.Datatypes <> nat ind
+binder 22129:22137 <> bit_index:169
+R22159:22174 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 22149:22155 <> builder:170
+R22193:22202 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R22206:22212 Core.Core_Primitive <> :::'t_usize' not
+R22218:22225 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R22231:22238 KernelCompat <> t_Global constr
+binder 22180:22189 <> recomposed:171
+R22263:22265 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R22247:22262 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R22266:22275 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BTreeMap def
+R22279:22285 Core.Core_Primitive <> :::'t_usize' not
+R22291:22298 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_BigInt def
+R22304:22311 KernelCompat <> t_Global constr
+R22326:22334 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> remaining:168 var
+R22345:22345 Corelib.Init.Datatypes <> O constr
+R22356:22356 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22364:22365 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22376:22376 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22357:22363 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:170 var
+R22366:22375 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> recomposed:171 var
+R22382:22382 Corelib.Init.Datatypes <> S constr
+R22435:22454 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_allocate_aux def
+R22456:22462 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:170 var
+R22413:22413 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22421:22422 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22430:22430 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R22496:22510 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R22522:22528 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:170 var
+R22541:22546 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+R22568:22583 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one_minus_var def
+R22605:22616 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_18__new def
+R22618:22619 Corelib.Init.Datatypes <> tt constr
+binder 22477:22483 <> builder:174
+R22657:22667 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_add_term def
+R22669:22678 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> recomposed:171 var
+R22689:22696 Stdlib.ZArith.BinInt Z shiftl def
+R22703:22710 Stdlib.ZArith.BinInt Z of_nat def
+R22712:22720 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bit_index:169 var
+binder 22635:22644 <> recomposed:175
+R22733:22748 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> range_bits_to_lc:172 def
+R22787:22796 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> recomposed:175 var
+R22779:22785 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:174 var
+R22766:22766 Corelib.Init.Datatypes <> S constr
+R22768:22776 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bit_index:169 var
+def 22817:22841 <> encode_constraint_runtime
+R22856:22871 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 22846:22852 <> builder:176
+R22890:22908 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsConstraint ind
+binder 22877:22886 <> constraint:177
+R22933:22939 Core.Core_Primitive <> :::'t_usize' not
+binder 22914:22929 <> constraint_index:178
+R22962:22964 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R22946:22961 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R22965:22972 KernelCompat <> t_Result ind
+R22976:22979 Corelib.Init.Datatypes <> unit ind
+R22985:23007 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R23022:23031 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint:177 var
+R23042:23064 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal constr
+R23103:23131 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal_f_lhs proj
+binder 23096:23098 <> lhs:180
+R23170:23198 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Equal_f_rhs proj
+binder 23163:23165 <> rhs:181
+R23232:23234 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lhs:180 var
+R23249:23263 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Mul constr
+R23324:23341 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R23343:23349 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23360:23375 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R23301:23301 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23309:23310 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23319:23319 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23422:23431 KernelCompat <> Result_Err constr
+R23456:23456 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23464:23465 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23482:23482 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23457:23463 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23466:23475 KernelCompat <> Result_Err constr
+R23496:23504 KernelCompat <> Result_Ok constr
+R23553:23570 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R23572:23578 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23589:23604 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R23530:23530 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23538:23539 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23548:23548 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23659:23668 KernelCompat <> Result_Err constr
+R23697:23697 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23705:23706 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23723:23723 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23698:23704 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23707:23716 KernelCompat <> Result_Err constr
+R23741:23749 KernelCompat <> Result_Ok constr
+R23802:23819 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R23821:23827 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23829:23831 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rhs:181 var
+R23833:23848 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R23779:23779 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23787:23788 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23797:23797 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23911:23920 KernelCompat <> Result_Err constr
+R23953:23953 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23961:23962 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23979:23979 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R23954:23960 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R23963:23972 KernelCompat <> Result_Err constr
+R24001:24009 KernelCompat <> Result_Ok constr
+R24038:24038 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24068:24069 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24082:24082 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24039:24053 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R24055:24061 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24070:24078 KernelCompat <> Result_Ok constr
+R24080:24081 Corelib.Init.Datatypes <> tt constr
+R24167:24169 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rhs:181 var
+R24188:24202 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsExpr_Mul constr
+R24267:24284 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R24286:24292 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24303:24318 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R24244:24244 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24252:24253 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24262:24262 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24373:24382 KernelCompat <> Result_Err constr
+R24411:24411 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24419:24420 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24437:24437 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24412:24418 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24421:24430 KernelCompat <> Result_Err constr
+R24455:24463 KernelCompat <> Result_Ok constr
+R24516:24533 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R24535:24541 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24552:24567 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R24493:24493 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24501:24502 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24511:24511 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24630:24639 KernelCompat <> Result_Err constr
+R24672:24672 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24680:24681 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24698:24698 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24673:24679 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24682:24691 KernelCompat <> Result_Err constr
+R24720:24728 KernelCompat <> Result_Ok constr
+R24785:24802 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R24804:24810 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24812:24814 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lhs:180 var
+R24816:24831 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R24762:24762 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24770:24771 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24780:24780 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24902:24911 KernelCompat <> Result_Err constr
+R24948:24948 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24956:24957 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24974:24974 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R24949:24955 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R24958:24967 KernelCompat <> Result_Err constr
+R25000:25008 KernelCompat <> Result_Ok constr
+R25041:25041 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25071:25072 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25085:25085 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25042:25056 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R25058:25064 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25073:25081 KernelCompat <> Result_Ok constr
+R25083:25084 Corelib.Init.Datatypes <> tt constr
+R25214:25231 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R25233:25239 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25241:25243 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lhs:180 var
+R25245:25260 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R25189:25189 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25197:25198 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25209:25209 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25317:25326 KernelCompat <> Result_Err constr
+R25355:25355 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25363:25364 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25381:25381 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25356:25362 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25365:25374 KernelCompat <> Result_Err constr
+R25399:25407 KernelCompat <> Result_Ok constr
+R25467:25484 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_expr_to_lc def
+R25486:25492 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25494:25496 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> rhs:181 var
+R25498:25513 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R25442:25442 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25450:25451 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25462:25462 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25578:25587 KernelCompat <> Result_Err constr
+R25620:25620 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25628:25629 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25646:25646 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25621:25627 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25630:25639 KernelCompat <> Result_Err constr
+R25668:25676 KernelCompat <> Result_Ok constr
+R25722:25734 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_sub_assign def
+binder 25714:25717 <> diff:192
+R25775:25775 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25834:25835 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25848:25848 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R25776:25790 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R25792:25798 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R25800:25803 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> diff:192 var
+R25806:25811 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one def
+R25813:25814 Corelib.Init.Datatypes <> tt constr
+R25818:25829 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_18__new def
+R25831:25832 Corelib.Init.Datatypes <> tt constr
+R25836:25844 KernelCompat <> Result_Ok constr
+R25846:25847 Corelib.Init.Datatypes <> tt constr
+R25918:25942 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Boolean constr
+R25992:26031 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Boolean_f_signal_index proj
+binder 25976:25987 <> signal_index:193
+R26067:26075 KernelCompat <> impl__get def
+R26138:26149 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:193 var
+R26078:26093 KernelCompat <> impl_1__as_slice def
+R26096:26126 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBuilder_f_signal_columns proj
+R26128:26134 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R26164:26174 Core.Core_Option <> Option_Some constr
+R26206:26211 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_var def
+binder 26197:26201 <> value:194
+R26230:26230 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26301:26302 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26315:26315 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26231:26245 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R26247:26253 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R26255:26259 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> value:194 var
+R26262:26277 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one_minus_var def
+R26285:26296 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_18__new def
+R26298:26299 Corelib.Init.Datatypes <> tt constr
+R26303:26311 KernelCompat <> Result_Ok constr
+R26313:26314 Corelib.Init.Datatypes <> tt constr
+R26325:26335 Core.Core_Option <> Option_None constr
+R26350:26350 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26358:26359 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26456:26456 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26351:26357 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R26360:26369 KernelCompat <> Result_Err constr
+R26372:26392 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError def
+R26394:26409 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R26411:26454 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisErrorKind_InvalidSignalIndex constr
+R26472:26494 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range constr
+R26542:26579 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range_f_signal_index proj
+binder 26526:26537 <> signal_index:195
+R26619:26648 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Range_f_bits proj
+binder 26611:26614 <> bits:196
+R26682:26698 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_signal_lc def
+R26700:26706 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R26708:26719 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> signal_index:195 var
+R26721:26736 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R26751:26760 KernelCompat <> Result_Err constr
+R26781:26781 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26789:26790 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26807:26807 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26782:26788 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R26791:26800 KernelCompat <> Result_Err constr
+R26817:26825 KernelCompat <> Result_Ok constr
+R26895:26910 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> range_bits_to_lc def
+R26927:26934 Stdlib.NArith.BinNat N to_nat def
+R26937:26944 KernelCompat <> u32_to_n def
+R26946:26949 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bits:196 var
+R26967:26967 Corelib.Init.Datatypes <> O constr
+R26983:26989 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R27006:27017 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> impl_18__new def
+R27019:27020 Corelib.Init.Datatypes <> tt constr
+R26858:26858 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26866:26867 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R26878:26878 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27036:27036 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27096:27097 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27110:27110 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27037:27051 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_add_row def
+R27053:27059 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R27075:27080 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> lc_one def
+R27082:27083 Corelib.Init.Datatypes <> tt constr
+R27098:27106 KernelCompat <> Result_Ok constr
+R27108:27109 Corelib.Init.Datatypes <> tt constr
+R27126:27149 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Lookup constr
+R27160:27160 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27168:27169 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27270:27270 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27161:27167 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R27170:27179 KernelCompat <> Result_Err constr
+R27182:27202 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError def
+R27204:27219 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R27221:27268 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisErrorKind_LookupRequiresLowering constr
+R27276:27301 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox constr
+R27339:27371 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_f_kind proj
+R27407:27452 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBlackBoxKind_RecursiveAggregationMarker constr
+R27467:27467 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27475:27476 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27489:27489 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27468:27474 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R27477:27485 KernelCompat <> Result_Ok constr
+R27487:27488 Corelib.Init.Datatypes <> tt constr
+R27499:27523 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBlackBoxKind_Other constr
+R27538:27538 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27546:27547 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27650:27650 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R27539:27545 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:176 var
+R27548:27557 KernelCompat <> Result_Err constr
+R27560:27580 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisError def
+R27582:27597 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:178 var
+R27599:27648 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsSynthesisErrorKind_BlackBoxRequiresLowering constr
+def 27679:27705 <> synthesize_constraints_from
+R27720:27735 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+binder 27710:27716 <> builder:197
+R27755:27759 KernelCompat <> t_Vec def
+R27763:27781 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsConstraint ind
+R27787:27794 KernelCompat <> t_Global constr
+binder 27741:27751 <> constraints:198
+R27821:27827 Core.Core_Primitive <> :::'t_usize' not
+binder 27802:27817 <> constraint_index:199
+R27857:27864 KernelCompat <> t_Result ind
+R27868:27883 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsBuilder' not
+R27889:27911 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R27926:27936 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraints:198 var
+R27947:27948 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R27959:27967 KernelCompat <> Result_Ok constr
+R27969:27975 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:197 var
+R27991:27994 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R28032:28056 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> encode_constraint_runtime def
+R28058:28064 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:197 var
+R28077:28092 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:199 var
+R28107:28107 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28120:28121 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28134:28134 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28122:28130 KernelCompat <> Result_Ok constr
+R28132:28133 Corelib.Init.Datatypes <> tt constr
+R28149:28175 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from:200 def
+R28249:28274 KernelCompat <> impl_usize__saturating_add def
+R28276:28291 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> constraint_index:199 var
+R28299:28305 Core.Core_Primitive <> :::'t_usize' not
+R28318:28318 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28320:28321 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28338:28338 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R28322:28331 KernelCompat <> Result_Err constr
+R28353:28362 KernelCompat <> Result_Err constr
+def 28399:28420 <> synthesize_ccs_program
+R28435:28460 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsConstraintProgram' not
+binder 28425:28431 <> program:202
+R28467:28474 KernelCompat <> t_Result ind
+R28478:28493 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsProgram' not
+R28499:28521 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsSynthesisError' not
+R28545:28555 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_new def
+R28557:28563 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:202 var
+binder 28534:28540 <> builder:203
+R28576:28602 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> synthesize_constraints_from def
+R28604:28610 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:203 var
+R28613:28650 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R28652:28658 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:202 var
+R28666:28672 Core.Core_Primitive <> :::'t_usize' not
+R28684:28692 KernelCompat <> Result_Ok constr
+R28711:28719 KernelCompat <> Result_Ok constr
+R28722:28735 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder_finish def
+R28737:28743 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> builder:203 var
+R28746:28777 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_field proj
+R28779:28785 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> program:202 var
+R28793:28802 KernelCompat <> Result_Err constr
+R28819:28828 KernelCompat <> Result_Err constr

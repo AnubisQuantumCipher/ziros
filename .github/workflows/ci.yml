@@ -1,0 +1,32 @@
+name: public-mirror-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  prove_host_build:
+    runs-on:
+      - self-hosted
+      - macOS
+      - ARM64
+      - ziros
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo build --workspace
+      - run: cargo test -p zkf-lib --lib app::reentry::tests:: -- --nocapture
+      - run: cargo test -p zkf-cli reentry_assurance -- --nocapture
+      - run: bash ./scripts/run_verus_reentry_assurance_proofs.sh
+      - run: python3 scripts/generate_verification_status_artifacts.py --check
+
+  verifier_hosts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo build -p zkf-lib -p zkf-cli

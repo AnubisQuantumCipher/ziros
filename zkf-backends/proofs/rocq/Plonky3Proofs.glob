@@ -1,0 +1,56 @@
+DIGEST f2806399c85a56ff5747018be9321bdc
+FPlonky3Proofs
+R15:27 BackendCompat <> <> lib
+R45:60 Plonky3Semantics <> <> lib
+R105:138 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> <> lib
+prf 150:179 <> plonky3_lower_program_sound_ok
+binder 192:198 <> program:1
+binder 200:206 <> lowered:2
+R254:261 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R234:236 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R213:225 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> lower_program def
+R227:233 Plonky3Proofs <> program:1 var
+R237:245 BackendCompat <> Result_Ok constr
+R247:253 Plonky3Proofs <> lowered:2 var
+R262:283 Plonky3Semantics <> LoweredProgramAccepted def
+R285:291 Plonky3Proofs <> program:1 var
+R293:299 Plonky3Proofs <> lowered:2 var
+prf 376:409 <> plonky3_public_inputs_preserved_ok
+binder 422:428 <> program:3
+binder 430:436 <> lowered:4
+R508:515 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R491:493 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R443:474 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> public_input_positions_preserved def
+R476:482 Plonky3Proofs <> program:3 var
+R484:490 Plonky3Proofs <> lowered:4 var
+R494:502 BackendCompat <> Result_Ok constr
+R504:507 Corelib.Init.Datatypes <> true constr
+R516:536 Plonky3Semantics <> PublicInputsPreserved def
+R538:544 Plonky3Proofs <> program:3 var
+R546:552 Plonky3Proofs <> lowered:4 var
+prf 633:672 <> plonky3_lowering_witness_preservation_ok
+binder 685:691 <> lowered:5
+binder 693:699 <> witness:6
+binder 701:705 <> field:7
+binder 707:709 <> row:8
+R769:776 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R753:755 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R716:730 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> build_trace_row def
+R732:738 Plonky3Proofs <> lowered:5 var
+R740:746 Plonky3Proofs <> witness:6 var
+R748:752 Plonky3Proofs <> field:7 var
+R756:764 BackendCompat <> Result_Ok constr
+R766:768 Plonky3Proofs <> row:8 var
+R809:812 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R777:800 Plonky3Semantics <> LoweredProgramWellFormed def
+R802:808 Plonky3Proofs <> lowered:5 var
+R813:828 Plonky3Semantics <> TraceRowAccepted def
+R830:836 Plonky3Proofs <> lowered:5 var
+R838:844 Plonky3Proofs <> witness:6 var
+R846:850 Plonky3Proofs <> field:7 var
+R852:854 Plonky3Proofs <> row:8 var
+R914:929 Plonky3Semantics <> TraceRowAccepted def
+R952:975 Plonky3Semantics <> LoweredProgramWellFormed def
+R989:1003 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> build_trace_row def
+R1028:1051 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> validate_lowered_program def
+R1028:1051 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> validate_lowered_program def

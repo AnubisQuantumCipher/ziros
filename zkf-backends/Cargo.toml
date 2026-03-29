@@ -1,0 +1,82 @@
+[package]
+name = "zkf-backends"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[features]
+default = ["full"]
+full = ["native-blackbox-solvers", "native-nova", "nova-compression"]
+kani-minimal = []
+native-blackbox-solvers = ["dep:acvm_blackbox_solver", "dep:bn254_blackbox_solver"]
+native-nova = ["dep:nova-snark", "nova-snark/experimental", "zkf-core/native-nova"]
+nova-compression = ["native-nova"]
+native-sp1 = ["dep:sp1-sdk", "zkf-core/native-sp1"]
+native-risc-zero = ["dep:risc0-zkvm", "dep:risc0-binfmt", "dep:risc0-zkos-v1compat", "zkf-core/native-risc-zero"]
+metal-gpu = []
+
+[dependencies]
+acir.workspace = true
+acvm_blackbox_solver = { workspace = true, optional = true }
+base64.workspace = true
+bincode.workspace = true
+bn254_blackbox_solver = { workspace = true, optional = true }
+once_cell.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+group.workspace = true
+sha2.workspace = true
+k256.workspace = true
+p256.workspace = true
+num-traits.workspace = true
+zkf-core = { path = "../zkf-core" }
+nova-snark = { workspace = true, optional = true }
+sp1-sdk = { workspace = true, optional = true, features = ["blocking"] }
+risc0-zkvm = { workspace = true, optional = true }
+risc0-binfmt = { workspace = true, optional = true }
+risc0-zkos-v1compat = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ark-bn254.workspace = true
+ark-ec.workspace = true
+ark-ff.workspace = true
+ark-groth16.workspace = true
+ark-poly.workspace = true
+ark-relations.workspace = true
+ark-serialize.workspace = true
+ark-snark.workspace = true
+halo2_proofs.workspace = true
+ff.workspace = true
+num-bigint.workspace = true
+postcard.workspace = true
+p3-air.workspace = true
+p3-challenger.workspace = true
+p3-commit.workspace = true
+p3-dft.workspace = true
+p3-field.workspace = true
+p3-fri.workspace = true
+p3-circle.workspace = true
+p3-goldilocks.workspace = true
+p3-baby-bear.workspace = true
+p3-mersenne-31.workspace = true
+p3-keccak.workspace = true
+p3-matrix.workspace = true
+p3-merkle-tree.workspace = true
+p3-poseidon2.workspace = true
+p3-symmetric.workspace = true
+p3-uni-stark.workspace = true
+halo2_proofs_pse.workspace = true
+rand_chacha.workspace = true
+rand.workspace = true
+rand09.workspace = true
+ureq.workspace = true
+
+[target.'cfg(hax)'.dependencies]
+hax-lib = { git = "https://github.com/cryspen/hax", rev = "1f0259212fa994fb351853026397042c497d07b9" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+
+[dev-dependencies]
+proptest.workspace = true
+zkf-examples = { path = "../zkf-examples" }

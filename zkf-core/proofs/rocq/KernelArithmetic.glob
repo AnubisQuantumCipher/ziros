@@ -1,0 +1,55 @@
+DIGEST 27b3dacc04f8f52cab2a7e1a20e488f9
+FKernelArithmetic
+R27:32 Stdlib.ZArith.ZArith <> <> lib
+R34:36 Stdlib.micromega.Lia <> <> lib
+def 72:81 <> is_boolean
+R88:88 Corelib.Numbers.BinNums <> Z ind
+binder 84:84 <> x:1
+R106:109 Corelib.Init.Logic <> ::type_scope:x_'\/'_x not
+R102:104 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R101:101 KernelArithmetic <> x:1 var
+R111:113 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R110:110 KernelArithmetic <> x:1 var
+def 129:137 <> fits_bits
+R149:149 Corelib.Numbers.BinNums <> Z ind
+binder 140:143 <> bits:2
+binder 145:145 <> x:3
+R163:166 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x_'<'_x not
+R168:170 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x_'<'_x not
+R167:167 KernelArithmetic <> x:3 var
+R167:167 KernelArithmetic <> x:3 var
+R172:174 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R175:178 KernelArithmetic <> bits:2 var
+prf 188:207 <> boolean_fits_one_bit
+binder 218:218 <> x:4
+R233:236 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R221:230 KernelArithmetic <> is_boolean def
+R232:232 KernelArithmetic <> x:4 var
+R237:245 KernelArithmetic <> fits_bits def
+R249:249 KernelArithmetic <> x:4 var
+R286:295 KernelArithmetic <> is_boolean def
+R316:324 KernelArithmetic <> fits_bits def
+prf 393:410 <> fits_bits_monotone
+binder 423:423 <> x:5
+binder 425:429 <> small:6
+binder 431:435 <> large:7
+R461:468 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R443:446 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x_'<='_x not
+R452:455 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x_'<='_x not
+R447:451 KernelArithmetic <> small:6 var
+R447:451 KernelArithmetic <> small:6 var
+R456:460 KernelArithmetic <> large:7 var
+R486:493 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R469:477 KernelArithmetic <> fits_bits def
+R479:483 KernelArithmetic <> small:6 var
+R485:485 KernelArithmetic <> x:5 var
+R494:502 KernelArithmetic <> fits_bits def
+R504:508 KernelArithmetic <> large:7 var
+R510:510 KernelArithmetic <> x:5 var
+R579:587 KernelArithmetic <> fits_bits def
+R656:658 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R630:642 Stdlib.ZArith.BinInt Z lt_le_trans thm
+R656:658 Stdlib.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R630:642 Stdlib.ZArith.BinInt Z lt_le_trans thm
+R698:712 Stdlib.ZArith.BinInt Z pow_le_mono_r thm
+R698:712 Stdlib.ZArith.BinInt Z pow_le_mono_r thm

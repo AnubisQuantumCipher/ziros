@@ -1,0 +1,21 @@
+[package]
+name = "zkf-conformance"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Conformance test suite for ZKF backends"
+
+[features]
+default = []
+metal-gpu = ["zkf-backends/metal-gpu"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core", features = ["full"] }
+zkf-backends = { path = "../zkf-backends", features = ["native-nova"] }
+zkf-runtime = { path = "../zkf-runtime" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

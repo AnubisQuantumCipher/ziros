@@ -1,0 +1,46 @@
+DIGEST af5d9f845e4297ebe463a0c89ff8ea67
+FZkfCoreExtraction.Zkf_core_Field
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+ind 361:369 <> t_FieldId
+constr 383:395 <> FieldId_Bn254
+constr 399:416 <> FieldId_Bls12_381_
+constr 420:434 <> FieldId_PastaFp
+constr 438:452 <> FieldId_PastaFq
+constr 456:473 <> FieldId_Goldilocks
+constr 477:492 <> FieldId_BabyBear
+constr 496:513 <> FieldId_Mersenne31
+scheme 361:369 <> t_FieldId_rect
+scheme 361:369 <> t_FieldId_ind
+scheme 361:369 <> t_FieldId_rec
+scheme 361:369 <> t_FieldId_sind
+rec 531:549 <> FieldElement_record
+proj 569:588 <> FieldElement_f_bytes
+proj 629:646 <> FieldElement_f_len
+proj 660:682 <> FieldElement_f_negative
+R592:622 Core.Core_Primitive <> :::'t_Array' not
+R614:620 Core.Core_Primitive <> :::'t_usize' not
+R601:604 Core.Core_Primitive <> :::'t_u8' not
+R650:653 Core.Core_Primitive <> :::'t_u8' not
+R686:689 Corelib.Init.Datatypes <> bool ind
+inst 720:747 <> settable_FieldElement_record
+R751:758 RecordUpdate.RecordSet <> Settable class
+R767:777 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R803:805 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R826:827 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R846:847 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R871:871 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R848:870 ZkfCoreExtraction.Zkf_core_Field <> FieldElement_f_negative proj
+R828:845 ZkfCoreExtraction.Zkf_core_Field <> FieldElement_f_len proj
+R806:825 ZkfCoreExtraction.Zkf_core_Field <> FieldElement_f_bytes proj
+R778:802 ZkfCoreExtraction.Zkf_core_Field <> Build_FieldElement_record constr
+R778:802 ZkfCoreExtraction.Zkf_core_Field <> Build_FieldElement_record constr
+R906:924 ZkfCoreExtraction.Zkf_core_Field <> FieldElement_record rec
+not 883:883 <> :::'t_FieldElement'

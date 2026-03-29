@@ -1,0 +1,128 @@
+DIGEST abeecf6714119376da40a36732b97787
+FZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec
+R107:112 Stdlib.ZArith.ZArith <> <> lib
+R114:119 Stdlib.NArith.NArith <> <> lib
+R180:192 BackendCompat <> <> lib
+ind 206:238 <> t_SpecSupportedLookupLoweringPath
+constr 252:301 <> SpecSupportedLookupLoweringPath_SelectorValueTable
+scheme 206:238 <> t_SpecSupportedLookupLoweringPath_rect
+scheme 206:238 <> t_SpecSupportedLookupLoweringPath_ind
+scheme 206:238 <> t_SpecSupportedLookupLoweringPath_rec
+scheme 206:238 <> t_SpecSupportedLookupLoweringPath_sind
+rec 312:339 <> LookupLoweringSurface_record
+proj 355:392 <> LookupLoweringSurface_f_supported_path
+proj 433:467 <> LookupLoweringSurface_f_input_count
+proj 482:517 <> LookupLoweringSurface_f_output_count
+proj 532:565 <> LookupLoweringSurface_f_table_rows
+proj 580:616 <> LookupLoweringSurface_f_table_columns
+proj 631:668 <> LookupLoweringSurface_f_selector_count
+proj 683:730 <> LookupLoweringSurface_f_boolean_constraint_count
+proj 745:793 <> LookupLoweringSurface_f_equality_constraint_count
+proj 808:851 <> LookupLoweringSurface_f_output_binding_count
+R396:428 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> t_SpecSupportedLookupLoweringPath ind
+R471:477 Core.Core_Primitive <> :::'t_usize' not
+R521:527 Core.Core_Primitive <> :::'t_usize' not
+R569:575 Core.Core_Primitive <> :::'t_usize' not
+R620:626 Core.Core_Primitive <> :::'t_usize' not
+R672:678 Core.Core_Primitive <> :::'t_usize' not
+R734:740 Core.Core_Primitive <> :::'t_usize' not
+R797:803 Core.Core_Primitive <> :::'t_usize' not
+R855:861 Core.Core_Primitive <> :::'t_usize' not
+def 878:898 <> LookupLoweringSurface
+R903:936 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> Build_LookupLoweringSurface_record constr
+def 950:972 <> t_LookupLoweringSurface
+R977:1004 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface_record rec
+def 1019:1051 <> lookup_lowering_surface_supported
+R1070:1076 Core.Core_Primitive <> :::'t_usize' not
+binder 1056:1066 <> input_count:13
+R1095:1101 Core.Core_Primitive <> :::'t_usize' not
+binder 1082:1091 <> table_rows:14
+R1123:1129 Core.Core_Primitive <> :::'t_usize' not
+binder 1107:1119 <> table_columns:15
+R1136:1139 Corelib.Init.Datatypes <> bool ind
+R1146:1149 Corelib.Init.Datatypes <> andb def
+R1201:1204 Corelib.Init.Datatypes <> andb def
+R1255:1258 BackendCompat <> f_le abbrev
+R1272:1284 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:15 var
+R1260:1270 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:13 var
+R1213:1216 BackendCompat <> f_le abbrev
+R1237:1243 Core.Core_Primitive <> :::'t_usize' not
+R1218:1227 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:14 var
+R1156:1159 Corelib.Init.Datatypes <> negb def
+R1162:1165 BackendCompat <> f_eq abbrev
+R1184:1190 Core.Core_Primitive <> :::'t_usize' not
+R1167:1176 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:14 var
+def 1301:1336 <> lookup_lowering_output_binding_count
+R1355:1361 Core.Core_Primitive <> :::'t_usize' not
+binder 1341:1351 <> input_count:16
+R1382:1388 Core.Core_Primitive <> :::'t_usize' not
+binder 1367:1378 <> output_count:17
+R1410:1416 Core.Core_Primitive <> :::'t_usize' not
+binder 1394:1406 <> table_columns:18
+R1423:1429 Core.Core_Primitive <> :::'t_usize' not
+R1461:1470 BackendCompat <> n_to_usize def
+R1473:1477 Stdlib.NArith.BinNat N max def
+R1506:1508 Stdlib.NArith.BinNat <> ::N_scope:x_'-'_x not
+R1482:1491 BackendCompat <> usize_to_n def
+R1493:1505 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:18 var
+R1509:1518 BackendCompat <> usize_to_n def
+R1520:1530 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:16 var
+binder 1440:1456 <> remaining_columns:19
+R1542:1546 Stdlib.NArith.BinNat N leb def
+R1549:1558 BackendCompat <> usize_to_n def
+R1560:1571 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:17 var
+R1575:1584 BackendCompat <> usize_to_n def
+R1586:1602 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> remaining_columns:19 var
+R1632:1648 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> remaining_columns:19 var
+R1612:1623 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:17 var
+def 1663:1703 <> lookup_lowering_equality_constraint_count
+R1722:1728 Core.Core_Primitive <> :::'t_usize' not
+binder 1708:1718 <> input_count:20
+R1749:1755 Core.Core_Primitive <> :::'t_usize' not
+binder 1734:1745 <> output_count:21
+R1777:1783 Core.Core_Primitive <> :::'t_usize' not
+binder 1761:1773 <> table_columns:22
+R1790:1796 Core.Core_Primitive <> :::'t_usize' not
+R1835:1870 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_output_binding_count def
+R1872:1882 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:20 var
+R1884:1895 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:21 var
+R1897:1909 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:22 var
+binder 1807:1826 <> output_binding_count:23
+R1916:1920 BackendCompat <> f_add def
+R1939:1943 BackendCompat <> f_add def
+R1957:1976 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_binding_count:23 var
+R1945:1955 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:20 var
+R1928:1934 Core.Core_Primitive <> :::'t_usize' not
+def 1992:2024 <> supported_lookup_lowering_surface
+R2043:2049 Core.Core_Primitive <> :::'t_usize' not
+binder 2029:2039 <> input_count:24
+R2070:2076 Core.Core_Primitive <> :::'t_usize' not
+binder 2055:2066 <> output_count:25
+R2095:2101 Core.Core_Primitive <> :::'t_usize' not
+binder 2082:2091 <> table_rows:26
+R2123:2129 Core.Core_Primitive <> :::'t_usize' not
+binder 2107:2119 <> table_columns:27
+R2136:2143 Core.Core_Option <> t_Option ind
+R2146:2168 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> t_LookupLoweringSurface def
+R2179:2211 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_surface_supported def
+R2213:2223 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:24 var
+R2225:2234 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:26 var
+R2236:2248 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:27 var
+R2679:2689 Core.Core_Option <> Option_None constr
+R2259:2269 Core.Core_Option <> Option_Some constr
+R2278:2298 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> LookupLoweringSurface def
+R2310:2359 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> SpecSupportedLookupLoweringPath_SelectorValueTable constr
+R2371:2381 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:24 var
+R2392:2403 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:25 var
+R2414:2423 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:26 var
+R2434:2446 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:27 var
+R2457:2466 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:26 var
+R2477:2486 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_rows:26 var
+R2498:2538 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_equality_constraint_count def
+R2540:2550 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:24 var
+R2552:2563 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:25 var
+R2565:2577 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:27 var
+R2590:2625 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> lookup_lowering_output_binding_count def
+R2627:2637 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> input_count:24 var
+R2639:2650 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> output_count:25 var
+R2652:2664 ZkfBackendsExtraction.Zkf_backends_Proof_lookup_lowering_spec <> table_columns:27 var

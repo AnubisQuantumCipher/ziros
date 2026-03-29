@@ -1,0 +1,385 @@
+DIGEST e5ede5538bc0a35cdea0c5bb725c633d
+FZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R365:376 KernelCompat <> <> lib
+def 416:449 <> preserve_successful_artifact_bytes
+R463:467 KernelCompat <> t_Vec def
+R471:474 Core.Core_Primitive <> :::'t_u8' not
+R480:487 KernelCompat <> t_Global constr
+binder 452:459 <> artifact:1
+R494:498 KernelCompat <> t_Vec def
+R502:505 Core.Core_Primitive <> :::'t_u8' not
+R511:518 KernelCompat <> t_Global constr
+R527:534 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:1 var
+def 547:556 <> u8_list_eq
+R566:569 Corelib.Init.Datatypes <> list ind
+R571:574 Core.Core_Primitive <> :::'t_u8' not
+binder 559:562 <> left:2
+R586:589 Corelib.Init.Datatypes <> list ind
+R591:594 Core.Core_Primitive <> :::'t_u8' not
+binder 578:582 <> right:3
+R599:602 Corelib.Init.Datatypes <> bool ind
+R621:625 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> right:3 var
+R615:618 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> left:2 var
+R636:637 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R640:641 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R658:661 Corelib.Init.Datatypes <> bool ind
+R651:654 Corelib.Init.Datatypes <> true constr
+R677:680 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R702:705 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R724:727 Corelib.Init.Datatypes <> andb def
+R803:812 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> u8_list_eq:4 def
+R736:740 Stdlib.NArith.BinNat N eqb def
+R743:748 Core.Core_Base_interface_Int <> U8_f_v proj
+R751:764 Core.Core_Primitive <> :::'u8_0' not
+R769:774 Core.Core_Base_interface_Int <> U8_f_v proj
+R777:791 Core.Core_Primitive <> :::'u8_0' not
+R861:864 Corelib.Init.Datatypes <> bool ind
+R853:857 Corelib.Init.Datatypes <> false constr
+def 886:902 <> artifact_bytes_eq
+R912:941 Core.Core_Primitive <> :::'t_Array' not
+R933:939 Core.Core_Primitive <> :::'t_usize' not
+R921:924 Core.Core_Primitive <> :::'t_u8' not
+binder 905:908 <> left:7
+R953:982 Core.Core_Primitive <> :::'t_Array' not
+R974:980 Core.Core_Primitive <> :::'t_usize' not
+R962:965 Core.Core_Primitive <> :::'t_u8' not
+binder 945:949 <> right:8
+R987:990 Corelib.Init.Datatypes <> bool ind
+R997:1006 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> u8_list_eq def
+R1013:1038 Core.Core_Primitive <> :::'Slice_f_v' not
+R1024:1037 Core.Core_Primitive <> :::'Array_f_v' not
+R1034:1037 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> left:7 var
+R1046:1072 Core.Core_Primitive <> :::'Slice_f_v' not
+R1057:1071 Core.Core_Primitive <> :::'Array_f_v' not
+R1067:1071 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> right:8 var
+ind 1087:1113 <> t_ProofSwarmActivationLevel
+constr 1127:1159 <> ProofSwarmActivationLevel_Dormant
+constr 1163:1193 <> ProofSwarmActivationLevel_Alert
+constr 1197:1228 <> ProofSwarmActivationLevel_Active
+constr 1232:1266 <> ProofSwarmActivationLevel_Emergency
+scheme 1087:1113 <> t_ProofSwarmActivationLevel_rect
+scheme 1087:1113 <> t_ProofSwarmActivationLevel_ind
+scheme 1087:1113 <> t_ProofSwarmActivationLevel_rec
+scheme 1087:1113 <> t_ProofSwarmActivationLevel_sind
+rec 1281:1317 <> ProofDisabledSwarmSurfaceState_record
+proj 1337:1385 <> ProofDisabledSwarmSurfaceState_f_activation_level
+proj 1422:1478 <> ProofDisabledSwarmSurfaceState_f_verdict_activation_level
+proj 1515:1566 <> ProofDisabledSwarmSurfaceState_f_threat_digest_count
+proj 1583:1634 <> ProofDisabledSwarmSurfaceState_f_consensus_confirmed
+proj 1648:1697 <> ProofDisabledSwarmSurfaceState_f_telemetry_present
+proj 1711:1760 <> ProofDisabledSwarmSurfaceState_f_bias_basis_points
+R1389:1415 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+R1482:1508 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+R1570:1576 Core.Core_Primitive <> :::'t_usize' not
+R1638:1641 Corelib.Init.Datatypes <> bool ind
+R1701:1704 Corelib.Init.Datatypes <> bool ind
+R1764:1768 Core.Core_Primitive <> :::'t_u16' not
+def 1787:1818 <> t_ProofDisabledSwarmSurfaceState
+R1823:1859 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_record rec
+inst 1888:1933 <> settable_ProofDisabledSwarmSurfaceState_record
+R1937:1944 RecordUpdate.RecordSet <> Settable class
+R1953:1963 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2007:2009 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2059:2060 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2118:2119 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2172:2173 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2226:2227 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2278:2279 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2330:2330 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R2280:2329 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_bias_basis_points proj
+R2228:2277 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_telemetry_present proj
+R2174:2225 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_consensus_confirmed proj
+R2120:2171 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_threat_digest_count proj
+R2061:2117 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_verdict_activation_level proj
+R2010:2058 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_activation_level proj
+R1964:2006 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> Build_ProofDisabledSwarmSurfaceState_record constr
+R1964:2006 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> Build_ProofDisabledSwarmSurfaceState_record constr
+def 2344:2373 <> ProofDisabledSwarmSurfaceState
+R2378:2420 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> Build_ProofDisabledSwarmSurfaceState_record constr
+abbrev 2432:2449 <> f_activation_level
+R2454:2502 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_activation_level proj
+abbrev 2514:2563 <> t_ProofDisabledSwarmSurfaceStatef_activation_level
+R2568:2616 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_activation_level proj
+abbrev 2628:2653 <> f_verdict_activation_level
+R2658:2714 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_verdict_activation_level proj
+abbrev 2726:2783 <> t_ProofDisabledSwarmSurfaceStatef_verdict_activation_level
+R2788:2844 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_verdict_activation_level proj
+abbrev 2856:2876 <> f_threat_digest_count
+R2881:2932 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_threat_digest_count proj
+abbrev 2944:2996 <> t_ProofDisabledSwarmSurfaceStatef_threat_digest_count
+R3001:3052 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_threat_digest_count proj
+abbrev 3064:3084 <> f_consensus_confirmed
+R3089:3140 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_consensus_confirmed proj
+abbrev 3152:3204 <> t_ProofDisabledSwarmSurfaceStatef_consensus_confirmed
+R3209:3260 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_consensus_confirmed proj
+abbrev 3272:3290 <> f_telemetry_present
+R3295:3344 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_telemetry_present proj
+abbrev 3356:3406 <> t_ProofDisabledSwarmSurfaceStatef_telemetry_present
+R3411:3460 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_telemetry_present proj
+abbrev 3472:3490 <> f_bias_basis_points
+R3495:3544 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_bias_basis_points proj
+abbrev 3556:3606 <> t_ProofDisabledSwarmSurfaceStatef_bias_basis_points
+R3611:3660 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState_f_bias_basis_points proj
+def 3675:3695 <> activation_level_rank
+R3706:3732 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+binder 3698:3702 <> level:18
+R3737:3740 Core.Core_Primitive <> :::'t_u8' not
+R3753:3757 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:18 var
+R3768:3800 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R3814:3817 Core.Core_Primitive <> :::'t_u8' not
+R3824:3854 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R3868:3871 Core.Core_Primitive <> :::'t_u8' not
+R3878:3909 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R3923:3926 Core.Core_Primitive <> :::'t_u8' not
+R3933:3967 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Emergency constr
+R3981:3984 Core.Core_Primitive <> :::'t_u8' not
+def 4006:4032 <> disabled_surface_state_spec
+R4040:4043 Corelib.Init.Datatypes <> unit ind
+R4040:4043 Corelib.Init.Datatypes <> unit ind
+binder 4036:4043 <> pat:20
+R4048:4079 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofDisabledSwarmSurfaceState def
+R4086:4115 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofDisabledSwarmSurfaceState def
+R4118:4150 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R4154:4186 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R4195:4201 Core.Core_Primitive <> :::'t_usize' not
+R4215:4218 Corelib.Init.Datatypes <> bool ind
+R4207:4211 Corelib.Init.Datatypes <> false constr
+R4232:4235 Corelib.Init.Datatypes <> bool ind
+R4224:4228 Corelib.Init.Datatypes <> false constr
+R4248:4252 Core.Core_Primitive <> :::'t_u16' not
+def 4269:4292 <> controller_artifact_path
+R4305:4308 Corelib.Init.Datatypes <> bool ind
+binder 4295:4301 <> enabled:21
+R4323:4352 Core.Core_Primitive <> :::'t_Array' not
+R4344:4350 Core.Core_Primitive <> :::'t_usize' not
+R4332:4335 Core.Core_Primitive <> :::'t_u8' not
+binder 4312:4319 <> artifact:22
+R4365:4368 Corelib.Init.Datatypes <> bool ind
+binder 4356:4361 <> reject:23
+R4373:4380 KernelCompat <> t_Result ind
+R4384:4413 Core.Core_Primitive <> :::'t_Array' not
+R4405:4411 Core.Core_Primitive <> :::'t_usize' not
+R4393:4396 Core.Core_Primitive <> :::'t_u8' not
+R4419:4422 Corelib.Init.Datatypes <> unit ind
+R4437:4437 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4445:4445 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4452:4452 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4438:4444 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> enabled:21 var
+R4446:4451 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> reject:23 var
+R4463:4463 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4469:4469 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4471:4471 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4464:4468 Corelib.Init.Datatypes <> false constr
+R4480:4488 KernelCompat <> Result_Ok constr
+R4491:4498 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:22 var
+R4505:4505 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4510:4510 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4515:4515 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4506:4509 Corelib.Init.Datatypes <> true constr
+R4511:4514 Corelib.Init.Datatypes <> true constr
+R4524:4533 KernelCompat <> Result_Err constr
+R4536:4537 Corelib.Init.Datatypes <> tt constr
+R4544:4544 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4549:4549 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4555:4555 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R4545:4548 Corelib.Init.Datatypes <> true constr
+R4550:4554 Corelib.Init.Datatypes <> false constr
+R4564:4572 KernelCompat <> Result_Ok constr
+R4575:4582 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:22 var
+def 4604:4647 <> controller_artifact_path_matches_pure_helper
+R4660:4663 Corelib.Init.Datatypes <> bool ind
+binder 4650:4656 <> enabled:24
+R4678:4707 Core.Core_Primitive <> :::'t_Array' not
+R4699:4705 Core.Core_Primitive <> :::'t_usize' not
+R4687:4690 Core.Core_Primitive <> :::'t_u8' not
+binder 4667:4674 <> artifact:25
+R4720:4723 Corelib.Init.Datatypes <> bool ind
+binder 4711:4716 <> reject:26
+R4728:4731 Corelib.Init.Datatypes <> bool ind
+R4744:4767 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> controller_artifact_path def
+R4770:4776 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> enabled:24 var
+R4780:4787 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:25 var
+R4791:4796 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> reject:26 var
+R4808:4816 KernelCompat <> Result_Ok constr
+R4840:4856 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact_bytes_eq def
+R4874:4881 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:25 var
+R4888:4897 KernelCompat <> Result_Err constr
+R4908:4911 Corelib.Init.Datatypes <> andb def
+R4924:4929 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> reject:26 var
+R4914:4920 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> enabled:24 var
+def 4951:4990 <> successful_artifact_path_preserves_bytes
+R5003:5006 Corelib.Init.Datatypes <> bool ind
+binder 4993:4999 <> enabled:27
+R5021:5050 Core.Core_Primitive <> :::'t_Array' not
+R5042:5048 Core.Core_Primitive <> :::'t_usize' not
+R5030:5033 Core.Core_Primitive <> :::'t_u8' not
+binder 5010:5017 <> artifact:28
+R5055:5058 Corelib.Init.Datatypes <> bool ind
+R5071:5094 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> controller_artifact_path def
+R5097:5103 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> enabled:27 var
+R5107:5114 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:28 var
+R5127:5130 Corelib.Init.Datatypes <> bool ind
+R5119:5123 Corelib.Init.Datatypes <> false constr
+R5143:5151 KernelCompat <> Result_Ok constr
+R5175:5191 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact_bytes_eq def
+R5209:5216 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:28 var
+R5223:5232 KernelCompat <> Result_Err constr
+R5252:5255 Corelib.Init.Datatypes <> bool ind
+R5244:5248 Corelib.Init.Datatypes <> false constr
+def 5277:5312 <> encrypted_gossip_artifact_projection
+R5326:5355 Core.Core_Primitive <> :::'t_Array' not
+R5347:5353 Core.Core_Primitive <> :::'t_usize' not
+R5335:5338 Core.Core_Primitive <> :::'t_u8' not
+binder 5315:5322 <> artifact:29
+R5360:5389 Core.Core_Primitive <> :::'t_Array' not
+R5381:5387 Core.Core_Primitive <> :::'t_usize' not
+R5369:5372 Core.Core_Primitive <> :::'t_u8' not
+R5396:5403 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:29 var
+def 5418:5466 <> encrypted_gossip_surface_preserves_artifact_bytes
+R5480:5509 Core.Core_Primitive <> :::'t_Array' not
+R5501:5507 Core.Core_Primitive <> :::'t_usize' not
+R5489:5492 Core.Core_Primitive <> :::'t_u8' not
+binder 5469:5476 <> artifact:30
+R5514:5517 Corelib.Init.Datatypes <> bool ind
+R5524:5540 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact_bytes_eq def
+R5543:5578 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> encrypted_gossip_artifact_projection def
+R5581:5588 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:30 var
+R5593:5600 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> artifact:30 var
+def 5616:5648 <> encrypted_gossip_fail_closed_spec
+R5664:5667 Corelib.Init.Datatypes <> bool ind
+binder 5651:5660 <> negotiated:31
+R5691:5694 Corelib.Init.Datatypes <> bool ind
+binder 5671:5687 <> plaintext_present:32
+R5726:5729 Corelib.Init.Datatypes <> bool ind
+binder 5698:5722 <> encrypted_payload_present:33
+R5734:5737 Corelib.Init.Datatypes <> bool ind
+R5751:5760 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> negotiated:31 var
+R5810:5813 Corelib.Init.Datatypes <> andb def
+R5844:5848 KernelCompat <> f_not def
+R5851:5875 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> encrypted_payload_present:33 var
+R5816:5820 KernelCompat <> f_not def
+R5823:5839 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> plaintext_present:32 var
+R5773:5777 KernelCompat <> f_not def
+R5780:5796 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> plaintext_present:32 var
+def 5892:5933 <> controller_artifact_mutation_surface_count
+R5941:5944 Corelib.Init.Datatypes <> unit ind
+R5941:5944 Corelib.Init.Datatypes <> unit ind
+binder 5937:5944 <> pat:34
+R5949:5955 Core.Core_Primitive <> :::'t_usize' not
+R5967:5973 Core.Core_Primitive <> :::'t_usize' not
+def 5989:6007 <> cooldown_tick_level
+R6018:6044 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+binder 6010:6014 <> level:35
+R6066:6069 Corelib.Init.Datatypes <> bool ind
+binder 6048:6062 <> cooldown_active:36
+R6074:6100 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+R6114:6128 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_active:36 var
+R6164:6168 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:35 var
+R6181:6213 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R6224:6256 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R6264:6294 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R6305:6337 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R6345:6376 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R6387:6417 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R6425:6459 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Emergency constr
+R6470:6501 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R6141:6145 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:35 var
+def 6524:6556 <> cooldown_tick_is_non_deescalating
+R6567:6593 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+binder 6559:6563 <> level:38
+R6598:6601 Corelib.Init.Datatypes <> bool ind
+R6614:6618 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:38 var
+R6629:6661 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R6676:6694 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R6697:6701 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:38 var
+R6713:6716 Corelib.Init.Datatypes <> bool ind
+R6706:6709 Corelib.Init.Datatypes <> true constr
+R6731:6763 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R6782:6785 Corelib.Init.Datatypes <> bool ind
+R6775:6778 Corelib.Init.Datatypes <> true constr
+R6814:6817 Corelib.Init.Datatypes <> bool ind
+R6806:6810 Corelib.Init.Datatypes <> false constr
+R6832:6862 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R6877:6895 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R6898:6902 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:38 var
+R6914:6917 Corelib.Init.Datatypes <> bool ind
+R6907:6910 Corelib.Init.Datatypes <> true constr
+R6932:6962 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R6981:6984 Corelib.Init.Datatypes <> bool ind
+R6974:6977 Corelib.Init.Datatypes <> true constr
+R7013:7016 Corelib.Init.Datatypes <> bool ind
+R7005:7009 Corelib.Init.Datatypes <> false constr
+R7031:7062 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R7077:7095 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R7098:7102 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:38 var
+R7114:7117 Corelib.Init.Datatypes <> bool ind
+R7107:7110 Corelib.Init.Datatypes <> true constr
+R7132:7163 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R7182:7185 Corelib.Init.Datatypes <> bool ind
+R7175:7178 Corelib.Init.Datatypes <> true constr
+R7214:7217 Corelib.Init.Datatypes <> bool ind
+R7206:7210 Corelib.Init.Datatypes <> false constr
+R7232:7266 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Emergency constr
+R7281:7299 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R7302:7306 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:38 var
+R7318:7321 Corelib.Init.Datatypes <> bool ind
+R7311:7314 Corelib.Init.Datatypes <> true constr
+R7336:7370 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Emergency constr
+R7389:7392 Corelib.Init.Datatypes <> bool ind
+R7382:7385 Corelib.Init.Datatypes <> true constr
+R7421:7424 Corelib.Init.Datatypes <> bool ind
+R7413:7417 Corelib.Init.Datatypes <> false constr
+def 7454:7490 <> cooldown_tick_drops_at_most_one_level
+R7501:7527 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> t_ProofSwarmActivationLevel ind
+binder 7493:7497 <> level:40
+R7532:7535 Corelib.Init.Datatypes <> bool ind
+R7548:7552 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:40 var
+R7563:7595 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R7610:7628 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R7631:7635 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:40 var
+R7648:7651 Corelib.Init.Datatypes <> bool ind
+R7640:7644 Corelib.Init.Datatypes <> false constr
+R7666:7698 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R7717:7720 Corelib.Init.Datatypes <> bool ind
+R7710:7713 Corelib.Init.Datatypes <> true constr
+R7749:7752 Corelib.Init.Datatypes <> bool ind
+R7741:7745 Corelib.Init.Datatypes <> false constr
+R7767:7797 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R7812:7830 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R7833:7837 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:40 var
+R7850:7853 Corelib.Init.Datatypes <> bool ind
+R7842:7846 Corelib.Init.Datatypes <> false constr
+R7868:7900 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Dormant constr
+R7919:7922 Corelib.Init.Datatypes <> bool ind
+R7912:7915 Corelib.Init.Datatypes <> true constr
+R7951:7954 Corelib.Init.Datatypes <> bool ind
+R7943:7947 Corelib.Init.Datatypes <> false constr
+R7969:8000 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R8015:8033 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R8036:8040 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:40 var
+R8053:8056 Corelib.Init.Datatypes <> bool ind
+R8045:8049 Corelib.Init.Datatypes <> false constr
+R8071:8101 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Alert constr
+R8120:8123 Corelib.Init.Datatypes <> bool ind
+R8113:8116 Corelib.Init.Datatypes <> true constr
+R8152:8155 Corelib.Init.Datatypes <> bool ind
+R8144:8148 Corelib.Init.Datatypes <> false constr
+R8170:8204 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Emergency constr
+R8219:8237 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> cooldown_tick_level def
+R8240:8244 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> level:40 var
+R8257:8260 Corelib.Init.Datatypes <> bool ind
+R8249:8253 Corelib.Init.Datatypes <> false constr
+R8275:8306 ZkfRuntimeExtraction.Zkf_runtime_Proof_swarm_spec <> ProofSwarmActivationLevel_Active constr
+R8325:8328 Corelib.Init.Datatypes <> bool ind
+R8318:8321 Corelib.Init.Datatypes <> true constr
+R8357:8360 Corelib.Init.Datatypes <> bool ind
+R8349:8353 Corelib.Init.Datatypes <> false constr

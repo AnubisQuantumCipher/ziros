@@ -1,0 +1,10 @@
+[verus]
+release_tag = "release/0.2026.03.17.a96bad0"
+version = "0.2026.03.17.a96bad0"
+asset_macos_arm64 = "verus-0.2026.03.17.a96bad0-arm64-macos.zip"
+download_url_macos_arm64 = "https://github.com/verus-lang/verus/releases/download/release/0.2026.03.17.a96bad0/verus-0.2026.03.17.a96bad0-arm64-macos.zip"
+asset_macos_x86_64 = "verus-0.2026.03.17.a96bad0-x86-macos.zip"
+download_url_macos_x86_64 = "https://github.com/verus-lang/verus/releases/download/release/0.2026.03.17.a96bad0/verus-0.2026.03.17.a96bad0-x86-macos.zip"
+asset_linux_x86_64 = "verus-0.2026.03.17.a96bad0-x86-linux.zip"
+download_url_linux_x86_64 = "https://github.com/verus-lang/verus/releases/download/release/0.2026.03.17.a96bad0/verus-0.2026.03.17.a96bad0-x86-linux.zip"
+proof_file = "zkf-runtime/proofs/verus/buffer_bridge_core_verus.rs"

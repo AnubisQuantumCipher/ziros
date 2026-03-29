@@ -1,0 +1,194 @@
+DIGEST 9b610c616dbfa196414f017dc444f42d
+FZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R365:376 KernelCompat <> <> lib
+ind 415:436 <> t_ProofEmbeddedFieldId
+constr 450:475 <> ProofEmbeddedFieldId_Bn254
+constr 479:509 <> ProofEmbeddedFieldId_Bls12_381_
+constr 513:540 <> ProofEmbeddedFieldId_PastaFp
+constr 544:571 <> ProofEmbeddedFieldId_PastaFq
+constr 575:605 <> ProofEmbeddedFieldId_Goldilocks
+constr 609:637 <> ProofEmbeddedFieldId_BabyBear
+constr 641:671 <> ProofEmbeddedFieldId_Mersenne31
+scheme 415:436 <> t_ProofEmbeddedFieldId_rect
+scheme 415:436 <> t_ProofEmbeddedFieldId_ind
+scheme 415:436 <> t_ProofEmbeddedFieldId_rec
+scheme 415:436 <> t_ProofEmbeddedFieldId_sind
+ind 692:717 <> t_ProofEmbeddedBackendKind
+constr 731:770 <> ProofEmbeddedBackendKind_ArkworksGroth16
+constr 774:805 <> ProofEmbeddedBackendKind_Plonky3
+constr 809:838 <> ProofEmbeddedBackendKind_Halo2
+constr 842:879 <> ProofEmbeddedBackendKind_Halo2Bls12381
+scheme 692:717 <> t_ProofEmbeddedBackendKind_rect
+scheme 692:717 <> t_ProofEmbeddedBackendKind_ind
+scheme 692:717 <> t_ProofEmbeddedBackendKind_rec
+scheme 692:717 <> t_ProofEmbeddedBackendKind_sind
+def 898:923 <> canonical_input_key_string
+R938:945 Core.TODO <> t_String def
+binder 926:934 <> requested:5
+R964:971 Core.Core_Option <> t_Option ind
+R975:982 Core.TODO <> t_String def
+binder 949:960 <> alias_target:6
+R989:996 Core.TODO <> t_String def
+R1003:1017 KernelCompat <> impl__unwrap_or def
+R1035:1043 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> requested:5 var
+R1020:1031 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> alias_target:6 var
+rec 1055:1082 <> ProgramMismatchFields_record
+proj 1102:1133 <> ProgramMismatchFields_f_expected
+proj 1151:1179 <> ProgramMismatchFields_f_found
+R1137:1144 Core.TODO <> t_String def
+R1183:1190 Core.TODO <> t_String def
+def 1209:1231 <> t_ProgramMismatchFields
+R1236:1263 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_record rec
+inst 1288:1324 <> settable_ProgramMismatchFields_record
+R1328:1335 RecordUpdate.RecordSet <> Settable class
+R1344:1354 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1389:1391 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1424:1425 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1455:1455 RecordUpdate.RecordSet <> :::'settable!'_x_'<'_x_';'_'..'_';'_x_'>' not
+R1426:1454 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_found proj
+R1392:1423 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_expected proj
+R1355:1388 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> Build_ProgramMismatchFields_record constr
+R1355:1388 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> Build_ProgramMismatchFields_record constr
+def 1469:1489 <> ProgramMismatchFields
+R1494:1527 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> Build_ProgramMismatchFields_record constr
+abbrev 1539:1548 <> f_expected
+R1553:1584 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_expected proj
+abbrev 1596:1628 <> t_ProgramMismatchFieldsf_expected
+R1633:1664 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_expected proj
+abbrev 1676:1682 <> f_found
+R1687:1715 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_found proj
+abbrev 1727:1756 <> t_ProgramMismatchFieldsf_found
+R1761:1789 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields_f_found proj
+def 1804:1826 <> program_mismatch_fields
+R1840:1847 Core.TODO <> t_String def
+binder 1829:1836 <> expected:10
+R1859:1866 Core.TODO <> t_String def
+binder 1851:1855 <> found:11
+R1871:1893 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> t_ProgramMismatchFields def
+R1900:1920 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProgramMismatchFields def
+R1923:1930 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:10 var
+R1934:1938 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:11 var
+def 1954:1989 <> default_backend_for_proof_field_spec
+R2000:2021 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> t_ProofEmbeddedFieldId ind
+binder 1992:1996 <> field:12
+R2026:2051 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> t_ProofEmbeddedBackendKind ind
+R2064:2068 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> field:12 var
+R2079:2104 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bn254 constr
+R2113:2152 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_ArkworksGroth16 constr
+R2158:2188 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Bls12_381_ constr
+R2197:2234 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2Bls12381 constr
+R2240:2267 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFp constr
+R2273:2300 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_PastaFq constr
+R2309:2338 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R2309:2338 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Halo2 constr
+R2344:2374 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Goldilocks constr
+R2380:2408 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_BabyBear constr
+R2414:2444 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedFieldId_Mersenne31 constr
+R2453:2484 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R2453:2484 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+R2453:2484 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> ProofEmbeddedBackendKind_Plonky3 constr
+def 2505:2547 <> private_identity_merkle_direction_is_binary
+R2562:2565 Core.Core_Primitive <> :::'t_u8' not
+binder 2550:2558 <> direction:14
+R2570:2573 Corelib.Init.Datatypes <> bool ind
+R2580:2582 Corelib.Init.Datatypes <> orb def
+R2631:2635 Stdlib.NArith.BinNat N eqb def
+R2638:2643 Core.Core_Base_interface_Int <> U8_f_v proj
+R2646:2659 Core.Core_Primitive <> :::'u8_0' not
+R2651:2659 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> direction:14 var
+R2589:2593 Stdlib.NArith.BinNat N eqb def
+R2596:2601 Core.Core_Base_interface_Int <> U8_f_v proj
+R2604:2617 Core.Core_Primitive <> :::'u8_0' not
+R2609:2617 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> direction:14 var
+def 2681:2724 <> private_identity_expected_public_input_arity
+R2732:2735 Corelib.Init.Datatypes <> unit ind
+R2732:2735 Corelib.Init.Datatypes <> unit ind
+binder 2728:2735 <> pat:15
+R2740:2746 Core.Core_Primitive <> :::'t_usize' not
+R2758:2764 Core.Core_Primitive <> :::'t_usize' not
+def 2780:2826 <> private_identity_public_input_arity_is_expected
+R2835:2841 Core.Core_Primitive <> :::'t_usize' not
+binder 2829:2831 <> len:16
+R2846:2849 Corelib.Init.Datatypes <> bool ind
+R2856:2859 KernelCompat <> f_eq def
+R2862:2864 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> len:16 var
+R2868:2911 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> private_identity_expected_public_input_arity def
+R2914:2915 Corelib.Init.Datatypes <> tt constr
+def 2930:2953 <> digest_bytes_match_lists
+R2967:2970 Corelib.Init.Datatypes <> list ind
+R2972:2975 Core.Core_Primitive <> :::'t_u8' not
+binder 2956:2963 <> expected:17
+R2987:2990 Corelib.Init.Datatypes <> list ind
+R2992:2995 Core.Core_Primitive <> :::'t_u8' not
+binder 2979:2983 <> found:18
+R3000:3003 Corelib.Init.Datatypes <> bool ind
+R3026:3030 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:18 var
+R3016:3023 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:17 var
+R3041:3042 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R3045:3046 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R3063:3066 Corelib.Init.Datatypes <> bool ind
+R3056:3059 Corelib.Init.Datatypes <> true constr
+R3086:3089 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R3115:3118 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R3137:3140 Corelib.Init.Datatypes <> andb def
+R3220:3243 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> digest_bytes_match_lists:19 def
+R3149:3153 Stdlib.NArith.BinNat N eqb def
+R3156:3161 Core.Core_Base_interface_Int <> U8_f_v proj
+R3164:3181 Core.Core_Primitive <> :::'u8_0' not
+R3186:3191 Core.Core_Base_interface_Int <> U8_f_v proj
+R3194:3208 Core.Core_Primitive <> :::'u8_0' not
+R3296:3299 Corelib.Init.Datatypes <> bool ind
+R3288:3292 Corelib.Init.Datatypes <> false constr
+def 3321:3345 <> digest_bytes_match_slices
+R3359:3370 Core.Core_Primitive <> :::'t_Slice' not
+R3367:3370 Core.Core_Primitive <> :::'t_u8' not
+binder 3348:3355 <> expected:22
+R3382:3393 Core.Core_Primitive <> :::'t_Slice' not
+R3390:3393 Core.Core_Primitive <> :::'t_u8' not
+binder 3374:3378 <> found:23
+R3398:3401 Corelib.Init.Datatypes <> bool ind
+R3408:3431 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> digest_bytes_match_lists def
+R3434:3451 Core.Core_Primitive <> :::'Slice_f_v' not
+R3444:3451 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:22 var
+R3455:3469 Core.Core_Primitive <> :::'Slice_f_v' not
+R3465:3469 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:23 var
+def 3485:3502 <> digest_bytes_match
+R3516:3520 KernelCompat <> t_Vec def
+R3524:3527 Core.Core_Primitive <> :::'t_u8' not
+R3533:3540 KernelCompat <> t_Global constr
+binder 3505:3512 <> expected:24
+R3554:3558 KernelCompat <> t_Vec def
+R3562:3565 Core.Core_Primitive <> :::'t_u8' not
+R3571:3578 KernelCompat <> t_Global constr
+binder 3546:3550 <> found:25
+R3585:3588 Corelib.Init.Datatypes <> bool ind
+R3595:3618 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> digest_bytes_match_lists def
+R3620:3627 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:24 var
+R3629:3633 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:25 var
+def 3648:3668 <> program_digests_match
+R3682:3689 Core.TODO <> t_String def
+binder 3671:3678 <> expected:26
+R3701:3708 Core.TODO <> t_String def
+binder 3693:3697 <> found:27
+R3713:3716 Corelib.Init.Datatypes <> bool ind
+R3723:3732 Stdlib.Strings.String <> eqb def
+R3734:3741 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:26 var
+R3743:3747 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:27 var
+def 3762:3789 <> program_digest_guard_accepts
+R3803:3810 Core.TODO <> t_String def
+binder 3792:3799 <> expected:28
+R3822:3829 Core.TODO <> t_String def
+binder 3814:3818 <> found:29
+R3834:3837 Corelib.Init.Datatypes <> bool ind
+R3844:3864 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> program_digests_match def
+R3867:3874 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> expected:28 var
+R3878:3882 ZkfLibExtraction.Zkf_lib_Proof_embedded_app_spec <> found:29 var

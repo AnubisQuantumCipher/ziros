@@ -1,0 +1,35 @@
+[package]
+name = "zkf-frontends"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+acir.workspace = true
+acir_beta9.workspace = true
+acir_beta19.workspace = true
+acvm.workspace = true
+acvm_beta9.workspace = true
+acvm_beta19.workspace = true
+bn254_blackbox_solver.workspace = true
+bn254_blackbox_solver_beta9.workspace = true
+bn254_blackbox_solver_beta19.workspace = true
+base64.workspace = true
+bincode.workspace = true
+flate2.workspace = true
+num-bigint.workspace = true
+num-traits.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# Keep Noir beta19 on the Keccak RC it expects so external application builds
+# do not drift to an incompatible prerelease when they enable runtime imports.
+noir_keccak_compat = { package = "keccak", version = "=0.2.0-rc.0" }
+zkf-core = { path = "../zkf-core" }
+
+[target.'cfg(hax)'.dependencies]
+hax-lib = { git = "https://github.com/cryspen/hax", rev = "1f0259212fa994fb351853026397042c497d07b9" }
+
+[dev-dependencies]
+zkf-backends = { path = "../zkf-backends" }

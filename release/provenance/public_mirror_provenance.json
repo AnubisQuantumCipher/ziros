@@ -1,0 +1,47 @@
+{
+  "schema": "ziros-public-mirror-provenance-v1",
+  "generated_at_utc": "2026-03-29T11:24:47.259797+00:00",
+  "source_repository": "private-staging-repo-redacted",
+  "public_repository": "https://github.com/AnubisQuantumCipher/ziros",
+  "open_core_members": [
+    "zkf-core",
+    "zkf-frontends",
+    "zkf-backends",
+    "zkf-gadgets",
+    "zkf-registry",
+    "zkf-ir-spec",
+    "zkf-conformance",
+    "zkf-cli",
+    "zkf-lib",
+    "zkf-examples",
+    "zkf-runtime",
+    "zkf-distributed",
+    "zkf-ui"
+  ],
+  "excluded_packages": [
+    "zkCarbon",
+    "zk_rollup",
+    "zkf-api",
+    "zkf-backends-pro",
+    "zkf-metal",
+    "zkf-metal-public-cli",
+    "zkf-verify"
+  ],
+  "boundary_contract": {
+    "mission_scope": "ground-side mission assurance",
+    "nasa_target_classification": "NASA Class D ground-support mission-ops assurance",
+    "ingestion_mode": "normalized-export-based ingestion",
+    "no_native_replacement_claim": true,
+    "non_replacement_targets": [
+      "GMAT",
+      "SPICE",
+      "Dymos/OpenMDAO",
+      "Trick/JEOD",
+      "Basilisk",
+      "cFS",
+      "F Prime"
+    ],
+    "class_c_or_higher_requires_independent_assessment": true,
+    "classification_boundary_note": "Any mission that wants to place ZirOS outputs inside a NASA Class C or higher decision chain must perform an independent program assessment outside ZirOS."
+  }
+}

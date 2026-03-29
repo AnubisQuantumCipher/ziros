@@ -1,0 +1,1037 @@
+DIGEST 49f51c648de2ffb1dfe7a0575e450349
+FBackendCompat
+R24:29 Stdlib.ZArith.ZArith <> <> lib
+R47:50 Stdlib.Lists.List <> <> lib
+R60:77 Stdlib.Lists.List ListNotations <> mod
+R126:129 Core.Core <> <> lib
+R157:167 Core.ControlFlow <> <> lib
+ind 181:189 <> globality
+constr 196:203 <> t_Global
+scheme 181:189 <> globality_rect
+scheme 181:189 <> globality_ind
+scheme 181:189 <> globality_rec
+scheme 181:189 <> globality_sind
+def 218:222 <> t_Vec
+binder 225:225 <> t:3
+R240:248 BackendCompat <> globality ind
+R261:264 Corelib.Init.Datatypes <> list ind
+R266:266 BackendCompat <> t:3 var
+ind 280:287 <> t_Result
+constr 323:331 <> Result_Ok
+constr 355:364 <> Result_Err
+binder 290:290 <> t:4
+binder 301:301 <> e:5
+R336:339 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R335:335 BackendCompat <> t:4 var
+R340:347 BackendCompat <> t_Result:6 ind
+R351:351 BackendCompat <> e:5 var
+R349:349 BackendCompat <> t:4 var
+R369:372 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R368:368 BackendCompat <> e:5 var
+R373:380 BackendCompat <> t_Result:6 ind
+R384:384 BackendCompat <> e:5 var
+R382:382 BackendCompat <> t:4 var
+scheme 280:287 <> t_Result_rect
+scheme 280:287 <> t_Result_ind
+scheme 280:287 <> t_Result_rec
+scheme 280:287 <> t_Result_sind
+R397:405 BackendCompat <> Result_Ok constr
+R397:405 BackendCompat <> Result_Ok constr
+R426:435 BackendCompat <> Result_Err constr
+R426:435 BackendCompat <> Result_Err constr
+def 458:469 <> usize_to_nat
+R480:486 Core.Core_Primitive <> :::'t_usize' not
+binder 472:476 <> value:8
+R491:493 Corelib.Init.Datatypes <> nat ind
+R500:507 Stdlib.NArith.BinNat N to_nat def
+R510:516 Core.Core_Base_interface_Int <> U64_f_v proj
+R519:531 Core.Core_Primitive <> :::'usize_0' not
+R527:531 BackendCompat <> value:8 var
+def 548:557 <> usize_to_n
+R568:574 Core.Core_Primitive <> :::'t_usize' not
+binder 560:564 <> value:9
+R579:579 Corelib.Numbers.BinNums <> N ind
+R586:592 Core.Core_Base_interface_Int <> U64_f_v proj
+R595:607 Core.Core_Primitive <> :::'usize_0' not
+R603:607 BackendCompat <> value:9 var
+def 623:632 <> n_to_usize
+R643:643 Corelib.Numbers.BinNums <> N ind
+binder 635:639 <> value:10
+R648:654 Core.Core_Primitive <> :::'t_usize' not
+R661:673 Core.Core_Array_Rec_bundle_579704328 <> Build_t_usize constr
+R676:686 Core.Core_Base_interface_Int <> Build_t_U64 constr
+R688:692 BackendCompat <> value:10 var
+ax 703:714 <> dropped_body
+binder 726:726 <> a:11
+R730:730 BackendCompat <> a:11 var
+def 745:753 <> usize_eqb
+R766:772 Core.Core_Primitive <> :::'t_usize' not
+binder 756:758 <> lhs:14
+binder 760:762 <> rhs:15
+R777:780 Corelib.Init.Datatypes <> bool ind
+R787:791 Stdlib.NArith.BinNat N eqb def
+R794:803 BackendCompat <> usize_to_n def
+R805:807 BackendCompat <> lhs:14 var
+R811:820 BackendCompat <> usize_to_n def
+R822:824 BackendCompat <> rhs:15 var
+def 840:852 <> usize_compare
+R865:871 Core.Core_Primitive <> :::'t_usize' not
+binder 855:857 <> lhs:16
+binder 859:861 <> rhs:17
+R876:885 Core.Core_Cmp <> t_Ordering ind
+R895:899 Stdlib.NArith.BinNat N ltb def
+R902:911 BackendCompat <> usize_to_n def
+R913:915 BackendCompat <> lhs:16 var
+R919:928 BackendCompat <> usize_to_n def
+R930:932 BackendCompat <> rhs:17 var
+R964:968 Stdlib.NArith.BinNat N eqb def
+R971:980 BackendCompat <> usize_to_n def
+R982:984 BackendCompat <> lhs:16 var
+R988:997 BackendCompat <> usize_to_n def
+R999:1001 BackendCompat <> rhs:17 var
+R1031:1046 Core.Core_Cmp <> Ordering_Greater constr
+R1009:1022 Core.Core_Cmp <> Ordering_Equal constr
+R940:952 Core.Core_Cmp <> Ordering_Less constr
+def 1061:1079 <> index_list_at_usize
+binder 1082:1082 <> a:18
+R1095:1098 Corelib.Init.Datatypes <> list ind
+R1100:1100 BackendCompat <> a:18 var
+binder 1086:1091 <> values:19
+R1112:1118 Core.Core_Primitive <> :::'t_usize' not
+binder 1104:1108 <> index:20
+R1123:1123 BackendCompat <> a:18 var
+R1136:1144 Stdlib.Lists.List <> nth_error def
+R1154:1165 BackendCompat <> usize_to_nat def
+R1167:1171 BackendCompat <> index:20 var
+R1146:1151 BackendCompat <> values:19 var
+R1183:1186 Corelib.Init.Datatypes <> Some constr
+R1207:1210 Corelib.Init.Datatypes <> None constr
+R1215:1226 BackendCompat <> dropped_body prfax
+rec 1242:1250 <> t_SameAdd
+proj 1270:1277 <> same_add
+binder 1253:1253 <> a:21
+R1282:1285 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1281:1281 BackendCompat <> a:21 var
+R1287:1290 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1286:1286 BackendCompat <> a:21 var
+R1291:1291 BackendCompat <> a:21 var
+rec 1304:1312 <> t_SameSub
+proj 1332:1339 <> same_sub
+binder 1315:1315 <> a:24
+R1344:1347 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1343:1343 BackendCompat <> a:24 var
+R1349:1352 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1348:1348 BackendCompat <> a:24 var
+R1353:1353 BackendCompat <> a:24 var
+rec 1366:1374 <> t_SameMul
+proj 1394:1401 <> same_mul
+binder 1377:1377 <> a:27
+R1406:1409 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1405:1405 BackendCompat <> a:27 var
+R1411:1414 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1410:1410 BackendCompat <> a:27 var
+R1415:1415 BackendCompat <> a:27 var
+rec 1428:1436 <> t_SameRem
+proj 1456:1463 <> same_rem
+binder 1439:1439 <> a:30
+R1468:1471 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1467:1467 BackendCompat <> a:30 var
+R1473:1476 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1472:1472 BackendCompat <> a:30 var
+R1477:1477 BackendCompat <> a:30 var
+rec 1490:1501 <> t_SameBitAnd
+proj 1521:1531 <> same_bitand
+binder 1504:1504 <> a:33
+R1536:1539 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1535:1535 BackendCompat <> a:33 var
+R1541:1544 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1540:1540 BackendCompat <> a:33 var
+R1545:1545 BackendCompat <> a:33 var
+rec 1558:1567 <> t_ShrOut64
+proj 1589:1600 <> same_shr_u64
+binder 1570:1572 <> rhs:36
+R1609:1612 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1604:1608 Core.Core_Primitive <> :::'t_u64' not
+R1616:1619 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1613:1615 BackendCompat <> rhs:36 var
+R1620:1624 Core.Core_Primitive <> :::'t_u64' not
+inst 1650:1662 <> t_SameAdd_u64
+R1666:1674 BackendCompat <> t_SameAdd class
+R1676:1680 Core.Core_Primitive <> :::'t_u64' not
+R1689:1696 BackendCompat <> same_add meth
+binder 1705:1707 <> lhs:39
+binder 1709:1711 <> rhs:40
+R1716:1726 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R1729:1737 Core.Core_Ops_Arith <> Add_f_add meth
+R1752:1760 Core.Core_Primitive <> :::'u64_0' not
+R1758:1760 BackendCompat <> rhs:40 var
+R1740:1748 Core.Core_Primitive <> :::'u64_0' not
+R1746:1748 BackendCompat <> lhs:39 var
+inst 1786:1798 <> t_SameAdd_u32
+R1802:1810 BackendCompat <> t_SameAdd class
+R1812:1816 Core.Core_Primitive <> :::'t_u32' not
+R1825:1832 BackendCompat <> same_add meth
+binder 1841:1843 <> lhs:41
+binder 1845:1847 <> rhs:42
+R1852:1862 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R1865:1873 Core.Core_Ops_Arith <> Add_f_add meth
+R1888:1896 Core.Core_Primitive <> :::'u32_0' not
+R1894:1896 BackendCompat <> rhs:42 var
+R1876:1884 Core.Core_Primitive <> :::'u32_0' not
+R1882:1884 BackendCompat <> lhs:41 var
+inst 1922:1936 <> t_SameAdd_usize
+R1940:1948 BackendCompat <> t_SameAdd class
+R1950:1956 Core.Core_Primitive <> :::'t_usize' not
+R1965:1972 BackendCompat <> same_add meth
+binder 1981:1983 <> lhs:43
+binder 1985:1987 <> rhs:44
+R1992:2004 Core.Core_Array_Rec_bundle_579704328 <> Build_t_usize constr
+R2007:2015 Core.Core_Ops_Arith <> Add_f_add meth
+R2032:2042 Core.Core_Primitive <> :::'usize_0' not
+R2040:2042 BackendCompat <> rhs:44 var
+R2018:2028 Core.Core_Primitive <> :::'usize_0' not
+R2026:2028 BackendCompat <> lhs:43 var
+inst 2069:2081 <> t_SameSub_u64
+R2085:2093 BackendCompat <> t_SameSub class
+R2095:2099 Core.Core_Primitive <> :::'t_u64' not
+R2108:2115 BackendCompat <> same_sub meth
+binder 2124:2126 <> lhs:45
+binder 2128:2130 <> rhs:46
+R2135:2145 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R2148:2156 Core.Core_Ops_Arith <> Sub_f_sub meth
+R2171:2179 Core.Core_Primitive <> :::'u64_0' not
+R2177:2179 BackendCompat <> rhs:46 var
+R2159:2167 Core.Core_Primitive <> :::'u64_0' not
+R2165:2167 BackendCompat <> lhs:45 var
+inst 2205:2217 <> t_SameSub_u32
+R2221:2229 BackendCompat <> t_SameSub class
+R2231:2235 Core.Core_Primitive <> :::'t_u32' not
+R2244:2251 BackendCompat <> same_sub meth
+binder 2260:2262 <> lhs:47
+binder 2264:2266 <> rhs:48
+R2271:2281 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R2284:2292 Core.Core_Ops_Arith <> Sub_f_sub meth
+R2307:2315 Core.Core_Primitive <> :::'u32_0' not
+R2313:2315 BackendCompat <> rhs:48 var
+R2295:2303 Core.Core_Primitive <> :::'u32_0' not
+R2301:2303 BackendCompat <> lhs:47 var
+inst 2341:2355 <> t_SameSub_usize
+R2359:2367 BackendCompat <> t_SameSub class
+R2369:2375 Core.Core_Primitive <> :::'t_usize' not
+R2384:2391 BackendCompat <> same_sub meth
+binder 2400:2402 <> lhs:49
+binder 2404:2406 <> rhs:50
+R2411:2423 Core.Core_Array_Rec_bundle_579704328 <> Build_t_usize constr
+R2426:2434 Core.Core_Ops_Arith <> Sub_f_sub meth
+R2451:2461 Core.Core_Primitive <> :::'usize_0' not
+R2459:2461 BackendCompat <> rhs:50 var
+R2437:2447 Core.Core_Primitive <> :::'usize_0' not
+R2445:2447 BackendCompat <> lhs:49 var
+inst 2488:2500 <> t_SameMul_u64
+R2504:2512 BackendCompat <> t_SameMul class
+R2514:2518 Core.Core_Primitive <> :::'t_u64' not
+R2527:2534 BackendCompat <> same_mul meth
+binder 2543:2545 <> lhs:51
+binder 2547:2549 <> rhs:52
+R2554:2564 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R2567:2575 Core.Core_Ops_Arith <> Mul_f_mul meth
+R2590:2598 Core.Core_Primitive <> :::'u64_0' not
+R2596:2598 BackendCompat <> rhs:52 var
+R2578:2586 Core.Core_Primitive <> :::'u64_0' not
+R2584:2586 BackendCompat <> lhs:51 var
+inst 2624:2636 <> t_SameMul_u32
+R2640:2648 BackendCompat <> t_SameMul class
+R2650:2654 Core.Core_Primitive <> :::'t_u32' not
+R2663:2670 BackendCompat <> same_mul meth
+binder 2679:2681 <> lhs:53
+binder 2683:2685 <> rhs:54
+R2690:2700 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R2703:2711 Core.Core_Ops_Arith <> Mul_f_mul meth
+R2726:2734 Core.Core_Primitive <> :::'u32_0' not
+R2732:2734 BackendCompat <> rhs:54 var
+R2714:2722 Core.Core_Primitive <> :::'u32_0' not
+R2720:2722 BackendCompat <> lhs:53 var
+inst 2760:2774 <> t_SameMul_usize
+R2778:2786 BackendCompat <> t_SameMul class
+R2788:2794 Core.Core_Primitive <> :::'t_usize' not
+R2803:2810 BackendCompat <> same_mul meth
+binder 2819:2821 <> lhs:55
+binder 2823:2825 <> rhs:56
+R2830:2842 Core.Core_Array_Rec_bundle_579704328 <> Build_t_usize constr
+R2845:2853 Core.Core_Ops_Arith <> Mul_f_mul meth
+R2870:2880 Core.Core_Primitive <> :::'usize_0' not
+R2878:2880 BackendCompat <> rhs:56 var
+R2856:2866 Core.Core_Primitive <> :::'usize_0' not
+R2864:2866 BackendCompat <> lhs:55 var
+inst 2907:2919 <> t_SameRem_u64
+R2923:2931 BackendCompat <> t_SameRem class
+R2933:2937 Core.Core_Primitive <> :::'t_u64' not
+R2946:2953 BackendCompat <> same_rem meth
+binder 2962:2964 <> lhs:57
+binder 2966:2968 <> rhs:58
+R2973:2983 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R2986:2994 Core.Core_Ops_Arith <> Rem_f_rem meth
+R3009:3017 Core.Core_Primitive <> :::'u64_0' not
+R3015:3017 BackendCompat <> rhs:58 var
+R2997:3005 Core.Core_Primitive <> :::'u64_0' not
+R3003:3005 BackendCompat <> lhs:57 var
+inst 3043:3055 <> t_SameRem_u32
+R3059:3067 BackendCompat <> t_SameRem class
+R3069:3073 Core.Core_Primitive <> :::'t_u32' not
+R3082:3089 BackendCompat <> same_rem meth
+binder 3098:3100 <> lhs:59
+binder 3102:3104 <> rhs:60
+R3109:3119 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R3122:3130 Core.Core_Ops_Arith <> Rem_f_rem meth
+R3145:3153 Core.Core_Primitive <> :::'u32_0' not
+R3151:3153 BackendCompat <> rhs:60 var
+R3133:3141 Core.Core_Primitive <> :::'u32_0' not
+R3139:3141 BackendCompat <> lhs:59 var
+inst 3179:3193 <> t_SameRem_usize
+R3197:3205 BackendCompat <> t_SameRem class
+R3207:3213 Core.Core_Primitive <> :::'t_usize' not
+R3222:3229 BackendCompat <> same_rem meth
+binder 3238:3240 <> lhs:61
+binder 3242:3244 <> rhs:62
+R3249:3261 Core.Core_Array_Rec_bundle_579704328 <> Build_t_usize constr
+R3264:3272 Core.Core_Ops_Arith <> Rem_f_rem meth
+R3289:3299 Core.Core_Primitive <> :::'usize_0' not
+R3297:3299 BackendCompat <> rhs:62 var
+R3275:3285 Core.Core_Primitive <> :::'usize_0' not
+R3283:3285 BackendCompat <> lhs:61 var
+inst 3326:3341 <> t_SameBitAnd_u64
+R3345:3356 BackendCompat <> t_SameBitAnd class
+R3358:3362 Core.Core_Primitive <> :::'t_u64' not
+R3371:3381 BackendCompat <> same_bitand meth
+binder 3390:3392 <> lhs:63
+binder 3394:3396 <> rhs:64
+R3401:3411 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R3414:3428 Core.Core_Ops_Bit <> BitAnd_f_bitand meth
+R3443:3451 Core.Core_Primitive <> :::'u64_0' not
+R3449:3451 BackendCompat <> rhs:64 var
+R3431:3439 Core.Core_Primitive <> :::'u64_0' not
+R3437:3439 BackendCompat <> lhs:63 var
+inst 3478:3491 <> t_ShrOut64_u32
+R3495:3504 BackendCompat <> t_ShrOut64 class
+R3506:3510 Core.Core_Primitive <> :::'t_u32' not
+R3519:3530 BackendCompat <> same_shr_u64 meth
+binder 3539:3541 <> lhs:65
+binder 3543:3545 <> rhs:66
+R3550:3560 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u64 constr
+R3563:3571 Core.Core_Ops_Bit <> Shr_f_shr meth
+R3586:3594 Core.Core_Primitive <> :::'u32_0' not
+R3592:3594 BackendCompat <> rhs:66 var
+R3574:3582 Core.Core_Primitive <> :::'u64_0' not
+R3580:3582 BackendCompat <> lhs:65 var
+inst 3621:3638 <> t_PartialEq_string
+R3642:3652 Core.Core_Cmp <> t_PartialEq class
+R3654:3661 Core.TODO <> t_String def
+R3663:3670 Core.TODO <> t_String def
+R3717:3730 Core.Core_Cmp <> PartialEq_f_ne meth
+R3683:3696 Core.Core_Cmp <> PartialEq_f_eq meth
+R3701:3710 Stdlib.Strings.String <> eqb def
+binder 3739:3741 <> lhs:67
+binder 3743:3745 <> rhs:68
+R3750:3753 Corelib.Init.Datatypes <> negb def
+R3756:3765 Stdlib.Strings.String <> eqb def
+R3767:3769 BackendCompat <> lhs:67 var
+R3771:3773 BackendCompat <> rhs:68 var
+inst 3802:3818 <> t_PartialEq_usize
+R3822:3832 Core.Core_Cmp <> t_PartialEq class
+R3834:3840 Core.Core_Primitive <> :::'t_usize' not
+R3842:3848 Core.Core_Primitive <> :::'t_usize' not
+R3894:3907 Core.Core_Cmp <> PartialEq_f_ne meth
+R3861:3874 Core.Core_Cmp <> PartialEq_f_eq meth
+R3879:3887 BackendCompat <> usize_eqb def
+binder 3916:3918 <> lhs:69
+binder 3920:3922 <> rhs:70
+R3927:3930 Corelib.Init.Datatypes <> negb def
+R3933:3941 BackendCompat <> usize_eqb def
+R3943:3945 BackendCompat <> lhs:69 var
+R3947:3949 BackendCompat <> rhs:70 var
+inst 3978:3995 <> t_PartialOrd_usize
+R3999:4010 Core.Core_Cmp <> t_PartialOrd class
+R4020:4026 Core.Core_Primitive <> :::'t_usize' not
+R4012:4018 Core.Core_Primitive <> :::'t_usize' not
+R4360:4374 Core.Core_Cmp <> PartialOrd_f_ge meth
+R4281:4295 Core.Core_Cmp <> PartialOrd_f_gt meth
+R4202:4216 Core.Core_Cmp <> PartialOrd_f_le meth
+R4123:4137 Core.Core_Cmp <> PartialOrd_f_lt meth
+R4039:4062 Core.Core_Cmp <> PartialOrd_f_partial_cmp meth
+binder 4071:4073 <> lhs:71
+binder 4075:4077 <> rhs:72
+R4082:4092 Core.Core_Option <> Option_Some constr
+R4095:4107 BackendCompat <> usize_compare def
+R4109:4111 BackendCompat <> lhs:71 var
+R4113:4115 BackendCompat <> rhs:72 var
+binder 4146:4148 <> lhs:73
+binder 4150:4152 <> rhs:74
+R4157:4161 Stdlib.NArith.BinNat N ltb def
+R4164:4173 BackendCompat <> usize_to_n def
+R4175:4177 BackendCompat <> lhs:73 var
+R4181:4190 BackendCompat <> usize_to_n def
+R4192:4194 BackendCompat <> rhs:74 var
+binder 4225:4227 <> lhs:75
+binder 4229:4231 <> rhs:76
+R4236:4240 Stdlib.NArith.BinNat N leb def
+R4243:4252 BackendCompat <> usize_to_n def
+R4254:4256 BackendCompat <> lhs:75 var
+R4260:4269 BackendCompat <> usize_to_n def
+R4271:4273 BackendCompat <> rhs:76 var
+binder 4304:4306 <> lhs:77
+binder 4308:4310 <> rhs:78
+R4315:4319 Stdlib.NArith.BinNat N ltb def
+R4322:4331 BackendCompat <> usize_to_n def
+R4333:4335 BackendCompat <> rhs:78 var
+R4339:4348 BackendCompat <> usize_to_n def
+R4350:4352 BackendCompat <> lhs:77 var
+binder 4383:4385 <> lhs:79
+binder 4387:4389 <> rhs:80
+R4394:4398 Stdlib.NArith.BinNat N leb def
+R4401:4410 BackendCompat <> usize_to_n def
+R4412:4414 BackendCompat <> rhs:80 var
+R4418:4427 BackendCompat <> usize_to_n def
+R4429:4431 BackendCompat <> lhs:79 var
+inst 4460:4477 <> t_Index_list_usize
+binder 4480:4480 <> a:81
+R4485:4491 Core.Core_Ops_Index <> t_Index class
+R4494:4497 Corelib.Init.Datatypes <> list ind
+R4499:4499 BackendCompat <> a:81 var
+R4502:4508 Core.Core_Primitive <> :::'t_usize' not
+R4546:4558 Core.Core_Ops_Index <> Index_f_index meth
+R4521:4534 Core.Core_Ops_Index <> Index_f_Output meth
+binder 4567:4570 <> self:82
+binder 4572:4576 <> index:83
+R4581:4599 BackendCompat <> index_list_at_usize def
+R4606:4610 BackendCompat <> index:83 var
+R4601:4604 BackendCompat <> self:82 var
+inst 4638:4656 <> t_Index_slice_usize
+binder 4659:4659 <> a:84
+R4664:4670 Core.Core_Ops_Index <> t_Index class
+R4673:4681 Core.Core_Primitive <> :::'t_Slice' not
+R4681:4681 BackendCompat <> a:84 var
+R4684:4690 Core.Core_Primitive <> :::'t_usize' not
+R4728:4740 Core.Core_Ops_Index <> Index_f_index meth
+R4703:4716 Core.Core_Ops_Index <> Index_f_Output meth
+binder 4749:4752 <> self:85
+binder 4754:4758 <> index:86
+R4763:4781 BackendCompat <> index_list_at_usize def
+R4800:4804 BackendCompat <> index:86 var
+R4784:4797 Core.Core_Primitive <> :::'Slice_f_v' not
+R4794:4797 BackendCompat <> self:85 var
+def 4824:4828 <> f_add
+binder 4831:4831 <> a:87
+R4836:4844 BackendCompat <> t_SameAdd class
+R4846:4846 BackendCompat <> a:87 var
+binder 4836:4846 <> H:88
+R4856:4856 BackendCompat <> a:87 var
+binder 4850:4852 <> lhs:89
+R4866:4866 BackendCompat <> a:87 var
+binder 4860:4862 <> rhs:90
+R4871:4871 BackendCompat <> a:87 var
+R4876:4883 BackendCompat <> same_add meth
+R4889:4891 BackendCompat <> rhs:90 var
+R4885:4887 BackendCompat <> lhs:89 var
+def 4905:4909 <> f_sub
+binder 4912:4912 <> a:91
+R4917:4925 BackendCompat <> t_SameSub class
+R4927:4927 BackendCompat <> a:91 var
+binder 4917:4927 <> H:92
+R4937:4937 BackendCompat <> a:91 var
+binder 4931:4933 <> lhs:93
+R4947:4947 BackendCompat <> a:91 var
+binder 4941:4943 <> rhs:94
+R4952:4952 BackendCompat <> a:91 var
+R4957:4964 BackendCompat <> same_sub meth
+R4970:4972 BackendCompat <> rhs:94 var
+R4966:4968 BackendCompat <> lhs:93 var
+def 4986:4990 <> f_mul
+binder 4993:4993 <> a:95
+R4998:5006 BackendCompat <> t_SameMul class
+R5008:5008 BackendCompat <> a:95 var
+binder 4998:5008 <> H:96
+R5018:5018 BackendCompat <> a:95 var
+binder 5012:5014 <> lhs:97
+R5028:5028 BackendCompat <> a:95 var
+binder 5022:5024 <> rhs:98
+R5033:5033 BackendCompat <> a:95 var
+R5038:5045 BackendCompat <> same_mul meth
+R5051:5053 BackendCompat <> rhs:98 var
+R5047:5049 BackendCompat <> lhs:97 var
+def 5067:5071 <> f_rem
+binder 5074:5074 <> a:99
+R5079:5087 BackendCompat <> t_SameRem class
+R5089:5089 BackendCompat <> a:99 var
+binder 5079:5089 <> H:100
+R5099:5099 BackendCompat <> a:99 var
+binder 5093:5095 <> lhs:101
+R5109:5109 BackendCompat <> a:99 var
+binder 5103:5105 <> rhs:102
+R5114:5114 BackendCompat <> a:99 var
+R5119:5126 BackendCompat <> same_rem meth
+R5132:5134 BackendCompat <> rhs:102 var
+R5128:5130 BackendCompat <> lhs:101 var
+def 5148:5155 <> f_bitand
+binder 5158:5158 <> a:103
+R5163:5174 BackendCompat <> t_SameBitAnd class
+R5176:5176 BackendCompat <> a:103 var
+binder 5163:5176 <> H:104
+R5186:5186 BackendCompat <> a:103 var
+binder 5180:5182 <> lhs:105
+R5196:5196 BackendCompat <> a:103 var
+binder 5190:5192 <> rhs:106
+R5201:5201 BackendCompat <> a:103 var
+R5206:5216 BackendCompat <> same_bitand meth
+R5222:5224 BackendCompat <> rhs:106 var
+R5218:5220 BackendCompat <> lhs:105 var
+def 5238:5242 <> f_shr
+binder 5245:5247 <> rhs:107
+R5252:5261 BackendCompat <> t_ShrOut64 class
+R5263:5265 BackendCompat <> rhs:107 var
+binder 5252:5265 <> H:108
+R5275:5279 Core.Core_Primitive <> :::'t_u64' not
+binder 5269:5271 <> lhs:109
+R5295:5297 BackendCompat <> rhs:107 var
+binder 5283:5291 <> rhs_value:110
+R5302:5306 Core.Core_Primitive <> :::'t_u64' not
+R5313:5324 BackendCompat <> same_shr_u64 meth
+R5330:5338 BackendCompat <> rhs_value:110 var
+R5326:5328 BackendCompat <> lhs:109 var
+abbrev 5351:5354 <> f_eq
+R5359:5372 Core.Core_Cmp <> PartialEq_f_eq meth
+abbrev 5384:5387 <> f_ne
+R5392:5405 Core.Core_Cmp <> PartialEq_f_ne meth
+abbrev 5417:5420 <> f_lt
+R5425:5439 Core.Core_Cmp <> PartialOrd_f_lt meth
+abbrev 5451:5454 <> f_le
+R5459:5473 Core.Core_Cmp <> PartialOrd_f_le meth
+abbrev 5485:5488 <> f_ge
+R5493:5507 Core.Core_Cmp <> PartialOrd_f_ge meth
+abbrev 5519:5522 <> f_gt
+R5527:5541 Core.Core_Cmp <> PartialOrd_f_gt meth
+def 5556:5562 <> f_index
+binder 5565:5565 <> a:111
+R5578:5586 Core.Core_Primitive <> :::'t_Slice' not
+R5586:5586 BackendCompat <> a:111 var
+binder 5569:5574 <> values:112
+R5598:5604 Core.Core_Primitive <> :::'t_usize' not
+binder 5590:5594 <> index:113
+R5609:5609 BackendCompat <> a:111 var
+R5616:5634 BackendCompat <> index_list_at_usize def
+R5655:5659 BackendCompat <> index:113 var
+R5637:5652 Core.Core_Primitive <> :::'Slice_f_v' not
+R5647:5652 BackendCompat <> values:112 var
+def 5674:5678 <> f_not
+R5689:5692 Corelib.Init.Datatypes <> bool ind
+binder 5681:5685 <> value:114
+R5697:5700 Corelib.Init.Datatypes <> bool ind
+R5705:5708 Corelib.Init.Datatypes <> negb def
+R5710:5714 BackendCompat <> value:114 var
+def 5729:5736 <> f_branch
+binder 5739:5739 <> a:115
+binder 5741:5741 <> e:116
+R5753:5760 BackendCompat <> t_Result ind
+R5762:5762 BackendCompat <> a:115 var
+R5764:5764 BackendCompat <> e:116 var
+binder 5745:5749 <> value:117
+R5769:5781 Core.ControlFlow <> t_ControlFlow ind
+R5783:5783 BackendCompat <> a:115 var
+R5785:5785 BackendCompat <> e:116 var
+R5798:5802 BackendCompat <> value:117 var
+R5813:5821 BackendCompat <> Result_Ok constr
+R5832:5851 Core.ControlFlow <> ControlFlow_Continue constr
+R5863:5872 BackendCompat <> Result_Err constr
+R5886:5902 Core.ControlFlow <> ControlFlow_Break constr
+def 5932:5946 <> f_from_residual
+binder 5949:5949 <> a:119
+binder 5951:5951 <> e:120
+R5966:5966 BackendCompat <> e:120 var
+binder 5955:5962 <> residual:121
+R5971:5978 BackendCompat <> t_Result ind
+R5980:5980 BackendCompat <> a:119 var
+R5982:5982 BackendCompat <> e:120 var
+R5989:5998 BackendCompat <> Result_Err constr
+R6000:6007 BackendCompat <> residual:121 var
+def 6022:6034 <> impl_u64__MAX
+R6038:6042 Core.Core_Primitive <> :::'t_u64' not
+R6071:6075 Core.Core_Primitive <> :::'t_u64' not
+def 6090:6102 <> impl_u32__MAX
+R6106:6110 Core.Core_Primitive <> :::'t_u32' not
+R6129:6133 Core.Core_Primitive <> :::'t_u32' not
+def 6148:6162 <> impl_usize__MAX
+R6166:6172 Core.Core_Primitive <> :::'t_usize' not
+R6201:6207 Core.Core_Primitive <> :::'t_usize' not
+def 6223:6231 <> impl__new
+binder 6234:6234 <> a:122
+R6242:6245 Corelib.Init.Datatypes <> unit ind
+R6250:6254 BackendCompat <> t_Vec def
+R6256:6256 BackendCompat <> a:122 var
+R6258:6265 BackendCompat <> t_Global constr
+R6270:6271 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+def 6286:6296 <> impl_1__len
+binder 6299:6299 <> a:123
+R6312:6315 Corelib.Init.Datatypes <> list ind
+R6317:6317 BackendCompat <> a:123 var
+binder 6303:6308 <> values:124
+R6322:6328 Core.Core_Primitive <> :::'t_usize' not
+R6335:6342 Stdlib.ZArith.BinInt Z of_nat def
+R6345:6355 Stdlib.Lists.List <> length abbrev
+R6357:6362 BackendCompat <> values:124 var
+def 6378:6386 <> impl__len
+binder 6389:6389 <> a:125
+R6402:6410 Core.Core_Primitive <> :::'t_Slice' not
+R6410:6410 BackendCompat <> a:125 var
+binder 6393:6398 <> values:126
+R6415:6421 Core.Core_Primitive <> :::'t_usize' not
+R6428:6435 Stdlib.ZArith.BinInt Z of_nat def
+R6438:6448 Stdlib.Lists.List <> length abbrev
+R6451:6466 Core.Core_Primitive <> :::'Slice_f_v' not
+R6461:6466 BackendCompat <> values:126 var
+def 6483:6491 <> impl__get
+binder 6494:6494 <> a:127
+R6507:6515 Core.Core_Primitive <> :::'t_Slice' not
+R6515:6515 BackendCompat <> a:127 var
+binder 6498:6503 <> values:128
+R6527:6533 Core.Core_Primitive <> :::'t_usize' not
+binder 6519:6523 <> index:129
+R6538:6545 Core.Core_Option <> t_Option ind
+R6547:6547 BackendCompat <> a:127 var
+R6560:6568 Stdlib.Lists.List <> nth_error def
+R6590:6601 BackendCompat <> usize_to_nat def
+R6603:6607 BackendCompat <> index:129 var
+R6571:6586 Core.Core_Primitive <> :::'Slice_f_v' not
+R6581:6586 BackendCompat <> values:128 var
+R6619:6622 Corelib.Init.Datatypes <> Some constr
+R6633:6643 Core.Core_Option <> Option_Some constr
+R6655:6658 Corelib.Init.Datatypes <> None constr
+R6663:6673 Core.Core_Option <> Option_None constr
+def 6694:6709 <> impl_1__is_empty
+binder 6712:6712 <> a:130
+R6725:6728 Corelib.Init.Datatypes <> list ind
+R6730:6730 BackendCompat <> a:130 var
+binder 6716:6721 <> values:131
+R6735:6738 Corelib.Init.Datatypes <> bool ind
+R6751:6756 BackendCompat <> values:131 var
+R6767:6768 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R6773:6776 Corelib.Init.Datatypes <> true constr
+R6787:6791 Corelib.Init.Datatypes <> false constr
+def 6812:6825 <> impl__is_empty
+binder 6828:6828 <> a:133
+R6841:6849 Core.Core_Primitive <> :::'t_Slice' not
+R6849:6849 BackendCompat <> a:133 var
+binder 6832:6837 <> values:134
+R6854:6857 Corelib.Init.Datatypes <> bool ind
+R6864:6879 BackendCompat <> impl_1__is_empty def
+R6882:6897 Core.Core_Primitive <> :::'Slice_f_v' not
+R6892:6897 BackendCompat <> values:134 var
+def 6913:6929 <> impl__split_first
+binder 6932:6932 <> a:135
+R6945:6953 Core.Core_Primitive <> :::'t_Slice' not
+R6953:6953 BackendCompat <> a:135 var
+binder 6936:6941 <> values:136
+R6958:6965 Core.Core_Option <> t_Option ind
+R6969:6971 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R6968:6968 BackendCompat <> a:135 var
+R6972:6980 Core.Core_Primitive <> :::'t_Slice' not
+R6980:6980 BackendCompat <> a:135 var
+R6994:7009 Core.Core_Primitive <> :::'Slice_f_v' not
+R7004:7009 BackendCompat <> values:136 var
+R7020:7021 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R7026:7036 Core.Core_Option <> Option_None constr
+R7047:7050 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R7071:7081 Core.Core_Option <> Option_Some constr
+R7083:7083 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7089:7090 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7123:7123 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R7091:7103 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+def 7144:7153 <> impl__iter
+binder 7156:7156 <> a:137
+R7169:7177 Core.Core_Primitive <> :::'t_Slice' not
+R7177:7177 BackendCompat <> a:137 var
+binder 7160:7165 <> values:138
+R7182:7185 Corelib.Init.Datatypes <> list ind
+R7187:7187 BackendCompat <> a:137 var
+R7194:7209 Core.Core_Primitive <> :::'Slice_f_v' not
+R7204:7209 BackendCompat <> values:138 var
+def 7224:7237 <> impl_2__cloned
+binder 7240:7240 <> a:139
+R7252:7259 Core.Core_Option <> t_Option ind
+R7261:7261 BackendCompat <> a:139 var
+binder 7244:7248 <> value:140
+R7266:7273 Core.Core_Option <> t_Option ind
+R7275:7275 BackendCompat <> a:139 var
+R7280:7284 BackendCompat <> value:140 var
+def 7299:7312 <> impl_2__copied
+binder 7315:7315 <> a:141
+R7327:7334 Core.Core_Option <> t_Option ind
+R7336:7336 BackendCompat <> a:141 var
+binder 7319:7323 <> value:142
+R7341:7348 Core.Core_Option <> t_Option ind
+R7350:7350 BackendCompat <> a:141 var
+R7355:7359 BackendCompat <> value:142 var
+def 7374:7386 <> impl__is_some
+binder 7389:7389 <> a:143
+R7401:7408 Core.Core_Option <> t_Option ind
+R7410:7410 BackendCompat <> a:143 var
+binder 7393:7397 <> value:144
+R7415:7418 Corelib.Init.Datatypes <> bool ind
+R7431:7435 BackendCompat <> value:144 var
+R7446:7456 Core.Core_Option <> Option_Some constr
+R7463:7466 Corelib.Init.Datatypes <> true constr
+R7472:7482 Core.Core_Option <> Option_None constr
+R7487:7491 Corelib.Init.Datatypes <> false constr
+def 7512:7524 <> impl__is_none
+binder 7527:7527 <> a:146
+R7539:7546 Core.Core_Option <> t_Option ind
+R7548:7548 BackendCompat <> a:146 var
+binder 7531:7535 <> value:147
+R7553:7556 Corelib.Init.Datatypes <> bool ind
+R7563:7566 Corelib.Init.Datatypes <> negb def
+R7569:7581 BackendCompat <> impl__is_some def
+R7583:7587 BackendCompat <> value:147 var
+def 7603:7622 <> impl__unwrap_or_else
+binder 7625:7625 <> a:148
+R7637:7644 Core.Core_Option <> t_Option ind
+R7646:7646 BackendCompat <> a:148 var
+binder 7629:7633 <> value:149
+R7665:7668 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R7661:7664 Corelib.Init.Datatypes <> unit ind
+R7669:7669 BackendCompat <> a:148 var
+binder 7650:7657 <> fallback:150
+R7674:7674 BackendCompat <> a:148 var
+R7687:7691 BackendCompat <> value:149 var
+R7702:7712 Core.Core_Option <> Option_Some constr
+R7733:7743 Core.Core_Option <> Option_None constr
+R7748:7755 BackendCompat <> fallback:150 var
+R7757:7758 Corelib.Init.Datatypes <> tt constr
+def 7779:7793 <> impl__unwrap_or
+binder 7796:7796 <> a:152
+R7808:7815 Core.Core_Option <> t_Option ind
+R7817:7817 BackendCompat <> a:152 var
+binder 7800:7804 <> value:153
+R7832:7832 BackendCompat <> a:152 var
+binder 7821:7828 <> fallback:154
+R7837:7837 BackendCompat <> a:152 var
+R7850:7854 BackendCompat <> value:153 var
+R7865:7875 Core.Core_Option <> Option_Some constr
+R7896:7906 Core.Core_Option <> Option_None constr
+R7911:7918 BackendCompat <> fallback:154 var
+def 7939:7947 <> impl__map
+binder 7950:7950 <> a:156
+binder 7952:7952 <> b:157
+R7964:7971 Core.Core_Option <> t_Option ind
+R7973:7973 BackendCompat <> a:156 var
+binder 7956:7960 <> value:158
+R7982:7985 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R7981:7981 BackendCompat <> a:156 var
+R7986:7986 BackendCompat <> b:157 var
+binder 7977:7977 <> f:159
+R7991:7998 Core.Core_Option <> t_Option ind
+R8000:8000 BackendCompat <> b:157 var
+R8013:8017 BackendCompat <> value:158 var
+R8028:8038 Core.Core_Option <> Option_Some constr
+R8049:8059 Core.Core_Option <> Option_Some constr
+R8062:8062 BackendCompat <> f:159 var
+R8075:8085 Core.Core_Option <> Option_None constr
+R8090:8100 Core.Core_Option <> Option_None constr
+def 8121:8131 <> impl__ok_or
+binder 8134:8134 <> a:161
+binder 8136:8136 <> e:162
+R8148:8155 Core.Core_Option <> t_Option ind
+R8157:8157 BackendCompat <> a:161 var
+binder 8140:8144 <> value:163
+R8169:8169 BackendCompat <> e:162 var
+binder 8161:8165 <> error:164
+R8174:8181 BackendCompat <> t_Result ind
+R8183:8183 BackendCompat <> a:161 var
+R8185:8185 BackendCompat <> e:162 var
+R8198:8202 BackendCompat <> value:163 var
+R8213:8223 Core.Core_Option <> Option_Some constr
+R8234:8242 BackendCompat <> Result_Ok constr
+R8254:8264 Core.Core_Option <> Option_None constr
+R8269:8278 BackendCompat <> Result_Err constr
+R8280:8284 BackendCompat <> error:164 var
+def 8305:8320 <> impl__ok_or_else
+binder 8323:8323 <> a:166
+binder 8325:8325 <> e:167
+R8337:8344 Core.Core_Option <> t_Option ind
+R8346:8346 BackendCompat <> a:166 var
+binder 8329:8333 <> value:168
+R8362:8365 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R8358:8361 Corelib.Init.Datatypes <> unit ind
+R8366:8366 BackendCompat <> e:167 var
+binder 8350:8354 <> error:169
+R8371:8378 BackendCompat <> t_Result ind
+R8380:8380 BackendCompat <> a:166 var
+R8382:8382 BackendCompat <> e:167 var
+R8395:8399 BackendCompat <> value:168 var
+R8410:8420 Core.Core_Option <> Option_Some constr
+R8431:8439 BackendCompat <> Result_Ok constr
+R8451:8461 Core.Core_Option <> Option_None constr
+R8466:8475 BackendCompat <> Result_Err constr
+R8478:8482 BackendCompat <> error:169 var
+R8484:8485 Corelib.Init.Datatypes <> tt constr
+def 8507:8513 <> f_deref
+binder 8516:8516 <> a:171
+R8528:8528 BackendCompat <> a:171 var
+binder 8520:8524 <> value:172
+R8533:8533 BackendCompat <> a:171 var
+R8538:8542 BackendCompat <> value:172 var
+def 8557:8563 <> f_clone
+binder 8566:8566 <> a:173
+R8578:8578 BackendCompat <> a:173 var
+binder 8570:8574 <> value:174
+R8583:8583 BackendCompat <> a:173 var
+R8588:8592 BackendCompat <> value:174 var
+def 8607:8618 <> impl_1__push
+binder 8621:8621 <> a:175
+R8634:8637 Corelib.Init.Datatypes <> list ind
+R8639:8639 BackendCompat <> a:175 var
+binder 8625:8630 <> values:176
+R8651:8651 BackendCompat <> a:175 var
+binder 8643:8647 <> value:177
+R8656:8660 BackendCompat <> t_Vec def
+R8662:8662 BackendCompat <> a:175 var
+R8664:8671 BackendCompat <> t_Global constr
+R8684:8687 Corelib.Init.Datatypes <> ::list_scope:x_'++'_x not
+R8678:8683 BackendCompat <> values:176 var
+R8688:8688 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R8694:8694 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R8689:8693 BackendCompat <> value:177 var
+def 8709:8724 <> impl_1__as_slice
+binder 8727:8727 <> a:178
+R8740:8743 Corelib.Init.Datatypes <> list ind
+R8745:8745 BackendCompat <> a:178 var
+binder 8731:8736 <> values:179
+R8750:8758 Core.Core_Primitive <> :::'t_Slice' not
+R8758:8758 BackendCompat <> a:178 var
+R8765:8777 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R8781:8786 BackendCompat <> values:179 var
+def 8801:8811 <> f_into_iter
+binder 8814:8814 <> a:180
+R8827:8830 Corelib.Init.Datatypes <> list ind
+R8832:8832 BackendCompat <> a:180 var
+binder 8818:8823 <> values:181
+R8837:8840 Corelib.Init.Datatypes <> list ind
+R8842:8842 BackendCompat <> a:180 var
+R8847:8852 BackendCompat <> values:181 var
+def 8867:8872 <> f_fold
+binder 8875:8875 <> a:182
+binder 8877:8879 <> acc:183
+R8892:8895 Corelib.Init.Datatypes <> list ind
+R8897:8897 BackendCompat <> a:182 var
+binder 8883:8888 <> values:184
+R8908:8910 BackendCompat <> acc:183 var
+binder 8901:8904 <> init:185
+R8921:8924 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R8918:8920 BackendCompat <> acc:183 var
+R8926:8929 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R8925:8925 BackendCompat <> a:182 var
+R8930:8932 BackendCompat <> acc:183 var
+binder 8914:8914 <> f:186
+R8937:8939 BackendCompat <> acc:183 var
+R8946:8959 Stdlib.Lists.List <> fold_left def
+R8970:8973 BackendCompat <> init:185 var
+R8963:8968 BackendCompat <> values:184 var
+R8961:8961 BackendCompat <> f:186 var
+def 8988:8993 <> unsize
+binder 8996:8996 <> a:187
+R9009:9012 Corelib.Init.Datatypes <> list ind
+R9014:9014 BackendCompat <> a:187 var
+binder 9000:9005 <> values:188
+R9019:9027 Core.Core_Primitive <> :::'t_Slice' not
+R9027:9027 BackendCompat <> a:187 var
+R9034:9046 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R9050:9055 BackendCompat <> values:188 var
+def 9070:9081 <> impl__to_vec
+binder 9084:9084 <> a:189
+R9097:9105 Core.Core_Primitive <> :::'t_Slice' not
+R9105:9105 BackendCompat <> a:189 var
+binder 9088:9093 <> values:190
+R9110:9114 BackendCompat <> t_Vec def
+R9116:9116 BackendCompat <> a:189 var
+R9118:9125 BackendCompat <> t_Global constr
+R9132:9147 Core.Core_Primitive <> :::'Slice_f_v' not
+R9142:9147 BackendCompat <> values:190 var
+def 9163:9176 <> impl__into_vec
+binder 9179:9179 <> a:191
+R9192:9200 Core.Core_Primitive <> :::'t_Slice' not
+R9200:9200 BackendCompat <> a:191 var
+binder 9183:9188 <> values:192
+R9205:9209 BackendCompat <> t_Vec def
+R9211:9211 BackendCompat <> a:191 var
+R9213:9220 BackendCompat <> t_Global constr
+R9227:9242 Core.Core_Primitive <> :::'Slice_f_v' not
+R9237:9242 BackendCompat <> values:192 var
+def 9257:9265 <> from_elem
+binder 9268:9268 <> a:193
+R9280:9280 BackendCompat <> a:193 var
+binder 9272:9276 <> value:194
+R9290:9296 Core.Core_Primitive <> :::'t_usize' not
+binder 9284:9286 <> len:195
+R9301:9304 Corelib.Init.Datatypes <> list ind
+R9306:9306 BackendCompat <> a:193 var
+R9313:9323 Stdlib.Lists.List <> repeat abbrev
+R9332:9343 BackendCompat <> usize_to_nat def
+R9345:9347 BackendCompat <> len:195 var
+R9325:9329 BackendCompat <> value:194 var
+def 9363:9388 <> impl_usize__saturating_add
+R9397:9403 Core.Core_Primitive <> :::'t_usize' not
+binder 9391:9393 <> lhs:196
+R9413:9419 Core.Core_Primitive <> :::'t_usize' not
+binder 9407:9409 <> rhs:197
+R9424:9430 Core.Core_Primitive <> :::'t_usize' not
+R9437:9441 BackendCompat <> f_add def
+R9447:9449 BackendCompat <> rhs:197 var
+R9443:9445 BackendCompat <> lhs:196 var
+def 9462:9474 <> update_at_nat
+binder 9477:9477 <> a:198
+R9490:9493 Corelib.Init.Datatypes <> list ind
+R9495:9495 BackendCompat <> a:198 var
+binder 9481:9486 <> values:199
+R9507:9509 Corelib.Init.Datatypes <> nat ind
+binder 9499:9503 <> index:200
+R9521:9521 BackendCompat <> a:198 var
+binder 9513:9517 <> value:201
+R9526:9529 Corelib.Init.Datatypes <> list ind
+R9531:9531 BackendCompat <> a:198 var
+R9552:9556 BackendCompat <> index:200 var
+R9544:9549 BackendCompat <> values:199 var
+R9567:9568 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R9576:9577 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R9584:9587 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9606:9606 Corelib.Init.Datatypes <> O constr
+R9616:9619 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9611:9615 BackendCompat <> value:201 var
+R9654:9657 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9676:9676 Corelib.Init.Datatypes <> S constr
+R9716:9719 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9720:9732 BackendCompat <> update_at_nat:202 def
+R9767:9771 BackendCompat <> value:201 var
+def 9792:9806 <> update_at_usize
+binder 9809:9809 <> a:205
+R9822:9830 Core.Core_Primitive <> :::'t_Slice' not
+R9830:9830 BackendCompat <> a:205 var
+binder 9813:9818 <> values:206
+R9842:9848 Core.Core_Primitive <> :::'t_usize' not
+binder 9834:9838 <> index:207
+R9860:9860 BackendCompat <> a:205 var
+binder 9852:9856 <> value:208
+R9865:9873 Core.Core_Primitive <> :::'t_Slice' not
+R9873:9873 BackendCompat <> a:205 var
+R9880:9892 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R9897:9909 BackendCompat <> update_at_nat def
+R9951:9955 BackendCompat <> value:208 var
+R9931:9942 BackendCompat <> usize_to_nat def
+R9944:9948 BackendCompat <> index:207 var
+R9912:9927 Core.Core_Primitive <> :::'Slice_f_v' not
+R9922:9927 BackendCompat <> values:206 var
+def 9971:9978 <> n_to_u32
+R9989:9989 Corelib.Numbers.BinNums <> N ind
+binder 9981:9985 <> value:209
+R9994:9998 Core.Core_Primitive <> :::'t_u32' not
+R10005:10015 Core.Core_Array_Rec_bundle_579704328 <> Build_t_u32 constr
+R10018:10028 Core.Core_Base_interface_Int <> Build_t_U32 constr
+R10030:10034 BackendCompat <> value:209 var
+def 10050:10057 <> u32_to_n
+R10068:10072 Core.Core_Primitive <> :::'t_u32' not
+binder 10060:10064 <> value:210
+R10077:10077 Corelib.Numbers.BinNums <> N ind
+R10084:10090 Core.Core_Base_interface_Int <> U32_f_v proj
+R10093:10103 Core.Core_Primitive <> :::'u32_0' not
+R10099:10103 BackendCompat <> value:210 var
+def 10119:10134 <> build_enumerated
+binder 10137:10137 <> a:211
+R10150:10153 Corelib.Init.Datatypes <> list ind
+R10155:10155 BackendCompat <> a:211 var
+binder 10141:10146 <> values:212
+R10160:10163 Corelib.Init.Datatypes <> list ind
+R10173:10175 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R10166:10172 Core.Core_Primitive <> :::'t_usize' not
+R10176:10176 BackendCompat <> a:211 var
+R10184:10195 Stdlib.Lists.List <> combine def
+R10293:10298 BackendCompat <> values:212 var
+R10202:10209 Stdlib.Lists.List <> map abbrev
+R10255:10262 Stdlib.Lists.List <> seq abbrev
+R10267:10277 Stdlib.Lists.List <> length abbrev
+R10279:10284 BackendCompat <> values:212 var
+binder 10216:10220 <> index:213
+R10225:10234 BackendCompat <> n_to_usize def
+R10237:10244 Stdlib.NArith.BinNat N of_nat def
+R10246:10250 BackendCompat <> index:213 var
+def 10313:10333 <> fold_enumerated_slice
+binder 10336:10336 <> a:214
+binder 10338:10340 <> acc:215
+R10355:10363 Core.Core_Primitive <> :::'t_Slice' not
+R10363:10363 BackendCompat <> a:214 var
+binder 10346:10351 <> values:216
+R10376:10379 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10373:10375 BackendCompat <> acc:215 var
+R10384:10387 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10380:10383 Corelib.Init.Datatypes <> unit ind
+R10388:10391 Corelib.Init.Datatypes <> bool ind
+R10404:10406 BackendCompat <> acc:215 var
+binder 10397:10400 <> init:217
+R10419:10422 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10416:10418 BackendCompat <> acc:215 var
+R10423:10423 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10435:10439 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10431:10433 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R10424:10430 Core.Core_Primitive <> :::'t_usize' not
+R10434:10434 BackendCompat <> a:214 var
+R10440:10442 BackendCompat <> acc:215 var
+binder 10412:10412 <> f:218
+R10447:10449 BackendCompat <> acc:215 var
+R10456:10469 Stdlib.Lists.List <> fold_left def
+R10511:10514 BackendCompat <> init:217 var
+R10474:10489 BackendCompat <> build_enumerated def
+R10492:10507 Core.Core_Primitive <> :::'Slice_f_v' not
+R10502:10507 BackendCompat <> values:216 var
+R10471:10471 BackendCompat <> f:218 var
+def 10529:10543 <> build_u32_range
+R10560:10564 Core.Core_Primitive <> :::'t_u32' not
+binder 10546:10550 <> lower:219
+binder 10552:10556 <> upper:220
+R10569:10572 Corelib.Init.Datatypes <> list ind
+R10574:10578 Core.Core_Primitive <> :::'t_u32' not
+R10585:10592 Stdlib.Lists.List <> map abbrev
+R10644:10651 Stdlib.Lists.List <> seq abbrev
+R10694:10701 Stdlib.NArith.BinNat N to_nat def
+R10718:10720 Stdlib.NArith.BinNat <> ::N_scope:x_'-'_x not
+R10704:10711 BackendCompat <> u32_to_n def
+R10713:10717 BackendCompat <> upper:220 var
+R10721:10728 BackendCompat <> u32_to_n def
+R10730:10734 BackendCompat <> lower:219 var
+R10660:10667 Stdlib.NArith.BinNat N to_nat def
+R10670:10677 BackendCompat <> u32_to_n def
+R10679:10683 BackendCompat <> lower:219 var
+binder 10603:10607 <> index:221
+R10612:10619 BackendCompat <> n_to_u32 def
+R10622:10629 Stdlib.NArith.BinNat N of_nat def
+R10631:10635 BackendCompat <> index:221 var
+def 10752:10761 <> fold_range
+binder 10764:10766 <> acc:222
+R10780:10784 Core.Core_Primitive <> :::'t_u32' not
+binder 10772:10776 <> lower:223
+R10798:10802 Core.Core_Primitive <> :::'t_u32' not
+binder 10790:10794 <> upper:224
+R10815:10818 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10812:10814 BackendCompat <> acc:222 var
+R10824:10827 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10819:10823 Core.Core_Primitive <> :::'t_u32' not
+R10828:10831 Corelib.Init.Datatypes <> bool ind
+R10844:10846 BackendCompat <> acc:222 var
+binder 10837:10840 <> init:225
+R10859:10862 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10856:10858 BackendCompat <> acc:222 var
+R10868:10871 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R10863:10867 Core.Core_Primitive <> :::'t_u32' not
+R10872:10874 BackendCompat <> acc:222 var
+binder 10852:10852 <> f:226
+R10879:10881 BackendCompat <> acc:222 var
+R10888:10901 Stdlib.Lists.List <> fold_left def
+R10935:10938 BackendCompat <> init:225 var
+R10906:10920 BackendCompat <> build_u32_range def
+R10922:10926 BackendCompat <> lower:223 var
+R10928:10932 BackendCompat <> upper:224 var
+R10903:10903 BackendCompat <> f:226 var
