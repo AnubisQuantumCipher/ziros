@@ -127,6 +127,171 @@ telemetry and runtime context to recommend the best hardware route for a job:
 CPU, Metal GPU, or a stricter certified lane. Proof validity never depends on
 the model. Dispatch policy may depend on the model. Proof truth does not.
 
+## SSD Guardian: iCloud-Integrated Storage Lifecycle
+
+ZirOS is the first zero-knowledge framework to ship an embedded storage
+lifecycle subsystem. The SSD Guardian classifies every artifact the proving
+pipeline produces, archives irreplaceable outputs to iCloud, purges ephemeral
+waste, and enforces witness deletion as a security operation — automatically,
+in the background, tuned to the specific Mac it is running on.
+
+### Why This Matters
+
+Zero-knowledge proving is storage-hostile. A single 100-step reentry thermal
+circuit generates 197 MB of artifacts: a 159 MB compiled constraint system,
+a 26 MB witness file containing 221,779 private field elements, 12 MB of
+program representations, plus traces, verifiers, and reports. The Rust
+workspace build cache adds another 41 GB of incremental compilation objects.
+Run twenty programs through testing, calibration, and production proving, and
+you consume 200–300 GB on a machine with a 1 TB SSD.
+
+No other ZK framework manages this. Circom does not. snarkjs does not. Halo2
+does not. Arkworks does not. They assume infinite disk or manual cleanup.
+ZirOS assumes you are on a laptop and you have better things to do.
+
+### The Three-Class File System
+
+Every file ZirOS produces is classified into one of four retention classes:
+
+**Local Critical** — never leaves the machine, never deleted:
+- `~/.zkf/swarm/**` — live defense state (Queen, Sentinel, Warrior)
+- `~/.zkf/keystore/**` — Ed25519 + ML-DSA-44 cryptographic keys
+- `~/.zkf/tuning/**` — adaptive Metal GPU dispatch thresholds
+- `~/.zkf/security/**` — quarantine markers and security event logs
+
+**Archivable** — moved to iCloud, organized by category and run name:
+- `*.proof.json` — Groth16/STARK proof artifacts (128 bytes–6 KB)
+- `*.execution_trace.json` — UMPG stage timing, GPU attribution, security verdict
+- `*Verifier.sol` — Solidity on-chain verification contracts
+- `*.report.md` — mission assurance reports
+- `~/.zkf/telemetry/**` — Neural Engine training data (2,000+ records)
+
+**Ephemeral** — deleted immediately, can be regenerated:
+- `target-local/debug/**` — 41 GB Rust incremental build cache
+- `*.compiled.json` — 80–159 MB compiled constraint systems
+- `*.witness.*.json` — witness files (security-critical deletion)
+- `*.program.json` — circuit IR representations
+
+**Operational** — left untouched:
+- `target-local/release/**` — the binary you run
+- `~/.zkf/models/*.mlpackage` — CoreML model packages
+
+### Witness Purging Is A Security Operation
+
+This is the most important thing the SSD Guardian does. A witness file
+contains every private input to a zero-knowledge circuit: the classified
+trajectory, the proprietary aerodynamic coefficients, the guidance policy,
+the bank-angle schedule, the vehicle mass, the atmospheric density profile.
+If the purpose of a ZK proof is to hide those values, leaving the witness on
+disk after proving is a direct contradiction of the security model.
+
+The guardian's `purge_witness_after_prove` is enabled by default. The moment
+a proof is generated and verified, the witness is deleted — before the output
+bundle is written. There is no window where the witness sits on disk
+unprotected after a successful proof.
+
+Failed witnesses are also deleted. A failed computation may contain partial
+values that reveal structural information about private inputs without the
+corresponding proof that would justify their existence.
+
+The only way to retain witnesses is `ZKF_STORAGE_PURGE_WITNESS=0`, a
+development-only bypass treated identically to
+`ZKF_ALLOW_DEV_DETERMINISTIC_GROTH16`.
+
+### iCloud Integration
+
+The archive tier uses `~/Library/Mobile Documents/com~apple~CloudDocs/`
+because it is the only cloud storage natively integrated into macOS:
+
+- **Automatic local eviction**: when SSD space is tight, macOS replaces
+  local copies with lightweight placeholders that occupy zero bytes until
+  opened.
+- **Zero configuration**: every Mac with an Apple ID has iCloud Drive.
+  No daemon, no credentials, no API keys.
+- **End-to-end encryption**: with Advanced Data Protection enabled,
+  encryption keys are held only on your devices, not by Apple.
+
+The archive is structured for browsability:
+
+```
+~/Library/Mobile Documents/com~apple~CloudDocs/
+└── ZirOS_Archive/
+    ├── proofs/{run_name}/         128-byte Groth16 proofs
+    ├── traces/{run_name}/         UMPG execution telemetry
+    ├── verifiers/{run_name}/      Solidity contracts
+    ├── reports/{run_name}/        Mission assurance reports
+    ├── audits/{run_name}/         Circuit security audits
+    └── telemetry/{date}/          Neural Engine training data
+```
+
+Every run gets its own timestamped directory. You can browse the archive from
+any Apple device. At 128 bytes per proof, 4 TB of iCloud storage holds 31
+billion proofs.
+
+### What Never Goes To iCloud
+
+The guardian enforces a strict data-class boundary. Cryptographic keys,
+swarm defense state, security quarantine markers, and adaptive tuning state
+never leave the local machine — not even to iCloud. If iCloud were
+compromised, the attacker would find proofs (public by design), execution
+traces (operational), and telemetry (anonymizable) — never keys, never
+witnesses, never defense state.
+
+### Device-Adaptive Profiles
+
+The guardian auto-detects SSD capacity and selects thresholds:
+
+| Profile | SSD | Warn | Critical | Monitor | Debug Cache |
+|---------|-----|------|----------|---------|-------------|
+| Constrained | ≤ 300 GB | 30 GB | 15 GB | 30 min | Purge every build |
+| Standard | 301–600 GB | 50 GB | 25 GB | 1 hour | Purge after tests |
+| Comfortable | 601 GB–1.2 TB | 100 GB | 50 GB | 1 hour | Purge weekly |
+| Generous | > 1.2 TB | 200 GB | 100 GB | Daily | Purge monthly |
+
+A 256 GB MacBook Air gets Constrained: aggressive cleanup, 30-minute
+monitoring, immediate proof archival. A Mac Studio with 8 TB gets Generous:
+relaxed thresholds, daily monitoring, build caches kept for fast incremental
+compilation.
+
+### The Background Agent
+
+```bash
+zkf storage install
+```
+
+This installs a macOS launchd agent (`com.ziros.storage-guardian`) that runs
+`zkf storage sweep --auto` every hour. It runs at low I/O priority and will
+never compete with proving workloads. If free space is healthy, it logs a
+one-line check and exits. If free space drops below the warning threshold, it
+archives to iCloud. Below critical, it runs a full sweep.
+
+### Measured Results
+
+From a 100-step reentry thermal proving run on M4 Max (48 GB, 1 TB SSD):
+
+| Metric | Value |
+|--------|-------|
+| Artifacts created | 197 MB (17 files) |
+| Archived to iCloud | 130 KB (9 files — proofs, traces, verifiers, reports) |
+| Purged from disk | 191 MB + 12.8 GB build cache |
+| Remaining on disk | 1.3 KB (README.md) |
+| Witness deleted | 26 MB (221,779 private field elements) |
+| Free space recovered | 44 GB across two test sweeps |
+| iCloud archive total | 2,153 files, 25 MB |
+
+### Commands
+
+```bash
+zkf storage status          # Disk health, build cache, iCloud archive, recoverable estimate
+zkf storage doctor --json   # SSD wear, temperature, SMART diagnostics
+zkf storage sweep           # Archive to iCloud + purge ephemeral artifacts
+zkf storage sweep --auto    # Threshold-aware: only acts when disk is low
+zkf storage archive         # Archive only (no purge)
+zkf storage purge           # Purge only (no archive)
+zkf storage restore <path>  # Force-download a file from iCloud
+zkf storage install         # Install hourly launchd background agent
+```
+
 ## Supported Backends And Frontends
 
 ### Primary Backends
@@ -156,7 +321,15 @@ The live support matrix for this checkout is
 
 ## Quick Start
 
-Fresh clone to verified proof:
+Prebuilt install:
+
+```bash
+curl -sSf https://zkf.dev/install.sh | sh
+export PATH="$HOME/.zkf/bin:$PATH"
+ziros doctor
+```
+
+Source build from a fresh clone:
 
 ```bash
 git clone git@github.com:anubisquantumcipher/ziros.git
