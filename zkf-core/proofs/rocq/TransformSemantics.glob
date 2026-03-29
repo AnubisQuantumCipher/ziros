@@ -1,0 +1,556 @@
+DIGEST 9a82b79985e31450807d2656b046bee4
+FTransformSemantics
+R15:18 Stdlib.Lists.List <> <> lib
+R20:25 Stdlib.NArith.NArith <> <> lib
+R35:52 Stdlib.Lists.List ListNotations <> mod
+R71:82 KernelCompat <> <> lib
+R100:114 KernelGenerated <> <> lib
+ind 128:149 <> TransformExprListHolds
+constr 308:333 <> TransformExprListHolds_nil
+constr 391:417 <> TransformExprListHolds_cons
+ind 784:801 <> TransformExprHolds
+constr 945:968 <> TransformExprHolds_Const
+constr 1167:1191 <> TransformExprHolds_Signal
+constr 1465:1486 <> TransformExprHolds_Add
+constr 1721:1742 <> TransformExprHolds_Sub
+constr 2039:2060 <> TransformExprHolds_Mul
+constr 2357:2378 <> TransformExprHolds_Div
+R164:182 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 154:160 <> witness:1
+R196:204 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 188:192 <> field:2
+R216:231 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+binder 210:212 <> acc:3
+R272:277 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R238:242 KernelCompat <> t_Vec def
+R244:262 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformExpr ind
+R264:271 KernelCompat <> t_Global constr
+R294:297 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R278:293 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R909:914 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R890:908 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformExpr ind
+R931:934 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R915:930 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecFieldValue' not
+R341:362 TransformSemantics <> TransformExprListHolds:4 ind
+R385:387 TransformSemantics <> acc:3 var
+R382:383 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R378:380 TransformSemantics <> acc:3 var
+R372:376 TransformSemantics <> field:2 var
+R364:370 TransformSemantics <> witness:1 var
+binder 419:422 <> expr:8
+binder 424:438 <> remaining_exprs:9
+binder 440:449 <> expr_value:10
+binder 451:461 <> final_value:11
+R521:528 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R469:486 TransformSemantics <> TransformExprHolds:5 ind
+R511:520 TransformSemantics <> expr_value:10 var
+R506:509 TransformSemantics <> expr:8 var
+R502:504 TransformSemantics <> acc:3 var
+R496:500 TransformSemantics <> field:2 var
+R488:494 TransformSemantics <> witness:1 var
+R662:669 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R529:550 TransformSemantics <> TransformExprListHolds:4 ind
+R651:661 TransformSemantics <> final_value:11 var
+R629:643 TransformSemantics <> remaining_exprs:9 var
+R585:599 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> add_spec_values def
+R601:603 TransformSemantics <> acc:3 var
+R605:614 TransformSemantics <> expr_value:10 var
+R616:620 TransformSemantics <> field:2 var
+R572:576 TransformSemantics <> field:2 var
+R558:564 TransformSemantics <> witness:1 var
+R670:691 TransformSemantics <> TransformExprListHolds:4 ind
+R767:777 TransformSemantics <> final_value:11 var
+R740:743 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R736:739 TransformSemantics <> expr:8 var
+R744:758 TransformSemantics <> remaining_exprs:9 var
+R725:727 TransformSemantics <> acc:3 var
+R713:717 TransformSemantics <> field:2 var
+R699:705 TransformSemantics <> witness:1 var
+binder 970:979 <> const_expr:12
+R987:1004 TransformSemantics <> TransformExprHolds:5 ind
+R1092:1111 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> normalize_spec_value def
+R1114:1144 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Const_f_value proj
+R1146:1155 TransformSemantics <> const_expr:12 var
+R1158:1162 TransformSemantics <> field:2 var
+R1049:1071 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Const constr
+R1073:1082 TransformSemantics <> const_expr:12 var
+R1038:1040 TransformSemantics <> acc:3 var
+R1026:1030 TransformSemantics <> field:2 var
+R1012:1018 TransformSemantics <> witness:1 var
+binder 1193:1203 <> signal_expr:13
+binder 1205:1209 <> value:14
+R1343:1350 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1325:1327 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1217:1238 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_signal_value def
+R1246:1252 TransformSemantics <> witness:1 var
+R1261:1299 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_signal_index proj
+R1301:1311 TransformSemantics <> signal_expr:13 var
+R1320:1324 TransformSemantics <> field:2 var
+R1328:1336 KernelCompat <> Result_Ok constr
+R1338:1342 TransformSemantics <> value:14 var
+R1351:1368 TransformSemantics <> TransformExprHolds:5 ind
+R1457:1461 TransformSemantics <> value:14 var
+R1413:1436 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal constr
+R1438:1448 TransformSemantics <> signal_expr:13 var
+R1402:1404 TransformSemantics <> acc:3 var
+R1390:1394 TransformSemantics <> field:2 var
+R1376:1382 TransformSemantics <> witness:1 var
+binder 1488:1493 <> values:15
+binder 1495:1499 <> value:16
+R1607:1614 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1507:1528 TransformSemantics <> TransformExprListHolds:4 ind
+R1602:1606 TransformSemantics <> value:16 var
+R1589:1594 TransformSemantics <> values:15 var
+R1563:1577 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> zero_spec_value def
+R1579:1580 Corelib.Init.Datatypes <> tt constr
+R1550:1554 TransformSemantics <> field:2 var
+R1536:1542 TransformSemantics <> witness:1 var
+R1615:1632 TransformSemantics <> TransformExprHolds:5 ind
+R1713:1717 TransformSemantics <> value:16 var
+R1677:1697 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Add constr
+R1699:1704 TransformSemantics <> values:15 var
+R1666:1668 TransformSemantics <> acc:3 var
+R1654:1658 TransformSemantics <> field:2 var
+R1640:1646 TransformSemantics <> witness:1 var
+binder 1744:1746 <> lhs:17
+binder 1748:1750 <> rhs:18
+binder 1752:1760 <> lhs_value:19
+binder 1762:1770 <> rhs_value:20
+R1828:1835 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1778:1795 TransformSemantics <> TransformExprHolds:5 ind
+R1819:1827 TransformSemantics <> lhs_value:19 var
+R1815:1817 TransformSemantics <> lhs:17 var
+R1811:1813 TransformSemantics <> acc:3 var
+R1805:1809 TransformSemantics <> field:2 var
+R1797:1803 TransformSemantics <> witness:1 var
+R1886:1893 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1836:1853 TransformSemantics <> TransformExprHolds:5 ind
+R1877:1885 TransformSemantics <> rhs_value:20 var
+R1873:1875 TransformSemantics <> rhs:18 var
+R1869:1871 TransformSemantics <> acc:3 var
+R1863:1867 TransformSemantics <> field:2 var
+R1855:1861 TransformSemantics <> witness:1 var
+R1894:1911 TransformSemantics <> TransformExprHolds:5 ind
+R1994:2008 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> sub_spec_values def
+R2010:2018 TransformSemantics <> lhs_value:19 var
+R2020:2028 TransformSemantics <> rhs_value:20 var
+R2030:2034 TransformSemantics <> field:2 var
+R1956:1976 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Sub constr
+R1978:1980 TransformSemantics <> lhs:17 var
+R1982:1984 TransformSemantics <> rhs:18 var
+R1945:1947 TransformSemantics <> acc:3 var
+R1933:1937 TransformSemantics <> field:2 var
+R1919:1925 TransformSemantics <> witness:1 var
+binder 2062:2064 <> lhs:21
+binder 2066:2068 <> rhs:22
+binder 2070:2078 <> lhs_value:23
+binder 2080:2088 <> rhs_value:24
+R2146:2153 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2096:2113 TransformSemantics <> TransformExprHolds:5 ind
+R2137:2145 TransformSemantics <> lhs_value:23 var
+R2133:2135 TransformSemantics <> lhs:21 var
+R2129:2131 TransformSemantics <> acc:3 var
+R2123:2127 TransformSemantics <> field:2 var
+R2115:2121 TransformSemantics <> witness:1 var
+R2204:2211 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2154:2171 TransformSemantics <> TransformExprHolds:5 ind
+R2195:2203 TransformSemantics <> rhs_value:24 var
+R2191:2193 TransformSemantics <> rhs:22 var
+R2187:2189 TransformSemantics <> acc:3 var
+R2181:2185 TransformSemantics <> field:2 var
+R2173:2179 TransformSemantics <> witness:1 var
+R2212:2229 TransformSemantics <> TransformExprHolds:5 ind
+R2312:2326 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> mul_spec_values def
+R2328:2336 TransformSemantics <> lhs_value:23 var
+R2338:2346 TransformSemantics <> rhs_value:24 var
+R2348:2352 TransformSemantics <> field:2 var
+R2274:2294 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Mul constr
+R2296:2298 TransformSemantics <> lhs:21 var
+R2300:2302 TransformSemantics <> rhs:22 var
+R2263:2265 TransformSemantics <> acc:3 var
+R2251:2255 TransformSemantics <> field:2 var
+R2237:2243 TransformSemantics <> witness:1 var
+binder 2380:2382 <> lhs:25
+binder 2384:2386 <> rhs:26
+binder 2388:2396 <> lhs_value:27
+binder 2398:2406 <> rhs_value:28
+binder 2408:2412 <> value:29
+R2470:2477 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2420:2437 TransformSemantics <> TransformExprHolds:5 ind
+R2461:2469 TransformSemantics <> lhs_value:27 var
+R2457:2459 TransformSemantics <> lhs:25 var
+R2453:2455 TransformSemantics <> acc:3 var
+R2447:2451 TransformSemantics <> field:2 var
+R2439:2445 TransformSemantics <> witness:1 var
+R2528:2535 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2478:2495 TransformSemantics <> TransformExprHolds:5 ind
+R2519:2527 TransformSemantics <> rhs_value:28 var
+R2515:2517 TransformSemantics <> rhs:26 var
+R2511:2513 TransformSemantics <> acc:3 var
+R2505:2509 TransformSemantics <> field:2 var
+R2497:2503 TransformSemantics <> witness:1 var
+R2597:2604 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2577:2579 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2536:2550 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> div_spec_values def
+R2552:2560 TransformSemantics <> lhs_value:27 var
+R2562:2570 TransformSemantics <> rhs_value:28 var
+R2572:2576 TransformSemantics <> field:2 var
+R2580:2590 Core.Core_Option <> Option_Some constr
+R2592:2596 TransformSemantics <> value:29 var
+R2605:2622 TransformSemantics <> TransformExprHolds:5 ind
+R2704:2708 TransformSemantics <> value:29 var
+R2667:2687 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Div constr
+R2689:2691 TransformSemantics <> lhs:25 var
+R2693:2695 TransformSemantics <> rhs:26 var
+R2656:2658 TransformSemantics <> acc:3 var
+R2644:2648 TransformSemantics <> field:2 var
+R2630:2636 TransformSemantics <> witness:1 var
+scheme 128:149 <> TransformExprListHolds_ind
+scheme 128:149 <> TransformExprListHolds_sind
+scheme 784:801 <> TransformExprHolds_ind
+scheme 784:801 <> TransformExprHolds_sind
+def 2719:2745 <> TransformExprListHolds_ind'
+def 2804:2826 <> TransformExprHolds_ind'
+R2766:2787 TransformSemantics <> TransformExprListHolds ind
+R2847:2864 TransformSemantics <> TransformExprHolds ind
+R2927:2953 TransformSemantics <> TransformExprListHolds_ind' scheme
+R2956:2978 TransformSemantics <> TransformExprHolds_ind' scheme
+ind 2992:3015 <> TransformConstraintHolds
+constr 3131:3160 <> TransformConstraintHolds_Equal
+constr 3784:3815 <> TransformConstraintHolds_Boolean
+constr 4224:4253 <> TransformConstraintHolds_Range
+R3030:3051 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformProgram' not
+binder 3020:3026 <> program:30
+R3067:3085 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 3057:3063 <> witness:31
+R3117:3120 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3092:3116 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformConstraint ind
+binder 3162:3177 <> equal_constraint:34
+binder 3179:3187 <> lhs_value:35
+binder 3189:3197 <> rhs_value:36
+R3386:3393 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3205:3222 TransformSemantics <> TransformExprHolds ind
+R3230:3236 TransformSemantics <> witness:31 var
+R3245:3272 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R3274:3280 TransformSemantics <> program:30 var
+R3290:3304 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> zero_spec_value def
+R3306:3307 Corelib.Init.Datatypes <> tt constr
+R3317:3351 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_lhs proj
+R3353:3368 TransformSemantics <> equal_constraint:34 var
+R3377:3385 TransformSemantics <> lhs_value:35 var
+R3575:3582 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3394:3411 TransformSemantics <> TransformExprHolds ind
+R3419:3425 TransformSemantics <> witness:31 var
+R3434:3461 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R3463:3469 TransformSemantics <> program:30 var
+R3479:3493 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> zero_spec_value def
+R3495:3496 Corelib.Init.Datatypes <> tt constr
+R3506:3540 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_rhs proj
+R3542:3557 TransformSemantics <> equal_constraint:34 var
+R3566:3574 TransformSemantics <> rhs_value:36 var
+R3666:3673 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3659:3661 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3583:3599 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> spec_values_equal def
+R3601:3609 TransformSemantics <> lhs_value:35 var
+R3611:3619 TransformSemantics <> rhs_value:36 var
+R3622:3649 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R3651:3657 TransformSemantics <> program:30 var
+R3662:3665 Corelib.Init.Datatypes <> true constr
+R3674:3697 TransformSemantics <> TransformConstraintHolds:32 ind
+R3734:3762 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal constr
+R3764:3779 TransformSemantics <> equal_constraint:34 var
+R3719:3725 TransformSemantics <> witness:31 var
+R3705:3711 TransformSemantics <> program:30 var
+binder 3817:3834 <> boolean_constraint:37
+binder 3836:3840 <> value:38
+R4021:4028 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4003:4005 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3848:3869 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_signal_value def
+R3877:3883 TransformSemantics <> witness:31 var
+R3892:3937 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_signal_index proj
+R3939:3956 TransformSemantics <> boolean_constraint:37 var
+R3966:3993 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R3995:4001 TransformSemantics <> program:30 var
+R4006:4014 KernelCompat <> Result_Ok constr
+R4016:4020 TransformSemantics <> value:38 var
+R4102:4109 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4095:4097 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4029:4049 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> spec_value_is_boolean def
+R4051:4055 TransformSemantics <> value:38 var
+R4058:4085 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R4087:4093 TransformSemantics <> program:30 var
+R4098:4101 Corelib.Init.Datatypes <> true constr
+R4110:4133 TransformSemantics <> TransformConstraintHolds:32 ind
+R4170:4200 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean constr
+R4202:4219 TransformSemantics <> boolean_constraint:37 var
+R4155:4161 TransformSemantics <> witness:31 var
+R4141:4147 TransformSemantics <> program:30 var
+binder 4255:4270 <> range_constraint:39
+binder 4272:4276 <> value:40
+R4453:4460 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4435:4437 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4284:4305 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_signal_value def
+R4313:4319 TransformSemantics <> witness:31 var
+R4328:4371 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_signal_index proj
+R4373:4388 TransformSemantics <> range_constraint:39 var
+R4398:4425 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R4427:4433 TransformSemantics <> program:30 var
+R4438:4446 KernelCompat <> Result_Ok constr
+R4448:4452 TransformSemantics <> value:40 var
+R4607:4614 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R4600:4602 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4461:4480 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> spec_value_fits_bits def
+R4488:4492 TransformSemantics <> value:40 var
+R4501:4536 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_bits proj
+R4538:4553 TransformSemantics <> range_constraint:39 var
+R4563:4590 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R4592:4598 TransformSemantics <> program:30 var
+R4603:4606 Corelib.Init.Datatypes <> true constr
+R4615:4638 TransformSemantics <> TransformConstraintHolds:32 ind
+R4675:4703 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range constr
+R4705:4720 TransformSemantics <> range_constraint:39 var
+R4660:4666 TransformSemantics <> witness:31 var
+R4646:4652 TransformSemantics <> program:30 var
+scheme 2992:3015 <> TransformConstraintHolds_ind
+scheme 2992:3015 <> TransformConstraintHolds_sind
+def 4736:4756 <> TransformProgramHolds
+R4771:4792 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformProgram' not
+binder 4761:4767 <> program:41
+R4808:4826 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec <> :::'t_SpecKernelWitness' not
+binder 4798:4804 <> witness:42
+R4841:4846 Corelib.Lists.ListDef <> Forall ind
+R4892:4925 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_constraints proj
+R4927:4933 TransformSemantics <> program:41 var
+R4849:4872 TransformSemantics <> TransformConstraintHolds ind
+R4874:4880 TransformSemantics <> program:41 var
+R4882:4888 TransformSemantics <> witness:42 var
+def 4947:4981 <> transform_signal_sort_key_from_list
+R4996:4999 Corelib.Init.Datatypes <> list ind
+R5001:5021 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+binder 4986:4992 <> signals:43
+R5042:5048 Core.Core_Primitive <> :::'t_usize' not
+binder 5027:5038 <> signal_index:44
+R5053:5059 Core.Core_Primitive <> :::'t_usize' not
+R5072:5078 TransformSemantics <> signals:43 var
+R5089:5090 Stdlib.Lists.List ListNotations ::list_scope:'['_']' not
+R5101:5112 TransformSemantics <> signal_index:44 var
+R5124:5127 Corelib.Init.Datatypes <> ::list_scope:x_'::'_x not
+R5158:5161 KernelCompat <> f_eq def
+R5164:5197 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_signal_index proj
+R5207:5218 TransformSemantics <> signal_index:44 var
+R5290:5324 TransformSemantics <> transform_signal_sort_key_from_list:45 def
+R5344:5355 TransformSemantics <> signal_index:44 var
+R5233:5262 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_sort_key proj
+def 5376:5400 <> transform_signal_sort_key
+R5415:5419 KernelCompat <> t_Vec def
+R5421:5441 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+R5443:5450 KernelCompat <> t_Global constr
+binder 5405:5411 <> signals:47
+R5471:5477 Core.Core_Primitive <> :::'t_usize' not
+binder 5456:5467 <> signal_index:48
+R5482:5488 Core.Core_Primitive <> :::'t_usize' not
+R5495:5529 TransformSemantics <> transform_signal_sort_key_from_list def
+R5531:5537 TransformSemantics <> signals:47 var
+R5539:5550 TransformSemantics <> signal_index:48 var
+def 5563:5589 <> canonicalize_transform_expr
+R5601:5619 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformExpr ind
+binder 5594:5597 <> expr:49
+R5624:5642 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformExpr ind
+R5655:5658 TransformSemantics <> expr:49 var
+R5669:5691 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Const constr
+R5713:5735 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Const constr
+R5752:5775 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal constr
+R5798:5821 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal constr
+R5834:5872 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_signal_index proj
+R5834:5872 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_signal_index proj
+R5834:5872 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_signal_index proj
+R5950:5984 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_sort_key proj
+R5950:5984 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_sort_key proj
+R5890:5924 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_sort_key proj
+R6002:6036 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Signal_f_sort_key proj
+R6057:6077 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Add constr
+R6095:6115 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Add constr
+R6118:6120 Corelib.Lists.ListDef <> map def
+R6122:6148 TransformSemantics <> canonicalize_transform_expr:50 def
+R6162:6182 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Sub constr
+R6201:6221 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Sub constr
+R6232:6258 TransformSemantics <> canonicalize_transform_expr:50 def
+R6274:6300 TransformSemantics <> canonicalize_transform_expr:50 def
+R6311:6331 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Mul constr
+R6350:6370 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Mul constr
+R6381:6407 TransformSemantics <> canonicalize_transform_expr:50 def
+R6423:6449 TransformSemantics <> canonicalize_transform_expr:50 def
+R6460:6480 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Div constr
+R6499:6519 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformExpr_Div constr
+R6530:6556 TransformSemantics <> canonicalize_transform_expr:50 def
+R6572:6598 TransformSemantics <> canonicalize_transform_expr:50 def
+def 6624:6656 <> canonicalize_transform_constraint
+R6671:6675 KernelCompat <> t_Vec def
+R6677:6697 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+R6699:6706 KernelCompat <> t_Global constr
+binder 6661:6667 <> signals:52
+R6725:6749 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformConstraint ind
+binder 6712:6721 <> constraint:53
+R6754:6778 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> t_SpecTransformConstraint ind
+R6791:6800 TransformSemantics <> constraint:53 var
+R6811:6839 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal constr
+R6867:6895 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal constr
+R6908:6942 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_lhs proj
+R6908:6942 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_lhs proj
+R6908:6942 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_lhs proj
+R7070:7104 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_rhs proj
+R7070:7104 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_rhs proj
+R7232:7272 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_label_key proj
+R7232:7272 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_label_key proj
+R6960:6986 TransformSemantics <> canonicalize_transform_expr def
+R7004:7038 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_lhs proj
+R7122:7148 TransformSemantics <> canonicalize_transform_expr def
+R7166:7200 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_rhs proj
+R7290:7330 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Equal_f_label_key proj
+R7356:7386 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean constr
+R7416:7446 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean constr
+R7459:7504 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_signal_index proj
+R7459:7504 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_signal_index proj
+R7459:7504 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_signal_index proj
+R7666:7708 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_label_key proj
+R7666:7708 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_label_key proj
+R7522:7546 TransformSemantics <> transform_signal_sort_key def
+R7563:7569 TransformSemantics <> signals:52 var
+R7587:7632 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_signal_index proj
+R7726:7768 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Boolean_f_label_key proj
+R7796:7824 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range constr
+R7852:7880 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range constr
+R7893:7936 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_signal_index proj
+R7893:7936 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_signal_index proj
+R7893:7936 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_signal_index proj
+R8094:8129 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_bits proj
+R8094:8129 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_bits proj
+R8213:8253 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_label_key proj
+R8213:8253 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_label_key proj
+R7954:7978 TransformSemantics <> transform_signal_sort_key def
+R7995:8001 TransformSemantics <> signals:52 var
+R8019:8062 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_signal_index proj
+R8147:8182 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_bits proj
+R8271:8311 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformConstraint_Range_f_label_key proj
+def 8352:8380 <> canonicalize_transform_signal
+R8394:8414 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+binder 8385:8390 <> signal:55
+R8419:8439 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+R8449:8482 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_signal_index proj
+R8449:8482 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_signal_index proj
+R8449:8482 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_signal_index proj
+R8531:8560 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_sort_key proj
+R8531:8560 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_sort_key proj
+R8609:8640 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_visibility proj
+R8609:8640 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_visibility proj
+R8691:8726 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_constant_value proj
+R8691:8726 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_constant_value proj
+R8781:8810 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_required proj
+R8781:8810 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_required proj
+R8487:8516 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_sort_key proj
+R8518:8523 TransformSemantics <> signal:55 var
+R8565:8594 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_sort_key proj
+R8596:8601 TransformSemantics <> signal:55 var
+R8645:8676 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_visibility proj
+R8678:8683 TransformSemantics <> signal:55 var
+R8731:8766 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_constant_value proj
+R8768:8773 TransformSemantics <> signal:55 var
+R8815:8844 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformSignal_f_required proj
+R8846:8851 TransformSemantics <> signal:55 var
+def 8869:8901 <> canonicalize_transform_assignment
+R8916:8920 KernelCompat <> t_Vec def
+R8922:8942 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+R8944:8951 KernelCompat <> t_Global constr
+binder 8906:8912 <> signals:56
+R8970:8994 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformAssignment' not
+binder 8957:8966 <> assignment:57
+R8999:9023 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformAssignment' not
+R9033:9077 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_target_signal_index proj
+R9033:9077 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_target_signal_index proj
+R9033:9077 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_target_signal_index proj
+R9206:9235 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_expr proj
+R9206:9235 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_expr proj
+R9089:9113 TransformSemantics <> transform_signal_sort_key def
+R9124:9130 TransformSemantics <> signals:56 var
+R9142:9186 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_target_signal_index proj
+R9188:9197 TransformSemantics <> assignment:57 var
+R9247:9273 TransformSemantics <> canonicalize_transform_expr def
+R9276:9305 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformAssignment_f_expr proj
+R9307:9316 TransformSemantics <> assignment:57 var
+def 9335:9361 <> canonicalize_transform_hint
+R9376:9380 KernelCompat <> t_Vec def
+R9382:9402 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformSignal' not
+R9404:9411 KernelCompat <> t_Global constr
+binder 9366:9372 <> signals:58
+R9424:9442 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformHint' not
+binder 9417:9420 <> hint:59
+R9447:9465 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformHint' not
+R9475:9513 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_target_signal_index proj
+R9475:9513 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_target_signal_index proj
+R9475:9513 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_target_signal_index proj
+R9630:9668 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_source_signal_index proj
+R9630:9668 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_source_signal_index proj
+R9525:9549 TransformSemantics <> transform_signal_sort_key def
+R9560:9566 TransformSemantics <> signals:58 var
+R9578:9616 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_target_signal_index proj
+R9618:9621 TransformSemantics <> hint:59 var
+R9680:9704 TransformSemantics <> transform_signal_sort_key def
+R9715:9721 TransformSemantics <> signals:58 var
+R9733:9771 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformHint_f_source_signal_index proj
+R9773:9776 TransformSemantics <> hint:59 var
+def 9795:9824 <> canonicalize_transform_program
+R9839:9860 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformProgram' not
+binder 9829:9835 <> program:60
+R9865:9886 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformProgram' not
+R9912:9914 Corelib.Lists.ListDef <> map def
+R9947:9976 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R9978:9984 TransformSemantics <> program:60 var
+R9916:9944 TransformSemantics <> canonicalize_transform_signal def
+binder 9897:9903 <> signals:61
+R10015:10017 Corelib.Lists.ListDef <> map def
+R10109:10142 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_constraints proj
+R10144:10150 TransformSemantics <> program:60 var
+R10026:10058 TransformSemantics <> canonicalize_transform_constraint def
+R10061:10090 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R10092:10098 TransformSemantics <> program:60 var
+binder 9996:10006 <> constraints:62
+R10161:10188 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R10161:10188 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R10161:10188 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R10236:10265 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R10236:10265 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R10329:10362 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_constraints proj
+R10329:10362 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_constraints proj
+R10434:10467 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_assignments proj
+R10434:10467 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_assignments proj
+R10629:10656 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_hints proj
+R10629:10656 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_hints proj
+R10193:10220 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R10222:10228 TransformSemantics <> program:60 var
+R10277:10295 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> sort_signals_by_key def
+R10298:10310 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R10314:10320 TransformSemantics <> signals:61 var
+R10374:10396 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> sort_constraints_by_key def
+R10399:10411 Core.Core_Array_Rec_bundle_579704328 <> Build_t_Slice constr
+R10415:10425 TransformSemantics <> constraints:62 var
+R10479:10481 Corelib.Lists.ListDef <> map def
+R10579:10612 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_assignments proj
+R10614:10620 TransformSemantics <> program:60 var
+R10493:10525 TransformSemantics <> canonicalize_transform_assignment def
+R10528:10557 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R10559:10565 TransformSemantics <> program:60 var
+R10668:10670 Corelib.Lists.ListDef <> map def
+R10762:10789 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_hints proj
+R10791:10797 TransformSemantics <> program:60 var
+R10682:10708 TransformSemantics <> canonicalize_transform_hint def
+R10711:10740 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_signals proj
+R10742:10748 TransformSemantics <> program:60 var
+def 10816:10856 <> TransformProgramsReorderReindexEquivalent
+R10871:10892 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> :::'t_SpecTransformProgram' not
+binder 10861:10863 <> lhs:63
+binder 10865:10867 <> rhs:64
+R10941:10943 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R10907:10936 TransformSemantics <> canonicalize_transform_program def
+R10938:10940 TransformSemantics <> lhs:63 var
+R10944:10973 TransformSemantics <> canonicalize_transform_program def
+R10975:10977 TransformSemantics <> rhs:64 var

@@ -1,0 +1,5 @@
+-R ./ TODO
+-arg -w
+-arg all
+
+Zkf_lib_Proof_embedded_app_spec.v

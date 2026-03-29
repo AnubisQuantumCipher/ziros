@@ -1,0 +1,28 @@
+[package]
+name = "zkf-keymanager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+libcrux-ml-dsa.workspace = true
+libcrux-ml-kem.workspace = true
+ed25519-dalek.workspace = true
+sha2.workspace = true
+argon2.workspace = true
+chacha20poly1305 = "0.10"
+zeroize.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.9"
+security-framework = "2"
+security-framework-sys = "2"
+
+[dev-dependencies]
+tempfile = "3"

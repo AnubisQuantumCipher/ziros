@@ -1,0 +1,41 @@
+{
+  "backend": "plonky3",
+  "pcs": "fri",
+  "plonky3_version": "0.4.2",
+  "required_proof_metadata": [
+    "field",
+    "scheme",
+    "pcs",
+    "seed"
+  ],
+  "rust_files": [
+    {
+      "path": "zkf-backends/src/plonky3.rs",
+      "sha256": "fc21fab3ac376c33052f078e446a02cb4227c1fa782ce2f9d981b45e5a2fd63d"
+    },
+    {
+      "path": "zkf-backends/src/wrapping/stark_to_groth16.rs",
+      "sha256": "b47897b338965d89f657977680d2d468da77c94b4a9024ede9ca448bc830ed45"
+    }
+  ],
+  "scheme": "stark",
+  "seed_derivation": "program-digest",
+  "source_verification_semantics": [
+    "circuit-replayed",
+    "host-compressed-check"
+  ],
+  "surface": "fri",
+  "wrapper_semantics": [
+    "fri-verifier-circuit",
+    "nova-compressed-attestation-binding"
+  ],
+  "wrapper_statuses": [
+    "wrapped-v2",
+    "wrapped-v3"
+  ],
+  "wrapper_strategies": [
+    "direct-fri-v2",
+    "nova-compressed-v3"
+  ],
+  "wrapper_surface": "stark-to-groth16"
+}

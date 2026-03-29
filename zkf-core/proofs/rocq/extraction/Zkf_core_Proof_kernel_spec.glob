@@ -1,0 +1,108 @@
+DIGEST 31ee0c5d67785aa0295551d30caaa08a
+FZkfCoreExtraction.Zkf_core_Proof_kernel_spec
+R70:75 Stdlib.ZArith.ZArith <> <> lib
+R93:96 Stdlib.Lists.List <> <> lib
+R106:123 Stdlib.Lists.List ListNotations <> mod
+R184:188 Stdlib.Strings.Ascii <> <> lib
+R206:211 Stdlib.Strings.String <> <> lib
+R229:245 Stdlib.Floats.Floats <> <> lib
+R281:289 RecordUpdate.RecordSet <> <> lib
+R299:316 RecordUpdate.RecordSet RecordSetNotations <> mod
+R344:347 Core.Core <> <> lib
+R388:420 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> <> lib
+R458:473 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecFieldValue' not
+not 433:433 <> :::'t_SpecFieldValue'
+R523:549 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_raw_bigint def
+not 487:487 <> :::'spec_field_value_raw_bigint'
+R611:649 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_from_bigint_with_field def
+not 563:563 <> :::'spec_field_value_from_bigint_with_field'
+R693:713 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_zero def
+not 663:663 <> :::'spec_field_value_zero'
+R764:791 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_is_zero_raw def
+not 727:727 <> :::'spec_field_value_is_zero_raw'
+R841:867 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_field_value_is_one_raw def
+not 805:805 <> :::'spec_field_value_is_one_raw'
+R915:939 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_normalize_mod_bigint def
+not 881:881 <> :::'spec_normalize_mod_bigint'
+R985:1007 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> spec_mod_inverse_bigint def
+not 953:953 <> :::'spec_mod_inverse_bigint'
+R1046:1061 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelExpr ind
+not 1021:1021 <> :::'t_SpecKernelExpr'
+R1104:1123 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Const constr
+not 1075:1075 <> :::'SpecKernelExpr_Const'
+R1167:1187 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Signal constr
+not 1137:1137 <> :::'SpecKernelExpr_Signal'
+R1228:1245 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Add constr
+not 1201:1201 <> :::'SpecKernelExpr_Add'
+R1286:1303 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Sub constr
+not 1259:1259 <> :::'SpecKernelExpr_Sub'
+R1344:1361 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Mul constr
+not 1317:1317 <> :::'SpecKernelExpr_Mul'
+R1402:1419 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelExpr_Div constr
+not 1375:1375 <> :::'SpecKernelExpr_Div'
+R1464:1485 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelConstraint ind
+not 1433:1433 <> :::'t_SpecKernelConstraint'
+R1534:1559 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Equal constr
+not 1499:1499 <> :::'SpecKernelConstraint_Equal'
+R1610:1637 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Boolean constr
+not 1573:1573 <> :::'SpecKernelConstraint_Boolean'
+R1686:1711 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Range constr
+not 1651:1651 <> :::'SpecKernelConstraint_Range'
+R1761:1787 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelConstraint_Lookup constr
+not 1725:1725 <> :::'SpecKernelConstraint_Lookup'
+R1833:1855 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelLookupTable' not
+not 1801:1801 <> :::'t_SpecKernelLookupTable'
+R1897:1915 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelProgram' not
+not 1869:1869 <> :::'t_SpecKernelProgram'
+R1957:1975 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> :::'t_SpecKernelWitness' not
+not 1929:1929 <> :::'t_SpecKernelWitness'
+R2021:2043 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecLookupFailureKind ind
+not 1989:1989 <> :::'t_SpecLookupFailureKind'
+R2106:2145 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_InputArityMismatch constr
+not 2057:2057 <> :::'SpecLookupFailureKind_InputArityMismatch'
+R2203:2237 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecLookupFailureKind_NoMatchingRow constr
+not 2159:2159 <> :::'SpecLookupFailureKind_NoMatchingRow'
+R2282:2303 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> t_SpecKernelCheckError ind
+not 2251:2251 <> :::'t_SpecKernelCheckError'
+R2360:2393 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_MissingSignal constr
+not 2317:2317 <> :::'SpecKernelCheckError_MissingSignal'
+R2451:2485 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_DivisionByZero constr
+not 2407:2407 <> :::'SpecKernelCheckError_DivisionByZero'
+R2547:2585 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_UnknownLookupTable constr
+not 2499:2499 <> :::'SpecKernelCheckError_UnknownLookupTable'
+R2643:2677 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_EqualViolation constr
+not 2599:2599 <> :::'SpecKernelCheckError_EqualViolation'
+R2737:2773 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_BooleanViolation constr
+not 2691:2691 <> :::'SpecKernelCheckError_BooleanViolation'
+R2831:2865 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_RangeViolation constr
+not 2787:2787 <> :::'SpecKernelCheckError_RangeViolation'
+R2924:2959 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> SpecKernelCheckError_LookupViolation constr
+not 2879:2879 <> :::'SpecKernelCheckError_LookupViolation'
+R3001:3019 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> kernel_signal_value def
+not 2973:2973 <> :::'kernel_signal_value'
+R3068:3093 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs_from def
+not 3033:3033 <> :::'render_lookup_outputs_from'
+R3137:3157 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> render_lookup_outputs def
+not 3107:3107 <> :::'render_lookup_outputs'
+R3209:3237 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs_from def
+not 3171:3171 <> :::'collect_evaluated_inputs_from'
+R3284:3307 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> collect_evaluated_inputs def
+not 3251:3251 <> :::'collect_evaluated_inputs'
+R3353:3375 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs_from def
+not 3321:3321 <> :::'row_matches_inputs_from'
+R3416:3433 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_inputs def
+not 3389:3389 <> :::'row_matches_inputs'
+R3471:3485 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> skip_row_prefix def
+not 3447:3447 <> :::'skip_row_prefix'
+R3532:3555 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs_from def
+not 3499:3499 <> :::'row_matches_outputs_from'
+R3597:3615 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> row_matches_outputs def
+not 3569:3569 <> :::'row_matches_outputs'
+R3666:3693 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> lookup_has_matching_row_from def
+not 3629:3629 <> :::'lookup_has_matching_row_from'
+R3725:3733 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> eval_expr def
+not 3707:3707 <> :::'eval_expr'
+R3778:3799 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_constraints_from def
+not 3747:3747 <> :::'check_constraints_from'
+R3835:3847 ZkfCoreExtraction.Zkf_core_Proof_kernel_spec_Bundle <> check_program def
+not 3813:3813 <> :::'check_program'

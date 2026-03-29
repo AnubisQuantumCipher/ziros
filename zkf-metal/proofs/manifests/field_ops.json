@@ -1,0 +1,1584 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "field_ops",
+  "claim": "attested GPU surface from Rust inputs to GPU outputs, bound to the shipped metallib, reflection, and pipeline descriptors; certification status is carried per program by certified_claim",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_add_goldilocks",
+      "family": "field_ops",
+      "kernel": "batch_add_goldilocks",
+      "variant": "goldilocks_add",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_add",
+          "operator": "field_add",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_add_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_add_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "31b951c0032d0737bade695a0047e1d094dc0b5caebfd0159a871f5246f9d082",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_add_goldilocks",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_add"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_sub_goldilocks",
+      "family": "field_ops",
+      "kernel": "batch_sub_goldilocks",
+      "variant": "goldilocks_sub",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_sub",
+          "operator": "field_sub",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_sub_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_sub_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "71f88f5a9edbd52e68a0886c01a5983ae4f3cd56c277792d75f92128545880bb",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_sub_goldilocks",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_sub"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_mul_goldilocks",
+      "family": "field_ops",
+      "kernel": "batch_mul_goldilocks",
+      "variant": "goldilocks_mul",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_mul",
+          "operator": "field_mul",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_mul_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_mul_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "eb38794da760f5d45fd49cb0f63546c65cd8248702ef7be5afab432784541039",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_mul_goldilocks",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_mul"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_inv_prefix_goldilocks",
+      "family": "field_ops",
+      "kernel": "batch_inv_prefix_goldilocks",
+      "variant": "goldilocks_inv_prefix",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "chunk_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "element_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "chunk_size"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "input",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "chunk_index"
+              },
+              {
+                "symbol": "chunk_size"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "chunk_size"
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "prefix",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "chunk_index"
+              },
+              {
+                "symbol": "chunk_size"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "chunk_size"
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_inv_prefix",
+          "operator": "field_inv_prefix",
+          "arithmetic_domain": "field",
+          "reads": [
+            "input"
+          ],
+          "writes": [
+            "prefix"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_inv_prefix_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_inv_prefix_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "634ee45b69a1c21fcd5a26c0559ed3fa6f09e9c93f3ec801a29f68c0e013dfaf",
+            "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
+            "pipeline_descriptor_sha256": "2cd24db1ecf97502e389bf1579a91cfa849cf68e12fa3a4f59638e25472afe5e",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "input",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "prefix",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "chunk_size",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field inversion staging kernels exactly",
+        "workgroup_policy": "one thread per chunk; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_inv_prefix_goldilocks",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_inv_prefix"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_inv_backprop_goldilocks",
+      "family": "field_ops",
+      "kernel": "batch_inv_backprop_goldilocks",
+      "variant": "goldilocks_inv_backprop",
+      "field": "goldilocks",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "chunk_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "element_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "chunk_size"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "input",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "chunk_index"
+              },
+              {
+                "symbol": "chunk_size"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "chunk_size"
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "prefix",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "chunk_index"
+              },
+              {
+                "symbol": "chunk_size"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "chunk_size"
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "output",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "chunk_index"
+              },
+              {
+                "symbol": "chunk_size"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "chunk_size"
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "goldilocks_inv_backprop",
+          "operator": "field_inv_backprop",
+          "arithmetic_domain": "field",
+          "reads": [
+            "input",
+            "prefix"
+          ],
+          "writes": [
+            "output"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_inv_backprop_goldilocks"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_inv_backprop_goldilocks",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "0e9e712979a3517dfa17b8f14cec60c60449ee5afe2ed6e68678ab2bf67ef7e2",
+            "public_reflection_sha256": "077c1d634c3ab0ad66f4a9f41a1c42559487f68d08dc108fe1fb8c863c413238",
+            "pipeline_descriptor_sha256": "05850fda5e6900ac202581f23be2061a6ef54f3f8127fbe225c5878e04d92c9f",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "input",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "prefix",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "output",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "count",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "chunk_size",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field inversion staging kernels exactly",
+        "workgroup_policy": "one thread per chunk; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_inv_backprop_goldilocks",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "goldilocks_inv_backprop"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_add_babybear",
+      "family": "field_ops",
+      "kernel": "batch_add_babybear",
+      "variant": "babybear_add",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "babybear_add",
+          "operator": "field_add",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_add_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_add_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "7999500933e4ca8627df6f53ff3a292990581baa791b015d5717fcb55b440816",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_add_babybear",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_add"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_sub_babybear",
+      "family": "field_ops",
+      "kernel": "batch_sub_babybear",
+      "variant": "babybear_sub",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "babybear_sub",
+          "operator": "field_sub",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_sub_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_sub_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "05658d4ec219cdc59f1fb2c67697b06d1f73c774b045485c0830ff6a076742fd",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_sub_babybear",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_sub"
+          }
+        ]
+      },
+      "certified_claim": false
+    },
+    {
+      "theorem_id": "gpu.field_ops_surface_attested",
+      "program_id": "batch_mul_babybear",
+      "family": "field_ops",
+      "kernel": "batch_mul_babybear",
+      "variant": "babybear_mul",
+      "field": "baby_bear",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "element_index"
+        },
+        "lane_index": null,
+        "batch_index": null,
+        "guard": {
+          "ge_expr": [
+            {
+              "symbol": "element_count"
+            },
+            {
+              "nat_const": 1
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "element_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_size",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "element_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "chunk_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "a",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        },
+        {
+          "name": "b",
+          "kind": "global_input",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "a",
+          "kind": "global_output",
+          "start": {
+            "symbol": "element_index"
+          },
+          "len": {
+            "nat_const": 1
+          },
+          "bound": {
+            "symbol": "element_count"
+          },
+          "element_bytes": 4
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "babybear_mul",
+          "operator": "field_mul",
+          "arithmetic_domain": "field",
+          "reads": [
+            "a",
+            "b"
+          ],
+          "writes": [
+            "a"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/field_ops.rs": "6dc887c8c0f86637940a4e4f9ce180c13a57b8c68f44ecad75208051f4506abd",
+          "zkf-metal/src/shaders/batch_field_ops.metal": "97a738bc2ec58576e0b4e75d70147dc30ddbc1a31e305724beb42662d7f5e655"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/batch_field_ops.metal",
+          "zkf-metal/src/field_ops.rs"
+        ],
+        "entrypoints": [
+          "batch_mul_babybear"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "main_library",
+            "entrypoint": "batch_mul_babybear",
+            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "reflection_sha256": "3691bd50cc2542b305ca1e450b4ba2eb98870de6901e23434aa62c1605541b61",
+            "public_reflection_sha256": "e9f543abca1177e2cfe6ba39d40401df79669522cfd2ebcf3cd67868b1cd39ba",
+            "pipeline_descriptor_sha256": "b0be2d42982e185703dce2ba7cf73210bc7a33cf5c773865bcbac561c904dc85",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "a",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "b",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "count",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped batch field operation kernels exactly",
+        "workgroup_policy": "one thread per field element; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_mul_babybear",
+            "source_path": "zkf-metal/src/shaders/batch_field_ops.metal",
+            "library": "main_library",
+            "binding_kind": "babybear_mul"
+          }
+        ]
+      },
+      "certified_claim": false
+    }
+  ]
+}

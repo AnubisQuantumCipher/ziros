@@ -1,0 +1,63 @@
+[package]
+name = "zkf-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[features]
+default = ["full"]
+full = []
+guest = []
+native-nova = []
+native-sp1 = []
+native-risc-zero = []
+kani-residual = []
+acvm-solver = ["dep:acvm", "dep:bn254_blackbox_solver"]
+acvm-solver-beta9 = ["dep:acir_beta9", "dep:acvm_beta9", "dep:bn254_blackbox_solver_beta9"]
+acvm-solver-beta19 = ["dep:acir_beta19", "dep:acvm_beta19", "dep:bn254_blackbox_solver_beta19"]
+
+[dependencies]
+acvm = { workspace = true, optional = true }
+acir_beta9 = { workspace = true, optional = true }
+acir_beta19 = { workspace = true, optional = true }
+acvm_beta9 = { workspace = true, optional = true }
+acvm_beta19 = { workspace = true, optional = true }
+argon2.workspace = true
+ark-bn254.workspace = true
+ark-bls12-381.workspace = true
+ark-ec.workspace = true
+ark-ff.workspace = true
+ark-serialize.workspace = true
+bn254_blackbox_solver = { workspace = true, optional = true }
+bn254_blackbox_solver_beta9 = { workspace = true, optional = true }
+bn254_blackbox_solver_beta19 = { workspace = true, optional = true }
+base64.workspace = true
+ed25519-dalek.workspace = true
+ff.workspace = true
+libc.workspace = true
+libcrux-ml-dsa.workspace = true
+num-bigint.workspace = true
+num-traits.workspace = true
+once_cell.workspace = true
+pasta_curves.workspace = true
+serde.workspace = true
+serde_json = { workspace = true, features = ["unbounded_depth"] }
+serde_stacker.workspace = true
+stacker.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+zeroize.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.9"
+security-framework = "2"
+security-framework-sys = "2"
+
+[target.'cfg(hax)'.dependencies]
+hax-lib = { git = "https://github.com/cryspen/hax", rev = "1f0259212fa994fb351853026397042c497d07b9" }
+
+[dev-dependencies]
+proptest.workspace = true
+rand.workspace = true
+tempfile = "3"

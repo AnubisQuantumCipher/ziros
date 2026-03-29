@@ -1,0 +1,49 @@
+{
+  "backend": "nova-native",
+  "compile_scheme": "nova-ivc",
+  "compressed_fold_supported_profiles": [
+    "classic"
+  ],
+  "curve_cycle": "pallas-vesta",
+  "fold_scheme": "nova-ivc-fold",
+  "native_mode": "recursive-snark-v2",
+  "primary_curve": "pallas",
+  "profiles": [
+    "classic",
+    "hypernova"
+  ],
+  "required_compiled_metadata": [
+    "nova_native_mode",
+    "nova_profile",
+    "nova_curve_cycle",
+    "nova_step_arity",
+    "scheme",
+    "mode"
+  ],
+  "required_fold_proof_metadata": [
+    "nova_native_mode",
+    "nova_steps",
+    "nova_curve_cycle",
+    "nova_profile",
+    "nova_compressed",
+    "nova_ivc_in",
+    "nova_ivc_out",
+    "nova_ivc_initial_state",
+    "nova_ivc_final_state"
+  ],
+  "required_single_step_proof_metadata": [
+    "nova_native_mode",
+    "nova_steps",
+    "nova_curve_cycle",
+    "nova_profile"
+  ],
+  "rust_files": [
+    {
+      "path": "zkf-backends/src/nova_native.rs",
+      "sha256": "5c03282a423e5bb9b10b97c4cbded45a43123afc1d0f53c675e508c23f0df098"
+    }
+  ],
+  "secondary_curve": "vesta",
+  "step_arity": 1,
+  "surface": "nova-hypernova"
+}

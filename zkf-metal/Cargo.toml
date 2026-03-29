@@ -1,0 +1,81 @@
+[package]
+name = "zkf-metal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+build = "build.rs"
+
+[features]
+default = []
+metal4 = []
+
+[dependencies]
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-metal = { version = "0.3", features = [
+    "MTLAllocation",
+    "MTLArgument",
+    "MTLDevice",
+    "MTLCommandQueue",
+    "MTLCommandBuffer",
+    "MTLCommandEncoder",
+    "MTLComputeCommandEncoder",
+    "MTLComputePipeline",
+    "MTLPipeline",
+    "MTLLibrary",
+    "MTLEvent",
+    "MTLResource",
+    "MTLBuffer",
+    "MTLTypes",
+    "MTLBinaryArchive",
+    "MTLResidencySet",
+    "MTL4CommandAllocator",
+] }
+objc2-foundation = { version = "0.3", features = [
+    "NSString",
+    "NSError",
+    "NSDictionary",
+    "NSArray",
+    "NSURL",
+] }
+block2 = "0.6"
+zkf-core = { path = "../zkf-core" }
+ark-bn254 = { workspace = true }
+ark-ec = { workspace = true }
+ark-ff = { workspace = true }
+ark-poly = { workspace = true }
+ark-serialize = { workspace = true }
+p3-field = { workspace = true }
+p3-goldilocks = { workspace = true }
+p3-baby-bear = { workspace = true }
+p3-dft = { workspace = true }
+p3-matrix = { workspace = true }
+p3-poseidon2 = { workspace = true }
+p3-symmetric = { workspace = true }
+p3-commit = { workspace = true }
+p3-merkle-tree = { workspace = true }
+ff.workspace = true
+serde = { version = "1", features = ["derive"] }
+itertools = "0.14"
+rand09 = { workspace = true }
+log = "0.4"
+halo2curves = { version = "0.9.0", features = ["std", "bits", "derive_serde"] }
+pasta_curves = "0.5"
+serde_json.workspace = true
+sha2.workspace = true
+
+[build-dependencies]
+sha2.workspace = true
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+rand.workspace = true
+ark-std = "0.5"
+sha2 = "0.10"
+tiny-keccak = { version = "2", features = ["keccak"] }
+
+[[bench]]
+name = "metal_bench"
+harness = false

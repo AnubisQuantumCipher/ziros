@@ -1,0 +1,9 @@
+[spirv]
+spirv_cross_repo = "https://github.com/KhronosGroup/SPIRV-Cross.git"
+spirv_cross_rev = "4d4b79bd7b69b07fabdeb06f849334ba79ea7cee"
+spirv_tools_repo = "https://github.com/KhronosGroup/SPIRV-Tools.git"
+spirv_tools_rev = "8a13595dd4ae5049ef42d0f30297d0c427db54b5"
+spirv_llvm_translator_repo = "https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git"
+spirv_llvm_translator_rev = "3f0254ae1f1de13aa549bc2961e0af0f691e16ba"
+platform = "macos-arm64"
+llvm_config_hint = "/opt/homebrew/opt/llvm/bin/llvm-config"

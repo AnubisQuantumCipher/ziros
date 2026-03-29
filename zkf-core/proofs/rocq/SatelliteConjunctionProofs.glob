@@ -1,0 +1,414 @@
+DIGEST bbd13d22408c4ee7b56cd784884c75f5
+FSatelliteConjunctionProofs
+R27:32 Stdlib.ZArith.ZArith <> <> lib
+R34:36 Stdlib.micromega.Lia <> <> lib
+def 72:97 <> satellite_spacecraft_count
+R101:101 Corelib.Numbers.BinNums <> Z ind
+def 120:139 <> satellite_step_count
+R143:143 Corelib.Numbers.BinNums <> Z ind
+def 165:193 <> satellite_private_input_count
+R197:197 Corelib.Numbers.BinNums <> Z ind
+def 217:244 <> satellite_public_input_count
+R248:248 Corelib.Numbers.BinNums <> Z ind
+def 267:295 <> satellite_public_output_count
+R299:299 Corelib.Numbers.BinNums <> Z ind
+def 318:337 <> satellite_pair_count
+R341:341 Corelib.Numbers.BinNums <> Z ind
+R409:411 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R374:377 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R408:408 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R348:373 SatelliteConjunctionProofs <> satellite_spacecraft_count def
+R404:406 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R378:403 SatelliteConjunctionProofs <> satellite_spacecraft_count def
+def 427:455 <> satellite_final_state_payload
+R487:487 Corelib.Numbers.BinNums <> Z ind
+binder 458:459 <> px:1
+binder 461:462 <> py:2
+binder 464:465 <> pz:3
+binder 467:468 <> vx:4
+binder 470:471 <> vy:5
+binder 473:474 <> vz:6
+binder 476:478 <> tag:7
+binder 480:483 <> step:8
+R519:521 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R515:517 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R511:513 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R507:509 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R503:505 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R499:501 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R495:497 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R494:494 Corelib.Numbers.BinNums <> Z ind
+R498:498 Corelib.Numbers.BinNums <> Z ind
+R502:502 Corelib.Numbers.BinNums <> Z ind
+R506:506 Corelib.Numbers.BinNums <> Z ind
+R510:510 Corelib.Numbers.BinNums <> Z ind
+R514:514 Corelib.Numbers.BinNums <> Z ind
+R518:518 Corelib.Numbers.BinNums <> Z ind
+R522:522 Corelib.Numbers.BinNums <> Z ind
+R529:529 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R532:533 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R536:537 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R540:541 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R544:545 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R548:549 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R552:553 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R557:558 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R563:563 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R530:531 SatelliteConjunctionProofs <> px:1 var
+R534:535 SatelliteConjunctionProofs <> py:2 var
+R538:539 SatelliteConjunctionProofs <> pz:3 var
+R542:543 SatelliteConjunctionProofs <> vx:4 var
+R546:547 SatelliteConjunctionProofs <> vy:5 var
+R550:551 SatelliteConjunctionProofs <> vz:6 var
+R554:556 SatelliteConjunctionProofs <> tag:7 var
+R559:562 SatelliteConjunctionProofs <> step:8 var
+def 578:604 <> satellite_plan_leaf_payload
+R631:631 Corelib.Numbers.BinNums <> Z ind
+binder 607:609 <> dvx:9
+binder 611:613 <> dvy:10
+binder 615:617 <> dvz:11
+binder 619:627 <> burn_step:12
+R645:647 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R641:643 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R637:639 Corelib.Init.Datatypes <> ::type_scope:x_'*'_x not
+R636:636 Corelib.Numbers.BinNums <> Z ind
+R640:640 Corelib.Numbers.BinNums <> Z ind
+R644:644 Corelib.Numbers.BinNums <> Z ind
+R648:648 Corelib.Numbers.BinNums <> Z ind
+R655:655 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R659:660 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R664:665 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R669:670 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R680:680 Corelib.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R656:658 SatelliteConjunctionProofs <> dvx:9 var
+R661:663 SatelliteConjunctionProofs <> dvy:10 var
+R666:668 SatelliteConjunctionProofs <> dvz:11 var
+R671:679 SatelliteConjunctionProofs <> burn_step:12 var
+def 695:707 <> burn_selector
+R737:737 Corelib.Numbers.BinNums <> Z ind
+binder 710:721 <> claimed_step:13
+binder 723:733 <> actual_step:14
+R742:742 Corelib.Numbers.BinNums <> Z ind
+R752:759 Stdlib.ZArith.BinInt Z eq_dec def
+R761:772 SatelliteConjunctionProofs <> claimed_step:13 var
+R774:784 SatelliteConjunctionProofs <> actual_step:14 var
+def 813:831 <> propagated_velocity
+R850:850 Corelib.Numbers.BinNums <> Z ind
+binder 834:834 <> v:15
+binder 836:837 <> dv:16
+binder 839:846 <> selector:17
+R855:855 Corelib.Numbers.BinNums <> Z ind
+R863:865 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R862:862 SatelliteConjunctionProofs <> v:15 var
+R874:876 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R866:873 SatelliteConjunctionProofs <> selector:17 var
+R877:878 SatelliteConjunctionProofs <> dv:16 var
+def 893:911 <> propagated_position
+R927:927 Corelib.Numbers.BinNums <> Z ind
+binder 914:914 <> x:18
+binder 916:921 <> v_next:19
+binder 923:923 <> a:20
+R932:932 Corelib.Numbers.BinNums <> Z ind
+R949:951 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R940:942 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R939:939 SatelliteConjunctionProofs <> x:18 var
+R943:948 SatelliteConjunctionProofs <> v_next:19 var
+R953:955 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R952:952 SatelliteConjunctionProofs <> a:20 var
+def 971:994 <> propagated_velocity_next
+R1019:1019 Corelib.Numbers.BinNums <> Z ind
+binder 997:1002 <> v_next:21
+binder 1004:1008 <> a_now:22
+binder 1010:1015 <> a_next:23
+R1024:1024 Corelib.Numbers.BinNums <> Z ind
+R1037:1039 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R1031:1036 SatelliteConjunctionProofs <> v_next:21 var
+R1040:1040 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R1055:1058 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R1046:1048 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R1041:1045 SatelliteConjunctionProofs <> a_now:22 var
+R1049:1054 SatelliteConjunctionProofs <> a_next:23 var
+def 1074:1084 <> running_min
+R1106:1106 Corelib.Numbers.BinNums <> Z ind
+binder 1087:1094 <> previous:24
+binder 1096:1102 <> current:25
+R1111:1111 Corelib.Numbers.BinNums <> Z ind
+R1116:1120 Stdlib.ZArith.BinInt Z min def
+R1122:1129 SatelliteConjunctionProofs <> previous:24 var
+R1131:1137 SatelliteConjunctionProofs <> current:25 var
+def 1152:1166 <> threshold_slack
+R1189:1189 Corelib.Numbers.BinNums <> Z ind
+binder 1169:1175 <> minimum:26
+binder 1177:1185 <> threshold:27
+R1194:1194 Corelib.Numbers.BinNums <> Z ind
+R1208:1210 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R1201:1207 SatelliteConjunctionProofs <> minimum:26 var
+R1211:1219 SatelliteConjunctionProofs <> threshold:27 var
+def 1234:1245 <> budget_slack
+R1263:1263 Corelib.Numbers.BinNums <> Z ind
+binder 1248:1253 <> budget:28
+binder 1255:1259 <> total:29
+R1268:1268 Corelib.Numbers.BinNums <> Z ind
+R1281:1283 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R1275:1280 SatelliteConjunctionProofs <> budget:28 var
+R1284:1288 SatelliteConjunctionProofs <> total:29 var
+prf 1298:1329 <> satellite_spacecraft_count_exact
+R1361:1363 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1335:1360 SatelliteConjunctionProofs <> satellite_spacecraft_count def
+prf 1399:1424 <> satellite_step_count_exact
+R1450:1452 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1430:1449 SatelliteConjunctionProofs <> satellite_step_count def
+prf 1491:1525 <> satellite_private_input_count_exact
+R1560:1562 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1531:1559 SatelliteConjunctionProofs <> satellite_private_input_count def
+prf 1599:1632 <> satellite_public_input_count_exact
+R1666:1668 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1638:1665 SatelliteConjunctionProofs <> satellite_public_input_count def
+prf 1704:1738 <> satellite_public_output_count_exact
+R1773:1775 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1744:1772 SatelliteConjunctionProofs <> satellite_public_output_count def
+prf 1811:1836 <> satellite_pair_count_exact
+R1862:1864 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1842:1861 SatelliteConjunctionProofs <> satellite_pair_count def
+prf 1900:1945 <> satellite_final_state_payload_domain_separated
+binder 1958:1959 <> px:30
+binder 1961:1962 <> py:31
+binder 1964:1965 <> pz:32
+binder 1967:1968 <> vx:33
+binder 1970:1971 <> vy:34
+binder 1973:1974 <> vz:35
+binder 1976:1979 <> tag1:36
+binder 1981:1984 <> tag2:37
+binder 1986:1989 <> step:38
+R2008:2015 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2000:2003 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R1996:1999 SatelliteConjunctionProofs <> tag1:36 var
+R2004:2007 SatelliteConjunctionProofs <> tag2:37 var
+R2073:2080 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R2016:2044 SatelliteConjunctionProofs <> satellite_final_state_payload def
+R2046:2047 SatelliteConjunctionProofs <> px:30 var
+R2049:2050 SatelliteConjunctionProofs <> py:31 var
+R2052:2053 SatelliteConjunctionProofs <> pz:32 var
+R2055:2056 SatelliteConjunctionProofs <> vx:33 var
+R2058:2059 SatelliteConjunctionProofs <> vy:34 var
+R2061:2062 SatelliteConjunctionProofs <> vz:35 var
+R2064:2067 SatelliteConjunctionProofs <> tag1:36 var
+R2069:2072 SatelliteConjunctionProofs <> step:38 var
+R2081:2109 SatelliteConjunctionProofs <> satellite_final_state_payload def
+R2111:2112 SatelliteConjunctionProofs <> px:30 var
+R2114:2115 SatelliteConjunctionProofs <> py:31 var
+R2117:2118 SatelliteConjunctionProofs <> pz:32 var
+R2120:2121 SatelliteConjunctionProofs <> vx:33 var
+R2123:2124 SatelliteConjunctionProofs <> vy:34 var
+R2126:2127 SatelliteConjunctionProofs <> vz:35 var
+R2129:2132 SatelliteConjunctionProofs <> tag2:37 var
+R2134:2137 SatelliteConjunctionProofs <> step:38 var
+prf 2256:2299 <> satellite_plan_leaf_payload_domain_separated
+binder 2312:2314 <> dvx:39
+binder 2316:2318 <> dvy:40
+binder 2320:2322 <> dvz:41
+binder 2324:2328 <> burn1:42
+binder 2330:2334 <> burn2:43
+R2355:2362 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2346:2349 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R2341:2345 SatelliteConjunctionProofs <> burn1:42 var
+R2350:2354 SatelliteConjunctionProofs <> burn2:43 var
+R2408:2415 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R2363:2389 SatelliteConjunctionProofs <> satellite_plan_leaf_payload def
+R2391:2393 SatelliteConjunctionProofs <> dvx:39 var
+R2395:2397 SatelliteConjunctionProofs <> dvy:40 var
+R2399:2401 SatelliteConjunctionProofs <> dvz:41 var
+R2403:2407 SatelliteConjunctionProofs <> burn1:42 var
+R2416:2442 SatelliteConjunctionProofs <> satellite_plan_leaf_payload def
+R2444:2446 SatelliteConjunctionProofs <> dvx:39 var
+R2448:2450 SatelliteConjunctionProofs <> dvy:40 var
+R2452:2454 SatelliteConjunctionProofs <> dvz:41 var
+R2456:2460 SatelliteConjunctionProofs <> burn2:43 var
+prf 2570:2586 <> burn_selector_hit
+binder 2599:2610 <> claimed_step:44
+R2656:2658 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2617:2629 SatelliteConjunctionProofs <> burn_selector def
+R2631:2642 SatelliteConjunctionProofs <> claimed_step:44 var
+R2644:2655 SatelliteConjunctionProofs <> claimed_step:44 var
+R2701:2713 SatelliteConjunctionProofs <> burn_selector def
+R2728:2735 Stdlib.ZArith.BinInt Z eq_dec def
+R2728:2735 Stdlib.ZArith.BinInt Z eq_dec def
+prf 2789:2806 <> burn_selector_miss
+binder 2819:2830 <> claimed_step:45
+binder 2832:2842 <> actual_step:46
+R2876:2883 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2861:2864 Corelib.Init.Logic <> ::type_scope:x_'<>'_x not
+R2849:2860 SatelliteConjunctionProofs <> claimed_step:45 var
+R2865:2875 SatelliteConjunctionProofs <> actual_step:46 var
+R2922:2924 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2884:2896 SatelliteConjunctionProofs <> burn_selector def
+R2898:2909 SatelliteConjunctionProofs <> claimed_step:45 var
+R2911:2921 SatelliteConjunctionProofs <> actual_step:46 var
+R2984:2996 SatelliteConjunctionProofs <> burn_selector def
+R3011:3018 Stdlib.ZArith.BinInt Z eq_dec def
+R3011:3018 Stdlib.ZArith.BinInt Z eq_dec def
+prf 3071:3091 <> burn_selector_boolean
+binder 3104:3115 <> claimed_step:47
+binder 3117:3127 <> actual_step:48
+R3223:3225 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3172:3179 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R3222:3222 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R3134:3146 SatelliteConjunctionProofs <> burn_selector def
+R3148:3159 SatelliteConjunctionProofs <> claimed_step:47 var
+R3161:3171 SatelliteConjunctionProofs <> actual_step:48 var
+R3181:3183 Stdlib.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3184:3196 SatelliteConjunctionProofs <> burn_selector def
+R3198:3209 SatelliteConjunctionProofs <> claimed_step:47 var
+R3211:3221 SatelliteConjunctionProofs <> actual_step:48 var
+R3280:3292 SatelliteConjunctionProofs <> burn_selector def
+R3307:3314 Stdlib.ZArith.BinInt Z eq_dec def
+R3307:3314 Stdlib.ZArith.BinInt Z eq_dec def
+prf 3360:3387 <> propagated_velocity_equation
+binder 3400:3400 <> v:49
+binder 3402:3403 <> dv:50
+binder 3405:3412 <> selector:51
+R3452:3454 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3419:3437 SatelliteConjunctionProofs <> propagated_velocity def
+R3439:3439 SatelliteConjunctionProofs <> v:49 var
+R3441:3442 SatelliteConjunctionProofs <> dv:50 var
+R3444:3451 SatelliteConjunctionProofs <> selector:51 var
+R3456:3458 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3455:3455 SatelliteConjunctionProofs <> v:49 var
+R3467:3469 Stdlib.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R3459:3466 SatelliteConjunctionProofs <> selector:51 var
+R3470:3471 SatelliteConjunctionProofs <> dv:50 var
+prf 3516:3543 <> propagated_position_equation
+binder 3556:3556 <> x:52
+binder 3558:3563 <> v_next:53
+binder 3565:3565 <> a:54
+R3602:3604 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3572:3590 SatelliteConjunctionProofs <> propagated_position def
+R3592:3592 SatelliteConjunctionProofs <> x:52 var
+R3594:3599 SatelliteConjunctionProofs <> v_next:53 var
+R3601:3601 SatelliteConjunctionProofs <> a:54 var
+R3615:3617 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3606:3608 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3605:3605 SatelliteConjunctionProofs <> x:52 var
+R3609:3614 SatelliteConjunctionProofs <> v_next:53 var
+R3619:3621 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R3618:3618 SatelliteConjunctionProofs <> a:54 var
+prf 3667:3699 <> propagated_velocity_next_equation
+binder 3712:3717 <> v_next:55
+binder 3719:3723 <> a_now:56
+binder 3725:3730 <> a_next:57
+R3781:3787 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3737:3760 SatelliteConjunctionProofs <> propagated_velocity_next def
+R3762:3767 SatelliteConjunctionProofs <> v_next:55 var
+R3769:3773 SatelliteConjunctionProofs <> a_now:56 var
+R3775:3780 SatelliteConjunctionProofs <> a_next:57 var
+R3794:3796 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3788:3793 SatelliteConjunctionProofs <> v_next:55 var
+R3797:3797 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R3812:3815 Stdlib.ZArith.BinInt <> ::Z_scope:x_'/'_x not
+R3803:3805 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3798:3802 SatelliteConjunctionProofs <> a_now:56 var
+R3806:3811 SatelliteConjunctionProofs <> a_next:57 var
+prf 3861:3882 <> running_min_prev_slack
+binder 3895:3902 <> previous:58
+binder 3904:3910 <> current:59
+R4007:4009 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3945:3951 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3917:3927 SatelliteConjunctionProofs <> running_min def
+R3929:3936 SatelliteConjunctionProofs <> previous:58 var
+R3938:3944 SatelliteConjunctionProofs <> current:59 var
+R3952:3966 SatelliteConjunctionProofs <> threshold_slack def
+R3968:3975 SatelliteConjunctionProofs <> previous:58 var
+R3978:3988 SatelliteConjunctionProofs <> running_min def
+R3990:3997 SatelliteConjunctionProofs <> previous:58 var
+R3999:4005 SatelliteConjunctionProofs <> current:59 var
+R4010:4017 SatelliteConjunctionProofs <> previous:58 var
+R4063:4073 SatelliteConjunctionProofs <> running_min def
+R4076:4090 SatelliteConjunctionProofs <> threshold_slack def
+R4105:4115 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+R4105:4115 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+prf 4153:4174 <> running_min_curr_slack
+binder 4187:4194 <> previous:60
+binder 4196:4202 <> current:61
+R4298:4300 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4237:4243 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4209:4219 SatelliteConjunctionProofs <> running_min def
+R4221:4228 SatelliteConjunctionProofs <> previous:60 var
+R4230:4236 SatelliteConjunctionProofs <> current:61 var
+R4244:4258 SatelliteConjunctionProofs <> threshold_slack def
+R4260:4266 SatelliteConjunctionProofs <> current:61 var
+R4269:4279 SatelliteConjunctionProofs <> running_min def
+R4281:4288 SatelliteConjunctionProofs <> previous:60 var
+R4290:4296 SatelliteConjunctionProofs <> current:61 var
+R4301:4307 SatelliteConjunctionProofs <> current:61 var
+R4353:4363 SatelliteConjunctionProofs <> running_min def
+R4366:4380 SatelliteConjunctionProofs <> threshold_slack def
+R4395:4405 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+R4395:4405 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+prf 4443:4470 <> running_min_lower_bound_left
+binder 4483:4490 <> previous:62
+binder 4492:4498 <> current:63
+R4533:4536 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R4505:4515 SatelliteConjunctionProofs <> running_min def
+R4517:4524 SatelliteConjunctionProofs <> previous:62 var
+R4526:4532 SatelliteConjunctionProofs <> current:63 var
+R4537:4544 SatelliteConjunctionProofs <> previous:62 var
+R4590:4600 SatelliteConjunctionProofs <> running_min def
+R4615:4625 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+R4615:4625 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+prf 4663:4691 <> running_min_lower_bound_right
+binder 4704:4711 <> previous:64
+binder 4713:4719 <> current:65
+R4754:4757 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R4726:4736 SatelliteConjunctionProofs <> running_min def
+R4738:4745 SatelliteConjunctionProofs <> previous:64 var
+R4747:4753 SatelliteConjunctionProofs <> current:65 var
+R4758:4764 SatelliteConjunctionProofs <> current:65 var
+R4810:4820 SatelliteConjunctionProofs <> running_min def
+R4835:4845 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+R4835:4845 Stdlib.ZArith.ZArith_dec <> Z_le_gt_dec def
+prf 4883:4912 <> threshold_slack_reconstruction
+binder 4925:4931 <> minimum:66
+binder 4933:4941 <> threshold:67
+R4993:4995 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4981:4983 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4948:4962 SatelliteConjunctionProofs <> threshold_slack def
+R4964:4970 SatelliteConjunctionProofs <> minimum:66 var
+R4972:4980 SatelliteConjunctionProofs <> threshold:67 var
+R4984:4992 SatelliteConjunctionProofs <> threshold:67 var
+R4996:5002 SatelliteConjunctionProofs <> minimum:66 var
+R5049:5063 SatelliteConjunctionProofs <> threshold_slack def
+prf 5085:5111 <> budget_slack_reconstruction
+binder 5124:5129 <> budget:68
+binder 5131:5135 <> total:69
+R5175:5177 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R5167:5169 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5142:5153 SatelliteConjunctionProofs <> budget_slack def
+R5155:5160 SatelliteConjunctionProofs <> budget:68 var
+R5162:5166 SatelliteConjunctionProofs <> total:69 var
+R5170:5174 SatelliteConjunctionProofs <> total:69 var
+R5178:5183 SatelliteConjunctionProofs <> budget:68 var
+R5225:5236 SatelliteConjunctionProofs <> budget_slack def
+prf 5258:5284 <> threshold_slack_nonnegative
+binder 5297:5303 <> minimum:70
+binder 5305:5313 <> threshold:71
+R5340:5347 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5329:5332 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R5320:5328 SatelliteConjunctionProofs <> threshold:71 var
+R5333:5339 SatelliteConjunctionProofs <> minimum:70 var
+R5349:5352 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R5353:5367 SatelliteConjunctionProofs <> threshold_slack def
+R5369:5375 SatelliteConjunctionProofs <> minimum:70 var
+R5377:5385 SatelliteConjunctionProofs <> threshold:71 var
+R5436:5450 SatelliteConjunctionProofs <> threshold_slack def
+prf 5472:5495 <> budget_slack_nonnegative
+binder 5508:5513 <> budget:72
+binder 5515:5519 <> total:73
+R5541:5548 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R5531:5534 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R5526:5530 SatelliteConjunctionProofs <> total:73 var
+R5535:5540 SatelliteConjunctionProofs <> budget:72 var
+R5550:5553 Stdlib.ZArith.BinInt <> ::Z_scope:x_'<='_x not
+R5554:5565 SatelliteConjunctionProofs <> budget_slack def
+R5567:5572 SatelliteConjunctionProofs <> budget:72 var
+R5574:5578 SatelliteConjunctionProofs <> total:73 var
+R5624:5635 SatelliteConjunctionProofs <> budget_slack def

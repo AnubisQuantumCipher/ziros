@@ -1,0 +1,192 @@
+[workspace]
+members = [
+  "zkf-core",
+  "zkf-cloudfs",
+  "zkf-frontends",
+  "zkf-backends",
+  "zkf-gadgets",
+  "zkf-registry",
+  "zkf-ir-spec",
+  "zkf-conformance",
+  "zkf-cli",
+  "zkf-lib",
+  "zkf-examples",
+  "zkf-keymanager",
+  "zkf-runtime",
+  "zkf-storage",
+  "zkf-distributed",
+  "zkf-ui",
+]
+exclude = [
+  "vendor/ark-relations-patched",
+  "vendor/nova-snark-patched",
+  "vendor/p3-merkle-tree-gpu",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "LicenseRef-ZirOS-Proprietary"
+authors = ["AnubisQuantumCipher"]
+repository = "https://github.com/anubisquantumcipher/ziros"
+homepage = "https://github.com/anubisquantumcipher/ziros"
+documentation = "https://github.com/anubisquantumcipher/ziros"
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)', 'cfg(kani_ra)'] }
+
+[workspace.lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+
+[workspace.dependencies]
+acir = "0.46"
+acir_beta9 = { package = "acir", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.9" }
+acir_beta19 = { package = "acir", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.19" }
+acvm_beta9 = { package = "acvm", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.9", features = ["bn254"] }
+acvm_beta19 = { package = "acvm", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.19", features = ["bn254"] }
+bn254_blackbox_solver_beta9 = { package = "bn254_blackbox_solver", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.9" }
+bn254_blackbox_solver_beta19 = { package = "bn254_blackbox_solver", git = "https://github.com/noir-lang/noir", tag = "v1.0.0-beta.19" }
+bn254_blackbox_solver = "0.46"
+acvm = "0.46"
+acvm_blackbox_solver = "0.46"
+base64 = "0.22"
+bincode = "1.3"
+clap = { version = "4.5", features = ["derive"] }
+cfg-if = "1.0"
+chrono = { version = "0.4", features = ["clock", "serde"] }
+argon2 = "0.5"
+ed25519-dalek = "2"
+libc = "0.2"
+flate2 = "1.0"
+num-bigint = "0.4"
+num-traits = "0.2"
+once_cell = "1.20"
+postcard = { version = "1.1", features = ["alloc"] }
+rand = "0.8"
+rand09 = { package = "rand", version = "0.9", features = ["small_rng"] }
+getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom02 = { package = "getrandom", version = "0.2", features = ["js"] }
+semver = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_stacker = "0.1"
+stacker = "0.1"
+sha2 = "0.10"
+crossterm = "0.28"
+indicatif = "0.17"
+owo-colors = "4"
+ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }
+libcrux-ml-dsa = { version = "0.0.8", default-features = false, features = ["std", "mldsa87"] }
+libcrux-ml-kem = { version = "0.0.8", default-features = false, features = ["std", "mlkem1024"] }
+proptest = "1.6"
+ff = "0.13"
+group = "0.13"
+thiserror = "2.0"
+halo2_proofs = "0.3.2"
+halo2_proofs_pse = { package = "halo2_proofs", git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v0.4.0" }
+rand_chacha = "0.3"
+ureq = { version = "2.10", features = ["json"] }
+k256 = { version = "0.13.4", features = ["ecdsa"] }
+p256 = { version = "0.13.2", features = ["ecdsa"] }
+zeroize = { version = "1", features = ["derive"] }
+
+ark-bn254 = "0.5"
+ark-bls12-381 = "0.5"
+ark-ec = "0.5"
+ark-ff = "0.5"
+ark-groth16 = "0.5"
+ark-poly = "0.5"
+ark-relations = "0.5"
+ark-serialize = "0.5"
+ark-snark = "0.5"
+pasta_curves = "0.5.1"
+
+# Plonky3 crates pinned to exact version — the STARK-to-SNARK wrapper's
+# Poseidon2 gadget must match these exactly (golden vector test will fail
+# if round constants, MDS, or RNG derivation change across versions).
+p3-air = "=0.4.2"
+p3-challenger = "=0.4.2"
+p3-commit = "=0.4.2"
+p3-dft = "=0.4.2"
+p3-field = "=0.4.2"
+p3-fri = "=0.4.2"
+p3-circle = "=0.4.2"
+p3-goldilocks = "=0.4.2"
+p3-baby-bear = "=0.4.2"
+p3-mersenne-31 = "=0.4.2"
+p3-keccak = "=0.4.2"
+p3-matrix = "=0.4.2"
+p3-merkle-tree = { path = "vendor/p3-merkle-tree-gpu" }
+p3-poseidon2 = "=0.4.2"
+p3-symmetric = "=0.4.2"
+p3-uni-stark = "=0.4.2"
+nova-snark = { path = "vendor/nova-snark-patched" }
+risc0-zkvm = { version = "=2.3.2", default-features = false, features = ["client", "prove"] }
+risc0-binfmt = "2.0.3"
+risc0-zkos-v1compat = "2.2.2"
+sp1-sdk = "6.0.2"
+
+[patch.crates-io]
+ark-relations = { path = "vendor/ark-relations-patched" }
+halo2_proofs = { path = "vendor/halo2-proofs-patched" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+debug = 0
+incremental = false
+
+[profile.dev.package.ark-ff]
+opt-level = 3
+
+[profile.dev.package.ark-ec]
+opt-level = 3
+
+[profile.dev.package.ark-poly]
+opt-level = 3
+
+[profile.dev.package.ark-relations]
+opt-level = 3
+
+[profile.dev.package.ark-groth16]
+opt-level = 3
+
+[profile.dev.package.ark-bn254]
+opt-level = 3
+
+[profile.dev.package.zkf-core]
+opt-level = 3
+
+[profile.dev.package.zkf-backends]
+opt-level = 3
+
+[profile.test.package.ark-ff]
+opt-level = 3
+
+[profile.test.package.ark-ec]
+opt-level = 3
+
+[profile.test.package.ark-poly]
+opt-level = 3
+
+[profile.test.package.ark-relations]
+opt-level = 3
+
+[profile.test.package.ark-groth16]
+opt-level = 3
+
+[profile.test.package.ark-bn254]
+opt-level = 3
+
+[profile.test.package.zkf-core]
+opt-level = 3
+
+[profile.test.package.zkf-backends]
+opt-level = 3

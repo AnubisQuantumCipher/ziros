@@ -1,0 +1,9 @@
+{
+  "version": { "major": 2, "minor": 0 },
+  "do_communications_commitment": false,
+  "num_inputs": 2,
+  "instructions": [
+    { "op": "test_eq", "a": 0, "b": 1 },
+    { "op": "output", "var": 2 }
+  ]
+}

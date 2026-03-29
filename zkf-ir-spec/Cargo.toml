@@ -1,0 +1,17 @@
+[package]
+name = "zkf-ir-spec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Formal IR specification for the ZKF zero-knowledge framework"
+
+[dependencies]
+num-bigint = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+zkf-core = { path = "../zkf-core", default-features = false }
+
+[lints]
+workspace = true

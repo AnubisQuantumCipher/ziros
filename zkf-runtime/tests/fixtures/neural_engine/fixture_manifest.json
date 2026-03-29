@@ -1,0 +1,188 @@
+{
+  "fixture_corpus": {
+    "corpus_hash": "6c6c5baf7aedc4bd00c7326244103fcfc345272d97f16eb87062194a135e1652",
+    "path": "zkf-runtime/tests/fixtures/neural_engine/control_plane_fixture_corpus.jsonl",
+    "sha256": "271312451eac7d19e9ea23db0c56d67dcf103b1d9bf46f1ecd6cbab78a77658b"
+  },
+  "lanes": {
+    "anomaly": {
+      "corpus_hash": "6c6c5baf7aedc4bd00c7326244103fcfc345272d97f16eb87062194a135e1652",
+      "input_shape": 47,
+      "lane_semantics": "baseline residual envelope smoke floor over nominal and degraded runs",
+      "metrics": {
+        "mae": 2.959308766462924e-07,
+        "r2": 0.9999999996452892,
+        "rows": 72,
+        "scenario_count": 12
+      },
+      "output_name": "anomaly_score",
+      "package": "models/anomaly_detector_v1.mlpackage",
+      "package_tree_sha256": "c8614980a918f8dba96b16bacaad68ee18d5ebfecec01d6de21ef74238d5d37c",
+      "quality_gate": {
+        "measurements": {
+          "mae": 2.959308766462924e-07,
+          "r2": 0.9999999996452892,
+          "rows": 72.0,
+          "scenario_count": 12.0
+        },
+        "passed": true,
+        "reasons": [],
+        "thresholds": {
+          "mae_max": 0.08,
+          "r2_min": 0.96,
+          "rows_min": 12.0,
+          "scenario_count_min": 4.0
+        }
+      },
+      "sidecar": "models/anomaly_detector_v1.mlpackage.json",
+      "sidecar_sha256": "1d6de003a01faa85d207a6251c7815dec6c82cff6b58463c695ac624db196e42",
+      "tool_versions": {
+        "coremltools": "9.0",
+        "numpy": "2.0.2",
+        "python": "3.10.13",
+        "scikit-learn": "1.5.2",
+        "scipy": "1.13.1"
+      },
+      "trainer_script": "train_anomaly_detector.py"
+    },
+    "backend": {
+      "corpus_hash": "6c6c5baf7aedc4bd00c7326244103fcfc345272d97f16eb87062194a135e1652",
+      "input_shape": 47,
+      "lane_semantics": "grouped backend ranking smoke floor across optimization objectives",
+      "metrics": {
+        "group_count": 36,
+        "mae": 0.12756786601746464,
+        "mean_reciprocal_rank": 0.9444444444444444,
+        "r2": 0.9999830725702796,
+        "rows": 72,
+        "top1_accuracy": 0.8888888888888888
+      },
+      "output_name": "backend_score",
+      "package": "models/backend_recommender_v1.mlpackage",
+      "package_tree_sha256": "a2bf589ef7d4d334896f41eaa885f52eda36d010c59faf1f96cf055cad4c442f",
+      "quality_gate": {
+        "measurements": {
+          "group_count": 36.0,
+          "mae": 0.12756786601746464,
+          "mean_reciprocal_rank": 0.9444444444444444,
+          "r2": 0.9999830725702796,
+          "rows": 72.0,
+          "top1_accuracy": 0.8888888888888888
+        },
+        "passed": true,
+        "reasons": [],
+        "thresholds": {
+          "group_count_min": 6.0,
+          "mae_max": 0.35,
+          "mean_reciprocal_rank_min": 0.94,
+          "r2_min": 0.95,
+          "rows_min": 18.0,
+          "top1_accuracy_min": 0.88
+        }
+      },
+      "sidecar": "models/backend_recommender_v1.mlpackage.json",
+      "sidecar_sha256": "95b8ef0fe3c80c57dfdb5cf32a169c5b0bfda388ee36af7c432d8d0225295dba",
+      "tool_versions": {
+        "coremltools": "9.0",
+        "numpy": "2.0.2",
+        "python": "3.10.13",
+        "scikit-learn": "1.5.2",
+        "scipy": "1.13.1"
+      },
+      "trainer_script": "train_backend_recommender.py"
+    },
+    "duration": {
+      "corpus_hash": "6c6c5baf7aedc4bd00c7326244103fcfc345272d97f16eb87062194a135e1652",
+      "input_shape": 47,
+      "lane_semantics": "realized execution ETA smoke floor after backend and dispatch are fixed",
+      "metrics": {
+        "mae_ms": 0.11027508693529518,
+        "r2": 0.9999993575197599,
+        "rows": 108,
+        "scenario_count": 12
+      },
+      "output_name": "predicted_duration_ms",
+      "package": "models/duration_estimator_v1.mlpackage",
+      "package_tree_sha256": "c27b1722ed24b9ad034511c4ae781efd57398cfa1fe1f900ee1b4beef679083f",
+      "quality_gate": {
+        "measurements": {
+          "mae_ms": 0.11027508693529518,
+          "r2": 0.9999993575197599,
+          "rows": 108.0,
+          "scenario_count": 12.0
+        },
+        "passed": true,
+        "reasons": [],
+        "thresholds": {
+          "mae_ms_max": 45.0,
+          "r2_min": 0.96,
+          "rows_min": 12.0,
+          "scenario_count_min": 4.0
+        }
+      },
+      "sidecar": "models/duration_estimator_v1.mlpackage.json",
+      "sidecar_sha256": "a66c66042f76179a5eb1e99fe8ead1f22c95b7aaa77b7f0e9ef1f3ec41617b80",
+      "tool_versions": {
+        "coremltools": "9.0",
+        "numpy": "2.0.2",
+        "python": "3.10.13",
+        "scikit-learn": "1.5.2",
+        "scipy": "1.13.1"
+      },
+      "trainer_script": "train_duration_estimator.py"
+    },
+    "scheduler": {
+      "corpus_hash": "6c6c5baf7aedc4bd00c7326244103fcfc345272d97f16eb87062194a135e1652",
+      "input_shape": 47,
+      "lane_semantics": "candidate-ranking smoke floor over deterministic dispatch alternatives",
+      "metrics": {
+        "mae_ms": 0.0392639502386937,
+        "r2": 0.9999997670870739,
+        "rows": 72,
+        "scenario_count": 12
+      },
+      "output_name": "predicted_duration_ms",
+      "package": "models/scheduler_v1.mlpackage",
+      "package_tree_sha256": "4df34bf6c54e719c5813c68d3d5a1573298a4b93cb0993110899ef4d9c45b33b",
+      "quality_gate": {
+        "measurements": {
+          "mae_ms": 0.0392639502386937,
+          "r2": 0.9999997670870739,
+          "rows": 72.0,
+          "scenario_count": 12.0
+        },
+        "passed": true,
+        "reasons": [],
+        "thresholds": {
+          "mae_ms_max": 40.0,
+          "r2_min": 0.97,
+          "rows_min": 12.0,
+          "scenario_count_min": 4.0
+        }
+      },
+      "sidecar": "models/scheduler_v1.mlpackage.json",
+      "sidecar_sha256": "0f285909d69b9e105cf0c98c9b65a6fdfa6f7def65f085e24385e6bdac11e727",
+      "tool_versions": {
+        "coremltools": "9.0",
+        "numpy": "2.0.2",
+        "python": "3.10.13",
+        "scikit-learn": "1.5.2",
+        "scipy": "1.13.1"
+      },
+      "trainer_script": "train_scheduler_model.py"
+    }
+  },
+  "requirements_file": {
+    "path": "scripts/neural_engine_requirements.txt",
+    "sha256": "b00a12763e8ccea66f5571993898cd92784c2cd055933fd3fe7a4f3ed5f08426"
+  },
+  "schema": "zkf-neural-fixture-models-v1",
+  "schema_fingerprint": "3e05b7ee88d044937f9d6fb44d741b530bea8d9295e1adf384d85c059cbde14e",
+  "tool_versions": {
+    "coremltools": "9.0",
+    "numpy": "2.0.2",
+    "python": "3.10.13",
+    "scikit-learn": "1.5.2",
+    "scipy": "1.13.1"
+  }
+}

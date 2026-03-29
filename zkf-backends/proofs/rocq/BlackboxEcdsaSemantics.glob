@@ -1,0 +1,105 @@
+DIGEST 4402e22308ae206baacd5b112226594b
+FBlackboxEcdsaSemantics
+R24:29 Stdlib.NArith.NArith <> <> lib
+R47:59 BackendCompat <> <> lib
+R104:141 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> <> lib
+def 156:162 <> usize_1
+R166:172 Core.Core_Primitive <> :::'t_usize' not
+R177:186 BackendCompat <> n_to_usize def
+def 204:212 <> usize_160
+R216:222 Core.Core_Primitive <> :::'t_usize' not
+R227:236 BackendCompat <> n_to_usize def
+def 257:285 <> EcdsaRuntimeRelationSemantics
+R301:330 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaRuntimeRelation def
+binder 290:297 <> relation:1
+R391:396 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R384:386 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R347:374 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_valid_signature_forces_one abbrev
+R376:383 BlackboxEcdsaSemantics <> relation:1 var
+R387:390 Corelib.Init.Datatypes <> true constr
+R444:449 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R437:439 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R397:427 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_invalid_signature_forces_zero abbrev
+R429:436 BlackboxEcdsaSemantics <> relation:1 var
+R440:443 Corelib.Init.Datatypes <> true constr
+R494:499 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R487:489 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R450:477 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_malformed_abi_fails_closed abbrev
+R479:486 BlackboxEcdsaSemantics <> relation:1 var
+R490:493 Corelib.Init.Datatypes <> true constr
+R528:530 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R500:518 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_low_s_is_required abbrev
+R520:527 BlackboxEcdsaSemantics <> relation:1 var
+R531:534 Corelib.Init.Datatypes <> true constr
+def 549:578 <> EcdsaSecp256k1ByteAbiSemantics
+R595:625 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaByteAbiSemantics def
+binder 583:591 <> semantics:2
+R709:714 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R669:671 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R642:658 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_curve abbrev
+R660:668 BlackboxEcdsaSemantics <> semantics:2 var
+R672:708 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256k1 constr
+R775:780 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R742:744 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R715:731 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_field abbrev
+R733:741 BlackboxEcdsaSemantics <> semantics:2 var
+R745:774 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R825:830 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R813:815 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R781:802 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_inputs_len abbrev
+R804:812 BlackboxEcdsaSemantics <> semantics:2 var
+R816:824 BlackboxEcdsaSemantics <> usize_160 def
+R874:879 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R864:866 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R831:853 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_outputs_len abbrev
+R855:863 BlackboxEcdsaSemantics <> semantics:2 var
+R867:873 BlackboxEcdsaSemantics <> usize_1 def
+R916:921 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R909:911 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R880:898 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_result_is_boolean abbrev
+R900:908 BlackboxEcdsaSemantics <> semantics:2 var
+R912:915 Corelib.Init.Datatypes <> true constr
+R1001:1006 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R950:952 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R922:939 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_aux_witness_mode abbrev
+R941:949 BlackboxEcdsaSemantics <> semantics:2 var
+R953:1000 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness constr
+R1007:1035 BlackboxEcdsaSemantics <> EcdsaRuntimeRelationSemantics def
+R1038:1055 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_runtime_relation abbrev
+R1057:1065 BlackboxEcdsaSemantics <> semantics:2 var
+def 1081:1110 <> EcdsaSecp256r1ByteAbiSemantics
+R1127:1157 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> t_CriticalEcdsaByteAbiSemantics def
+binder 1115:1123 <> semantics:3
+R1241:1246 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1201:1203 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1174:1190 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_curve abbrev
+R1192:1200 BlackboxEcdsaSemantics <> semantics:3 var
+R1204:1240 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SupportedCriticalEcdsaCurve_Secp256r1 constr
+R1307:1312 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1274:1276 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1247:1263 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_field abbrev
+R1265:1273 BlackboxEcdsaSemantics <> semantics:3 var
+R1277:1306 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> SpecCriticalEcdsaFieldId_Bn254 constr
+R1357:1362 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1345:1347 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1313:1334 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_inputs_len abbrev
+R1336:1344 BlackboxEcdsaSemantics <> semantics:3 var
+R1348:1356 BlackboxEcdsaSemantics <> usize_160 def
+R1406:1411 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1396:1398 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1363:1385 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_supported_outputs_len abbrev
+R1387:1395 BlackboxEcdsaSemantics <> semantics:3 var
+R1399:1405 BlackboxEcdsaSemantics <> usize_1 def
+R1448:1453 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1441:1443 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1412:1430 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_result_is_boolean abbrev
+R1432:1440 BlackboxEcdsaSemantics <> semantics:3 var
+R1444:1447 Corelib.Init.Datatypes <> true constr
+R1533:1538 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1482:1484 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1454:1471 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_aux_witness_mode abbrev
+R1473:1481 BlackboxEcdsaSemantics <> semantics:3 var
+R1485:1532 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> CriticalEcdsaAuxWitnessMode_ArithmeticAuxWitness constr
+R1539:1567 BlackboxEcdsaSemantics <> EcdsaRuntimeRelationSemantics def
+R1570:1587 ZkfBackendsExtraction.Zkf_backends_Proof_blackbox_ecdsa_spec <> f_runtime_relation abbrev
+R1589:1597 BlackboxEcdsaSemantics <> semantics:3 var

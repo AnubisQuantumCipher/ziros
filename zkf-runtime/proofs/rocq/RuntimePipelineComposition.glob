@@ -1,0 +1,178 @@
+DIGEST fa7b8008f7a5b2fb1fe56294f0a13895
+FRuntimePipelineComposition
+R15:18 Stdlib.Bool.Bool <> <> lib
+R37:48 KernelCompat <> <> lib
+R66:80 KernelGenerated <> <> lib
+R98:112 KernelSemantics <> <> lib
+R130:148 PipelineComposition <> <> lib
+R189:217 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> <> lib
+R261:290 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> <> lib
+def 305:337 <> proof_runtime_field_of_core_field
+R348:356 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 340:344 <> field:1
+R361:381 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> t_ProofRuntimeFieldId ind
+R394:398 RuntimePipelineComposition <> field:1 var
+R409:421 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bn254 constr
+R426:450 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bn254 constr
+R456:473 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Bls12_381_ constr
+R478:507 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Bls12_381_ constr
+R513:527 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFp constr
+R532:558 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFp constr
+R564:578 ZkfCoreExtraction.Zkf_core_Field <> FieldId_PastaFq constr
+R583:609 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_PastaFq constr
+R615:632 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Goldilocks constr
+R637:666 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Goldilocks constr
+R672:687 ZkfCoreExtraction.Zkf_core_Field <> FieldId_BabyBear constr
+R692:719 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_BabyBear constr
+R725:742 ZkfCoreExtraction.Zkf_core_Field <> FieldId_Mersenne31 constr
+R747:776 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> ProofRuntimeFieldId_Mersenne31 constr
+prf 794:843 <> runtime_default_backend_candidates_are_nonempty_ok
+binder 856:860 <> field:3
+R920:922 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R867:913 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_default_backend_candidates_are_nonempty def
+R915:919 RuntimePipelineComposition <> field:3 var
+R923:926 Corelib.Init.Datatypes <> true constr
+prf 1001:1031 <> cli_runtime_path_composition_ok
+binder 1044:1050 <> program:4
+binder 1052:1058 <> witness:5
+R1119:1126 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R1104:1106 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1065:1087 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_check_program def
+R1089:1095 RuntimePipelineComposition <> program:4 var
+R1097:1103 RuntimePipelineComposition <> witness:5 var
+R1107:1115 KernelCompat <> Result_Ok constr
+R1117:1118 Corelib.Init.Datatypes <> tt constr
+R1262:1269 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1255:1257 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1127:1173 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_default_backend_candidates_are_nonempty def
+R1182:1214 RuntimePipelineComposition <> proof_runtime_field_of_core_field def
+R1217:1244 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> SpecTransformProgram_f_field proj
+R1246:1252 RuntimePipelineComposition <> program:4 var
+R1258:1261 Corelib.Init.Datatypes <> true constr
+R1270:1281 KernelSemantics <> ProgramHolds def
+R1290:1316 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> transform_program_to_kernel def
+R1327:1352 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> optimize_ir_program_output def
+R1355:1378 ZkfCoreExtraction.Zkf_core_Proof_transform_spec <> normalize_program_output def
+R1380:1386 RuntimePipelineComposition <> program:4 var
+R1397:1403 RuntimePipelineComposition <> witness:5 var
+R1547:1596 RuntimePipelineComposition <> runtime_default_backend_candidates_are_nonempty_ok thm
+R1547:1596 RuntimePipelineComposition <> runtime_default_backend_candidates_are_nonempty_ok thm
+R1610:1648 PipelineComposition <> cli_runtime_pipeline_to_kernel_sound_ok thm
+R1610:1648 PipelineComposition <> cli_runtime_pipeline_to_kernel_sound_ok thm
+prf 1683:1722 <> hybrid_verify_decision_is_logical_and_ok
+binder 1735:1744 <> primary_ok:6
+binder 1746:1757 <> companion_ok:7
+R1815:1823 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1764:1790 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> hybrid_verify_decision_spec def
+R1792:1801 RuntimePipelineComposition <> primary_ok:6 var
+R1803:1814 RuntimePipelineComposition <> companion_ok:7 var
+R1824:1827 Corelib.Init.Datatypes <> andb def
+R1840:1851 RuntimePipelineComposition <> companion_ok:7 var
+R1829:1838 RuntimePipelineComposition <> primary_ok:6 var
+prf 1924:1996 <> digest_matches_recorded_hash_spec_rejects_missing_or_explicit_mismatch_ok
+binder 2009:2016 <> recorded:8
+binder 2018:2025 <> expected:9
+R2032:2032 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2168:2176 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2055:2064 Corelib.Init.Logic <> ::type_scope:x_'\/'_x not
+R2041:2043 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2033:2040 RuntimePipelineComposition <> recorded:8 var
+R2044:2054 Core.Core_Option <> Option_None constr
+R2065:2071 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R2077:2086 Corelib.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+binder 2072:2076 <> value:10
+R2115:2118 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R2095:2097 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2087:2094 RuntimePipelineComposition <> recorded:8 var
+R2098:2108 Core.Core_Option <> Option_Some constr
+R2110:2114 RuntimePipelineComposition <> value:10 var
+R2160:2162 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2119:2144 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R2146:2150 RuntimePipelineComposition <> value:10 var
+R2152:2159 RuntimePipelineComposition <> expected:9 var
+R2163:2167 Corelib.Init.Datatypes <> false constr
+R2228:2230 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2177:2209 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> digest_matches_recorded_hash_spec def
+R2211:2218 RuntimePipelineComposition <> recorded:8 var
+R2220:2227 RuntimePipelineComposition <> expected:9 var
+R2231:2235 Corelib.Init.Datatypes <> false constr
+prf 2421:2481 <> hardware_probes_clean_spec_rejects_unhealthy_or_mismatched_ok
+binder 2494:2500 <> summary:11
+R2507:2507 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2569:2577 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R2528:2537 Corelib.Init.Logic <> ::type_scope:x_'\/'_x not
+R2520:2522 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2508:2511 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> f_ok abbrev
+R2513:2519 RuntimePipelineComposition <> summary:11 var
+R2523:2527 Corelib.Init.Datatypes <> false constr
+R2561:2563 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2538:2552 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> f_mismatch_free abbrev
+R2554:2560 RuntimePipelineComposition <> summary:11 var
+R2564:2568 Corelib.Init.Datatypes <> false constr
+R2612:2614 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2578:2603 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> hardware_probes_clean_spec def
+R2605:2611 RuntimePipelineComposition <> summary:11 var
+R2615:2619 Corelib.Init.Datatypes <> false constr
+prf 2814:2890 <> hybrid_primary_leg_byte_components_match_spec_rejects_component_divergence_ok
+binder 2903:2916 <> artifact_proof:12
+binder 2918:2928 <> artifact_vk:13
+binder 2930:2942 <> primary_proof:14
+binder 2944:2953 <> primary_vk:15
+R2960:2960 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3091:3099 Corelib.Init.Logic <> ::type_scope:x_'->'_x not
+R3024:3033 Corelib.Init.Logic <> ::type_scope:x_'\/'_x not
+R3016:3018 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R2961:2986 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R2988:3001 RuntimePipelineComposition <> artifact_proof:12 var
+R3003:3015 RuntimePipelineComposition <> primary_proof:14 var
+R3019:3023 Corelib.Init.Datatypes <> false constr
+R3083:3085 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3034:3059 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3061:3071 RuntimePipelineComposition <> artifact_vk:13 var
+R3073:3082 RuntimePipelineComposition <> primary_vk:15 var
+R3086:3090 Corelib.Init.Datatypes <> false constr
+R3203:3205 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3100:3144 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> hybrid_primary_leg_byte_components_match_spec def
+R3152:3165 RuntimePipelineComposition <> artifact_proof:12 var
+R3167:3177 RuntimePipelineComposition <> artifact_vk:13 var
+R3179:3191 RuntimePipelineComposition <> primary_proof:14 var
+R3193:3202 RuntimePipelineComposition <> primary_vk:15 var
+R3206:3210 Corelib.Init.Datatypes <> false constr
+R3308:3352 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> hybrid_primary_leg_byte_components_match_spec def
+R3503:3505 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3373:3376 Corelib.Init.Datatypes <> andb def
+R3453:3478 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3387:3412 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3506:3510 Corelib.Init.Datatypes <> false constr
+R3503:3505 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3373:3376 Corelib.Init.Datatypes <> andb def
+R3453:3478 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3387:3412 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3506:3510 Corelib.Init.Datatypes <> false constr
+R3527:3552 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3589:3593 Corelib.Init.Datatypes <> false constr
+R3527:3552 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3589:3593 Corelib.Init.Datatypes <> false constr
+R3658:3702 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> hybrid_primary_leg_byte_components_match_spec def
+R3853:3855 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3723:3726 Corelib.Init.Datatypes <> andb def
+R3803:3828 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3737:3762 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3856:3860 Corelib.Init.Datatypes <> false constr
+R3853:3855 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R3723:3726 Corelib.Init.Datatypes <> andb def
+R3803:3828 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3737:3762 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3856:3860 Corelib.Init.Datatypes <> false constr
+R3877:3902 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3933:3937 Corelib.Init.Datatypes <> false constr
+R3877:3902 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3933:3937 Corelib.Init.Datatypes <> false constr
+R3985:4010 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+R3985:4010 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> runtime_digest_bytes_match def
+prf 4076:4124 <> replay_manifest_identity_is_deterministic_spec_ok
+binder 4137:4144 <> manifest:16
+R4206:4208 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R4151:4196 ZkfRuntimeExtraction.Zkf_runtime_Proof_runtime_spec <> replay_manifest_identity_is_deterministic_spec def
+R4198:4205 RuntimePipelineComposition <> manifest:16 var
+R4209:4212 Corelib.Init.Datatypes <> true constr

@@ -1,0 +1,51 @@
+DIGEST f5a11f7bfb56a12095c269f7acbf06ea
+FPlonky3Semantics
+R15:27 BackendCompat <> <> lib
+R72:105 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> <> lib
+def 120:141 <> LoweredProgramAccepted
+R154:166 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_SpecProgram def
+binder 144:150 <> program:1
+R180:195 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_LoweredProgram def
+binder 170:176 <> lowered:2
+R231:233 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R210:222 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> lower_program def
+R224:230 Plonky3Semantics <> program:1 var
+R234:242 BackendCompat <> Result_Ok constr
+R244:250 Plonky3Semantics <> lowered:2 var
+def 265:288 <> LoweredProgramWellFormed
+R301:316 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_LoweredProgram def
+binder 291:297 <> lowered:3
+R363:365 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R331:354 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> validate_lowered_program def
+R356:362 Plonky3Semantics <> lowered:3 var
+R366:374 BackendCompat <> Result_Ok constr
+R376:377 Corelib.Init.Datatypes <> tt constr
+def 392:412 <> PublicInputsPreserved
+R425:437 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_SpecProgram def
+binder 415:421 <> program:4
+R451:466 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_LoweredProgram def
+binder 441:447 <> lowered:5
+R529:531 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R481:512 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> public_input_positions_preserved def
+R514:520 Plonky3Semantics <> program:4 var
+R522:528 Plonky3Semantics <> lowered:5 var
+R532:540 BackendCompat <> Result_Ok constr
+R542:545 Corelib.Init.Datatypes <> true constr
+def 560:575 <> TraceRowAccepted
+R590:605 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_LoweredProgram def
+binder 580:586 <> lowered:6
+R621:633 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_SpecWitness def
+binder 611:617 <> witness:7
+R647:666 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> t_SpecPlonky3FieldId ind
+binder 639:643 <> field:8
+R678:682 BackendCompat <> t_Vec def
+R684:688 Core.Core_Primitive <> :::'t_u64' not
+R690:697 BackendCompat <> t_Global constr
+binder 672:674 <> row:9
+R751:753 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R714:728 ZkfBackendsExtraction.Zkf_backends_Proof_plonky3_surface <> build_trace_row def
+R730:736 Plonky3Semantics <> lowered:6 var
+R738:744 Plonky3Semantics <> witness:7 var
+R746:750 Plonky3Semantics <> field:8 var
+R754:762 BackendCompat <> Result_Ok constr
+R764:766 Plonky3Semantics <> row:9 var

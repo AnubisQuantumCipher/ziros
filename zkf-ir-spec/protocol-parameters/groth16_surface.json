@@ -1,0 +1,43 @@
+{
+  "backend": "arkworks-groth16",
+  "curve": "bn254",
+  "development_boundary": "development-only",
+  "field": "bn254",
+  "required_compiled_metadata": [
+    "curve",
+    "scheme",
+    "setup_blob_version",
+    "setup_deterministic",
+    "setup_seed_source",
+    "groth16_setup_provenance",
+    "groth16_setup_security_boundary",
+    "groth16_setup_blob_path"
+  ],
+  "required_proof_metadata": [
+    "curve",
+    "scheme",
+    "prove_deterministic",
+    "prove_seed_source"
+  ],
+  "rust_files": [
+    {
+      "path": "zkf-backends/src/arkworks.rs",
+      "sha256": "5e8548e9b5642a3b596acbb98c2fa7d27b19be910c377edc776f4536114fc1ad"
+    },
+    {
+      "path": "zkf-backends/src/lib_non_hax.rs",
+      "sha256": "14745acef99b37b0bd7d0de6a406e148770ec8cbca1aa4cb1dd9b160eafac857"
+    }
+  ],
+  "scheme": "groth16",
+  "security_boundary": "trusted-imported",
+  "setup_blob_version": 1,
+  "setup_provenance": "trusted-imported-blob",
+  "surface": "groth16",
+  "verifier_checks": [
+    "compiled_backend_matches",
+    "artifact_backend_matches",
+    "program_digest_matches",
+    "verification_key_matches_compiled_setup_blob"
+  ]
+}

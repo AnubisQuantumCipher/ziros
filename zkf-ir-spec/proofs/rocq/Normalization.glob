@@ -1,0 +1,11 @@
+DIGEST 50b1d428962fb8388238dc92be9d1e14
+FNormalization
+R27:32 Stdlib.ZArith.ZArith <> <> lib
+R34:36 Stdlib.micromega.Lia <> <> lib
+prf 69:90 <> normalization_add_zero
+R105:105 Corelib.Numbers.BinNums <> Z ind
+binder 101:101 <> x:1
+R113:115 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R109:111 Stdlib.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R112:112 Normalization <> x:1 var
+R116:116 Normalization <> x:1 var

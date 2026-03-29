@@ -1,0 +1,64 @@
+[package]
+name = "zkf-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[features]
+default = [
+    "acvm-solver",
+    "acvm-solver-beta9",
+    "acvm-solver-beta19",
+    "native-nova",
+    "zkf-backends/native-blackbox-solvers",
+]
+all-native-backends = ["native-sp1", "native-risc-zero"]
+acvm-solver = ["zkf-core/acvm-solver"]
+acvm-solver-beta9 = ["zkf-core/acvm-solver-beta9"]
+acvm-solver-beta19 = ["zkf-core/acvm-solver-beta19"]
+metal-gpu = ["zkf-backends/metal-gpu", "zkf-runtime/metal-gpu"]
+native-nova = ["zkf-backends/native-nova", "zkf-backends/nova-compression", "zkf-core/native-nova"]
+native-sp1 = ["zkf-backends/native-sp1", "zkf-core/native-sp1"]
+native-risc-zero = ["zkf-backends/native-risc-zero", "zkf-core/native-risc-zero"]
+neural-engine = ["zkf-runtime/neural-engine"]
+distributed = []
+
+[dependencies]
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-keymanager = { path = "../zkf-keymanager" }
+zkf-storage = { path = "../zkf-storage" }
+zkf-runtime = { path = "../zkf-runtime" }
+zkf-distributed = { path = "../zkf-distributed" }
+ed25519-dalek.workspace = true
+base64.workspace = true
+clap.workspace = true
+libc.workspace = true
+getrandom.workspace = true
+getrandom02.workspace = true
+libcrux-ml-dsa.workspace = true
+num-bigint.workspace = true
+num-traits.workspace = true
+owo-colors.workspace = true
+serde.workspace = true
+serde_cbor = "0.11"
+serde_json.workspace = true
+sha2.workspace = true
+zkf-backends = { path = "../zkf-backends", default-features = false }
+zkf-conformance = { path = "../zkf-conformance" }
+zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
+zkf-examples = { path = "../zkf-examples" }
+zkf-frontends = { path = "../zkf-frontends" }
+zkf-gadgets = { path = "../zkf-gadgets" }
+zkf-lib = { path = "../zkf-lib" }
+zkf-registry = { path = "../zkf-registry" }
+zkf-ui = { path = "../zkf-ui" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+ark-bn254.workspace = true
+ark-ff.workspace = true
+objc2 = "0.6"
+objc2-metal = { version = "0.3", features = ["MTLBuffer", "MTLResource", "MTLTypes"] }
+
+[dev-dependencies]
+tempfile = "3"

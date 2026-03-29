@@ -1,0 +1,558 @@
+{
+  "schema": "zkf-metal-gpu-proof-manifest-v3",
+  "family": "hash",
+  "claim": "end-to-end mechanized GPU lane from Rust inputs to GPU outputs, assuming the pinned Apple Metal stack executes the attested metallib and pipeline state correctly",
+  "trusted_tcb": [
+    "Lean",
+    "Verus",
+    "Apple Metal compiler",
+    "Apple Metal driver/runtime",
+    "Apple GPU hardware"
+  ],
+  "programs": [
+    {
+      "theorem_id": "gpu.hash_differential_bounded",
+      "program_id": "batch_sha256",
+      "family": "hash",
+      "kernel": "batch_sha256",
+      "variant": "sha256_batch",
+      "field": "bytes",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "message_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "message_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "batch_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "input_len"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "output_bytes"
+                },
+                {
+                  "nat_const": 32
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "batch_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "message_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "input_len",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "input_bytes",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "output_bytes",
+          "min_value": 32,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 32
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "inputs",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "message_index"
+              },
+              {
+                "symbol": "input_len"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "input_len"
+          },
+          "bound": {
+            "symbol": "input_bytes"
+          },
+          "element_bytes": 1
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "digests",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "message_index"
+              },
+              {
+                "nat_const": 32
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 32
+          },
+          "bound": {
+            "symbol": "output_bytes"
+          },
+          "element_bytes": 1
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "message_schedule",
+          "operator": "sha256_message_schedule",
+          "arithmetic_domain": "bytes",
+          "reads": [
+            "inputs"
+          ],
+          "writes": [
+            "digests"
+          ]
+        },
+        {
+          "name": "compression_rounds",
+          "operator": "sha256_compression_round",
+          "arithmetic_domain": "bytes",
+          "reads": [
+            "inputs"
+          ],
+          "writes": [
+            "digests"
+          ]
+        },
+        {
+          "name": "digest_writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "digests"
+          ],
+          "writes": [
+            "digests"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/hash/mod.rs": "1ad36bf8a24a9620b5bd3e170d4d3c97a4ac3f075b12101c23e66842d8d09971",
+          "zkf-metal/src/shaders/sha256.metal": "2b76ca48b54686c0705c4f779e0fd207a359b1b7172f95607466390c721ebc3d"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/sha256.metal",
+          "zkf-metal/src/hash/mod.rs"
+        ],
+        "entrypoints": [
+          "batch_sha256"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "hash_library",
+            "entrypoint": "batch_sha256",
+            "metallib_sha256": "45d8123d3fe035e09b1631a36750aebcd9f84f1f5a22ac3d710f625fc759ec26",
+            "reflection_sha256": "b0003fc166e44e21b6c17da07d42f3b686c5faa8815a3fd3dfbdfb346addc15d",
+            "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
+            "pipeline_descriptor_sha256": "d5f19c88282eed469cddb5421105b334c1cecbc8155533a750051b4423596d73",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "inputs",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "outputs",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_inputs",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "input_len",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must exactly match the shipped Metal hash entrypoint",
+        "workgroup_policy": "one thread per message; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_sha256",
+            "source_path": "zkf-metal/src/shaders/sha256.metal",
+            "library": "hash_library",
+            "binding_kind": "sha256_batch"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "batch_sha256",
+            "source_path": "zkf-metal/src/shaders/sha256.metal",
+            "library": "hash_library",
+            "binding_kind": "sha256_batch"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "batch_sha256",
+            "source_path": "zkf-metal/src/shaders/sha256.metal",
+            "library": "hash_library",
+            "binding_kind": "sha256_batch"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.hash_differential_bounded",
+      "program_id": "batch_keccak256",
+      "family": "hash",
+      "kernel": "batch_keccak256",
+      "variant": "keccak256_batch",
+      "field": "bytes",
+      "curve": null,
+      "route": null,
+      "index_map": {
+        "global_index": {
+          "symbol": "message_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "message_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "batch_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "input_len"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "output_bytes"
+                },
+                {
+                  "nat_const": 32
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "batch_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "message_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "input_len",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "input_bytes",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "output_bytes",
+          "min_value": 32,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": 32
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "inputs",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "message_index"
+              },
+              {
+                "symbol": "input_len"
+              }
+            ]
+          },
+          "len": {
+            "symbol": "input_len"
+          },
+          "bound": {
+            "symbol": "input_bytes"
+          },
+          "element_bytes": 1
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "digests",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "message_index"
+              },
+              {
+                "nat_const": 32
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 32
+          },
+          "bound": {
+            "symbol": "output_bytes"
+          },
+          "element_bytes": 1
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "theta_phase",
+          "operator": "keccak_theta",
+          "arithmetic_domain": "bytes",
+          "reads": [
+            "inputs"
+          ],
+          "writes": [
+            "digests"
+          ]
+        },
+        {
+          "name": "rho_pi_phase",
+          "operator": "keccak_rho_pi",
+          "arithmetic_domain": "bytes",
+          "reads": [
+            "digests"
+          ],
+          "writes": [
+            "digests"
+          ]
+        },
+        {
+          "name": "chi_iota_phase",
+          "operator": "keccak_chi_iota",
+          "arithmetic_domain": "bytes",
+          "reads": [
+            "digests"
+          ],
+          "writes": [
+            "digests"
+          ]
+        },
+        {
+          "name": "digest_writeback",
+          "operator": "layout_writeback",
+          "arithmetic_domain": "layout",
+          "reads": [
+            "digests"
+          ],
+          "writes": [
+            "digests"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/hash/mod.rs": "1ad36bf8a24a9620b5bd3e170d4d3c97a4ac3f075b12101c23e66842d8d09971",
+          "zkf-metal/src/shaders/keccak256.metal": "f80b547a36e34fc05fd309ab67612a0bb3c4112044c8ea1b64ac2e08b008672e"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/keccak256.metal",
+          "zkf-metal/src/hash/mod.rs"
+        ],
+        "entrypoints": [
+          "batch_keccak256"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "hash_library",
+            "entrypoint": "batch_keccak256",
+            "metallib_sha256": "45d8123d3fe035e09b1631a36750aebcd9f84f1f5a22ac3d710f625fc759ec26",
+            "reflection_sha256": "b0003fc166e44e21b6c17da07d42f3b686c5faa8815a3fd3dfbdfb346addc15d",
+            "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
+            "pipeline_descriptor_sha256": "623c7b272980a5443314962b13aa924d0550caf51d8170e21f63f743500980f1",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "inputs",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "outputs",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_inputs",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "input_len",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must exactly match the shipped Metal hash entrypoint",
+        "workgroup_policy": "one thread per message; host threads-per-group capped at 256",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "batch_keccak256",
+            "source_path": "zkf-metal/src/shaders/keccak256.metal",
+            "library": "hash_library",
+            "binding_kind": "keccak256_batch"
+          },
+          {
+            "step_index": 1,
+            "entrypoint": "batch_keccak256",
+            "source_path": "zkf-metal/src/shaders/keccak256.metal",
+            "library": "hash_library",
+            "binding_kind": "keccak256_batch"
+          },
+          {
+            "step_index": 2,
+            "entrypoint": "batch_keccak256",
+            "source_path": "zkf-metal/src/shaders/keccak256.metal",
+            "library": "hash_library",
+            "binding_kind": "keccak256_batch"
+          },
+          {
+            "step_index": 3,
+            "entrypoint": "batch_keccak256",
+            "source_path": "zkf-metal/src/shaders/keccak256.metal",
+            "library": "hash_library",
+            "binding_kind": "keccak256_batch"
+          }
+        ]
+      },
+      "certified_claim": true
+    }
+  ]
+}

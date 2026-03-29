@@ -1,0 +1,92 @@
+DIGEST f21633ff1c353b0e407cd07d29e1ee23
+FCcsSemantics
+R15:18 Stdlib.Lists.List <> <> lib
+R36:41 Stdlib.NArith.NArith <> <> lib
+R51:68 Stdlib.Lists.List ListNotations <> mod
+R87:98 KernelCompat <> <> lib
+R139:152 ZkfCoreExtraction.Zkf_core_Field <> <> lib
+R193:215 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> <> lib
+def 230:248 <> ConstraintSupported
+R266:284 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> t_SpecCcsConstraint ind
+binder 253:262 <> constraint:1
+R305:314 CcsSemantics <> constraint:1 var
+R325:348 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_Lookup constr
+R359:363 Corelib.Init.Logic <> False ind
+R369:394 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox constr
+R421:453 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraint_BlackBox_f_kind proj
+R478:523 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBlackBoxKind_RecursiveAggregationMarker constr
+R528:531 Corelib.Init.Logic <> True ind
+R541:565 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsBlackBoxKind_Other constr
+R570:574 Corelib.Init.Logic <> False ind
+R601:604 Corelib.Init.Logic <> True ind
+def 625:640 <> ProgramSupported
+R655:680 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsConstraintProgram' not
+binder 645:651 <> program:3
+R695:700 Corelib.Lists.ListDef <> Forall ind
+R723:760 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsConstraintProgram_f_constraints proj
+R762:768 CcsSemantics <> program:3 var
+R702:720 CcsSemantics <> ConstraintSupported def
+def 784:802 <> canonical_multisets
+R815:823 ZkfCoreExtraction.Zkf_core_Field <> t_FieldId ind
+binder 807:811 <> field:4
+R828:832 KernelCompat <> t_Vec def
+R834:855 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset_record rec
+R857:864 KernelCompat <> t_Global constr
+R871:872 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R973:977 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R1070:1073 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R873:887 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset def
+R895:895 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R910:911 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R926:926 Stdlib.Lists.List ListNotations ::list_scope:'['_x_';'_x_';'_'..'_';'_x_']' not
+R896:905 KernelCompat <> n_to_usize def
+R912:921 KernelCompat <> n_to_usize def
+R935:954 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bigint_to_spec_value def
+R957:961 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> f_one def
+R963:964 Corelib.Init.Datatypes <> tt constr
+R967:971 CcsSemantics <> field:4 var
+R978:992 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMultiset def
+R1000:1000 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R1015:1015 Stdlib.Lists.List ListNotations ::list_scope:'['_x_']' not
+R1001:1010 KernelCompat <> n_to_usize def
+R1024:1043 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> bigint_to_spec_value def
+R1046:1050 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> f_neg def
+R1053:1057 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> f_one def
+R1059:1060 Corelib.Init.Datatypes <> tt constr
+R1064:1068 CcsSemantics <> field:4 var
+def 1088:1115 <> MatrixDimensionsMatchProgram
+R1130:1145 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsProgram' not
+binder 1120:1126 <> program:5
+R1160:1179 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_record rec
+binder 1151:1156 <> matrix:6
+R1264:1269 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1221:1223 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1194:1213 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_f_rows proj
+R1215:1220 CcsSemantics <> matrix:6 var
+R1224:1255 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_num_constraints proj
+R1257:1263 CcsSemantics <> program:5 var
+R1297:1299 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1270:1289 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsMatrix_f_cols proj
+R1291:1296 CcsSemantics <> matrix:6 var
+R1300:1329 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_num_variables proj
+R1331:1337 CcsSemantics <> program:5 var
+def 1352:1368 <> CanonicalCcsShape
+R1383:1398 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> :::'t_SpecCcsProgram' not
+binder 1373:1379 <> program:7
+R1459:1464 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1455:1457 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1413:1418 Corelib.Init.Datatypes <> length def
+R1421:1445 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_matrices proj
+R1447:1453 CcsSemantics <> program:7 var
+R1546:1551 Corelib.Init.Logic <> ::type_scope:x_'/\'_x not
+R1465:1470 Corelib.Lists.ListDef <> Forall ind
+R1512:1536 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_matrices proj
+R1538:1544 CcsSemantics <> program:7 var
+R1473:1500 CcsSemantics <> MatrixDimensionsMatchProgram def
+R1502:1508 CcsSemantics <> program:7 var
+R1586:1592 Corelib.Init.Logic <> ::type_scope:x_'='_x not
+R1552:1577 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_multisets proj
+R1579:1585 CcsSemantics <> program:7 var
+R1593:1611 CcsSemantics <> canonical_multisets def
+R1614:1635 ZkfCoreExtraction.Zkf_core_Proof_ccs_spec <> SpecCcsProgram_f_field proj
+R1637:1643 CcsSemantics <> program:7 var
