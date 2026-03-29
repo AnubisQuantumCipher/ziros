@@ -1427,12 +1427,12 @@ mod tests {
         let signed_credential = IssuerSignedCredentialV1 {
             claims,
             issuer_public_keys: zkf_core::PublicKeyBundle {
-                scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa44,
+                scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa87,
                 ed25519: ed25519_signing_key.verifying_key().to_bytes().to_vec(),
                 ml_dsa87: keypair.verification_key.as_slice().to_vec(),
             },
             issuer_signature_bundle: zkf_core::SignatureBundle {
-                scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa44,
+                scheme: zkf_core::SignatureScheme::HybridEd25519MlDsa87,
                 ed25519: ed25519_signing_key.sign(&message).to_bytes().to_vec(),
                 ml_dsa87: ml_dsa_signature.as_slice().to_vec(),
             },
