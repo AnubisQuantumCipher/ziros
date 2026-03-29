@@ -351,21 +351,86 @@ The repo ships a Neural Engine control-plane story through runtime and documenta
 - model-operations docs in [`docs/NEURAL_ENGINE_OPERATIONS.md`](docs/NEURAL_ENGINE_OPERATIONS.md)
 - explicit canonical-truth language that model output is advisory, not proof-validity truth
 
-### Storage And Artifact Lifecycle
+### Post-Quantum Cryptographic Surfaces
 
-The current tree clearly contains archive-aware artifact metadata and documentation for a storage lifecycle story, but it does not expose a standalone storage command family in the current `zkf-cli` command tree.
+ZirOS ships NIST-standardized post-quantum cryptography across the proving, identity, and communication layers.
 
-What is source-backed today:
+| Surface | Algorithm | Standard | Security Level | Status |
+| --- | --- | --- | --- | --- |
+| STARK proofs (Plonky3) | FRI + hash-based Merkle commitment | Information-theoretic | Post-quantum (no elliptic curves) | `ready` |
+| Swarm peer identity | ML-DSA-87 (hybrid with Ed25519) | NIST FIPS 204 | Level 5 (AES-256 equivalent) | `ready` |
+| Credential issuance | ML-DSA-87 signature bundles | NIST FIPS 204 | Level 5 | `ready` |
+| Proof-origin attestation | ML-DSA-87 on proof artifacts | NIST FIPS 204 | Level 5 | `ready` |
+| Epoch key exchange | ML-KEM-1024 (hybrid with X25519) | NIST FIPS 203 | Level 5 | `ready` |
+| Gossip encryption | ChaCha20-Poly1305 (256-bit symmetric) | — | Post-quantum (symmetric) | `ready` |
+| Key derivation | HKDF-SHA384 | CNSA 2.0 compliant | Post-quantum | `ready` |
+| Credential KDF | Argon2id + SHA-256 | — | Post-quantum (symmetric) | `ready` |
 
-- proof artifacts carry `archive_metadata` fields in `zkf-core`
-- runtime and backend paths propagate archive-aware metadata
-- docs and current README text describe an SSD Guardian / archival story
-- unified-memory management explicitly models spillable buffers
+CNSA 2.0 alignment: ML-DSA-87 for digital signatures, ML-KEM-1024 for key establishment, SHA-384 for key derivation, and ChaCha20-Poly1305 (AES-256 equivalent) for authenticated encryption. The Plonky3 STARK backend provides post-quantum proofs without trusted setup; Groth16, Halo2, and Nova backends remain classical (elliptic-curve-based) and are explicitly labeled as such.
 
-What this README will not overclaim:
+The hybrid identity scheme (`HybridEd25519MlDsa87`) requires both Ed25519 and ML-DSA-87 signatures to verify. If either algorithm is broken, the other provides continued security. The hybrid key exchange combines X25519 and ML-KEM-1024 shared secrets through HKDF-SHA384; compromising one algorithm does not compromise the derived key.
 
-- a checked-in storage CLI subcommand surface
-- exact disk-footprint or benchmark numbers that are not independently anchored outside prior README prose
+Implementation surface: `libcrux-ml-dsa` v0.0.8 for ML-DSA-87, `libcrux-ml-kem` v0.0.8 for ML-KEM-1024, `chacha20poly1305` for AEAD, `hkdf` with SHA-384 for key derivation. Private keys are stored in iCloud Keychain on macOS (Secure Enclave protected, synced with Advanced Data Protection) or in file-based storage with restricted permissions on other platforms.
+
+Post-quantum backend classification:
+
+| Backend | Post-Quantum | Basis |
+| --- | --- | --- |
+| `plonky3` | Yes | FRI polynomial commitment is hash-based; no number-theoretic assumptions |
+| `arkworks-groth16` | No | BN254 elliptic curve pairings; vulnerable to Shor's algorithm |
+| `halo2` | No | Pasta curve IPA; vulnerable to Shor's algorithm |
+| `halo2-bls12-381` | No | BLS12-381 KZG; vulnerable to Shor's algorithm |
+| `nova` / `hypernova` | No | Pallas/Vesta curves; vulnerable to Shor's algorithm |
+| STARK-to-SNARK wrapping | Outer: No | Inner STARK is post-quantum; outer Groth16 wrapper is classical |
+
+For end-to-end post-quantum proof generation, use `--backend plonky3` without wrapping.
+
+### iCloud-Native Storage Architecture
+
+ZirOS implements iCloud Drive as the persistent storage layer and iCloud Keychain as the key management layer. The local SSD operates as a transparent cache. Artifacts are written directly to iCloud on creation; macOS handles upload, sync, cross-device availability, and automatic local eviction under storage pressure.
+
+Persistent state directory: `~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/`
+
+| Directory | Contents | Access pattern |
+| --- | --- | --- |
+| `proofs/{app}/{timestamp}/` | Proof artifacts organized by application and proving timestamp | Write on prove, read on verify/inspect |
+| `traces/{app}/{timestamp}/` | UMPG execution telemetry, GPU attribution, security verdicts | Write on prove |
+| `verifiers/{app}/{timestamp}/` | Solidity verification contracts | Write on export |
+| `reports/{app}/{timestamp}/` | Mission assurance and proving reports | Write on export |
+| `audits/{app}/{timestamp}/` | Circuit security audit results | Write on audit |
+| `telemetry/` | Neural Engine training records | Write per job, read on retrain |
+| `swarm/` | Threat patterns, detection rules, reputation logs, entrypoint observations, attestation chains | Read/write per job |
+
+Key management: persistent private keys (Ed25519, ML-DSA-87, proving keys, credential keys) are stored in iCloud Keychain with `kSecAttrSynchronizable = true` and Secure Enclave protection on each device. Keys sync across Apple devices signed into the same Apple ID with Advanced Data Protection enabled. Ephemeral keys (X25519, ML-KEM-1024 epoch keys) remain in-process memory only and are never persisted.
+
+Witness handling: witnesses contain every private input to a circuit in plaintext. They are generated in the local cache (`~/.zkf/cache/`), used for proving, and deleted immediately after proof verification. Witnesses are never written to iCloud. This is the enforcement mechanism that preserves the zero-knowledge property on the storage layer.
+
+Local cache: `~/.zkf/cache/` holds ephemeral computation artifacts (witnesses during proving, build intermediates, active proving keys pulled from iCloud for a session). The cache is expendable; its contents can be rebuilt from iCloud or regenerated from source.
+
+Device-adaptive profiles:
+
+| Profile | SSD capacity | Warning threshold | Critical threshold | Monitor interval |
+| --- | --- | --- | --- | --- |
+| Constrained | up to 300 GB | 30 GB | 15 GB | 30 minutes |
+| Standard | 301 to 600 GB | 50 GB | 25 GB | 1 hour |
+| Comfortable | 601 GB to 1.2 TB | 100 GB | 50 GB | 1 hour |
+| Generous | above 1.2 TB | 200 GB | 100 GB | daily |
+
+Cross-device operation: install ZirOS on any Mac, sign in with the same Apple ID, and all keys, proofs, telemetry, models, and swarm state are immediately available. No manual file transfer, no USB drives, no configuration beyond `ziros doctor`.
+
+Storage and key commands:
+
+```bash
+ziros storage status --json    # iCloud sync state, local cache usage, key inventory
+ziros storage evict            # Release locally cached iCloud files to free SSD space
+ziros storage warm             # Pre-fetch frequently used files into local cache
+ziros storage install          # Install the hourly macOS launchd cache-management agent
+ziros keys list --json         # Enumerate all keys across Keychain and file backends
+ziros keys audit --json        # Report key age, rotation status, sync health, permissions
+ziros keys rotate <id>         # Generate new key material and retire the previous key
+```
+
+On non-macOS platforms, the iCloud layer falls back to local file storage at `~/.zkf/` with the same directory structure and access patterns.
 
 ### Checked Build And Test Truth
 
