@@ -2961,7 +2961,7 @@ fn wrapped_artifact_cache_key(
     let mut hasher = Sha256::new();
     let wrap_mode = effective_wrap_mode(policy);
     let resources = SystemResources::detect();
-    hasher.update(b"zkf-stark-to-groth16-artifact-cache-v2:");
+    hasher.update(b"zkf-stark-to-groth16-artifact-cache-v3:");
     hasher.update(wrap_mode.as_bytes());
     hasher.update(b":");
     hasher.update(plan.strategy.as_str().as_bytes());
@@ -2969,13 +2969,6 @@ fn wrapped_artifact_cache_key(
     hasher.update(plan.estimated_constraints.to_string().as_bytes());
     hasher.update(b":");
     hasher.update(plan.estimated_memory_bytes.to_string().as_bytes());
-    hasher.update(b":");
-    hasher.update(
-        plan.memory_budget_bytes
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "unknown".to_string())
-            .as_bytes(),
-    );
     hasher.update(b":");
     hasher.update(detected_hardware_profile_label(&resources).as_bytes());
     hasher.update(b":");
@@ -4054,6 +4047,83 @@ mod tests {
         }
     }
 
+    fn test_wrap_plan(
+        strategy: WrapStrategy,
+        estimated_constraints: u64,
+        estimated_memory_bytes: u64,
+        memory_budget_bytes: Option<u64>,
+    ) -> WrapPlan {
+        WrapPlan {
+            strategy,
+            estimated_constraints,
+            estimated_memory_bytes,
+            memory_budget_bytes,
+            low_memory_mode: false,
+            reason: "test".to_string(),
+        }
+    }
+
+    fn healthy_cached_wrapped_artifact() -> ProofArtifact {
+        let mut metadata = BTreeMap::new();
+        metadata.insert("status".to_string(), "wrapped-v2".to_string());
+        metadata.insert("trust_model".to_string(), "cryptographic".to_string());
+        metadata.insert("wrapper_strategy".to_string(), "direct-fri-v2".to_string());
+        metadata.insert(
+            "wrapper_cache_hit".to_string(),
+            "false".to_string(),
+        );
+        metadata.insert("wrapper_cache_source".to_string(), "miss".to_string());
+        metadata.insert(
+            "runtime_detected_hardware_profile".to_string(),
+            "apple-silicon-m4-max-48gb".to_string(),
+        );
+        metadata.insert(
+            "runtime_hardware_profile".to_string(),
+            "apple-silicon-m4-max-48gb".to_string(),
+        );
+        metadata.insert(
+            "metal_dispatch_circuit_open".to_string(),
+            "false".to_string(),
+        );
+        metadata.insert(
+            "target_groth16_metal_dispatch_circuit_open".to_string(),
+            "false".to_string(),
+        );
+        metadata.insert("metal_no_cpu_fallback".to_string(), "true".to_string());
+        metadata.insert(
+            "qap_witness_map_fallback_state".to_string(),
+            "none".to_string(),
+        );
+        metadata.insert(
+            "qap_witness_map_engine".to_string(),
+            "metal-bn254-ntt+streamed-reduction".to_string(),
+        );
+        metadata.insert("metal_dispatch_last_failure".to_string(), "".to_string());
+        metadata.insert(
+            "target_groth16_metal_dispatch_last_failure".to_string(),
+            "".to_string(),
+        );
+        metadata.insert(
+            "groth16_msm_engine".to_string(),
+            "metal-bn254-msm".to_string(),
+        );
+        metadata.insert(
+            "groth16_msm_reason".to_string(),
+            "bn254-groth16-metal-msm".to_string(),
+        );
+        metadata.insert("groth16_msm_fallback_state".to_string(), "none".to_string());
+        metadata.insert("gpu_stage_busy_ratio".to_string(), "0.250".to_string());
+
+        ProofArtifact::new(
+            BackendKind::ArkworksGroth16,
+            "test-digest-abc123",
+            vec![9, 8, 7],
+            vec![6, 5, 4],
+            vec![],
+        )
+        .with_metadata(metadata)
+    }
+
     fn wrapped_fixture() -> &'static ProofArtifact {
         static FIXTURE: OnceLock<ProofArtifact> = OnceLock::new();
         FIXTURE.get_or_init(|| {
@@ -4108,6 +4178,122 @@ mod tests {
             .expect("attested plan");
             assert_eq!(attested_plan.strategy, WrapStrategy::NovaCompressedV3);
         }
+    }
+
+    #[test]
+    fn wrapped_artifact_cache_key_ignores_memory_budget_bytes() {
+        let source_proof = make_plonky3_proof_artifact(vec![1, 2, 3]);
+        let source_compiled = make_plonky3_compiled();
+        let policy = WrapperExecutionPolicy {
+            honor_env_overrides: false,
+            allow_large_direct_materialization: false,
+            force_mode: None,
+        };
+        let cold_plan =
+            test_wrap_plan(WrapStrategy::DirectFriV2, 3_000_000, 2_688_000_000, Some(36 << 30));
+        let warm_plan =
+            test_wrap_plan(WrapStrategy::DirectFriV2, 3_000_000, 2_688_000_000, Some(31 << 30));
+
+        let cold_key =
+            wrapped_artifact_cache_key(&source_proof, &source_compiled, &cold_plan, policy)
+                .expect("cold key");
+        let warm_key =
+            wrapped_artifact_cache_key(&source_proof, &source_compiled, &warm_plan, policy)
+                .expect("warm key");
+
+        assert_eq!(cold_key, warm_key);
+    }
+
+    #[test]
+    fn wrapped_artifact_cache_key_changes_for_proof_or_strategy_drift() {
+        let source_compiled = make_plonky3_compiled();
+        let policy = WrapperExecutionPolicy {
+            honor_env_overrides: false,
+            allow_large_direct_materialization: false,
+            force_mode: None,
+        };
+        let direct_plan =
+            test_wrap_plan(WrapStrategy::DirectFriV2, 3_000_000, 2_688_000_000, Some(36 << 30));
+        let nova_plan = test_wrap_plan(
+            WrapStrategy::NovaCompressedV3,
+            1_400,
+            256 * 1024 * 1024,
+            Some(36 << 30),
+        );
+        let source_proof_a = make_plonky3_proof_artifact(vec![1, 2, 3]);
+        let source_proof_b = make_plonky3_proof_artifact(vec![1, 2, 4]);
+
+        let direct_key_a =
+            wrapped_artifact_cache_key(&source_proof_a, &source_compiled, &direct_plan, policy)
+                .expect("direct key a");
+        let direct_key_b =
+            wrapped_artifact_cache_key(&source_proof_b, &source_compiled, &direct_plan, policy)
+                .expect("direct key b");
+        let nova_key =
+            wrapped_artifact_cache_key(&source_proof_a, &source_compiled, &nova_plan, policy)
+                .expect("nova key");
+
+        assert_ne!(direct_key_a, direct_key_b);
+        assert_ne!(direct_key_a, nova_key);
+    }
+
+    #[test]
+    fn wrapped_artifact_disk_cache_reloads_across_budget_drift() {
+        let _guard = wrap_mode_lock().lock().unwrap();
+        let cache_root = std::env::temp_dir().join(format!(
+            "zkf-artifact-cache-{}-{}",
+            std::process::id(),
+            "budget-drift"
+        ));
+        let cache_root_string = cache_root.to_string_lossy().into_owned();
+        let _env = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
+        let _ = std::fs::remove_dir_all(&cache_root);
+        WRAPPED_ARTIFACT_CACHE.lock().unwrap().clear();
+
+        let source_proof = make_plonky3_proof_artifact(vec![1, 2, 3]);
+        let source_compiled = make_plonky3_compiled();
+        let policy = WrapperExecutionPolicy {
+            honor_env_overrides: false,
+            allow_large_direct_materialization: false,
+            force_mode: None,
+        };
+        let cold_plan =
+            test_wrap_plan(WrapStrategy::DirectFriV2, 3_000_000, 2_688_000_000, Some(36 << 30));
+        let warm_plan =
+            test_wrap_plan(WrapStrategy::DirectFriV2, 3_000_000, 2_688_000_000, Some(31 << 30));
+
+        let cold_key =
+            wrapped_artifact_cache_key(&source_proof, &source_compiled, &cold_plan, policy)
+                .expect("cold key");
+        let warm_key =
+            wrapped_artifact_cache_key(&source_proof, &source_compiled, &warm_plan, policy)
+                .expect("warm key");
+        assert_eq!(cold_key, warm_key);
+
+        let artifact = healthy_cached_wrapped_artifact();
+        assert!(wrapped_artifact_is_certified_strict_healthy(&artifact.metadata));
+        persist_wrapped_artifact(&cold_key, &artifact).expect("persist artifact");
+        assert!(wrapped_artifact_disk_cache_path(&cold_key).is_file());
+
+        let cached = load_wrapped_artifact_from_disk(&warm_key)
+            .expect("load artifact")
+            .expect("cached artifact");
+        let marked = mark_wrapped_artifact_cache_hit(cached, "disk");
+
+        assert_eq!(
+            marked
+                .metadata
+                .get("wrapper_cache_hit")
+                .map(String::as_str),
+            Some("true")
+        );
+        assert_eq!(
+            marked
+                .metadata
+                .get("wrapper_cache_source")
+                .map(String::as_str),
+            Some("disk")
+        );
     }
 
     #[test]

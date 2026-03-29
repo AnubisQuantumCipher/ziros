@@ -7132,6 +7132,7 @@ mod tests {
                         hardware_profile: "apple-silicon-m4-max-48gb".to_string(),
                         chip_family: "m4".to_string(),
                         form_factor: "laptop".to_string(),
+                        program_digest: Some("digest".to_string()),
                         gpu_core_count: Some(40),
                         ane_tops: Some(38.0),
                         metal_available: true,
