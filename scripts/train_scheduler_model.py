@@ -8,21 +8,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 
 from zkf_control_plane_common import (
     DEFAULT_MODEL_DIR,
-    OBJECTIVES,
+    advisory_duration_label,
     build_quality_gate,
     build_feature_vector,
+    chosen_candidate,
     control_plane_feature_labels,
     control_plane_schema_name,
     chosen_backend,
-    chosen_candidate,
     corpus_hash,
     convert_sklearn_regressor,
-    duration_ms,
+    decision_candidate_rankings,
+    decision_objective,
     load_telemetry_records,
     record_role,
     safe_r2,
@@ -47,8 +48,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--feature-schema",
-        choices=["v1", "v2"],
-        default="v1",
+        choices=["v1", "v2", "v3"],
+        default="v3",
         help="Control-plane feature schema to train against",
     )
     return parser.parse_args()
@@ -79,30 +80,45 @@ def main() -> int:
     rows = []
     scenario_ids = set()
     for record in records:
-        if duration_ms(record) <= 0.0:
+        ranking_rows = decision_candidate_rankings(record)
+        if ranking_rows:
+            objective = decision_objective(record)
+            scenario_ids.add(scenario_id(record))
+            for candidate, predicted_duration_ms in ranking_rows:
+                rows.append(
+                    (
+                        build_feature_vector(
+                            record,
+                            candidate=candidate,
+                            backend=chosen_backend(record),
+                            objective=objective,
+                            feature_schema=args.feature_schema,
+                        ),
+                        predicted_duration_ms,
+                    )
+                )
             continue
         if record_role(record) not in included_roles:
             continue
         scenario_ids.add(scenario_id(record))
-        for objective in OBJECTIVES:
-            rows.append(
-                (
-                    build_feature_vector(
-                        record,
-                        candidate=chosen_candidate(record),
-                        backend=chosen_backend(record),
-                        objective=objective,
-                        feature_schema=args.feature_schema,
-                    ),
-                    duration_ms(record),
-                )
+        rows.append(
+            (
+                build_feature_vector(
+                    record,
+                    candidate=chosen_candidate(record),
+                    backend=chosen_backend(record),
+                    objective=decision_objective(record),
+                    feature_schema=args.feature_schema,
+                ),
+                advisory_duration_label(record),
             )
+        )
     if len(rows) < 12:
         raise SystemExit("scheduler trainer needs at least 12 objective-expanded rows")
 
     x = np.asarray([features for features, _ in rows], dtype=np.float32)
     y = np.asarray([label for _, label in rows], dtype=np.float32)
-    model = GradientBoostingRegressor(random_state=42, n_estimators=180, max_depth=3)
+    model = RandomForestRegressor(random_state=42, n_estimators=320, n_jobs=-1)
     model.fit(x, y)
     predictions = model.predict(x)
     metrics = {
@@ -119,7 +135,7 @@ def main() -> int:
         feature_count=len(feature_labels),
     )
     extra_metadata = {
-        "lane_semantics": "candidate-ranking smoke floor over deterministic dispatch alternatives",
+        "lane_semantics": "candidate-ranking distillation over advisory dispatch rankings",
     }
     if args.quality_profile != "fixture":
         extra_metadata["quality_profile"] = args.quality_profile

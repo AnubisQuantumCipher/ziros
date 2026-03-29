@@ -15,7 +15,7 @@ use std::time::{Duration, Instant};
 use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
 use zkf_storage::{
     FileClass, StorageGuardianConfig, archive_file, classify_path, current_utc_timestamp,
-    icloud_archive_root, purge_ephemeral,
+    purge_ephemeral, resolve_archive_target,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -1337,19 +1337,9 @@ pub fn archive_showcase_artifacts(app_id: &str, artifacts: &[&Path]) -> ZkfResul
         return Ok(());
     }
 
-    let home = std::env::var_os("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("."));
-    let archive_root = match icloud_archive_root() {
-        Some(path) => path,
-        None if config.dry_run => expected_icloud_archive_root(&home),
-        None => {
-            return Err(ZkfError::Io(
-                "iCloud Drive is not available at ~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS_Archive"
-                    .to_string(),
-            ));
-        }
-    };
+    let archive_root = resolve_archive_target(config.dry_run)
+        .map_err(storage_error_to_zkf)?
+        .root;
     let run_name = format!("{app_id}_{}", current_utc_timestamp());
 
     for artifact in artifacts {
@@ -1401,13 +1391,6 @@ pub fn purge_showcase_witness_artifacts(paths: &[&Path]) -> ZkfResult<()> {
 
     purge_ephemeral(&purge_targets, config.dry_run).map_err(storage_error_to_zkf)?;
     Ok(())
-}
-
-fn expected_icloud_archive_root(home: &Path) -> PathBuf {
-    home.join("Library")
-        .join("Mobile Documents")
-        .join("com~apple~CloudDocs")
-        .join("ZirOS_Archive")
 }
 
 fn storage_error_to_zkf(error: zkf_storage::StorageError) -> ZkfError {

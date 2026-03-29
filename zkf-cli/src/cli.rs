@@ -627,6 +627,8 @@ pub(crate) enum StorageCommands {
     Sweep {
         #[arg(long)]
         dry_run: bool,
+        #[arg(long)]
+        auto: bool,
     },
     /// Monitor SSD health and trigger archive or sweep actions based on thresholds.
     Watch {

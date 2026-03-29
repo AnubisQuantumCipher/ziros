@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 
 from zkf_control_plane_common import (
@@ -22,6 +22,8 @@ from zkf_control_plane_common import (
     chosen_backend,
     corpus_hash,
     convert_sklearn_regressor,
+    decision_backend_rankings,
+    decision_objective,
     duration_ms,
     load_telemetry_records,
     proof_size_bytes,
@@ -49,8 +51,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--feature-schema",
-        choices=["v1", "v2"],
-        default="v1",
+        choices=["v1", "v2", "v3"],
+        default="v3",
         help="Control-plane feature schema to train against",
     )
     return parser.parse_args()
@@ -91,8 +93,30 @@ def main() -> int:
     records = load_telemetry_records(args.input)
     digest = corpus_hash(args.input)
     included_roles = {"realized", "backend-option"}
+    rows = []
+    row_metadata: list[tuple[str, str, str]] = []
     grouped_records: dict[str, list[dict]] = defaultdict(list)
     for record in records:
+        ranking_rows = decision_backend_rankings(record)
+        if ranking_rows:
+            objective = decision_objective(record)
+            best = min(score for _, score in ranking_rows)
+            normalizer = max(best, 1.0)
+            for backend, raw_score in ranking_rows:
+                rows.append(
+                    (
+                        build_feature_vector(
+                            record,
+                            candidate=None,
+                            backend=backend,
+                            objective=objective,
+                            feature_schema=args.feature_schema,
+                        ),
+                        raw_score / normalizer,
+                    )
+                )
+                row_metadata.append((scenario_id(record), objective, backend))
+            continue
         backend = chosen_backend(record)
         if not backend or duration_ms(record) <= 0.0:
             continue
@@ -100,8 +124,6 @@ def main() -> int:
             continue
         grouped_records[scenario_id(record)].append(record)
 
-    rows = []
-    row_metadata: list[tuple[str, str, str]] = []
     for group_id, group in grouped_records.items():
         backends = {chosen_backend(record) for record in group}
         if len(backends) < 2:
@@ -130,7 +152,7 @@ def main() -> int:
 
     x = np.asarray([features for features, _ in rows], dtype=np.float32)
     y = np.asarray([label for _, label in rows], dtype=np.float32)
-    model = GradientBoostingRegressor(random_state=42, n_estimators=220, max_depth=3)
+    model = RandomForestRegressor(random_state=42, n_estimators=320, n_jobs=-1)
     model.fit(x, y)
     predictions = model.predict(x)
 
@@ -173,7 +195,7 @@ def main() -> int:
         feature_count=len(feature_labels),
     )
     extra_metadata = {
-        "lane_semantics": "grouped backend ranking smoke floor across optimization objectives",
+        "lane_semantics": "backend ranking distillation over advisory backend recommendation traces",
     }
     if args.quality_profile != "fixture":
         extra_metadata["quality_profile"] = args.quality_profile

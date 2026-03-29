@@ -76,7 +76,18 @@ PLATFORM_FEATURE_LABELS = [
 ]
 FEATURE_LABELS_V1 = BASE_FEATURE_LABELS + CONTROL_PLANE_ONE_HOT_LABELS
 FEATURE_LABELS_V2 = FEATURE_LABELS_V1 + PLATFORM_FEATURE_LABELS
-FEATURE_LABELS = FEATURE_LABELS_V2
+PROGRAM_DIGEST_BUCKET_COUNT = 64
+RUNTIME_ADVISORY_FEATURE_LABELS = [
+    "heuristic_estimate_ms_log2_norm",
+    "heuristic_upper_bound_ms_log2_norm",
+    "heuristic_upper_bound_ratio",
+    "heuristic_expected_proof_size_log2_norm",
+    "execution_regime_cpu_only",
+    "execution_regime_partial_fallback",
+    "execution_regime_gpu_capable",
+] + [f"program_digest_bucket_{index:02d}" for index in range(PROGRAM_DIGEST_BUCKET_COUNT)]
+FEATURE_LABELS_V3 = FEATURE_LABELS_V2 + RUNTIME_ADVISORY_FEATURE_LABELS
+FEATURE_LABELS = FEATURE_LABELS_V3
 THRESHOLD_OPTIMIZER_FEATURE_LABELS = [
     "chip_generation_norm",
     "gpu_cores_norm",
@@ -129,6 +140,25 @@ SECURITY_FEATURE_LABELS_V2 = FEATURE_LABELS_V2 + [
     "integrity_mismatch_flag",
     "anonymous_burst_flag",
 ]
+SECURITY_FEATURE_LABELS_V3 = FEATURE_LABELS_V3 + [
+    "watchdog_notice_count_log2_norm",
+    "watchdog_warning_count_log2_norm",
+    "watchdog_critical_count_log2_norm",
+    "timing_alert_count_log2_norm",
+    "thermal_alert_count_log2_norm",
+    "memory_alert_count_log2_norm",
+    "gpu_circuit_breaker_count_log2_norm",
+    "repeated_fallback_count_log2_norm",
+    "anomaly_severity_score_norm",
+    "model_integrity_failure_count_log2_norm",
+    "rate_limit_violation_count_log2_norm",
+    "auth_failure_count_log2_norm",
+    "malformed_request_count_log2_norm",
+    "backend_incompatibility_attempt_count_log2_norm",
+    "telemetry_replay_flag",
+    "integrity_mismatch_flag",
+    "anonymous_burst_flag",
+]
 DISPATCH_CANDIDATES = [
     "cpu-only",
     "hash-only",
@@ -153,6 +183,7 @@ DEFAULT_TELEMETRY_DIR = Path.home() / ".zkf" / "telemetry"
 DEFAULT_MODEL_DIR = Path.home() / ".zkf" / "models"
 SCHEMA_V1 = "zkf-neural-control-plane-v1"
 SCHEMA_V2 = "zkf-neural-control-plane-v2"
+SCHEMA_V3 = "zkf-neural-control-plane-v3"
 THRESHOLD_SCHEMA_V1 = "zkf-neural-threshold-optimizer-v1"
 
 def schema_fingerprint(labels: Iterable[str] | None = None) -> str:
@@ -168,6 +199,8 @@ def control_plane_feature_labels(feature_schema: str) -> list[str]:
         return list(FEATURE_LABELS_V1)
     if feature_schema == "v2":
         return list(FEATURE_LABELS_V2)
+    if feature_schema == "v3":
+        return list(FEATURE_LABELS_V3)
     raise ValueError(f"unsupported feature schema: {feature_schema}")
 
 
@@ -176,6 +209,8 @@ def security_feature_labels(feature_schema: str) -> list[str]:
         return list(SECURITY_FEATURE_LABELS_V1)
     if feature_schema == "v2":
         return list(SECURITY_FEATURE_LABELS_V2)
+    if feature_schema == "v3":
+        return list(SECURITY_FEATURE_LABELS_V3)
     raise ValueError(f"unsupported feature schema: {feature_schema}")
 
 
@@ -184,6 +219,8 @@ def control_plane_schema_name(feature_schema: str) -> str:
         return SCHEMA_V1
     if feature_schema == "v2":
         return SCHEMA_V2
+    if feature_schema == "v3":
+        return SCHEMA_V3
     raise ValueError(f"unsupported feature schema: {feature_schema}")
 
 
@@ -191,15 +228,25 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def _normalize_loaded_record(payload: Any, source_path: str) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    nested_record = payload.get("record")
+    if isinstance(nested_record, dict):
+        record = dict(nested_record)
+        record["_source_path"] = _str(payload.get("source_path"), source_path)
+        return record
+    payload["_source_path"] = source_path
+    return payload
+
+
 def _load_json_path(path: Path) -> list[dict[str, Any]]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return []
-    if isinstance(payload, dict):
-        payload["_source_path"] = str(path)
-        return [payload]
-    return []
+    normalized = _normalize_loaded_record(payload, str(path))
+    return [normalized] if normalized else []
 
 
 def _load_jsonl_path(path: Path) -> list[dict[str, Any]]:
@@ -216,9 +263,9 @@ def _load_jsonl_path(path: Path) -> list[dict[str, Any]]:
             payload = json.loads(line)
         except json.JSONDecodeError:
             continue
-        if isinstance(payload, dict):
-            payload["_source_path"] = f"{path}:{lineno}"
-            records.append(payload)
+        normalized = _normalize_loaded_record(payload, f"{path}:{lineno}")
+        if normalized is not None:
+            records.append(normalized)
     return records
 
 
@@ -326,6 +373,16 @@ def _bool(value: Any, default: bool = False) -> bool:
     return default
 
 
+def _canonical_backend_label(value: Any, default: str = "") -> str:
+    label = _str(value, default)
+    aliases = {
+        "hyper-nova": "hypernova",
+        "halo2-bls12381": "halo2",
+        "halo2-bls12-381": "halo2",
+    }
+    return aliases.get(label, label)
+
+
 def _chip_family(record: dict[str, Any]) -> str:
     features = _nested(record, "control_plane", "decision", "features", default={})
     if isinstance(features, dict):
@@ -431,6 +488,155 @@ def _stage_ratio(record: dict[str, Any], names: list[str]) -> float:
     return matched / total
 
 
+def _program_digest_bucket_features(record: dict[str, Any]) -> list[float]:
+    vector = [0.0] * PROGRAM_DIGEST_BUCKET_COUNT
+    digest = _str(_nested(record, "metadata", "program_digest"))
+    if len(digest) >= 8:
+        try:
+            vector[int(digest[:8], 16) % PROGRAM_DIGEST_BUCKET_COUNT] = 1.0
+        except ValueError:
+            pass
+    return vector
+
+
+def _expected_proof_size_bytes(record: dict[str, Any], backend: str | None = None) -> int:
+    scale = math.log2(max(1, _int(record.get("circuit_features", {}).get("constraint_count"), 1)))
+    backend_label = _canonical_backend_label(backend or chosen_backend(record))
+    base = {
+        "arkworks-groth16": 128.0,
+        "plonky3": 24_576.0,
+        "nova": 1_770_000.0,
+        "hypernova": 1_200_000.0,
+        "halo2": 8_192.0,
+        "sp1": 65_536.0,
+        "risc-zero": 65_536.0,
+        "midnight-compact": 4_096.0,
+    }.get(backend_label, 8_192.0)
+    return int(base + max(scale, 1.0) * 96.0)
+
+
+def _execution_regime(record: dict[str, Any], candidate: str | None = None) -> str:
+    explicit = _str(
+        _nested(record, "control_plane", "decision", "duration_estimate", "execution_regime"),
+        _str(_nested(record, "control_plane", "decision", "anomaly_baseline", "execution_regime")),
+    )
+    if explicit:
+        return explicit
+    if not _bool(_nested(record, "control_plane", "decision", "features", "metal_available")):
+        return "cpu-only"
+    resolved_candidate = candidate or chosen_candidate(record)
+    if resolved_candidate == "cpu-only":
+        return "cpu-only"
+    if resolved_candidate == "full-gpu":
+        return "gpu-capable"
+    return "partial-fallback"
+
+
+def _heuristic_duration_bound_multiplier(record: dict[str, Any], execution_regime: str) -> float:
+    base = {
+        "gpu-capable": 1.35,
+        "partial-fallback": 1.65,
+        "cpu-only": 1.95,
+    }.get(execution_regime, 1.95)
+    features = _nested(record, "control_plane", "decision", "features", default={})
+    if not isinstance(features, dict):
+        features = {}
+    memory_penalty = 1.0 + _float(features.get("memory_pressure_ratio"), 0.0) * 0.75
+    thermal_penalty = 1.0 + _float(features.get("thermal_pressure"), 0.0) * 0.50
+    low_power_penalty = 1.10 if _bool(features.get("low_power_mode")) else 1.0
+    return min(4.0, max(1.10, base * memory_penalty * thermal_penalty * low_power_penalty))
+
+
+def _heuristic_scheduler_ms(
+    record: dict[str, Any],
+    *,
+    candidate: str | None = None,
+    backend: str | None = None,
+) -> float:
+    circuit = record.get("circuit_features", {})
+    if not isinstance(circuit, dict):
+        circuit = {}
+    constraints = max(1.0, float(_int(circuit.get("constraint_count"), 1)))
+    signals = max(1.0, float(_int(circuit.get("signal_count"), 1)))
+    witness_scale = max(1.0, math.log2(max(1, _int(circuit.get("witness_size"), 1))))
+    stage_weight = max(1.0, float(sum(_stage_counts(record).values())))
+    memory_pressure_ratio = _float(
+        _nested(record, "control_plane", "decision", "features", "memory_pressure_ratio"),
+        0.0,
+    )
+    pressure_penalty = 1.0
+    if memory_pressure_ratio >= 0.95:
+        pressure_penalty = 2.3
+    elif memory_pressure_ratio >= 0.85:
+        pressure_penalty = 1.8
+    elif memory_pressure_ratio >= 0.70:
+        pressure_penalty = 1.25
+    thermal_penalty = 1.0 + _float(
+        _nested(record, "control_plane", "decision", "features", "thermal_pressure"),
+        0.0,
+    ) * 0.50
+    form_factor = _form_factor(record)
+    mobile_penalty = 1.35 if form_factor == "mobile" else 1.20 if form_factor == "headset" else 1.0
+    low_power_penalty = (
+        1.18 if _bool(_nested(record, "control_plane", "decision", "features", "low_power_mode")) else 1.0
+    )
+    backend_weight = {
+        "plonky3": 0.85,
+        "arkworks-groth16": 1.0,
+        "nova": 1.20,
+        "hypernova": 1.20,
+        "halo2": 1.15,
+        "sp1": 1.40,
+        "risc-zero": 1.40,
+        "midnight-compact": 1.30,
+    }.get(backend or chosen_backend(record), 1.15)
+    resolved_candidate = candidate or chosen_candidate(record)
+    gpu_discount = {
+        "cpu-only": 1.20,
+        "hash-only": 1.00 - _stage_ratio(record, ["poseidon-batch", "sha256-batch", "merkle-layer"]) * 0.18,
+        "algebra-only": 1.00 - _stage_ratio(record, ["ntt", "lde", "msm"]) * 0.22,
+        "stark-heavy": 1.00
+        - _stage_ratio(
+            record,
+            ["ntt", "lde", "poseidon-batch", "merkle-layer", "fri-fold", "fri-query-open"],
+        )
+        * 0.28,
+        "balanced": 0.84,
+        "full-gpu": 1.25
+        if not _bool(_nested(record, "control_plane", "decision", "features", "metal_available"))
+        else 0.76 + memory_pressure_ratio * 0.20,
+    }.get(resolved_candidate, 1.20)
+    return (
+        (math.log2(constraints) * 18.0)
+        + (math.log2(signals) * 12.0)
+        + (witness_scale * 8.0)
+        + (stage_weight * 6.0)
+    ) * backend_weight * pressure_penalty * thermal_penalty * mobile_penalty * low_power_penalty * max(0.40, gpu_discount)
+
+
+def _resolved_runtime_candidate(
+    record: dict[str, Any],
+    *,
+    candidate: str | None = None,
+    backend: str | None = None,
+) -> str:
+    if candidate in DISPATCH_CANDIDATES:
+        return candidate
+    resolved_backend = _canonical_backend_label(backend or chosen_backend(record), "arkworks-groth16")
+    best_candidate = "cpu-only"
+    best_score = float("inf")
+    for dispatch_candidate in DISPATCH_CANDIDATES:
+        score = _heuristic_scheduler_ms(
+            record,
+            candidate=dispatch_candidate,
+            backend=resolved_backend,
+        )
+        if score < best_score:
+            best_candidate = dispatch_candidate
+            best_score = score
+    return best_candidate
+
+
 def build_feature_vector(
     record: dict[str, Any],
     *,
@@ -474,8 +680,10 @@ def build_feature_vector(
         _float(features.get("memory_pressure_ratio"), 0.0),
         _float(features.get("thermal_pressure"), 0.0),
         _float(features.get("cpu_speed_limit"), 1.0),
-        1.0 if _nested(record, "hardware_state", "metal_available", default=False) else 0.0,
-        1.0 if _float(features.get("unified_memory"), 0.0) > 0 else 0.0,
+        1.0
+        if _bool(features.get("metal_available"), _bool(_nested(record, "hardware_state", "metal_available"), False))
+        else 0.0,
+        1.0 if _bool(features.get("unified_memory")) else 0.0,
         1.0 if _str(features.get("hardware_profile")) == "apple-silicon-m4-max-48gb" else 0.0,
         1.0 if _str(features.get("hardware_profile")).startswith("apple-silicon") else 0.0,
         1.0 if _str(_nested(record, "metadata", "job_kind", default="prove")) == "prove" else 0.0,
@@ -491,7 +699,7 @@ def build_feature_vector(
         vector.append(1.0 if objective == item else 0.0)
     if feature_schema == "v1":
         return vector
-    if feature_schema != "v2":
+    if feature_schema not in {"v2", "v3"}:
         raise ValueError(f"unsupported feature schema: {feature_schema}")
     battery_present, on_external_power, low_power_mode = _platform_bools(record)
     form_factor = _form_factor(record)
@@ -509,6 +717,37 @@ def build_feature_vector(
             1.0 if form_factor == "headset" else 0.0,
         ]
     )
+    if feature_schema == "v3":
+        resolved_candidate = _resolved_runtime_candidate(record, candidate=candidate, backend=backend)
+        resolved_backend = _canonical_backend_label(backend or chosen_backend(record), "arkworks-groth16")
+        heuristic_estimate_ms = _heuristic_scheduler_ms(
+            record,
+            candidate=resolved_candidate,
+            backend=resolved_backend,
+        )
+        execution_regime = _execution_regime(record, resolved_candidate)
+        heuristic_upper_bound_ratio = (
+            _heuristic_duration_bound_multiplier(record, execution_regime)
+            if _bool(_nested(record, "control_plane", "decision", "features", "metal_available"))
+            else 1.0
+        )
+        heuristic_upper_bound_ms = (
+            heuristic_estimate_ms * heuristic_upper_bound_ratio
+            if _bool(_nested(record, "control_plane", "decision", "features", "metal_available"))
+            else 0.0
+        )
+        vector.extend(
+            [
+                normalized_log2(max(1, int(heuristic_estimate_ms)), 24.0),
+                normalized_log2(max(0, int(heuristic_upper_bound_ms)), 24.0),
+                float(heuristic_upper_bound_ratio),
+                normalized_log2(_expected_proof_size_bytes(record, resolved_backend), 24.0),
+                1.0 if execution_regime == "cpu-only" else 0.0,
+                1.0 if execution_regime == "partial-fallback" else 0.0,
+                1.0 if execution_regime == "gpu-capable" else 0.0,
+            ]
+        )
+        vector.extend(_program_digest_bucket_features(record))
     return vector
 
 
@@ -681,7 +920,10 @@ def chosen_candidate(record: dict[str, Any]) -> str:
 
 
 def chosen_backend(record: dict[str, Any]) -> str:
-    return _str(_nested(record, "metadata", "backend_used"), "arkworks-groth16")
+    return _canonical_backend_label(
+        _nested(record, "metadata", "backend_used"),
+        "arkworks-groth16",
+    )
 
 
 def record_role(record: dict[str, Any]) -> str:
@@ -762,6 +1004,74 @@ def degraded_state(record: dict[str, Any]) -> str:
 
 def proof_size_bytes(record: dict[str, Any]) -> int:
     return _int(_nested(record, "metadata", "proof_size_bytes"), 0)
+
+
+def decision_objective(record: dict[str, Any]) -> str:
+    explicit = _str(
+        _nested(record, "control_plane", "decision", "backend_recommendation", "objective"),
+        record_objective(record),
+    )
+    return explicit if explicit in OBJECTIVES else "fastest-prove"
+
+
+def decision_candidate_rankings(record: dict[str, Any]) -> list[tuple[str, float]]:
+    rankings = _nested(record, "control_plane", "decision", "candidate_rankings", default=[])
+    if not isinstance(rankings, list):
+        return []
+    rows: list[tuple[str, float]] = []
+    seen: set[str] = set()
+    for item in rankings:
+        if not isinstance(item, dict):
+            continue
+        candidate = _str(item.get("candidate"))
+        predicted = _float(item.get("predicted_duration_ms"), 0.0)
+        if candidate not in DISPATCH_CANDIDATES or candidate in seen or predicted <= 0.0:
+            continue
+        seen.add(candidate)
+        rows.append((candidate, predicted))
+    return rows
+
+
+def decision_backend_rankings(record: dict[str, Any]) -> list[tuple[str, float]]:
+    rankings = _nested(
+        record,
+        "control_plane",
+        "decision",
+        "backend_recommendation",
+        "rankings",
+        default=[],
+    )
+    if not isinstance(rankings, list):
+        return []
+    rows: list[tuple[str, float]] = []
+    seen: set[str] = set()
+    for item in rankings:
+        if not isinstance(item, dict):
+            continue
+        backend = _canonical_backend_label(item.get("backend"))
+        score = _float(item.get("score"), 0.0)
+        if backend not in BACKEND_LABELS or backend in seen or score <= 0.0:
+            continue
+        seen.add(backend)
+        rows.append((backend, score))
+    return rows
+
+
+def advisory_duration_label(record: dict[str, Any]) -> float:
+    for value in (
+        _nested(record, "control_plane", "decision", "duration_estimate", "estimate_ms"),
+        _nested(record, "control_plane", "decision", "duration_estimate", "predicted_wall_time_ms"),
+        _nested(record, "control_plane", "decision", "anomaly_baseline", "advisory_estimate_ms"),
+        _nested(record, "control_plane", "decision", "anomaly_baseline", "expected_duration_ms"),
+    ):
+        label = _float(value, 0.0)
+        if label > 0.0:
+            return label
+    return max(duration_ms(record), 1.0)
+
+
+def deployed_anomaly_budget(record: dict[str, Any]) -> float:
+    return max(1.0, min(4.0, float(anomaly_budget(record))))
 
 
 def duration_ms(record: dict[str, Any]) -> float:
@@ -925,7 +1235,12 @@ def summarize_corpus(records: list[dict[str, Any]]) -> dict[str, Any]:
     for record in records:
         job_kind_counts[job_kind(record)] += 1
         objective_counts[record_objective(record)] += 1
-        backend_counts[chosen_backend(record)] += 1
+        backend_rankings = decision_backend_rankings(record)
+        if backend_rankings:
+            for backend, _ in backend_rankings:
+                backend_counts[backend] += 1
+        else:
+            backend_counts[chosen_backend(record)] += 1
         field_counts[field_used(record)] += 1
         hardware_profile_counts[hardware_profile(record)] += 1
         state_counts[degraded_state(record)] += 1
@@ -968,6 +1283,47 @@ def summarize_corpus(records: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         "integrity_mismatch_records": integrity_mismatch_records,
     }
+
+
+def sanitize_training_records(
+    records: list[dict[str, Any]],
+    *,
+    require_control_plane: bool = True,
+    require_positive_duration: bool = True,
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    kept: list[dict[str, Any]] = []
+    seen_sequence_ids: set[str] = set()
+    stats = {
+        "input_records": len(records),
+        "kept_records": 0,
+        "skipped_integrity_mismatch_records": 0,
+        "skipped_duplicate_sequence_ids": 0,
+        "skipped_missing_control_plane_records": 0,
+        "skipped_nonpositive_duration_records": 0,
+    }
+    for record in records:
+        metadata = record.get("metadata", {})
+        if isinstance(metadata, dict) and metadata.get("integrity_mismatch_flags"):
+            stats["skipped_integrity_mismatch_records"] += 1
+            continue
+        sequence_id = _str(metadata.get("telemetry_sequence_id")) if isinstance(metadata, dict) else ""
+        if sequence_id:
+            if sequence_id in seen_sequence_ids:
+                stats["skipped_duplicate_sequence_ids"] += 1
+                continue
+            seen_sequence_ids.add(sequence_id)
+        if require_control_plane and not isinstance(
+            _nested(record, "control_plane", "decision", default=None),
+            dict,
+        ):
+            stats["skipped_missing_control_plane_records"] += 1
+            continue
+        if require_positive_duration and duration_ms(record) <= 0.0:
+            stats["skipped_nonpositive_duration_records"] += 1
+            continue
+        kept.append(record)
+    stats["kept_records"] = len(kept)
+    return kept, stats
 
 
 def validate_corpus_summary(

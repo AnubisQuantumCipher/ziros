@@ -17,8 +17,8 @@ def groth16Snapshot : Groth16SurfaceSnapshot := {
   requiredProofMetadata := ["curve", "scheme", "prove_deterministic", "prove_seed_source"],
   verifierChecks := ["compiled_backend_matches", "artifact_backend_matches", "program_digest_matches", "verification_key_matches_compiled_setup_blob"],
   rustFiles := [
-  { path := "zkf-backends/src/arkworks.rs", sha256 := "5e8548e9b5642a3b596acbb98c2fa7d27b19be910c377edc776f4536114fc1ad" },
-  { path := "zkf-backends/src/lib_non_hax.rs", sha256 := "14745acef99b37b0bd7d0de6a406e148770ec8cbca1aa4cb1dd9b160eafac857" }
+  { path := "zkf-backends/src/arkworks.rs", sha256 := "ca74386ec25a06710413d181d8e1bdd289bcd5e9a9e7ad4bbd3cfe46823c7af9" },
+  { path := "zkf-backends/src/lib_non_hax.rs", sha256 := "31f3e1756ff867c6848e49a4f57942e4c5473d8411e1df9af4d96d19973dcb3a" }
 ]
 }
 

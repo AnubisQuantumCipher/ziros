@@ -15,10 +15,14 @@ from typing import Any
 import build_control_plane_corpus as corpus_builder
 from zkf_control_plane_common import (
     DEFAULT_MODEL_DIR,
+    DEFAULT_TELEMETRY_DIR,
+    THRESHOLD_OPTIMIZER_FEATURE_LABELS,
+    THRESHOLD_SCHEMA_V1,
     control_plane_feature_labels,
     control_plane_schema_name,
     corpus_hash,
     load_telemetry_records,
+    sanitize_training_records,
     security_feature_labels,
     schema_fingerprint,
     tool_versions,
@@ -26,7 +30,9 @@ from zkf_control_plane_common import (
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIREMENTS_PATH = ROOT / "scripts" / "neural_engine_requirements.txt"
-SCHEMA = "zkf-neural-model-bundle-v2"
+FIXTURE_CORPUS_PATH = ROOT / "zkf-runtime" / "tests" / "fixtures" / "neural_engine" / "control_plane_fixture_corpus.jsonl"
+FEATURE_SCHEMA = "v3"
+SCHEMA = "zkf-neural-model-bundle-v3"
 
 LANES = {
     "scheduler": {
@@ -54,6 +60,13 @@ LANES = {
         "output_name": "risk_score",
         "trainer": ROOT / "scripts" / "train_security_detector.py",
     },
+}
+
+OPTIONAL_LANES = {
+    "threshold-optimizer": {
+        "package": "threshold_optimizer_v1.mlpackage",
+        "output_name": "gpu_lane_score",
+    }
 }
 
 
@@ -151,12 +164,36 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def telemetry_dir_stats(directory: Path) -> dict[str, Any]:
+    entries = [path for path in directory.iterdir() if path.is_file()]
+    entries.sort(key=lambda path: path.name)
+    digest = hashlib.sha256()
+    for path in entries:
+        digest.update(path.name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return {
+        "schema": "zkf-telemetry-corpus-v1",
+        "directory": str(directory),
+        "record_count": len(entries),
+        "corpus_hash": digest.hexdigest(),
+    }
+
+
+def augment_sidecar(path: Path, extra_metadata: dict[str, Any]) -> None:
+    payload = load_json(path)
+    payload.update(extra_metadata)
+    path.write_text(canonical_json(payload), encoding="utf-8")
+
+
 def run_trainer(
     script: Path,
     input_paths: list[str],
     out_path: Path,
     profile: str,
     feature_schema: str,
+    extra_sidecar_metadata: dict[str, Any] | None = None,
 ) -> None:
     command = [
         "python3",
@@ -183,6 +220,9 @@ def run_trainer(
             f"stdout:\n{proc.stdout}\n\nstderr:\n{proc.stderr}"
         )
     normalize_mlpackage(out_path)
+    sidecar_path = Path(f"{out_path}.json")
+    if extra_sidecar_metadata:
+        augment_sidecar(sidecar_path, extra_sidecar_metadata)
 
 
 def validate_sidecar(
@@ -190,32 +230,46 @@ def validate_sidecar(
     sidecar_path: Path,
     *,
     expected_corpus_hash: str,
+    expected_telemetry_hash: str,
     profile: str,
     feature_schema: str,
 ) -> dict[str, Any]:
     payload = load_json(sidecar_path)
-    expected = LANES[lane]
+    if lane == "threshold-optimizer":
+        expected = OPTIONAL_LANES[lane]
+    else:
+        expected = LANES[lane]
     if payload.get("lane") != lane:
         raise SystemExit(f"{sidecar_path} lane mismatch: {payload.get('lane')} != {lane}")
-    expected_version = "v2" if feature_schema == "v2" else "v1"
+    expected_version = "v1" if lane == "threshold-optimizer" else feature_schema
     if payload.get("version") != expected_version:
         raise SystemExit(f"{sidecar_path} version mismatch: {payload.get('version')}")
-    expected_labels = (
-        security_feature_labels(feature_schema)
-        if lane == "security"
-        else control_plane_feature_labels(feature_schema)
-    )
+    if lane == "threshold-optimizer":
+        expected_labels = list(THRESHOLD_OPTIMIZER_FEATURE_LABELS)
+        expected_schema = THRESHOLD_SCHEMA_V1
+    else:
+        expected_labels = (
+            security_feature_labels(feature_schema)
+            if lane == "security"
+            else control_plane_feature_labels(feature_schema)
+        )
+        expected_schema = control_plane_schema_name(feature_schema)
     if payload.get("schema_fingerprint") != schema_fingerprint(expected_labels):
         raise SystemExit(
             f"{sidecar_path} schema fingerprint drift: {payload.get('schema_fingerprint')}"
         )
-    if payload.get("schema") != control_plane_schema_name(feature_schema):
+    if payload.get("schema") != expected_schema:
         raise SystemExit(f"{sidecar_path} schema drift: {payload.get('schema')}")
     if payload.get("output_name") != expected["output_name"]:
         raise SystemExit(
             f"{sidecar_path} output name drift: {payload.get('output_name')} != {expected['output_name']}"
         )
-    if payload.get("corpus_hash") != expected_corpus_hash:
+    if lane == "threshold-optimizer":
+        if payload.get("telemetry_corpus_hash") != expected_telemetry_hash:
+            raise SystemExit(
+                f"{sidecar_path} telemetry corpus hash drift: {payload.get('telemetry_corpus_hash')} != {expected_telemetry_hash}"
+            )
+    elif payload.get("corpus_hash") != expected_corpus_hash:
         raise SystemExit(
             f"{sidecar_path} corpus hash drift: {payload.get('corpus_hash')} != {expected_corpus_hash}"
         )
@@ -242,6 +296,11 @@ def build_manifest(
     input_paths: list[str],
     profile: str,
     feature_schema: str,
+    telemetry_stats: dict[str, Any],
+    live_sanitization: dict[str, int],
+    raw_live_record_count: int,
+    live_training_record_count: int,
+    fixture_training_record_count: int,
 ) -> dict[str, Any]:
     corpus_digest = corpus_hash(input_paths)
     summary = load_json(summary_path)
@@ -257,10 +316,17 @@ def build_manifest(
             "sha256": sha256_path(corpus_path),
             "corpus_hash": corpus_digest,
         },
+        "telemetry_corpus": telemetry_stats,
         "corpus_summary": {
             "path": str(summary_path),
             "sha256": sha256_path(summary_path),
             "summary": summary,
+        },
+        "training_inputs": {
+            "raw_live_record_count": raw_live_record_count,
+            "live_training_record_count": live_training_record_count,
+            "fixture_training_record_count": fixture_training_record_count,
+            "sanitization": live_sanitization,
         },
         "requirements_file": {
             "path": str(REQUIREMENTS_PATH),
@@ -269,13 +335,20 @@ def build_manifest(
         "tool_versions": tool_versions(),
         "lanes": {},
     }
-    for lane, config in LANES.items():
+    manifest_lanes = dict(LANES)
+    for lane, config in OPTIONAL_LANES.items():
+        package_path = model_dir / config["package"]
+        sidecar_path = Path(f"{package_path}.json")
+        if package_path.exists() and sidecar_path.exists():
+            manifest_lanes[lane] = config
+    for lane, config in manifest_lanes.items():
         package_path = model_dir / config["package"]
         sidecar_path = Path(f"{package_path}.json")
         sidecar = validate_sidecar(
             lane,
             sidecar_path,
             expected_corpus_hash=corpus_digest,
+            expected_telemetry_hash=str(telemetry_stats["corpus_hash"]),
             profile=profile,
             feature_schema=feature_schema,
         )
@@ -296,6 +369,8 @@ def build_manifest(
             "quality_profile": sidecar.get("quality_profile", "fixture"),
             "lane_semantics": sidecar.get("lane_semantics"),
             "corpus_hash": sidecar.get("corpus_hash"),
+            "telemetry_corpus_hash": sidecar.get("telemetry_corpus_hash"),
+            "telemetry_record_count": sidecar.get("telemetry_record_count"),
             "tool_versions": sidecar.get("tool_versions"),
         }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -307,9 +382,24 @@ def main() -> int:
     args = parse_args()
     if not REQUIREMENTS_PATH.exists():
         raise SystemExit(f"missing neural-engine requirements file: {REQUIREMENTS_PATH}")
+    if not DEFAULT_TELEMETRY_DIR.exists():
+        raise SystemExit(f"missing telemetry directory: {DEFAULT_TELEMETRY_DIR}")
 
-    records = load_telemetry_records(args.input)
-    trainer_inputs = list(args.input)
+    raw_live_records = load_telemetry_records(args.input)
+    live_records, live_sanitization = sanitize_training_records(raw_live_records)
+    if not live_records:
+        raise SystemExit("no sanitized live telemetry records were available for training")
+
+    training_records = list(live_records)
+    fixture_records: list[dict[str, Any]] = []
+    if args.profile == "production":
+        if not FIXTURE_CORPUS_PATH.exists():
+            raise SystemExit(f"missing fixture corpus required for production coverage: {FIXTURE_CORPUS_PATH}")
+        fixture_input_records = load_telemetry_records([str(FIXTURE_CORPUS_PATH)])
+        fixture_records, _ = sanitize_training_records(fixture_input_records)
+        training_records.extend(fixture_records)
+
+    telemetry_stats = telemetry_dir_stats(DEFAULT_TELEMETRY_DIR)
     validation = {}
     if args.profile == "production":
         validation.update(corpus_builder.PRODUCTION_REQUIREMENTS)
@@ -318,18 +408,39 @@ def main() -> int:
     args.model_dir.mkdir(parents=True, exist_ok=True)
 
     _, summary = corpus_builder.write_corpus(
-        records=records,
+        records=training_records,
         out_path=args.corpus_out,
         summary_out=args.summary_out,
         profile=args.profile,
         validation=validation,
-        feature_schema="v2",
+        feature_schema=FEATURE_SCHEMA,
     )
+    summary["telemetry_corpus"] = telemetry_stats
+    summary["raw_live_record_count"] = len(raw_live_records)
+    summary["live_sanitization"] = live_sanitization
+    summary["live_training_record_count"] = len(live_records)
+    summary["fixture_training_record_count"] = len(fixture_records)
+    if fixture_records:
+        summary["fixture_supplement"] = {
+            "path": str(FIXTURE_CORPUS_PATH),
+            "sha256": sha256_path(FIXTURE_CORPUS_PATH),
+            "record_count": len(fixture_records),
+        }
+    args.summary_out.write_text(canonical_json(summary), encoding="utf-8")
     if not summary["validation"]["passed"]:
         raise SystemExit(
             "control-plane corpus does not satisfy the requested coverage profile:\n- "
             + "\n- ".join(summary["validation"]["reasons"])
         )
+    trainer_inputs = [str(args.corpus_out)]
+    shared_sidecar_metadata = {
+        "telemetry_corpus_hash": telemetry_stats["corpus_hash"],
+        "telemetry_record_count": telemetry_stats["record_count"],
+        "raw_live_record_count": len(raw_live_records),
+        "live_training_record_count": len(live_records),
+        "fixture_training_record_count": len(fixture_records),
+        "training_corpus_path": str(args.corpus_out),
+    }
 
     with tempfile.TemporaryDirectory(prefix="zkf-control-plane-models-") as temp_root:
         staging_root = Path(temp_root)
@@ -341,7 +452,8 @@ def main() -> int:
                 trainer_inputs,
                 staging_models / config["package"],
                 args.profile,
-                "v2",
+                FEATURE_SCHEMA,
+                shared_sidecar_metadata,
             )
 
         for config in LANES.values():
@@ -362,7 +474,12 @@ def main() -> int:
         manifest_path=args.manifest_out,
         input_paths=trainer_inputs,
         profile=args.profile,
-        feature_schema="v2",
+        feature_schema=FEATURE_SCHEMA,
+        telemetry_stats=telemetry_stats,
+        live_sanitization=live_sanitization,
+        raw_live_record_count=len(raw_live_records),
+        live_training_record_count=len(live_records),
+        fixture_training_record_count=len(fixture_records),
     )
     print("wrote control-plane model bundle:")
     for config in LANES.values():

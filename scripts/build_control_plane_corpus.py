@@ -78,8 +78,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-fixture-share", type=float)
     parser.add_argument(
         "--feature-schema",
-        choices=["v1", "v2"],
-        default="v2",
+        choices=["v1", "v2", "v3"],
+        default="v3",
         help="Feature schema to materialize in the normalized corpus",
     )
     return parser.parse_args()
@@ -164,7 +164,7 @@ def write_corpus(
     summary_out: Path | None,
     profile: str,
     validation: dict,
-    feature_schema: str = "v2",
+    feature_schema: str = "v3",
 ) -> tuple[int, dict]:
     rows = build_rows(records, feature_schema=feature_schema)
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -114,3 +114,4 @@ vectors.json
 /benchmarks/workspaces/**/out/
 /benchmarks/workspaces/**/target/
 /.zkf-tools/
+.venv/

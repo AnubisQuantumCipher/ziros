@@ -8,12 +8,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 
 from zkf_control_plane_common import (
     DEFAULT_MODEL_DIR,
-    OBJECTIVES,
+    advisory_duration_label,
     build_quality_gate,
     build_feature_vector,
     control_plane_feature_labels,
@@ -22,7 +22,7 @@ from zkf_control_plane_common import (
     chosen_candidate,
     corpus_hash,
     convert_sklearn_regressor,
-    duration_ms,
+    decision_objective,
     load_telemetry_records,
     record_role,
     safe_r2,
@@ -47,8 +47,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--feature-schema",
-        choices=["v1", "v2"],
-        default="v1",
+        choices=["v1", "v2", "v3"],
+        default="v3",
         help="Control-plane feature schema to train against",
     )
     return parser.parse_args()
@@ -79,12 +79,13 @@ def main() -> int:
     rows = []
     scenario_ids = set()
     for record in records:
-        if duration_ms(record) <= 0.0:
-            continue
         if record_role(record) not in included_roles:
             continue
+        label = advisory_duration_label(record)
+        if label <= 0.0:
+            continue
         scenario_ids.add(scenario_id(record))
-        for objective in OBJECTIVES:
+        for objective in [decision_objective(record)]:
             rows.append(
                 (
                     build_feature_vector(
@@ -94,15 +95,15 @@ def main() -> int:
                         objective=objective,
                         feature_schema=args.feature_schema,
                     ),
-                    duration_ms(record),
+                    label,
                 )
             )
     if len(rows) < 12:
-        raise SystemExit("duration estimator needs at least 12 objective-expanded rows")
+        raise SystemExit("duration estimator needs at least 12 advisory ETA rows")
 
     x = np.asarray([features for features, _ in rows], dtype=np.float32)
     y = np.asarray([label for _, label in rows], dtype=np.float32)
-    model = GradientBoostingRegressor(random_state=42, n_estimators=200, max_depth=3)
+    model = RandomForestRegressor(random_state=42, n_estimators=320, n_jobs=-1)
     model.fit(x, y)
     predictions = model.predict(x)
     metrics = {
@@ -119,7 +120,7 @@ def main() -> int:
         feature_count=len(feature_labels),
     )
     extra_metadata = {
-        "lane_semantics": "realized execution ETA smoke floor after backend and dispatch are fixed",
+        "lane_semantics": "advisory ETA distillation after backend and dispatch are fixed",
     }
     if args.quality_profile != "fixture":
         extra_metadata["quality_profile"] = args.quality_profile

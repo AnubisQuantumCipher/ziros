@@ -4,6 +4,16 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="${ZIROS_BIN_DIR:-$HOME/.local/bin}"
 
+write_wrapper() {
+    local path="$1"
+    local target_name="$2"
+    cat > "$path" <<EOF
+#!/bin/sh
+exec "\$(dirname "\$0")/$target_name" "\$@"
+EOF
+    chmod +x "$path"
+}
+
 ensure_rust() {
     if command -v cargo >/dev/null 2>&1 && command -v rustup >/dev/null 2>&1; then
         return
@@ -31,11 +41,9 @@ ensure_xcode_clt() {
 install_binary() {
     mkdir -p "$BIN_DIR"
     cp "$ROOT_DIR/target-local/release/zkf-cli" "$BIN_DIR/zkf-cli"
-    cat > "$BIN_DIR/ziros" <<'EOF'
-#!/bin/sh
-exec "$(dirname "$0")/zkf-cli" "$@"
-EOF
-    chmod +x "$BIN_DIR/zkf-cli" "$BIN_DIR/ziros"
+    write_wrapper "$BIN_DIR/ziros" "zkf-cli"
+    write_wrapper "$BIN_DIR/zkf" "zkf-cli"
+    chmod +x "$BIN_DIR/zkf-cli"
 }
 
 ensure_rust
@@ -60,6 +68,7 @@ cat <<EOF
 Installed:
   $BIN_DIR/zkf-cli
   $BIN_DIR/ziros
+  $BIN_DIR/zkf
 
 Quick start:
   export PATH="$BIN_DIR:\$PATH"

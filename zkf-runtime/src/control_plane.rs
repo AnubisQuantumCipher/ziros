@@ -177,8 +177,8 @@ impl ModelLane {
 
     pub fn supported_input_shapes(self) -> &'static [usize] {
         match self {
-            Self::Scheduler | Self::Backend | Self::Duration | Self::Anomaly => &[57, 47],
-            Self::Security => &[68, 58],
+            Self::Scheduler | Self::Backend | Self::Duration | Self::Anomaly => &[128, 57, 47],
+            Self::Security => &[145, 74, 64, 68, 58],
             Self::ThresholdOptimizer => &[12],
         }
     }
@@ -468,6 +468,8 @@ pub struct ControlPlaneFeatures {
     pub requested_backend: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub backend_route: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub program_digest: Option<String>,
     pub requested_jobs: usize,
     pub total_jobs: usize,
 }
@@ -1492,12 +1494,20 @@ fn load_model_descriptor(
         quality_gate,
         corpus_hash: sidecar
             .as_ref()
-            .and_then(|payload| payload.get("corpus_hash"))
+            .and_then(|payload| {
+                payload
+                    .get("telemetry_corpus_hash")
+                    .or_else(|| payload.get("corpus_hash"))
+            })
             .and_then(|value| value.as_str())
             .map(str::to_string),
         corpus_record_count: sidecar
             .as_ref()
-            .and_then(|payload| payload.get("record_count"))
+            .and_then(|payload| {
+                payload
+                    .get("telemetry_record_count")
+                    .or_else(|| payload.get("record_count"))
+            })
             .and_then(|value| value.as_u64()),
         trained_at: sidecar
             .as_ref()
@@ -1731,21 +1741,27 @@ fn inspect_model_integrity(
 }
 
 fn load_model_bundle_manifest(path: &Path) -> Option<(PathBuf, serde_json::Value)> {
-    let root = if path.is_dir() {
-        Some(path)
-    } else {
-        path.parent()
-    }?;
-    for file_name in [
-        "control_plane_models_manifest.json",
-        "fixture_manifest.json",
-        "zkf-model-bundle-manifest.json",
-    ] {
-        let candidate = root.join(file_name);
-        if let Ok(bytes) = fs::read(&candidate)
-            && let Ok(payload) = serde_json::from_slice(&bytes)
-        {
-            return Some((candidate, payload));
+    let mut roots = Vec::new();
+    if path.is_dir() {
+        if let Some(parent) = path.parent() {
+            roots.push(parent.to_path_buf());
+        }
+        roots.push(path.to_path_buf());
+    } else if let Some(parent) = path.parent() {
+        roots.push(parent.to_path_buf());
+    }
+    for root in roots {
+        for file_name in [
+            "control_plane_models_manifest.json",
+            "fixture_manifest.json",
+            "zkf-model-bundle-manifest.json",
+        ] {
+            let candidate = root.join(file_name);
+            if let Ok(bytes) = fs::read(&candidate)
+                && let Ok(payload) = serde_json::from_slice(&bytes)
+            {
+                return Some((candidate, payload));
+            }
         }
     }
     None
@@ -2035,7 +2051,7 @@ fn extract_features(request: &ControlPlaneRequest<'_>) -> ControlPlaneFeatures {
         .collect();
 
     ControlPlaneFeatures {
-        feature_schema: "zkf-neural-control-plane-v2".to_string(),
+        feature_schema: "zkf-neural-control-plane-v3".to_string(),
         job_kind: request.job_kind,
         objective: request.objective,
         circuit,
@@ -2071,6 +2087,10 @@ fn extract_features(request: &ControlPlaneRequest<'_>) -> ControlPlaneFeatures {
             .requested_backend
             .map(|backend| backend.as_str().to_string()),
         backend_route: request.backend_route.map(backend_route_label),
+        program_digest: request
+            .program
+            .map(Program::digest_hex)
+            .or_else(|| request.compiled.map(|compiled| compiled.program_digest.clone())),
         requested_jobs,
         total_jobs,
     }
@@ -2123,7 +2143,7 @@ fn control_plane_base_feature_vector(features: &ControlPlaneFeatures) -> Vec<f32
         } else {
             0.0
         },
-        if features.hardware_profile.starts_with("apple") || features.chip_family != "non-apple" {
+        if features.hardware_profile.starts_with("apple-silicon") {
             1.0
         } else {
             0.0
@@ -2983,6 +3003,100 @@ fn heuristic_expected_proof_size_bytes(
     (base + scale * 96.0) as u64
 }
 
+fn feature_backend_kind(backend: BackendKind) -> BackendKind {
+    match backend {
+        BackendKind::Halo2Bls12381 => BackendKind::Halo2,
+        other => other,
+    }
+}
+
+fn resolved_feature_backend(
+    features: &ControlPlaneFeatures,
+    backend: Option<BackendKind>,
+) -> BackendKind {
+    let requested_backend = features
+        .requested_backend
+        .as_deref()
+        .and_then(|value| value.parse::<BackendKind>().ok());
+    feature_backend_kind(backend.or(requested_backend).unwrap_or(BackendKind::ArkworksGroth16))
+}
+
+fn resolved_feature_candidate(
+    features: &ControlPlaneFeatures,
+    candidate: Option<DispatchCandidate>,
+    backend: Option<BackendKind>,
+) -> DispatchCandidate {
+    if let Some(candidate) = candidate {
+        return candidate;
+    }
+    let resolved_backend = resolved_feature_backend(features, backend);
+    DispatchCandidate::ALL
+        .into_iter()
+        .min_by(|left, right| {
+            heuristic_scheduler_ms(features, resolved_backend, *left)
+                .total_cmp(&heuristic_scheduler_ms(features, resolved_backend, *right))
+        })
+        .unwrap_or(DispatchCandidate::CpuOnly)
+}
+
+fn program_digest_bucket_index(features: &ControlPlaneFeatures) -> Option<usize> {
+    let digest = features.program_digest.as_deref()?;
+    let prefix = digest.get(..8)?;
+    usize::from_str_radix(prefix, 16).ok().map(|value| value % 64)
+}
+
+fn extend_runtime_advisory_features(
+    mut vector: Vec<f32>,
+    features: &ControlPlaneFeatures,
+    candidate: Option<DispatchCandidate>,
+    backend: Option<BackendKind>,
+) -> Vec<f32> {
+    let resolved_backend = resolved_feature_backend(features, backend);
+    let resolved_candidate = resolved_feature_candidate(features, candidate, Some(resolved_backend));
+    let execution_regime = planned_execution_regime(features, resolved_candidate);
+    let heuristic_estimate_ms =
+        heuristic_scheduler_ms(features, resolved_backend, resolved_candidate).max(1.0);
+    let heuristic_upper_bound_ratio = if features.metal_available {
+        heuristic_duration_bound_multiplier(features, execution_regime)
+    } else {
+        1.0
+    };
+    let heuristic_upper_bound_ms = if features.metal_available {
+        heuristic_estimate_ms * heuristic_upper_bound_ratio
+    } else {
+        0.0
+    };
+    vector.extend([
+        normalized_log2(heuristic_estimate_ms.max(1.0) as usize, 24.0),
+        normalized_log2(heuristic_upper_bound_ms.max(0.0) as usize, 24.0),
+        heuristic_upper_bound_ratio as f32,
+        normalized_log2(
+            heuristic_expected_proof_size_bytes(features, resolved_backend) as usize,
+            24.0,
+        ),
+        if execution_regime == ExecutionRegime::CpuOnly {
+            1.0
+        } else {
+            0.0
+        },
+        if execution_regime == ExecutionRegime::PartialFallback {
+            1.0
+        } else {
+            0.0
+        },
+        if execution_regime == ExecutionRegime::GpuCapable {
+            1.0
+        } else {
+            0.0
+        },
+    ]);
+    let digest_bucket = program_digest_bucket_index(features);
+    for index in 0..64 {
+        vector.push(if digest_bucket == Some(index) { 1.0 } else { 0.0 });
+    }
+    vector
+}
+
 fn build_feature_vector_for_descriptor(
     descriptor: &ModelDescriptor,
     features: &ControlPlaneFeatures,
@@ -3034,7 +3148,18 @@ fn build_feature_vector_for_shape(
     match shape {
         47 => vector,
         57 => extend_platform_features(vector, features),
-        _ => extend_platform_features(vector, features),
+        128 => extend_runtime_advisory_features(
+            extend_platform_features(vector, features),
+            features,
+            candidate,
+            backend,
+        ),
+        _ => extend_runtime_advisory_features(
+            extend_platform_features(vector, features),
+            features,
+            candidate,
+            backend,
+        ),
     }
 }
 
@@ -3047,9 +3172,17 @@ pub(crate) fn build_security_feature_vector(
     security_inputs: &SecurityFeatureInputs,
 ) -> Vec<f32> {
     let mut vector = match shape {
-        58 => build_feature_vector_for_shape(
+        64 | 58 => build_feature_vector_for_shape(
             ModelLane::Scheduler,
             47,
+            features,
+            candidate,
+            backend,
+            objective,
+        ),
+        145 => build_feature_vector_for_shape(
+            ModelLane::Scheduler,
+            128,
             features,
             candidate,
             backend,
@@ -3104,6 +3237,7 @@ fn extend_control_plane_one_hots(
     backend: Option<BackendKind>,
     objective: Option<OptimizationObjective>,
 ) -> Vec<f32> {
+    let backend = backend.map(feature_backend_kind);
     for lane in DispatchCandidate::ALL {
         vector.push(if Some(lane) == candidate { 1.0 } else { 0.0 });
     }
@@ -3284,6 +3418,25 @@ pub fn feature_vector_labels_v2() -> Vec<String> {
     labels
 }
 
+pub fn feature_vector_labels_v3() -> Vec<String> {
+    let mut labels = feature_vector_labels_v2();
+    labels.extend(
+        [
+            "heuristic_estimate_ms_log2_norm",
+            "heuristic_upper_bound_ms_log2_norm",
+            "heuristic_upper_bound_ratio",
+            "heuristic_expected_proof_size_log2_norm",
+            "execution_regime_cpu_only",
+            "execution_regime_partial_fallback",
+            "execution_regime_gpu_capable",
+        ]
+        .into_iter()
+        .map(str::to_string),
+    );
+    labels.extend((0..64).map(|index| format!("program_digest_bucket_{index:02}")));
+    labels
+}
+
 pub fn threshold_optimizer_feature_labels() -> Vec<String> {
     [
         "chip_generation_norm",
@@ -3360,8 +3513,36 @@ pub fn security_feature_labels_v2() -> Vec<String> {
     labels
 }
 
+pub fn security_feature_labels_v3() -> Vec<String> {
+    let mut labels = feature_vector_labels_v3();
+    labels.extend(
+        [
+            "watchdog_notice_count_log2_norm",
+            "watchdog_warning_count_log2_norm",
+            "watchdog_critical_count_log2_norm",
+            "timing_alert_count_log2_norm",
+            "thermal_alert_count_log2_norm",
+            "memory_alert_count_log2_norm",
+            "gpu_circuit_breaker_count_log2_norm",
+            "repeated_fallback_count_log2_norm",
+            "anomaly_severity_score_norm",
+            "model_integrity_failure_count_log2_norm",
+            "rate_limit_violation_count_log2_norm",
+            "auth_failure_count_log2_norm",
+            "malformed_request_count_log2_norm",
+            "backend_incompatibility_attempt_count_log2_norm",
+            "telemetry_replay_flag",
+            "integrity_mismatch_flag",
+            "anonymous_burst_flag",
+        ]
+        .into_iter()
+        .map(str::to_string),
+    );
+    labels
+}
+
 pub fn feature_vector_labels() -> Vec<String> {
-    feature_vector_labels_v2()
+    feature_vector_labels_v3()
 }
 
 pub fn dispatch_candidates() -> &'static [DispatchCandidate] {
@@ -3394,7 +3575,10 @@ fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<St
     let labels = match (lane, shape) {
         (ModelLane::ThresholdOptimizer, 12) => threshold_optimizer_feature_labels(),
         (ModelLane::Security, 58) => security_feature_labels_v1(),
+        (ModelLane::Security, 64) => security_feature_labels_v1(),
         (ModelLane::Security, 68) => security_feature_labels_v2(),
+        (ModelLane::Security, 74) => security_feature_labels_v2(),
+        (ModelLane::Security, 145) => security_feature_labels_v3(),
         (
             ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
             47,
@@ -3403,6 +3587,10 @@ fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<St
             ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
             57,
         ) => feature_vector_labels_v2(),
+        (
+            ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
+            128,
+        ) => feature_vector_labels_v3(),
         _ => return None,
     };
     Some(fingerprint_for_labels(&labels))
@@ -3410,8 +3598,14 @@ fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<St
 
 fn model_freshness_notice(sidecar: Option<&serde_json::Value>) -> Option<String> {
     let sidecar = sidecar?;
-    let trained_corpus_hash = sidecar.get("corpus_hash").and_then(|value| value.as_str());
-    let trained_record_count = sidecar.get("record_count").and_then(|value| value.as_u64());
+    let trained_corpus_hash = sidecar
+        .get("telemetry_corpus_hash")
+        .or_else(|| sidecar.get("corpus_hash"))
+        .and_then(|value| value.as_str());
+    let trained_record_count = sidecar
+        .get("telemetry_record_count")
+        .or_else(|| sidecar.get("record_count"))
+        .and_then(|value| value.as_u64());
     let trained_at = sidecar.get("trained_at").and_then(|value| value.as_str());
     let corpus_stats = telemetry_corpus_stats().ok()?;
 
@@ -3871,7 +4065,7 @@ pub(crate) fn predict_numeric(
 
 pub fn stable_feature_schema_fingerprint() -> String {
     schema_fingerprint_for_lane_shape(ModelLane::Scheduler, feature_vector_labels().len())
-        .expect("scheduler v2 schema fingerprint")
+        .expect("scheduler v3 schema fingerprint")
 }
 
 #[cfg(test)]
@@ -4135,11 +4329,11 @@ mod tests {
 
     #[test]
     fn feature_vector_schema_is_stable() {
-        assert_eq!(feature_vector_labels().len(), 57);
+        assert_eq!(feature_vector_labels().len(), 128);
         assert_eq!(stable_feature_schema_fingerprint().len(), 64);
         assert_eq!(
-            schema_fingerprint_for_lane_shape(ModelLane::Scheduler, 47),
-            Some("3e05b7ee88d044937f9d6fb44d741b530bea8d9295e1adf384d85c059cbde14e".to_string())
+            schema_fingerprint_for_lane_shape(ModelLane::Scheduler, 128),
+            Some("ce0d7b22a196dea7fdeff4553bb63eb80c9a9a39e0f601f123fa4ef380750354".to_string())
         );
     }
 

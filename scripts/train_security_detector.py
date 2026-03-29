@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 
 from zkf_control_plane_common import (
@@ -43,8 +43,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--feature-schema",
-        choices=["v1", "v2"],
-        default="v1",
+        choices=["v1", "v2", "v3"],
+        default="v3",
         help="Security feature schema to train against",
     )
     return parser.parse_args()
@@ -87,7 +87,7 @@ def main() -> int:
 
     x = np.asarray([features for features, _ in rows], dtype=np.float32)
     y = np.asarray([label for _, label in rows], dtype=np.float32)
-    model = GradientBoostingRegressor(random_state=42, n_estimators=180, max_depth=3)
+    model = RandomForestRegressor(random_state=42, n_estimators=320, n_jobs=-1)
     model.fit(x, y)
     predictions = model.predict(x)
     metrics = {

@@ -10,8 +10,10 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
 pub use archiver::{
-    ArchiveCategory, ArchiveReport, archive_file, archive_to_icloud, current_icloud_archive_bytes,
-    current_utc_timestamp, icloud_archive_root,
+    ArchiveCategory, ArchiveReport, ArchiveTargetKind, ICloudArchiveHealth,
+    ResolvedArchiveTarget, archive_file, archive_to_icloud, current_icloud_archive_bytes,
+    current_utc_timestamp, icloud_archive_health, icloud_archive_root,
+    local_archive_fallback_root, resolve_archive_target,
 };
 pub use classifier::{FileClass, classify_path, collect_archivable_paths, collect_showcase_roots};
 pub use config::StorageGuardianConfig;

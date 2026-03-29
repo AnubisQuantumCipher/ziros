@@ -8,9 +8,8 @@
     <array>
         <string>__ZKF_CLI_PATH__</string>
         <string>storage</string>
-        <string>watch</string>
-        <string>--interval</string>
-        <string>3600</string>
+        <string>sweep</string>
+        <string>--auto</string>
     </array>
     <key>EnvironmentVariables</key>
     <dict>

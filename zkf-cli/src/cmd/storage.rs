@@ -6,10 +6,11 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use zkf_storage::{
-    FileClass, StorageGuardianConfig, SweepReport, archive_file, classify_path,
-    collect_archivable_paths, collect_ephemeral_paths, collect_showcase_roots,
+    ArchiveTargetKind, FileClass, PurgeReport, StorageGuardianConfig, SweepReport, archive_file,
+    classify_path, collect_archivable_paths, collect_ephemeral_paths, collect_showcase_roots,
     current_icloud_archive_bytes, current_utc_timestamp, directory_size_bytes, get_ssd_health,
-    icloud_archive_root, purge_ephemeral,
+    icloud_archive_health, icloud_archive_root, local_archive_fallback_root, purge_ephemeral,
+    resolve_archive_target,
 };
 
 const LAUNCHD_TEMPLATE: &str =
@@ -58,6 +59,9 @@ struct ICloudArchiveReport {
     available: bool,
     path: String,
     archived_bytes: Option<u64>,
+    sync_state: String,
+    sync_reason: Option<String>,
+    fallback_path: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -104,8 +108,20 @@ struct ArchiveCommandReport {
     files_archived: usize,
     bytes_archived: u64,
     archive_root: String,
+    archive_mode: String,
+    icloud_sync_state: String,
+    icloud_sync_reason: Option<String>,
     archived_paths: Vec<String>,
     dry_run: bool,
+}
+
+#[derive(Debug, Serialize)]
+struct AutoSweepReport {
+    health_status: String,
+    available_gb: f64,
+    action: String,
+    archive: Option<ArchiveCommandReport>,
+    purge: Option<PurgeReport>,
 }
 
 pub(crate) fn handle_storage(command: StorageCommands) -> Result<(), String> {
@@ -116,7 +132,7 @@ pub(crate) fn handle_storage(command: StorageCommands) -> Result<(), String> {
             dry_run,
             include_release,
         } => handle_purge(dry_run, include_release),
-        StorageCommands::Sweep { dry_run } => handle_sweep(dry_run),
+        StorageCommands::Sweep { dry_run, auto } => handle_sweep(dry_run, auto),
         StorageCommands::Watch { interval } => handle_watch(interval),
         StorageCommands::Restore { path } => handle_restore(&path),
         StorageCommands::Doctor { json } => handle_doctor(json),
@@ -166,21 +182,17 @@ fn handle_purge(dry_run: bool, include_release: bool) -> Result<(), String> {
     Ok(())
 }
 
-fn handle_sweep(dry_run: bool) -> Result<(), String> {
-    let archive = archive_report(dry_run)?;
-    let repo_root = repo_root();
-    let home = home_dir();
-    let paths =
-        collect_ephemeral_paths(&repo_root, &home, false).map_err(|err| err.to_string())?;
-    let purge = purge_ephemeral(&paths, dry_run).map_err(|err| err.to_string())?;
-    let report = SweepReport {
-        files_archived: archive.files_archived,
-        bytes_archived: archive.bytes_archived,
-        files_purged: purge.files_purged,
-        bytes_freed: purge.bytes_freed,
-        icloud_archive_path: Some(PathBuf::from(&archive.archive_root)),
-        errors: Vec::new(),
-    };
+fn handle_sweep(dry_run: bool, auto: bool) -> Result<(), String> {
+    if auto {
+        let report = auto_sweep_report(dry_run)?;
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|err| err.to_string())?
+        );
+        return Ok(());
+    }
+
+    let report = perform_sweep(dry_run)?;
     println!(
         "{}",
         serde_json::to_string_pretty(&report).map_err(|err| err.to_string())?
@@ -192,29 +204,11 @@ fn handle_watch(interval: u64) -> Result<(), String> {
     let config = StorageGuardianConfig::from_env();
     let sleep_secs = interval.max(1);
     loop {
-        let doctor = doctor_report()?;
-        match doctor.health_status.as_str() {
-            "critical" => {
-                eprintln!(
-                    "storage guardian: critical free space detected ({:.1} GB); running sweep",
-                    doctor.available_gb
-                );
-                handle_sweep(config.dry_run)?;
-            }
-            "warning" => {
-                eprintln!(
-                    "storage guardian: warning free space detected ({:.1} GB); running archive",
-                    doctor.available_gb
-                );
-                handle_archive(config.dry_run)?;
-            }
-            _ => {
-                println!(
-                    "storage guardian: healthy free space {:.1} GB used {:.1}%",
-                    doctor.available_gb, doctor.used_percent
-                );
-            }
-        }
+        let report = auto_sweep_report(config.dry_run)?;
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|err| err.to_string())?
+        );
         thread::sleep(Duration::from_secs(sleep_secs));
     }
 }
@@ -353,6 +347,7 @@ fn status_report() -> Result<StorageStatusReport, String> {
     };
     let expected_archive_root = expected_icloud_archive_root(&home);
     let icloud_root = icloud_archive_root().unwrap_or_else(|| expected_archive_root.clone());
+    let icloud_health = icloud_archive_health();
     let archivable_paths =
         collect_archivable_paths(&repo_root, &home).map_err(|err| err.to_string())?;
     let ephemeral_paths =
@@ -377,6 +372,9 @@ fn status_report() -> Result<StorageStatusReport, String> {
             available: icloud_root.exists(),
             path: icloud_root.display().to_string(),
             archived_bytes: current_icloud_archive_bytes(),
+            sync_state: icloud_health.as_str().to_string(),
+            sync_reason: icloud_health.reason().map(ToOwned::to_owned),
+            fallback_path: local_archive_fallback_root().display().to_string(),
         },
         recoverable_bytes,
         recoverable_gb: bytes_to_gb(recoverable_bytes),
@@ -391,7 +389,12 @@ fn archive_report(dry_run: bool) -> Result<ArchiveCommandReport, String> {
 
     let repo_root = repo_root();
     let home = home_dir();
-    let archive_root = archive_root_for_mode(dry_run, &home)?;
+    let target = resolve_archive_target(dry_run).map_err(|err| err.to_string())?;
+    let archive_root = if dry_run && matches!(target.kind, ArchiveTargetKind::ICloud) {
+        archive_root_for_mode(dry_run, &home)?
+    } else {
+        target.root.clone()
+    };
     let mut files = collect_archivable_paths(&repo_root, &home).map_err(|err| err.to_string())?;
     files.sort();
 
@@ -399,6 +402,9 @@ fn archive_report(dry_run: bool) -> Result<ArchiveCommandReport, String> {
         files_archived: 0,
         bytes_archived: 0,
         archive_root: archive_root.display().to_string(),
+        archive_mode: target.kind.as_str().to_string(),
+        icloud_sync_state: target.icloud_health.as_str().to_string(),
+        icloud_sync_reason: target.icloud_health.reason().map(ToOwned::to_owned),
         archived_paths: Vec::new(),
         dry_run,
     };
@@ -416,6 +422,58 @@ fn archive_report(dry_run: bool) -> Result<ArchiveCommandReport, String> {
     }
 
     Ok(report)
+}
+
+fn perform_sweep(dry_run: bool) -> Result<SweepReport, String> {
+    let archive = archive_report(dry_run)?;
+    let repo_root = repo_root();
+    let home = home_dir();
+    let paths =
+        collect_ephemeral_paths(&repo_root, &home, false).map_err(|err| err.to_string())?;
+    let purge = purge_ephemeral(&paths, dry_run).map_err(|err| err.to_string())?;
+    Ok(SweepReport {
+        files_archived: archive.files_archived,
+        bytes_archived: archive.bytes_archived,
+        files_purged: purge.files_purged,
+        bytes_freed: purge.bytes_freed,
+        icloud_archive_path: Some(PathBuf::from(&archive.archive_root)),
+        errors: Vec::new(),
+    })
+}
+
+fn auto_sweep_report(dry_run: bool) -> Result<AutoSweepReport, String> {
+    let doctor = doctor_report()?;
+    match doctor.health_status.as_str() {
+        "critical" => {
+            let archive = archive_report(dry_run)?;
+            let repo_root = repo_root();
+            let home = home_dir();
+            let paths = collect_ephemeral_paths(&repo_root, &home, false)
+                .map_err(|err| err.to_string())?;
+            let purge = purge_ephemeral(&paths, dry_run).map_err(|err| err.to_string())?;
+            Ok(AutoSweepReport {
+                health_status: doctor.health_status,
+                available_gb: doctor.available_gb,
+                action: "sweep".to_string(),
+                archive: Some(archive),
+                purge: Some(purge),
+            })
+        }
+        "warning" => Ok(AutoSweepReport {
+            health_status: doctor.health_status,
+            available_gb: doctor.available_gb,
+            action: "archive".to_string(),
+            archive: Some(archive_report(dry_run)?),
+            purge: None,
+        }),
+        _ => Ok(AutoSweepReport {
+            health_status: doctor.health_status,
+            available_gb: doctor.available_gb,
+            action: "noop".to_string(),
+            archive: None,
+            purge: None,
+        }),
+    }
 }
 
 fn doctor_report() -> Result<StorageDoctorReport, String> {

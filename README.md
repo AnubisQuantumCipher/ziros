@@ -156,7 +156,15 @@ The live support matrix for this checkout is
 
 ## Quick Start
 
-Fresh clone to verified proof:
+Prebuilt install:
+
+```bash
+curl -sSf https://zkf.dev/install.sh | sh
+export PATH="$HOME/.zkf/bin:$PATH"
+ziros doctor
+```
+
+Source build from a fresh clone:
 
 ```bash
 git clone git@github.com:anubisquantumcipher/ziros.git

@@ -6,6 +6,19 @@ set -euo pipefail
 
 VERSION="${ZKF_VERSION:-latest}"
 INSTALL_DIR="${ZKF_INSTALL_DIR:-$HOME/.zkf/bin}"
+BASE_URL="${ZKF_RELEASE_BASE_URL:-https://releases.zkf.dev}"
+
+write_wrapper() {
+    local path="$1"
+    local target_name="$2"
+    cat > "$path" <<EOF
+#!/bin/bash
+set -euo pipefail
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+exec -a "$(basename "$path")" "\$SCRIPT_DIR/$target_name" "\$@"
+EOF
+    chmod +x "$path"
+}
 
 echo "ZirOS Installer (formerly ZKF)"
 echo "=============================="
@@ -63,34 +76,29 @@ echo ""
 mkdir -p "$INSTALL_DIR"
 
 # Download binary
-DOWNLOAD_URL="https://releases.zkf.dev/${VERSION}/zkf-${TARGET}"
+DOWNLOAD_URL="${BASE_URL}/${VERSION}/zkf-${TARGET}"
 echo "Downloading zkf from $DOWNLOAD_URL..."
 
 if command -v curl >/dev/null 2>&1; then
-    curl -sSfL "$DOWNLOAD_URL" -o "$INSTALL_DIR/zkf"
+    curl -sSfL "$DOWNLOAD_URL" -o "$INSTALL_DIR/zkf-cli"
 elif command -v wget >/dev/null 2>&1; then
-    wget -q "$DOWNLOAD_URL" -O "$INSTALL_DIR/zkf"
+    wget -q "$DOWNLOAD_URL" -O "$INSTALL_DIR/zkf-cli"
 else
     echo "Error: curl or wget required"
     exit 1
 fi
 
-chmod +x "$INSTALL_DIR/zkf"
-
-cat > "$INSTALL_DIR/ziros" <<'EOF'
-#!/bin/bash
-set -euo pipefail
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec -a ziros "$SCRIPT_DIR/zkf" "$@"
-EOF
-chmod +x "$INSTALL_DIR/ziros"
+chmod +x "$INSTALL_DIR/zkf-cli"
+write_wrapper "$INSTALL_DIR/ziros" "zkf-cli"
+write_wrapper "$INSTALL_DIR/zkf" "zkf-cli"
 
 # Verify installation
-"$INSTALL_DIR/zkf" --version 2>/dev/null || true
+"$INSTALL_DIR/zkf-cli" --version 2>/dev/null || true
 
 echo ""
-echo "ZirOS installed to: $INSTALL_DIR/zkf"
+echo "ZirOS installed to: $INSTALL_DIR/zkf-cli"
 echo "ZirOS alias installed to: $INSTALL_DIR/ziros"
+echo "Legacy zkf alias installed to: $INSTALL_DIR/zkf"
 echo ""
 
 # Add to PATH if needed
@@ -120,6 +128,7 @@ fi
 echo ""
 echo "Quick start:"
 echo "  ziros demo --json            # Preferred command name"
+echo "  zkf-cli doctor               # Installed binary name"
 echo "  ziros capabilities           # Show supported backends"
 echo "  ziros doctor                 # Check system requirements"
 echo "  zkf ...                      # Legacy alias still works"

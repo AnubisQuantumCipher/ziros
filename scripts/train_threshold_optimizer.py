@@ -13,6 +13,7 @@ from sklearn.metrics import mean_absolute_error
 
 from zkf_control_plane_common import (
     DEFAULT_MODEL_DIR,
+    DEFAULT_TELEMETRY_DIR,
     THRESHOLD_OPTIMIZER_FEATURE_LABELS,
     THRESHOLD_SCHEMA_V1,
     build_quality_gate,
@@ -59,10 +60,28 @@ def quality_thresholds(profile: str) -> dict[str, float]:
     }
 
 
+def telemetry_dir_stats(directory: Path) -> dict[str, str | int]:
+    import hashlib
+
+    entries = [path for path in directory.iterdir() if path.is_file()]
+    entries.sort(key=lambda path: path.name)
+    digest = hashlib.sha256()
+    for path in entries:
+        digest.update(path.name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return {
+        "record_count": len(entries),
+        "corpus_hash": digest.hexdigest(),
+    }
+
+
 def main() -> int:
     args = parse_args()
     records = load_telemetry_records(args.input)
     digest = corpus_hash(args.input)
+    telemetry_stats = telemetry_dir_stats(DEFAULT_TELEMETRY_DIR)
 
     rows = []
     scenario_ids = set()
@@ -101,6 +120,9 @@ def main() -> int:
     )
     extra_metadata = {
         "lane_semantics": "stage crossover score for adaptive GPU-versus-CPU threshold selection",
+        "telemetry_corpus_hash": telemetry_stats["corpus_hash"],
+        "telemetry_record_count": telemetry_stats["record_count"],
+        "telemetry_source": str(DEFAULT_TELEMETRY_DIR),
     }
     if args.quality_profile != "fixture":
         extra_metadata["quality_profile"] = args.quality_profile
