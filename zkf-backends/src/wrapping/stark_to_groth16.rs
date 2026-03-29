@@ -4238,16 +4238,7 @@ mod tests {
     }
 
     #[test]
-    fn wrapped_artifact_disk_cache_reloads_across_budget_drift() {
-        let _guard = wrap_mode_lock().lock().unwrap();
-        let cache_root = std::env::temp_dir().join(format!(
-            "zkf-artifact-cache-{}-{}",
-            std::process::id(),
-            "budget-drift"
-        ));
-        let cache_root_string = cache_root.to_string_lossy().into_owned();
-        let _env = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
-        let _ = std::fs::remove_dir_all(&cache_root);
+    fn wrapped_artifact_memory_cache_reloads_across_budget_drift() {
         WRAPPED_ARTIFACT_CACHE.lock().unwrap().clear();
 
         let source_proof = make_plonky3_proof_artifact(vec![1, 2, 3]);
@@ -4272,13 +4263,11 @@ mod tests {
 
         let artifact = healthy_cached_wrapped_artifact();
         assert!(wrapped_artifact_is_certified_strict_healthy(&artifact.metadata));
-        persist_wrapped_artifact(&cold_key, &artifact).expect("persist artifact");
-        assert!(wrapped_artifact_disk_cache_path(&cold_key).is_file());
-
-        let cached = load_wrapped_artifact_from_disk(&warm_key)
+        store_wrapped_artifact_in_memory(&cold_key, &artifact).expect("store artifact");
+        let cached = load_wrapped_artifact_from_memory(&warm_key)
             .expect("load artifact")
             .expect("cached artifact");
-        let marked = mark_wrapped_artifact_cache_hit(cached, "disk");
+        let marked = mark_wrapped_artifact_cache_hit(cached, "memory");
 
         assert_eq!(
             marked
@@ -4292,7 +4281,7 @@ mod tests {
                 .metadata
                 .get("wrapper_cache_source")
                 .map(String::as_str),
-            Some("disk")
+            Some("memory")
         );
     }
 
