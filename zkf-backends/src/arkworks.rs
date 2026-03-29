@@ -7,16 +7,15 @@ use crate::blackbox_native::validate_blackbox_constraints;
 use crate::metal_runtime::append_backend_runtime_metadata;
 use crate::r1cs_lowering::lower_program_for_backend;
 use crate::{
-    BackendEngine, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
-    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
-    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
-    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
-    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY,
-    GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
-    GROTH16_STREAMED_PK_PATH_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY,
-    GROTH16_STREAMED_SETUP_STORAGE_VALUE, GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY,
-    allow_dev_deterministic_groth16, proof_seed_override, requested_groth16_setup_blob_path,
-    setup_seed_override,
+    BackendEngine, GROTH16_AUTO_CEREMONY_PROVENANCE, GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY,
+    GROTH16_DETERMINISTIC_DEV_PROVENANCE, GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
+    GROTH16_IMPORTED_SETUP_PROVENANCE, GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
+    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
+    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
+    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY, GROTH16_STREAMED_PK_PATH_METADATA_KEY,
+    GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_VALUE,
+    GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY, allow_dev_deterministic_groth16,
+    proof_seed_override, requested_groth16_setup_blob_path, setup_seed_override,
 };
 use ark_bn254::{Bn254, Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use ark_ec::{AffineRepr, CurveGroup, VariableBaseMSM, scalar_mul::BatchMulPreprocessing};
@@ -34,6 +33,7 @@ use ark_relations::r1cs::{
 };
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_snark::SNARK;
+use rand::Rng;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use serde::{Deserialize, Serialize};
@@ -360,6 +360,7 @@ fn annotate_setup_metadata(
     imported_path: Option<&str>,
     setup_seed: Option<[u8; 32]>,
     used_seed_override: bool,
+    used_auto_ceremony: bool,
 ) {
     match imported_path {
         Some(path) => {
@@ -399,6 +400,8 @@ fn annotate_setup_metadata(
                 "setup_seed_source".to_string(),
                 if is_streamed_local_ceremony {
                     "local-ceremony-phase2".to_string()
+                } else if used_auto_ceremony {
+                    "auto-ceremony".to_string()
                 } else if used_seed_override {
                     "override".to_string()
                 } else {
@@ -412,6 +415,8 @@ fn annotate_setup_metadata(
                 GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
                 if is_streamed_local_ceremony {
                     GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE.to_string()
+                } else if used_auto_ceremony {
+                    GROTH16_AUTO_CEREMONY_PROVENANCE.to_string()
                 } else {
                     GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string()
                 },
@@ -420,6 +425,8 @@ fn annotate_setup_metadata(
                 GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
                 if is_streamed_local_ceremony {
                     GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY.to_string()
+                } else if used_auto_ceremony {
+                    GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string()
                 } else {
                     GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string()
                 },
@@ -575,11 +582,22 @@ impl BackendEngine for ArkworksGroth16Backend {
             let lowered_program = lowered.program.clone();
 
             let imported_setup = imported_setup_blob_for_program(program)?;
-            let used_seed_override = setup_seed_override().is_some();
             let program_digest = lowered_program.digest_hex();
-            let setup_seed = imported_setup.is_none().then(|| {
-                setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-            });
+            let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
+                (None, false, false)
+            } else if let Some(seed) = setup_seed_override() {
+                (Some(seed), true, false)
+            } else {
+                // Auto-ceremony: generate and cache a random seed per circuit
+                // digest so the developer never needs --allow-dev-deterministic-groth16.
+                match auto_ceremony_seed(&program_digest) {
+                    Ok(seed) => (Some(seed), true, true),
+                    Err(_) => {
+                        // Fall back to deterministic seed if cache dir is unwritable.
+                        (Some(deterministic_setup_seed(&program_digest)), false, false)
+                    }
+                }
+            };
             if trace_arkworks_compile_enabled() {
                 eprintln!(
                     "[arkworks-groth16-compile] program={} signals={} constraints={} imported_setup={} seed_present={}",
@@ -647,6 +665,7 @@ impl BackendEngine for ArkworksGroth16Backend {
                 imported_setup.as_ref().map(|setup| setup.path.as_str()),
                 setup_seed,
                 used_seed_override,
+                used_auto_ceremony,
             );
             annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
             attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -828,11 +847,17 @@ impl BackendEngine for ArkworksGroth16Backend {
         // Build Groth16 setup directly from ZIR-lowered R1CS constraints
         // instead of re-lowering from v2.
         let imported_setup = imported_setup_blob_for_program(&v2_raw)?;
-        let used_seed_override = setup_seed_override().is_some();
         let program_digest = v2.digest_hex();
-        let setup_seed = imported_setup.is_none().then(|| {
-            setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-        });
+        let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
+            (None, false, false)
+        } else if let Some(seed) = setup_seed_override() {
+            (Some(seed), true, false)
+        } else {
+            match auto_ceremony_seed(&program_digest) {
+                Ok(seed) => (Some(seed), true, true),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, false),
+            }
+        };
         let setup_blob = if let Some(imported_setup) = imported_setup.as_ref() {
             imported_setup.blob.clone()
         } else {
@@ -869,6 +894,7 @@ impl BackendEngine for ArkworksGroth16Backend {
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
+            used_auto_ceremony,
         );
         compiled.metadata.insert(
             "zir_r1cs_constraints".to_string(),
@@ -985,11 +1011,17 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
         let lowered = lower_program_for_backend(program, BackendKind::ArkworksGroth16)?;
         let lowered_program = lowered.program.clone();
         let imported_setup = imported_setup_blob_for_program(program)?;
-        let used_seed_override = setup_seed_override().is_some();
         let program_digest = lowered_program.digest_hex();
-        let setup_seed = imported_setup.is_none().then(|| {
-            setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-        });
+        let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
+            (None, false, false)
+        } else if let Some(seed) = setup_seed_override() {
+            (Some(seed), true, false)
+        } else {
+            match auto_ceremony_seed(&program_digest) {
+                Ok(seed) => (Some(seed), true, true),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, false),
+            }
+        };
         let streamed_setup = match (imported_setup.as_ref(), setup_seed) {
             (None, Some(seed)) => {
                 maybe_build_streamed_groth16_setup(&lowered_program, &program_digest, seed)?
@@ -1039,6 +1071,7 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
+            used_auto_ceremony,
         );
         annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
         attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -4690,6 +4723,54 @@ fn deterministic_setup_seed(program_digest: &str) -> [u8; 32] {
     let mut seed = [0u8; 32];
     seed.copy_from_slice(&digest);
     seed
+}
+
+fn groth16_auto_ceremony_cache_dir() -> PathBuf {
+    std::env::var_os("ZKF_GROTH16_CEREMONY_CACHE_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            let home = std::env::var_os("HOME")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."));
+            home.join(".zkf").join("groth16-ceremony")
+        })
+}
+
+/// Return a cached per-circuit random seed, generating one with system entropy
+/// on first use. The seed file is stored at
+/// `~/.zkf/groth16-ceremony/{program_digest}.seed` so that repeated compiles
+/// of the same circuit reuse the same CRS material. The seed is generated from
+/// `StdRng::from_entropy()`, not from the program digest, so the toxic waste
+/// is not recoverable from public information.
+fn auto_ceremony_seed(program_digest: &str) -> ZkfResult<[u8; 32]> {
+    let cache_dir = groth16_auto_ceremony_cache_dir();
+    let seed_path = cache_dir.join(format!("{program_digest}.seed"));
+
+    // Try to load a previously generated seed.
+    if let Ok(bytes) = fs::read(&seed_path) {
+        if bytes.len() == 32 {
+            let mut seed = [0u8; 32];
+            seed.copy_from_slice(&bytes);
+            return Ok(seed);
+        }
+    }
+
+    // Generate fresh entropy and persist it.
+    let mut seed = [0u8; 32];
+    StdRng::from_entropy().fill(&mut seed);
+    fs::create_dir_all(&cache_dir).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to create Groth16 auto-ceremony cache dir '{}': {err}",
+            cache_dir.display()
+        ))
+    })?;
+    fs::write(&seed_path, seed).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony seed to '{}': {err}",
+            seed_path.display()
+        ))
+    })?;
+    Ok(seed)
 }
 
 fn hex_seed(seed: &[u8; 32]) -> String {
