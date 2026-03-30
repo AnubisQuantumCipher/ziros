@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 use zkf_core::{
-    Constraint, DebugOptions, Expr, FieldElement, FieldId, Program, Signal, Visibility,
-    WitnessAssignment, WitnessPlan, build_witness_flow, debug_program, generate_witness,
-    generate_witness_unchecked,
+    BlackBoxOp, Constraint, DebugOptions, Expr, FieldElement, FieldId, Program, Signal,
+    Visibility, WitnessAssignment, WitnessPlan, build_witness_flow, debug_program,
+    generate_witness, generate_witness_unchecked,
 };
 
 fn program_with_plan() -> Program {
@@ -132,6 +132,7 @@ fn debug_can_continue_after_failures() {
         &witness,
         DebugOptions {
             stop_on_first_failure: false,
+            include_poseidon_trace: false,
         },
     );
     assert!(!report.passed);
@@ -182,12 +183,17 @@ fn underconstrained_analysis_reports_linear_nullity() {
         &witness,
         DebugOptions {
             stop_on_first_failure: false,
+            include_poseidon_trace: false,
         },
     );
 
     assert_eq!(report.underconstrained.linear_private_signal_count, 2);
     assert_eq!(report.underconstrained.linear_rank, 1);
     assert_eq!(report.underconstrained.linear_nullity, 1);
+    assert_eq!(
+        report.underconstrained.linear_only_signals,
+        report.underconstrained.linearly_underdetermined_private_signals
+    );
     assert_eq!(report.underconstrained.nonlinear_constraint_count, 0);
     assert!(
         report
@@ -200,6 +206,74 @@ fn underconstrained_analysis_reports_linear_nullity() {
             .underconstrained
             .unconstrained_private_signals
             .is_empty()
+    );
+}
+
+#[test]
+fn debug_poseidon_trace_is_opt_in() {
+    let program = Program {
+        name: "poseidon_trace_demo".to_string(),
+        field: FieldId::Bn254,
+        signals: vec![
+            Signal {
+                name: "left".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "right".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            },
+            Signal {
+                name: "digest".to_string(),
+                visibility: Visibility::Public,
+                constant: None,
+                ty: None,
+            },
+        ],
+        constraints: vec![Constraint::BlackBox {
+            op: BlackBoxOp::Poseidon,
+            inputs: vec![Expr::signal("left"), Expr::signal("right")],
+            outputs: vec!["digest".to_string()],
+            params: BTreeMap::new(),
+            label: Some("poseidon_round".to_string()),
+        }],
+        witness_plan: WitnessPlan::default(),
+        ..Default::default()
+    };
+    let witness = generate_witness_unchecked(
+        &program,
+        &inputs(&[("left", 3), ("right", 5), ("digest", 8)]),
+    )
+    .expect("unchecked witness should build");
+
+    let report_without_trace = debug_program(&program, &witness, DebugOptions::default());
+    assert!(report_without_trace.poseidon_trace.is_empty());
+
+    let report_with_trace = debug_program(
+        &program,
+        &witness,
+        DebugOptions {
+            stop_on_first_failure: true,
+            include_poseidon_trace: true,
+        },
+    );
+    assert_eq!(report_with_trace.poseidon_trace.len(), 1);
+    assert_eq!(
+        report_with_trace.poseidon_trace[0].label.as_deref(),
+        Some("poseidon_round")
+    );
+    assert_eq!(report_with_trace.poseidon_trace[0].inputs.len(), 2);
+    assert_eq!(
+        report_with_trace.poseidon_trace[0].inputs[0].signal_names,
+        vec!["left".to_string()]
+    );
+    assert_eq!(
+        report_with_trace.poseidon_trace[0].outputs[0].name,
+        "digest".to_string()
     );
 }
 

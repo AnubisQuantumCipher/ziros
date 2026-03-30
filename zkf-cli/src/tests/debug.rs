@@ -53,7 +53,7 @@ fn debug_writes_report_for_partial_witness_and_keeps_concrete_failures() {
     )
     .expect("inputs");
 
-    crate::cmd::debug::handle_debug(program_path, inputs_path, out_path.clone(), false, None)
+    crate::cmd::debug::handle_debug(program_path, inputs_path, out_path.clone(), false, false, None)
         .expect("debug should write a report for partial witnesses");
 
     let report: zkf_core::DebugReport = read_json(&out_path).expect("debug report");

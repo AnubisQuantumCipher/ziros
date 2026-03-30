@@ -367,6 +367,8 @@ fn direct_prove_success_payload_includes_structured_groth16_acceleration() {
         hybrid_bundle: None,
         credential_bundle: None,
         archive_metadata: None,
+        proof_origin_signature: None,
+        proof_origin_public_keys: None,
     };
 
     let payload = cmd::prove::direct_prove_success_payload(

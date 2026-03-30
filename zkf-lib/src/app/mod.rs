@@ -6,6 +6,7 @@ pub mod audit;
 pub mod builder;
 pub mod combustion;
 pub mod descent;
+pub mod edl_monte_carlo;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod evidence;
 pub mod falcon_heavy_certification;
@@ -22,6 +23,8 @@ pub mod reentry_ops;
 pub mod satellite;
 pub mod science;
 pub mod spec;
+pub mod subsystem;
+pub mod subsystem_support;
 pub mod sovereign_economic_defense;
 pub mod templates;
 pub mod thermochemical;

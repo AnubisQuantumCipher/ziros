@@ -124,10 +124,10 @@ pub use benchmark::{BenchmarkMetrics, BenchmarkReport, StatsAggregate};
 #[cfg(feature = "full")]
 pub use debugger::{
     ConstraintTrace, ConstraintTraceDetail, DebugOptions, DebugReport, ExprTrace,
-    SymbolicConstraint, SymbolicOrigin, SymbolicSignal, UnderconstrainedAnalysis, WitnessFlowEdge,
-    WitnessFlowGraph, WitnessFlowNode, WitnessFlowStep, analyze_underconstrained,
-    analyze_underconstrained_zir, build_witness_flow, build_witness_flow_zir, debug_program,
-    debug_program_zir,
+    PoseidonTraceEntry, PoseidonTraceSignal, PoseidonTraceValue, SymbolicConstraint,
+    SymbolicOrigin, SymbolicSignal, UnderconstrainedAnalysis, WitnessFlowEdge, WitnessFlowGraph,
+    WitnessFlowNode, WitnessFlowStep, analyze_underconstrained, analyze_underconstrained_zir,
+    build_witness_flow, build_witness_flow_zir, debug_program, debug_program_zir,
 };
 #[cfg(feature = "full")]
 pub use diagnostics::{

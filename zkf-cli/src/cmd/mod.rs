@@ -23,6 +23,7 @@ pub(crate) mod runtime;
 pub(crate) mod aerospace_qualification;
 pub(crate) mod sovereign_economic_defense;
 pub(crate) mod storage;
+pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
@@ -32,7 +33,7 @@ pub(crate) mod keys;
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    TelemetryCommands,
+    SubsystemCommands, TelemetryCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -44,6 +45,14 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     let guard = EntrypointGuard::begin(EntrypointSurface::Cli, command_name(&command));
     let result = match command {
         Commands::App { command } => app::handle_app(command),
+        Commands::Subsystem { command } => match command {
+            SubsystemCommands::VerifyCompleteness { root, json } => {
+                subsystem::handle_verify_completeness(root, json)
+            }
+            SubsystemCommands::VerifyReleasePin { pin, binary, json } => {
+                subsystem::handle_verify_release_pin(pin, binary, json)
+            }
+        },
         Commands::Credential { command } => credential::handle_credential(command),
         Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
@@ -167,8 +176,16 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             inputs,
             out,
             continue_on_failure,
+            poseidon_trace,
             solver,
-        } => debug::handle_debug(program, inputs, out, continue_on_failure, solver),
+        } => debug::handle_debug(
+            program,
+            inputs,
+            out,
+            continue_on_failure,
+            poseidon_trace,
+            solver,
+        ),
         Commands::Prove {
             program,
             inputs,
@@ -526,6 +543,14 @@ fn command_name(command: &Commands) -> String {
                     "app:aerospace-qualification:export-bundle".to_string()
                 }
             },
+        },
+        Commands::Subsystem { command } => match command {
+            SubsystemCommands::VerifyCompleteness { .. } => {
+                "subsystem:verify-completeness".to_string()
+            }
+            SubsystemCommands::VerifyReleasePin { .. } => {
+                "subsystem:verify-release-pin".to_string()
+            }
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),

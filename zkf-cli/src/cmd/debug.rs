@@ -1,8 +1,11 @@
+use std::fs;
 use std::path::PathBuf;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use zkf_cloudfs::CloudFS;
 use zkf_core::{
-    DebugOptions, Program, analyze_program, debug_program, ensure_witness_completeness,
-    generate_partial_witness, solve_witness, solver_by_name,
+    DebugOptions, PoseidonTraceEntry, Program, analyze_program, debug_program,
+    ensure_witness_completeness, generate_partial_witness, solve_witness, solver_by_name,
 };
 
 use crate::util::{
@@ -14,6 +17,7 @@ pub(crate) fn handle_debug(
     inputs: PathBuf,
     out: PathBuf,
     continue_on_failure: bool,
+    poseidon_trace: bool,
     solver: Option<String>,
 ) -> Result<(), String> {
     let program: Program = load_program_v2(&program)?;
@@ -59,8 +63,16 @@ pub(crate) fn handle_debug(
         &witness,
         DebugOptions {
             stop_on_first_failure: !(continue_on_failure || witness_is_partial),
+            include_poseidon_trace: poseidon_trace,
         },
     );
+    let mut report = report;
+    let poseidon_trace_path = if poseidon_trace && !report.poseidon_trace.is_empty() {
+        let trace = std::mem::take(&mut report.poseidon_trace);
+        Some(persist_poseidon_trace_local(&program, &trace)?)
+    } else {
+        None
+    };
     write_json(&out, &report)?;
 
     let first_concrete_failure = report
@@ -106,6 +118,80 @@ pub(crate) fn handle_debug(
     } else {
         println!("debug: FAILED -> {}", out.display());
     }
+    if let Some(path) = poseidon_trace_path {
+        println!(
+            "debug: poseidon trace written to local cache only -> {}",
+            path.display()
+        );
+    }
 
     Ok(())
+}
+
+const POSEIDON_TRACE_CACHE_DIR: &str = "debug/poseidon";
+const POSEIDON_TRACE_MAX_AGE: Duration = Duration::from_secs(60 * 60);
+
+fn persist_poseidon_trace_local(
+    program: &Program,
+    trace: &[PoseidonTraceEntry],
+) -> Result<PathBuf, String> {
+    let cloudfs = CloudFS::new().map_err(|error| error.to_string())?;
+    prune_stale_poseidon_traces(cloudfs.cache_root().join(POSEIDON_TRACE_CACHE_DIR));
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    let slug = program
+        .name
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() {
+                ch.to_ascii_lowercase()
+            } else {
+                '-'
+            }
+        })
+        .collect::<String>()
+        .trim_matches('-')
+        .to_string();
+    let relative = format!(
+        "{POSEIDON_TRACE_CACHE_DIR}/{}-{}-{now}.json",
+        if slug.is_empty() { "program" } else { &slug },
+        &program.digest_hex()[..16]
+    );
+    let payload = serde_json::json!({
+        "schema": "zkf-poseidon-trace-v1",
+        "program_name": program.name.clone(),
+        "program_digest": program.digest_hex(),
+        "generated_at_unix_seconds": now,
+        "trace": trace,
+    });
+    let bytes = serde_json::to_vec_pretty(&payload).map_err(|error| error.to_string())?;
+    cloudfs
+        .write_local_only(&relative, &bytes)
+        .map_err(|error| error.to_string())?;
+    Ok(cloudfs.cache_root().join(relative))
+}
+
+fn prune_stale_poseidon_traces(root: PathBuf) {
+    let Ok(entries) = fs::read_dir(&root) else {
+        return;
+    };
+    let now = SystemTime::now();
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let Ok(metadata) = entry.metadata() else {
+            continue;
+        };
+        let Ok(modified) = metadata.modified() else {
+            continue;
+        };
+        if now
+            .duration_since(modified)
+            .unwrap_or_default()
+            .gt(&POSEIDON_TRACE_MAX_AGE)
+        {
+            let _ = fs::remove_file(path);
+        }
+    }
 }

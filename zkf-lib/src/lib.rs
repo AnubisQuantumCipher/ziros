@@ -239,6 +239,11 @@ pub use app::spec::{
     build_app_spec, instantiate_template, template_registry,
 };
 #[cfg(not(hax))]
+pub use app::subsystem::{
+    SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, SUBSYSTEM_MANIFEST_SCHEMA_V1,
+    SubsystemCircuitManifestV1, SubsystemManifestEnvelopeV1,
+};
+#[cfg(not(hax))]
 pub use app::sovereign_economic_defense::{
     AntiExtractionShieldRequestV1, CommunityLandTrustGovernanceRequestV1,
     CooperativeTreasuryAssuranceRequestV1, RecirculationSovereigntyScoreRequestV1,

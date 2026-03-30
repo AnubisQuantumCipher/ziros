@@ -9,7 +9,7 @@ use crate::util::{
 use chrono::Utc;
 use ed25519_dalek::{Signer, SigningKey};
 use libcrux_ml_dsa::ml_dsa_87::{
-    MLDSA87SigningKey, MLDSA87VerificationKey, generate_key_pair, sign as mldsa_sign,
+    MLDSA87SigningKey, generate_key_pair, sign as mldsa_sign,
 };
 use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
 use serde::{Deserialize, Serialize};

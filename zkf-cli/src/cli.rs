@@ -18,6 +18,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: AppCommands,
     },
+    /// Operate black-box subsystem bundles and validate their closure contract.
+    Subsystem {
+        #[command(subcommand)]
+        command: SubsystemCommands,
+    },
     /// Issue and prove private-identity credentials.
     Credential {
         #[command(subcommand)]
@@ -217,6 +222,8 @@ pub(crate) enum Commands {
         out: PathBuf,
         #[arg(long)]
         continue_on_failure: bool,
+        #[arg(long)]
+        poseidon_trace: bool,
         #[arg(long)]
         solver: Option<String>,
     },
@@ -496,7 +503,7 @@ pub(crate) enum AppCommands {
         template: String,
         #[arg(long = "template-arg")]
         template_arg: Vec<String>,
-        #[arg(long, default_value = "colored")]
+        #[arg(long, default_value = "auto")]
         style: String,
         #[arg(long)]
         out: Option<PathBuf>,
@@ -542,6 +549,28 @@ pub(crate) enum AppCommands {
         about = "Run the six-circuit aerospace qualification subsystem powered by ZirOS with Midnight governance: thermal qualification, vibration/shock qualification, lot genealogy, firmware provenance, test campaign compliance, and flight-readiness assembly."
     )]
     AerospaceQualification(AerospaceQualificationArgs),
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum SubsystemCommands {
+    /// Verify that a subsystem bundle is complete against the canonical 20-slot contract.
+    #[command(name = "verify-completeness")]
+    VerifyCompleteness {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Verify the pinned zkf binary checksum and signature carried by a subsystem bundle.
+    #[command(name = "verify-release-pin")]
+    VerifyReleasePin {
+        #[arg(long)]
+        pin: PathBuf,
+        #[arg(long)]
+        binary: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[derive(Debug, Args)]

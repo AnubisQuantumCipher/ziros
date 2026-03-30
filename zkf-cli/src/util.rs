@@ -2189,8 +2189,9 @@ pub(crate) fn render_zkf_error(err: ZkfError) -> String {
             }
             if let Some(analysis) = analysis.as_deref() {
                 rendered.push_str(&format!(
-                    "; linear_nullity={}; linearly_underdetermined_private_signals={:?}; nonlinear_unanchored_components={:?}",
+                    "; linear_nullity={}; linear_only_signals={:?}; linearly_underdetermined_private_signals={:?}; nonlinear_unanchored_components={:?}",
                     analysis.linear_nullity,
+                    analysis.linear_only_signals,
                     analysis.linearly_underdetermined_private_signals,
                     analysis.nonlinear_unanchored_components
                 ));

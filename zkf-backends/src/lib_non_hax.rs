@@ -511,6 +511,14 @@ pub const GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY: &str = "groth16_setup_sto
 pub const GROTH16_STREAMED_SETUP_STORAGE_VALUE: &str = "streamed-disk";
 pub const GROTH16_STREAMED_PK_PATH_METADATA_KEY: &str = "groth16_streamed_pk_path";
 pub const GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY: &str = "groth16_streamed_shape_path";
+pub const GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY: &str = "groth16_ceremony_subsystem";
+pub const GROTH16_CEREMONY_ID_METADATA_KEY: &str = "groth16_ceremony_id";
+pub const GROTH16_CEREMONY_KIND_METADATA_KEY: &str = "groth16_ceremony_kind";
+pub const GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY: &str = "groth16_ceremony_report_path";
+pub const GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY: &str =
+    "groth16_ceremony_report_sha256";
+pub const GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY: &str =
+    "groth16_ceremony_seed_commitment_sha256";
 pub const GROTH16_IMPORTED_SETUP_PROVENANCE: &str = "trusted-imported-blob";
 pub const GROTH16_DETERMINISTIC_DEV_PROVENANCE: &str = "deterministic-dev";
 pub const GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE: &str = "local-ceremony-phase2-streamed";
@@ -684,6 +692,24 @@ pub fn compiled_uses_auto_ceremony_groth16_setup(compiled: &CompiledProgram) -> 
             .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
             .map(String::as_str)
             == Some(GROTH16_AUTO_CEREMONY_PROVENANCE)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_ID_METADATA_KEY)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_KIND_METADATA_KEY)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY)
+        && compiled
+            .metadata
+            .contains_key(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY)
 }
 
 pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfResult<()> {
@@ -711,7 +737,7 @@ pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfR
         .unwrap_or("unspecified");
 
     Err(ZkfError::Backend(format!(
-        "security-covered Groth16 proving requires imported trusted CRS material or a streamed local-ceremony setup bound to the compiled program. Recompile with program metadata key '{}' (or env '{}') pointing to a trusted setup blob, or use the local-ceremony streamed setup lane, or set '{}' / the matching override only for explicit development testing. Current boundary={boundary}, provenance={provenance}.",
+        "security-covered Groth16 proving requires imported trusted CRS material, a fully reported subsystem auto-ceremony compile, or a streamed local-ceremony setup bound to the compiled program. Recompile with program metadata key '{}' (or env '{}') pointing to a trusted setup blob, or recompile without a setup override so the subsystem auto-ceremony report is materialized, or use the local-ceremony streamed setup lane, or set '{}' / the matching override only for explicit development testing. Current boundary={boundary}, provenance={provenance}.",
         GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
         GROTH16_SETUP_BLOB_PATH_ENV,
         ALLOW_DEV_DETERMINISTIC_GROTH16_ENV,

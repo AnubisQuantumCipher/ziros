@@ -2,7 +2,9 @@ use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_backends::{
-    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, backend_for,
+    GROTH16_CEREMONY_ID_METADATA_KEY, GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY,
+    GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY, backend_for,
+    ensure_security_covered_groth16_setup,
     set_allow_dev_deterministic_groth16_override, set_proof_seed_override, set_setup_seed_override,
     with_allow_dev_deterministic_groth16_override, with_proof_seed_override,
     with_setup_seed_override,
@@ -35,6 +37,14 @@ fn unique_temp_setup_blob_path() -> PathBuf {
         "zkf-groth16-setup-{}-{nanos}.bin",
         std::process::id()
     ))
+}
+
+fn unique_temp_dir(prefix: &str) -> PathBuf {
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("clock")
+        .as_nanos();
+    std::env::temp_dir().join(format!("{prefix}-{}-{nanos}", std::process::id()))
 }
 
 #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
@@ -506,6 +516,89 @@ fn groth16_compile_honors_setup_seed_override() {
         compiled.metadata.contains_key("r1cs_recursive_markers"),
         "compile metadata should include recursive marker count"
     );
+}
+
+#[test]
+fn groth16_compile_auto_ceremony_is_scoped_per_subsystem_and_reported() {
+    let _guard = lock_setup_seed();
+    set_setup_seed_override(None);
+    set_allow_dev_deterministic_groth16_override(None);
+
+    let cache_dir = unique_temp_dir("zkf-groth16-auto-ceremony");
+    std::fs::create_dir_all(&cache_dir).expect("create ceremony cache dir");
+    let previous_cache_dir = std::env::var_os("ZKF_GROTH16_CEREMONY_CACHE_DIR");
+    unsafe {
+        std::env::set_var("ZKF_GROTH16_CEREMONY_CACHE_DIR", &cache_dir);
+    }
+
+    let result = (|| {
+        let backend = backend_for(BackendKind::ArkworksGroth16);
+        let mut program = mul_add_program();
+        program
+            .metadata
+            .insert("application".to_string(), "test-subsystem".to_string());
+
+        let compiled = backend.compile(&program).expect("compile should pass");
+        ensure_security_covered_groth16_setup(&compiled)
+            .expect("auto ceremony should satisfy security-covered setup");
+
+        assert_eq!(
+            compiled
+                .metadata
+                .get("setup_seed_source")
+                .map(String::as_str),
+            Some("auto-ceremony")
+        );
+        assert_eq!(
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY)
+                .map(String::as_str),
+            Some("test-subsystem")
+        );
+        assert!(
+            !compiled.metadata.contains_key("setup_seed_hex"),
+            "auto ceremony must not expose toxic-waste seed bytes in compiled metadata"
+        );
+
+        let report_path = PathBuf::from(
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY)
+                .expect("ceremony report path metadata"),
+        );
+        let report_bytes = std::fs::read(&report_path).expect("read auto ceremony report");
+        let report: serde_json::Value =
+            serde_json::from_slice(&report_bytes).expect("parse auto ceremony report");
+        assert_eq!(report["subsystem_id"], "test-subsystem");
+        assert_eq!(report["program_digest"], compiled.program_digest);
+        assert_eq!(report["security_boundary"], "auto-ceremony");
+
+        let witness = generate_witness(&program, &mul_add_inputs(3, 4)).expect("witness");
+        let proof = backend.prove(&compiled, &witness).expect("prove");
+        assert_eq!(
+            proof.metadata
+                .get(GROTH16_CEREMONY_ID_METADATA_KEY)
+                .map(String::as_str),
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_ID_METADATA_KEY)
+                .map(String::as_str)
+        );
+        assert_eq!(
+            proof.metadata
+                .get(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY)
+                .map(String::as_str),
+            Some(report_path.to_string_lossy().as_ref())
+        );
+    })();
+
+    match previous_cache_dir {
+        Some(value) => unsafe { std::env::set_var("ZKF_GROTH16_CEREMONY_CACHE_DIR", value) },
+        None => unsafe { std::env::remove_var("ZKF_GROTH16_CEREMONY_CACHE_DIR") },
+    }
+    let _ = std::fs::remove_dir_all(&cache_dir);
+    result
 }
 
 #[test]

@@ -38,6 +38,15 @@ order.
   validated, and the truth surfaces are updated again.
 - Public/release-safe flows are strict cryptographic unless the caller explicitly opts into an
   attestation trust lane.
+- Groth16 setup trust must be read from emitted metadata, not narrative prose. The live reporting
+  contract is `setup_seed_source`, `groth16_setup_provenance`, `groth16_setup_security_boundary`,
+  and, for the auto-ceremony lane, `groth16_ceremony_subsystem`,
+  `groth16_ceremony_id`, `groth16_ceremony_kind`, `groth16_ceremony_report_path`,
+  `groth16_ceremony_report_sha256`, and `groth16_ceremony_seed_commitment_sha256`.
+- Subsystem bundles consume a pinned `zkf` release binary as a black box. The shipped contract is
+  author-fixed backend policy per circuit/lane, not end-user-selectable backend mutation.
+- Native BN254 Groth16 is the supported on-chain subsystem lane. Public STARK-to-Groth16 wrapping
+  remains non-primary and must not be described as the default subsystem publication route.
 
 Additional trust semantics guidance lives in
 `WRAPPING_SECURITY.md`.

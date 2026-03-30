@@ -8,10 +8,12 @@ use crate::metal_runtime::append_backend_runtime_metadata;
 use crate::r1cs_lowering::lower_program_for_backend;
 use crate::{
     BackendEngine, GROTH16_AUTO_CEREMONY_PROVENANCE, GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY,
+    GROTH16_CEREMONY_ID_METADATA_KEY, GROTH16_CEREMONY_KIND_METADATA_KEY,
+    GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY, GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY,
+    GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY, GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY,
     GROTH16_DETERMINISTIC_DEV_PROVENANCE, GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
     GROTH16_IMPORTED_SETUP_PROVENANCE, GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
-    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
-    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
+    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
     GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY, GROTH16_STREAMED_PK_PATH_METADATA_KEY,
     GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_VALUE,
     GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY, allow_dev_deterministic_groth16,
@@ -72,6 +74,255 @@ struct StreamedSetupBlob {
     blob: Vec<u8>,
     pk_path: PathBuf,
     shape_path: PathBuf,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum AutoCeremonySeedSource {
+    ExistingCache,
+    Generated,
+    MigratedLegacyCache,
+}
+
+impl AutoCeremonySeedSource {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::ExistingCache => "existing-cache",
+            Self::Generated => "generated-os-rng",
+            Self::MigratedLegacyCache => "migrated-legacy-cache",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AutoCeremonyContext {
+    subsystem_id: String,
+    ceremony_id: String,
+    seed_path: PathBuf,
+    report_path: PathBuf,
+    seed: [u8; 32],
+    seed_source: AutoCeremonySeedSource,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AutoCeremonySubsystemManifest {
+    schema: String,
+    backend: String,
+    subsystem_id: String,
+    created_at_unix: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AutoCeremonyProgramReport {
+    schema: String,
+    backend: String,
+    subsystem_id: String,
+    ceremony_id: String,
+    ceremony_kind: String,
+    program_name: String,
+    program_digest: String,
+    created_at_unix: u64,
+    seed_source: String,
+    seed_commitment_sha256: String,
+    seed_path: String,
+    setup_storage: String,
+    setup_blob_version: u8,
+    setup_blob_sha256: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    streamed_pk_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    streamed_shape_path: Option<String>,
+    security_boundary: String,
+}
+
+fn unix_timestamp_now() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+fn sanitize_ceremony_path_component(value: &str) -> String {
+    let sanitized: String = value
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.') {
+                ch
+            } else {
+                '-'
+            }
+        })
+        .collect();
+    sanitized
+        .trim_matches('-')
+        .chars()
+        .take(96)
+        .collect::<String>()
+}
+
+fn groth16_auto_ceremony_subsystem_id(program: &Program) -> String {
+    [
+        "subsystem_id",
+        "subsystem",
+        "application",
+        "app_id",
+        "app",
+        "owner",
+    ]
+    .iter()
+    .find_map(|key| program.metadata.get(*key))
+    .filter(|value| !value.trim().is_empty())
+    .cloned()
+    .unwrap_or_else(|| program.name.clone())
+}
+
+fn ensure_auto_ceremony_subsystem_manifest(
+    cache_dir: &Path,
+    subsystem_id: &str,
+) -> ZkfResult<()> {
+    let manifest_path = cache_dir.join("subsystem.json");
+    if manifest_path.exists() {
+        return Ok(());
+    }
+    let manifest = AutoCeremonySubsystemManifest {
+        schema: "zkf-groth16-auto-ceremony-subsystem-v1".to_string(),
+        backend: BackendKind::ArkworksGroth16.as_str().to_string(),
+        subsystem_id: subsystem_id.to_string(),
+        created_at_unix: unix_timestamp_now(),
+    };
+    let bytes = serde_json::to_vec_pretty(&manifest)
+        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    fs::write(&manifest_path, bytes).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony subsystem manifest '{}': {err}",
+            manifest_path.display()
+        ))
+    })
+}
+
+fn legacy_auto_ceremony_seed_path(program_digest: &str) -> PathBuf {
+    groth16_auto_ceremony_cache_dir().join(format!("{program_digest}.seed"))
+}
+
+fn auto_ceremony_context(program: &Program, program_digest: &str) -> ZkfResult<AutoCeremonyContext> {
+    let subsystem_id = groth16_auto_ceremony_subsystem_id(program);
+    let subsystem_slug = sanitize_ceremony_path_component(&subsystem_id);
+    let subsystem_dir = groth16_auto_ceremony_cache_dir().join(subsystem_slug);
+    let program_dir = subsystem_dir.join("programs").join(program_digest);
+    fs::create_dir_all(&program_dir).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to create Groth16 auto-ceremony cache dir '{}': {err}",
+            program_dir.display()
+        ))
+    })?;
+    ensure_auto_ceremony_subsystem_manifest(&subsystem_dir, &subsystem_id)?;
+
+    let seed_path = program_dir.join("phase2.seed");
+    let report_path = program_dir.join("report.json");
+
+    if let Ok(bytes) = fs::read(&seed_path)
+        && bytes.len() == 32
+    {
+        let mut seed = [0u8; 32];
+        seed.copy_from_slice(&bytes);
+        return Ok(AutoCeremonyContext {
+            subsystem_id: subsystem_id.clone(),
+            ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+            seed_path,
+            report_path,
+            seed,
+            seed_source: AutoCeremonySeedSource::ExistingCache,
+        });
+    }
+
+    let legacy_seed_path = legacy_auto_ceremony_seed_path(program_digest);
+    if let Ok(bytes) = fs::read(&legacy_seed_path)
+        && bytes.len() == 32
+    {
+        fs::write(&seed_path, &bytes).map_err(|err| {
+            ZkfError::Io(format!(
+                "failed to migrate Groth16 legacy auto-ceremony seed to '{}': {err}",
+                seed_path.display()
+            ))
+        })?;
+        let mut seed = [0u8; 32];
+        seed.copy_from_slice(&bytes);
+        return Ok(AutoCeremonyContext {
+            subsystem_id: subsystem_id.clone(),
+            ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+            seed_path,
+            report_path,
+            seed,
+            seed_source: AutoCeremonySeedSource::MigratedLegacyCache,
+        });
+    }
+
+    let mut seed = [0u8; 32];
+    StdRng::from_entropy().fill(&mut seed);
+    fs::write(&seed_path, seed).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony seed to '{}': {err}",
+            seed_path.display()
+        ))
+    })?;
+    Ok(AutoCeremonyContext {
+        subsystem_id: subsystem_id.clone(),
+        ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+        seed_path,
+        report_path,
+        seed,
+        seed_source: AutoCeremonySeedSource::Generated,
+    })
+}
+
+fn write_auto_ceremony_report(
+    context: &AutoCeremonyContext,
+    program: &Program,
+    program_digest: &str,
+    setup_blob: &[u8],
+    streamed_setup: Option<&StreamedSetupBlob>,
+) -> ZkfResult<String> {
+    let report = AutoCeremonyProgramReport {
+        schema: "zkf-groth16-auto-ceremony-report-v1".to_string(),
+        backend: BackendKind::ArkworksGroth16.as_str().to_string(),
+        subsystem_id: context.subsystem_id.clone(),
+        ceremony_id: context.ceremony_id.clone(),
+        ceremony_kind: "subsystem-scoped-auto-phase2".to_string(),
+        program_name: program.name.clone(),
+        program_digest: program_digest.to_string(),
+        created_at_unix: unix_timestamp_now(),
+        seed_source: context.seed_source.as_str().to_string(),
+        seed_commitment_sha256: sha256_hex(&context.seed),
+        seed_path: context.seed_path.display().to_string(),
+        setup_storage: if streamed_setup.is_some() {
+            GROTH16_STREAMED_SETUP_STORAGE_VALUE.to_string()
+        } else {
+            "compiled-blob".to_string()
+        },
+        setup_blob_version: SETUP_BLOB_VERSION,
+        setup_blob_sha256: sha256_hex(setup_blob),
+        streamed_pk_path: streamed_setup.map(|value| value.pk_path.display().to_string()),
+        streamed_shape_path: streamed_setup.map(|value| value.shape_path.display().to_string()),
+        security_boundary: GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string(),
+    };
+    let bytes =
+        serde_json::to_vec_pretty(&report).map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    fs::write(&context.report_path, &bytes).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony report '{}': {err}",
+            context.report_path.display()
+        ))
+    })?;
+    Ok(sha256_hex(&bytes))
 }
 
 fn load_requested_setup_blob(path: impl AsRef<Path>) -> ZkfResult<Vec<u8>> {
@@ -360,8 +611,18 @@ fn annotate_setup_metadata(
     imported_path: Option<&str>,
     setup_seed: Option<[u8; 32]>,
     used_seed_override: bool,
-    used_auto_ceremony: bool,
+    auto_ceremony: Option<(&AutoCeremonyContext, &str)>,
 ) {
+    let clear_auto_ceremony_metadata =
+        |metadata: &mut BTreeMap<String, String>| {
+            metadata.remove(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY);
+            metadata.remove(GROTH16_CEREMONY_ID_METADATA_KEY);
+            metadata.remove(GROTH16_CEREMONY_KIND_METADATA_KEY);
+            metadata.remove(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY);
+            metadata.remove(GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY);
+            metadata.remove(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY);
+        };
+
     match imported_path {
         Some(path) => {
             compiled
@@ -384,56 +645,97 @@ fn annotate_setup_metadata(
                 GROTH16_SETUP_BLOB_PATH_METADATA_KEY.to_string(),
                 path.to_string(),
             );
+            clear_auto_ceremony_metadata(&mut compiled.metadata);
         }
         None => {
             let setup_seed = setup_seed.expect("deterministic setup seed must be present");
-            let is_streamed_local_ceremony = compiled
-                .metadata
-                .get(GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY)
-                .map(String::as_str)
-                == Some(GROTH16_STREAMED_SETUP_STORAGE_VALUE)
-                && used_seed_override;
             compiled
                 .metadata
                 .insert("setup_deterministic".to_string(), "true".to_string());
-            compiled.metadata.insert(
-                "setup_seed_source".to_string(),
-                if is_streamed_local_ceremony {
-                    "local-ceremony-phase2".to_string()
-                } else if used_auto_ceremony {
-                    "auto-ceremony".to_string()
-                } else if used_seed_override {
-                    "override".to_string()
-                } else {
-                    "program-digest".to_string()
-                },
-            );
-            compiled
-                .metadata
-                .insert("setup_seed_hex".to_string(), hex_seed(&setup_seed));
-            compiled.metadata.insert(
-                GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
-                if is_streamed_local_ceremony {
-                    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE.to_string()
-                } else if used_auto_ceremony {
-                    GROTH16_AUTO_CEREMONY_PROVENANCE.to_string()
-                } else {
-                    GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string()
-                },
-            );
-            compiled.metadata.insert(
-                GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
-                if is_streamed_local_ceremony {
-                    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY.to_string()
-                } else if used_auto_ceremony {
-                    GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string()
-                } else {
-                    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string()
-                },
-            );
+            if let Some((context, report_sha256)) = auto_ceremony {
+                compiled
+                    .metadata
+                    .insert("setup_seed_source".to_string(), "auto-ceremony".to_string());
+                compiled.metadata.remove("setup_seed_hex");
+                compiled.metadata.insert(
+                    GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+                    GROTH16_AUTO_CEREMONY_PROVENANCE.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+                    GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY.to_string(),
+                    context.subsystem_id.clone(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_ID_METADATA_KEY.to_string(),
+                    context.ceremony_id.clone(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_KIND_METADATA_KEY.to_string(),
+                    "subsystem-scoped-auto-phase2".to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY.to_string(),
+                    context.report_path.display().to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY.to_string(),
+                    report_sha256.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY.to_string(),
+                    sha256_hex(&context.seed),
+                );
+            } else {
+                compiled.metadata.insert(
+                    "setup_seed_source".to_string(),
+                    if used_seed_override {
+                        "override".to_string()
+                    } else {
+                        "program-digest".to_string()
+                    },
+                );
+                compiled
+                    .metadata
+                    .insert("setup_seed_hex".to_string(), hex_seed(&setup_seed));
+                compiled.metadata.insert(
+                    GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+                    GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+                    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string(),
+                );
+                clear_auto_ceremony_metadata(&mut compiled.metadata);
+            }
             compiled
                 .metadata
                 .remove(GROTH16_SETUP_BLOB_PATH_METADATA_KEY);
+        }
+    }
+}
+
+fn propagate_setup_metadata_to_proof(
+    compiled: &CompiledProgram,
+    metadata: &mut BTreeMap<String, String>,
+) {
+    for key in [
+        "setup_deterministic",
+        "setup_seed_source",
+        GROTH16_SETUP_PROVENANCE_METADATA_KEY,
+        GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
+        GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY,
+        GROTH16_CEREMONY_ID_METADATA_KEY,
+        GROTH16_CEREMONY_KIND_METADATA_KEY,
+        GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY,
+        GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY,
+        GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY,
+    ] {
+        if let Some(value) = compiled.metadata.get(key) {
+            metadata.insert(key.to_string(), value.clone());
         }
     }
 }
@@ -583,19 +885,15 @@ impl BackendEngine for ArkworksGroth16Backend {
 
             let imported_setup = imported_setup_blob_for_program(program)?;
             let program_digest = lowered_program.digest_hex();
-            let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
-                (None, false, false)
+            let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some()
+            {
+                (None, false, None)
             } else if let Some(seed) = setup_seed_override() {
-                (Some(seed), true, false)
+                (Some(seed), true, None)
             } else {
-                // Auto-ceremony: generate and cache a random seed per circuit
-                // digest so the developer never needs --allow-dev-deterministic-groth16.
-                match auto_ceremony_seed(&program_digest) {
-                    Ok(seed) => (Some(seed), true, true),
-                    Err(_) => {
-                        // Fall back to deterministic seed if cache dir is unwritable.
-                        (Some(deterministic_setup_seed(&program_digest)), false, false)
-                    }
+                match auto_ceremony_context(program, &program_digest) {
+                    Ok(context) => (Some(context.seed), true, Some(context)),
+                    Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
                 }
             };
             if trace_arkworks_compile_enabled() {
@@ -643,6 +941,18 @@ impl BackendEngine for ArkworksGroth16Backend {
                     .map_err(|err| ZkfError::Serialization(err.to_string()))?;
                 pack_setup_blob(&pk_bytes, &vk_bytes)?
             };
+            let auto_ceremony_report_sha256 = auto_ceremony_context
+                .as_ref()
+                .map(|context| {
+                    write_auto_ceremony_report(
+                        context,
+                        program,
+                        &program_digest,
+                        &setup_blob,
+                        streamed_setup.as_ref(),
+                    )
+                })
+                .transpose()?;
 
             let mut compiled =
                 build_audited_compiled_program(self.kind(), program, lowered_program)?;
@@ -665,7 +975,9 @@ impl BackendEngine for ArkworksGroth16Backend {
                 imported_setup.as_ref().map(|setup| setup.path.as_str()),
                 setup_seed,
                 used_seed_override,
-                used_auto_ceremony,
+                auto_ceremony_context
+                    .as_ref()
+                    .zip(auto_ceremony_report_sha256.as_deref()),
             );
             annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
             attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -739,6 +1051,7 @@ impl BackendEngine for ArkworksGroth16Backend {
             metadata.insert("curve".to_string(), "bn254".to_string());
             metadata.insert("scheme".to_string(), "groth16".to_string());
             annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+            propagate_setup_metadata_to_proof(compiled, &mut metadata);
             append_groth16_metal_metadata(&mut metadata, msm_dispatch);
             append_backend_runtime_metadata(&mut metadata, self.kind());
 
@@ -848,14 +1161,14 @@ impl BackendEngine for ArkworksGroth16Backend {
         // instead of re-lowering from v2.
         let imported_setup = imported_setup_blob_for_program(&v2_raw)?;
         let program_digest = v2.digest_hex();
-        let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
-            (None, false, false)
+        let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some() {
+            (None, false, None)
         } else if let Some(seed) = setup_seed_override() {
-            (Some(seed), true, false)
+            (Some(seed), true, None)
         } else {
-            match auto_ceremony_seed(&program_digest) {
-                Ok(seed) => (Some(seed), true, true),
-                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, false),
+            match auto_ceremony_context(&v2_raw, &program_digest) {
+                Ok(context) => (Some(context.seed), true, Some(context)),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
             }
         };
         let setup_blob = if let Some(imported_setup) = imported_setup.as_ref() {
@@ -876,6 +1189,12 @@ impl BackendEngine for ArkworksGroth16Backend {
                 .map_err(|err| ZkfError::Serialization(err.to_string()))?;
             pack_setup_blob(&pk_bytes, &vk_bytes)?
         };
+        let auto_ceremony_report_sha256 = auto_ceremony_context
+            .as_ref()
+            .map(|context| {
+                write_auto_ceremony_report(context, &v2_raw, &program_digest, &setup_blob, None)
+            })
+            .transpose()?;
 
         let mut compiled = build_audited_compiled_program(self.kind(), &v2_raw, v2)?;
         compiled.compiled_data = Some(setup_blob);
@@ -894,7 +1213,9 @@ impl BackendEngine for ArkworksGroth16Backend {
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
-            used_auto_ceremony,
+            auto_ceremony_context
+                .as_ref()
+                .zip(auto_ceremony_report_sha256.as_deref()),
         );
         compiled.metadata.insert(
             "zir_r1cs_constraints".to_string(),
@@ -967,6 +1288,7 @@ impl BackendEngine for ArkworksGroth16Backend {
         metadata.insert("curve".to_string(), "bn254".to_string());
         metadata.insert("scheme".to_string(), "groth16".to_string());
         annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+        propagate_setup_metadata_to_proof(compiled, &mut metadata);
         metadata.insert("zir_native_prove".to_string(), "true".to_string());
         append_groth16_metal_metadata(&mut metadata, msm_dispatch);
         append_backend_runtime_metadata(&mut metadata, self.kind());
@@ -1012,14 +1334,14 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
         let lowered_program = lowered.program.clone();
         let imported_setup = imported_setup_blob_for_program(program)?;
         let program_digest = lowered_program.digest_hex();
-        let (setup_seed, used_seed_override, used_auto_ceremony) = if imported_setup.is_some() {
-            (None, false, false)
+        let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some() {
+            (None, false, None)
         } else if let Some(seed) = setup_seed_override() {
-            (Some(seed), true, false)
+            (Some(seed), true, None)
         } else {
-            match auto_ceremony_seed(&program_digest) {
-                Ok(seed) => (Some(seed), true, true),
-                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, false),
+            match auto_ceremony_context(program, &program_digest) {
+                Ok(context) => (Some(context.seed), true, Some(context)),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
             }
         };
         let streamed_setup = match (imported_setup.as_ref(), setup_seed) {
@@ -1050,6 +1372,18 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
                 .map_err(|err| ZkfError::Serialization(err.to_string()))?;
             pack_setup_blob(&pk_bytes, &vk_bytes)?
         };
+        let auto_ceremony_report_sha256 = auto_ceremony_context
+            .as_ref()
+            .map(|context| {
+                write_auto_ceremony_report(
+                    context,
+                    program,
+                    &program_digest,
+                    &setup_blob,
+                    streamed_setup.as_ref(),
+                )
+            })
+            .transpose()?;
 
         let mut compiled = CompiledProgram::new(BackendKind::ArkworksGroth16, lowered_program);
         if program.digest_hex() != compiled.program_digest {
@@ -1071,7 +1405,9 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
-            used_auto_ceremony,
+            auto_ceremony_context
+                .as_ref()
+                .zip(auto_ceremony_report_sha256.as_deref()),
         );
         annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
         attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -1191,6 +1527,7 @@ pub fn compile_and_prove_arkworks_unchecked_for_test_fixture(
         metadata.insert("curve".to_string(), "bn254".to_string());
         metadata.insert("scheme".to_string(), "groth16".to_string());
         annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+        propagate_setup_metadata_to_proof(&compiled, &mut metadata);
         append_groth16_metal_metadata(&mut metadata, msm_dispatch);
         append_backend_runtime_metadata(&mut metadata, BackendKind::ArkworksGroth16);
 
@@ -4734,43 +5071,6 @@ fn groth16_auto_ceremony_cache_dir() -> PathBuf {
                 .unwrap_or_else(|| PathBuf::from("."));
             home.join(".zkf").join("groth16-ceremony")
         })
-}
-
-/// Return a cached per-circuit random seed, generating one with system entropy
-/// on first use. The seed file is stored at
-/// `~/.zkf/groth16-ceremony/{program_digest}.seed` so that repeated compiles
-/// of the same circuit reuse the same CRS material. The seed is generated from
-/// `StdRng::from_entropy()`, not from the program digest, so the toxic waste
-/// is not recoverable from public information.
-fn auto_ceremony_seed(program_digest: &str) -> ZkfResult<[u8; 32]> {
-    let cache_dir = groth16_auto_ceremony_cache_dir();
-    let seed_path = cache_dir.join(format!("{program_digest}.seed"));
-
-    // Try to load a previously generated seed.
-    if let Ok(bytes) = fs::read(&seed_path) {
-        if bytes.len() == 32 {
-            let mut seed = [0u8; 32];
-            seed.copy_from_slice(&bytes);
-            return Ok(seed);
-        }
-    }
-
-    // Generate fresh entropy and persist it.
-    let mut seed = [0u8; 32];
-    StdRng::from_entropy().fill(&mut seed);
-    fs::create_dir_all(&cache_dir).map_err(|err| {
-        ZkfError::Io(format!(
-            "failed to create Groth16 auto-ceremony cache dir '{}': {err}",
-            cache_dir.display()
-        ))
-    })?;
-    fs::write(&seed_path, seed).map_err(|err| {
-        ZkfError::Io(format!(
-            "failed to write Groth16 auto-ceremony seed to '{}': {err}",
-            seed_path.display()
-        ))
-    })?;
-    Ok(seed)
 }
 
 fn hex_seed(seed: &[u8; 32]) -> String {

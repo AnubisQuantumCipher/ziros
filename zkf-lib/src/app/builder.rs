@@ -141,6 +141,15 @@ fn matrix_names(prefix: &str, rows: usize, cols: usize) -> ZkfResult<Vec<Vec<Str
         .collect())
 }
 
+const SUBSYSTEM_IDENTITY_METADATA_KEYS: &[&str] = &[
+    "subsystem_id",
+    "subsystem",
+    "application",
+    "app_id",
+    "app",
+    "owner",
+];
+
 fn rewrite_zir_expr(expr: &zir::Expr, signal_names: &BTreeMap<String, String>) -> zir::Expr {
     match expr {
         zir::Expr::Const(value) => zir::Expr::Const(value.clone()),
@@ -856,6 +865,12 @@ impl ProgramBuilder {
         value: impl Into<String>,
     ) -> ZkfResult<&mut Self> {
         self.metadata.insert(key.into(), value.into());
+        Ok(self)
+    }
+
+    pub fn subsystem_id(&mut self, subsystem_id: impl Into<String>) -> ZkfResult<&mut Self> {
+        self.metadata
+            .insert("subsystem_id".to_string(), subsystem_id.into());
         Ok(self)
     }
 
@@ -1775,6 +1790,16 @@ impl ProgramBuilder {
     }
 
     pub fn build(&self) -> ZkfResult<Program> {
+        let mut metadata = self.metadata.clone();
+        let has_explicit_subsystem_identity = SUBSYSTEM_IDENTITY_METADATA_KEYS.iter().any(|key| {
+            metadata
+                .get(*key)
+                .is_some_and(|value| !value.trim().is_empty())
+        });
+        if !has_explicit_subsystem_identity {
+            metadata.insert("subsystem_id".to_string(), self.name.clone());
+        }
+
         let zir_program = zir::Program {
             name: self.name.clone(),
             field: self.field,
@@ -1788,7 +1813,7 @@ impl ProgramBuilder {
             lookup_tables: self.lookup_tables.clone(),
             memory_regions: self.memory_regions.clone(),
             custom_gates: self.custom_gates.clone(),
-            metadata: self.metadata.clone(),
+            metadata,
         };
 
         let declared_signals = zir_program
@@ -2088,6 +2113,61 @@ mod tests {
             }]
         );
         assert_eq!(program.metadata.get("owner"), Some(&"builder".to_string()));
+    }
+
+    #[test]
+    fn builder_auto_stamps_subsystem_id_when_identity_metadata_is_missing() {
+        let mut builder = ProgramBuilder::new("subsystem_default", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("subsystem_id"),
+            Some(&"subsystem_default".to_string())
+        );
+    }
+
+    #[test]
+    fn builder_does_not_override_existing_subsystem_identity_metadata() {
+        let mut builder = ProgramBuilder::new("subsystem_default", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+        builder
+            .metadata_entry("application", "explicit-subsystem")
+            .expect("application metadata");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("application"),
+            Some(&"explicit-subsystem".to_string())
+        );
+        assert_eq!(program.metadata.get("subsystem_id"), None);
+    }
+
+    #[test]
+    fn builder_subsystem_id_helper_sets_explicit_identity() {
+        let mut builder = ProgramBuilder::new("default_name", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+        builder
+            .subsystem_id("builder-subsystem")
+            .expect("subsystem metadata");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("subsystem_id"),
+            Some(&"builder-subsystem".to_string())
+        );
     }
 
     #[test]

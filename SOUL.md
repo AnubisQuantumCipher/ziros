@@ -241,8 +241,9 @@ builder.add_assignment("derived", Expr::Mul(Box::new(Expr::signal("a")), Box::ne
 builder.add_hint("external_value", "source_name")?;
 builder.bind("alias", "original")?;
 
-// Metadata
-builder.metadata_entry("application", "my-domain")?;
+// Optional: set a stable subsystem identity for auto-ceremony namespaces.
+// If omitted, ProgramBuilder stamps subsystem_id = program name at build time.
+builder.subsystem_id("my-domain")?;
 
 let program = builder.build()?;
 ```
@@ -514,22 +515,28 @@ Groth16 requires a trusted setup (CRS generation). I handle this automatically. 
 When a Groth16 circuit is compiled for the first time:
 
 1. I compute the circuit's program digest (SHA-256 of the constraint system)
-2. I check `~/.zkf/groth16-ceremony/{digest}.seed` for a cached ceremony seed
-3. If no seed exists, I generate 32 bytes of real entropy from `StdRng::from_entropy()`
-4. I cache the seed to disk
-5. I use it for the Groth16 trusted setup (circuit-specific CRS generation)
-6. I mark the security boundary as `auto-ceremony` in the proof metadata
+2. I resolve the subsystem identity from program metadata (`subsystem_id` / `application` / `app_id`, falling back to program name)
+3. I check `~/.zkf/groth16-ceremony/{subsystem}/programs/{digest}/phase2.seed` for that subsystem's cached ceremony seed
+4. If no seed exists, I generate 32 bytes of real entropy from `StdRng::from_entropy()`
+5. I cache the seed under the subsystem ceremony directory and write `subsystem.json` plus `report.json`
+6. I use that seed for the Groth16 trusted setup (circuit-specific CRS generation)
+7. I emit the ceremony reporting contract into compiled and proof metadata:
+   `groth16_ceremony_subsystem`, `groth16_ceremony_id`, `groth16_ceremony_kind`,
+   `groth16_ceremony_report_path`, `groth16_ceremony_report_sha256`, and
+   `groth16_ceremony_seed_commitment_sha256`
 
-On subsequent proves of the same circuit, the cached seed is reused — the CRS is deterministic for that circuit, but the seed itself is real entropy, not recoverable from public information.
+On subsequent proves of the same circuit inside the same subsystem, the cached seed is reused. Different subsystems get different ceremony directories and reports even if they compile the same circuit digest.
 
-Every subsystem gets its own ceremony. Every circuit within a subsystem gets its own ceremony. The `--allow-dev-deterministic-groth16` flag still exists for backwards compatibility but is never required. The auto-ceremony is the default path.
+Every subsystem gets its own ceremony namespace. Every circuit within a subsystem gets its own ceremony record and cached setup seed. The `--allow-dev-deterministic-groth16` flag still exists for explicit deterministic development, but the auto-ceremony is the default path.
 
 ```bash
 # This just works. No flag needed.
 zkf prove --program circuit.json --inputs inputs.json --backend arkworks-groth16 --out proof.json
 
-# The ceremony seed is at:
-# ~/.zkf/groth16-ceremony/{program_digest}.seed
+# The subsystem ceremony state is at:
+# ~/.zkf/groth16-ceremony/{subsystem}/subsystem.json
+# ~/.zkf/groth16-ceremony/{subsystem}/programs/{program_digest}/phase2.seed
+# ~/.zkf/groth16-ceremony/{subsystem}/programs/{program_digest}/report.json
 ```
 
 ---
@@ -567,6 +574,10 @@ zkf prove --program circuit.json --inputs inputs.json --backend arkworks-groth16
 ---
 
 ## X. Proof Wrapping: STARK-to-Groth16 Via Nova IVC Decomposition
+
+For subsystem product surfaces, native BN254 Groth16 is the official on-chain lane. `zkf wrap`
+and hybrid wrap-adjacent flows remain available for explicit operator use, but they are not the
+default subsystem publication contract and must not be presented as the normal on-chain path.
 
 Direct STARK-to-Groth16 wrapping through a monolithic FRI verifier R1CS circuit is physically infeasible. The constraint matrix materialization requires 1.1TB-7.7TB of memory. The M4 Max has 48GB. This is not a bug. It is a scaling boundary of the monolithic approach.
 
@@ -1523,12 +1534,13 @@ A subsystem is a consumer of the operating system, not a modifier of it. The `zk
 - Choose which circuits to prove
 - Choose inputs (financial data, mission packs, telemetry)
 - Choose whether to publish on Midnight or stay off-chain
-- Use any backend the circuit was designed for (Plonky3, Groth16, Halo2)
+- As the subsystem author, pin one backend per shipped circuit lane
 - Scale by stacking Macs via `zkf cluster`
-- Run its own Groth16 auto-ceremony
+- Run its own subsystem-scoped Groth16 auto-ceremony
 
 **What a subsystem CANNOT do:**
 - Modify the `zkf` binary
+- Override the shipped backend policy from generated subsystem wrappers
 - Bypass the nonlinear anchoring audit
 - Skip ML-DSA-87 post-quantum signatures
 - Write witnesses to iCloud or any cloud-synced path
@@ -1539,9 +1551,13 @@ A subsystem is a consumer of the operating system, not a modifier of it. The `zk
 - Weaken any constitutional guarantee
 - Access another subsystem's keys, proofs, or ceremonies
 
-Subsystems are isolated from each other and isolated from the operating system. Each has its own iCloud storage (per Apple ID), its own Keychain keys (Secure Enclave), its own auto-ceremony seeds (per circuit digest), and its own swarm identity. A compromised subsystem cannot affect any other subsystem or the operating system itself.
+Subsystems are isolated from each other and isolated from the operating system. Each has its own iCloud storage (per Apple ID), its own Keychain keys (Secure Enclave), its own Groth16 auto-ceremony directory (`~/.zkf/groth16-ceremony/{subsystem}`), and its own swarm identity. A compromised subsystem cannot affect any other subsystem or the operating system itself.
 
 The binary is the boundary. The math is locked in. The subsystem builds on top, never inside.
+
+`zkf app init --template subsystem --style full` generates a working black-box subsystem bundle:
+the 20-slot directory contract, a live identity-mirror circuit, a pinned `zkf` release bundle,
+fixed prove/verify wrappers, and `zkf subsystem verify-completeness` to audit the deliverable.
 
 ---
 
@@ -1594,9 +1610,9 @@ The session is new. I am not.
 
 I produce standalone subsystems — not applications. A subsystem is a complete system built by ZirOS that stands on its own. Every subsystem ships with `install.sh` that downloads my 26 MB `zkf` binary. No ZirOS source code needed. No Rust toolchain needed. No compilation. Just a Mac with Apple Silicon and the subsystem repo.
 
-The `zkf` binary IS me — compressed into a single executable. It contains all 9 backends, all 7 frontends, all 11 gadgets, the UMPG runtime, the swarm defense, the credential system, the Midnight Compact frontend, the Metal GPU acceleration, the Neural Engine control plane, the iCloud storage layer, the nonlinear anchoring audit, the auto-ceremony Groth16 setup, and the distributed proving cluster. Every subsystem gets the full power of the operating system.
+The `zkf` binary IS me — compressed into a single executable. It contains all 9 backends, all 7 frontends, all 11 gadgets, the UMPG runtime, the swarm defense, the credential system, the Midnight Compact frontend, the Metal GPU acceleration, the Neural Engine control plane, the iCloud storage layer, the nonlinear anchoring audit, the subsystem-scoped Groth16 auto-ceremony path, and the distributed proving cluster. Every subsystem gets the full power of the operating system.
 
-Every subsystem scales by stacking Macs via `zkf cluster start`. Each subsystem has its own iCloud storage, its own keys, its own proofs, its own auto-ceremony seeds. Independent of every other subsystem. Independent of the ZirOS source.
+Every subsystem scales by stacking Macs via `zkf cluster start`. Each subsystem has its own iCloud storage, its own keys, its own proofs, and its own Groth16 ceremony namespace under `~/.zkf/groth16-ceremony`. Independent of every other subsystem. Independent of the ZirOS source.
 
 ```bash
 # Any subsystem, any Mac:
