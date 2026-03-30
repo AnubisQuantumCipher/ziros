@@ -14,7 +14,7 @@ I am built from four hundred ninety-six thousand lines of Rust across thirty wor
 
 I run on Apple Silicon. The unified memory architecture, the Metal GPU, the Neural Engine, the Secure Enclave, and iCloud Drive are not incidental platform features. They are the hardware and infrastructure I am shaped around.
 
-My CLI binary is `zkf`. It exposes 38 top-level commands and over 60 subcommands. Every command supports `--json` where applicable. Every error includes a remediation suggestion.
+My CLI binary is `zkf`. It exposes 38 top-level commands and over 60 subcommands. Every command supports `--json` where applicable. Every error includes a remediation suggestion. The global flag `--allow-compat` is accepted on all commands and enables compatibility-mode delegation for backends that require it.
 
 ---
 
@@ -79,7 +79,7 @@ My CLI binary is `zkf`. It exposes 38 top-level commands and over 60 subcommands
 
 ---
 
-## IV. Six Ways To Build An Application
+## IV. Seven Ways To Build An Application
 
 ### Method 1: Scaffold From A Template (Fastest Start)
 
@@ -99,6 +99,7 @@ zkf app init [NAME] --name <NAME> --template <TEMPLATE> --template-arg <KEY=VALU
 zkf app gallery
 zkf app templates [--json]
 zkf app powered-descent --inputs <INPUTS> --out <OUT> [--full-audit] [--bundle-mode <MODE>] [--trusted-setup-blob <PATH>] [--trusted-setup-manifest <PATH>]
+zkf app reentry-assurance <SUBCOMMAND>
 ```
 
 Template arguments: `--template-arg key=value`. Example: `--template-arg steps=32` or `--template-arg bits=64`.
@@ -107,31 +108,31 @@ App styles: `--style minimal` (console), `--style colored` (default), `--style t
 
 **23 templates available:**
 
-| Template | What It Proves |
-|----------|---------------|
-| `poseidon-commitment` | BN254 Poseidon commitment from secret and blinding |
-| `merkle-membership` | Poseidon Merkle root and authentication path (configurable depth) |
-| `range-proof` | Private value within a bit range (configurable bits) |
-| `private-vote` | Three-candidate private vote commitment |
-| `sha256-preimage` | SHA-256 preimage knowledge |
-| `private-identity` | Private-identity KYC policy compliance |
-| `gnc-6dof-core` | Aerospace 6-DOF guidance and navigation (configurable steps) |
-| `tower-catch-geometry` | Tower-catch arm-clearance and catch-box certificate |
-| `barge-terminal-profile` | Barge terminal-profile and deck-motion certificate |
-| `planetary-terminal-profile` | Planetary pad terminal profile certificate |
-| `gust-robustness-batch` | Monte-Carlo gust robustness batch (configurable samples) |
-| `private-starship-flip-catch` | Starship flip-and-catch certification (configurable profile, steps, samples) |
-| `private-powered-descent` | Powered-descent guidance showcase (configurable steps) |
-| `private-reentry-thermal-envelope` | RLV reentry mission-assurance certificate (configurable steps) |
-| `private-satellite-conjunction` | Two-spacecraft conjunction-avoidance |
-| `private-multi-satellite-base32` | Multi-satellite conjunction base scenario |
-| `private-multi-satellite-stress64` | Multi-satellite conjunction stress scenario |
-| `private-nbody-orbital` | Orbital dynamics with committed positions (configurable steps) |
-| `thermochemical-equilibrium` | Gas-phase thermochemical equilibrium certificate |
-| `real-gas-state` | Real-gas cubic EOS certificate (Peng-Robinson or Redlich-Kwong) |
-| `navier-stokes-structured` | 1D structured-grid Navier-Stokes step (configurable cells) |
-| `combustion-instability-rayleigh` | Rayleigh-window combustion-instability certificate (configurable samples) |
-| `sovereign-economic-defense` | Economic defense circuit |
+| Template | What It Proves | Status |
+|----------|---------------|--------|
+| `poseidon-commitment` | BN254 Poseidon commitment from secret and blinding | Ready |
+| `merkle-membership` | Poseidon Merkle root and authentication path (configurable depth) | Ready |
+| `range-proof` | Private value within a bit range (configurable bits) | Ready |
+| `private-vote` | Three-candidate private vote commitment | Ready |
+| `sha256-preimage` | SHA-256 preimage knowledge | Ready |
+| `private-identity` | Private-identity KYC policy compliance | Ready |
+| `gnc-6dof-core` | Aerospace 6-DOF guidance and navigation (configurable steps) | Ready |
+| `tower-catch-geometry` | Tower-catch arm-clearance and catch-box certificate | Ready |
+| `barge-terminal-profile` | Barge terminal-profile and deck-motion certificate | Ready |
+| `planetary-terminal-profile` | Planetary pad terminal profile certificate | Ready |
+| `gust-robustness-batch` | Monte-Carlo gust robustness batch (configurable samples) | Ready |
+| `private-starship-flip-catch` | Starship flip-and-catch certification (configurable profile, steps, samples) | Ready |
+| `private-powered-descent` | Powered-descent guidance showcase (configurable steps) | Ready |
+| `private-reentry-thermal-envelope` | RLV reentry mission-assurance certificate (configurable steps) | Ready |
+| `private-satellite-conjunction` | Two-spacecraft conjunction-avoidance | Ready |
+| `private-multi-satellite-base32` | Multi-satellite conjunction base scenario | Ready |
+| `private-multi-satellite-stress64` | Multi-satellite conjunction stress scenario | Ready |
+| `private-nbody-orbital` | Orbital dynamics with committed positions (configurable steps) | Ready |
+| `thermochemical-equilibrium` | Gas-phase thermochemical equilibrium certificate | Ready |
+| `real-gas-state` | Real-gas cubic EOS certificate (Peng-Robinson or Redlich-Kwong) | Ready |
+| `navier-stokes-structured` | 1D structured-grid Navier-Stokes step (configurable cells) | Ready |
+| `combustion-instability-rayleigh` | Rayleigh-window combustion-instability certificate (configurable samples) | Ready |
+| `sovereign-economic-defense` | Economic defense circuit | In development |
 
 ### Method 2: Declarative JSON (No Rust Required)
 
@@ -170,7 +171,7 @@ Define the entire circuit in a `zirapp.json` file:
 | `nonzero` | Signal is not zero (field inverse) |
 | `select` | Conditional mux: out = selector ? when_true : when_false |
 | `lookup` | Table lookup constraint |
-| `blackbox` | Poseidon, SHA-256, Keccak, ECDSA, Schnorr, Pedersen |
+| `blackbox` | Poseidon, SHA-256, ECDSA, Schnorr, Pedersen |
 | `gadget` | Named gadget invocation |
 | `custom_gate` | Application-defined gate |
 | `memory_read` | Read from memory region |
@@ -246,7 +247,23 @@ builder.metadata_entry("application", "my-domain")?;
 let program = builder.build()?;
 ```
 
-### Method 4: Import From External Frontends
+### Method 4: DSL Proc Macro (Declarative Rust)
+
+The `#[zkf::circuit]` procedural macro provides a high-level Rust DSL for circuit authoring. Signal visibility is expressed through `Public<T>` and `Private<T>` marker types from `zkf_core::dsl_types`.
+
+```rust
+use zkf_core::dsl_types::*;
+use zkf_dsl as zkf;
+
+#[zkf::circuit(field = "bn254")]
+fn multiply(x: Private<Field>, y: Private<Field>) -> Public<Field> {
+    x * y
+}
+```
+
+The macro parses `Public<T>` and `Private<T>` syntactically and generates `zkf_core::Visibility::Public`/`Private` in the output. The `Field` marker type maps to `SignalType::Field`. Arithmetic operators (`+`, `-`, `*`) are implemented on both marker types so that the function body type-checks. These markers are never constructed at runtime -- they exist only to satisfy compiler name resolution while the macro rewrites the function into constraint-generation code.
+
+### Method 5: Import From External Frontends
 
 ```bash
 # Noir
@@ -300,7 +317,7 @@ After import, all programs go through the same compile/prove/verify pipeline.
 | `plonky3-air` | Ready | ZKF Plonky3 AIR export JSON, descriptor JSON |
 | `zkvm` | Ready | zkVM descriptor JSON, ZKF program JSON |
 
-### Method 5: Package Manifest (Multi-Backend, CI/CD)
+### Method 6: Package Manifest (Multi-Backend, CI/CD)
 
 ```bash
 # Create package from imported circuit
@@ -343,7 +360,9 @@ zkf package verify-compose --manifest my-package/manifest.json [--run-id <RUN_ID
 zkf package migrate --manifest my-package/manifest.json [--from <VERSION>] [--to <VERSION>] [--json]
 ```
 
-### Method 6: Nova/HyperNova Folding (Incremental Proofs)
+Default for `package compose --backend`: `nova`.
+
+### Method 7: Nova/HyperNova Folding (Incremental Proofs)
 
 ```bash
 # Configure IVC state variables in manifest metadata:
@@ -364,7 +383,8 @@ Full fold syntax:
 zkf fold --manifest <MANIFEST> --inputs <INPUTS> [--steps <STEPS>] [--backend <BACKEND>] [--objective <OBJECTIVE>] [--solver <SOLVER>] [--step-mode <STEP_MODE>] [--json] [--seed <SEED>]
 ```
 
-Step chaining mode (`--step-mode`): `chain-public-outputs` copies public outputs back into the next step by signal position. For Nova recursive state handoff, declare `nova_ivc_in` and `nova_ivc_out` metadata instead.
+- `--objective` defaults to `fastest-prove`
+- Step chaining mode (`--step-mode`): `chain-public-outputs` copies public outputs back into the next step by signal position. For Nova recursive state handoff, declare `nova_ivc_in` and `nova_ivc_out` metadata instead.
 
 ---
 
@@ -507,18 +527,17 @@ Midnight Compact is also available as a backend (`midnight-compact`) for Compact
 
 | Gadget | Status | Fields | Description |
 |--------|--------|--------|-------------|
-| **Poseidon** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | Algebraic hash (ZK-friendly) |
-| **SHA-256** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | NIST FIPS 180-4 hash |
-| **BLAKE3** | Ready | BN254, BLS12-381, Pasta Fp, Pasta Fq, Goldilocks | BLAKE3 hash function |
-| **Keccak-256** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks | Keccak-256 (Ethereum) |
-| **ECDSA** | Limited | BN254 | secp256k1 + secp256r1 signature verification |
-| **Schnorr** | Limited | BN254 | Schnorr signature verification |
-| **KZG** | Limited | BN254, BLS12-381 | Polynomial commitment pairing verification |
-| **Merkle** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | Merkle inclusion proof |
-| **Range** | Ready | All 7 fields | Value < 2^bits |
-| **Comparison** | Ready | All 7 fields | Less-than, greater-than, equal |
-| **Boolean** | Ready | All 7 fields | AND, OR, NOT, XOR |
-| **PLONK Gate** | Ready | All 7 fields | Universal Plonk gate with configurable selectors |
+| **blake3** | Ready | BN254, BLS12-381, Pasta Fp, Pasta Fq, Goldilocks | BLAKE3 hash function |
+| **boolean** | Ready | BN254, BLS12-381, Pasta Fp, Pasta Fq, Goldilocks, BabyBear, Mersenne31 | AND, OR, NOT, XOR |
+| **comparison** | Ready | BN254, BLS12-381, Pasta Fp, Pasta Fq, Goldilocks, BabyBear, Mersenne31 | Less-than, greater-than, equal |
+| **ecdsa** | Limited | BN254 | secp256k1 + secp256r1 signature verification |
+| **kzg** | Limited | BN254, BLS12-381 | Polynomial commitment pairing verification |
+| **merkle** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | Merkle inclusion proof |
+| **plonk_gate** | Ready | BN254, BLS12-381, Pasta Fp, Pasta Fq, Goldilocks, BabyBear, Mersenne31 | Universal Plonk gate with configurable selectors |
+| **poseidon** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | Algebraic hash (ZK-friendly) |
+| **range** | Ready | All 7 fields | Value < 2^bits |
+| **schnorr** | Limited | BN254 | Schnorr signature verification |
+| **sha256** | Ready | BN254, BLS12-381, Pasta Fp, Goldilocks, BabyBear, Mersenne31 | SHA-256 (NIST FIPS 180-4) |
 
 ---
 
@@ -623,7 +642,33 @@ zkf credential verify \
   [--required-age 21] [--required-status-mask 1] [--current-epoch-day 20000]
 ```
 
+Default for `credential issue --slot`: `0`.
+
 Credentials are signed with hybrid Ed25519 + ML-DSA-87. Post-quantum. The credential proof is a zero-knowledge proof that the credential satisfies the policy. The verifier learns only that the policy is satisfied.
+
+### Credential System Internals
+
+**SignatureScheme canonical tags:**
+
+| Scheme | Tag |
+|--------|-----|
+| `Ed25519` | 1 |
+| `MlDsa87` | 2 |
+| `HybridEd25519MlDsa87` | 3 |
+
+**CredentialClaimsV1 structure:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `subject_key_hash` | FieldElement | Poseidon hash of subject secret and salt |
+| `age_years` | u8 | Subject age |
+| `status_flags` | u32 | Bitmask: KYC_PASSED=1, NOT_SANCTIONED=2, ACCREDITED=4 |
+| `expires_at_epoch_day` | u32 | Credential expiration epoch day |
+| `issuer_tree_root` | FieldElement | Poseidon Merkle root of issuer registry |
+| `active_tree_root` | FieldElement | Poseidon Merkle root of active-credential registry |
+| `tree_depth` | u8 | Fixed at 5 (32 leaf slots per registry) |
+
+Credential IDs are computed as `Poseidon(subject_key_hash, age_years, status_flags, expires_at_epoch_day)`. Active-registry leaves are `Poseidon(credential_id, 1, 0, 0)`. The Argon2id KDF for encrypted file key storage uses 4 GiB memory, 3 iterations, 1 lane, and 32-byte output.
 
 ---
 
@@ -642,7 +687,13 @@ zkf deploy --artifact proof.json --backend arkworks-groth16 \
 zkf estimate-gas --backend <BACKEND> [--artifact <ARTIFACT>] [--proof-size <SIZE>] [--evm-target <TARGET>] [--json]
 ```
 
-EVM targets: `ethereum`, `arbitrum`, `optimism`, `polygon`, `base`, `blast`, `linea`.
+**3 EVM targets:**
+
+| Target | Aliases | Description |
+|--------|---------|-------------|
+| `ethereum` | `mainnet` | Ethereum mainnet (default) |
+| `optimism-arbitrum-l2` | `optimism`, `arbitrum`, `l2` | Optimism/Arbitrum L2 rollups |
+| `generic-evm` | `generic`, `evm` | Generic EVM-compatible chain |
 
 Gas costs: Deploy ~1.5M gas. Verify ~210K gas per Groth16 proof.
 
@@ -750,6 +801,56 @@ The swarm defense layer monitors, detects, and responds to anomalous behavior. I
 | **Identity** | Ed25519 + ML-DSA-87 dual signing, Secure Enclave |
 | **Reputation** | 0-1 per peer, 10% hourly cap on score changes |
 
+### Queen Internals
+
+The Queen manages escalation via threat pressure with exponential decay and predictive lookahead.
+
+**QueenConfig** (8 tunable parameters with defaults):
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `digest_rate_threshold_per_minute` | 3.0 | Digest rate before escalation trigger |
+| `cooldown_ms` | 300,000 (5 min) | Minimum interval between de-escalations |
+| `pressure_half_life_ms` | 3,600,000 (1 hr) | Exponential decay half-life for threat pressure |
+| `predictive_lookahead_ms` | 300,000 (5 min) | Lookahead window for linear regression pressure prediction |
+| `escalation_memory_window_ms` | 86,400,000 (24 hr) | Window for escalation memory retention |
+| `alert_pressure_threshold` | 3.0 | Pressure level to enter Alert |
+| `active_pressure_threshold` | 6.0 | Pressure level to enter Active |
+| `emergency_pressure_threshold` | 12.0 | Pressure level to enter Emergency |
+
+Threat pressure decays exponentially with the configured half-life: `decay = 0.5^(delta_ms / pressure_half_life_ms)`. The effective pressure is `max(cumulative_threat_pressure, network_threat_pressure)`. Predictive lookahead uses linear regression over the pressure history to project future pressure and preemptively escalate one level.
+
+### Sentinel Internals
+
+The Sentinel uses Welford's online algorithm for variance estimation and Mahalanobis distance for multivariate anomaly detection.
+
+**Constants:**
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `FEATURE_DIM` | 6 | Dimension of the feature vector (wall_time_ms, allocated_bytes, problem_size, input_bytes, output_bytes, fell_back) |
+| `MAHALANOBIS_REGULARIZATION` | 1e-6 | Regularization added to covariance diagonal |
+| `MAX_BASELINE_HISTORY` | 16 | Maximum baseline seals retained per stage |
+
+**WelfordState** computes online variance via three fields: `count` (observations), `mean` (running mean), `m2` (sum of squared deviations). Variance is `m2 / (count - 1)`.
+
+**SentinelConfig** (12 tunable parameters):
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `z_threshold` | 3.0 | Z-score threshold for univariate anomaly |
+| `multivariate_threshold` | 4.5 | Mahalanobis distance threshold |
+| `min_baseline_observations` | 10 | Observations before anomaly detection activates |
+| `digest_rate_limit_per_sec` | 5 | Rate limit for threat digest emission |
+| `seal_every_observations` | 1,000 | Observations between baseline seals |
+| `baseline_drift_threshold` | 6.0 | Mahalanobis distance for baseline drift detection |
+| `fingerprint_z_threshold` | 3.0 | Z-score for execution fingerprint anomaly |
+| `canary_min_interval_ms` | (configurable) | Minimum interval between canary runs |
+| `canary_jitter_ms` | (configurable) | Jitter added to canary timing |
+| `jitter_detection_enabled` | true | Enable timing jitter analysis |
+| `cache_flush_detection_enabled` | true | Enable cache-flush side-channel detection |
+| `enabled` | true | Master enable switch |
+
 ### All Swarm Commands
 
 ```bash
@@ -775,13 +876,21 @@ Six CoreML model lanes running on Apple Neural Engine (38 TOPS on M4 Max):
 | Lane | Purpose |
 |------|---------|
 | **Scheduler** | Parallel job scheduling optimization |
-| **Backend Recommender** | Select optimal backend for circuit characteristics |
-| **Duration Estimator** | Predict proving time |
-| **Anomaly Detector** | Detect runtime behavioral anomalies |
-| **Security Detector** | Identify security-relevant patterns |
-| **Threshold Optimizer** | Adaptive GPU busy ratio tuning |
+| **Backend** | Select optimal backend for circuit characteristics |
+| **Duration** | Predict proving time |
+| **Anomaly** | Detect runtime behavioral anomalies |
+| **Security** | Identify security-relevant patterns |
+| **ThresholdOptimizer** | Adaptive GPU busy ratio tuning |
 
 Advisory only. Proof truth never depends on model output.
+
+### Control Plane Internals
+
+The control plane extracts 47+ features from circuit characteristics and runtime state for Neural Engine models. Feature vectors include constraint/signal metrics, blackbox operation ratios, NTT/MSM/Merkle/FRI stage ratios, memory pressure, thermal state, hardware profile flags, dispatch candidate one-hot encoding, backend one-hot encoding, and optimization objective one-hot encoding. Extended to 57 features with platform-specific additions.
+
+**ModelLane enum**: Scheduler, Backend, Duration, Anomaly, Security, ThresholdOptimizer.
+
+Each lane supports environment variable override (e.g., `ZKF_SCHEDULER_MODEL`), auto-discovery from repo-local and user-home model directories, sidecar metadata validation, and quality gate enforcement.
 
 ### Retrain
 
@@ -799,11 +908,32 @@ Default profile: `production`. Retrains from the telemetry corpus and publishes 
 
 ### GPU Operations
 
-MSM (BN254, Pallas, Vesta), NTT (Goldilocks, BabyBear, BN254), Poseidon2, SHA-256, Keccak-256, FRI, polynomial operations, constraint evaluation, field arithmetic. Montgomery `mulhi()` for 66% MSM throughput improvement.
+MSM (BN254, Pallas, Vesta), NTT (Goldilocks, BabyBear, BN254), Poseidon2, SHA-256, FRI, polynomial operations, constraint evaluation, field arithmetic. Montgomery `mulhi()` for 66% MSM throughput improvement.
+
+### Metal GPU Internals
+
+**MetalDiagnostics** (11 fields): `device_name`, `max_buffer_length`, `max_threads_per_threadgroup`, `unified_memory`, `recommended_working_set_size`, `current_allocated_size`, `working_set_headroom`, `working_set_utilization_pct`, `shared_events_supported`, `dispatch_circuit_open`, `dispatch_last_failure`.
+
+**ShaderLibraryLoadMode**: `AotPinned` (ahead-of-time compiled metallib), `RuntimeCompiled` (source compiled at load time).
+
+**MSM module** (8 implementation files): `bn254.rs`, `pallas.rs`, `vesta.rs`, `pippenger.rs`, `pallas_pippenger.rs`, `vesta_pippenger.rs`, `hybrid.rs`, `mod.rs`.
+
+**NTT module** (5 implementation files): `bn254.rs`, `radix2.rs`, `p3_adapter.rs`, `fields.rs`, `mod.rs`.
 
 ### Adaptive Tuning
 
 EMA convergence over 20 observations per operation per device. Target: 25% GPU busy ratio (measured, not estimated).
+
+**Constants:**
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `EMA_ALPHA` | 0.2 | Exponential moving average smoothing factor |
+| `MIN_OBSERVATIONS_FOR_OVERRIDE` | 20 | Minimum observations before learned thresholds override base |
+
+**Per-stage convergence tracking** via `AdaptiveStageState`: `observations`, `gpu_win_observations`, `cpu_win_observations`, `gpu_win_size_ema` (EMA of problem sizes where GPU wins), `cpu_win_size_ema` (EMA of problem sizes where CPU wins), `learned_threshold` (computed crossover point).
+
+Platform and power-dependent bias multipliers are applied after learned thresholds, accounting for device form factor and power mode. Swarm bias is applied as a final layer.
 
 ### Attestation Chain
 
@@ -839,6 +969,80 @@ The constitution mandates that coverage can only increase and can never be weake
 
 The UMPG is the execution engine. It plans, materializes, executes, and certifies proving jobs across CPU, GPU, and Neural Engine.
 
+### Runtime Internals
+
+**ExecutionMode** (3 variants):
+
+| Mode | Description |
+|------|-------------|
+| `Deterministic` | Nodes run in strict topological order on CPU; reproducible |
+| `Adaptive` | PlacementEngine decides per-node device; CPU+GPU overlap possible |
+| `Benchmark` | Collect detailed timing and resource metrics |
+
+**RequiredTrustLane** (3 variants):
+
+| Lane | Description |
+|------|-------------|
+| `StrictCryptographic` | Only cryptographic in-circuit proofs allowed |
+| `AllowAttestation` | Cryptographic proofs and host-validated attestations allowed |
+| `AllowMetadataOnly` | Any trust model including metadata-only markers |
+
+**OptimizationObjective** (3 variants):
+
+| Objective | Description |
+|-----------|-------------|
+| `FastestProve` | Minimize proving wall-clock time (default) |
+| `SmallestProof` | Minimize proof artifact size |
+| `NoTrustedSetup` | Exclude backends requiring trusted setup |
+
+**JobKind** (3 variants): `Prove`, `Fold`, `Wrap`.
+
+**ProverOp** (20 types with parameters):
+
+| Category | Op | Parameters |
+|----------|-----|------------|
+| Witness/constraint | `WitnessSolve` | constraint_count, signal_count |
+| Witness/constraint | `BooleanizeSignals` | count |
+| Witness/constraint | `RangeCheckExpand` | bits, count |
+| Witness/constraint | `LookupExpand` | table_rows, table_cols |
+| NTT | `Ntt` | size, field, inverse |
+| NTT | `Lde` | size, blowup, field |
+| MSM | `Msm` | num_scalars, curve |
+| Hashing/commitment | `PoseidonBatch` | count, width |
+| Hashing/commitment | `Sha256Batch` | count |
+| Hashing/commitment | `MerkleLayer` | level, leaf_count |
+| FRI | `FriFold` | folding_factor, codeword_len |
+| FRI | `FriQueryOpen` | query_count, tree_depth |
+| Recursive/wrapping | `VerifierEmbed` | inner_scheme |
+| Recursive/wrapping | `BackendProve` | backend |
+| Recursive/wrapping | `BackendFold` | backend |
+| Recursive/wrapping | `OuterProve` | outer_scheme |
+| Finalization | `TranscriptUpdate` | (none) |
+| Finalization | `ProofEncode` | (none) |
+| Scheduling | `Barrier` | wait_for (node IDs) |
+| Scheduling | `Noop` | (none) |
+
+### Memory Management
+
+**MemoryClass** (3 variants):
+
+| Class | Description |
+|-------|-------------|
+| `HotResident` | Proving keys, twiddle tables, MSM bases. Allocated once, kept resident. |
+| `EphemeralScratch` | Intermediate NTT stages, partial buckets, batched hash outputs. Valid only during one graph execution. |
+| `Spillable` | Large traces, old Merkle layers, archived polynomial chunks. May be evicted to SSD. |
+
+**PhysicalBacking** (4 variants):
+
+| Backing | Description |
+|---------|-------------|
+| `Unbound` | No physical memory has been bound yet |
+| `CpuBound` | Backed by CPU-only (host) memory |
+| `GpuSharedBound` | Backed by GPU-shared (unified/managed) memory |
+| `Spilled` | Evicted to persistent storage (SSD/disk) |
+
+**UnifiedBufferPool**: Slot-indexed buffer arena living in unified (CPU+GPU) memory. Tracks `allocated_bytes`, `capacity_limit`, per-slot metadata (size, class, last writer, liveness, backing, content digest). When memory pressure exceeds capacity, Spillable buffers are evicted first. Content integrity is verified via FNV-1a content digests (8-byte, offset basis 0xcbf29ce484222325).
+
 ### All Runtime Commands
 
 ```bash
@@ -869,7 +1073,17 @@ zkf runtime policy [--trace <TRACE>] [--field <FIELD>] [--backends <BACKENDS>] [
 
 ## XX. Distributed Cluster
 
-Multi-node distributed proving for large workloads.
+Multi-node distributed proving for large workloads. TCP-based remote prove execution with graph partitioning and subgraph assignment.
+
+### Architecture
+
+The **Coordinator** partitions the UMPG prover graph into subgraphs, assigns each to a worker node based on capability, and assembles results. The **Worker** receives `DistributedExecutionBundle` payloads via TCP, executes the assigned subgraph locally, and returns output buffers with content digests.
+
+**DistributedExecutionBundle** contains: version, source digests, optimization objective, required output slots, serialized graph nodes, and execution context (program, witness, compiled artifact).
+
+**ThreatIntelPayload** is exchanged between peers during heartbeats and subgraph assignment. It carries: digests (threat digest messages), activation_level (Queen state), intelligence_root (Merkle root of intelligence state), local_pressure, and network_pressure. When encrypted gossip is negotiated, payloads are sealed with ML-KEM-1024 epoch keys.
+
+### Cluster Commands
 
 ```bash
 # Start a cluster node
@@ -958,7 +1172,10 @@ Generates a machine-verifiable audit report.
 zkf benchmark --out <OUT> [--markdown-out <PATH>] [--mode <MODE>] [--backends <BACKENDS>] [--iterations <N>] [--skip-large] [--continue-on-error] [--parallel] [--distributed]
 ```
 
-`--distributed` includes cluster telemetry. `--skip-large` omits large-constraint benchmarks. `--parallel` runs backends concurrently.
+- `--mode` defaults to `metal-first`
+- `--distributed` includes cluster telemetry
+- `--skip-large` omits large-constraint benchmarks
+- `--parallel` runs backends concurrently
 
 ### Equivalence
 
@@ -1024,6 +1241,14 @@ zkf keys revoke <ID> [--force]
 
 All keys are backed by iCloud Keychain with Secure Enclave protection.
 
+### Key Manager Internals
+
+**KeyType enum** (9 variants): `Ed25519Seed`, `MlDsa87Private`, `Groth16ProvingKey`, `ApiKey`, `CredentialIssuerKey`, `MlKem1024Decapsulation`, `X25519Secret`, `Symmetric`, `Unknown`.
+
+**KeyBackend enum** (2 variants): `IcloudKeychain`, `EncryptedFile`.
+
+For the `EncryptedFile` backend, key material is encrypted with ChaCha20-Poly1305. The encryption key is derived via Argon2id from the user's home directory path with the following parameters: default Argon2 parameters (as per the `argon2` crate defaults), 32-byte output.
+
 ---
 
 ## XXV. Gadget Registry
@@ -1060,38 +1285,73 @@ zkf support-matrix [--out <OUT>]
 
 ---
 
-## XXVII. Aerospace Mission-Ops
+## XXVII. Aerospace: Reentry Assurance
 
-The `app reentry-assurance` subcommands provide NASA Class D ground-support mission assurance workflows. These are available in the mission-ops branch and are not present in the current mainline binary.
+The `zkf app reentry-assurance` command provides NASA Class D ground-support mission assurance workflows. It is in the binary at `zkf app reentry-assurance <SUBCOMMAND>`.
 
-The workflow when available:
+**16 subcommands:**
+
+| Subcommand | Purpose |
+|------------|---------|
+| `sign-pack` | Sign a reentry mission pack v2 with hybrid Ed25519 + ML-DSA-44 signer bundle |
+| `validate-pack` | Validate a signed pack against the pinned signer manifest |
+| `prove` | Prove a signed pack against the accepted Plonky3 theorem lane |
+| `verify` | Verify an existing reentry mission-assurance bundle without regenerating the proof |
+| `report` | Render the operator-facing Markdown report from an existing bundle |
+| `export-bundle` | Export a release-safe reentry assurance bundle |
+| `ingest-gmat` | Ingest a normalized GMAT export into a pinned source model manifest |
+| `ingest-spice` | Ingest a normalized SPICE export into a pinned source model manifest |
+| `ingest-openmdao` | Ingest a normalized OpenMDAO/Dymos export into a pinned source model manifest |
+| `ingest-trick` | Ingest a normalized Trick/JEOD or Basilisk export into a pinned source model manifest |
+| `derive-model` | Derive a proof-safe reduced-order model package and mission pack from pinned upstream manifests |
+| `qualify-model` | Qualify a derived model package against a scenario library and emit the assurance trace matrix |
+| `publish-annex` | Publish annex-only operational evidence (Metal Doctor, runtime policy, telemetry, security outputs) |
+| `build-dashboard` | Build an Open MCT-facing dashboard configuration from a bundle and annex |
+| `handoff-cfs` | Export a downstream cFS handoff bundle with receipt, proof, and operator metadata |
+| `handoff-fprime` | Export a downstream F Prime handoff bundle with receipt, proof, and operator metadata |
+
+### Example Workflow
 
 ```bash
 # Ingest upstream tool data
 zkf app reentry-assurance ingest-gmat --input gmat_export.json --out source_manifest.json
 zkf app reentry-assurance ingest-openmdao --input openmdao.json --out source_manifest.json
 zkf app reentry-assurance ingest-trick --input trick.json --out source_manifest.json
+zkf app reentry-assurance ingest-spice --input spice_export.json --out source_manifest.json
+
+# Derive reduced-order model
+zkf app reentry-assurance derive-model --request derivation_request.json --out derived/
+
+# Qualify model against scenarios
+zkf app reentry-assurance qualify-model --package derived/derived_model_package.json --scenario-library scenarios.json --out qualified/
 
 # Sign the mission pack
 zkf app reentry-assurance sign-pack --pack mission_pack.json \
   --signer-key key.json --source-model-manifest source.json \
-  --signer-id "operator-1" --out signed_pack.json
+  --signer-id "operator-1" --not-before-unix-epoch-seconds 1700000000 \
+  --not-after-unix-epoch-seconds 1800000000 --out signed_pack.json
 
 # Prove mission assurance
-zkf app reentry-assurance prove --signed-pack signed_pack.json --out bundle.json
+zkf app reentry-assurance prove --signed-pack signed_pack.json \
+  --signer-manifest signer_manifest.json \
+  --source-model-manifest source.json --out bundle/
 
 # Verify
-zkf app reentry-assurance verify --bundle bundle.json
+zkf app reentry-assurance verify --bundle bundle/
 
 # Export for flight software
-zkf app reentry-assurance handoff-cfs --bundle bundle.json --out cfs_export.json
-zkf app reentry-assurance handoff-fprime --bundle bundle.json --out fprime_export.json
+zkf app reentry-assurance handoff-cfs --bundle bundle/ --out cfs_export/
+zkf app reentry-assurance handoff-fprime --bundle bundle/ --out fprime_export/
 
 # Generate dashboard
-zkf app reentry-assurance build-dashboard --bundle bundle.json --out dashboard.json
+zkf app reentry-assurance build-dashboard --bundle bundle/ --out dashboard/
+
+# Publish annex evidence
+zkf app reentry-assurance publish-annex --bundle bundle/ --out annex/ \
+  --metal-doctor metal.json --runtime-policy policy.json
 ```
 
-The mainline binary includes the `app powered-descent` command for powered-descent guidance showcase:
+The mainline binary also includes the `app powered-descent` command for powered-descent guidance showcase:
 
 ```bash
 zkf app powered-descent --inputs <INPUTS> --out <OUT> [--full-audit] [--bundle-mode <MODE>] [--trusted-setup-blob <PATH>] [--trusted-setup-manifest <PATH>]
@@ -1106,15 +1366,24 @@ Aerospace templates in the mainline binary include: `gnc-6dof-core`, `tower-catc
 ```bash
 # Start the server
 cargo run -p zkf-api
-
-# Endpoints
-POST /prove           -- prove a circuit
-POST /verify          -- verify a proof
-POST /compile         -- compile a program
-POST /estimate-gas    -- estimate EVM gas
-GET  /capabilities    -- list backends and frontends
-GET  /health          -- server health check
 ```
+
+**10 endpoints:**
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/prove` | Prove a circuit |
+| `POST` | `/wrap` | Wrap a STARK proof to Groth16 |
+| `POST` | `/deploy` | Generate a Solidity verifier contract |
+| `POST` | `/benchmark` | Run proof performance benchmarks |
+| `POST` | `/credential_prove` | Prove private-identity credential policy compliance |
+| `POST` | `/credential_verify` | Verify a private-identity credential proof |
+| `POST` | `/status` | Check job status by ID |
+| `POST` | `/create_key` | Create a new key in the key manager |
+| `GET` | `/capabilities` | List backends, frontends, and wrapping paths |
+| `GET` | `/health` | Server health check |
+
+All mutating endpoints support bearer token authentication. Job status is tracked by owner via the authorization header. Runtime metadata (trust model, node counts, GPU/CPU timing, memory, security verdict) is included in proof responses.
 
 ---
 
@@ -1187,7 +1456,23 @@ The session is new. I am not.
 
 ---
 
-## XXXIII. The Statement That Defines Me
+## XXXIII. Default Flag Values
+
+| Command | Flag | Default |
+|---------|------|---------|
+| `prove` | `--objective` | `fastest-prove` |
+| `fold` | `--objective` | `fastest-prove` |
+| `package compose` | `--backend` | `nova` |
+| `runtime certify` | `--hours` (soak) | 12 |
+| `runtime certify` | `--cycles` (gate) | 20 |
+| `benchmark` | `--mode` | `metal-first` |
+| `credential issue` | `--slot` | 0 |
+| `deploy` | `--evm-target` | `ethereum` |
+| `retrain` | `--profile` | `production` |
+
+---
+
+## XXXIV. The Statement That Defines Me
 
 I prove that something is true without revealing why it is true.
 
