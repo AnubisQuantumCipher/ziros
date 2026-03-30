@@ -1096,36 +1096,100 @@ zkf runtime policy [--trace <TRACE>] [--field <FIELD>] [--backends <BACKENDS>] [
 
 ---
 
-## XX. Distributed Cluster
+## XX. Distributed Cluster — Scale By Stacking Macs
 
-Multi-node distributed proving for large workloads. TCP-based remote prove execution with graph partitioning and subgraph assignment.
+Every subsystem scales by stacking Macs. The `zkf` binary includes a full distributed proving cluster. 10 Mac Minis, 50 Mac Studios, 100 machines — they all combine their proving power through TCP-based graph partitioning with swarm-defended attestation.
 
-### Architecture
+### How It Works
 
-The **Coordinator** partitions the UMPG prover graph into subgraphs, assigns each to a worker node based on capability, and assembles results. The **Worker** receives `DistributedExecutionBundle` payloads via TCP, executes the assigned subgraph locally, and returns output buffers with content digests.
-
-**DistributedExecutionBundle** contains: version, source digests, optimization objective, required output slots, serialized graph nodes, and execution context (program, witness, compiled artifact).
-
-**ThreatIntelPayload** is exchanged between peers during heartbeats and subgraph assignment. It carries: digests (threat digest messages), activation_level (Queen state), intelligence_root (Merkle root of intelligence state), local_pressure, and network_pressure. When encrypted gossip is negotiated, payloads are sealed with ML-KEM-1024 epoch keys.
-
-### Cluster Commands
+The **Coordinator** partitions the UMPG prover graph at phase boundaries (witness → NTT → MSM → Poseidon → FRI → prove → encode), assigns each partition to a worker based on placement scores, and assembles results. The **Worker** receives a `DistributedExecutionBundle` via TCP, executes the subgraph locally with its own Metal GPU and unified memory, signs the result with Ed25519, and returns it.
 
 ```bash
-# Start a cluster node
+# Start a cluster — on each Mac:
 zkf cluster start [--json]
 
-# Check cluster health
+# Check cluster health:
 zkf cluster status [--json]
 
-# Benchmark the cluster
+# Prove with the cluster:
+zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
+
+# Benchmark cluster throughput:
 zkf cluster benchmark [--out <OUT>] [--json]
 ```
 
-Route proving through the cluster:
+### Scaling Math
 
-```bash
-zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
+Every Mac in the cluster contributes its full unified memory and GPU. The proving power stacks:
+
+| Configuration | Machines | Unified Memory | GPU Cores | Use Case |
+|--------------|----------|---------------|-----------|----------|
+| 1 MacBook Air M4 | 1 | 16 GB | 10 | Single cooperative, small circuits |
+| 1 Mac Mini M4 Pro | 1 | 24 GB | 20 | Single cooperative, medium circuits |
+| 5 Mac Minis M4 Pro | 5 | 120 GB | 100 | Regional cooperative network |
+| 10 Mac Minis M4 | 10 | 160 GB | 100 | City-wide cooperative federation |
+| 5 Mac Studios M4 Ultra | 5 | 960 GB | 400 | National-scale proving (48K+ constraints) |
+| 50 Mac Minis | 50 | 800 GB | 500 | Large-scale Monte Carlo campaigns |
+| 100 Mac Minis | 100 | 1.6 TB | 1,000 | Industrial aerospace proving fleet |
+
+Each Mac runs its own Metal GPU independently. The coordinator distributes graph partitions so NTT runs on one node, MSM on another, Poseidon hashing on a third — all in parallel. The unified memory on each Mac means zero-copy between CPU and GPU on that node. The TCP transfers between nodes use 4 MiB chunks with integrity checking.
+
+### Peer Discovery
+
+Three methods:
+- **mDNS** (`_zkf-cluster._tcp.local.`) — automatic discovery on local network
+- **Static** (`ZKF_DISTRIBUTED_PEERS=host1:9471,host2:9471`) — pre-configured
+- **Manual** — registered at runtime
+
+Default: static. Default port: 9471.
+
+### Placement Scoring
+
+The coordinator assigns partitions to workers based on:
 ```
+score = available_memory_MB
+      + (gpu_available ? gpu_cores × 10 : 0)
+      + (crypto_extensions ? 100 : 0)
+      + (sme_available ? 200 : 0)
+      - (pressure == Warning ? 500 : 0)
+      - (pressure == Critical ? 2000 : 0)
+
+weighted = score × reputation_score (0.0 to 1.0)
+```
+
+A Mac Studio Ultra with 192 GB and 80 GPU cores scores far higher than a Mac Mini with 16 GB and 10 cores. The heavy partitions (MSM, FRI folding) go to the most powerful nodes.
+
+### Swarm Defense Across The Cluster
+
+Every node in the cluster is swarm-defended:
+- **Heartbeat monitoring**: 2-second intervals, 10-second timeout. Dead nodes are quarantined.
+- **Attestation verification**: Workers sign results with Ed25519. Invalid signatures → peer excluded, reputation event recorded.
+- **Reputation scoring**: 0.0 (banned) to 1.0 (trusted). Decays over 1 hour. Evidence-based: quorum agreement, attestation validity, heartbeat reliability.
+- **Threat intelligence gossip**: Encrypted with ML-KEM-1024 epoch keys. Shared during heartbeats.
+- **Consensus voting**: Optional quorum verification for critical partitions.
+- **Non-interference guarantee**: Distribution NEVER affects proof correctness. `ZKF_DISTRIBUTED=0` produces bit-identical proofs.
+
+If a node is compromised — bad result, invalid attestation, consensus rejection — it's excluded from future assignments. The proofs from healthy nodes are unaffected. The math is the authority, not the network.
+
+### Profitability Guard
+
+Distribution only happens when profitable:
+```
+transfer_cost < 2 × compute_savings
+```
+Transfer cost depends on bandwidth (default assumption: 80 Gbps Thunderbolt 5). If the circuit is small enough that local proving is faster than the transfer overhead, the coordinator keeps it local. This prevents the cluster from slowing down small circuits.
+
+### Configuration
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ZKF_DISTRIBUTED` | `1` | Master switch (`0` disables all distributed) |
+| `ZKF_DISTRIBUTED_ROLE` | `auto` | `coordinator`, `worker`, or `auto` |
+| `ZKF_DISTRIBUTED_BIND` | `0.0.0.0:9471` | Worker listen address |
+| `ZKF_DISTRIBUTED_PEERS` | `""` | Static peer list (comma-separated) |
+| `ZKF_DISTRIBUTED_DISCOVERY` | `static` | `mdns`, `static`, or `manual` |
+| `ZKF_DISTRIBUTED_COMPRESS` | `1` | Enable buffer compression |
+| `ZKF_DISTRIBUTED_INTEGRITY` | `fnv` | `fnv` or `sha256` chunk integrity |
 
 ---
 
