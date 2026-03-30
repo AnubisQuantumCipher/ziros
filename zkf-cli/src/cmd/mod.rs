@@ -45,7 +45,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     let result = match command {
         Commands::App { command } => app::handle_app(command),
         Commands::Credential { command } => credential::handle_credential(command),
-        Commands::Capabilities => capabilities::handle_capabilities(),
+        Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
         Commands::Doctor { json } => capabilities::handle_doctor(json),
@@ -532,7 +532,7 @@ fn command_name(command: &Commands) -> String {
             CredentialCommands::Prove { .. } => "credential:prove".to_string(),
             CredentialCommands::Verify { .. } => "credential:verify".to_string(),
         },
-        Commands::Capabilities => "capabilities".to_string(),
+        Commands::Capabilities { .. } => "capabilities".to_string(),
         Commands::Frontends { .. } => "frontends".to_string(),
         Commands::SupportMatrix { .. } => "support-matrix".to_string(),
         Commands::Doctor { .. } => "doctor".to_string(),

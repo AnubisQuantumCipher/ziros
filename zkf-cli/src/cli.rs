@@ -24,7 +24,10 @@ pub(crate) enum Commands {
         command: CredentialCommands,
     },
     /// List supported backends, fields, and framework capabilities.
-    Capabilities,
+    Capabilities {
+        #[arg(long)]
+        json: bool,
+    },
     /// List available ZK frontends (Noir, Circom, Cairo, Halo2, etc.) and their status.
     Frontends {
         #[arg(long)]
