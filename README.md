@@ -579,6 +579,7 @@ ZirOS produces standalone subsystems — complete applications that run independ
 | **Burn Budget** | Multi-phase fuel budget | [burn-budget](https://github.com/AnubisQuantumCipher/burn-budget) |
 | **Metal Provers** | 51 Lean 4 GPU kernel theorems | [metal-provers](https://github.com/AnubisQuantumCipher/metal-provers) |
 | **Bubble Proof** | Sonoluminescence simulation | [bubble-proof](https://github.com/AnubisQuantumCipher/bubble-proof) |
+| **Aerospace Qualification Exchange** | Component thermal, vibration/shock, firmware provenance, lot genealogy, test campaign, flight readiness | [ziros-aerospace-qualification](https://github.com/AnubisQuantumCipher/ziros-aerospace-qualification) |
 
 ---
 
