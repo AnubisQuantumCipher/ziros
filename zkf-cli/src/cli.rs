@@ -527,6 +527,93 @@ pub(crate) enum AppCommands {
         about = "Theorem-first reentry mission assurance for ground-side mission operations. Targets NASA Class D, uses normalized-export-based ingestion, and does not natively replace GMAT, SPICE, Dymos/OpenMDAO, Trick/JEOD, Basilisk, cFS, or F Prime."
     )]
     ReentryAssurance(ReentryAssuranceArgs),
+    /// Operate the sovereign economic defense theorem surface.
+    #[command(
+        name = "sovereign-economic-defense",
+        about = "Run the five-circuit sovereign economic defense app powered by ZirOS: cooperative treasury assurance, community land trust governance, anti-extraction shield, wealth trajectory assurance, and recirculation sovereignty scoring."
+    )]
+    SovereignEconomicDefense(SovereignEconomicDefenseArgs),
+    /// Operate the aerospace qualification, digital thread, and flight-readiness exchange.
+    #[command(
+        name = "aerospace-qualification",
+        about = "Run the six-circuit aerospace qualification subsystem powered by ZirOS with Midnight governance: thermal qualification, vibration/shock qualification, lot genealogy, firmware provenance, test campaign compliance, and flight-readiness assembly."
+    )]
+    AerospaceQualification(AerospaceQualificationArgs),
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct AerospaceQualificationArgs {
+    #[command(subcommand)]
+    pub(crate) command: AerospaceQualificationCommands,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub(crate) enum AerospaceQualificationCircuitSelector {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    All,
+}
+
+impl std::str::FromStr for AerospaceQualificationCircuitSelector {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "1" | "one" | "thermal" => Ok(Self::One),
+            "2" | "two" | "vibration" => Ok(Self::Two),
+            "3" | "three" | "genealogy" => Ok(Self::Three),
+            "4" | "four" | "firmware" => Ok(Self::Four),
+            "5" | "five" | "campaign" => Ok(Self::Five),
+            "6" | "six" | "readiness" => Ok(Self::Six),
+            "all" => Ok(Self::All),
+            _ => Err(format!("unknown circuit selector: {value}")),
+        }
+    }
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AerospaceQualificationCommands {
+    /// Prove one circuit or the full six-circuit aerospace qualification bundle.
+    Prove {
+        #[arg(long)]
+        inputs: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value = "all")]
+        circuit: AerospaceQualificationCircuitSelector,
+        #[arg(long)]
+        groth16_setup_blob: Option<PathBuf>,
+        #[arg(long)]
+        allow_dev_deterministic_groth16: bool,
+        #[arg(long, default_value = "ethereum")]
+        evm_target: String,
+        #[arg(long)]
+        seed: Option<String>,
+    },
+    /// Verify an existing aerospace qualification bundle.
+    Verify {
+        #[arg(long)]
+        bundle: PathBuf,
+    },
+    /// Render the mission report from an existing bundle.
+    Report {
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Export a release-safe bundle.
+    #[command(name = "export-bundle")]
+    ExportBundle {
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
 }
 
 #[derive(Debug, Args)]
@@ -713,6 +800,102 @@ pub(crate) enum ReentryAssuranceCommands {
         bundle: PathBuf,
         #[arg(long)]
         out: PathBuf,
+    },
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct SovereignEconomicDefenseArgs {
+    #[command(subcommand)]
+    pub(crate) command: SovereignEconomicDefenseCommands,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub(crate) enum SovereignEconomicDefenseCircuitSelector {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    All,
+}
+
+impl std::str::FromStr for SovereignEconomicDefenseCircuitSelector {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "1" | "one" | "cooperative-treasury-assurance" | "cooperative-treasury" => {
+                Ok(Self::One)
+            }
+            "2" | "two" | "community-land-trust-governance" | "community-land-trust" => {
+                Ok(Self::Two)
+            }
+            "3" | "three" | "anti-extraction-shield" | "anti-extraction" => Ok(Self::Three),
+            "4" | "four" | "wealth-trajectory-assurance" | "wealth-trajectory" => {
+                Ok(Self::Four)
+            }
+            "5" | "five" | "recirculation-sovereignty-score" | "recirculation" => {
+                Ok(Self::Five)
+            }
+            "all" => Ok(Self::All),
+            other => Err(format!(
+                "unknown sovereign economic defense circuit selector '{other}' (expected 1, 2, 3, 4, 5, or all)"
+            )),
+        }
+    }
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum SovereignEconomicDefenseCommands {
+    /// Prove one circuit or the full five-circuit sovereign economic defense bundle.
+    Prove {
+        #[arg(long)]
+        inputs: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value = "all")]
+        circuit: SovereignEconomicDefenseCircuitSelector,
+        #[arg(long)]
+        groth16_setup_blob: Option<PathBuf>,
+        #[arg(long)]
+        allow_dev_deterministic_groth16: bool,
+        #[arg(long, default_value = "ethereum")]
+        evm_target: String,
+        /// Allow attestation-level wrapped proofs for STARK circuits.
+        /// When combined with wrapping, the app may emit `wrapped-v3` Nova-compressed
+        /// Groth16 artifacts whose trust model remains attestation, not strict cryptographic.
+        #[arg(long)]
+        allow_attestation: bool,
+        /// Force the Nova-compressed wrapper path instead of direct FRI wrapping.
+        #[arg(long)]
+        compress: bool,
+        /// Retained for CLI stability. The repo-constrained sovereign economic defense bundle
+        /// omits STARK-to-Groth16 wrapping either way and ships STARK proofs as the primary
+        /// deliverable. Circuit 3 remains the native BN254 Groth16 on-chain lane.
+        #[arg(long)]
+        no_wrap: bool,
+    },
+    /// Verify an existing sovereign economic defense bundle.
+    Verify {
+        #[arg(long)]
+        bundle: PathBuf,
+    },
+    /// Regenerate the operator report from an existing sovereign economic defense bundle.
+    Report {
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Export a release-safe sovereign economic defense bundle.
+    #[command(name = "export-bundle")]
+    ExportBundle {
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        include_private: bool,
     },
 }
 

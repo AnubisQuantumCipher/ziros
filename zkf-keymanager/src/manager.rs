@@ -1,9 +1,6 @@
 use crate::zeroize_types::{Ed25519Seed, SymmetricKey};
-#[cfg(not(target_os = "macos"))]
 use argon2::Argon2;
-#[cfg(not(target_os = "macos"))]
 use chacha20poly1305::aead::{Aead, KeyInit};
-#[cfg(not(target_os = "macos"))]
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 use chrono::Utc;
 use libcrux_ml_dsa::KEY_GENERATION_RANDOMNESS_SIZE;
@@ -12,11 +9,11 @@ use libcrux_ml_kem::KEY_GENERATION_SEED_SIZE as ML_KEM_KEY_GENERATION_SEED_SIZE;
 use libcrux_ml_kem::mlkem1024::generate_key_pair as generate_ml_kem_key_pair;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-#[cfg(not(target_os = "macos"))]
 use std::fs;
 use std::io;
-#[cfg(not(target_os = "macos"))]
 use std::path::{Path, PathBuf};
+#[cfg(target_os = "macos")]
+use std::sync::OnceLock;
 use zkf_cloudfs::CloudFS;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -126,7 +123,9 @@ impl KeyManager {
     pub fn backend(&self) -> KeyBackend {
         #[cfg(target_os = "macos")]
         {
-            if zkf_core::keystore::synchronizable_keychain_supported() {
+            if zkf_core::keystore::synchronizable_keychain_supported()
+                && keychain_storage_supported()
+            {
                 KeyBackend::IcloudKeychain
             } else {
                 KeyBackend::EncryptedFile
@@ -155,49 +154,66 @@ impl KeyManager {
     }
 
     pub fn store_key(&self, id: &str, service: &str, bytes: &[u8]) -> io::Result<()> {
+        let backend = self.backend();
         let entry = KeyEntry {
             id: id.to_string(),
             service: service.to_string(),
             key_type: KeyType::from_service(service),
-            backend: self.backend(),
+            backend,
             digest: hex_sha256(bytes),
             stored_at_unix: Utc::now().timestamp(),
         };
 
-        #[cfg(target_os = "macos")]
-        {
-            store_keychain_item(service, id, bytes)?;
-        }
-
-        #[cfg(not(target_os = "macos"))]
-        {
-            store_encrypted_file(&self.file_key_path(id, service), bytes)?;
+        match backend {
+            KeyBackend::IcloudKeychain => {
+                #[cfg(target_os = "macos")]
+                {
+                    store_keychain_item(service, id, bytes)?;
+                }
+                #[cfg(not(target_os = "macos"))]
+                {
+                    return Err(io::Error::other(
+                        "icloud-keychain backend is unavailable on this platform",
+                    ));
+                }
+            }
+            KeyBackend::EncryptedFile => {
+                store_encrypted_file(&self.file_key_path(id, service), bytes)?;
+            }
         }
 
         self.upsert_index_entry(entry)
     }
 
     pub fn retrieve_key(&self, id: &str, service: &str) -> io::Result<Vec<u8>> {
-        #[cfg(target_os = "macos")]
-        {
-            retrieve_keychain_item(service, id)
-        }
-
-        #[cfg(not(target_os = "macos"))]
-        {
-            retrieve_encrypted_file(&self.file_key_path(id, service))
+        match self.backend() {
+            KeyBackend::IcloudKeychain => {
+                #[cfg(target_os = "macos")]
+                {
+                    retrieve_keychain_item(service, id)
+                }
+                #[cfg(not(target_os = "macos"))]
+                {
+                    Err(io::Error::other(
+                        "icloud-keychain backend is unavailable on this platform",
+                    ))
+                }
+            }
+            KeyBackend::EncryptedFile => retrieve_encrypted_file(&self.file_key_path(id, service)),
         }
     }
 
     pub fn delete_key(&self, id: &str, service: &str) -> io::Result<()> {
-        #[cfg(target_os = "macos")]
-        {
-            let _ = delete_keychain_item(service, id);
-        }
-
-        #[cfg(not(target_os = "macos"))]
-        {
-            let _ = delete_encrypted_file(&self.file_key_path(id, service));
+        match self.backend() {
+            KeyBackend::IcloudKeychain => {
+                #[cfg(target_os = "macos")]
+                {
+                    let _ = delete_keychain_item(service, id);
+                }
+            }
+            KeyBackend::EncryptedFile => {
+                let _ = delete_encrypted_file(&self.file_key_path(id, service));
+            }
         }
 
         self.remove_index_entry(id, service)
@@ -271,7 +287,6 @@ impl KeyManager {
         self.cloudfs.write(relative_path, &payload)
     }
 
-    #[cfg(not(target_os = "macos"))]
     fn file_key_path(&self, id: &str, service: &str) -> PathBuf {
         let mut digest = Sha256::new();
         digest.update(service.as_bytes());
@@ -350,7 +365,6 @@ fn hex_sha256(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
 
-#[cfg(not(target_os = "macos"))]
 fn store_encrypted_file(path: &Path, bytes: &[u8]) -> io::Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
@@ -380,7 +394,6 @@ fn store_encrypted_file(path: &Path, bytes: &[u8]) -> io::Result<()> {
     Ok(())
 }
 
-#[cfg(not(target_os = "macos"))]
 fn retrieve_encrypted_file(path: &Path) -> io::Result<Vec<u8>> {
     let payload: SealedFile = serde_json::from_slice(&fs::read(path)?)
         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
@@ -391,7 +404,6 @@ fn retrieve_encrypted_file(path: &Path) -> io::Result<Vec<u8>> {
         .map_err(|err| io::Error::other(err.to_string()))
 }
 
-#[cfg(not(target_os = "macos"))]
 fn delete_encrypted_file(path: &Path) -> io::Result<()> {
     if !path.exists() {
         return Ok(());
@@ -401,7 +413,6 @@ fn delete_encrypted_file(path: &Path) -> io::Result<()> {
     fs::remove_file(path)
 }
 
-#[cfg(not(target_os = "macos"))]
 fn derive_file_key(salt: &[u8]) -> io::Result<[u8; 32]> {
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
     let mut output = [0u8; 32];
@@ -412,7 +423,6 @@ fn derive_file_key(salt: &[u8]) -> io::Result<[u8; 32]> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg(not(target_os = "macos"))]
 struct SealedFile {
     salt: Vec<u8>,
     nonce: Vec<u8>,
@@ -604,6 +614,33 @@ fn keychain_probe() -> io::Result<bool> {
         Ok(true)
     } else {
         cvt_status(status).map(|_| true)
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn keychain_storage_supported() -> bool {
+    static SUPPORT: OnceLock<bool> = OnceLock::new();
+    *SUPPORT.get_or_init(|| match keychain_storage_probe() {
+        Ok(()) => true,
+        Err(error) if error.to_string().contains("required entitlement") => false,
+        Err(_) => false,
+    })
+}
+
+#[cfg(target_os = "macos")]
+fn keychain_storage_probe() -> io::Result<()> {
+    let service = "com.ziros.keymanager.probe.write";
+    let account = "probe-write";
+    let probe = b"ziros-keymanager-probe";
+    store_keychain_item(service, account, probe)?;
+    let stored = retrieve_keychain_item(service, account)?;
+    let _ = delete_keychain_item(service, account);
+    if stored == probe {
+        Ok(())
+    } else {
+        Err(io::Error::other(
+            "keychain storage probe returned mismatched bytes",
+        ))
     }
 }
 

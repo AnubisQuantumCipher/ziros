@@ -43,6 +43,7 @@ owo-colors.workspace = true
 serde.workspace = true
 serde_cbor = "0.11"
 serde_json.workspace = true
+chrono.workspace = true
 sha2.workspace = true
 zkf-backends = { path = "../zkf-backends", default-features = false }
 zkf-conformance = { path = "../zkf-conformance" }
