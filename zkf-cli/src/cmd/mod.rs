@@ -20,6 +20,8 @@ pub(crate) mod prove;
 pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
+pub(crate) mod aerospace_qualification;
+pub(crate) mod sovereign_economic_defense;
 pub(crate) mod storage;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
@@ -495,6 +497,34 @@ fn command_name(command: &Commands) -> String {
                     "app:reentry-assurance:handoff-fprime".to_string()
                 }
                 None => "app:reentry-assurance".to_string(),
+            },
+            AppCommands::SovereignEconomicDefense(args) => match &args.command {
+                crate::cli::SovereignEconomicDefenseCommands::Prove { .. } => {
+                    "app:sovereign-economic-defense:prove".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::Verify { .. } => {
+                    "app:sovereign-economic-defense:verify".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::Report { .. } => {
+                    "app:sovereign-economic-defense:report".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::ExportBundle { .. } => {
+                    "app:sovereign-economic-defense:export-bundle".to_string()
+                }
+            },
+            AppCommands::AerospaceQualification(args) => match &args.command {
+                crate::cli::AerospaceQualificationCommands::Prove { .. } => {
+                    "app:aerospace-qualification:prove".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::Verify { .. } => {
+                    "app:aerospace-qualification:verify".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::Report { .. } => {
+                    "app:aerospace-qualification:report".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::ExportBundle { .. } => {
+                    "app:aerospace-qualification:export-bundle".to_string()
+                }
             },
         },
         Commands::Credential { command } => match command {

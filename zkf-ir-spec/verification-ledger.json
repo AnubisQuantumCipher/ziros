@@ -746,7 +746,7 @@
       "status": "mechanized_local",
       "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_scheduler_verus.rs",
-      "notes": "Verus theorem `gpu_cpu_gpu_partition_equivalence` proves the runtime’s verified placement partition composes the mechanized GPU subset with the verified CPU lane without changing verifier truth: GPU-eligible nodes stay on the attested whitelist, CPU-routed nodes remain on the CPU proof surface, and the combined execution plan preserves the same accepted statement through final proof generation.",
+      "notes": "Verus theorem `gpu_cpu_gpu_partition_equivalence` proves the runtime\u2019s verified placement partition composes the mechanized GPU subset with the verified CPU lane without changing verifier truth: GPU-eligible nodes stay on the attested whitelist, CPU-routed nodes remain on the CPU proof surface, and the combined execution plan preserves the same accepted statement through final proof generation.",
       "trusted_assumptions": []
     },
     {
@@ -1759,6 +1759,100 @@
       "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
       "notes": "Local Rocq theorem `private_identity_public_input_arity_guard_ok` proves the extracted private-identity arity helper is exactly equality against the shipped expected public-input arity helper.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "sed.common.signed_bound_slack_nonnegative",
+      "title": "Signed bound slack is nonnegative when |value| <= bound",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "verus",
+      "status": "proposed",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_verus.rs",
+      "notes": "Verus proof that bound^2 - value^2 >= 0 for all |value| <= bound. Proposed, not yet mechanically verified.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "sed.common.floor_sqrt_satisfies_relation",
+      "title": "Floor sqrt satisfies sqrt^2 <= value < (sqrt+1)^2",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "kani",
+      "status": "proposed",
+      "assurance_class": "bounded_check",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_kani.rs",
+      "notes": "Kani bounded model check for values up to 100,000. Proposed.",
+      "trusted_assumptions": [
+        "kani-bounded-model-check-soundness"
+      ]
+    },
+    {
+      "theorem_id": "sed.common.exact_division_remainder_bounded",
+      "title": "Exact division remainder is strictly less than denominator",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "kani",
+      "status": "proposed",
+      "assurance_class": "bounded_check",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_kani.rs",
+      "notes": "Kani bounded model check for numerators up to 1,000,000 and denominators up to 1,000. Proposed.",
+      "trusted_assumptions": [
+        "kani-bounded-model-check-soundness"
+      ]
+    },
+    {
+      "theorem_id": "sed.cooperative_treasury.reserve_ratio_ordering",
+      "title": "Reserve ratio division preserves ordering of reserve balances",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "verus",
+      "status": "proposed",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_verus.rs",
+      "notes": "Verus proof that if reserve_a > reserve_b with same total, ratio_a >= ratio_b. Proposed.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "sed.anti_extraction.severity_classification_monotone",
+      "title": "Severity score classification is monotone in violation magnitudes",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "verus",
+      "status": "proposed",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_verus.rs",
+      "notes": "Verus specification that severity_score >= predatory_threshold implies any_violation is true. Proposed.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "sed.recirculation.euler_step_capital_nonnegative",
+      "title": "Euler step capital transition preserves nonnegativity",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "verus",
+      "status": "proposed",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_verus.rs",
+      "notes": "Verus proof that current_capital + capital_gain >= 0 when both inputs nonnegative. Proposed.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "sed.recirculation.recirculation_rate_bounded",
+      "title": "Recirculation rate cannot exceed scale",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "kani",
+      "status": "proposed",
+      "assurance_class": "bounded_check",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_kani.rs",
+      "notes": "Kani bounded model check that (internal * scale) / total <= scale. Proposed.",
+      "trusted_assumptions": [
+        "kani-bounded-model-check-soundness"
+      ]
+    },
+    {
+      "theorem_id": "sed.surface_constants",
+      "title": "Surface constants match Rust implementation values",
+      "scope": "zkf-lib::app::sovereign_economic_defense",
+      "checker": "verus",
+      "status": "proposed",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "ZirOS_Sovereign_Economic_Defense_System/16_formal_verification/sovereign_economic_defense_verus.rs",
+      "notes": "Verus proof that Goldilocks scale, BN254 scale, integration steps, and bounds match Rust constants. Proposed.",
       "trusted_assumptions": []
     }
   ]

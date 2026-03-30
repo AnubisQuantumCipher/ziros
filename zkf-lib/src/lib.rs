@@ -239,6 +239,61 @@ pub use app::spec::{
     build_app_spec, instantiate_template, template_registry,
 };
 #[cfg(not(hax))]
+pub use app::sovereign_economic_defense::{
+    AntiExtractionShieldRequestV1, CommunityLandTrustGovernanceRequestV1,
+    CooperativeTreasuryAssuranceRequestV1, RecirculationSovereigntyScoreRequestV1,
+    SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS,
+    SOVEREIGN_ECONOMIC_DEFENSE_GOLDILOCKS_SCALE_DECIMALS,
+    SOVEREIGN_ECONOMIC_DEFENSE_INTEGRATION_STEPS, SovereignEconomicDefenseRunManifestV1,
+    WealthTrajectoryAssuranceRequestV1, anti_extraction_shield_witness_from_request,
+    build_anti_extraction_shield_program, build_community_land_trust_governance_program,
+    build_cooperative_treasury_assurance_program,
+    build_recirculation_sovereignty_score_program,
+    build_wealth_trajectory_assurance_program,
+    community_land_trust_governance_witness_from_request,
+    cooperative_treasury_assurance_witness_from_request,
+    recirculation_sovereignty_score_witness_from_request,
+    wealth_trajectory_assurance_witness_from_request,
+};
+#[cfg(not(hax))]
+pub use app::aerospace_qualification::{
+    AEROSPACE_QUALIFICATION_BN254_SCALE_DECIMALS, AEROSPACE_QUALIFICATION_GOLDILOCKS_SCALE_DECIMALS,
+    AEROSPACE_QUALIFICATION_MAX_COMPONENTS, AEROSPACE_QUALIFICATION_MAX_HANDLERS,
+    AEROSPACE_QUALIFICATION_MAX_READINGS, AEROSPACE_QUALIFICATION_MAX_TESTS,
+    AEROSPACE_QUALIFICATION_SPECTRAL_BANDS, AerospaceQualificationRunManifestV1,
+    ComponentThermalQualificationRequestV1, FlightReadinessAssemblyRequestV1,
+    FirmwareProvenanceRequestV1, LotGenealogyRequestV1, TestCampaignComplianceRequestV1,
+    VibrationShockQualificationRequestV1, build_component_thermal_qualification_program,
+    build_firmware_provenance_program, build_flight_readiness_assembly_program,
+    build_lot_genealogy_program, build_test_campaign_compliance_program,
+    build_vibration_shock_qualification_program,
+    component_thermal_qualification_witness_from_request,
+    firmware_provenance_witness_from_request, flight_readiness_assembly_witness_from_request,
+    lot_genealogy_witness_from_request, test_campaign_compliance_witness_from_request,
+    vibration_shock_qualification_witness_from_request,
+};
+#[cfg(not(hax))]
+pub use app::falcon_heavy_certification::{
+    AscentTrajectoryRequestV1, BoosterRecoveryCertificationRequestV1, CoreRecoveryDataV1,
+    EngineHealthCertificationRequestV1, EngineOutMissionRequestV1, EngineShutdownEventV1,
+    FALCON_HEAVY_ASCENT_STEPS, FALCON_HEAVY_BN254_SCALE_DECIMALS, FALCON_HEAVY_CORE_COUNT,
+    FALCON_HEAVY_ENGINE_COUNT, FALCON_HEAVY_ENGINES_PER_CORE,
+    FALCON_HEAVY_ENVIRONMENT_STEPS, FALCON_HEAVY_GOLDILOCKS_SCALE_DECIMALS,
+    FALCON_HEAVY_MAX_BURNS, FALCON_HEAVY_PARAMS_PER_ENGINE,
+    FALCON_HEAVY_RECOVERY_STEPS_PER_CORE, FalconHeavyMissionManifestV1,
+    FullMissionIntegrationRequestV1, OrbitalBurnV1, PayloadFairingEnvironmentRequestV1,
+    UpperStageMultiBurnRequestV1, ascent_trajectory_witness_from_request,
+    booster_recovery_witness_from_request, build_ascent_trajectory_program,
+    build_booster_recovery_program, build_engine_health_certification_program,
+    build_engine_out_mission_program, build_full_mission_integration_program,
+    build_payload_fairing_environment_program, build_upper_stage_multi_burn_program,
+    engine_health_certification_witness_from_request,
+    engine_out_mission_witness_from_request,
+    full_mission_integration_witness_from_request,
+    payload_fairing_environment_witness_from_request,
+    upper_stage_multi_burn_witness_from_request,
+};
+#[cfg(not(hax))]
 pub use app::templates::TemplateProgram;
 #[cfg(not(hax))]
 pub use app::thermochemical::{

@@ -578,6 +578,7 @@ ZirOS produces standalone subsystems — complete applications that run independ
 | **Burn Budget** | Multi-phase mission fuel budget with 5 burn phases | Reserve thresholds, Poseidon-committed balances, 1.4s | [burn-budget](https://github.com/AnubisQuantumCipher/burn-budget) |
 | **Metal Provers** | GPU kernel correctness for MSM, NTT, Poseidon2 | 51 Lean 4 theorems, fail-closed attestation | [metal-provers](https://github.com/AnubisQuantumCipher/metal-provers) |
 | **Bubble Proof** | Rayleigh-Plesset sonoluminescence simulation | 3,000 Störmer-Verlet steps, 1,088-byte proof, 3ms verify | [bubble-proof](https://github.com/AnubisQuantumCipher/bubble-proof) |
+| **Aerospace Qualification Exchange** | Supplier thermal/vibration/shock qualification, lot genealogy chain-of-custody, firmware provenance, test campaign compliance, flight-readiness assembly — with Midnight Network selective disclosure governance | 6 circuits (4 Plonky3 STARK + 2 Groth16), 6 Midnight Compact contracts, ML-DSA-87 hybrid signatures, 34s total prove | [ziros-midnight-aerospace-qualification-exchange](https://github.com/AnubisQuantumCipher/ziros-midnight-aerospace-qualification-exchange) |
 
 Every subsystem: `git clone` → `./install.sh` → proving on any Apple Silicon Mac.
 

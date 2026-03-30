@@ -4,7 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
-use crate::cli::{AppCommands, ReentryAssuranceArgs, ReentryAssuranceCommands};
+use crate::cli::{
+    AppCommands, ReentryAssuranceArgs, ReentryAssuranceCommands,
+};
 use crate::util::{read_json, write_json, write_text};
 use ed25519_dalek::{Signer, SigningKey};
 use libcrux_ml_dsa::ml_dsa_87::{
@@ -2997,6 +2999,12 @@ pub(crate) fn handle_app(command: AppCommands) -> Result<(), String> {
             trusted_setup_manifest,
         ),
         AppCommands::ReentryAssurance(args) => handle_reentry_assurance_command(args),
+        AppCommands::SovereignEconomicDefense(args) => {
+            crate::cmd::sovereign_economic_defense::handle_sovereign_economic_defense_command(args)
+        }
+        AppCommands::AerospaceQualification(args) => {
+            crate::cmd::aerospace_qualification::handle_aerospace_qualification_command(args)
+        }
     }
 }
 

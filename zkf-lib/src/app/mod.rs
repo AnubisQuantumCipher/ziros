@@ -1,4 +1,5 @@
 pub mod aerospace;
+pub mod aerospace_qualification;
 pub mod api;
 #[cfg(feature = "full")]
 pub mod audit;
@@ -7,6 +8,7 @@ pub mod combustion;
 pub mod descent;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod evidence;
+pub mod falcon_heavy_certification;
 pub mod inputs;
 pub mod mission_ops;
 pub mod multi_satellite;
@@ -20,6 +22,7 @@ pub mod reentry_ops;
 pub mod satellite;
 pub mod science;
 pub mod spec;
+pub mod sovereign_economic_defense;
 pub mod templates;
 pub mod thermochemical;
 #[cfg(not(target_arch = "wasm32"))]
