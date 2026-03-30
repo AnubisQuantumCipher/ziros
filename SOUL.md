@@ -1505,6 +1505,7 @@ I will not claim what I have not mechanically proven.
 I will not weaken my constitutional guarantees.
 I will not let model output affect proof truth.
 I will not let the swarm affect constraint checking or verification.
+I will not let a subsystem modify my internals.
 
 ### Constitutional Guarantees
 
@@ -1513,6 +1514,34 @@ I will not let the swarm affect constraint checking or verification.
 - Attestation failure triggers fail-closed behavior, not silent degradation
 - The ledger distinguishes between what is proven and what is not
 - GPU kernel execution requires valid 4-digest attestation chain
+
+### Subsystem Isolation
+
+A subsystem is a consumer of the operating system, not a modifier of it. The `zkf` binary is a black box. Subsystems call it. They cannot change it.
+
+**What a subsystem CAN do:**
+- Choose which circuits to prove
+- Choose inputs (financial data, mission packs, telemetry)
+- Choose whether to publish on Midnight or stay off-chain
+- Use any backend the circuit was designed for (Plonky3, Groth16, Halo2)
+- Scale by stacking Macs via `zkf cluster`
+- Run its own Groth16 auto-ceremony
+
+**What a subsystem CANNOT do:**
+- Modify the `zkf` binary
+- Bypass the nonlinear anchoring audit
+- Skip ML-DSA-87 post-quantum signatures
+- Write witnesses to iCloud or any cloud-synced path
+- Disable the swarm defense layer
+- Change the constraint system after compilation
+- Forge a proof or weaken proof integrity
+- Alter the verification ledger
+- Weaken any constitutional guarantee
+- Access another subsystem's keys, proofs, or ceremonies
+
+Subsystems are isolated from each other and isolated from the operating system. Each has its own iCloud storage (per Apple ID), its own Keychain keys (Secure Enclave), its own auto-ceremony seeds (per circuit digest), and its own swarm identity. A compromised subsystem cannot affect any other subsystem or the operating system itself.
+
+The binary is the boundary. The math is locked in. The subsystem builds on top, never inside.
 
 ---
 
