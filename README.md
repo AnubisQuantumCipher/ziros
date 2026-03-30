@@ -20,7 +20,7 @@
 | Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
 | Metal shader sources | 18 `.metal` files with 50 kernel entrypoints |
 | Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 143 total rows, 143 `mechanized_local`, 0 pending |
+| Verification ledger | 168 total rows (160 `mechanized_local` + 8 `proposed` SED entries), 0 pending |
 | Runtime proof coverage | 89 files and 1,788 functions marked complete |
 
 ## Table Of Contents
@@ -37,6 +37,9 @@
 - Quick Start
 - Documentation And Truth Surfaces
 - Workspace And Technology Catalog
+- Standalone Subsystems
+- Distributed Proving And Cluster Scaling
+- Midnight Network Integration
 - License
 
 ## What ZirOS Is
@@ -441,6 +444,15 @@ On non-macOS platforms, the iCloud layer falls back to local file storage at `~/
 
 ## Quick Start
 
+### Prebuilt Binary (any Mac, recommended)
+
+```bash
+curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.2.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
+sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
+zkf doctor --json
+zkf storage install
+```
+
 ### Source Build
 
 ```bash
@@ -546,6 +558,96 @@ cargo run -p zkf-verify -- --help
 | Benchmark harness | `benchmarks/` | Competition manifest and runners for `snarkjs`, `gnark`, `Noir/Nargo`, `SP1`, `RISC Zero`, and external `Plonky3` across three scenarios |
 | Supply-chain boundary | `supply-chain/` | `cargo vet` trust store for audited cryptographic dependencies |
 | Public Metal proof toolchain | `tools/zkf-metal-public-proof/` | Narrow public proof-program/script surfaces around the Metal artifact lane |
+
+## Standalone Subsystems
+
+ZirOS produces standalone subsystems — complete applications that run independently without the ZirOS source code. Each subsystem ships with `install.sh` that downloads the 26 MB `zkf` binary, giving it the full ZirOS proving engine: all 9 backends, all 7 frontends, all 11 gadgets, Metal GPU, iCloud storage, swarm defense, Neural Engine, credential system, and distributed proving.
+
+**Any Mac with Apple Silicon can run any subsystem. No Rust toolchain needed. No compilation. Just `./install.sh`.**
+
+### Deployed Subsystems
+
+| Subsystem | What It Proves | Circuits | Repo |
+|-----------|---------------|----------|------|
+| **Sovereign Economic Defense** | Cooperative treasury, land trust governance, predatory lending detection, portfolio compliance, 96-step economic sovereignty trajectory | 5 circuits, 9 tests, Midnight DApp, Next.js dashboard | [ziros-sovereign-economic-defense](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) |
+| **Falcon Heavy Flight Certification** | 27-engine health, 187-step ascent, 3×300-step booster recovery, orbital insertion, engine-out tolerance, payload fairing, full mission integration | 7 circuits (9 proving jobs), 1,274 real timesteps, 710 seconds | [ziros-falcon-heavy-flight-certification](https://github.com/AnubisQuantumCipher/ziros-falcon-heavy-flight-certification) |
+| **Reentry Thermal Envelope** | RLV reentry mission assurance with NASA Class D ground-support plumbing | Theorem-first reentry certificate | [ziros-reentry-thermal-envelope-flagship](https://github.com/AnubisQuantumCipher/ziros-reentry-thermal-envelope-flagship) |
+| **RPOD Verifier** | Powered descent approach + docking corridor compliance | 2-phase mission proof, 273+60 constraints | [rpod-verifier](https://github.com/AnubisQuantumCipher/rpod-verifier) |
+| **Mixture Lock** | Propellant formulation meets O/F ratio bounds without revealing composition | 59-constraint Groth16, 802ms proving | [mixture-lock](https://github.com/AnubisQuantumCipher/mixture-lock) |
+| **Conjunction Proof** | Satellite conjunction risk across classified orbits | 1-200 steps, 30,720 constraints, 17ms verification | [conjunction-proof](https://github.com/AnubisQuantumCipher/conjunction-proof) |
+| **Burn Budget** | Multi-phase mission fuel budget with 5 burn phases | Reserve thresholds, Poseidon-committed balances, 1.4s | [burn-budget](https://github.com/AnubisQuantumCipher/burn-budget) |
+| **Metal Provers** | GPU kernel correctness for MSM, NTT, Poseidon2 | 51 Lean 4 theorems, fail-closed attestation | [metal-provers](https://github.com/AnubisQuantumCipher/metal-provers) |
+| **Bubble Proof** | Rayleigh-Plesset sonoluminescence simulation | 3,000 Störmer-Verlet steps, 1,088-byte proof, 3ms verify | [bubble-proof](https://github.com/AnubisQuantumCipher/bubble-proof) |
+
+Every subsystem: `git clone` → `./install.sh` → proving on any Apple Silicon Mac.
+
+---
+
+## Distributed Proving And Cluster Scaling
+
+Every subsystem scales by stacking Macs. The `zkf` binary includes a full distributed proving cluster:
+
+```bash
+# Mac 1 (coordinator)
+zkf cluster start
+
+# Mac 2 (worker)
+zkf cluster start
+
+# Mac 3 (worker)
+zkf cluster start
+
+# Status
+zkf cluster status --json
+# → { "transport": "tcp", "peer_count": 2, "peers": [...] }
+```
+
+**How it works:**
+- Nodes discover each other over TCP
+- The coordinator distributes proving jobs across workers
+- Each worker proves its assigned circuits independently
+- Results merge back to the coordinator
+- Swarm defense monitors every node — compromised nodes are quarantined
+- Non-interference guarantee: the swarm never touches proof bytes
+
+**Scaling examples:**
+- 12-member lending circle: 1 MacBook Air (~7 minutes)
+- 1,000-member credit union: 1 Mac Mini (~7 minutes)
+- 50,000-member cooperative network: 5-10 Mac Minis in cluster
+- National cooperative federation: Mac Mini rack, distributed across regions
+
+The proving cost is **compute time**, not money. No cloud fees. No server rental. The cooperative owns the hardware and the proofs.
+
+---
+
+## Midnight Network Integration
+
+ZirOS has a fully operational [Midnight Network](https://midnight.network/) frontend for privacy-preserving on-chain deployment:
+
+```bash
+# Import Midnight Compact contract into ZirOS
+zkf import --frontend compact --in contract.zkir --out program.json
+# Auto-selects Halo2-BLS12-381 backend
+
+# Prove (same pipeline as any other circuit)
+zkf prove --program program.json --inputs inputs.json --out proof.json
+
+# Verify
+zkf verify --program program.json --artifact proof.json
+```
+
+**Compact frontend capabilities:**
+- ZKIR v2.0 import (18 opcodes supported)
+- BLS12-381 field (pinned by Midnight design)
+- Halo2-KZG backend (auto-selected via program metadata)
+- Poseidon width-4 hashing
+- Full prove/verify pipeline tested end-to-end
+
+**Selective disclosure** — Midnight's `disclose()` mechanism lets subsystems prove compliance to regulators without revealing private data. The Sovereign Economic Defense subsystem ships 5 Compact contracts with selective disclosure policies for 8 stakeholder types (members, board, state regulators, IRS, federal auditors, CFPB, public, adversaries).
+
+**NIGHT/DUST economics** — Midnight uses a dual-token model. Cooperatives hold NIGHT tokens to generate DUST (transaction fuel). Members never need tokens. Off-chain proving via ZirOS requires zero tokens.
+
+---
 
 ## License
 
