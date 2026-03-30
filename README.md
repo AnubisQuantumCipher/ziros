@@ -444,7 +444,7 @@ On non-macOS platforms, the iCloud layer falls back to local file storage at `~/
 ### Prebuilt Binary (any Mac, recommended)
 
 ```bash
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.2.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
+curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
 sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
 zkf doctor --json
 zkf storage install
