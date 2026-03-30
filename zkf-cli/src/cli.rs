@@ -603,6 +603,8 @@ pub(crate) enum MidnightProofServerCommands {
         job_capacity: usize,
         #[arg(long, default_value_t = 2, env = "MIDNIGHT_PROOF_SERVER_NUM_WORKERS")]
         num_workers: usize,
+        #[arg(long, default_value = "umpg", env = "MIDNIGHT_PROOF_SERVER_ENGINE")]
+        engine: String,
         #[arg(
             long,
             default_value_t = 600.0,

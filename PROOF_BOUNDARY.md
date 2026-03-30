@@ -14,14 +14,15 @@ swarm defense envelope.
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 160.
+- Total ledger entries: 168.
 - Machine-checked rows: 160 total (160 `mechanized_local`, 0 `mechanized_generated`).
 - Remaining bounded/external/pending rows: 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
-- Assurance classes: 132 `mechanized_implementation_claim`, 0 `bounded_check`, 3 `attestation_backed_lane`, 16 `model_only_claim`, 9 `hypothesis_carried_theorem`.
+- Assurance classes: 137 `mechanized_implementation_claim`, 3 `bounded_check`, 3 `attestation_backed_lane`, 16 `model_only_claim`, 9 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
-- Release-grade ready: `true`.
-- Release-grade blockers: none.
+- Release-grade ready: `false`.
+- Release-grade blockers:
+  - 3 row(s) still carry trusted_assumptions
 <!-- END GENERATED VERIFICATION STATUS -->
 
 When prose and the ledger disagree, the ledger wins.

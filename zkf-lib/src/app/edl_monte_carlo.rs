@@ -2327,7 +2327,10 @@ pub fn build_edl_campaign_attestation_program(
     for i in 0..n {
         let name = format!("edla_traj_commit_{i}");
         builder.private_input(&name)?;
-        builder.constrain_range(&name, 63)?;
+        // Goldilocks Poseidon outputs are already nonlinearly anchored by the
+        // campaign hash chain below and may legitimately exceed 63 bits.
+        // Keeping a 63-bit range gate here causes valid trajectory
+        // commitments to fail before the attestation circuit can hash them.
         commit_names.push(name);
     }
 

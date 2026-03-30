@@ -1274,6 +1274,8 @@ Midnight transaction costs are paid in DUST generated from NIGHT holdings. ZirOS
 3. Use wallet configuration and balance helpers such as `getDustBalance()`, `getUnshieldedBalances()`, and `balanceUnsealedTransaction()` before submission.
 4. Submit only the finalized transaction; do not treat proof generation alone as a network-side deployment.
 
+For compatibility debugging, run `MIDNIGHT_PROOF_SERVER_ENGINE=upstream bash 05_scripts/run-midnight-proof-server.sh`. The default launcher path is the UMPG-backed ZirOS compatibility engine.
+
 The helpers under `18_dapp/src/` are written to prefer the wallet-provided proving path and fall back to the local proof server only when needed.
 "#
     .to_string()
@@ -1346,8 +1348,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIN="${ZKF_SUBSYSTEM_ZKF_BIN:-$ROOT/20_release/bin/zkf}"
 PORT="${MIDNIGHT_PROOF_SERVER_PORT:-6300}"
+ENGINE="${MIDNIGHT_PROOF_SERVER_ENGINE:-umpg}"
 
-exec "$BIN" midnight proof-server serve --port "$PORT" --json
+exec "$BIN" midnight proof-server serve --port "$PORT" --engine "$ENGINE" --json
 "#
     .to_string()
 }
@@ -1528,6 +1531,11 @@ mod tests {
                 .join("05_scripts/run-midnight-proof-server.sh")
                 .is_file()
         );
+        let launcher =
+            fs::read_to_string(generated.join("05_scripts/run-midnight-proof-server.sh"))
+                .expect("read proof-server launcher");
+        assert!(launcher.contains("MIDNIGHT_PROOF_SERVER_ENGINE:-umpg"));
+        assert!(launcher.contains("--engine \"$ENGINE\""));
         assert!(generated.join("05_scripts/deploy-midnight.sh").is_file());
         assert!(generated.join("06_docs/post_quantum_anchor.md").is_file());
         assert!(generated.join("07_compiled/program.json").is_file());

@@ -12394,6 +12394,7 @@ dependencies = [
 name = "zkf-cli"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
  "actix-web",
  "ark-bn254 0.5.0",
  "ark-ff 0.5.0",
@@ -12404,6 +12405,7 @@ dependencies = [
  "futures",
  "getrandom 0.2.17",
  "getrandom 0.3.4",
+ "introspection",
  "libc",
  "libcrux-ml-dsa",
  "midnight-base-crypto",
@@ -12413,6 +12415,7 @@ dependencies = [
  "midnight-serialize",
  "midnight-storage",
  "midnight-transient-crypto",
+ "midnight-zkir",
  "midnight-zswap",
  "num-bigint 0.4.6",
  "num-traits",

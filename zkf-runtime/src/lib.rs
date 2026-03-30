@@ -30,6 +30,8 @@ pub mod buffer_bridge;
 #[cfg(feature = "kani-minimal")]
 pub(crate) mod buffer_bridge_core;
 #[cfg(all(feature = "full", not(hax)))]
+pub mod compatibility;
+#[cfg(all(feature = "full", not(hax)))]
 pub mod control_plane;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod cpu_driver;
@@ -103,6 +105,11 @@ pub use api::{
     BatchBackendProofScheduler, BatchBackendProofSuccess, RuntimeCompiler, RuntimeExecutor,
 };
 pub use buffer_bridge::{BufferBridge, BufferView, BufferViewMut, PhysicalBuffer, ResidencyClass};
+#[cfg(all(feature = "full", not(hax)))]
+pub use compatibility::{
+    CompatibilityJobHandle, CompatibilityJobKind, CompatibilityRuntime, CompatibilityRuntimeConfig,
+    CompatibilityRuntimeError, CompatibilityRuntimeSnapshot,
+};
 #[cfg(all(feature = "full", not(hax)))]
 pub use control_plane::{
     AnomalySeverity, AnomalyVerdict, BackendRecommendation, BackendScore, BoundSource,
