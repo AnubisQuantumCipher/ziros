@@ -586,16 +586,184 @@ ZirOS produces standalone subsystems — complete applications that run independ
 
 ## Distributed Proving And Cluster Scaling
 
-Every subsystem scales by stacking Macs. The `zkf` binary includes a full distributed proving cluster:
+Every subsystem scales by stacking Macs. The `zkf` binary includes a full TCP-based distributed proving cluster with swarm-defended attestation, reputation scoring, and automatic graph partitioning.
 
-```bash
-# Start nodes
-zkf cluster start        # on each Mac
-zkf cluster status --json # see peers
-zkf cluster benchmark    # test throughput
+### How It Scales
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Mac Mini 1  │────▶│  Mac Mini 2  │────▶│  Mac Mini 3  │────▶│  Mac Mini 4  │────▶│  Mac Mini 5  │
+│ Coordinator  │     │   Worker     │     │   Worker     │     │   Worker     │     │   Worker     │
+│  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│
+└──────▲───────┘     └──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
+       │                                                                                    │
+       └────────────────────────── Thunderbolt 5 Ring (120 Gbps) ───────────────────────────┘
 ```
 
-Nodes discover each other over TCP. The coordinator distributes proving jobs across workers. Swarm defense monitors every node — compromised nodes are quarantined without affecting proof correctness.
+The coordinator partitions the UMPG proving graph at phase boundaries (witness → NTT → MSM → Poseidon → FRI → prove → encode) and distributes partitions across workers. Each worker proves its assigned partition with its own Metal GPU and unified memory. Results merge back to the coordinator with cryptographic attestation.
+
+### Scaling Table
+
+| Configuration | Machines | Unified Memory | GPU Cores | Monthly Cost | Use Case |
+|--------------|----------|---------------|-----------|-------------|----------|
+| 1 MacBook Air M4 | 1 | 16 GB | 10 | $0 | Single user, small circuits |
+| 1 Mac Mini M4 Pro | 1 | 24 GB | 20 | $0 | Single cooperative or mission |
+| **5 Mac Minis M4 Pro** | **5** | **120 GB** | **100** | **$0** | **Regional network / fleet** |
+| 10 Mac Minis M4 Pro | 10 | 240 GB | 200 | $0 | City-wide federation |
+| 5 Mac Studios M4 Ultra | 5 | 960 GB | 400 | $0 | National-scale proving |
+| 50 Mac Minis | 50 | 1.2 TB | 1,000 | $0 | Industrial proving fleet |
+| 100 Mac Minis | 100 | 2.4 TB | 2,000 | $0 | Enterprise-scale operations |
+
+**$0/month** — you own the hardware. No cloud fees. No server rental. No corporation sees your data.
+
+### 5 Mac Mini Cluster — Complete Setup Guide
+
+**What to buy ($7,555 total):**
+
+| Item | Qty | Price | Total |
+|------|-----|-------|-------|
+| Mac Mini M4 Pro (24GB/512GB) | 5 | $1,399 | $6,995 |
+| Thunderbolt 5 cable (0.8m) | 5 | $50 | $250 |
+| Rack mount (2U, holds 5) | 1 | $80 | $80 |
+| Power strip (surge protected) | 1 | $30 | $30 |
+| 10Gb Ethernet switch (backup) | 1 | $200 | $200 |
+
+**Physical setup:**
+1. Mount 5 Minis in the rack
+2. Cable Thunderbolt 5 in a ring topology (Mini 1 → 2 → 3 → 4 → 5 → back to 1)
+3. Each link: 120 Gbps bidirectional — buffer transfers take milliseconds
+
+**Network setup (on each Mac):**
+```
+System Settings → Network → Thunderbolt Bridge
+Mac 1: 10.0.1.1    Mac 2: 10.0.1.2    Mac 3: 10.0.1.3
+Mac 4: 10.0.1.4    Mac 5: 10.0.1.5
+Subnet: 255.255.255.0 — No gateway (isolated proving network)
+```
+
+**Install ZirOS (on each Mac):**
+```bash
+# Clone any subsystem repo and run install.sh — or install zkf directly:
+curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
+sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
+zkf storage install
+```
+
+**Start the cluster:**
+```bash
+# Mac 1 (coordinator):
+export ZKF_DISTRIBUTED_PEERS=10.0.1.2:9471,10.0.1.3:9471,10.0.1.4:9471,10.0.1.5:9471
+zkf cluster start
+
+# Mac 2-5 (workers):
+zkf cluster start
+
+# Verify:
+zkf cluster status --json
+# → { "peer_count": 4, "peers": [...] }
+```
+
+**Prove across the cluster:**
+```bash
+zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
+```
+
+### What Happens Under The Hood
+
+```
+Proving Job Arrives at Coordinator
+         │
+         ▼
+    ┌────────────────────────────┐
+    │  UMPG Graph Partitioner   │
+    │  Splits at phase boundaries│
+    └────────────┬───────────────┘
+                 │
+    ┌────────────┼────────────┬────────────┬────────────┐
+    ▼            ▼            ▼            ▼            ▼
+ Mac 1        Mac 2        Mac 3        Mac 4        Mac 5
+ Phase 0      Phase 1      Phase 2      Phase 3      Phase 4
+ Witness      NTT/LDE      MSM          Hash/Merkle  FRI Fold
+    │            │            │            │            │
+    └────────────┴────────────┴────────────┴────────────┘
+                              │
+                         Results Merge
+                              │
+                    Attestation Verify
+                    (Ed25519 signatures)
+                              │
+                         Final Proof
+```
+
+### Placement Scoring
+
+The coordinator assigns partitions to workers based on a placement score:
+
+```
+score = available_memory_MB
+      + (gpu_cores × 10)
+      + (crypto_extensions ? 100 : 0)
+      - (memory_pressure == Warning ? 500 : 0)
+      - (memory_pressure == Critical ? 2000 : 0)
+
+weighted_score = score × reputation (0.0 to 1.0)
+```
+
+A Mac Studio Ultra (192 GB, 80 GPU cores) scores far higher than a Mac Mini (24 GB, 20 cores). Heavy partitions go to the most powerful nodes.
+
+### Swarm Defense Across The Cluster
+
+Every node is swarm-defended:
+- **Heartbeat**: 2-second intervals, 10-second timeout — dead nodes quarantined
+- **Attestation**: Workers sign results with Ed25519 — invalid signatures → peer excluded
+- **Reputation**: 0.0 (banned) to 1.0 (trusted) — decays over 1 hour
+- **Threat gossip**: Encrypted with ML-KEM-1024 epoch keys — shared during heartbeats
+- **Consensus**: Optional quorum verification for critical partitions
+- **Non-interference**: Distribution NEVER changes proof correctness — `ZKF_DISTRIBUTED=0` produces bit-identical proofs
+
+### Profitability Guard
+
+Distribution only happens when profitable:
+```
+transfer_cost < 2 × compute_savings
+```
+Small circuits stay local. Large circuits (48K+ constraints) get distributed. The system never slows down a simple proof by adding network overhead.
+
+### Cost vs. Cloud
+
+| Option | Upfront | Monthly | Annual | Data Control |
+|--------|---------|---------|--------|-------------|
+| **5 Mac Minis** | **$7,555** | **$0** | **$0** | **You own everything** |
+| AWS (5 instances) | $0 | $3,000 | $36,000 | Amazon sees your data |
+| Azure (5 instances) | $0 | $4,500 | $54,000 | Microsoft sees your data |
+| GCP (5 instances) | $0 | $3,500 | $42,000 | Google sees your data |
+
+After 3 months, the Mac cluster is cheaper. After 1 year, you've saved $30,000-$50,000. And no corporation ever sees your proving data, your witnesses, or your keys.
+
+### Power & Cooling
+
+- 5 Mac Minis: **175W total** (less than a gaming PC)
+- No server room. No special cooling. Room temperature.
+- Each Mac Mini has its own internal fan. Barely audible.
+
+### Peer Discovery
+
+Three methods:
+- **mDNS** (`_zkf-cluster._tcp.local.`) — automatic on local network
+- **Static** (`ZKF_DISTRIBUTED_PEERS=host1:9471,host2:9471`) — pre-configured
+- **Manual** — registered at runtime
+
+### Configuration
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ZKF_DISTRIBUTED` | `1` | Master switch |
+| `ZKF_DISTRIBUTED_ROLE` | `auto` | `coordinator` / `worker` / `auto` |
+| `ZKF_DISTRIBUTED_BIND` | `0.0.0.0:9471` | Worker listen address |
+| `ZKF_DISTRIBUTED_PEERS` | `""` | Static peer list |
+| `ZKF_DISTRIBUTED_DISCOVERY` | `static` | `mdns` / `static` / `manual` |
+| `ZKF_DISTRIBUTED_COMPRESS` | `1` | Buffer compression |
+| `ZKF_DISTRIBUTED_INTEGRITY` | `fnv` | `fnv` or `sha256` chunk integrity |
 
 ---
 
