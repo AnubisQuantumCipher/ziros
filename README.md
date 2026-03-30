@@ -20,7 +20,7 @@
 | Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
 | Metal shader sources | 18 `.metal` files with 50 kernel entrypoints |
 | Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 143 total rows, 143 `mechanized_local`, 0 pending |
+| Verification ledger | 168 total rows (160 `mechanized_local` + 8 `proposed` SED entries), 0 pending |
 | Runtime proof coverage | 89 files and 1,788 functions marked complete |
 
 ## Table Of Contents
@@ -37,6 +37,9 @@
 - Quick Start
 - Documentation And Truth Surfaces
 - Workspace And Technology Catalog
+- Standalone Subsystems
+- Distributed Proving And Cluster Scaling
+- Midnight Network Integration
 - License
 
 ## What ZirOS Is
@@ -556,6 +559,56 @@ cargo run -p zkf-verify -- --help
 | Supply-chain boundary | `supply-chain/` | `cargo vet` trust store for audited cryptographic dependencies |
 | Public Metal proof toolchain | `tools/zkf-metal-public-proof/` | Narrow public proof-program/script surfaces around the Metal artifact lane |
 
+
+## Standalone Subsystems
+
+ZirOS produces standalone subsystems — complete applications that run independently without the ZirOS source code. Each subsystem ships with `install.sh` that downloads the 26 MB `zkf` binary, giving it the full ZirOS proving engine: all 9 backends, all 7 frontends, all 11 gadgets, Metal GPU, iCloud storage, swarm defense, Neural Engine, credential system, and distributed proving.
+
+**Any Mac with Apple Silicon can run any subsystem. No Rust toolchain needed. No compilation. Just `./install.sh`.**
+
+### Deployed Subsystems
+
+| Subsystem | What It Proves | Repo |
+|-----------|---------------|------|
+| **Sovereign Economic Defense** | Cooperative treasury, land trust, predatory lending, portfolio, 96-step sovereignty | [ziros-sovereign-economic-defense](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) |
+| **Falcon Heavy Flight Certification** | 27 engines, 187-step ascent, 3x300-step recovery, orbital, engine-out, fairing | [ziros-falcon-heavy-flight-certification](https://github.com/AnubisQuantumCipher/ziros-falcon-heavy-flight-certification) |
+| **Reentry Thermal Envelope** | RLV reentry mission assurance | [ziros-reentry-thermal-envelope-flagship](https://github.com/AnubisQuantumCipher/ziros-reentry-thermal-envelope-flagship) |
+| **RPOD Verifier** | Powered descent + docking corridor | [rpod-verifier](https://github.com/AnubisQuantumCipher/rpod-verifier) |
+| **Mixture Lock** | Propellant formulation O/F bounds | [mixture-lock](https://github.com/AnubisQuantumCipher/mixture-lock) |
+| **Conjunction Proof** | Satellite conjunction risk | [conjunction-proof](https://github.com/AnubisQuantumCipher/conjunction-proof) |
+| **Burn Budget** | Multi-phase fuel budget | [burn-budget](https://github.com/AnubisQuantumCipher/burn-budget) |
+| **Metal Provers** | 51 Lean 4 GPU kernel theorems | [metal-provers](https://github.com/AnubisQuantumCipher/metal-provers) |
+| **Bubble Proof** | Sonoluminescence simulation | [bubble-proof](https://github.com/AnubisQuantumCipher/bubble-proof) |
+
+---
+
+## Distributed Proving And Cluster Scaling
+
+Every subsystem scales by stacking Macs. The `zkf` binary includes a full distributed proving cluster:
+
+```bash
+# Start nodes
+zkf cluster start        # on each Mac
+zkf cluster status --json # see peers
+zkf cluster benchmark    # test throughput
+```
+
+Nodes discover each other over TCP. The coordinator distributes proving jobs across workers. Swarm defense monitors every node — compromised nodes are quarantined without affecting proof correctness.
+
+---
+
+## Midnight Network Integration
+
+ZirOS has a fully operational [Midnight Network](https://midnight.network/) frontend for privacy-preserving on-chain deployment:
+
+```bash
+zkf import --frontend compact --in contract.zkir --out program.json
+zkf prove --program program.json --inputs inputs.json --out proof.json
+```
+
+Compact ZKIR v2.0 import, BLS12-381 field, Halo2-KZG backend, selective disclosure via `disclose()`. The Sovereign Economic Defense subsystem ships 5 Compact contracts with regulatory compliance policies.
+
+---
 ## License
 
 See `LICENSE-BSL` and the crate metadata for the current repository licensing posture.
