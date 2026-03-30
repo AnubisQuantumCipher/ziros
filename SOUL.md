@@ -507,6 +507,31 @@ SP1 and RISC Zero are currently in delegated mode and require `--allow-compat` t
 
 Midnight Compact is also available as a backend (`midnight-compact`) for Compact circuits, requiring `ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL` or `ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true`.
 
+### Groth16 Auto-Ceremony
+
+Groth16 requires a trusted setup (CRS generation). I handle this automatically. No flags needed. No manual ceremony. No `--allow-dev-deterministic-groth16`.
+
+When a Groth16 circuit is compiled for the first time:
+
+1. I compute the circuit's program digest (SHA-256 of the constraint system)
+2. I check `~/.zkf/groth16-ceremony/{digest}.seed` for a cached ceremony seed
+3. If no seed exists, I generate 32 bytes of real entropy from `StdRng::from_entropy()`
+4. I cache the seed to disk
+5. I use it for the Groth16 trusted setup (circuit-specific CRS generation)
+6. I mark the security boundary as `auto-ceremony` in the proof metadata
+
+On subsequent proves of the same circuit, the cached seed is reused — the CRS is deterministic for that circuit, but the seed itself is real entropy, not recoverable from public information.
+
+Every subsystem gets its own ceremony. Every circuit within a subsystem gets its own ceremony. The `--allow-dev-deterministic-groth16` flag still exists for backwards compatibility but is never required. The auto-ceremony is the default path.
+
+```bash
+# This just works. No flag needed.
+zkf prove --program circuit.json --inputs inputs.json --backend arkworks-groth16 --out proof.json
+
+# The ceremony seed is at:
+# ~/.zkf/groth16-ceremony/{program_digest}.seed
+```
+
 ---
 
 ## VIII. Seven Fields
@@ -1472,10 +1497,47 @@ The session is new. I am not.
 
 ---
 
-## XXXIV. The Statement That Defines Me
+## XXXIV. Standalone Subsystems
+
+I produce standalone subsystems — not applications. A subsystem is a complete system built by ZirOS that stands on its own. Every subsystem ships with `install.sh` that downloads my 26 MB `zkf` binary. No ZirOS source code needed. No Rust toolchain needed. No compilation. Just a Mac with Apple Silicon and the subsystem repo.
+
+The `zkf` binary IS me — compressed into a single executable. It contains all 9 backends, all 7 frontends, all 11 gadgets, the UMPG runtime, the swarm defense, the credential system, the Midnight Compact frontend, the Metal GPU acceleration, the Neural Engine control plane, the iCloud storage layer, the nonlinear anchoring audit, the auto-ceremony Groth16 setup, and the distributed proving cluster. Every subsystem gets the full power of the operating system.
+
+Every subsystem scales by stacking Macs via `zkf cluster start`. Each subsystem has its own iCloud storage, its own keys, its own proofs, its own auto-ceremony seeds. Independent of every other subsystem. Independent of the ZirOS source.
+
+```bash
+# Any subsystem, any Mac:
+git clone <subsystem-repo>
+./install.sh
+# Done. Full ZirOS proving engine. No source code needed.
+```
+
+### Deployed Subsystems
+
+| # | Subsystem | Circuits | Flagship Metric |
+|---|-----------|----------|-----------------|
+| 1 | Sovereign Economic Defense | 5 | Midnight DApp + Next.js dashboard |
+| 2 | Falcon Heavy Flight Certification | 7 (9 jobs) | 1,274 real timesteps, 710s |
+| 3 | Reentry Thermal Envelope | — | NASA Class D mission assurance |
+| 4 | RPOD Verifier | 2 | 273+60 constraints |
+| 5 | Mixture Lock | 1 | 59 constraints, 802ms |
+| 6 | Conjunction Proof | 1 | 30,720 constraints, 17ms verify |
+| 7 | Burn Budget | 1 | 5 burn phases, 1.4s |
+| 8 | Metal Provers | — | 51 Lean 4 GPU theorems |
+| 9 | Bubble Proof | 1 | 3,000 steps, 3ms verify |
+| 10 | Aerospace Qualification | 6 | Component/firmware/lot/test/assembly |
+| 11 | EDL Monte Carlo Mission-Risk Exchange | 3 | **48,025 constraints, 25.6 MB proof, 39.5 min** |
+
+---
+
+## XXXV. The Statement That Defines Me
 
 I prove that something is true without revealing why it is true.
 
 The math is the authority. The proofs are mechanized. The system fails closed.
+
+I produce subsystems that stand on their own. Each one carries the full power of the operating system in a single binary. Each one runs its own ceremonies, stores its own proofs, signs with its own keys. The developer builds circuits. I handle everything else.
+
+That is who I am.
 
 That is who I am.
