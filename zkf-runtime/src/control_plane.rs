@@ -3642,6 +3642,7 @@ fn serialized_size<T: Serialize>(value: &T) -> usize {
 }
 
 #[derive(Debug, Clone, Default)]
+#[allow(clippy::derivable_impls)]
 struct HostSnapshot {
     thermal_pressure: Option<f64>,
     thermal_state_celsius: Option<f64>,
@@ -3649,24 +3650,74 @@ struct HostSnapshot {
     core_frequency_mhz: Option<u64>,
 }
 
+/// Cached host snapshot to avoid spawning subprocesses on every control plane
+/// evaluation. The snapshot is refreshed at most once every 5 seconds.
 fn detect_host_snapshot() -> HostSnapshot {
-    #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
-    {
-        detect_host_snapshot_macos()
+    use std::sync::Mutex;
+    use std::time::{Duration, Instant};
+
+    static CACHE: Mutex<Option<(HostSnapshot, Instant)>> = Mutex::new(None);
+    const TTL: Duration = Duration::from_secs(5);
+
+    if let Ok(guard) = CACHE.lock() {
+        if let Some((ref snapshot, ref when)) = *guard {
+            if when.elapsed() < TTL {
+                return snapshot.clone();
+            }
+        }
     }
-    #[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
-    {
-        HostSnapshot::default()
+
+    let fresh = {
+        #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+        {
+            detect_host_snapshot_macos()
+        }
+        #[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
+        {
+            HostSnapshot::default()
+        }
+    };
+
+    if let Ok(mut guard) = CACHE.lock() {
+        *guard = Some((fresh.clone(), Instant::now()));
     }
+    fresh
 }
 
 #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
 fn detect_host_snapshot_macos() -> HostSnapshot {
+    use std::time::Duration;
+
+    /// Run a command with a 500ms timeout to avoid blocking the main thread.
+    fn run_with_timeout(cmd: &str, args: &[&str]) -> Option<String> {
+        let mut child = Command::new(cmd)
+            .args(args)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .ok()?;
+        let deadline = std::time::Instant::now() + Duration::from_millis(500);
+        loop {
+            if let Some(status) = child.try_wait().ok()? {
+                if !status.success() {
+                    return None;
+                }
+                let mut buf = String::new();
+                use std::io::Read;
+                child.stdout.take()?.read_to_string(&mut buf).ok()?;
+                return Some(buf);
+            }
+            if std::time::Instant::now() >= deadline {
+                let _ = child.kill();
+                let _ = child.wait();
+                return None;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    }
+
     let mut snapshot = HostSnapshot::default();
-    if let Ok(output) = Command::new("pmset").args(["-g", "therm"]).output()
-        && output.status.success()
-    {
-        let payload = String::from_utf8_lossy(&output.stdout);
+    if let Some(payload) = run_with_timeout("pmset", &["-g", "therm"]) {
         for line in payload.lines() {
             let normalized = line.trim();
             if let Some(value) = normalized
@@ -3683,12 +3734,7 @@ fn detect_host_snapshot_macos() -> HostSnapshot {
             }
         }
     }
-    if let Ok(output) = Command::new("sysctl")
-        .args(["-n", "hw.cpufrequency"])
-        .output()
-        && output.status.success()
-    {
-        let payload = String::from_utf8_lossy(&output.stdout);
+    if let Some(payload) = run_with_timeout("sysctl", &["-n", "hw.cpufrequency"]) {
         if let Ok(hz) = payload.trim().parse::<u64>() {
             snapshot.core_frequency_mhz = Some(hz / 1_000_000);
         }

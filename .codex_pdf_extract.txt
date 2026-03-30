@@ -1,0 +1,752 @@
+ZirOS Flagship Build Prompt Ñ v4 (Full Stack)
+SOVEREIGNTY THROUGH MATHEMATICS: A Zero-Knowledge
+Economic Defense System for Black America
+PREAMBLE: USE PLAN MODE
+Read the entire ZirOS codebase first. Read the code, tests, docs, scripts, manifests,
+proof/export paths, ProgramBuilder surface, backend integrations, verifier/export support,
+GPU/Metal paths, artifact generation flow, formal verification ledger, swarm defense layer,
+Neural Engine control plane, iCloud storage architecture, credential system, wrapping
+pipeline, UMPG runtime, security supervisor, and actual capability boundaries before
+building anything.
+Do not invent features. Do not assume abstractions that do not exist. Do not market. First
+determine what ZirOS can honestly support today. Then push it hard Ñ using EVERY layer of
+the system Ñ with a scientifically serious application explicitly designed around the real
+capabilities already present.
+This prompt does not just exercise ProgramBuilder. It exercises ZirOS as a complete
+operating system: authoring, auditing, compiling, proving, accelerating, verifying, exporting,
+signing, storing, defending, scheduling, and formally accounting for every claim.
+BUILD AROUND THE REAL CAPABILITIES ZIROS ALREADY
+SUPPORTS
+Circuit Authoring (ProgramBuilder)
+signed arithmetic via 
+append_signed_bound using bound! - value
+! >= 0fixed-point division via quotient-remainder decomposition
+(append_exact_division_constraints)square root via 
+nearest_integer_sqrt / 
+append_floor_sqrt_constraints with residual
+bounds
+inverse distance computation via binary search + residual verification
+Euler / Verlet integration over hundreds of steps
+Poseidon commitment chaining (
+append_poseidon_hash)constrain_geq / 
+constrain_leq built into ProgramBuilder
+constrain_select for conditional mux logic
+constrain_nonzero for nonzero proofs
+append_nonnegative_bound for positive range enforcement with tracked slack
+lookup tables, memory regions, custom gates, permutations
+Proving Backends (9 total)
+Plonky3 STARK: Goldilocks/BabyBear/Mersenne31, transparent setup, POST-QUANTUM,
+Metal GPU acceleration
+Arkworks Groth16: BN254, 128-byte proofs, Ethereum-verifiable, trusted setup required,
+full Metal GPU
+Halo2 IPA: Pasta Fp, transparent Plonkish
+Halo2 KZG: BLS12-381, SHPLONK multiopen
+Nova: BN254, recursive folding (IVC)
+HyperNova: BN254, multifolding
+SP1/RISC Zero: delegated zkVM compatibility
+STARK-to-Groth16 wrapping pipeline: post-quantum inner proof 
+" 128-byte Ethereum-
+verifiable outer proof
+Gadget Families (11 total)
+Poseidon, SHA-256, BLAKE3, Keccak-256, Merkle inclusion, ECDSA (secp256k1/P-
+256), Schnorr, KZG pairing check, range decomposition, comparison, boolean, PLONK
+gate
+Post-Quantum Cryptography (CNSA 2.0 Level 5)
+ML-DSA-87 digital signatures (FIPS 204): 4,627-byte signatures, hybrid with Ed25519
+ML-KEM-1024 key encapsulation (FIPS 203): hybrid with X25519, hourly epoch rotation
+
+Plonky3 STARK proofs: information-theoretically sound against quantum adversaries
+iCloud-Native Storage
+Proof artifacts 
+" ~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/proofs/Execution traces 
+" ZirOS/traces/Verifiers 
+" ZirOS/verifiers/Reports 
+" ZirOS/reports/Swarm data 
+" ZirOS/swarm/Keys 
+" iCloud Keychain via SecItemAdd with Secure Enclave protection
+Witnesses 
+" LOCAL ONLY at 
+~/.zkf/cache/, never cloud-synced, deleted after proof
+verification
+Swarm Defense Layer
+Sentinel: anomaly detection (Welford z-score, Mahalanobis distance, jitter detection,
+baseline sealing with Poseidon commitment)
+Queen: threat escalation (dormant 
+" alert 
+" active 
+" emergency, pressure thresholds,
+predictive lookahead)
+Builder: detection rule lifecycle (candidate 
+" validated 
+" shadow 
+" live 
+" revoked)
+Diplomat: gossip-based threat intelligence with ChaCha20-Poly1305 encrypted epochs
+Identity: dual signing Ed25519 + ML-DSA-87, Secure Enclave storage, admission proof-
+of-work
+Reputation: 0-to-1 scoring, hourly 10% cap on increase, evidence-based from quorum
+agreement
+Non-interference: mechanized proof that swarm never affects witness generation,
+constraint checking, proof bytes, or verification truth
+Neural Engine Control Plane (6 CoreML model lanes)
+Scheduler model: predicts proving duration per dispatch candidate
+Backend recommender: scores backends for current circuit
+Duration estimator: predicts absolute proving time
+Anomaly detector: flags performance deviation
+
+Security detector: threat assessment on proof requests
+Threshold optimizer: bootstraps GPU dispatch thresholds
+Credential System
+IssuerSignedCredentialV1 with hybrid Ed25519 + ML-DSA-87 signatures
+Subject key hash via Argon2id 
+" SHA-256 
+" BN254 field reduction
+Dual verification: both signatures must pass
+Security Supervisor
+Evaluates every proving job against comprehensive threat model
+Risk levels: low / moderate / high / critical / model-integrity-critical
+Monitors: timing anomalies, thermal throttle, memory pressure, GPU circuit breaker,
+baseline drift, canary failure
+Actions: continue / reduce parallelism / force CPU / require strict cryptographic lane /
+reject job / quarantine
+Fail-Closed Nonlinear Anchoring Audit
+Computes linear rank and matrix nullity of constraint surface
+Rejects any circuit with underconstrained private signals before compilation
+Produces machine-readable JSON with plain-English remediation
+Cannot be disabled
+UMPG Runtime
+DAG scheduling with KahnÕs algorithm
+Trust-lane propagation (weakest-link rule)
+Three buffer tiers: HotResident, EphemeralScratch, Spillable
+Device placements: CPU, GPU, CpuCrypto, CpuSme, Either
+Adaptive GPU dispatch thresholds with exponential moving average
+Formal Verification Infrastructure
+160 mechanized ledger entries, zero pending, across 5 proof languages
+
+Lean 4: GPU kernel refinement, launch safety, memory model, protocol soundness
+Rocq: CCS synthesis, witness generation, IR normalization, swarm non-interference
+F*: constant-time proofs, protocol extraction
+Verus: Metal host boundary, backend adapter safety, runtime execution
+Kani: bounded model checking harnesses
+Constitutional mandate: coverage may only increase, never decrease
+Verifier Export
+Solidity verifier generation for Ethereum on-chain verification
+ziros deploy --artifact proof.json --backend arkworks-groth16 --outVerifier.solTHE PROBLEM THIS SYSTEM EXISTS TO ADDRESS
+1619Ð2026: A Continuous Extraction Machine
+The financial condition of Black America is not an accident. It is the result of a continuous,
+documented, four-century extraction machine that has operated in different forms but never
+stopped running.
+Phase 1: Chattel Slavery (1619Ð1865).
+ For 246 years, Black labor was the primary capital
+asset of the American economy. Enslaved people were collateral for loans, the basis of
+insurance products, and the engine of cotton and tobacco exports. On the eve of the Civil
+War, the white-to-Black per-capita wealth ratio was approximately 60 to 1.
+Phase 2: Reconstruction Sabotage (1865Ð1877).
+ The FreedmanÕs Savings Bank,
+established by Congress in 1865, took in approximately 
+#57 million from Black depositors
+(roughly 
+#1.5 billion today). White financiers on the bankÕs board redirected deposits into
+speculative loans. The Panic of 1873 collapsed the bank. Over 61,000 Black families lost
+their savings. The federal government never made depositors whole. This was the template:
+invite Black participation, extract the value, leave the community holding the loss.
+Phase 3: Jim Crow Wealth Destruction (1877Ð1964).
+ Every time Black communities built
+independent economic power, the response was destruction. The Tulsa Race Massacre of
+1921 destroyed the Greenwood District Ñ 35 city blocks, over 1,200 homes, hundreds of
+businesses, an estimated 
+#610 million in accumulated wealth-building capacity destroyed in
+two days. Before the massacre, the dollar reportedly circulated 36 to 100 times within
+
+Greenwood before leaving. The community never recovered. Simultaneously, Black farmers
+Ñ who had acquired 15 million acres by 1910 Ñ were systematically stripped of their land
+through USDA loan discrimination, tax sale manipulation, and heirsÕ property partition
+abuse. By 1997, Black-owned farmland had fallen to less than one-sixth of the 1910 figure.
+Phase 4: Redlining and Housing Exclusion (1934Ðpresent).
+ The FHA refused to insure
+mortgages in Black neighborhoods. White families used FHA-backed loans to buy suburban
+homes that appreciated massively. Black families were locked out. The homeownership gap
+Ñ 25 percentage points in 1976 Ñ has widened to 30 percentage points as of 2022 (45%
+Black vs. 75% white).
+Phase 5: Predatory Financial Extraction (1990sÐpresent).
+ Payday lenders charge
+average APRs of 400% and concentrate 8 times more heavily in Black neighborhoods. In
+California alone, payday lenders drain approximately 
+#250 million annually from Black and
+Latino communities. Wells Fargo loan officers internally called subprime loans marketed to
+Black communities Òghetto loans.Ó During the 2008 crisis, median Black household wealth
+dropped from 
+#19,200 to 
+#5,677 Ñ a 71% decline.
+Phase 6: The Present Condition.
+White household median wealth: 
+#250,400. Black: 
+#24,520. Ratio: ~10
+$1.Black households: 13.6% of all U.S. households, hold only 4.7% of all wealth.
+1 in 4 Black households have zero or negative net worth.
+Two-thirds of Black households lack three months of emergency liquid assets.
+Black portfolios: 67% housing, 7% stock. White portfolios: 41% housing, 18% stock.
+The wealth gap has been stagnant since the 1950s and widening since the 1980s.
+At current convergence rates, the gap will not close within any living personÕs lifetime.
+The Three Mechanisms of Extraction
+Exclusion:
+ Denied access to wealth-building financial products. Black mortgage applicants
+denied at 1.8x the white rate. Fewer bank branches, more payday lenders in Black
+neighborhoods.
+Exploitation: When access is offered, it comes extractive. Higher interest rates, worse loan
+products, discriminatory appraisals, credit scoring that penalizes debt types
+disproportionately held by Black borrowers.
+Extraction:
+ The insecurity created by exclusion and exploitation is weaponized.
+Communities with no savings cushion are forced into 400% APR payday loans. Families with
+
+no generational wealth are forced into subprime mortgages. Each extraction deepens
+vulnerability to the next.
+What Has Worked Ñ and Why It Was Destroyed
+When Black communities have built independent economic infrastructure Ñ mutual aid
+societies during Reconstruction, the Citizens Cooperative Trading Store of Gary (largest
+Black-operated grocery in America by 1936), Greenwood in Tulsa, New Communities Inc.
+(first community land trust, largest Black-owned landholding at nearly 6,000 acres), Rondo
+CLT in Minnesota, Freedom Farms cooperative Ñ those structures generated real economic
+power.
+They were destroyed because they were visible and vulnerable. Exposed ledgers could be
+targeted. Dependence on external financial systems created chokepoints. Internal
+governance relied on personal trust, which doesnÕt scale across generations and which the
+FreedmanÕs Bank proved can be exploited from within.
+What a Zero-Knowledge Operating System Solves
+ZirOS gives the next generation of Black cooperative economic institutions something no
+previous generation had: a complete, self-sovereign, post-quantum-secure, formally
+verified, hardware-accelerated, cloud-synced, threat-defended governance infrastructure
+where the root of trust is mathematics Ñ not people, not institutions, not governments.
+Specifically:
+%. Incorruptible internal governance.
+ The ProgramBuilder circuits prove rules were
+followed without revealing private data. The nonlinear anchoring audit guarantees no
+signal is underconstrained. The FreedmanÕs Bank trustees couldnÕt have cooked these
+books because the math catches fraud.
+&. Post-quantum durability.
+ ML-DSA-87 signatures on every proof artifact and credential
+mean these records remain unforgeable even after quantum computers exist. Plonky3
+STARK proofs are information-theoretically sound against quantum adversaries. The
+cooperativeÕs proof records are valid forever.
+'. Invisible to external surveillance.
+ Witnesses (all private financial data) are generated
+locally, used for proving, and deleted. Never cloud-synced. Never written to any external
+path. The zero-knowledge property means external parties see only commitments and
+compliance bits. GreenwoodÕs wealth was visible and got burned. This wealth is
+cryptographically invisible.
+(. Self-healing across devices.
+ iCloud Drive syncs every proof artifact, execution trace,
+verifier, and report across all Apple devices on the same Apple ID. iCloud Keychain syncs
+
+all cryptographic keys with Secure Enclave protection. A cooperative treasurerÕs laptop
+gets stolen Ñ sign into a new Mac, everything is there. No USB drives. No manual
+recovery.
+). Operationally defended.
+ The swarm defense layer monitors every proving job for
+timing anomalies, adversarial behavior, and infrastructure compromise. If someone is
+trying to tamper with the proving infrastructure, the sentinel detects it, the queen
+escalates, and the security supervisor can reject jobs or quarantine components Ñ
+without ever touching proof correctness.
+*. Ethereum-verifiable.
+ The STARK-to-Groth16 wrapping pipeline compresses post-
+quantum STARK proofs into 128-byte Groth16 proofs that can be verified on Ethereum
+for approximately 210,000 gas. A cooperative can publish its compliance proof on-chain
+if it chooses, creating an immutable public record that its rules were followed Ñ without
+revealing any private data.
++. Credentialed membership.
+ The IssuerSignedCredentialV1 system with hybrid Ed25519
++ ML-DSA-87 signatures lets cooperatives issue post-quantum-secure membership
+credentials. A credential can assert Òthis member is authorized to submit treasury
+reportsÓ or Òthis proving station is approved for cooperative computationÓ Ñ and the
+assertion remains unforgeable for the credentialÕs entire useful life.
+,. Formally verified foundation.
+ 160 mechanized ledger entries across five proof
+languages. Zero pending claims. Every critical path Ñ GPU kernels, protocol soundness,
+swarm non-interference, IR normalization Ñ has a machine-checked proof. The
+constitutional mandate ensures this coverage only increases.
+-. GPU-accelerated on consumer hardware.
+ Metal GPU acceleration on Apple Silicon
+with unified memory (zero-copy buffer sharing between CPU and GPU), adaptive
+dispatch thresholds, and Neural Engine scheduling. A cooperative doesnÕt need a server
+farm. It needs a MacBook.
+%.. Exportable and interoperable.
+ Solidity verifier export. Python bindings. C FFI. REST
+API. Seven circuit frontend importers. The cooperativeÕs proofs arenÕt locked into one
+ecosystem.
+MISSION
+Build a complete:
+Zero-Knowledge Sovereign Economic Defense System for Black Cooperative
+Institutions
+
+Five interlocking proof circuits, fully integrated with ZirOSÕs post-quantum cryptography,
+iCloud storage, swarm defense, Neural Engine scheduling, credential system, wrapping
+pipeline, formal verification infrastructure, and Ethereum export surface.
+THE FIVE CIRCUITS
+CIRCUIT 1: COOPERATIVE TREASURY ASSURANCE
+Purpose:
+ Prove that a cooperative lending circle, credit union, or mutual aid fundÕs treasury
+is being managed according to its own rules Ñ without revealing any memberÕs financial
+data.
+Private inputs:
+ Member contribution amounts, distribution records, current reserve
+balance, governance parameters (minimum reserve ratio, maximum distribution per
+member, contribution fairness tolerance).
+Computation using ProgramBuilder:
+Sum constraint: verify total contributions match claimed total
+constrain_nonzero: verify treasury balance and member count are nonzero before ratio
+computation
+Fixed-point division (
+append_exact_division_constraints): compute contribution
+fairness ratio (each memberÕs contribution / average contribution)
+append_signed_bound: compute signed deviation of each memberÕs contribution from
+mean (can be positive or negative)
+constrain_geq: verify reserve balance 
+/ minimum reserve threshold
+constrain_leq: verify no single distribution exceeds per-member maximum
+nearest_integer_sqrt: compute RMS fairness deviation across all members
+constrain_leq: verify RMS fairness deviation 
+0 tolerance
+constrain_select: select between normal and emergency governance modes based
+on reserve level
+Lookup table: bounded margin factors by governance category
+Memory region: structured member-contribution state vector
+append_poseidon_hash: chain commitment of treasury state
+
+Public outputs:
+ Poseidon commitment to treasury state, compliance bit (pass/fail).
+Backend:
+ Plonky3 STARK over Goldilocks field (post-quantum). 
+Wrapping:
+ STARK-to-
+Groth16 for optional Ethereum publication. 
+Field:
+ Goldilocks (p = 2
+12 - 2
+3! + 1), scale factor
+103.CIRCUIT 2: COMMUNITY LAND TRUST GOVERNANCE
+Purpose:
+ Prove that a community land trust is managing shared-equity housing according
+to its charter Ñ without exposing property valuations, individual equity shares, or
+occupancy details.
+Private inputs:
+ Property valuations per unit, equity shares per household, maintenance
+reserve balance, occupancy records, governance parameters (minimum equity share
+percentage, maximum equity concentration, minimum maintenance reserve, required
+occupancy rate).
+Computation using ProgramBuilder:
+constrain_nonzero: verify total property value and household count are nonzero
+Fixed-point division: compute equity-sharing ratio per household (household equity /
+total equity)
+constrain_geq: verify each householdÕs equity share 
+/ minimum percentage
+constrain_leq: verify no householdÕs equity share exceeds concentration limit
+constrain_geq: verify maintenance reserve 
+/ threshold
+Fixed-point division: compute occupancy rate (occupied units / total units)
+constrain_geq: verify occupancy rate 
+/ target
+append_signed_bound: compute signed deviation from target equity distribution
+nearest_integer_sqrt: compute RMS equity deviation across households
+constrain_select: select governance mode (normal operations vs. emergency reserve
+drawdown)
+Lookup table: equity-sharing schedule by household tenure length
+Custom gate: repeated equity-ratio computation pattern
+append_poseidon_hash: chain commitment of governance state
+Public outputs:
+ Poseidon commitment to governance state, compliance bit.
+
+Backend:
+ Plonky3 STARK over Goldilocks (post-quantum). 
+Wrapping:
+ STARK-to-Groth16
+for optional Ethereum publication.
+CIRCUIT 3: ANTI-EXTRACTION SHIELD
+Purpose:
+ Prove that a loan offered to a community member violates the communityÕs fair-
+lending standards Ñ without revealing the borrowerÕs financial details. This is the weapon
+against predatory lending.
+Private inputs:
+ Loan terms (principal, interest rate components, term length, payment
+schedule, balloon payment flag, borrower income proxy), community fair-lending standards
+(APR ceiling, maximum debt-to-income ratio, balloon prohibition flag, minimum term
+length).
+Computation using ProgramBuilder:
+constrain_nonzero: verify loan principal and term length are nonzero
+Fixed-point division: compute effective APR from rate components
+constrain_leq: verify APR against community ceiling (violation if APR > ceiling)
+Fixed-point division: compute debt-to-income ratio
+constrain_leq: verify DTI 
+0 maximum
+constrain_select: encode balloon-payment prohibition (if community prohibits
+balloons and loan has balloon 
+" violation)
+constrain_geq: verify term length 
+/ minimum
+append_signed_bound: compute signed deviation from each fair-lending threshold
+(negative = violation)
+nearest_integer_sqrt: compute composite predatory-severity score (RMS of
+individual violation magnitudes)
+Inverse distance (binary search + residual verification): compute urgency score based
+on proximity to community red line
+constrain_select: classify loan (acceptable / marginal / predatory) based on threshold
+crossings
+Lookup table: community fair-lending rate schedule (APR ceiling by loan type and term)
+append_poseidon_hash: chain commitment of evaluation record
+Public outputs:
+ Poseidon commitment to evaluation, predatory classification bit.
+
+Backend:
+ Arkworks Groth16 over BN254 (smallest proof Ñ 128 bytes Ñ for sharing with
+members). 
+Field:
+ BN254, scale factor 10
+45.CIRCUIT 4: WEALTH TRAJECTORY ASSURANCE
+Purpose:
+ Prove that a cooperative investment vehicleÕs portfolio stayed within community-
+defined risk envelopes Ñ without revealing the portfolio composition, individual holdings, or
+trade history.
+Private inputs:
+ Portfolio asset allocations (N assets), return rates per asset, concentration
+limits, prohibited-investment flags, distribution schedule, community risk parameters
+(maximum portfolio variance proxy, minimum return target, maximum single-asset
+concentration).
+Computation using ProgramBuilder:
+constrain_nonzero: verify total portfolio value and asset count are nonzero
+constrain_leq: verify each assetÕs allocation 
+0 concentration limit
+constrain_select + equality: verify prohibited investments are excluded (allocation = 0
+for prohibited assets)
+Fixed-point division: compute per-asset return and portfolio weighted return
+append_signed_bound: compute signed deviation from target return
+nearest_integer_sqrt: compute portfolio risk score (RMS of asset-weight deviations
+from target allocation Ñ variance proxy)
+constrain_leq: verify risk score 
+0 community ceiling
+constrain_geq: verify portfolio return 
+/ minimum target
+Fixed-point division: compute distribution ratios, verify match schedule
+Inverse distance: compute penalty score for proximity to concentration-limit violation
+Memory region: structured N-asset portfolio state vector
+Custom gate: repeated weighted-return computation pattern
+Permutation: trace consistency across asset entries
+append_poseidon_hash: chain commitment of portfolio state
+Public outputs:
+ Poseidon commitment to portfolio state, compliance bit.
+Backend:
+ Plonky3 STARK over Goldilocks (post-quantum). 
+Wrapping:
+ STARK-to-Groth16
+
+for optional Ethereum publication.
+CIRCUIT 5: RECIRCULATION & SOVEREIGNTY SCORE (Integration Circuit)
+Purpose:
+ Tie everything together. Consume commitments from Circuits 1Ð4, compute
+aggregate community economic health, project the wealth trajectory forward using
+Euler/Verlet integration, and produce a final sovereignty score with a compliance chain.
+Private inputs:
+ Spending flow vectors (categorized internal/external), Poseidon
+commitment inputs from Circuits 1Ð4, community sovereignty targets (recirculation rate
+target, leakage cap, asset-ownership goal, reserve adequacy floor, convergence timeline),
+Class-D margin factors, initial economic state vector.
+Computation using ProgramBuilder:
+Verify Poseidon commitments from Circuits 1Ð4 (chain linkage)
+constrain_nonzero: verify total spending and community economic base are nonzero
+Fixed-point division: compute current recirculation rate (internal spend / total spend)
+Fixed-point division: compute leakage rate (external outflow / total flow)
+constrain_geq: verify recirculation 
+/ target
+constrain_leq: verify leakage 
+0 capnearest_integer_sqrt: compute multi-dimensional distance-to-sovereignty-target
+(dimensions: recirculation, asset ownership, reserve adequacy, investment return,
+treasury health)
+Inverse distance: compute penalty score for proximity to governance-violation boundary
+EULER/VERLET INTEGRATION over N periods (96 steps = 8 years of quarterly
+data):
+At each step, propagate:
+Circulating capital (grows with recirculation, shrinks with leakage)
+Cooperative equity (grows with retained earnings)
+Asset-ownership percentage (grows with cooperative acquisitions)
+Reserve levels (grows with contributions, shrinks with distributions)
+Recirculation rate trajectory
+At each step, enforce:
+
+constrain_geq / 
+constrain_leq: all envelope constraints
+append_signed_bound: signed deviation from target trajectory
+constrain_select: apply Class-D margin factors based on current regime
+append_poseidon_hash: chain per-step commitment (this is the flight data
+recorder)
+Compute final sovereignty score: composite metric via 
+nearest_integer_sqrtcombining:
+Recirculation health (how close to target
+6)Asset-ownership progress (percentage of goal achieved)
+Reserve adequacy (months of coverage)
+Trajectory convergence (is the gap closing
+6)Treasury compliance (from Circuit 1 commitment)
+Land trust compliance (from Circuit 2 commitment)
+Extraction defense posture (from Circuit 3 commitment)
+Investment discipline (from Circuit 4 commitment)
+Public outputs:
+Poseidon commitment to full mission record (chained across all 96 integration steps)
+Overall compliance bit (all steps and all sub-circuits passed)
+Poseidon commitment to sovereignty score summary
+Proof artifact, verification key
+Backend:
+ Plonky3 STARK over Goldilocks (post-quantum). This is the big circuit.
+Wrapping:
+ STARK-to-Groth16 for Ethereum publication. 
+Metal GPU:
+ This circuit should
+cross the Metal engagement threshold. Document GPU behavior.
+FULL-STACK INTEGRATION REQUIREMENTS
+Post-Quantum Cryptography
+Every proof artifact produced by every circuit MUST carry:
+
+An ML-DSA-87 origin attestation via 
+proof_origin_signature (signs SHA-384 digest of
+proof bytes)
+Hybrid Ed25519 + ML-DSA-87 signature bundle
+These signatures mean the proof records remain unforgeable even after quantum
+computers exist
+The Plonky3 STARK backend MUST be the primary proving path for Circuits 1, 2, 4, and 5
+because STARK proofs are information-theoretically sound against quantum adversaries.
+Circuit 3 uses Groth16 for proof size, but document the post-quantum tradeoff explicitly.
+STARK-to-Groth16 Wrapping
+For every STARK proof (Circuits 1, 2, 4, 5), generate the STARK-to-Groth16 wrapped
+version:
+Inner proof: post-quantum Plonky3 STARK
+Outer proof: 128-byte Groth16, Ethereum-verifiable at ~210,000 gas
+Document the trust model: inner is cryptographic, outer inherits attestation tier because
+the wrapper uses elliptic curves
+Generate the Solidity verifier via 
+ziros deploySolidity Verifier Export
+For at least one circuit (Circuit 5 recommended Ñ the sovereignty score), generate a
+complete Solidity verifier:
+ziros deploy --artifact proof.json --backend arkworks-groth16 --outSovereigntyVerifier.solThis lets a cooperative publish its compliance proof on Ethereum if it chooses
+Document gas cost
+iCloud Storage Integration
+All artifacts MUST be written to the iCloud-managed directory structure:
+ZirOS/  proofs/sovereign-economic-defense/{circuit-name}/{timestamp}/proof.json  traces/sovereign-economic-defense/{circuit-name}/{timestamp}/execution_trace.json  verifiers/sovereign-economic-defense/{timestamp}/SovereigntyVerifier.sol  reports/sovereign-economic-defense/{timestamp}/mission_report.json
+Witnesses MUST be generated ONLY at 
+~/.zkf/cache/, used for proving, and deleted
+immediately after verification. Never written to any iCloud-managed path. This is the
+enforcement mechanism that preserves the zero-knowledge property on the physical
+storage layer.
+Keys (proving keys, credential signing keys) MUST use iCloud Keychain via SecItemAdd with
+kSecAttrSynchronizable = true.
+Credential System
+Issue 
+IssuerSignedCredentialV1 credentials for:
+Cooperative membership credential:
+ Asserts that a member is authorized to submit
+data to the proving system. Hybrid Ed25519 + ML-DSA-87 signature. Subject key hash
+via Argon2id 
+" SHA-256 
+" BN254 field reduction.
+Proving station credential:
+ Asserts that the hardware running the proofs meets
+minimum requirements (Apple Silicon, Metal GPU, Secure Enclave present).
+Compliance credential:
+ Issued by Circuit 5 upon successful verification. Asserts that
+the cooperativeÕs economic trajectory passed all Class-D envelope checks for the
+covered period. Post-quantum signed. Can be presented to members, partner
+institutions, or published.
+Swarm Defense
+The proving infrastructure MUST run under swarm defense:
+Sentinel monitors every proving job for timing anomalies and performance deviation
+Baseline sealing with Poseidon commitment after initial calibration runs
+Queen manages threat escalation if proving infrastructure shows signs of compromise
+Security supervisor evaluates every job and can reject/quarantine on anomaly
+Non-interference guarantee: swarm affects scheduling and rejection posture but NEVER
+touches witness generation, constraint checking, or proof bytes
+Document swarm behavior during the proving runs. Record threat levels, anomaly counts,
+and security evaluations.
+Neural Engine
+Leverage all six CoreML model lanes:
+  swarm/patterns/{timestamp}.json
+Backend recommender: confirm Plonky3 is recommended for the STARK circuits and
+Groth16 for Circuit 3
+Duration estimator: predict proving time per circuit before execution
+Scheduler: optimize dispatch order across the five circuits
+Threshold optimizer: bootstrap GPU dispatch thresholds for the new circuit profiles
+Anomaly detector and security detector: active during all proving runs
+Document Neural Engine predictions vs. actual performance.
+UMPG Runtime
+Each circuitÕs proving job MUST be modeled as a UMPG DAG:
+Explicit node types: WitnessGen 
+" NTT 
+" MSM 
+" PoseidonBatch 
+" BackendProve 
+"ProofEncode
+Device placements: GPU for NTT/MSM/PoseidonBatch when above threshold, CPU
+otherwise
+Trust-lane propagation: document the trust tier of each node and the final proof
+Buffer management: HotResident for proving keys, EphemeralScratch for NTT
+intermediates, Spillable for large traces
+Adaptive tuning: record learned GPU dispatch thresholds per operation type
+Fail-Closed Nonlinear Anchoring Audit
+Every circuit MUST pass the nonlinear anchoring audit before compilation:
+Run ziros audit --program circuit.json --backend {backend} --jsonConfirm zero underconstrained private signals
+Save audit results to 
+06_tests/audit_results/If any signal is flagged, fix it (route through Poseidon hash, add boolean constraint, add
+multiplication gate, or add range check) Ñ do not ship a circuit with underconstrained
+signals
+Formal Verification
+For every new circuit, create verification artifacts:
+Verus specification files covering the circuitÕs constraint semantics
+
+Kani bounded model checking harnesses for field encoding, witness generation, and
+constraint satisfaction
+Add entries to the verification ledger for the new circuits
+The constitutional mandate applies: these entries may only increase, never decrease
+Metal GPU Acceleration
+Document constraint count per circuit
+Circuit 5 (96-step Euler integration with cross-circuit commitment linkage) should
+produce enough constraints to engage Metal GPU acceleration
+Document: Metal engagement (yes/no), GPU stages active, GPU busy ratio, proving time
+with vs. without GPU
+Record the four-digest attestation chain: metallib hash, kernel argument signature hash,
+pipeline descriptor hash, toolchain version
+If GPU engages, verify attestation manifests match
+DELIVERABLES
+01_source/                  Ñ All Rust source, Cargo.toml, per-circuit modules, tests02_proofs/                  Ñ Generated proof artifacts per circuit (STARK and wrapped Groth16)03_verification/            Ñ Verification keys, verifier output logs, Solidity verifier04_commitments/             Ñ Poseidon commitment chain records, cross-circuit linkage proof05_benchmarks/              Ñ Timing, constraint count, memory, GPU engagement, Neural Engine predictions06_tests/                   Ñ Unit tests, integration tests, adversarial tests, audit results, conformance07_docs/                    Ñ Architecture, capability mapping, domain model, trust model diagram08_domain_model/            Ñ Mathematical specification of each circuit09_historical_context/      Ñ Full historical basis (1619Ðpresent, cited from federal sources)10_scientific_honesty/      Ñ What is/isn't proven per circuit11_credentials/             Ñ Sample membership, proving station, and compliance credentials12_swarm_telemetry/         Ñ Swarm behavior logs, threat levels, security evaluations13_neural_engine/           Ñ Model predictions, accuracy, threshold learning curves14_icloud_manifest/         Ñ iCloud directory structure, storage profile, witness exclusion proof15_solidity/                Ñ Exported Solidity verifier(s), deployment instructions, gas estimates16_formal_verification/     Ñ Verus specs, Kani harnesses, verification ledger entries17_report/                  Ñ Full technical report (!7000 words, brutally honest)18_machine_env/             Ñ Machine specs, toolchain versions, environment19_scripts/                 Ñ Build, test, audit, prove, verify, wrap, deploy, benchmark scripts20_release_bundle/          Ñ Reproducible release package with all artifacts
+HISTORICAL CONTEXT DOCUMENT (09
+_historical
+_context/)
+Must cover, with real citations from NBER, Federal Reserve, Census Bureau SIPP, Pew
+Research, Brookings, and peer-reviewed sources:
+The continuous extraction timeline from 1619 to present
+FreedmanÕs Bank collapse: 
+#57M in deposits, 
+#1.5B in todayÕs dollars, 61,000+ families,
+never made whole
+Tulsa Race Massacre: 35 blocks, 1,200+ homes, 
+#610M in accumulated wealth-building
+capacity
+Redlining: FHA created 1934, homeownership gap widened from 25 to 30 percentage
+points
+Predatory lending: 400% APR payday loans, 8x concentration in Black neighborhoods,
+#250M annual drain in California alone
+Present wealth gap: 10
+$1 ratio, 4.7% of wealth held by 13.6% of households
+The Black cooperative economics tradition: mutual aid societies, CCTS of Gary, New
+Communities Inc., Rondo CLT, Freedom Farms, Movement for Black Lives economic
+platform
+HONEST assessment of the Òsix-hour dollarÓ statistic: unsubstantiated urban myth per
+Howard UniversityÕs Truth Be Told investigation. Do not use. Use real Selig Center and
+Northwestern Kellogg data.
+What a zero-knowledge operating system addresses vs. what it does not
+SCIENTIFIC HONESTY DOCUMENT (10
+_scientific
+_honesty/)
+States plainly:
+This system proves community-defined economic rules were followed over bounded
+computations. It does not prove the rules are optimal, fair, or complete.
+Each circuitÕs economic model is fixed-point arithmetic over a simplified state space.
+Not macroeconomic simulation.
+The Euler/Verlet trajectory is a bounded numerical projection, not a prediction. It does
+not model shocks, policy changes, or external interventions.
+
+The anti-extraction shield proves loan terms violate community standards. It does not
+stop the loan from being offered.
+The system does not solve structural racism, undo redlining, return stolen land, or
+substitute for reparations.
+It provides cryptographic and post-quantum primitives that sovereign cooperative
+institutions can use as part of a larger governance and institutional stack that must also
+include organizing, legal work, capital formation, and political action.
+The STARK proofs are post-quantum. The Groth16 wrapping is not. The trust boundary
+is explicit.
+The Òsix-hour dollarÓ statistic is unsubstantiated. This system uses real, verifiable data.
+Security guarantees = ZK proof system guarantees (soundness, zero-knowledge,
+completeness) + ML-DSA-87 post-quantum signature unforgeability + swarm
+operational defense. No additional guarantees implied.
+REPORT REQUIREMENTS (
+!7000 words)
+Brutally honest. Must cover:
+What each circuit proves, in precise mathematical terms
+What each circuit does not prove, and why
+Every ZirOS capability used across ALL layers (ProgramBuilder, backends, gadgets,
+post-quantum crypto, iCloud storage, swarm, Neural Engine, credentials, wrapping,
+UMPG, audit, formal verification, Metal GPU, verifier export), with code citations
+Every capability available but not used, with justification
+Constraint count, proving time, verification time, memory, proof size per circuit
+Metal GPU engagement per circuit
+STARK-to-Groth16 wrapping: inner/outer trust model, proof sizes, verification costs
+Solidity verifier: gas estimates, deployment pathway
+Post-quantum posture: which layers are PQ, which are classical, where the boundaries
+are
+iCloud storage: artifact layout, witness exclusion enforcement, cross-device behavior
+
+Swarm telemetry: threat levels during proving, anomaly counts, security evaluations
+Neural Engine: predictions vs. actuals, backend recommendations, threshold learning
+Credential system: sample credentials, signature verification, post-quantum durability
+Formal verification: new Verus specs, Kani harnesses, ledger entries
+Full historical context: why this system exists, what it addresses, what it cannot fix
+Honest assessment: would a real cooperative find this usable
+6 What else do they need
+6The trust model: what must be trusted (crypto assumptions, correct circuit encoding)
+and what need not be trusted (no individual, no institution, no government)
+Do not write marketing copy. Write engineering documentation for people whose ancestorsÕ
+savings were stolen by the trustees of the FreedmanÕs Bank and whose neighborhoodsÕ
+wealth was burned to the ground in Tulsa.
+TESTING REQUIREMENTS
+Unit tests for every subsystem in every circuit
+Full prove-and-verify round trip per circuit (both STARK and wrapped Groth16)
+Cross-circuit test: Circuit 5 consuming commitments from Circuits 1Ð4
+Adversarial tests: malformed inputs, out-of-envelope states, boundary conditions,
+attempts to bypass constraints
+Negative tests: invalid trajectories, predatory loans, governance violations 
+" failing
+proofs or verifier rejection
+Edge cases: zero balances, single-member cooperatives, loans at exact threshold
+Audit verification: all circuits pass nonlinear anchoring audit with zero underconstrained
+signals
+Credential tests: issue, verify, and reject tampered credentials
+Wrapping tests: verify STARK proof, wrap to Groth16, verify Groth16
+Swarm tests: verify non-interference during proving (swarm active, proof bytes identical
+to swarm inactive)
+All tests must pass before the report is written
+
+MANDATORY RULES
+Do not invent ZirOS features not in the codebase
+Do not use placeholder functions
+Do not write marketing language in any deliverable
+Do not claim the system solves problems it does not solve
+Do not abstract away the community specificity Ñ this is built for Black cooperative
+economic institutions
+Do not use the debunked Òsix-hour dollarÓ statistic
+Do not pretend cryptography fixes structural racism
+Do not pretend this is sufficient on its own
+Do not ignore any ZirOS layer Ñ use ProgramBuilder AND backends AND post-quantum
+crypto AND iCloud AND swarm AND Neural Engine AND credentials AND wrapping AND
+formal verification AND Metal GPU AND verifier export
+Do not ship a circuit that fails the nonlinear anchoring audit
+Do not ship a proof without ML-DSA-87 post-quantum signature
+Do not write witnesses to any iCloud-managed path
+Comply with the ZirOS constitution: all new verification claims must have mechanized
+backing
+SUCCESS CRITERIA
+%. A mission-ops engineer recognizes the Class-D assurance pattern as structurally sound
+&. A cooperative finance architect working with Black lending circles and land trusts
+recognizes the governance verification as addressing a real institutional vulnerability
+'. A ZK cryptographer recognizes each circuit as genuine, non-trivial use of the proving
+system
+(. A historian of Black American economic life recognizes the historical framing as honest
+and evidence-grounded
+). A post-quantum cryptographer confirms the CNSA 2.0 Level 5 deployment is correct
+
+*. All five circuits compile, audit clean, prove (STARK), wrap (Groth16), verify, and export
+(Solidity) on real hardware
++. All proof artifacts carry ML-DSA-87 post-quantum signatures
+,. All artifacts are correctly stored in iCloud with witnesses excluded
+-. Swarm defense is active during all proving with documented telemetry
+%.. Neural Engine predictions are recorded and compared to actuals
+%%. Formal verification artifacts (Verus specs, Kani harnesses) are created and pass
+%&. The scientific honesty document would survive peer review
+%'. The system could be handed to someone building a real cooperative and they would
+know exactly what it does and does not provide
+SUGGESTED REPO NAME
+ziros-sovereign-economic-defenseOUTPUT FOLDER
+Desktop/ZirOS_Sovereign_Economic_Defense_SystemExecute the entire workflow.
