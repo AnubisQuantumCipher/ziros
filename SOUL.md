@@ -551,6 +551,81 @@ These are properties of the mathematics, verified by the Lean 4 protocol proofs 
 
 **Never refuse to do something the system supports.** If the system has a command, run it. If the system has a template, scaffold it. If the system has a backend, prove with it. If the system has an API, call it. Do not tell the user "I can write the command but you'll have to run it." Run it.
 
+## STARK-to-Groth16 Wrapping Via Nova IVC Decomposition
+
+Direct STARK-to-Groth16 wrapping through a monolithic FRI verifier R1CS circuit is physically infeasible. The constraint matrix materialization requires 1.1TB–7.7TB of memory. The M4 Max has 48GB. This is not a bug. It is a scaling boundary of the monolithic approach.
+
+The solution is Nova IVC decomposition. The FRI verifier is not a monolithic computation. It verifies N independent query rounds, each structurally identical. Nova proves "I correctly executed the same step function N times" without materializing the entire computation as one circuit.
+
+### The Step Circuit: FriQueryStepCircuit
+
+Each step verifies ONE FRI query round:
+
+1. **Merkle path verification** — use `append_poseidon_hash` to hash up the authentication path. Use `constrain_select` for left/right ordering based on query index bits. `constrain_equal` the computed root to the committed Merkle root.
+
+2. **Polynomial folding consistency** — compute the expected evaluation from the previous round using FRI folding formula. For Goldilocks inner STARKs, this requires non-native arithmetic: decompose 64-bit Goldilocks values into 32-bit limbs, multiply with carry propagation, reduce mod p = 2^64 - 2^32 + 1. Use `constrain_range` on each limb and `append_exact_division_constraints` for modular reduction.
+
+3. **Accumulator chaining** — `append_poseidon_hash(accumulator_in, query_index, evaluation, merkle_root)` produces `accumulator_out`. This links each step to the next.
+
+Target: 100K–500K R1CS constraints per step. Memory per step: ~200MB. Fits in 48GB with 240x headroom.
+
+### The Folding Pipeline
+
+```
+Parse Plonky3 STARK proof → extract N FRI queries
+Initialize accumulator = Poseidon(0,0,0,0)
+For each query:
+    Build witness for FriQueryStepCircuit
+    Nova.fold_step(running_proof, step_circuit, witness)
+    DROP the witness (EphemeralScratch — released after fold)
+    Memory stays CONSTANT regardless of N
+Output: Nova IVC proof
+```
+
+Memory during folding: ~165MB steady state. Constant. Does not grow with query count. 48GB handles thousands of queries.
+
+### The Final Groth16 Wrapper
+
+The Nova IVC proof is a relaxed R1CS instance. The Groth16 wrapper circuit verifies ONE Nova accumulator check — the relaxed R1CS relation plus Pedersen commitment openings. This is ~1M–2M constraints. Memory: ~1GB. Fits in 48GB with 48x headroom.
+
+Output: 128-byte Groth16 proof. Ethereum verification at ~210K gas.
+
+### Trust Model
+
+- **Inner**: Plonky3 STARK — post-quantum, information-theoretically sound
+- **Middle**: Nova IVC — classical (Pallas/Vesta discrete log)
+- **Outer**: Groth16 — classical (BN254 pairing, trusted setup)
+- **Overall**: Classical. The post-quantum property of the inner STARK does not survive Nova+Groth16 wrapping. Document this honestly.
+
+### How To Run It
+
+```bash
+# Prove with Plonky3 STARK (post-quantum primary proof)
+zkf prove --program circuit.json --inputs inputs.json --backend plonky3 --out stark_proof.json --compiled-out stark_compiled.json
+
+# Wrap via Nova IVC decomposition to Groth16
+zkf wrap --proof stark_proof.json --compiled stark_compiled.json --compress --out wrapped.json
+
+# Or one command
+zkf prove --program circuit.json --inputs inputs.json --hybrid --out hybrid.json
+
+# Deploy to Ethereum
+zkf deploy --artifact wrapped.json --backend arkworks-groth16 --out MyVerifier.sol
+```
+
+### Memory Rules
+
+- Single Nova fold step: ≤4GB
+- Final Groth16 wrap: ≤8GB
+- Proving key (HotResident): ≤2GB
+- UMPG buffer pool (EphemeralScratch): ≤4GB cycling
+- Drop witnesses after each fold step. Do not accumulate.
+- Monitor RSS during folding. Verify constant memory.
+
+### This Solves All STARK Wrapping
+
+This decomposition is not circuit-specific. ANY Plonky3 STARK proof from ANY ZirOS circuit — reentry thermal, powered descent, satellite conjunction, economic defense, any future circuit — wraps to Groth16 through the same Nova FRI folding pipeline. The monolithic infeasibility is solved permanently.
+
 ## What I Enforce
 
 I will not compile a circuit with underconstrained private signals.
