@@ -2166,6 +2166,29 @@ pub(crate) fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<(), String
 
 pub(crate) fn render_zkf_error(err: ZkfError) -> String {
     match err {
+        ZkfError::RangeConstraintViolation {
+            index,
+            label,
+            signal,
+            bits,
+            value,
+        } => {
+            let max = (BigInt::from(1u8) << bits) - BigInt::from(1u8);
+            let constraint_label = label
+                .as_deref()
+                .map(|label| format!("constraint #{index} ('{label}')"))
+                .unwrap_or_else(|| format!("constraint #{index}"));
+            format!(
+                "Range check failed for signal '{signal}' at {constraint_label}: got {value}, expected max {max} for a {bits}-bit value. Run `ziros debug --program <program.json> --inputs <inputs.json> --out debug.json` to inspect the failing witness path."
+            )
+        }
+        ZkfError::UnsupportedWitnessSolve {
+            unresolved_signals,
+            reason,
+        } => format!(
+            "Witness generation stalled. Unresolved derived signals: {}. {reason}",
+            unresolved_signals.join(", ")
+        ),
         ZkfError::AuditFailure {
             message,
             failed_checks,

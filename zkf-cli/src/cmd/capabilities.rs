@@ -4,8 +4,6 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 use crate::cmd::runtime::installed_strict_certification_match;
-use zkf_keymanager::{KeyBackend, KeyManager};
-use zkf_storage::StorageStatusReport;
 use zkf_backends::{
     backend_for, capabilities_report, metal_runtime::capability_notes, metal_runtime_report,
     runtime_hardware_profile, strict_bn254_auto_route_ready_with_runtime,
@@ -14,6 +12,8 @@ use zkf_backends::{
 use zkf_core::{BackendCapabilityMatrix, BackendKind, SupportClass, ToolRequirement};
 use zkf_frontends::{FrontendKind, frontend_capabilities_matrix, frontend_for};
 use zkf_gadgets::registry::{AuditStatus, GadgetSpec, all_gadget_specs};
+use zkf_keymanager::{KeyBackend, KeyManager};
+use zkf_storage::StorageStatusReport;
 
 pub(crate) fn handle_capabilities() -> Result<(), String> {
     let matrix = capabilities_report();
@@ -173,7 +173,10 @@ pub(crate) fn handle_doctor(json: bool) -> Result<(), String> {
     );
     println!("persistent root: {}", report.storage.persistent_root);
     println!("cache root: {}", report.storage.cache_root);
-    println!("swarm sqlite live: {}", report.storage.swarm_sqlite_live_path);
+    println!(
+        "swarm sqlite live: {}",
+        report.storage.swarm_sqlite_live_path
+    );
     println!(
         "swarm sqlite snapshot: {}",
         report.storage.swarm_sqlite_snapshot_path
@@ -296,9 +299,15 @@ fn build_keychain_doctor_report() -> KeychainDoctorReport {
                 true
             };
             let audit = manager.audit();
-            let key_count = audit.as_ref().map(|report| report.key_count).unwrap_or_else(|_| {
-                manager.list_all().map(|entries| entries.len()).unwrap_or_default()
-            });
+            let key_count = audit
+                .as_ref()
+                .map(|report| report.key_count)
+                .unwrap_or_else(|_| {
+                    manager
+                        .list_all()
+                        .map(|entries| entries.len())
+                        .unwrap_or_default()
+                });
             let healthy = audit.as_ref().map(|report| report.healthy).unwrap_or(false);
             let note = match audit {
                 Ok(_) if enabled => Some(

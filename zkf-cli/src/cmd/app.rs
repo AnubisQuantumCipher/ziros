@@ -4,9 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
-use crate::cli::{
-    AppCommands, ReentryAssuranceArgs, ReentryAssuranceCommands,
-};
+use crate::cli::{AppCommands, ReentryAssuranceArgs, ReentryAssuranceCommands};
 use crate::util::{read_json, write_json, write_text};
 use ed25519_dalek::{Signer, SigningKey};
 use libcrux_ml_dsa::ml_dsa_87::{
@@ -2963,10 +2961,14 @@ pub(crate) fn handle_app(command: AppCommands) -> Result<(), String> {
                 .ok_or_else(|| "app init requires a name".to_string())?;
             let template_args = parse_template_args(&template_arg)?;
             if template == "subsystem" {
-                let subsystem_style = if style == "auto" { "full" } else { style.as_str() };
+                let subsystem_style = if style == "auto" {
+                    "full"
+                } else {
+                    style.as_str()
+                };
                 let path = crate::cmd::subsystem::scaffold_subsystem(&name, subsystem_style, out)?;
                 println!(
-                    "subsystem scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo test --manifest-path 01_source/Cargo.toml\n  bash 05_scripts/install.sh --check-only\n  ./19_cli/prove.sh\n  zkf subsystem verify-completeness --root {}",
+                    "subsystem scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo test --manifest-path 01_source/Cargo.toml\n  bash 05_scripts/install.sh --check-only\n  ./19_cli/prove.sh\n  bash 05_scripts/run-midnight-proof-server.sh\n  zkf subsystem verify-completeness --root {}",
                     template,
                     subsystem_style,
                     path.display(),

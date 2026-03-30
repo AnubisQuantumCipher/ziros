@@ -23,6 +23,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: SubsystemCommands,
     },
+    /// Operate Midnight-compatible proof-server and integration surfaces.
+    Midnight {
+        #[command(subcommand)]
+        command: MidnightCommands,
+    },
     /// Issue and prove private-identity credentials.
     Credential {
         #[command(subcommand)]
@@ -573,6 +578,48 @@ pub(crate) enum SubsystemCommands {
     },
 }
 
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightCommands {
+    /// Run the Midnight proof-server compatibility surface on port 6300.
+    #[command(name = "proof-server")]
+    ProofServer {
+        #[command(subcommand)]
+        command: MidnightProofServerCommands,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightProofServerCommands {
+    /// Serve the official Midnight proof-server wire contract through the ZirOS CLI.
+    Serve {
+        #[arg(
+            short,
+            long,
+            default_value_t = 6300,
+            env = "MIDNIGHT_PROOF_SERVER_PORT"
+        )]
+        port: u16,
+        #[arg(long, default_value_t = 0, env = "MIDNIGHT_PROOF_SERVER_JOB_CAPACITY")]
+        job_capacity: usize,
+        #[arg(long, default_value_t = 2, env = "MIDNIGHT_PROOF_SERVER_NUM_WORKERS")]
+        num_workers: usize,
+        #[arg(
+            long,
+            default_value_t = 600.0,
+            env = "MIDNIGHT_PROOF_SERVER_JOB_TIMEOUT"
+        )]
+        job_timeout: f64,
+        #[arg(
+            long,
+            default_value_t = false,
+            env = "MIDNIGHT_PROOF_SERVER_NO_FETCH_PARAMS"
+        )]
+        no_fetch_params: bool,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
 #[derive(Debug, Args)]
 pub(crate) struct AerospaceQualificationArgs {
     #[command(subcommand)]
@@ -863,12 +910,8 @@ impl std::str::FromStr for SovereignEconomicDefenseCircuitSelector {
                 Ok(Self::Two)
             }
             "3" | "three" | "anti-extraction-shield" | "anti-extraction" => Ok(Self::Three),
-            "4" | "four" | "wealth-trajectory-assurance" | "wealth-trajectory" => {
-                Ok(Self::Four)
-            }
-            "5" | "five" | "recirculation-sovereignty-score" | "recirculation" => {
-                Ok(Self::Five)
-            }
+            "4" | "four" | "wealth-trajectory-assurance" | "wealth-trajectory" => Ok(Self::Four),
+            "5" | "five" | "recirculation-sovereignty-score" | "recirculation" => Ok(Self::Five),
             "all" => Ok(Self::All),
             other => Err(format!(
                 "unknown sovereign economic defense circuit selector '{other}' (expected 1, 2, 3, 4, 5, or all)"
@@ -1528,9 +1571,7 @@ pub(crate) enum KeysCommands {
         json: bool,
     },
     /// Rotate a key in place and update its metadata.
-    Rotate {
-        id: String,
-    },
+    Rotate { id: String },
     /// Audit every tracked key for presence and sync health.
     Audit {
         #[arg(long)]

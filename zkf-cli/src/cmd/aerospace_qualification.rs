@@ -3,14 +3,12 @@ use crate::cli::{
     AerospaceQualificationCommands,
 };
 use crate::util::{
-    read_json, write_json, write_text, with_allow_dev_deterministic_groth16_override,
-    with_groth16_setup_blob_path_override,
+    read_json, with_allow_dev_deterministic_groth16_override,
+    with_groth16_setup_blob_path_override, write_json, write_text,
 };
 use chrono::Utc;
 use ed25519_dalek::{Signer, SigningKey};
-use libcrux_ml_dsa::ml_dsa_87::{
-    MLDSA87SigningKey, generate_key_pair, sign as mldsa_sign,
-};
+use libcrux_ml_dsa::ml_dsa_87::{MLDSA87SigningKey, generate_key_pair, sign as mldsa_sign};
 use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -30,9 +28,9 @@ use zkf_lib::{
     build_component_thermal_qualification_program, build_firmware_provenance_program,
     build_flight_readiness_assembly_program, build_lot_genealogy_program,
     build_test_campaign_compliance_program, build_vibration_shock_qualification_program,
-    component_thermal_qualification_witness_from_request, verify,
-    firmware_provenance_witness_from_request, flight_readiness_assembly_witness_from_request,
-    lot_genealogy_witness_from_request, test_campaign_compliance_witness_from_request,
+    component_thermal_qualification_witness_from_request, firmware_provenance_witness_from_request,
+    flight_readiness_assembly_witness_from_request, lot_genealogy_witness_from_request,
+    test_campaign_compliance_witness_from_request, verify,
     vibration_shock_qualification_witness_from_request,
 };
 use zkf_runtime::{
@@ -97,13 +95,8 @@ impl HybridSignerMaterial {
             .to_bytes()
             .to_vec();
         let randomness = secure_random_array::<SIGNING_RANDOMNESS_SIZE>()?;
-        let ml_dsa_signature = mldsa_sign(
-            &self.ml_dsa_signing_key()?,
-            bytes,
-            context,
-            randomness,
-        )
-        .map_err(|err| format!("failed to sign with ML-DSA-87: {err:?}"))?;
+        let ml_dsa_signature = mldsa_sign(&self.ml_dsa_signing_key()?, bytes, context, randomness)
+            .map_err(|err| format!("failed to sign with ML-DSA-87: {err:?}"))?;
         Ok(SignatureBundle {
             scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: ed25519_signature,
@@ -273,7 +266,13 @@ fn execute_circuit(
 
     println!("  [{circuit_id}] proving {circuit_name} on {backend:?}...");
     let started = Instant::now();
-    let execution = prove_with_runtime(backend, program, witness, groth16_setup_blob, allow_dev_deterministic_groth16)?;
+    let execution = prove_with_runtime(
+        backend,
+        program,
+        witness,
+        groth16_setup_blob,
+        allow_dev_deterministic_groth16,
+    )?;
     let duration_ms = started.elapsed().as_millis();
     println!("  [{circuit_id}] proved in {duration_ms}ms");
 
@@ -365,23 +364,23 @@ fn handle_prove(
     println!("Run ID: {run_id}");
 
     let bundle_root = out.clone();
-    fs::create_dir_all(&bundle_root)
-        .map_err(|e| format!("create bundle root: {e}"))?;
+    fs::create_dir_all(&bundle_root).map_err(|e| format!("create bundle root: {e}"))?;
 
     let hardware_profile = HardwareProfile::detect();
     println!("Hardware: {}", hardware_profile.as_str());
 
     let signer = generate_hybrid_signer()?;
     let includes = |sel: AerospaceQualificationCircuitSelector, id: u8| -> bool {
-        matches!(sel, AerospaceQualificationCircuitSelector::All) || match id {
-            1 => matches!(sel, AerospaceQualificationCircuitSelector::One),
-            2 => matches!(sel, AerospaceQualificationCircuitSelector::Two),
-            3 => matches!(sel, AerospaceQualificationCircuitSelector::Three),
-            4 => matches!(sel, AerospaceQualificationCircuitSelector::Four),
-            5 => matches!(sel, AerospaceQualificationCircuitSelector::Five),
-            6 => matches!(sel, AerospaceQualificationCircuitSelector::Six),
-            _ => false,
-        }
+        matches!(sel, AerospaceQualificationCircuitSelector::All)
+            || match id {
+                1 => matches!(sel, AerospaceQualificationCircuitSelector::One),
+                2 => matches!(sel, AerospaceQualificationCircuitSelector::Two),
+                3 => matches!(sel, AerospaceQualificationCircuitSelector::Three),
+                4 => matches!(sel, AerospaceQualificationCircuitSelector::Four),
+                5 => matches!(sel, AerospaceQualificationCircuitSelector::Five),
+                6 => matches!(sel, AerospaceQualificationCircuitSelector::Six),
+                _ => false,
+            }
     };
 
     let mut circuit_bundles: Vec<AerospaceQualificationCircuitBundleV1> = Vec::new();
@@ -389,11 +388,24 @@ fn handle_prove(
     // C1: Component Thermal Qualification (Goldilocks/Plonky3)
     if includes(circuit, 1) {
         println!("\n[C1] Component Thermal Qualification (Plonky3 STARK, post-quantum)");
-        let program = build_component_thermal_qualification_program(&manifest.thermal_qualification)
-            .map_err(|e| format!("C1 build: {e}"))?;
-        let witness = component_thermal_qualification_witness_from_request(&manifest.thermal_qualification)
-            .map_err(|e| format!("C1 witness: {e}"))?;
-        let outcome = execute_circuit(1, "Component Thermal Qualification", "component-thermal-qualification", BackendKind::Plonky3, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let program =
+            build_component_thermal_qualification_program(&manifest.thermal_qualification)
+                .map_err(|e| format!("C1 build: {e}"))?;
+        let witness =
+            component_thermal_qualification_witness_from_request(&manifest.thermal_qualification)
+                .map_err(|e| format!("C1 witness: {e}"))?;
+        let outcome = execute_circuit(
+            1,
+            "Component Thermal Qualification",
+            "component-thermal-qualification",
+            BackendKind::Plonky3,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -404,7 +416,18 @@ fn handle_prove(
             .map_err(|e| format!("C2 build: {e}"))?;
         let witness = vibration_shock_qualification_witness_from_request(&manifest.vibration_shock)
             .map_err(|e| format!("C2 witness: {e}"))?;
-        let outcome = execute_circuit(2, "Vibration/Shock Qualification", "vibration-shock-qualification", BackendKind::Plonky3, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let outcome = execute_circuit(
+            2,
+            "Vibration/Shock Qualification",
+            "vibration-shock-qualification",
+            BackendKind::Plonky3,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -415,7 +438,18 @@ fn handle_prove(
             .map_err(|e| format!("C3 build: {e}"))?;
         let witness = lot_genealogy_witness_from_request(&manifest.lot_genealogy)
             .map_err(|e| format!("C3 witness: {e}"))?;
-        let outcome = execute_circuit(3, "Lot Genealogy & Chain of Custody", "lot-genealogy", BackendKind::ArkworksGroth16, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let outcome = execute_circuit(
+            3,
+            "Lot Genealogy & Chain of Custody",
+            "lot-genealogy",
+            BackendKind::ArkworksGroth16,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -426,7 +460,18 @@ fn handle_prove(
             .map_err(|e| format!("C4 build: {e}"))?;
         let witness = firmware_provenance_witness_from_request(&manifest.firmware_provenance)
             .map_err(|e| format!("C4 witness: {e}"))?;
-        let outcome = execute_circuit(4, "Firmware Provenance", "firmware-provenance", BackendKind::ArkworksGroth16, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let outcome = execute_circuit(
+            4,
+            "Firmware Provenance",
+            "firmware-provenance",
+            BackendKind::ArkworksGroth16,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -437,7 +482,18 @@ fn handle_prove(
             .map_err(|e| format!("C5 build: {e}"))?;
         let witness = test_campaign_compliance_witness_from_request(&manifest.test_campaign)
             .map_err(|e| format!("C5 witness: {e}"))?;
-        let outcome = execute_circuit(5, "Test Campaign Compliance", "test-campaign-compliance", BackendKind::Plonky3, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let outcome = execute_circuit(
+            5,
+            "Test Campaign Compliance",
+            "test-campaign-compliance",
+            BackendKind::Plonky3,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -468,7 +524,18 @@ fn handle_prove(
             .map_err(|e| format!("C6 build: {e}"))?;
         let witness = flight_readiness_assembly_witness_from_request(&readiness_request)
             .map_err(|e| format!("C6 witness: {e}"))?;
-        let outcome = execute_circuit(6, "Flight-Readiness Assembly", "flight-readiness-assembly", BackendKind::Plonky3, program, witness, &bundle_root, &signer, groth16_setup_blob.as_deref(), allow_dev_deterministic_groth16)?;
+        let outcome = execute_circuit(
+            6,
+            "Flight-Readiness Assembly",
+            "flight-readiness-assembly",
+            BackendKind::Plonky3,
+            program,
+            witness,
+            &bundle_root,
+            &signer,
+            groth16_setup_blob.as_deref(),
+            allow_dev_deterministic_groth16,
+        )?;
         circuit_bundles.push(outcome.bundle);
     }
 
@@ -476,17 +543,19 @@ fn handle_prove(
     let metal_report = serde_json::to_value(metal_runtime_report()).map_err(|e| e.to_string())?;
     let circuit_reports: Vec<Value> = circuit_bundles
         .iter()
-        .map(|cb| json!({
-            "circuit_id": cb.circuit_id,
-            "circuit_name": cb.circuit_name,
-            "backend": cb.backend,
-            "audited": cb.audited,
-            "verified": cb.verified,
-            "proof_origin_verified": cb.proof_origin_verified,
-            "proof_sha256": cb.proof_sha256,
-            "duration_ms": cb.duration_ms,
-            "public_outputs": cb.public_outputs,
-        }))
+        .map(|cb| {
+            json!({
+                "circuit_id": cb.circuit_id,
+                "circuit_name": cb.circuit_name,
+                "backend": cb.backend,
+                "audited": cb.audited,
+                "verified": cb.verified,
+                "proof_origin_verified": cb.proof_origin_verified,
+                "proof_sha256": cb.proof_sha256,
+                "duration_ms": cb.duration_ms,
+                "public_outputs": cb.public_outputs,
+            })
+        })
         .collect();
 
     let report = AerospaceQualificationMissionReportV1 {
@@ -518,8 +587,11 @@ fn handle_prove(
     for cb in &circuit_bundles {
         md.push_str(&format!(
             "| {} | {} | {} | {} | {}ms |\n",
-            cb.circuit_id, cb.circuit_name, cb.backend,
-            if cb.verified { "PASS" } else { "FAIL" }, cb.duration_ms,
+            cb.circuit_id,
+            cb.circuit_name,
+            cb.backend,
+            if cb.verified { "PASS" } else { "FAIL" },
+            cb.duration_ms,
         ));
     }
     md.push_str("\n## Honesty Notes\n\n");
@@ -552,7 +624,10 @@ fn handle_prove(
 fn handle_verify(bundle: PathBuf) -> Result<(), String> {
     let manifest: AerospaceQualificationBundleManifestV1 =
         read_json(&bundle.join("bundle_manifest.json"))?;
-    println!("Verifying aerospace qualification bundle: {}", manifest.run_id);
+    println!(
+        "Verifying aerospace qualification bundle: {}",
+        manifest.run_id
+    );
 
     let mut all_pass = true;
     for cb in &manifest.circuits {
@@ -581,8 +656,7 @@ fn handle_verify(bundle: PathBuf) -> Result<(), String> {
 
 fn handle_report(bundle: PathBuf, out: Option<PathBuf>) -> Result<(), String> {
     let report_path = bundle.join("mission_report.md");
-    let report = fs::read_to_string(&report_path)
-        .map_err(|e| format!("read report: {e}"))?;
+    let report = fs::read_to_string(&report_path).map_err(|e| format!("read report: {e}"))?;
     if let Some(out_path) = out {
         write_text(&out_path, &report)?;
         println!("Report written to {}", out_path.display());

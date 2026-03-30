@@ -1268,15 +1268,14 @@ impl ProgramBuilder {
         self.constrain_range(&slack, bits_for_bigint_bound(bound))?;
         self.constrain_equal(
             Expr::signal(&anchor),
-            Expr::Mul(Box::new(Expr::signal(&slack)), Box::new(Expr::signal(&slack))),
+            Expr::Mul(
+                Box::new(Expr::signal(&slack)),
+                Box::new(Expr::signal(&slack)),
+            ),
         )
     }
 
-    pub fn append_poseidon_hash(
-        &mut self,
-        prefix: &str,
-        inputs: [Expr; 4],
-    ) -> ZkfResult<String> {
+    pub fn append_poseidon_hash(&mut self, prefix: &str, inputs: [Expr; 4]) -> ZkfResult<String> {
         let states = [
             format!("{prefix}_poseidon_state_0"),
             format!("{prefix}_poseidon_state_1"),
@@ -1320,7 +1319,10 @@ impl ProgramBuilder {
         self.constrain_equal(
             numerator,
             Expr::Add(vec![
-                Expr::Mul(Box::new(denominator.clone()), Box::new(Expr::signal(quotient))),
+                Expr::Mul(
+                    Box::new(denominator.clone()),
+                    Box::new(Expr::signal(quotient)),
+                ),
                 Expr::signal(remainder),
             ]),
         )?;
@@ -1354,11 +1356,7 @@ impl ProgramBuilder {
         self.private_signal(sqrt_signal)?;
         self.private_signal(remainder_signal)?;
         self.private_signal(upper_slack_signal)?;
-        self.append_nonnegative_bound(
-            sqrt_signal,
-            sqrt_bound,
-            &format!("{prefix}_sqrt_bound"),
-        )?;
+        self.append_nonnegative_bound(sqrt_signal, sqrt_bound, &format!("{prefix}_sqrt_bound"))?;
         self.constrain_equal(
             value.clone(),
             Expr::Add(vec![

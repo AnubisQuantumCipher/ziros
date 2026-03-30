@@ -5,8 +5,9 @@ use crate::cli::{
 use crate::cmd::runtime::wrap_artifact_via_runtime;
 use crate::solidity::{EvmTarget, parse_evm_target, render_groth16_solidity_verifier_for_target};
 use crate::util::{
-    annotate_artifact_with_runtime_report, read_json, write_json, write_text,
+    annotate_artifact_with_runtime_report, read_json,
     with_allow_dev_deterministic_groth16_override, with_groth16_setup_blob_path_override,
+    write_json, write_text,
 };
 use chrono::Utc;
 use ed25519_dalek::{Signer, SigningKey};
@@ -24,18 +25,18 @@ use std::sync::Arc;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use zkf_backends::{BackendRoute, metal_runtime_report, wrapping::default_wrapper_registry};
 use zkf_cloudfs::CloudFS;
+use zkf_core::wrapping::{WrapModeOverride, WrapperExecutionPolicy};
 use zkf_core::{
     AuditReport, BackendKind, CompiledProgram, Program, ProofArtifact, PublicKeyBundle,
     SignatureBundle, SignatureScheme, Witness, verify_bundle,
 };
-use zkf_core::wrapping::{WrapModeOverride, WrapperExecutionPolicy};
 use zkf_keymanager::KeyManager;
 use zkf_lib::{
     RecirculationSovereigntyScoreRequestV1, SovereignEconomicDefenseRunManifestV1,
     anti_extraction_shield_witness_from_request, audit_program_default,
     build_anti_extraction_shield_program, build_community_land_trust_governance_program,
-    build_cooperative_treasury_assurance_program,
-    build_recirculation_sovereignty_score_program, build_wealth_trajectory_assurance_program,
+    build_cooperative_treasury_assurance_program, build_recirculation_sovereignty_score_program,
+    build_wealth_trajectory_assurance_program,
     community_land_trust_governance_witness_from_request,
     cooperative_treasury_assurance_witness_from_request,
     recirculation_sovereignty_score_witness_from_request, verify,
@@ -104,13 +105,8 @@ impl HybridSignerMaterial {
             .to_bytes()
             .to_vec();
         let randomness = secure_random_array::<SIGNING_RANDOMNESS_SIZE>()?;
-        let ml_dsa_signature = mldsa_sign(
-            &self.ml_dsa_signing_key()?,
-            bytes,
-            context,
-            randomness,
-        )
-        .map_err(|err| format!("failed to sign with ML-DSA-87: {err:?}"))?;
+        let ml_dsa_signature = mldsa_sign(&self.ml_dsa_signing_key()?, bytes, context, randomness)
+            .map_err(|err| format!("failed to sign with ML-DSA-87: {err:?}"))?;
         Ok(SignatureBundle {
             scheme: SignatureScheme::HybridEd25519MlDsa87,
             ed25519: ed25519_signature,
@@ -501,10 +497,7 @@ fn handle_prove(
                 .file_name()
                 .and_then(|name| name.to_str())
                 .ok_or_else(|| {
-                    format!(
-                        "invalid verifier file name '{}'",
-                        verifier.path.display()
-                    )
+                    format!("invalid verifier file name '{}'", verifier.path.display())
                 })?
         );
         cloudfs
@@ -524,7 +517,9 @@ fn handle_prove(
         storage_mode: cloudfs.sync_root_state().to_string(),
         persistent_writes,
         local_only_roots: vec![cloudfs.cache_root().display().to_string()],
-        witness_policy: "~/.zkf/cache only; witnesses are never written into the persistent iCloud tree".to_string(),
+        witness_policy:
+            "~/.zkf/cache only; witnesses are never written into the persistent iCloud tree"
+                .to_string(),
     };
     let storage_manifest_path = bundle_root.join("14_icloud_manifest/storage_manifest.json");
     write_json(&storage_manifest_path, &storage_manifest)?;
@@ -586,7 +581,9 @@ fn handle_prove(
         storage_manifest_path: storage_manifest_path.display().to_string(),
         mission_report_json_path: mission_report_json_path.display().to_string(),
         mission_report_markdown_path: mission_report_markdown_path.display().to_string(),
-        verifier_path: verifier.as_ref().map(|value| value.path.display().to_string()),
+        verifier_path: verifier
+            .as_ref()
+            .map(|value| value.path.display().to_string()),
     };
     write_json(&bundle_root.join("bundle_manifest.json"), &bundle_manifest)?;
 
@@ -601,7 +598,8 @@ fn handle_prove(
 
 fn handle_verify(bundle: PathBuf) -> Result<(), String> {
     let bundle = resolve_cli_path(bundle)?;
-    let manifest: SovereignEconomicDefenseBundleManifestV1 = read_json(&bundle.join("bundle_manifest.json"))?;
+    let manifest: SovereignEconomicDefenseBundleManifestV1 =
+        read_json(&bundle.join("bundle_manifest.json"))?;
     for circuit in &manifest.circuits {
         let compiled: CompiledProgram = read_json(Path::new(&circuit.compiled_path))?;
         let artifact: ProofArtifact = read_json(Path::new(&circuit.proof_path))?;
@@ -619,13 +617,19 @@ fn handle_verify(bundle: PathBuf) -> Result<(), String> {
             let wrapper = registry
                 .find(artifact.backend, BackendKind::ArkworksGroth16)
                 .ok_or_else(|| {
-                    format!("no wrapper registered for {} -> arkworks-groth16", artifact.backend)
+                    format!(
+                        "no wrapper registered for {} -> arkworks-groth16",
+                        artifact.backend
+                    )
                 })?;
             let wrapped_verified = wrapper
                 .verify_wrapped(&wrapped)
                 .map_err(|error| error.to_string())?;
             if !wrapped_verified {
-                return Err(format!("wrapped proof verification failed for {}", circuit.slug));
+                return Err(format!(
+                    "wrapped proof verification failed for {}",
+                    circuit.slug
+                ));
             }
             verify_artifact_proof_origin(&wrapped)?;
         }
@@ -635,13 +639,17 @@ fn handle_verify(bundle: PathBuf) -> Result<(), String> {
             read_json(Path::new(credential_path))?;
         verify_credential(&credential)?;
     }
-    println!("sovereign economic defense bundle verified: {}", bundle.display());
+    println!(
+        "sovereign economic defense bundle verified: {}",
+        bundle.display()
+    );
     Ok(())
 }
 
 fn handle_report(bundle: PathBuf, out: Option<PathBuf>) -> Result<(), String> {
     let bundle = resolve_cli_path(bundle)?;
-    let manifest: SovereignEconomicDefenseBundleManifestV1 = read_json(&bundle.join("bundle_manifest.json"))?;
+    let manifest: SovereignEconomicDefenseBundleManifestV1 =
+        read_json(&bundle.join("bundle_manifest.json"))?;
     let mission_report: SovereignEconomicDefenseMissionReportV1 =
         read_json(Path::new(&manifest.mission_report_json_path))?;
     let output = out
@@ -660,12 +668,21 @@ fn handle_report(bundle: PathBuf, out: Option<PathBuf>) -> Result<(), String> {
     Ok(())
 }
 
-fn handle_export_bundle(bundle: PathBuf, out: PathBuf, include_private: bool) -> Result<(), String> {
+fn handle_export_bundle(
+    bundle: PathBuf,
+    out: PathBuf,
+    include_private: bool,
+) -> Result<(), String> {
     let bundle = resolve_cli_path(bundle)?;
     let out = resolve_cli_path(out)?;
-    fs::create_dir_all(&out).map_err(|error| format!("failed to create {}: {error}", out.display()))?;
-    let manifest: SovereignEconomicDefenseBundleManifestV1 = read_json(&bundle.join("bundle_manifest.json"))?;
-    copy_bundle_file(&bundle.join("bundle_manifest.json"), &out.join("bundle_manifest.json"))?;
+    fs::create_dir_all(&out)
+        .map_err(|error| format!("failed to create {}: {error}", out.display()))?;
+    let manifest: SovereignEconomicDefenseBundleManifestV1 =
+        read_json(&bundle.join("bundle_manifest.json"))?;
+    copy_bundle_file(
+        &bundle.join("bundle_manifest.json"),
+        &out.join("bundle_manifest.json"),
+    )?;
     copy_bundle_file(
         Path::new(&manifest.storage_manifest_path),
         &out.join("14_icloud_manifest/storage_manifest.json"),
@@ -690,8 +707,14 @@ fn handle_export_bundle(bundle: PathBuf, out: PathBuf, include_private: bool) ->
     }
     for circuit in &manifest.circuits {
         let destination = out.join("proofs").join(&circuit.slug);
-        copy_bundle_file(Path::new(&circuit.compiled_path), &destination.join("compiled.json"))?;
-        copy_bundle_file(Path::new(&circuit.proof_path), &destination.join("proof.json"))?;
+        copy_bundle_file(
+            Path::new(&circuit.compiled_path),
+            &destination.join("compiled.json"),
+        )?;
+        copy_bundle_file(
+            Path::new(&circuit.proof_path),
+            &destination.join("proof.json"),
+        )?;
         copy_bundle_file(
             Path::new(&circuit.audit_path),
             &destination.join("audit.json"),
@@ -713,7 +736,10 @@ fn handle_export_bundle(bundle: PathBuf, out: PathBuf, include_private: bool) ->
                 .file_name()
                 .and_then(|name| name.to_str())
                 .ok_or_else(|| format!("invalid credential file path '{}'", credential_path))?;
-            copy_bundle_file(Path::new(credential_path), &out.join("11_credentials").join(filename))?;
+            copy_bundle_file(
+                Path::new(credential_path),
+                &out.join("11_credentials").join(filename),
+            )?;
         }
     }
     println!(
@@ -816,7 +842,10 @@ fn execute_circuit(
         let wrapper = registry
             .find(artifact.backend, BackendKind::ArkworksGroth16)
             .ok_or_else(|| {
-                format!("no wrapper registered for {} -> arkworks-groth16", artifact.backend)
+                format!(
+                    "no wrapper registered for {} -> arkworks-groth16",
+                    artifact.backend
+                )
             })?;
         let direct_policy = WrapperExecutionPolicy {
             honor_env_overrides: false,
@@ -835,13 +864,12 @@ fn execute_circuit(
             }
             if !wrap_request.allow_attestation
                 && let (Some(estimated_memory_bytes), Some(memory_budget_bytes)) =
-                (preview.estimated_memory_bytes, preview.memory_budget_bytes)
+                    (preview.estimated_memory_bytes, preview.memory_budget_bytes)
                 && estimated_memory_bytes > memory_budget_bytes
             {
-                let detail = preview
-                    .reason
-                    .clone()
-                    .unwrap_or_else(|| "direct FRI wrap exceeds the detected runtime budget".to_string());
+                let detail = preview.reason.clone().unwrap_or_else(|| {
+                    "direct FRI wrap exceeds the detected runtime budget".to_string()
+                });
                 return Err(format!(
                     "strict cryptographic wrap for {slug} is blocked: direct-fri-v2 estimated_memory_bytes={} exceeds memory_budget_bytes={}; attestation fallback is forbidden; {}",
                     estimated_memory_bytes, memory_budget_bytes, detail
@@ -934,9 +962,21 @@ fn execute_circuit(
             .get("gpu_nodes")
             .and_then(|value| value.parse::<u64>().ok())
             .is_some_and(|value| value > 0),
-        icloud_proof_path: Some(cloudfs.persistent_root().join(&proof_relative).display().to_string()),
+        icloud_proof_path: Some(
+            cloudfs
+                .persistent_root()
+                .join(&proof_relative)
+                .display()
+                .to_string(),
+        ),
         icloud_wrapped_proof_path,
-        icloud_trace_path: Some(cloudfs.persistent_root().join(&trace_relative).display().to_string()),
+        icloud_trace_path: Some(
+            cloudfs
+                .persistent_root()
+                .join(&trace_relative)
+                .display()
+                .to_string(),
+        ),
     };
 
     Ok(CircuitExecutionOutcome {
@@ -945,7 +985,10 @@ fn execute_circuit(
     })
 }
 
-fn ensure_fail_closed_audit(program: &Program, backend: BackendKind) -> Result<AuditReport, String> {
+fn ensure_fail_closed_audit(
+    program: &Program,
+    backend: BackendKind,
+) -> Result<AuditReport, String> {
     let report = audit_program_default(program, Some(backend));
     if report.summary.failed > 0 {
         return Err(format!(
@@ -1198,7 +1241,10 @@ fn issue_credentials(
             artifact_digests: artifact_digests.to_vec(),
             metadata: BTreeMap::from([
                 ("application".to_string(), APP_ID.to_string()),
-                ("hardware_profile".to_string(), hardware_profile.as_str().to_string()),
+                (
+                    "hardware_profile".to_string(),
+                    hardware_profile.as_str().to_string(),
+                ),
             ]),
         };
         let signature = signer.sign_message(&claims.canonical_bytes()?, CREDENTIAL_CONTEXT)?;
@@ -1214,7 +1260,9 @@ fn issue_credentials(
     Ok(paths)
 }
 
-fn verify_credential(credential: &SignedSovereignEconomicDefenseCredentialV1) -> Result<(), String> {
+fn verify_credential(
+    credential: &SignedSovereignEconomicDefenseCredentialV1,
+) -> Result<(), String> {
     let bytes = credential.claims.canonical_bytes()?;
     if !verify_bundle(
         &credential.issuer_public_keys,
@@ -1249,7 +1297,12 @@ fn verify_artifact_proof_origin(artifact: &ProofArtifact) -> Result<(), String> 
         return Err("proof artifact is missing proof-origin signature".to_string());
     };
     let proof_hash = Sha384::digest(&artifact.proof);
-    if !verify_bundle(public_keys, proof_hash.as_slice(), signature, PROOF_ORIGIN_CONTEXT) {
+    if !verify_bundle(
+        public_keys,
+        proof_hash.as_slice(),
+        signature,
+        PROOF_ORIGIN_CONTEXT,
+    ) {
         return Err("proof-origin signature verification failed".to_string());
     }
     Ok(())
@@ -1378,10 +1431,7 @@ fn render_report_markdown(
         format!("- Run ID: `{}`", report.run_id),
         format!("- Timestamp: `{}`", report.timestamp),
         format!("- Hardware profile: `{}`", report.hardware_profile),
-        format!(
-            "- Storage mode: `{}`",
-            report.storage.storage_mode
-        ),
+        format!("- Storage mode: `{}`", report.storage.storage_mode),
         String::new(),
         "## Circuit Results".to_string(),
     ];
@@ -1399,11 +1449,7 @@ fn render_report_markdown(
         };
         lines.push(format!(
             "- Circuit {} (`{}`): backend=`{}`, verified=`{}`, wrapped_verified=`{}`",
-            circuit.circuit_id,
-            circuit.slug,
-            circuit.backend,
-            circuit.verified,
-            wrap_status
+            circuit.circuit_id, circuit.slug, circuit.backend, circuit.verified, wrap_status
         ));
         lines.push(format!(
             "  public_outputs={}",
@@ -1413,18 +1459,9 @@ fn render_report_markdown(
             lines.push(format!(
                 "  wrapped_path=`{}` status=`{}` strategy=`{}` trust_model=`{}`",
                 path,
-                circuit
-                    .wrapped_status
-                    .as_deref()
-                    .unwrap_or("unknown"),
-                circuit
-                    .wrapped_strategy
-                    .as_deref()
-                    .unwrap_or("unknown"),
-                circuit
-                    .wrapped_trust_model
-                    .as_deref()
-                    .unwrap_or("unknown"),
+                circuit.wrapped_status.as_deref().unwrap_or("unknown"),
+                circuit.wrapped_strategy.as_deref().unwrap_or("unknown"),
+                circuit.wrapped_trust_model.as_deref().unwrap_or("unknown"),
             ));
             if let Some(icloud_path) = circuit.icloud_wrapped_proof_path.as_ref() {
                 lines.push(format!("  icloud_wrapped_path=`{icloud_path}`"));
@@ -1459,12 +1496,15 @@ fn render_report_markdown(
     lines.join("\n")
 }
 
-fn mission_honesty_notes(
-    circuits: &[SovereignEconomicDefenseCircuitBundleV1],
-) -> Vec<String> {
+fn mission_honesty_notes(circuits: &[SovereignEconomicDefenseCircuitBundleV1]) -> Vec<String> {
     let attestation_wrapped = circuits
         .iter()
-        .filter_map(|circuit| circuit.wrapped_trust_model.as_deref().map(|model| (circuit, model)))
+        .filter_map(|circuit| {
+            circuit
+                .wrapped_trust_model
+                .as_deref()
+                .map(|model| (circuit, model))
+        })
         .filter(|(_, model)| *model == "attestation")
         .map(|(circuit, _)| circuit.slug.clone())
         .collect::<Vec<_>>();
@@ -1523,8 +1563,8 @@ fn load_verifier_bundle_for_report(
     let Some(path) = path else {
         return Ok(None);
     };
-    let source = fs::read_to_string(path)
-        .map_err(|error| format!("failed to read {}: {error}", path))?;
+    let source =
+        fs::read_to_string(path).map_err(|error| format!("failed to read {}: {error}", path))?;
     let target = mission_report
         .verifier
         .as_ref()

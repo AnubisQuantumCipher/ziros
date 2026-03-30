@@ -25,6 +25,8 @@ neural-engine = ["zkf-runtime/neural-engine"]
 distributed = []
 
 [dependencies]
+actix-web = { version = "4.11.0", default-features = false }
+base_crypto = { package = "midnight-base-crypto", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 zkf-cloudfs = { path = "../zkf-cloudfs" }
 zkf-keymanager = { path = "../zkf-keymanager" }
 zkf-storage = { path = "../zkf-storage" }
@@ -36,7 +38,10 @@ clap.workspace = true
 libc.workspace = true
 getrandom.workspace = true
 getrandom02.workspace = true
+futures = "0.3.31"
+ledger = { package = "midnight-ledger", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3", default-features = false, features = ["proving"] }
 libcrux-ml-dsa.workspace = true
+midnight_proof_server = { package = "midnight-proof-server", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 num-bigint.workspace = true
 num-traits.workspace = true
 owo-colors.workspace = true
@@ -45,6 +50,7 @@ serde_cbor = "0.11"
 serde_json.workspace = true
 chrono.workspace = true
 sha2.workspace = true
+transient_crypto = { package = "midnight-transient-crypto", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 zkf-backends = { path = "../zkf-backends", default-features = false }
 zkf-conformance = { path = "../zkf-conformance" }
 zkf-core = { path = "../zkf-core", default-features = false, features = ["full"] }
@@ -62,4 +68,11 @@ objc2 = "0.6"
 objc2-metal = { version = "0.3", features = ["MTLBuffer", "MTLResource", "MTLTypes"] }
 
 [dev-dependencies]
+coin_structure = { package = "midnight-coin-structure", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
+rand.workspace = true
+reqwest = { version = "0.12.22", default-features = false, features = ["json", "rustls-tls-native-roots"] }
+serialize = { package = "midnight-serialize", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
+storage = { package = "midnight-storage", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 tempfile = "3"
+tokio = { version = "1.46.1", features = ["full"] }
+zswap = { package = "midnight-zswap", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }

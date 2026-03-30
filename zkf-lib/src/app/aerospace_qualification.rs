@@ -489,9 +489,8 @@ fn parse_bn254_amount(value: &str, label: &str) -> ZkfResult<BigInt> {
 }
 
 fn parse_nonnegative_integer(value: &str, label: &str) -> ZkfResult<BigInt> {
-    let parsed = BigInt::parse_bytes(value.as_bytes(), 10).ok_or_else(|| {
-        ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer"))
-    })?;
+    let parsed = BigInt::parse_bytes(value.as_bytes(), 10)
+        .ok_or_else(|| ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer")))?;
     if parsed < zero() {
         return Err(ZkfError::InvalidArtifact(format!(
             "{label} must be nonnegative"
@@ -643,10 +642,7 @@ pub fn build_component_thermal_qualification_program(
     builder.private_signal("ctq_margin")?;
     builder.constrain_equal(
         signal_expr("ctq_margin"),
-        sub_expr(
-            signal_expr("ctq_upper_limit"),
-            signal_expr("ctq_max_temp"),
-        ),
+        sub_expr(signal_expr("ctq_upper_limit"), signal_expr("ctq_max_temp")),
     )?;
     builder.append_nonnegative_bound(
         "ctq_margin",
@@ -740,10 +736,8 @@ pub fn component_thermal_qualification_witness_from_request(
     let lower_floor = parse_goldilocks_amount(&request.temperature_lower_floor, "lower floor")?;
     let required_duration =
         parse_goldilocks_amount(&request.required_duration, "required duration")?;
-    let margin_threshold =
-        parse_goldilocks_amount(&request.margin_threshold, "margin threshold")?;
-    let component_id =
-        parse_nonnegative_integer(&request.component_id, "component id")?;
+    let margin_threshold = parse_goldilocks_amount(&request.margin_threshold, "margin threshold")?;
+    let component_id = parse_nonnegative_integer(&request.component_id, "component id")?;
     let lot_id = parse_nonnegative_integer(&request.lot_id, "lot id")?;
 
     for (i, v) in temps.iter().enumerate() {
@@ -793,11 +787,7 @@ pub fn component_thermal_qualification_witness_from_request(
             };
             // Write comparator support
             let geq = prev_max >= temps[i];
-            write_bool_value(
-                &mut values,
-                format!("ctq_max_temp_{i}_geq_bit"),
-                geq,
-            );
+            write_bool_value(&mut values, format!("ctq_max_temp_{i}_geq_bit"), geq);
             let offset = positive_comparison_offset(&aq_goldilocks_amount_bound());
             let slack = comparator_slack(&prev_max, &temps[i], &offset);
             write_nonnegative_bound_support(
@@ -883,16 +873,18 @@ pub fn component_thermal_qualification_witness_from_request(
             AQ_GOLDILOCKS_FIELD,
             [&temps[i], &durs[i], &previous_digest, &component_id],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("ctq_reading_commitment_{i}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("ctq_reading_commitment_{i}"), digest)
+                .as_bigint();
     }
     let anchor_digest = poseidon_permutation4(
         AQ_GOLDILOCKS_FIELD,
-        [&previous_digest, &min_required_cycles, &required_duration, &lot_id],
+        [
+            &previous_digest,
+            &min_required_cycles,
+            &required_duration,
+            &lot_id,
+        ],
     )?;
     let anchor_val = write_hash_lanes(&mut values, "ctq_anchor_hash", anchor_digest).as_bigint();
     // Anchor remaining linear-only signals: upper_limit, lower_floor, margin_threshold
@@ -900,7 +892,8 @@ pub fn component_thermal_qualification_witness_from_request(
         AQ_GOLDILOCKS_FIELD,
         [&anchor_val, &upper_limit, &lower_floor, &margin_threshold],
     )?;
-    let limits_anchor_val = write_hash_lanes(&mut values, "ctq_limits_anchor", limits_anchor_digest).as_bigint();
+    let limits_anchor_val =
+        write_hash_lanes(&mut values, "ctq_limits_anchor", limits_anchor_digest).as_bigint();
     let final_digest = poseidon_permutation4(
         AQ_GOLDILOCKS_FIELD,
         [&limits_anchor_val, &cycle_count, &margin, &component_id],
@@ -1066,7 +1059,12 @@ pub fn build_vibration_shock_qualification_program(
             } else {
                 format!("vsq_spectral_and_{i}")
             };
-            append_boolean_and(&mut builder, &target, &prev, &format!("vsq_spectral_pass_bit_{i}"))?;
+            append_boolean_and(
+                &mut builder,
+                &target,
+                &prev,
+                &format!("vsq_spectral_pass_bit_{i}"),
+            )?;
             prev = target;
         }
     }
@@ -1122,7 +1120,10 @@ pub fn build_vibration_shock_qualification_program(
     )?;
     builder.bind("vsq_vibration_commitment", signal_expr(&final_digest))?;
     builder.bind("vsq_vibration_pass", const_expr(&one()))?;
-    builder.bind("vsq_spectral_compliance", signal_expr("vsq_spectral_all_pass"))?;
+    builder.bind(
+        "vsq_spectral_compliance",
+        signal_expr("vsq_spectral_all_pass"),
+    )?;
     builder.build()
 }
 
@@ -1138,22 +1139,38 @@ pub fn vibration_shock_qualification_witness_from_request(
     )?;
     let mut values = BTreeMap::new();
 
-    let accels: Vec<BigInt> = request.acceleration_readings.iter().enumerate()
+    let accels: Vec<BigInt> = request
+        .acceleration_readings
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("acceleration {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let spectrals: Vec<BigInt> = request.spectral_density_readings.iter().enumerate()
+    let spectrals: Vec<BigInt> = request
+        .spectral_density_readings
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("spectral {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let spectral_limits: Vec<BigInt> = request.spectral_density_limits.iter().enumerate()
+    let spectral_limits: Vec<BigInt> = request
+        .spectral_density_limits
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("spectral limit {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let shock_durs: Vec<BigInt> = request.shock_pulse_durations.iter().enumerate()
+    let shock_durs: Vec<BigInt> = request
+        .shock_pulse_durations
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("shock duration {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
     let min_shock_dur = parse_goldilocks_amount(&request.min_shock_duration, "min shock duration")?;
     let peak_g_limit = parse_goldilocks_amount(&request.peak_g_limit, "peak g limit")?;
-    let calibration_hash = parse_nonnegative_integer(&request.calibration_hash, "calibration hash")?;
-    let approved_cal_hash = parse_nonnegative_integer(&request.approved_calibration_hash, "approved calibration hash")?;
+    let calibration_hash =
+        parse_nonnegative_integer(&request.calibration_hash, "calibration hash")?;
+    let approved_cal_hash = parse_nonnegative_integer(
+        &request.approved_calibration_hash,
+        "approved calibration hash",
+    )?;
 
     for (i, v) in accels.iter().enumerate() {
         write_value(&mut values, format!("vsq_accel_{i}"), v.clone());
@@ -1169,8 +1186,16 @@ pub fn vibration_shock_qualification_witness_from_request(
     }
     write_value(&mut values, "vsq_min_shock_duration", min_shock_dur.clone());
     write_value(&mut values, "vsq_peak_g_limit", peak_g_limit.clone());
-    write_value(&mut values, "vsq_calibration_hash", calibration_hash.clone());
-    write_value(&mut values, "vsq_approved_calibration_hash", approved_cal_hash.clone());
+    write_value(
+        &mut values,
+        "vsq_calibration_hash",
+        calibration_hash.clone(),
+    );
+    write_value(
+        &mut values,
+        "vsq_approved_calibration_hash",
+        approved_cal_hash.clone(),
+    );
     write_value(&mut values, "vsq_chain_seed", zero());
 
     if calibration_hash != approved_cal_hash {
@@ -1210,7 +1235,9 @@ pub fn vibration_shock_qualification_witness_from_request(
     }
 
     if peak_g > peak_g_limit {
-        return Err(ZkfError::InvalidArtifact("peak g-force exceeds limit".to_string()));
+        return Err(ZkfError::InvalidArtifact(
+            "peak g-force exceeds limit".to_string(),
+        ));
     }
     write_value(&mut values, "vsq_peak_g_slack", &peak_g_limit - &peak_g);
 
@@ -1220,7 +1247,11 @@ pub fn vibration_shock_qualification_witness_from_request(
                 "spectral density {i} exceeds limit"
             )));
         }
-        write_value(&mut values, format!("vsq_spectral_slack_{i}"), limit - spectral);
+        write_value(
+            &mut values,
+            format!("vsq_spectral_slack_{i}"),
+            limit - spectral,
+        );
     }
 
     for (i, dur) in shock_durs.iter().enumerate() {
@@ -1229,7 +1260,11 @@ pub fn vibration_shock_qualification_witness_from_request(
                 "shock pulse duration {i} below minimum"
             )));
         }
-        write_value(&mut values, format!("vsq_shock_dur_slack_{i}"), dur - &min_shock_dur);
+        write_value(
+            &mut values,
+            format!("vsq_shock_dur_slack_{i}"),
+            dur - &min_shock_dur,
+        );
     }
 
     // Spectral compliance bits
@@ -1255,20 +1290,26 @@ pub fn vibration_shock_qualification_witness_from_request(
     for i in 0..accel_count {
         let digest = poseidon_permutation4(
             AQ_GOLDILOCKS_FIELD,
-            [&accels[i], &previous_digest, &calibration_hash, &peak_g_limit],
+            [
+                &accels[i],
+                &previous_digest,
+                &calibration_hash,
+                &peak_g_limit,
+            ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("vsq_accel_commitment_{i}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("vsq_accel_commitment_{i}"), digest).as_bigint();
     }
     // Anchor spectral limit signals through Poseidon (matches circuit builder)
     for i in 0..spectral_count {
         let anchor_digest = poseidon_permutation4(
             AQ_GOLDILOCKS_FIELD,
-            [&previous_digest, &spectral_limits[i], &spectrals[i], &min_shock_dur],
+            [
+                &previous_digest,
+                &spectral_limits[i],
+                &spectrals[i],
+                &min_shock_dur,
+            ],
         )?;
         previous_digest = write_hash_lanes(
             &mut values,
@@ -1281,25 +1322,35 @@ pub fn vibration_shock_qualification_witness_from_request(
     for i in 0..shock_durs.len() {
         let shock_anchor = poseidon_permutation4(
             AQ_GOLDILOCKS_FIELD,
-            [&previous_digest, &shock_durs[i], &min_shock_dur, &calibration_hash],
+            [
+                &previous_digest,
+                &shock_durs[i],
+                &min_shock_dur,
+                &calibration_hash,
+            ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("vsq_shock_anchor_{i}"),
-            shock_anchor,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("vsq_shock_anchor_{i}"), shock_anchor)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         AQ_GOLDILOCKS_FIELD,
-        [&previous_digest, &peak_g, &approved_cal_hash, &min_shock_dur],
+        [
+            &previous_digest,
+            &peak_g,
+            &approved_cal_hash,
+            &min_shock_dur,
+        ],
     )?;
     let commitment = write_hash_lanes(&mut values, "vsq_final_commitment", final_digest);
     values.insert("vsq_vibration_commitment".to_string(), commitment);
     values.insert("vsq_vibration_pass".to_string(), FieldElement::ONE);
     values.insert(
         "vsq_spectral_compliance".to_string(),
-        values.get("vsq_spectral_all_pass").cloned().unwrap_or(FieldElement::ONE),
+        values
+            .get("vsq_spectral_all_pass")
+            .cloned()
+            .unwrap_or(FieldElement::ONE),
     );
 
     let program = build_vibration_shock_qualification_program(request)?;
@@ -1310,9 +1361,7 @@ pub fn vibration_shock_qualification_witness_from_request(
 // Circuit 3: Lot Genealogy & Chain of Custody (BN254 / Groth16)
 // ---------------------------------------------------------------------------
 
-pub fn build_lot_genealogy_program(
-    request: &LotGenealogyRequestV1,
-) -> ZkfResult<Program> {
+pub fn build_lot_genealogy_program(request: &LotGenealogyRequestV1) -> ZkfResult<Program> {
     let chain_len = request.handler_signature_hashes.len();
     if chain_len == 0 {
         return Err(ZkfError::InvalidArtifact(
@@ -1388,9 +1437,7 @@ pub fn build_lot_genealogy_program(
     builder.build()
 }
 
-pub fn lot_genealogy_witness_from_request(
-    request: &LotGenealogyRequestV1,
-) -> ZkfResult<Witness> {
+pub fn lot_genealogy_witness_from_request(request: &LotGenealogyRequestV1) -> ZkfResult<Witness> {
     let chain_len = request.handler_signature_hashes.len();
     validate_equal_lengths(
         "lot genealogy",
@@ -1454,12 +1501,8 @@ pub fn lot_genealogy_witness_from_request(
                 &inspection_vals[i],
             ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("lg_chain_{i}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("lg_chain_{i}"), digest).as_bigint();
     }
 
     values.insert(
@@ -1557,8 +1600,7 @@ pub fn firmware_provenance_witness_from_request(
         parse_nonnegative_integer(&request.approved_firmware_hash, "approved firmware hash")?;
     let toolchain_hash =
         parse_nonnegative_integer(&request.build_toolchain_hash, "toolchain hash")?;
-    let signing_key =
-        parse_nonnegative_integer(&request.signing_key_fingerprint, "signing key")?;
+    let signing_key = parse_nonnegative_integer(&request.signing_key_fingerprint, "signing key")?;
 
     if firmware_hash != approved_hash {
         return Err(ZkfError::InvalidArtifact(
@@ -1569,10 +1611,10 @@ pub fn firmware_provenance_witness_from_request(
     let version_encoded = BigInt::from(request.version_major) * BigInt::from(1_000_000u64)
         + BigInt::from(request.version_minor) * BigInt::from(1_000u64)
         + BigInt::from(request.version_patch);
-    let min_version_encoded =
-        BigInt::from(request.minimum_version_major) * BigInt::from(1_000_000u64)
-            + BigInt::from(request.minimum_version_minor) * BigInt::from(1_000u64)
-            + BigInt::from(request.minimum_version_patch);
+    let min_version_encoded = BigInt::from(request.minimum_version_major)
+        * BigInt::from(1_000_000u64)
+        + BigInt::from(request.minimum_version_minor) * BigInt::from(1_000u64)
+        + BigInt::from(request.minimum_version_patch);
 
     if version_encoded < min_version_encoded {
         return Err(ZkfError::InvalidArtifact(
@@ -1598,13 +1640,24 @@ pub fn firmware_provenance_witness_from_request(
 
     let commitment_digest = poseidon_permutation4(
         AQ_BN254_FIELD,
-        [&firmware_hash, &toolchain_hash, &signing_key, &version_encoded],
+        [
+            &firmware_hash,
+            &toolchain_hash,
+            &signing_key,
+            &version_encoded,
+        ],
     )?;
-    let commitment_val = write_hash_lanes(&mut values, "fp_commitment_hash", commitment_digest).as_bigint();
+    let commitment_val =
+        write_hash_lanes(&mut values, "fp_commitment_hash", commitment_digest).as_bigint();
     // Anchor linear-only signals: fp_approved_hash, fp_min_version_encoded
     let anchor_digest = poseidon_permutation4(
         AQ_BN254_FIELD,
-        [&commitment_val, &approved_hash, &min_version_encoded, &firmware_hash],
+        [
+            &commitment_val,
+            &approved_hash,
+            &min_version_encoded,
+            &firmware_hash,
+        ],
     )?;
     let commitment = write_hash_lanes(&mut values, "fp_anchor_hash", anchor_digest);
 
@@ -1758,13 +1811,22 @@ pub fn test_campaign_compliance_witness_from_request(
     let _operator_count = request.operator_certification_hashes.len();
     let mut values = BTreeMap::new();
 
-    let results: Vec<BigInt> = request.test_results.iter().enumerate()
+    let results: Vec<BigInt> = request
+        .test_results
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("test result {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let thresholds: Vec<BigInt> = request.test_thresholds.iter().enumerate()
+    let thresholds: Vec<BigInt> = request
+        .test_thresholds
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("test threshold {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let operators: Vec<BigInt> = request.operator_certification_hashes.iter().enumerate()
+    let operators: Vec<BigInt> = request
+        .operator_certification_hashes
+        .iter()
+        .enumerate()
         .map(|(i, v)| parse_nonnegative_integer(v, &format!("operator cert {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
 
@@ -1794,7 +1856,11 @@ pub fn test_campaign_compliance_witness_from_request(
     for (i, v) in operators.iter().enumerate() {
         write_value(&mut values, format!("tcc_operator_cert_{i}"), v.clone());
     }
-    write_value(&mut values, "tcc_actual_test_count", actual_test_count.clone());
+    write_value(
+        &mut values,
+        "tcc_actual_test_count",
+        actual_test_count.clone(),
+    );
     write_value(&mut values, "tcc_min_test_count", min_test_count.clone());
     write_value(
         &mut values,
@@ -1812,11 +1878,7 @@ pub fn test_campaign_compliance_witness_from_request(
         }
         let margin = &thresholds[i] - &results[i];
         write_value(&mut values, format!("tcc_margin_{i}"), margin.clone());
-        write_value(
-            &mut values,
-            format!("tcc_result_slack_{i}"),
-            margin.clone(),
-        );
+        write_value(&mut values, format!("tcc_result_slack_{i}"), margin.clone());
         total_margin += &margin;
     }
     write_value(&mut values, "tcc_total_margin_signal", total_margin.clone());
@@ -1829,12 +1891,8 @@ pub fn test_campaign_compliance_witness_from_request(
             AQ_GOLDILOCKS_FIELD,
             [&results[i], &thresholds[i], &previous_digest, &margin],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("tcc_test_commitment_{i}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("tcc_test_commitment_{i}"), digest).as_bigint();
     }
     let final_digest = poseidon_permutation4(
         AQ_GOLDILOCKS_FIELD,
@@ -1848,10 +1906,7 @@ pub fn test_campaign_compliance_witness_from_request(
     let commitment = write_hash_lanes(&mut values, "tcc_final_commitment", final_digest);
     values.insert("tcc_campaign_commitment".to_string(), commitment);
     values.insert("tcc_all_tests_passed".to_string(), FieldElement::ONE);
-    values.insert(
-        "tcc_total_margin".to_string(),
-        field(total_margin),
-    );
+    values.insert("tcc_total_margin".to_string(), field(total_margin));
 
     let program = build_test_campaign_compliance_program(request)?;
     materialize_seeded_witness(&program, values)
@@ -1878,9 +1933,7 @@ pub fn build_flight_readiness_assembly_program(
     let count_bits = 32u32;
 
     let mut builder = ProgramBuilder::new(
-        format!(
-            "aerospace_qualification_flight_readiness_{component_count}_{approval_count}"
-        ),
+        format!("aerospace_qualification_flight_readiness_{component_count}_{approval_count}"),
         AQ_GOLDILOCKS_FIELD,
     );
     builder.metadata_entry("application", "aerospace-qualification")?;
@@ -1989,7 +2042,11 @@ pub fn flight_readiness_assembly_witness_from_request(
             &request.component_qualification_commitments[i],
             &format!("component commitment {i}"),
         )?;
-        write_value(&mut values, format!("fra_component_commitment_{i}"), c.clone());
+        write_value(
+            &mut values,
+            format!("fra_component_commitment_{i}"),
+            c.clone(),
+        );
         commitment_vals.push(c);
 
         if request.revocation_flags[i] {
@@ -2051,12 +2108,8 @@ pub fn flight_readiness_assembly_witness_from_request(
                 &actual_approval_count,
             ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("fra_chain_{i}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("fra_chain_{i}"), digest).as_bigint();
     }
     // Anchor fra_required_approval_count through Poseidon (matches circuit builder)
     let fra_final = poseidon_permutation4(
@@ -2070,10 +2123,7 @@ pub fn flight_readiness_assembly_witness_from_request(
     )?;
     let fra_commitment = write_hash_lanes(&mut values, "fra_final_commitment", fra_final);
 
-    values.insert(
-        "fra_readiness_commitment".to_string(),
-        fra_commitment,
-    );
+    values.insert("fra_readiness_commitment".to_string(), fra_commitment);
     values.insert("fra_flight_ready".to_string(), FieldElement::ONE);
     values.insert(
         "fra_component_count_out".to_string(),
@@ -2160,7 +2210,11 @@ mod tests {
         TestCampaignComplianceRequestV1 {
             campaign_id: "TC-2026-001".to_string(),
             test_results: vec!["75.0".to_string(), "80.0".to_string(), "70.0".to_string()],
-            test_thresholds: vec!["100.0".to_string(), "100.0".to_string(), "100.0".to_string()],
+            test_thresholds: vec![
+                "100.0".to_string(),
+                "100.0".to_string(),
+                "100.0".to_string(),
+            ],
             operator_certification_hashes: vec!["1111".to_string(), "2222".to_string()],
             min_test_count: 2,
         }

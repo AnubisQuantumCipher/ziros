@@ -623,30 +623,44 @@ The proving cost is **compute time**, not money. No cloud fees. No server rental
 
 ## Midnight Network Integration
 
-ZirOS has a fully operational [Midnight Network](https://midnight.network/) frontend for privacy-preserving on-chain deployment:
+ZirOS is CLI-first for Midnight integration. The canonical local operator surface is the proof-server compatibility mode:
 
 ```bash
-# Import Midnight Compact contract into ZirOS
-zkf import --frontend compact --in contract.zkir --out program.json
-# Auto-selects Halo2-BLS12-381 backend
-
-# Prove (same pipeline as any other circuit)
-zkf prove --program program.json --inputs inputs.json --out proof.json
-
-# Verify
-zkf verify --program program.json --artifact proof.json
+# Serve the official Midnight proof-server contract locally
+zkf midnight proof-server serve --port 6300 --json
 ```
 
-**Compact frontend capabilities:**
-- ZKIR v2.0 import (18 opcodes supported)
-- BLS12-381 field (pinned by Midnight design)
-- Halo2-KZG backend (auto-selected via program metadata)
-- Poseidon width-4 hashing
-- Full prove/verify pipeline tested end-to-end
+That mode exposes the same route-level contract used by Midnight proof-server clients:
+
+- `POST /prove`
+- `POST /check`
+- `GET /health`
+
+The wire format is the official Midnight serialized request/response flow, not ZirOS's older custom JSON proof-server adapter.
+
+Midnight DApps should prefer wallet-provided proving through `getProvingProvider()` when available. The local proof-server URL (`http://127.0.0.1:6300`) is the explicit fallback for compatibility-oriented flows and local bring-up.
+
+The repo also retains a Compact frontend import path:
+
+```bash
+zkf import --frontend compact --in contract.zkir --out program.json
+```
+
+Truth boundary: the new `zkf midnight proof-server serve` mode is the local compatibility facade. It does not, by itself, upgrade the `midnight-compact` backend row in [`support-matrix.json`](support-matrix.json); that backend still carries its own readiness caveats until its runtime path is refactored onto the same official byte contract.
 
 **Selective disclosure** — Midnight's `disclose()` mechanism lets subsystems prove compliance to regulators without revealing private data. The Sovereign Economic Defense subsystem ships 5 Compact contracts with selective disclosure policies for 8 stakeholder types (members, board, state regulators, IRS, federal auditors, CFPB, public, adversaries).
 
 **NIGHT/DUST economics** — Midnight uses a dual-token model. Cooperatives hold NIGHT tokens to generate DUST (transaction fuel). Members never need tokens. Off-chain proving via ZirOS requires zero tokens.
+
+### Post-Quantum Anchor Pattern
+
+ZirOS can wrap Midnight-facing workflows in a post-quantum envelope without claiming that Midnight itself becomes post-quantum:
+
+- Off-chain proof lane: Plonky3 STARK proofs verified outside Midnight
+- Off-chain signature lane: ML-DSA-87 proof-origin signatures over operator artifacts
+- On-chain role for Midnight: commitment and timestamp anchor only
+
+That pattern supports commitment anchoring and later comparison against a locally verified proof package. It does not upgrade Midnight's own consensus, authorization, or classical proving cryptography.
 
 ---
 

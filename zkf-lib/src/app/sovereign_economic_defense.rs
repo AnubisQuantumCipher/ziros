@@ -4,7 +4,10 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zkf_backends::blackbox_gadgets::poseidon2_permutation_native;
-use zkf_core::{Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult, generate_witness};
+use zkf_core::{
+    Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult,
+    generate_witness,
+};
 
 use super::builder::ProgramBuilder;
 use super::subsystem_support;
@@ -293,7 +296,10 @@ fn write_nonnegative_bound_support(
     values.insert(signal_name, field_ref(value));
     let slack = bound - value;
     values.insert(nonnegative_bound_slack_name(prefix), field_ref(&slack));
-    values.insert(nonnegative_bound_anchor_name(prefix), field_ref(&(&slack * &slack)));
+    values.insert(
+        nonnegative_bound_anchor_name(prefix),
+        field_ref(&(&slack * &slack)),
+    );
     Ok(())
 }
 
@@ -310,7 +316,11 @@ fn write_exact_division_support(
     write_value(values, quotient_name, quotient.clone());
     write_value(values, remainder_name, remainder.clone());
     write_value(values, slack_name, slack.clone());
-    write_value(values, exact_division_slack_anchor_name(prefix), slack * slack);
+    write_value(
+        values,
+        exact_division_slack_anchor_name(prefix),
+        slack * slack,
+    );
 }
 
 fn write_floor_sqrt_support(
@@ -531,9 +541,8 @@ fn parse_bn254_ratio(value: &str, label: &str) -> ZkfResult<BigInt> {
 }
 
 fn parse_nonnegative_integer(value: &str, label: &str) -> ZkfResult<BigInt> {
-    let parsed = BigInt::parse_bytes(value.as_bytes(), 10).ok_or_else(|| {
-        ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer"))
-    })?;
+    let parsed = BigInt::parse_bytes(value.as_bytes(), 10)
+        .ok_or_else(|| ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer")))?;
     if parsed < zero() {
         return Err(ZkfError::InvalidArtifact(format!(
             "{label} must be nonnegative"
@@ -550,10 +559,7 @@ fn sum_exprs(names: &[String]) -> Expr {
     add_expr(names.iter().map(|name| signal_expr(name)).collect())
 }
 
-fn materialize_seeded_witness(
-    program: &Program,
-    values: WitnessInputs,
-) -> ZkfResult<Witness> {
+fn materialize_seeded_witness(program: &Program, values: WitnessInputs) -> ZkfResult<Witness> {
     generate_witness(program, &values)
 }
 
@@ -813,7 +819,8 @@ pub fn cooperative_treasury_assurance_witness_from_request(
         .map(|(index, value)| parse_goldilocks_amount(value, &format!("distribution {index}")))
         .collect::<ZkfResult<Vec<_>>>()?;
     let reserve_balance = parse_goldilocks_amount(&request.reserve_balance, "reserve balance")?;
-    let min_reserve_ratio = parse_goldilocks_ratio(&request.min_reserve_ratio, "min reserve ratio")?;
+    let min_reserve_ratio =
+        parse_goldilocks_ratio(&request.min_reserve_ratio, "min reserve ratio")?;
     let max_distribution_per_member = parse_goldilocks_amount(
         &request.max_distribution_per_member,
         "max distribution per member",
@@ -822,19 +829,35 @@ pub fn cooperative_treasury_assurance_witness_from_request(
         parse_goldilocks_amount(&request.fairness_tolerance, "fairness tolerance")?;
 
     for (index, value) in contributions.iter().enumerate() {
-        write_value(&mut values, format!("cta_contribution_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("cta_contribution_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in distributions.iter().enumerate() {
-        write_value(&mut values, format!("cta_distribution_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("cta_distribution_{index}"),
+            value.clone(),
+        );
     }
     write_value(&mut values, "cta_reserve_balance", reserve_balance.clone());
-    write_value(&mut values, "cta_min_reserve_ratio", min_reserve_ratio.clone());
+    write_value(
+        &mut values,
+        "cta_min_reserve_ratio",
+        min_reserve_ratio.clone(),
+    );
     write_value(
         &mut values,
         "cta_max_distribution_per_member",
         max_distribution_per_member.clone(),
     );
-    write_value(&mut values, "cta_fairness_tolerance", fairness_tolerance.clone());
+    write_value(
+        &mut values,
+        "cta_fairness_tolerance",
+        fairness_tolerance.clone(),
+    );
     write_value(&mut values, "cta_chain_seed", zero());
 
     let total_contributions = sum_bigints(&contributions);
@@ -977,9 +1000,8 @@ pub fn cooperative_treasury_assurance_witness_from_request(
         ));
     }
     let fairness_rms_remainder = &mean_square_deviation - (&fairness_rms * &fairness_rms);
-    let fairness_rms_upper_slack = ((&fairness_rms + one()) * (&fairness_rms + one()))
-        - &mean_square_deviation
-        - one();
+    let fairness_rms_upper_slack =
+        ((&fairness_rms + one()) * (&fairness_rms + one())) - &mean_square_deviation - one();
     write_floor_sqrt_support(
         &mut values,
         "cta_fairness_rms",
@@ -1133,7 +1155,10 @@ pub fn build_community_land_trust_governance_program(
         sum_exprs(&property_names),
     )?;
     builder.constrain_equal(signal_expr("clt_total_equity"), sum_exprs(&equity_names))?;
-    builder.constrain_equal(signal_expr("clt_occupied_units"), sum_exprs(&occupancy_names))?;
+    builder.constrain_equal(
+        signal_expr("clt_occupied_units"),
+        sum_exprs(&occupancy_names),
+    )?;
     builder.constrain_nonzero("clt_total_property_value")?;
     builder.constrain_nonzero("clt_total_equity")?;
     builder.constrain_geq(
@@ -1162,7 +1187,10 @@ pub fn build_community_land_trust_governance_program(
         signal_expr("clt_required_occupancy_rate"),
     )?;
     builder.append_exact_division_constraints(
-        mul_expr(signal_expr("clt_occupied_units"), const_expr(&sed_goldilocks_scale())),
+        mul_expr(
+            signal_expr("clt_occupied_units"),
+            const_expr(&sed_goldilocks_scale()),
+        ),
         const_expr(&BigInt::from(households as u64)),
         "clt_occupancy_rate",
         "clt_occupancy_rate_remainder",
@@ -1180,11 +1208,26 @@ pub fn build_community_land_trust_governance_program(
         "clt_tenure_schedule",
         2,
         vec![
-            vec![field(BigInt::from(0u8)), field(scale.clone() / BigInt::from(20u8))],
-            vec![field(BigInt::from(1u8)), field(scale.clone() / BigInt::from(10u8))],
-            vec![field(BigInt::from(2u8)), field(scale.clone() / BigInt::from(5u8))],
-            vec![field(BigInt::from(3u8)), field(scale.clone() / BigInt::from(4u8))],
-            vec![field(BigInt::from(4u8)), field(scale.clone() / BigInt::from(3u8))],
+            vec![
+                field(BigInt::from(0u8)),
+                field(scale.clone() / BigInt::from(20u8)),
+            ],
+            vec![
+                field(BigInt::from(1u8)),
+                field(scale.clone() / BigInt::from(10u8)),
+            ],
+            vec![
+                field(BigInt::from(2u8)),
+                field(scale.clone() / BigInt::from(5u8)),
+            ],
+            vec![
+                field(BigInt::from(3u8)),
+                field(scale.clone() / BigInt::from(4u8)),
+            ],
+            vec![
+                field(BigInt::from(4u8)),
+                field(scale.clone() / BigInt::from(3u8)),
+            ],
         ],
     )?;
 
@@ -1196,7 +1239,10 @@ pub fn build_community_land_trust_governance_program(
         let target_share = format!("clt_target_share_{index}");
         let deviation = format!("clt_equity_deviation_{index}");
         builder.append_exact_division_constraints(
-            mul_expr(signal_expr(&equity_names[index]), const_expr(&sed_goldilocks_scale())),
+            mul_expr(
+                signal_expr(&equity_names[index]),
+                const_expr(&sed_goldilocks_scale()),
+            ),
             signal_expr("clt_total_equity"),
             &equity_ratio,
             &ratio_remainder,
@@ -1218,7 +1264,10 @@ pub fn build_community_land_trust_governance_program(
         )?;
         builder.private_signal(&target_share)?;
         builder.constrain_lookup(
-            &[signal_expr(&tenure_names[index]), signal_expr(&target_share)],
+            &[
+                signal_expr(&tenure_names[index]),
+                signal_expr(&target_share),
+            ],
             "clt_tenure_schedule",
         )?;
         builder.append_nonnegative_bound(
@@ -1330,20 +1379,26 @@ pub fn community_land_trust_governance_witness_from_request(
         &request.min_maintenance_reserve,
         "minimum maintenance reserve",
     )?;
-    let required_occupancy_rate = parse_goldilocks_ratio(
-        &request.required_occupancy_rate,
-        "required occupancy rate",
-    )?;
+    let required_occupancy_rate =
+        parse_goldilocks_ratio(&request.required_occupancy_rate, "required occupancy rate")?;
     let max_rms_equity_deviation = parse_goldilocks_ratio(
         &request.max_rms_equity_deviation,
         "maximum rms equity deviation",
     )?;
 
     for (index, value) in property_values.iter().enumerate() {
-        write_value(&mut values, format!("clt_property_value_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("clt_property_value_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in equity_shares.iter().enumerate() {
-        write_value(&mut values, format!("clt_equity_share_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("clt_equity_share_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in request.occupancy_flags.iter().enumerate() {
         write_bool_value(&mut values, format!("clt_occupancy_flag_{index}"), *value);
@@ -1354,10 +1409,22 @@ pub fn community_land_trust_governance_witness_from_request(
                 "tenure bucket {index} must be in [0, 4]"
             )));
         }
-        write_value(&mut values, format!("clt_tenure_bucket_{index}"), BigInt::from(*value));
+        write_value(
+            &mut values,
+            format!("clt_tenure_bucket_{index}"),
+            BigInt::from(*value),
+        );
     }
-    write_value(&mut values, "clt_maintenance_reserve", maintenance_reserve.clone());
-    write_value(&mut values, "clt_min_equity_share", min_equity_share.clone());
+    write_value(
+        &mut values,
+        "clt_maintenance_reserve",
+        maintenance_reserve.clone(),
+    );
+    write_value(
+        &mut values,
+        "clt_min_equity_share",
+        min_equity_share.clone(),
+    );
     write_value(
         &mut values,
         "clt_max_equity_concentration",
@@ -1395,7 +1462,11 @@ pub fn community_land_trust_governance_witness_from_request(
             .filter(|occupied| **occupied)
             .count() as u64,
     );
-    write_value(&mut values, "clt_total_property_value", total_property_value);
+    write_value(
+        &mut values,
+        "clt_total_property_value",
+        total_property_value,
+    );
     write_value(&mut values, "clt_total_equity", total_equity.clone());
     write_value(&mut values, "clt_occupied_units", occupied_units.clone());
     if maintenance_reserve < min_maintenance_reserve {
@@ -1499,7 +1570,11 @@ pub fn community_land_trust_governance_witness_from_request(
             &max_equity_concentration - &equity_ratio,
         );
         let target_share = tenure_targets[request.tenure_buckets[index] as usize].clone();
-        write_value(&mut values, format!("clt_target_share_{index}"), target_share.clone());
+        write_value(
+            &mut values,
+            format!("clt_target_share_{index}"),
+            target_share.clone(),
+        );
         let deviation = &equity_ratio - &target_share;
         write_value(
             &mut values,
@@ -1516,8 +1591,7 @@ pub fn community_land_trust_governance_witness_from_request(
     }
 
     let mean_square_equity_deviation = &sum_squared_deviations / &household_count;
-    let mean_square_equity_deviation_remainder =
-        &sum_squared_deviations % &household_count;
+    let mean_square_equity_deviation_remainder = &sum_squared_deviations % &household_count;
     let mean_square_equity_deviation_slack =
         &household_count - &mean_square_equity_deviation_remainder - one();
     write_exact_division_support(
@@ -1538,10 +1612,10 @@ pub fn community_land_trust_governance_witness_from_request(
     }
     let rms_equity_deviation_remainder =
         &mean_square_equity_deviation - (&rms_equity_deviation * &rms_equity_deviation);
-    let rms_equity_deviation_upper_slack =
-        ((&rms_equity_deviation + one()) * (&rms_equity_deviation + one()))
-            - &mean_square_equity_deviation
-            - one();
+    let rms_equity_deviation_upper_slack = ((&rms_equity_deviation + one())
+        * (&rms_equity_deviation + one()))
+        - &mean_square_equity_deviation
+        - one();
     write_floor_sqrt_support(
         &mut values,
         "clt_rms_equity_deviation",
@@ -1593,7 +1667,10 @@ pub fn community_land_trust_governance_witness_from_request(
         ],
     )?;
     let governance_commitment = write_hash_lanes(&mut values, "clt_final_commitment", final_digest);
-    values.insert("clt_governance_commitment".to_string(), governance_commitment);
+    values.insert(
+        "clt_governance_commitment".to_string(),
+        governance_commitment,
+    );
     values.insert("clt_compliance_bit".to_string(), FieldElement::ONE);
     let program = build_community_land_trust_governance_program(request)?;
     materialize_seeded_witness(&program, values)
@@ -1759,22 +1836,34 @@ pub fn build_anti_extraction_shield_program(
             vec![
                 field(BigInt::from(0u8)),
                 field(BigInt::from(0u8)),
-                field(decimal_scaled("0.18", SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS)),
+                field(decimal_scaled(
+                    "0.18",
+                    SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS,
+                )),
             ],
             vec![
                 field(BigInt::from(0u8)),
                 field(BigInt::from(1u8)),
-                field(decimal_scaled("0.21", SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS)),
+                field(decimal_scaled(
+                    "0.21",
+                    SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS,
+                )),
             ],
             vec![
                 field(BigInt::from(1u8)),
                 field(BigInt::from(0u8)),
-                field(decimal_scaled("0.24", SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS)),
+                field(decimal_scaled(
+                    "0.24",
+                    SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS,
+                )),
             ],
             vec![
                 field(BigInt::from(1u8)),
                 field(BigInt::from(1u8)),
-                field(decimal_scaled("0.30", SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS)),
+                field(decimal_scaled(
+                    "0.30",
+                    SOVEREIGN_ECONOMIC_DEFENSE_BN254_SCALE_DECIMALS,
+                )),
             ],
         ],
     )?;
@@ -1814,7 +1903,10 @@ pub fn build_anti_extraction_shield_program(
     builder.constrain_select(
         "aes_apr_violation_mag",
         "aes_apr_violation_bit",
-        sub_expr(signal_expr("aes_effective_apr"), signal_expr("aes_apr_ceiling")),
+        sub_expr(
+            signal_expr("aes_effective_apr"),
+            signal_expr("aes_apr_ceiling"),
+        ),
         const_expr(&zero()),
     )?;
     append_geq_comparator_bit(
@@ -1948,7 +2040,10 @@ pub fn build_anti_extraction_shield_program(
     builder.private_signal("aes_marginal_bit_anchor")?;
     builder.constrain_equal(
         signal_expr("aes_marginal_bit_anchor"),
-        mul_expr(signal_expr("aes_marginal_bit"), signal_expr("aes_marginal_bit")),
+        mul_expr(
+            signal_expr("aes_marginal_bit"),
+            signal_expr("aes_marginal_bit"),
+        ),
     )?;
     append_geq_comparator_bit(
         &mut builder,
@@ -1968,7 +2063,10 @@ pub fn build_anti_extraction_shield_program(
     )?;
     builder.append_exact_division_constraints(
         const_expr(&(&sed_bn254_scale() * &sed_bn254_scale())),
-        add_expr(vec![signal_expr("aes_predatory_margin"), const_expr(&one())]),
+        add_expr(vec![
+            signal_expr("aes_predatory_margin"),
+            const_expr(&one()),
+        ]),
         "aes_urgency_score",
         "aes_urgency_score_remainder",
         "aes_urgency_score_slack",
@@ -1986,7 +2084,10 @@ pub fn build_anti_extraction_shield_program(
                 if index == 0 {
                     signal_expr("aes_chain_seed")
                 } else {
-                    signal_expr(&format!("aes_payment_commitment_{}_poseidon_state_0", index - 1))
+                    signal_expr(&format!(
+                        "aes_payment_commitment_{}_poseidon_state_0",
+                        index - 1
+                    ))
                 },
             ],
         )?;
@@ -2037,15 +2138,18 @@ pub fn anti_extraction_shield_witness_from_request(
         &request.max_debt_to_income_ratio,
         "maximum debt to income ratio",
     )?;
-    let marginal_threshold =
-        parse_bn254_ratio(&request.marginal_threshold, "marginal threshold")?;
+    let marginal_threshold = parse_bn254_ratio(&request.marginal_threshold, "marginal threshold")?;
     let predatory_threshold =
         parse_bn254_ratio(&request.predatory_threshold, "predatory threshold")?;
     let term_length = BigInt::from(request.scheduled_payments.len() as u64);
     let minimum_term_length = BigInt::from(request.minimum_term_length);
 
     for (index, value) in rate_components.iter().enumerate() {
-        write_value(&mut values, format!("aes_rate_component_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("aes_rate_component_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in payments.iter().enumerate() {
         write_value(&mut values, format!("aes_payment_{index}"), value.clone());
@@ -2265,7 +2369,11 @@ pub fn anti_extraction_shield_witness_from_request(
     for (signal_name, value, bound) in [
         ("aes_apr_violation_mag", &apr_violation_mag, &scale),
         ("aes_dti_violation_mag", &dti_violation_mag, &scale),
-        ("aes_term_violation_mag", &term_violation_mag, &BigInt::from(65_535u64)),
+        (
+            "aes_term_violation_mag",
+            &term_violation_mag,
+            &BigInt::from(65_535u64),
+        ),
         ("aes_balloon_violation_mag", &balloon_violation_mag, &scale),
     ] {
         write_nonnegative_bound_support(&mut values, signal_name, value, bound, signal_name)?;
@@ -2273,7 +2381,11 @@ pub fn anti_extraction_shield_witness_from_request(
     for (signal_name, value, bound) in [
         ("aes_apr_violation_mag", &apr_violation_mag, &scale),
         ("aes_dti_violation_mag", &dti_violation_mag, &scale),
-        ("aes_term_violation_mag", &term_violation_mag, &BigInt::from(65_535u64)),
+        (
+            "aes_term_violation_mag",
+            &term_violation_mag,
+            &BigInt::from(65_535u64),
+        ),
         ("aes_balloon_violation_mag", &balloon_violation_mag, &scale),
         ("aes_effective_apr", &effective_apr, &scale),
         ("aes_debt_to_income_ratio", &debt_to_income_ratio, &scale),
@@ -2287,8 +2399,7 @@ pub fn anti_extraction_shield_witness_from_request(
         + (&balloon_violation_mag * &balloon_violation_mag);
     let mean_square_violation = &sum_squared_violations / BigInt::from(4u8);
     let mean_square_violation_remainder = &sum_squared_violations % BigInt::from(4u8);
-    let mean_square_violation_slack =
-        BigInt::from(4u8) - &mean_square_violation_remainder - one();
+    let mean_square_violation_slack = BigInt::from(4u8) - &mean_square_violation_remainder - one();
     write_exact_division_support(
         &mut values,
         "aes_mean_square_violation",
@@ -2334,11 +2445,7 @@ pub fn anti_extraction_shield_witness_from_request(
         &scale,
         "aes_marginal_comparator_slack",
     )?;
-    write_bool_value(
-        &mut values,
-        "aes_predatory_class_bit",
-        predatory_class_bit,
-    );
+    write_bool_value(&mut values, "aes_predatory_class_bit", predatory_class_bit);
     write_nonnegative_bound_support(
         &mut values,
         "aes_predatory_class_slack",
@@ -2351,7 +2458,11 @@ pub fn anti_extraction_shield_witness_from_request(
         "aes_predatory_class_comparator_slack",
     )?;
     let predatory_margin = &severity_score - &predatory_threshold;
-    write_value(&mut values, "aes_predatory_margin", predatory_margin.clone());
+    write_value(
+        &mut values,
+        "aes_predatory_margin",
+        predatory_margin.clone(),
+    );
     let urgency_numerator = &scale * &scale;
     let urgency_denominator = &predatory_margin + one();
     let urgency_score = &urgency_numerator / &urgency_denominator;
@@ -2388,15 +2499,13 @@ pub fn anti_extraction_shield_witness_from_request(
     }
     let final_digest = poseidon_permutation4(
         SED_BN254_FIELD,
-        [
-            &principal,
-            &severity_score,
-            &urgency_score,
-            &one(),
-        ],
+        [&principal, &severity_score, &urgency_score, &one()],
     )?;
     let evaluation_commitment = write_hash_lanes(&mut values, "aes_final_commitment", final_digest);
-    values.insert("aes_evaluation_commitment".to_string(), evaluation_commitment);
+    values.insert(
+        "aes_evaluation_commitment".to_string(),
+        evaluation_commitment,
+    );
     values.insert("aes_predatory_bit".to_string(), FieldElement::ONE);
     let program = build_anti_extraction_shield_program(request)?;
     materialize_seeded_witness(&program, values)
@@ -2532,7 +2641,10 @@ pub fn build_wealth_trajectory_assurance_program(
         )?;
         builder.constrain_equal(signal_expr(&allowed), signal_expr(&allocation_names[index]))?;
         builder.append_exact_division_constraints(
-            mul_expr(signal_expr(&allocation_names[index]), signal_expr(&return_names[index])),
+            mul_expr(
+                signal_expr(&allocation_names[index]),
+                signal_expr(&return_names[index]),
+            ),
             signal_expr("wta_total_portfolio_value"),
             &weighted_return,
             &weighted_return_remainder,
@@ -2549,18 +2661,28 @@ pub fn build_wealth_trajectory_assurance_program(
             &sed_goldilocks_amount_bound(),
             &format!("wta_distribution_ratio_{index}"),
         )?;
-        builder.constrain_equal(signal_expr(&distribution_ratio), signal_expr(&target_names[index]))?;
+        builder.constrain_equal(
+            signal_expr(&distribution_ratio),
+            signal_expr(&target_names[index]),
+        )?;
         builder.private_signal(&deviation)?;
         builder.constrain_equal(
             signal_expr(&deviation),
             sub_expr(signal_expr(&ratio), signal_expr(&target_names[index])),
         )?;
-        builder.append_signed_bound(&deviation, &scale, &format!("wta_variance_deviation_{index}"))?;
+        builder.append_signed_bound(
+            &deviation,
+            &scale,
+            &format!("wta_variance_deviation_{index}"),
+        )?;
         weighted_returns.push(signal_expr(&weighted_return));
         variance_terms.push(mul_expr(signal_expr(&deviation), signal_expr(&deviation)));
     }
 
-    builder.constrain_equal(signal_expr("wta_portfolio_return"), add_expr(weighted_returns))?;
+    builder.constrain_equal(
+        signal_expr("wta_portfolio_return"),
+        add_expr(weighted_returns),
+    )?;
     builder.constrain_geq(
         "wta_return_target_slack",
         signal_expr("wta_portfolio_return"),
@@ -2629,7 +2751,10 @@ pub fn build_wealth_trajectory_assurance_program(
     )?;
     builder.append_exact_division_constraints(
         const_expr(&(&scale * &scale)),
-        add_expr(vec![signal_expr("wta_concentration_headroom"), const_expr(&one())]),
+        add_expr(vec![
+            signal_expr("wta_concentration_headroom"),
+            const_expr(&one()),
+        ]),
         "wta_penalty_score",
         "wta_penalty_score_remainder",
         "wta_penalty_score_slack",
@@ -2715,19 +2840,35 @@ pub fn wealth_trajectory_assurance_witness_from_request(
         parse_goldilocks_ratio(&request.min_return_target, "minimum return target")?;
 
     for (index, value) in allocations.iter().enumerate() {
-        write_value(&mut values, format!("wta_allocation_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("wta_allocation_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in return_rates.iter().enumerate() {
-        write_value(&mut values, format!("wta_return_rate_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("wta_return_rate_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in target_allocations.iter().enumerate() {
-        write_value(&mut values, format!("wta_target_allocation_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("wta_target_allocation_{index}"),
+            value.clone(),
+        );
     }
     for (index, value) in request.prohibited_flags.iter().enumerate() {
         write_bool_value(&mut values, format!("wta_prohibited_flag_{index}"), *value);
     }
     for (index, value) in distributions.iter().enumerate() {
-        write_value(&mut values, format!("wta_distribution_{index}"), value.clone());
+        write_value(
+            &mut values,
+            format!("wta_distribution_{index}"),
+            value.clone(),
+        );
     }
     write_value(
         &mut values,
@@ -2739,7 +2880,11 @@ pub fn wealth_trajectory_assurance_witness_from_request(
         "wta_max_variance_proxy",
         max_variance_proxy.clone(),
     );
-    write_value(&mut values, "wta_min_return_target", min_return_target.clone());
+    write_value(
+        &mut values,
+        "wta_min_return_target",
+        min_return_target.clone(),
+    );
     write_value(&mut values, "wta_chain_seed", zero());
 
     let total_portfolio_value = sum_bigints(&allocations);
@@ -2876,11 +3021,7 @@ pub fn wealth_trajectory_assurance_witness_from_request(
             write_nonnegative_bound_support(
                 &mut values,
                 format!("wta_running_max_ratio_{index}_geq_slack"),
-                &comparator_slack(
-                    &left,
-                    &current_ratio,
-                    &positive_comparison_offset(&scale),
-                ),
+                &comparator_slack(&left, &current_ratio, &positive_comparison_offset(&scale)),
                 &scale,
                 &format!("wta_running_max_ratio_{index}_comparator_slack"),
             )?;
@@ -2898,7 +3039,11 @@ pub fn wealth_trajectory_assurance_witness_from_request(
             "portfolio return fell below the minimum target".to_string(),
         ));
     }
-    write_value(&mut values, "wta_portfolio_return", portfolio_return.clone());
+    write_value(
+        &mut values,
+        "wta_portfolio_return",
+        portfolio_return.clone(),
+    );
     write_value(
         &mut values,
         "wta_return_target_slack",
@@ -3235,7 +3380,10 @@ pub fn build_recirculation_sovereignty_score_program(
             signal_expr("rss_class_d_nominal_margin"),
         )?;
         builder.append_exact_division_constraints(
-            mul_expr(signal_expr(&internal_names[step]), signal_expr(&selected_margin)),
+            mul_expr(
+                signal_expr(&internal_names[step]),
+                signal_expr(&selected_margin),
+            ),
             const_expr(&scale),
             &capital_gain,
             &capital_gain_remainder,
@@ -3244,7 +3392,10 @@ pub fn build_recirculation_sovereignty_score_program(
             &format!("rss_capital_gain_{step}"),
         )?;
         builder.append_exact_division_constraints(
-            mul_expr(signal_expr(&capital_gain), signal_expr("rss_investment_return_reference")),
+            mul_expr(
+                signal_expr(&capital_gain),
+                signal_expr("rss_investment_return_reference"),
+            ),
             const_expr(&scale),
             &equity_gain,
             &equity_gain_remainder,
@@ -3253,7 +3404,10 @@ pub fn build_recirculation_sovereignty_score_program(
             &format!("rss_equity_gain_{step}"),
         )?;
         builder.append_exact_division_constraints(
-            mul_expr(signal_expr(&internal_names[step]), signal_expr(&selected_margin)),
+            mul_expr(
+                signal_expr(&internal_names[step]),
+                signal_expr(&selected_margin),
+            ),
             const_expr(&(scale.clone() * BigInt::from(20u8))),
             &asset_gain,
             &asset_gain_remainder,
@@ -3302,13 +3456,19 @@ pub fn build_recirculation_sovereignty_score_program(
         builder.constrain_equal(
             signal_expr(&next_capital),
             sub_expr(
-                add_expr(vec![signal_expr(&current_capital), signal_expr(&capital_gain)]),
+                add_expr(vec![
+                    signal_expr(&current_capital),
+                    signal_expr(&capital_gain),
+                ]),
                 signal_expr(&external_names[step]),
             ),
         )?;
         builder.constrain_equal(
             signal_expr(&next_equity),
-            add_expr(vec![signal_expr(&current_equity), signal_expr(&equity_gain)]),
+            add_expr(vec![
+                signal_expr(&current_equity),
+                signal_expr(&equity_gain),
+            ]),
         )?;
         builder.constrain_equal(
             signal_expr(&next_asset),
@@ -3317,11 +3477,17 @@ pub fn build_recirculation_sovereignty_score_program(
         builder.constrain_equal(
             signal_expr(&next_reserve),
             sub_expr(
-                add_expr(vec![signal_expr(&current_reserve), signal_expr(&reserve_gain)]),
+                add_expr(vec![
+                    signal_expr(&current_reserve),
+                    signal_expr(&reserve_gain),
+                ]),
                 signal_expr(&reserve_drain),
             ),
         )?;
-        builder.constrain_equal(signal_expr(&next_recirculation), signal_expr(&recirculation))?;
+        builder.constrain_equal(
+            signal_expr(&next_recirculation),
+            signal_expr(&recirculation),
+        )?;
         builder.constrain_geq(
             format!("rss_reserve_floor_slack_{step}"),
             signal_expr(&next_reserve),
@@ -3340,7 +3506,10 @@ pub fn build_recirculation_sovereignty_score_program(
         )?;
         builder.constrain_equal(
             signal_expr(&asset_deviation),
-            sub_expr(signal_expr(&next_asset), signal_expr("rss_asset_ownership_goal")),
+            sub_expr(
+                signal_expr(&next_asset),
+                signal_expr("rss_asset_ownership_goal"),
+            ),
         )?;
         builder.constrain_equal(
             signal_expr(&reserve_deviation),
@@ -3395,10 +3564,7 @@ pub fn build_recirculation_sovereignty_score_program(
     builder.private_signal(&equity_nl_sq)?;
     builder.constrain_equal(
         signal_expr(&equity_nl_sq),
-        mul_expr(
-            signal_expr(&current_equity),
-            signal_expr(&current_equity),
-        ),
+        mul_expr(signal_expr(&current_equity), signal_expr(&current_equity)),
     )?;
 
     builder.append_exact_division_constraints(
@@ -3515,12 +3681,18 @@ pub fn recirculation_sovereignty_score_witness_from_request(
         .circuit_commitments
         .iter()
         .enumerate()
-        .map(|(index, value)| parse_nonnegative_integer(value, &format!("circuit commitment {index}")))
+        .map(|(index, value)| {
+            parse_nonnegative_integer(value, &format!("circuit commitment {index}"))
+        })
         .collect::<ZkfResult<Vec<_>>>()?;
-    let initial_circulating_capital =
-        parse_goldilocks_amount(&request.initial_circulating_capital, "initial circulating capital")?;
-    let initial_cooperative_equity =
-        parse_goldilocks_amount(&request.initial_cooperative_equity, "initial cooperative equity")?;
+    let initial_circulating_capital = parse_goldilocks_amount(
+        &request.initial_circulating_capital,
+        "initial circulating capital",
+    )?;
+    let initial_cooperative_equity = parse_goldilocks_amount(
+        &request.initial_cooperative_equity,
+        "initial cooperative equity",
+    )?;
     let initial_asset_ownership_pct = parse_goldilocks_ratio(
         &request.initial_asset_ownership_pct,
         "initial asset ownership percentage",
@@ -3534,33 +3706,33 @@ pub fn recirculation_sovereignty_score_witness_from_request(
     let recirculation_target =
         parse_goldilocks_ratio(&request.recirculation_target, "recirculation target")?;
     let leakage_cap = parse_goldilocks_ratio(&request.leakage_cap, "leakage cap")?;
-    let asset_ownership_goal = parse_goldilocks_ratio(
-        &request.asset_ownership_goal,
-        "asset ownership goal",
-    )?;
+    let asset_ownership_goal =
+        parse_goldilocks_ratio(&request.asset_ownership_goal, "asset ownership goal")?;
     let reserve_floor = parse_goldilocks_amount(&request.reserve_floor, "reserve floor")?;
-    let min_investment_return = parse_goldilocks_ratio(
-        &request.min_investment_return,
-        "minimum investment return",
-    )?;
+    let min_investment_return =
+        parse_goldilocks_ratio(&request.min_investment_return, "minimum investment return")?;
     let investment_return_reference = parse_goldilocks_ratio(
         &request.investment_return_reference,
         "investment return reference",
     )?;
-    let class_d_nominal_margin = parse_goldilocks_ratio(
-        &request.class_d_nominal_margin,
-        "class d nominal margin",
-    )?;
-    let class_d_stress_margin = parse_goldilocks_ratio(
-        &request.class_d_stress_margin,
-        "class d stress margin",
-    )?;
+    let class_d_nominal_margin =
+        parse_goldilocks_ratio(&request.class_d_nominal_margin, "class d nominal margin")?;
+    let class_d_stress_margin =
+        parse_goldilocks_ratio(&request.class_d_stress_margin, "class d stress margin")?;
 
     for (step, value) in internal_spend.iter().enumerate() {
-        write_value(&mut values, format!("rss_internal_spend_{step}"), value.clone());
+        write_value(
+            &mut values,
+            format!("rss_internal_spend_{step}"),
+            value.clone(),
+        );
     }
     for (step, value) in external_spend.iter().enumerate() {
-        write_value(&mut values, format!("rss_external_spend_{step}"), value.clone());
+        write_value(
+            &mut values,
+            format!("rss_external_spend_{step}"),
+            value.clone(),
+        );
     }
     for (index, commitment) in commitments.iter().enumerate() {
         write_value(
@@ -3578,17 +3750,32 @@ pub fn recirculation_sovereignty_score_witness_from_request(
         write_bool_value(&mut values, format!("rss_circuit_status_{index}"), *status);
     }
     for (name, value) in [
-        ("rss_initial_circulating_capital", &initial_circulating_capital),
-        ("rss_initial_cooperative_equity", &initial_cooperative_equity),
-        ("rss_initial_asset_ownership_pct", &initial_asset_ownership_pct),
+        (
+            "rss_initial_circulating_capital",
+            &initial_circulating_capital,
+        ),
+        (
+            "rss_initial_cooperative_equity",
+            &initial_cooperative_equity,
+        ),
+        (
+            "rss_initial_asset_ownership_pct",
+            &initial_asset_ownership_pct,
+        ),
         ("rss_initial_reserve_level", &initial_reserve_level),
-        ("rss_initial_recirculation_rate", &initial_recirculation_rate),
+        (
+            "rss_initial_recirculation_rate",
+            &initial_recirculation_rate,
+        ),
         ("rss_recirculation_target", &recirculation_target),
         ("rss_leakage_cap", &leakage_cap),
         ("rss_asset_ownership_goal", &asset_ownership_goal),
         ("rss_reserve_floor", &reserve_floor),
         ("rss_min_investment_return", &min_investment_return),
-        ("rss_investment_return_reference", &investment_return_reference),
+        (
+            "rss_investment_return_reference",
+            &investment_return_reference,
+        ),
         ("rss_class_d_nominal_margin", &class_d_nominal_margin),
         ("rss_class_d_stress_margin", &class_d_stress_margin),
     ] {
@@ -3613,9 +3800,15 @@ pub fn recirculation_sovereignty_score_witness_from_request(
     );
     let commitment_root = poseidon_permutation4(
         SED_GOLDILOCKS_FIELD,
-        [&commitments[0], &commitments[1], &commitments[2], &commitments[3]],
+        [
+            &commitments[0],
+            &commitments[1],
+            &commitments[2],
+            &commitments[3],
+        ],
     )?;
-    let commitment_root_lane = write_hash_lanes(&mut values, "rss_commitment_root", commitment_root);
+    let commitment_root_lane =
+        write_hash_lanes(&mut values, "rss_commitment_root", commitment_root);
 
     let mut current_capital = initial_circulating_capital.clone();
     let mut current_equity = initial_cooperative_equity.clone();
@@ -3631,7 +3824,11 @@ pub fn recirculation_sovereignty_score_witness_from_request(
                 "integration step {step} had zero total flow"
             )));
         }
-        write_value(&mut values, format!("rss_total_flow_{step}"), total_flow.clone());
+        write_value(
+            &mut values,
+            format!("rss_total_flow_{step}"),
+            total_flow.clone(),
+        );
         let recirculation_numerator = &internal_spend[step] * &scale;
         let recirculation_rate = &recirculation_numerator / &total_flow;
         let recirculation_remainder = &recirculation_numerator % &total_flow;
@@ -3802,14 +3999,26 @@ pub fn recirculation_sovereignty_score_witness_from_request(
                 "integration step {step} crossed a fail-closed economic envelope"
             )));
         }
-        write_value(&mut values, format!("rss_next_capital_{step}"), next_capital.clone());
-        write_value(&mut values, format!("rss_next_equity_{step}"), next_equity.clone());
+        write_value(
+            &mut values,
+            format!("rss_next_capital_{step}"),
+            next_capital.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("rss_next_equity_{step}"),
+            next_equity.clone(),
+        );
         write_value(
             &mut values,
             format!("rss_next_asset_ownership_{step}"),
             next_asset.clone(),
         );
-        write_value(&mut values, format!("rss_next_reserve_{step}"), next_reserve.clone());
+        write_value(
+            &mut values,
+            format!("rss_next_reserve_{step}"),
+            next_reserve.clone(),
+        );
         write_value(
             &mut values,
             format!("rss_next_recirculation_rate_{step}"),
@@ -3867,12 +4076,9 @@ pub fn recirculation_sovereignty_score_witness_from_request(
                 &current_reserve,
             ],
         )?;
-        let state_hi_lane = write_hash_lanes(
-            &mut values,
-            &format!("rss_step_state_hi_{step}"),
-            state_hi,
-        )
-        .as_bigint();
+        let state_hi_lane =
+            write_hash_lanes(&mut values, &format!("rss_step_state_hi_{step}"), state_hi)
+                .as_bigint();
         let step_chain = poseidon_permutation4(
             SED_GOLDILOCKS_FIELD,
             [
@@ -3882,12 +4088,9 @@ pub fn recirculation_sovereignty_score_witness_from_request(
                 &BigInt::from(step as u64),
             ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("rss_step_chain_{step}"),
-            step_chain,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("rss_step_chain_{step}"), step_chain)
+                .as_bigint();
 
         current_capital = next_capital;
         current_equity = next_equity;
@@ -3947,8 +4150,11 @@ pub fn recirculation_sovereignty_score_witness_from_request(
             &sovereignty_score,
         ],
     )?;
-    let summary_lane =
-        write_hash_lanes(&mut values, "rss_summary_commitment_internal", summary_commitment);
+    let summary_lane = write_hash_lanes(
+        &mut values,
+        "rss_summary_commitment_internal",
+        summary_commitment,
+    );
     let mission_commitment = poseidon_permutation4(
         SED_GOLDILOCKS_FIELD,
         [
@@ -3958,8 +4164,11 @@ pub fn recirculation_sovereignty_score_witness_from_request(
             &sovereignty_score,
         ],
     )?;
-    let mission_lane =
-        write_hash_lanes(&mut values, "rss_mission_commitment_internal", mission_commitment);
+    let mission_lane = write_hash_lanes(
+        &mut values,
+        "rss_mission_commitment_internal",
+        mission_commitment,
+    );
     values.insert("rss_mission_commitment".to_string(), mission_lane);
     values.insert("rss_summary_commitment".to_string(), summary_lane);
     values.insert("rss_overall_compliance_bit".to_string(), FieldElement::ONE);
@@ -4070,14 +4279,8 @@ mod tests {
     ) -> RecirculationSovereigntyScoreRequestV1 {
         RecirculationSovereigntyScoreRequestV1 {
             mission_id: "mission-alpha".to_string(),
-            internal_spend: vec![
-                "2.000".to_string();
-                SOVEREIGN_ECONOMIC_DEFENSE_INTEGRATION_STEPS
-            ],
-            external_spend: vec![
-                "0.200".to_string();
-                SOVEREIGN_ECONOMIC_DEFENSE_INTEGRATION_STEPS
-            ],
+            internal_spend: vec!["2.000".to_string(); SOVEREIGN_ECONOMIC_DEFENSE_INTEGRATION_STEPS],
+            external_spend: vec!["0.200".to_string(); SOVEREIGN_ECONOMIC_DEFENSE_INTEGRATION_STEPS],
             circuit_commitments: commitments,
             circuit_status_bits: status_bits,
             initial_circulating_capital: "1000.000".to_string(),
@@ -4099,111 +4302,111 @@ mod tests {
     #[test]
     fn sovereign_economic_defense_circuit_roundtrip() {
         run_sed_test_on_large_stack("sed-circuit-roundtrip", || {
-        let cta_request = cooperative_treasury_request();
-        let cta_program =
-            build_cooperative_treasury_assurance_program(&cta_request).expect("cta program");
-        let cta_audit = audit_program_default(&cta_program, Some(BackendKind::Plonky3));
-        if cta_audit.summary.failed != 0 {
-            let analysis = analyze_underconstrained(&cta_program);
-            panic!(
-                "cta audit must pass: {:?}\nunderconstrained={:?}",
-                cta_audit.checks, analysis
-            );
-        }
-        let cta_witness =
-            cooperative_treasury_assurance_witness_from_request(&cta_request).expect("cta witness");
-        let cta_compiled = compile(&cta_program, "plonky3", None).expect("cta compile");
-        let cta_artifact = prove(&cta_compiled, &cta_witness).expect("cta prove");
-        assert!(verify(&cta_compiled, &cta_artifact).expect("cta verify"));
-        assert_eq!(cta_artifact.public_inputs.len(), 2);
-        assert_eq!(cta_artifact.public_inputs[1].to_decimal_string(), "1");
+            let cta_request = cooperative_treasury_request();
+            let cta_program =
+                build_cooperative_treasury_assurance_program(&cta_request).expect("cta program");
+            let cta_audit = audit_program_default(&cta_program, Some(BackendKind::Plonky3));
+            if cta_audit.summary.failed != 0 {
+                let analysis = analyze_underconstrained(&cta_program);
+                panic!(
+                    "cta audit must pass: {:?}\nunderconstrained={:?}",
+                    cta_audit.checks, analysis
+                );
+            }
+            let cta_witness = cooperative_treasury_assurance_witness_from_request(&cta_request)
+                .expect("cta witness");
+            let cta_compiled = compile(&cta_program, "plonky3", None).expect("cta compile");
+            let cta_artifact = prove(&cta_compiled, &cta_witness).expect("cta prove");
+            assert!(verify(&cta_compiled, &cta_artifact).expect("cta verify"));
+            assert_eq!(cta_artifact.public_inputs.len(), 2);
+            assert_eq!(cta_artifact.public_inputs[1].to_decimal_string(), "1");
 
-        let clt_request = community_land_trust_request();
-        let clt_program =
-            build_community_land_trust_governance_program(&clt_request).expect("clt program");
-        let clt_audit = audit_program_default(&clt_program, Some(BackendKind::Plonky3));
-        if clt_audit.summary.failed != 0 {
-            let analysis = analyze_underconstrained(&clt_program);
-            panic!(
-                "clt audit must pass: {:?}\nunderconstrained={:?}",
-                clt_audit.checks, analysis
-            );
-        }
-        let clt_witness = community_land_trust_governance_witness_from_request(&clt_request)
-            .expect("clt witness");
-        let clt_compiled = compile(&clt_program, "plonky3", None).expect("clt compile");
-        let clt_artifact = prove(&clt_compiled, &clt_witness).expect("clt prove");
-        assert!(verify(&clt_compiled, &clt_artifact).expect("clt verify"));
-        assert_eq!(clt_artifact.public_inputs.len(), 2);
-        assert_eq!(clt_artifact.public_inputs[1].to_decimal_string(), "1");
+            let clt_request = community_land_trust_request();
+            let clt_program =
+                build_community_land_trust_governance_program(&clt_request).expect("clt program");
+            let clt_audit = audit_program_default(&clt_program, Some(BackendKind::Plonky3));
+            if clt_audit.summary.failed != 0 {
+                let analysis = analyze_underconstrained(&clt_program);
+                panic!(
+                    "clt audit must pass: {:?}\nunderconstrained={:?}",
+                    clt_audit.checks, analysis
+                );
+            }
+            let clt_witness = community_land_trust_governance_witness_from_request(&clt_request)
+                .expect("clt witness");
+            let clt_compiled = compile(&clt_program, "plonky3", None).expect("clt compile");
+            let clt_artifact = prove(&clt_compiled, &clt_witness).expect("clt prove");
+            assert!(verify(&clt_compiled, &clt_artifact).expect("clt verify"));
+            assert_eq!(clt_artifact.public_inputs.len(), 2);
+            assert_eq!(clt_artifact.public_inputs[1].to_decimal_string(), "1");
 
-        let aes_request = anti_extraction_request();
-        let aes_program =
-            build_anti_extraction_shield_program(&aes_request).expect("aes program");
-        let aes_audit = audit_program_default(&aes_program, Some(BackendKind::ArkworksGroth16));
-        if aes_audit.summary.failed != 0 {
-            let analysis = analyze_underconstrained(&aes_program);
-            panic!(
-                "aes audit must pass: {:?}\nunderconstrained={:?}",
-                aes_audit.checks, analysis
-            );
-        }
-        let aes_witness =
-            anti_extraction_shield_witness_from_request(&aes_request).expect("aes witness");
-        let (aes_compiled, aes_artifact) =
-            with_allow_dev_deterministic_groth16_override(Some(true), || {
-                let compiled =
-                    compile(&aes_program, "arkworks-groth16", None).expect("aes compile");
-                let artifact = prove(&compiled, &aes_witness).expect("aes prove");
-                (compiled, artifact)
-            });
-        assert!(verify(&aes_compiled, &aes_artifact).expect("aes verify"));
-        assert_eq!(aes_artifact.public_inputs.len(), 2);
-        assert_eq!(aes_artifact.public_inputs[1].to_decimal_string(), "1");
+            let aes_request = anti_extraction_request();
+            let aes_program =
+                build_anti_extraction_shield_program(&aes_request).expect("aes program");
+            let aes_audit = audit_program_default(&aes_program, Some(BackendKind::ArkworksGroth16));
+            if aes_audit.summary.failed != 0 {
+                let analysis = analyze_underconstrained(&aes_program);
+                panic!(
+                    "aes audit must pass: {:?}\nunderconstrained={:?}",
+                    aes_audit.checks, analysis
+                );
+            }
+            let aes_witness =
+                anti_extraction_shield_witness_from_request(&aes_request).expect("aes witness");
+            let (aes_compiled, aes_artifact) =
+                with_allow_dev_deterministic_groth16_override(Some(true), || {
+                    let compiled =
+                        compile(&aes_program, "arkworks-groth16", None).expect("aes compile");
+                    let artifact = prove(&compiled, &aes_witness).expect("aes prove");
+                    (compiled, artifact)
+                });
+            assert!(verify(&aes_compiled, &aes_artifact).expect("aes verify"));
+            assert_eq!(aes_artifact.public_inputs.len(), 2);
+            assert_eq!(aes_artifact.public_inputs[1].to_decimal_string(), "1");
 
-        let wta_request = wealth_trajectory_request();
-        let wta_program =
-            build_wealth_trajectory_assurance_program(&wta_request).expect("wta program");
-        let wta_audit = audit_program_default(&wta_program, Some(BackendKind::Plonky3));
-        if wta_audit.summary.failed != 0 {
-            let analysis = analyze_underconstrained(&wta_program);
-            panic!(
-                "wta audit must pass: {:?}\nunderconstrained={:?}",
-                wta_audit.checks, analysis
-            );
-        }
-        let wta_witness =
-            wealth_trajectory_assurance_witness_from_request(&wta_request).expect("wta witness");
-        let wta_compiled = compile(&wta_program, "plonky3", None).expect("wta compile");
-        let wta_artifact = prove(&wta_compiled, &wta_witness).expect("wta prove");
-        assert!(verify(&wta_compiled, &wta_artifact).expect("wta verify"));
-        assert_eq!(wta_artifact.public_inputs.len(), 2);
-        assert_eq!(wta_artifact.public_inputs[1].to_decimal_string(), "1");
+            let wta_request = wealth_trajectory_request();
+            let wta_program =
+                build_wealth_trajectory_assurance_program(&wta_request).expect("wta program");
+            let wta_audit = audit_program_default(&wta_program, Some(BackendKind::Plonky3));
+            if wta_audit.summary.failed != 0 {
+                let analysis = analyze_underconstrained(&wta_program);
+                panic!(
+                    "wta audit must pass: {:?}\nunderconstrained={:?}",
+                    wta_audit.checks, analysis
+                );
+            }
+            let wta_witness = wealth_trajectory_assurance_witness_from_request(&wta_request)
+                .expect("wta witness");
+            let wta_compiled = compile(&wta_program, "plonky3", None).expect("wta compile");
+            let wta_artifact = prove(&wta_compiled, &wta_witness).expect("wta prove");
+            assert!(verify(&wta_compiled, &wta_artifact).expect("wta verify"));
+            assert_eq!(wta_artifact.public_inputs.len(), 2);
+            assert_eq!(wta_artifact.public_inputs[1].to_decimal_string(), "1");
 
-        let rss_request = recirculation_request(
-            [
-                cta_artifact.public_inputs[0].to_decimal_string(),
-                clt_artifact.public_inputs[0].to_decimal_string(),
-                aes_artifact.public_inputs[0].to_decimal_string(),
-                wta_artifact.public_inputs[0].to_decimal_string(),
-            ],
-            [true, true, true, true],
-        );
-        let rss_program =
-            build_recirculation_sovereignty_score_program(&rss_request).expect("rss program");
-        let rss_audit = audit_program_default(&rss_program, Some(BackendKind::Plonky3));
-        assert_eq!(
-            rss_audit.summary.failed, 0,
-            "rss audit must pass: {:?}",
-            rss_audit.checks
-        );
-        let rss_witness = recirculation_sovereignty_score_witness_from_request(&rss_request)
-            .expect("rss witness");
-        let rss_compiled = compile(&rss_program, "plonky3", None).expect("rss compile");
-        let rss_artifact = prove(&rss_compiled, &rss_witness).expect("rss prove");
-        assert!(verify(&rss_compiled, &rss_artifact).expect("rss verify"));
-        assert_eq!(rss_artifact.public_inputs.len(), 3);
-        assert_eq!(rss_artifact.public_inputs[1].to_decimal_string(), "1");
+            let rss_request = recirculation_request(
+                [
+                    cta_artifact.public_inputs[0].to_decimal_string(),
+                    clt_artifact.public_inputs[0].to_decimal_string(),
+                    aes_artifact.public_inputs[0].to_decimal_string(),
+                    wta_artifact.public_inputs[0].to_decimal_string(),
+                ],
+                [true, true, true, true],
+            );
+            let rss_program =
+                build_recirculation_sovereignty_score_program(&rss_request).expect("rss program");
+            let rss_audit = audit_program_default(&rss_program, Some(BackendKind::Plonky3));
+            assert_eq!(
+                rss_audit.summary.failed, 0,
+                "rss audit must pass: {:?}",
+                rss_audit.checks
+            );
+            let rss_witness = recirculation_sovereignty_score_witness_from_request(&rss_request)
+                .expect("rss witness");
+            let rss_compiled = compile(&rss_program, "plonky3", None).expect("rss compile");
+            let rss_artifact = prove(&rss_compiled, &rss_witness).expect("rss prove");
+            assert!(verify(&rss_compiled, &rss_artifact).expect("rss verify"));
+            assert_eq!(rss_artifact.public_inputs.len(), 3);
+            assert_eq!(rss_artifact.public_inputs[1].to_decimal_string(), "1");
         });
     }
 
@@ -4225,8 +4428,7 @@ mod tests {
             .expect_err("non-predatory request must fail closed");
         let message = err.to_string();
         assert!(
-            message.contains("fair-lending violation")
-                || message.contains("predatory threshold"),
+            message.contains("fair-lending violation") || message.contains("predatory threshold"),
             "unexpected error: {message}"
         );
     }
@@ -4266,19 +4468,19 @@ mod tests {
     #[test]
     fn cta_handles_single_member() {
         run_sed_test_on_large_stack("cta-single-member", || {
-        let request = CooperativeTreasuryAssuranceRequestV1 {
-            treasury_id: "treasury-single".to_string(),
-            contributions: vec!["1000.000".to_string()],
-            distributions: vec!["500.000".to_string()],
-            reserve_balance: "500.000".to_string(),
-            min_reserve_ratio: "0.200".to_string(),
-            max_distribution_per_member: "600.000".to_string(),
-            fairness_tolerance: "25.000".to_string(),
-        };
-        build_cooperative_treasury_assurance_program(&request)
-            .expect("single member build must succeed");
-        cooperative_treasury_assurance_witness_from_request(&request)
-            .expect("single member witness must succeed");
+            let request = CooperativeTreasuryAssuranceRequestV1 {
+                treasury_id: "treasury-single".to_string(),
+                contributions: vec!["1000.000".to_string()],
+                distributions: vec!["500.000".to_string()],
+                reserve_balance: "500.000".to_string(),
+                min_reserve_ratio: "0.200".to_string(),
+                max_distribution_per_member: "600.000".to_string(),
+                fairness_tolerance: "25.000".to_string(),
+            };
+            build_cooperative_treasury_assurance_program(&request)
+                .expect("single member build must succeed");
+            cooperative_treasury_assurance_witness_from_request(&request)
+                .expect("single member witness must succeed");
         });
     }
 

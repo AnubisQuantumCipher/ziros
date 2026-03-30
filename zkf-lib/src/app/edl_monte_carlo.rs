@@ -5,7 +5,10 @@ use num_bigint::{BigInt, Sign};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zkf_backends::blackbox_gadgets::poseidon2_permutation_native;
-use zkf_core::{Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult, generate_witness};
+use zkf_core::{
+    Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult,
+    generate_witness,
+};
 
 use super::builder::ProgramBuilder;
 use super::subsystem_support;
@@ -276,7 +279,10 @@ fn write_nonnegative_bound_support(
     values.insert(signal_name, field_ref(value));
     let slack = bound - value;
     values.insert(nonnegative_bound_slack_name(prefix), field_ref(&slack));
-    values.insert(nonnegative_bound_anchor_name(prefix), field_ref(&(&slack * &slack)));
+    values.insert(
+        nonnegative_bound_anchor_name(prefix),
+        field_ref(&(&slack * &slack)),
+    );
     Ok(())
 }
 
@@ -293,7 +299,11 @@ fn write_exact_division_support(
     write_value(values, quotient_name, quotient.clone());
     write_value(values, remainder_name, remainder.clone());
     write_value(values, slack_name, slack.clone());
-    write_value(values, exact_division_slack_anchor_name(prefix), slack * slack);
+    write_value(
+        values,
+        exact_division_slack_anchor_name(prefix),
+        slack * slack,
+    );
 }
 
 fn write_floor_sqrt_support(
@@ -378,10 +388,7 @@ fn sum_exprs(names: &[String]) -> Expr {
     add_expr(names.iter().map(|name| signal_expr(name)).collect())
 }
 
-fn materialize_seeded_witness(
-    program: &Program,
-    values: WitnessInputs,
-) -> ZkfResult<Witness> {
+fn materialize_seeded_witness(program: &Program, values: WitnessInputs) -> ZkfResult<Witness> {
     generate_witness(program, &values)
 }
 
@@ -420,9 +427,8 @@ fn parse_edl_bn254_ratio(value: &str, label: &str) -> ZkfResult<BigInt> {
 }
 
 fn parse_nonneg_integer(value: &str, label: &str) -> ZkfResult<BigInt> {
-    let parsed = BigInt::parse_bytes(value.as_bytes(), 10).ok_or_else(|| {
-        ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer"))
-    })?;
+    let parsed = BigInt::parse_bytes(value.as_bytes(), 10)
+        .ok_or_else(|| ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer")))?;
     if parsed < zero() {
         return Err(ZkfError::InvalidArtifact(format!(
             "{label} must be nonnegative"
@@ -681,9 +687,7 @@ struct EdlStepComputation {
 // Circuit 1: EDL Trajectory Propagation (Goldilocks/Plonky3)
 // ---------------------------------------------------------------------------
 
-pub fn build_edl_trajectory_program(
-    request: &EdlTrajectoryRequestV1,
-) -> ZkfResult<Program> {
+pub fn build_edl_trajectory_program(request: &EdlTrajectoryRequestV1) -> ZkfResult<Program> {
     build_edl_trajectory_program_with_steps(request, EDL_MC_TRAJECTORY_STEPS)
 }
 
@@ -804,9 +808,21 @@ pub fn build_edl_trajectory_program_with_steps(
     let mut previous_chain = signal_expr("edl_chain_seed");
 
     for i in 0..steps {
-        let h_name = if i == 0 { "edl_h0".to_string() } else { format!("edl_step_{i}_h") };
-        let v_name = if i == 0 { "edl_v0".to_string() } else { format!("edl_step_{i}_v") };
-        let g_name = if i == 0 { "edl_gamma0".to_string() } else { format!("edl_step_{i}_gamma") };
+        let h_name = if i == 0 {
+            "edl_h0".to_string()
+        } else {
+            format!("edl_step_{i}_h")
+        };
+        let v_name = if i == 0 {
+            "edl_v0".to_string()
+        } else {
+            format!("edl_step_{i}_v")
+        };
+        let g_name = if i == 0 {
+            "edl_gamma0".to_string()
+        } else {
+            format!("edl_step_{i}_gamma")
+        };
         let bank_name = format!("edl_bank_cos_{i}");
         let rho_name = format!("edl_rho_{i}");
 
@@ -954,7 +970,11 @@ pub fn build_edl_trajectory_program_with_steps(
                 signal_expr(&gsing_name),
             ),
         )?;
-        builder.append_signed_bound(&dv_accel_name, &edl_acceleration_bound(), &format!("edl_step_{i}_dv_accel"))?;
+        builder.append_signed_bound(
+            &dv_accel_name,
+            &edl_acceleration_bound(),
+            &format!("edl_step_{i}_dv_accel"),
+        )?;
 
         let dv_name = format!("edl_step_{i}_dv");
         let dv_r = format!("edl_step_{i}_dv_r");
@@ -1053,7 +1073,11 @@ pub fn build_edl_trajectory_program_with_steps(
             signal_expr(&dg_accel_name),
             sub_expr(signal_expr(&lov_name), signal_expr(&gov_name)),
         )?;
-        builder.append_signed_bound(&dg_accel_name, &edl_acceleration_bound(), &format!("edl_step_{i}_dg_accel"))?;
+        builder.append_signed_bound(
+            &dg_accel_name,
+            &edl_acceleration_bound(),
+            &format!("edl_step_{i}_dg_accel"),
+        )?;
 
         let dg_name = format!("edl_step_{i}_dg");
         let dg_r = format!("edl_step_{i}_dg_r");
@@ -1082,7 +1106,11 @@ pub fn build_edl_trajectory_program_with_steps(
             signal_expr(&next_g),
             add_expr(vec![signal_expr(&g_name), signal_expr(&dg_name)]),
         )?;
-        builder.append_signed_bound(&next_g, &edl_gamma_bound(), &format!("edl_step_{}_gamma", i + 1))?;
+        builder.append_signed_bound(
+            &next_g,
+            &edl_gamma_bound(),
+            &format!("edl_step_{}_gamma", i + 1),
+        )?;
 
         // Heating rate proxy: qdot = k_sg * sqrt(rho / r_n) * V^3 / scale^2
         // Simplified: we just check the dynamic pressure envelope and a heating bound
@@ -1179,9 +1207,7 @@ pub fn build_edl_trajectory_program_with_steps(
 // Circuit 1 witness generator
 // ---------------------------------------------------------------------------
 
-pub fn edl_trajectory_witness_from_request(
-    request: &EdlTrajectoryRequestV1,
-) -> ZkfResult<Witness> {
+pub fn edl_trajectory_witness_from_request(request: &EdlTrajectoryRequestV1) -> ZkfResult<Witness> {
     edl_trajectory_witness_from_request_with_steps(request, EDL_MC_TRAJECTORY_STEPS)
 }
 
@@ -1222,10 +1248,14 @@ pub fn edl_trajectory_witness_from_request_with_steps(
     let gravity = parse_edl_goldilocks_amount(&request.gravity, "gravity")?;
 
     if mass == zero() {
-        return Err(ZkfError::InvalidArtifact("vehicle mass must be nonzero".to_string()));
+        return Err(ZkfError::InvalidArtifact(
+            "vehicle mass must be nonzero".to_string(),
+        ));
     }
     if rn == zero() {
-        return Err(ZkfError::InvalidArtifact("nose radius must be nonzero".to_string()));
+        return Err(ZkfError::InvalidArtifact(
+            "nose radius must be nonzero".to_string(),
+        ));
     }
 
     write_value(&mut values, "edl_h0", h0.clone());
@@ -1247,12 +1277,14 @@ pub fn edl_trajectory_witness_from_request_with_steps(
     write_signed_bound_support(&mut values, &gamma0, &edl_gamma_bound(), "edl_gamma0")?;
 
     // Parse per-step inputs
-    let bank_cosines = request.bank_angle_cosines
+    let bank_cosines = request
+        .bank_angle_cosines
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_goldilocks_signed(v, &format!("bank cosine {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let densities = request.atmosphere_density
+    let densities = request
+        .atmosphere_density
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_goldilocks_amount(v, &format!("atmosphere density {i}")))
@@ -1260,7 +1292,12 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 
     for (i, bank) in bank_cosines.iter().enumerate() {
         write_value(&mut values, format!("edl_bank_cos_{i}"), bank.clone());
-        write_signed_bound_support(&mut values, bank, &edl_bank_cos_bound(), &format!("edl_bank_cos_{i}"))?;
+        write_signed_bound_support(
+            &mut values,
+            bank,
+            &edl_bank_cos_bound(),
+            &format!("edl_bank_cos_{i}"),
+        )?;
     }
     for (i, rho) in densities.iter().enumerate() {
         write_value(&mut values, format!("edl_rho_{i}"), rho.clone());
@@ -1411,8 +1448,17 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 
         // dv_accel = la - da - gsing
         let dv_accel = &la - &da - &gsing;
-        write_value(&mut values, format!("edl_step_{i}_dv_accel"), dv_accel.clone());
-        write_signed_bound_support(&mut values, &dv_accel, &edl_acceleration_bound(), &format!("edl_step_{i}_dv_accel"))?;
+        write_value(
+            &mut values,
+            format!("edl_step_{i}_dv_accel"),
+            dv_accel.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &dv_accel,
+            &edl_acceleration_bound(),
+            &format!("edl_step_{i}_dv_accel"),
+        )?;
 
         // dv = dv_accel * dt / scale (dv_accel may be negative)
         let dv_raw = &dv_accel * &dt;
@@ -1435,7 +1481,11 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 
         // Altitude: dh = v * gamma * dt / scale^2
         let v_gamma = &v * &gamma;
-        write_value(&mut values, format!("edl_step_{i}_v_gamma"), v_gamma.clone());
+        write_value(
+            &mut values,
+            format!("edl_step_{i}_v_gamma"),
+            v_gamma.clone(),
+        );
 
         // v_gamma may be negative (gamma is signed), use Euclidean division
         let dh_raw = &v_gamma * &dt;
@@ -1497,8 +1547,17 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 
         // dg_accel = lov - gov
         let dg_accel = &lov - &gov;
-        write_value(&mut values, format!("edl_step_{i}_dg_accel"), dg_accel.clone());
-        write_signed_bound_support(&mut values, &dg_accel, &edl_acceleration_bound(), &format!("edl_step_{i}_dg_accel"))?;
+        write_value(
+            &mut values,
+            format!("edl_step_{i}_dg_accel"),
+            dg_accel.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &dg_accel,
+            &edl_acceleration_bound(),
+            &format!("edl_step_{i}_dg_accel"),
+        )?;
 
         // dg = dg_accel * dt / scale
         // dg_accel may be negative, use Euclidean division
@@ -1518,8 +1577,17 @@ pub fn edl_trajectory_witness_from_request_with_steps(
         write_value(&mut values, format!("edl_step_{i}_dg_nl_sq"), &dg * &dg);
 
         let g_next = &gamma + &dg;
-        write_value(&mut values, format!("edl_step_{}_gamma", i + 1), g_next.clone());
-        write_signed_bound_support(&mut values, &g_next, &edl_gamma_bound(), &format!("edl_step_{}_gamma", i + 1))?;
+        write_value(
+            &mut values,
+            format!("edl_step_{}_gamma", i + 1),
+            g_next.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &g_next,
+            &edl_gamma_bound(),
+            &format!("edl_step_{}_gamma", i + 1),
+        )?;
 
         // Safety slacks
         if q_i > q_max {
@@ -1527,25 +1595,27 @@ pub fn edl_trajectory_witness_from_request_with_steps(
                 "dynamic pressure exceeded at step {i}"
             )));
         }
-        write_value(&mut values, format!("edl_step_{i}_q_safety_slack"), &q_max - &q_i);
+        write_value(
+            &mut values,
+            format!("edl_step_{i}_q_safety_slack"),
+            &q_max - &q_i,
+        );
 
         if h < h_min {
             return Err(ZkfError::InvalidArtifact(format!(
                 "altitude below minimum at step {i}"
             )));
         }
-        write_value(&mut values, format!("edl_step_{i}_h_safety_slack"), &h - &h_min);
+        write_value(
+            &mut values,
+            format!("edl_step_{i}_h_safety_slack"),
+            &h - &h_min,
+        );
 
         // Poseidon step chain
-        let digest = poseidon_permutation4(
-            EDL_GOLDILOCKS_FIELD,
-            [&h, &v, &q_i, &previous_digest],
-        )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("edl_step_{i}_commit"),
-            digest,
-        ).as_bigint();
+        let digest = poseidon_permutation4(EDL_GOLDILOCKS_FIELD, [&h, &v, &q_i, &previous_digest])?;
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("edl_step_{i}_commit"), digest).as_bigint();
 
         // Advance state
         h = h_next;
@@ -1559,17 +1629,19 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 
     for i in 0..steps {
         let q_name = format!("edl_step_{i}_q");
-        let step_q = values.get(&q_name)
+        let step_q = values
+            .get(&q_name)
             .map(|fe| fe.as_bigint())
             .unwrap_or_else(zero);
-        write_value(&mut values, format!("edl_peak_q_geq_{i}"), &peak_q - &step_q);
+        write_value(
+            &mut values,
+            format!("edl_peak_q_geq_{i}"),
+            &peak_q - &step_q,
+        );
     }
 
     // Landing state commitment
-    let landing_digest = poseidon_permutation4(
-        EDL_GOLDILOCKS_FIELD,
-        [&h, &v, &gamma, &peak_q],
-    )?;
+    let landing_digest = poseidon_permutation4(EDL_GOLDILOCKS_FIELD, [&h, &v, &gamma, &peak_q])?;
     let landing_commit = write_hash_lanes(&mut values, "edl_landing_commit", landing_digest);
 
     // Peak Q commitment
@@ -1591,7 +1663,10 @@ pub fn edl_trajectory_witness_from_request_with_steps(
     )?;
     let trajectory_commitment = write_hash_lanes(&mut values, "edl_final_commit", final_digest);
 
-    values.insert("edl_trajectory_commitment".to_string(), trajectory_commitment);
+    values.insert(
+        "edl_trajectory_commitment".to_string(),
+        trajectory_commitment,
+    );
     values.insert("edl_compliance_bit".to_string(), FieldElement::ONE);
     values.insert("edl_peak_q_commitment".to_string(), peak_commit);
     values.insert("edl_landing_state_commitment".to_string(), landing_commit);
@@ -1604,9 +1679,7 @@ pub fn edl_trajectory_witness_from_request_with_steps(
 // Circuit 2: EDL Risk Summary (BN254/Groth16)
 // ---------------------------------------------------------------------------
 
-pub fn build_edl_risk_summary_program(
-    request: &EdlRiskSummaryRequestV1,
-) -> ZkfResult<Program> {
+pub fn build_edl_risk_summary_program(request: &EdlRiskSummaryRequestV1) -> ZkfResult<Program> {
     let n = request.trajectory_commitments.len();
     if n == 0 {
         return Err(ZkfError::InvalidArtifact(
@@ -1633,10 +1706,8 @@ pub fn build_edl_risk_summary_program(
     let heat_bits = bits_for_bound(&edl_bn254_heating_bound());
     let disp_bits = bits_for_bound(&edl_bn254_dispersion_bound());
 
-    let mut builder = ProgramBuilder::new(
-        format!("edl_monte_carlo_risk_summary_{n}"),
-        EDL_BN254_FIELD,
-    );
+    let mut builder =
+        ProgramBuilder::new(format!("edl_monte_carlo_risk_summary_{n}"), EDL_BN254_FIELD);
     builder.metadata_entry("application", "edl-monte-carlo")?;
     builder.metadata_entry("circuit", "risk-summary")?;
     builder.metadata_entry("trajectory_count", n.to_string())?;
@@ -1708,10 +1779,7 @@ pub fn build_edl_risk_summary_program(
 
     // -- Pass count --
     builder.private_signal("edlr_passed_count")?;
-    builder.constrain_equal(
-        signal_expr("edlr_passed_count"),
-        sum_exprs(&status_names),
-    )?;
+    builder.constrain_equal(signal_expr("edlr_passed_count"), sum_exprs(&status_names))?;
     builder.constrain_range("edlr_passed_count", bits_for_bound(&BigInt::from(n as u64)))?;
 
     // -- Pass rate: passed * scale / total --
@@ -1739,13 +1807,13 @@ pub fn build_edl_risk_summary_program(
     // -- Velocity RMS: sqrt(sum(v^2) / N) --
     let mut vel_sq_exprs = Vec::with_capacity(n);
     for i in 0..n {
-        vel_sq_exprs.push(mul_expr(signal_expr(&vel_names[i]), signal_expr(&vel_names[i])));
+        vel_sq_exprs.push(mul_expr(
+            signal_expr(&vel_names[i]),
+            signal_expr(&vel_names[i]),
+        ));
     }
     builder.private_signal("edlr_sum_vel_sq")?;
-    builder.constrain_equal(
-        signal_expr("edlr_sum_vel_sq"),
-        add_expr(vel_sq_exprs),
-    )?;
+    builder.constrain_equal(signal_expr("edlr_sum_vel_sq"), add_expr(vel_sq_exprs))?;
 
     builder.private_signal("edlr_mean_vel_sq")?;
     builder.private_signal("edlr_mean_vel_sq_r")?;
@@ -1808,7 +1876,11 @@ pub fn build_edl_risk_summary_program(
             signal_expr(&dev),
             sub_expr(signal_expr(&alt_names[i]), signal_expr("edlr_mean_alt")),
         )?;
-        builder.append_signed_bound(&dev, &edl_bn254_altitude_bound(), &format!("edlr_alt_dev_{i}"))?;
+        builder.append_signed_bound(
+            &dev,
+            &edl_bn254_altitude_bound(),
+            &format!("edlr_alt_dev_{i}"),
+        )?;
         alt_dev_sq_exprs.push(mul_expr(signal_expr(&dev), signal_expr(&dev)));
     }
 
@@ -1929,27 +2001,32 @@ pub fn edl_risk_summary_witness_from_request(
     write_value(&mut values, "edlr_chain_seed", zero());
 
     // Parse inputs
-    let commitments = request.trajectory_commitments
+    let commitments = request
+        .trajectory_commitments
         .iter()
         .enumerate()
         .map(|(i, v)| parse_nonneg_integer(v, &format!("trajectory commitment {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let landing_alts = request.landing_altitudes
+    let landing_alts = request
+        .landing_altitudes
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_bn254_amount(v, &format!("landing altitude {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let landing_vels = request.landing_velocities
+    let landing_vels = request
+        .landing_velocities
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_bn254_amount(v, &format!("landing velocity {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let peak_qs = request.peak_dynamic_pressures
+    let peak_qs = request
+        .peak_dynamic_pressures
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_bn254_amount(v, &format!("peak Q {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let peak_heats = request.peak_heating_rates
+    let peak_heats = request
+        .peak_heating_rates
         .iter()
         .enumerate()
         .map(|(i, v)| parse_edl_bn254_amount(v, &format!("peak heating {i}")))
@@ -1959,37 +2036,59 @@ pub fn edl_risk_summary_witness_from_request(
         &request.risk_threshold_landing_velocity,
         "velocity threshold",
     )?;
-    let threshold_disp = parse_edl_bn254_amount(
-        &request.risk_threshold_dispersion,
-        "dispersion threshold",
-    )?;
-    let threshold_heat = parse_edl_bn254_amount(
-        &request.risk_threshold_heating,
-        "heating threshold",
-    )?;
-    let required_pass_rate = parse_edl_bn254_ratio(
-        &request.required_pass_rate,
-        "required pass rate",
-    )?;
+    let threshold_disp =
+        parse_edl_bn254_amount(&request.risk_threshold_dispersion, "dispersion threshold")?;
+    let threshold_heat =
+        parse_edl_bn254_amount(&request.risk_threshold_heating, "heating threshold")?;
+    let required_pass_rate =
+        parse_edl_bn254_ratio(&request.required_pass_rate, "required pass rate")?;
 
     write_value(&mut values, "edlr_threshold_vel", threshold_vel.clone());
     write_value(&mut values, "edlr_threshold_disp", threshold_disp.clone());
     write_value(&mut values, "edlr_threshold_heat", threshold_heat.clone());
-    write_value(&mut values, "edlr_required_pass_rate", required_pass_rate.clone());
+    write_value(
+        &mut values,
+        "edlr_required_pass_rate",
+        required_pass_rate.clone(),
+    );
 
     for i in 0..n {
-        write_value(&mut values, format!("edlr_commit_{i}"), commitments[i].clone());
-        write_bool_value(&mut values, format!("edlr_status_{i}"), request.trajectory_status_bits[i]);
-        write_value(&mut values, format!("edlr_alt_{i}"), landing_alts[i].clone());
-        write_value(&mut values, format!("edlr_vel_{i}"), landing_vels[i].clone());
+        write_value(
+            &mut values,
+            format!("edlr_commit_{i}"),
+            commitments[i].clone(),
+        );
+        write_bool_value(
+            &mut values,
+            format!("edlr_status_{i}"),
+            request.trajectory_status_bits[i],
+        );
+        write_value(
+            &mut values,
+            format!("edlr_alt_{i}"),
+            landing_alts[i].clone(),
+        );
+        write_value(
+            &mut values,
+            format!("edlr_vel_{i}"),
+            landing_vels[i].clone(),
+        );
         write_value(&mut values, format!("edlr_q_{i}"), peak_qs[i].clone());
-        write_value(&mut values, format!("edlr_q_{i}_anchor"), &peak_qs[i] * &peak_qs[i]);
+        write_value(
+            &mut values,
+            format!("edlr_q_{i}_anchor"),
+            &peak_qs[i] * &peak_qs[i],
+        );
         write_value(&mut values, format!("edlr_heat_{i}"), peak_heats[i].clone());
     }
 
     // Pass count
     let passed_count = BigInt::from(
-        request.trajectory_status_bits.iter().filter(|b| **b).count() as u64,
+        request
+            .trajectory_status_bits
+            .iter()
+            .filter(|b| **b)
+            .count() as u64,
     );
     write_value(&mut values, "edlr_passed_count", passed_count.clone());
 
@@ -2015,7 +2114,11 @@ pub fn edl_risk_summary_witness_from_request(
             "pass rate below required threshold".to_string(),
         ));
     }
-    write_value(&mut values, "edlr_pass_rate_floor_slack", &pass_rate - &required_pass_rate);
+    write_value(
+        &mut values,
+        "edlr_pass_rate_floor_slack",
+        &pass_rate - &required_pass_rate,
+    );
 
     // Velocity RMS
     let sum_vel_sq = landing_vels.iter().fold(zero(), |acc, v| acc + v * v);
@@ -2037,9 +2140,7 @@ pub fn edl_risk_summary_witness_from_request(
 
     let vel_rms = bigint_isqrt_floor(&mean_vel_sq);
     let vel_rms_r = &mean_vel_sq - (&vel_rms * &vel_rms);
-    let vel_rms_upper_slack = ((&vel_rms + one()) * (&vel_rms + one()))
-        - &mean_vel_sq
-        - one();
+    let vel_rms_upper_slack = ((&vel_rms + one()) * (&vel_rms + one())) - &mean_vel_sq - one();
     write_floor_sqrt_support(
         &mut values,
         "edlr_vel_rms",
@@ -2105,9 +2206,7 @@ pub fn edl_risk_summary_witness_from_request(
 
     let dispersion = bigint_isqrt_floor(&alt_var);
     let disp_r = &alt_var - (&dispersion * &dispersion);
-    let disp_upper_slack = ((&dispersion + one()) * (&dispersion + one()))
-        - &alt_var
-        - one();
+    let disp_upper_slack = ((&dispersion + one()) * (&dispersion + one())) - &alt_var - one();
     write_floor_sqrt_support(
         &mut values,
         "edlr_dispersion",
@@ -2126,20 +2225,34 @@ pub fn edl_risk_summary_witness_from_request(
             "altitude dispersion exceeds threshold".to_string(),
         ));
     }
-    write_value(&mut values, "edlr_dispersion_slack", &threshold_disp - &dispersion);
+    write_value(
+        &mut values,
+        "edlr_dispersion_slack",
+        &threshold_disp - &dispersion,
+    );
 
     // Max heating
-    let max_heat = peak_heats.iter().fold(zero(), |acc, h| if *h > acc { h.clone() } else { acc });
+    let max_heat = peak_heats
+        .iter()
+        .fold(zero(), |acc, h| if *h > acc { h.clone() } else { acc });
     write_value(&mut values, "edlr_max_heat", max_heat.clone());
     for i in 0..n {
-        write_value(&mut values, format!("edlr_max_heat_geq_{i}"), &max_heat - &peak_heats[i]);
+        write_value(
+            &mut values,
+            format!("edlr_max_heat_geq_{i}"),
+            &max_heat - &peak_heats[i],
+        );
     }
     if max_heat > threshold_heat {
         return Err(ZkfError::InvalidArtifact(
             "peak heating exceeds threshold".to_string(),
         ));
     }
-    write_value(&mut values, "edlr_max_heat_slack", &threshold_heat - &max_heat);
+    write_value(
+        &mut values,
+        "edlr_max_heat_slack",
+        &threshold_heat - &max_heat,
+    );
 
     // Poseidon commitment chain
     let mut prev_digest = zero();
@@ -2153,11 +2266,8 @@ pub fn edl_risk_summary_witness_from_request(
                 &prev_digest,
             ],
         )?;
-        prev_digest = write_hash_lanes(
-            &mut values,
-            &format!("edlr_traj_commit_{i}"),
-            digest,
-        ).as_bigint();
+        prev_digest =
+            write_hash_lanes(&mut values, &format!("edlr_traj_commit_{i}"), digest).as_bigint();
     }
 
     // Risk digest
@@ -2176,7 +2286,10 @@ pub fn edl_risk_summary_witness_from_request(
 
     values.insert("edlr_risk_commitment".to_string(), risk_commitment);
     values.insert("edlr_risk_pass_bit".to_string(), FieldElement::ONE);
-    values.insert("edlr_pass_rate_commitment".to_string(), pass_rate_commitment);
+    values.insert(
+        "edlr_pass_rate_commitment".to_string(),
+        pass_rate_commitment,
+    );
 
     let program = build_edl_risk_summary_program(request)?;
     materialize_seeded_witness(&program, values)
@@ -2233,10 +2346,7 @@ pub fn build_edl_campaign_attestation_program(
     builder.constrain_range("edla_passed_samples", amount_bits)?;
 
     // Fail-closed: risk must pass
-    builder.constrain_equal(
-        signal_expr("edla_risk_status"),
-        const_expr(&one()),
-    )?;
+    builder.constrain_equal(signal_expr("edla_risk_status"), const_expr(&one()))?;
 
     // passed <= total
     builder.constrain_geq(
@@ -2313,20 +2423,30 @@ pub fn edl_campaign_attestation_witness_from_request(
     write_value(&mut values, "edla_chain_seed", zero());
 
     // Parse commitment values
-    let commitments = request.trajectory_commitments
+    let commitments = request
+        .trajectory_commitments
         .iter()
         .enumerate()
         .map(|(i, v)| parse_nonneg_integer(v, &format!("trajectory commitment {i}")))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let risk_commit = parse_nonneg_integer(&request.risk_summary_commitment, "risk summary commitment")?;
+    let risk_commit =
+        parse_nonneg_integer(&request.risk_summary_commitment, "risk summary commitment")?;
 
     for (i, c) in commitments.iter().enumerate() {
         write_value(&mut values, format!("edla_traj_commit_{i}"), c.clone());
     }
     write_value(&mut values, "edla_risk_commit", risk_commit.clone());
     write_bool_value(&mut values, "edla_risk_status", request.risk_summary_status);
-    write_value(&mut values, "edla_total_samples", BigInt::from(request.total_samples as u64));
-    write_value(&mut values, "edla_passed_samples", BigInt::from(request.passed_samples as u64));
+    write_value(
+        &mut values,
+        "edla_total_samples",
+        BigInt::from(request.total_samples as u64),
+    );
+    write_value(
+        &mut values,
+        "edla_passed_samples",
+        BigInt::from(request.passed_samples as u64),
+    );
     write_value(
         &mut values,
         "edla_samples_slack",
@@ -2340,11 +2460,7 @@ pub fn edl_campaign_attestation_witness_from_request(
             EDL_GOLDILOCKS_FIELD,
             [&commitments[i], &prev_digest, &zero(), &zero()],
         )?;
-        prev_digest = write_hash_lanes(
-            &mut values,
-            &format!("edla_chain_{i}"),
-            digest,
-        ).as_bigint();
+        prev_digest = write_hash_lanes(&mut values, &format!("edla_chain_{i}"), digest).as_bigint();
     }
 
     // Final commitment
@@ -2458,11 +2574,8 @@ mod tests {
     fn edl_trajectory_roundtrip() {
         run_edl_test_on_large_stack("edl-trajectory-roundtrip", || {
             let request = sample_trajectory_request(TEST_TRAJECTORY_STEPS);
-            let program = build_edl_trajectory_program_with_steps(
-                &request,
-                TEST_TRAJECTORY_STEPS,
-            )
-            .expect("trajectory program");
+            let program = build_edl_trajectory_program_with_steps(&request, TEST_TRAJECTORY_STEPS)
+                .expect("trajectory program");
 
             let audit = audit_program_default(&program, Some(BackendKind::Plonky3));
             if audit.summary.failed != 0 {
@@ -2473,11 +2586,9 @@ mod tests {
                 );
             }
 
-            let witness = edl_trajectory_witness_from_request_with_steps(
-                &request,
-                TEST_TRAJECTORY_STEPS,
-            )
-            .expect("trajectory witness");
+            let witness =
+                edl_trajectory_witness_from_request_with_steps(&request, TEST_TRAJECTORY_STEPS)
+                    .expect("trajectory witness");
 
             let compiled = compile(&program, "plonky3", None).expect("trajectory compile");
             let artifact = prove(&compiled, &witness).expect("trajectory prove");
@@ -2502,8 +2613,7 @@ mod tests {
                 );
             }
 
-            let witness =
-                edl_risk_summary_witness_from_request(&request).expect("risk witness");
+            let witness = edl_risk_summary_witness_from_request(&request).expect("risk witness");
 
             let (compiled, artifact) =
                 with_allow_dev_deterministic_groth16_override(Some(true), || {
@@ -2523,11 +2633,9 @@ mod tests {
         run_edl_test_on_large_stack("edl-campaign-roundtrip", || {
             // Step 1: Build trajectory proofs
             let traj_request = sample_trajectory_request(TEST_TRAJECTORY_STEPS);
-            let traj_program = build_edl_trajectory_program_with_steps(
-                &traj_request,
-                TEST_TRAJECTORY_STEPS,
-            )
-            .expect("trajectory program");
+            let traj_program =
+                build_edl_trajectory_program_with_steps(&traj_request, TEST_TRAJECTORY_STEPS)
+                    .expect("trajectory program");
             let traj_witness = edl_trajectory_witness_from_request_with_steps(
                 &traj_request,
                 TEST_TRAJECTORY_STEPS,
@@ -2541,8 +2649,7 @@ mod tests {
 
             // Step 2: Build risk summary
             let risk_request = sample_risk_summary_request(TEST_TRAJECTORY_COUNT);
-            let risk_program =
-                build_edl_risk_summary_program(&risk_request).expect("risk program");
+            let risk_program = build_edl_risk_summary_program(&risk_request).expect("risk program");
             let risk_witness =
                 edl_risk_summary_witness_from_request(&risk_request).expect("risk witness");
 
@@ -2564,10 +2671,11 @@ mod tests {
                 TEST_TRAJECTORY_COUNT,
                 TEST_TRAJECTORY_COUNT,
             );
-            let campaign_program =
-                build_edl_campaign_attestation_program(&campaign_request).expect("campaign program");
+            let campaign_program = build_edl_campaign_attestation_program(&campaign_request)
+                .expect("campaign program");
 
-            let campaign_audit = audit_program_default(&campaign_program, Some(BackendKind::Plonky3));
+            let campaign_audit =
+                audit_program_default(&campaign_program, Some(BackendKind::Plonky3));
             if campaign_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&campaign_program);
                 panic!(
@@ -2576,9 +2684,8 @@ mod tests {
                 );
             }
 
-            let campaign_witness =
-                edl_campaign_attestation_witness_from_request(&campaign_request)
-                    .expect("campaign witness");
+            let campaign_witness = edl_campaign_attestation_witness_from_request(&campaign_request)
+                .expect("campaign witness");
             let campaign_compiled =
                 compile(&campaign_program, "plonky3", None).expect("campaign compile");
             let campaign_artifact =
@@ -2595,10 +2702,8 @@ mod tests {
             let mut request = sample_trajectory_request(TEST_TRAJECTORY_STEPS);
             // Set an impossibly low Q max to trigger violation
             request.max_dynamic_pressure = "0.000".to_string();
-            let result = edl_trajectory_witness_from_request_with_steps(
-                &request,
-                TEST_TRAJECTORY_STEPS,
-            );
+            let result =
+                edl_trajectory_witness_from_request_with_steps(&request, TEST_TRAJECTORY_STEPS);
             assert!(
                 result.is_err(),
                 "trajectory witness should fail when dynamic pressure envelope is violated"
@@ -2614,8 +2719,8 @@ mod tests {
         run_edl_test_on_large_stack("edl-flagship-500", || {
             let steps = EDL_MC_TRAJECTORY_STEPS; // 500
             let request = sample_trajectory_request(steps);
-            let program = build_edl_trajectory_program_with_steps(&request, steps)
-                .expect("flagship program");
+            let program =
+                build_edl_trajectory_program_with_steps(&request, steps).expect("flagship program");
             let audit = audit_program_default(&program, Some(BackendKind::Plonky3));
             assert_eq!(
                 audit.summary.failed, 0,

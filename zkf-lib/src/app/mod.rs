@@ -22,10 +22,10 @@ pub mod reentry;
 pub mod reentry_ops;
 pub mod satellite;
 pub mod science;
+pub mod sovereign_economic_defense;
 pub mod spec;
 pub mod subsystem;
 pub mod subsystem_support;
-pub mod sovereign_economic_defense;
 pub mod templates;
 pub mod thermochemical;
 #[cfg(not(target_arch = "wasm32"))]

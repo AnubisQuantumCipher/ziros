@@ -10,10 +10,13 @@ use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use zkf_core::{BackendKind, FieldElement, Program, PublicKeyBundle, SignatureBundle, SignatureScheme, WitnessInputs, verify_bundle};
+use zkf_core::{
+    BackendKind, FieldElement, Program, PublicKeyBundle, SignatureBundle, SignatureScheme,
+    WitnessInputs, verify_bundle,
+};
 use zkf_lib::{
-    Expr, ProgramBuilder, SubsystemCircuitManifestV1, SubsystemManifestEnvelopeV1,
-    SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, audit_program_default, compile_and_prove, verify,
+    Expr, ProgramBuilder, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, SubsystemCircuitManifestV1,
+    SubsystemManifestEnvelopeV1, audit_program_default, compile_and_prove, verify,
 };
 
 use crate::util::{read_json, write_json, write_text};
@@ -183,15 +186,14 @@ pub(crate) fn scaffold_subsystem(
     let sample_inputs = sample_witness_inputs();
     let audit = audit_program_default(&program, Some(BackendKind::ArkworksGroth16));
     if audit.summary.failed > 0 {
-        return Err(
-            audit
-                .to_json()
-                .unwrap_or_else(|_| "identity mirror subsystem audit failed".to_string()),
-        );
+        return Err(audit
+            .to_json()
+            .unwrap_or_else(|_| "identity mirror subsystem audit failed".to_string()));
     }
     let embedded = compile_and_prove(&program, &sample_inputs, SUBSYSTEM_BACKEND, None, None)
         .map_err(|error| error.to_string())?;
-    let verified = verify(&embedded.compiled, &embedded.artifact).map_err(|error| error.to_string())?;
+    let verified =
+        verify(&embedded.compiled, &embedded.artifact).map_err(|error| error.to_string())?;
     if !verified {
         return Err("identity mirror subsystem verification failed after proving".to_string());
     }
@@ -244,6 +246,16 @@ pub(crate) fn scaffold_subsystem(
     )?;
     make_executable(&root.join("05_scripts/install.sh"))?;
     write_text(
+        &root.join("05_scripts/run-midnight-proof-server.sh"),
+        &run_midnight_proof_server_script_content(),
+    )?;
+    make_executable(&root.join("05_scripts/run-midnight-proof-server.sh"))?;
+    write_text(
+        &root.join("05_scripts/deploy-midnight.sh"),
+        &deploy_midnight_script_content(),
+    )?;
+    make_executable(&root.join("05_scripts/deploy-midnight.sh"))?;
+    write_text(
         &root.join("19_cli/prove.sh"),
         &prove_script_content(&subsystem_id),
     )?;
@@ -257,6 +269,18 @@ pub(crate) fn scaffold_subsystem(
     write_text(
         &root.join("06_docs/README.md"),
         &subsystem_readme_content(&subsystem_id, style),
+    )?;
+    write_text(
+        &root.join("06_docs/disclosure_policy.md"),
+        &disclosure_policy_content(&subsystem_id),
+    )?;
+    write_text(
+        &root.join("06_docs/night_dust_guide.md"),
+        &night_dust_guide_content(),
+    )?;
+    write_text(
+        &root.join("06_docs/post_quantum_anchor.md"),
+        &post_quantum_anchor_content(&subsystem_id),
     )?;
     write_text(
         &root.join("13_public_bundle/README.md"),
@@ -289,8 +313,16 @@ pub(crate) fn scaffold_subsystem(
         &dapp_package_json_content(&subsystem_id),
     )?;
     write_text(
-        &root.join("18_dapp/src/witness.ts"),
+        &root.join("18_dapp/src/witness.mjs"),
         &dapp_witness_provider_content(),
+    )?;
+    write_text(
+        &root.join("18_dapp/src/proof-server.mjs"),
+        &dapp_proof_server_content(),
+    )?;
+    write_text(
+        &root.join("18_dapp/src/midnight-wallet.mjs"),
+        &dapp_wallet_helper_content(),
     )?;
     write_text(
         &root.join("18_dapp/src/dashboard.tsx"),
@@ -313,7 +345,11 @@ pub(crate) fn handle_verify_completeness(root: PathBuf, json: bool) -> Result<()
     } else {
         println!(
             "subsystem completeness: {} ({})",
-            if report.overall_passed { "PASS" } else { "FAIL" },
+            if report.overall_passed {
+                "PASS"
+            } else {
+                "FAIL"
+            },
             report.root
         );
         for check in &report.checks {
@@ -349,7 +385,11 @@ pub(crate) fn handle_verify_release_pin(
     } else {
         println!(
             "release pin: {} ({})",
-            if report.overall_passed { "PASS" } else { "FAIL" },
+            if report.overall_passed {
+                "PASS"
+            } else {
+                "FAIL"
+            },
             binary.display()
         );
         for check in &report.checks {
@@ -465,7 +505,8 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
 
     let cargo_test_log = root.join("04_tests/cargo_test.txt");
     let cargo_test_text = fs::read_to_string(&cargo_test_log).unwrap_or_default();
-    let tests_captured = cargo_test_text.contains("test result: ok") || cargo_test_text.contains("passed");
+    let tests_captured =
+        cargo_test_text.contains("test result: ok") || cargo_test_text.contains("passed");
     checks.push(CompletenessCheckV1 {
         name: "tests:cargo".to_string(),
         passed: tests_captured,
@@ -493,7 +534,8 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
     });
 
     let credential_path = root.join("11_credentials/subsystem_credential.json");
-    let credential_public_keys_path = root.join("12_signatures/subsystem_credential_public_keys.json");
+    let credential_public_keys_path =
+        root.join("12_signatures/subsystem_credential_public_keys.json");
     let credential_signature_path = root.join("12_signatures/subsystem_credential_signature.json");
     let credential_signed = if credential_path.is_file()
         && credential_public_keys_path.is_file()
@@ -503,7 +545,12 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
         let public_keys: PublicKeyBundle = read_json(&credential_public_keys_path)?;
         let signature_bundle: SignatureBundle = read_json(&credential_signature_path)?;
         let bytes = serde_json::to_vec(&credential).map_err(|error| error.to_string())?;
-        verify_bundle(&public_keys, &bytes, &signature_bundle, SUBSYSTEM_CREDENTIAL_CONTEXT)
+        verify_bundle(
+            &public_keys,
+            &bytes,
+            &signature_bundle,
+            SUBSYSTEM_CREDENTIAL_CONTEXT,
+        )
     } else {
         false
     };
@@ -530,14 +577,18 @@ fn verify_release_pin_report(
     binary_path: &Path,
 ) -> Result<SubsystemCompletenessReportV1, String> {
     let signed: SignedSubsystemReleasePinV1 = read_json(pin_path)?;
-    let bytes = fs::read(binary_path).map_err(|error| format!("{}: {error}", binary_path.display()))?;
+    let bytes =
+        fs::read(binary_path).map_err(|error| format!("{}: {error}", binary_path.display()))?;
     let computed_sha = sha256_hex(&bytes);
     let signed_bytes = serde_json::to_vec(&signed.pin).map_err(|error| error.to_string())?;
     let checks = vec![
         CompletenessCheckV1 {
             name: "release-pin:checksum".to_string(),
             passed: computed_sha == signed.pin.binary_sha256,
-            detail: format!("expected={} actual={computed_sha}", signed.pin.binary_sha256),
+            detail: format!(
+                "expected={} actual={computed_sha}",
+                signed.pin.binary_sha256
+            ),
         },
         CompletenessCheckV1 {
             name: "release-pin:signature".to_string(),
@@ -590,19 +641,37 @@ fn subsystem_manifest(subsystem_id: &str) -> SubsystemManifestEnvelopeV1 {
 }
 
 fn build_identity_mirror_program(subsystem_id: &str) -> Result<Program, String> {
-    let mut builder = ProgramBuilder::new(format!("{subsystem_id}_identity_mirror"), zkf_core::FieldId::Bn254);
-    builder.subsystem_id(subsystem_id).map_err(|error| error.to_string())?;
-    builder.metadata_entry("application", subsystem_id).map_err(|error| error.to_string())?;
-    builder.metadata_entry("publication_target", SUBSYSTEM_PUBLICATION_TARGET)
+    let mut builder = ProgramBuilder::new(
+        format!("{subsystem_id}_identity_mirror"),
+        zkf_core::FieldId::Bn254,
+    );
+    builder
+        .subsystem_id(subsystem_id)
         .map_err(|error| error.to_string())?;
-    builder.metadata_entry("subsystem_backend_policy", SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED)
+    builder
+        .metadata_entry("application", subsystem_id)
         .map_err(|error| error.to_string())?;
-    builder.metadata_entry("subsystem_backend", SUBSYSTEM_BACKEND)
+    builder
+        .metadata_entry("publication_target", SUBSYSTEM_PUBLICATION_TARGET)
         .map_err(|error| error.to_string())?;
-    builder.metadata_entry("circuit_id", SUBSYSTEM_CIRCUIT_ID)
+    builder
+        .metadata_entry(
+            "subsystem_backend_policy",
+            SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED,
+        )
         .map_err(|error| error.to_string())?;
-    builder.private_input("input_value").map_err(|error| error.to_string())?;
-    builder.public_output("mirrored_value").map_err(|error| error.to_string())?;
+    builder
+        .metadata_entry("subsystem_backend", SUBSYSTEM_BACKEND)
+        .map_err(|error| error.to_string())?;
+    builder
+        .metadata_entry("circuit_id", SUBSYSTEM_CIRCUIT_ID)
+        .map_err(|error| error.to_string())?;
+    builder
+        .private_input("input_value")
+        .map_err(|error| error.to_string())?;
+    builder
+        .public_output("mirrored_value")
+        .map_err(|error| error.to_string())?;
     builder
         .bind_labeled(
             "mirrored_value",
@@ -672,7 +741,8 @@ fn bundle_current_binary(
         generated_at: Utc::now().to_rfc3339(),
     };
     let signed_bytes = serde_json::to_vec(&pin).map_err(|error| error.to_string())?;
-    let (public_keys, signature_bundle) = sign_payload(&signed_bytes, SUBSYSTEM_RELEASE_PIN_CONTEXT)?;
+    let (public_keys, signature_bundle) =
+        sign_payload(&signed_bytes, SUBSYSTEM_RELEASE_PIN_CONTEXT)?;
     Ok(SignedSubsystemReleasePinV1 {
         pin,
         public_keys,
@@ -689,9 +759,11 @@ fn resolve_release_binary() -> Result<PathBuf, String> {
     }
 
     let current_exe = std::env::current_exe().map_err(|error| error.to_string())?;
-    let deps_dir = current_exe
-        .parent()
-        .and_then(|path| path.file_name().and_then(|name| name.to_str()).map(|name| (path, name)));
+    let deps_dir = current_exe.parent().and_then(|path| {
+        path.file_name()
+            .and_then(|name| name.to_str())
+            .map(|name| (path, name))
+    });
     if let Some((deps_path, "deps")) = deps_dir
         && let Some(debug_dir) = deps_path.parent()
     {
@@ -744,7 +816,12 @@ fn run_source_cargo_test(source_root: &Path) -> Result<String, String> {
         .arg(source_root.join("Cargo.toml"))
         .arg("--quiet")
         .output()
-        .map_err(|error| format!("failed to run cargo test for {}: {error}", source_root.display()))?;
+        .map_err(|error| {
+            format!(
+                "failed to run cargo test for {}: {error}",
+                source_root.display()
+            )
+        })?;
     let mut combined = String::new();
     combined.push_str(&String::from_utf8_lossy(&output.stdout));
     if !output.stderr.is_empty() {
@@ -953,12 +1030,20 @@ The shipped subsystem interface is still the black-box `zkf` binary under `20_re
 - `02_manifest/subsystem_manifest.json`
 - `03_inputs/sample_input.json`
 - `05_scripts/install.sh`
+- `05_scripts/run-midnight-proof-server.sh`
+- `05_scripts/deploy-midnight.sh`
+- `06_docs/disclosure_policy.md`
+- `06_docs/night_dust_guide.md`
+- `06_docs/post_quantum_anchor.md`
 - `07_compiled/program.json`
 - `07_compiled/compiled.json`
 - `08_proofs/proof.json`
 - `09_verification/verification.json`
 - `10_audit/audit.json`
 - `17_report/report.md`
+- `18_dapp/src/proof-server.mjs`
+- `18_dapp/src/midnight-wallet.mjs`
+- `18_dapp/src/witness.mjs`
 - `19_cli/prove.sh`
 - `19_cli/verify.sh`
 "#,
@@ -993,6 +1078,8 @@ The authoring circuit is built through `ProgramBuilder`, tagged with the subsyst
 
 This report also records the black-box contract. The end-user-facing scripts only call the pinned `zkf` binary, only target `{backend}`, and only use the shipped program or compiled artifacts. They do not forward arbitrary backend, audit, or engine mutation flags. Witness material remains local-only by policy. Opt-in Poseidon traces, if later requested during debugging, belong in the cache tree rather than the persistent subsystem bundle.
 
+The bundle also carries Midnight-oriented operator aids around that proof surface: a local proof-server launcher, wallet/provider helper modules, NIGHT/DUST notes, a disclosure policy, and an explicit post-quantum anchor boundary note. Those files are deployment scaffolding around the subsystem; they do not change the fact that the shipped sample circuit itself is the identity-mirror Groth16 example.
+
 ## Metrics
 
 - Program name: `{program_name}`
@@ -1019,8 +1106,11 @@ fn dapp_package_json_content(subsystem_id: &str) -> String {
   "name": "{subsystem_id}-dapp",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {{
-    "start": "node ./src/witness.ts"
+    "witness": "node ./src/witness.mjs",
+    "wallet-config": "node ./src/midnight-wallet.mjs",
+    "proof-server": "bash ../05_scripts/run-midnight-proof-server.sh"
   }}
 }}
 "#
@@ -1028,11 +1118,73 @@ fn dapp_package_json_content(subsystem_id: &str) -> String {
 }
 
 fn dapp_witness_provider_content() -> String {
-    r#"const sampleWitness = {
+    r#"import { localProofServer } from "./proof-server.mjs";
+
+const sampleWitness = {
   input_value: 21
 };
 
-console.log(JSON.stringify(sampleWitness, null, 2));
+const payload = {
+  witness: sampleWitness,
+  proving: localProofServer()
+};
+
+console.log(JSON.stringify(payload, null, 2));
+"#
+    .to_string()
+}
+
+fn dapp_proof_server_content() -> String {
+    r#"export function localProofServer(port = Number(process.env.MIDNIGHT_PROOF_SERVER_PORT ?? 6300)) {
+  const baseUrl = `http://127.0.0.1:${port}`;
+  return {
+    baseUrl,
+    prove: `${baseUrl}/prove`,
+    check: `${baseUrl}/check`,
+    health: `${baseUrl}/health`
+  };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log(JSON.stringify(localProofServer(), null, 2));
+}
+"#
+    .to_string()
+}
+
+fn dapp_wallet_helper_content() -> String {
+    r#"import { localProofServer } from "./proof-server.mjs";
+
+export async function buildMidnightWalletConfig(wallet) {
+  const provingProvider = typeof wallet?.getProvingProvider === "function"
+    ? await wallet.getProvingProvider()
+    : null;
+  const configuration = typeof wallet?.getConfiguration === "function"
+    ? await wallet.getConfiguration()
+    : null;
+
+  return {
+    preferredMode: provingProvider ? "wallet-proving-provider" : "local-proof-server",
+    provingProvider,
+    localProofServer: localProofServer(),
+    deprecatedProverServerUri: configuration?.proverServerUri ?? null,
+    configuration
+  };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log(
+    JSON.stringify(
+      {
+        preferredMode: "wallet-proving-provider",
+        localProofServer: localProofServer(),
+        note: "Pass your Lace-compatible wallet object into buildMidnightWalletConfig() at runtime."
+      },
+      null,
+      2
+    )
+  );
+}
 "#
     .to_string()
 }
@@ -1046,6 +1198,9 @@ fn dapp_dashboard_content(subsystem_id: &str) -> String {
       <p>Fixed backend: {backend}</p>
       <p>Witness source: 03_inputs/sample_input.json</p>
       <p>Black-box binary: 20_release/bin/zkf</p>
+      <p>Local Midnight proof server: http://127.0.0.1:6300</p>
+      <p>Wallet proving preference: getProvingProvider() first, explicit local proof-server URL second.</p>
+      <p>Post-quantum anchor notes: 06_docs/post_quantum_anchor.md</p>
     </main>
   );
 }}
@@ -1084,6 +1239,77 @@ fn compact_contract_content(subsystem_id: &str) -> String {
     )
 }
 
+fn disclosure_policy_content(subsystem_id: &str) -> String {
+    format!(
+        r#"# Disclosure Policy
+
+This subsystem is scaffolded for Midnight-style selective disclosure, but the disclosure boundary is still author-controlled and must be reviewed before deployment.
+
+## Default policy
+
+- Public bundle: manifest, compiled artifact, proof artifact, verification receipt, audit report, subsystem report, and Compact contract source.
+- Private bundle: witness material, cache-only traces, credential secrets, and any operator-local telemetry that could reveal confidential source data.
+- Wallet-facing DApp surface: prefer a wallet proving provider (`getProvingProvider()`) when present; otherwise point the DApp to the local ZirOS proof server at `http://127.0.0.1:6300`.
+
+## Review checkpoints
+
+1. Verify that every disclosed field is required by the relying party.
+2. Keep raw witness inputs out of `13_public_bundle/` and the persistent iCloud tree.
+3. Treat ML-DSA proof-origin signatures and post-quantum anchor metadata as operator evidence, not as a replacement for Midnight's own authorization rules.
+
+Subsystem `{subsystem_id}` ships these rules as working defaults, not as a blanket regulatory statement.
+"#
+    )
+}
+
+fn night_dust_guide_content() -> String {
+    r#"# NIGHT And DUST Guide
+
+Midnight transaction costs are paid in DUST generated from NIGHT holdings. ZirOS off-chain proving does not consume NIGHT or DUST by itself; the token spend happens only when the resulting transaction is balanced and submitted to Midnight.
+
+## Operator order of operations
+
+1. Start the local proof server with `bash 05_scripts/run-midnight-proof-server.sh` if your wallet does not provide a proving provider directly.
+2. Ask the wallet for `getProvingProvider()` first.
+3. Use wallet configuration and balance helpers such as `getDustBalance()`, `getUnshieldedBalances()`, and `balanceUnsealedTransaction()` before submission.
+4. Submit only the finalized transaction; do not treat proof generation alone as a network-side deployment.
+
+The helpers under `18_dapp/src/` are written to prefer the wallet-provided proving path and fall back to the local proof server only when needed.
+"#
+    .to_string()
+}
+
+fn post_quantum_anchor_content(subsystem_id: &str) -> String {
+    format!(
+        r#"# Post-Quantum Anchor Boundary
+
+ZirOS can wrap Midnight-facing workflows in a post-quantum envelope, but it does not make Midnight's own consensus or classical proving cryptography post-quantum.
+
+## Honest boundary
+
+- Post-quantum proof lane: Plonky3 STARK proofs generated and verified off-chain.
+- Post-quantum signature lane: ML-DSA-87 proof-origin signatures over operator artifacts.
+- Midnight role: public anchor for a commitment and timestamp, not the post-quantum verifier itself.
+
+## What survives
+
+If a subsystem publishes a hash commitment to Midnight and retains the STARK proof plus ML-DSA signature off-chain, an independent verifier can still:
+
+1. Verify the STARK proof locally.
+2. Verify the ML-DSA-87 signature locally.
+3. Compare the locally recomputed commitment to the value anchored on Midnight.
+
+## What does not follow from that
+
+- This does not upgrade Midnight's base cryptography to post-quantum security.
+- This does not make unauthorized Midnight state changes impossible if Midnight's own classical authorization layer fails.
+- This does not apply to the default identity-mirror sample in this scaffold, which ships a BN254 Groth16 example circuit. Move the proof lane to `plonky3` before advertising post-quantum proof guarantees.
+
+Use this document as the trust-boundary note for subsystem `{subsystem_id}` when you graduate the sample into a Midnight-anchored Plonky3 deployment.
+"#
+    )
+}
+
 fn install_script_content(subsystem_id: &str) -> String {
     format!(
         r#"#!/usr/bin/env bash
@@ -1111,6 +1337,53 @@ chmod +x "$TARGET"
 printf 'installed pinned zkf for {subsystem_id} -> %s\n' "$TARGET"
 "#
     )
+}
+
+fn run_midnight_proof_server_script_content() -> String {
+    r#"#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BIN="${ZKF_SUBSYSTEM_ZKF_BIN:-$ROOT/20_release/bin/zkf}"
+PORT="${MIDNIGHT_PROOF_SERVER_PORT:-6300}"
+
+exec "$BIN" midnight proof-server serve --port "$PORT" --json
+"#
+    .to_string()
+}
+
+fn deploy_midnight_script_content() -> String {
+    r#"#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONTRACT="$ROOT/16_compact/Subsystem.compact"
+PORT="${MIDNIGHT_PROOF_SERVER_PORT:-6300}"
+PROOF_SERVER_URL="${MIDNIGHT_PROOF_SERVER_URL:-http://127.0.0.1:$PORT}"
+
+if [[ ! -f "$CONTRACT" ]]; then
+  echo "missing Compact contract source: $CONTRACT" >&2
+  exit 66
+fi
+
+if ! command -v compactc >/dev/null 2>&1; then
+  echo "compactc is not installed. Install the Midnight Compact compiler before deployment." >&2
+  exit 127
+fi
+
+cat <<EOF
+Midnight deployment preflight
+  contract: $CONTRACT
+  proof-server-url: $PROOF_SERVER_URL
+  wallet-preference: getProvingProvider() first, local proof server second
+
+Next:
+  1. Start the local prover with bash 05_scripts/run-midnight-proof-server.sh
+  2. Compile the Compact contract with your installed compactc toolchain
+  3. Balance and submit the resulting transaction through your Midnight wallet/DApp stack
+EOF
+"#
+    .to_string()
 }
 
 fn prove_script_content(subsystem_id: &str) -> String {
@@ -1244,15 +1517,32 @@ mod tests {
         let generated = scaffold_subsystem("Demo Subsystem", "full", Some(out.clone()))
             .expect("subsystem scaffold");
         assert_eq!(generated, out);
-        assert!(generated.join("02_manifest/subsystem_manifest.json").is_file());
+        assert!(
+            generated
+                .join("02_manifest/subsystem_manifest.json")
+                .is_file()
+        );
         assert!(generated.join("05_scripts/install.sh").is_file());
+        assert!(
+            generated
+                .join("05_scripts/run-midnight-proof-server.sh")
+                .is_file()
+        );
+        assert!(generated.join("05_scripts/deploy-midnight.sh").is_file());
+        assert!(generated.join("06_docs/post_quantum_anchor.md").is_file());
         assert!(generated.join("07_compiled/program.json").is_file());
         assert!(generated.join("08_proofs/proof.json").is_file());
         assert!(generated.join("10_audit/audit.json").is_file());
         assert!(generated.join("01_source/tests/roundtrip.rs").is_file());
+        assert!(generated.join("18_dapp/src/proof-server.mjs").is_file());
+        assert!(generated.join("18_dapp/src/midnight-wallet.mjs").is_file());
+        assert!(generated.join("18_dapp/src/witness.mjs").is_file());
         let manifest: SubsystemManifestEnvelopeV1 =
             read_json(&generated.join("02_manifest/subsystem_manifest.json")).expect("manifest");
-        assert_eq!(manifest.backend_policy, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED);
+        assert_eq!(
+            manifest.backend_policy,
+            SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED
+        );
         assert_eq!(
             manifest
                 .circuits

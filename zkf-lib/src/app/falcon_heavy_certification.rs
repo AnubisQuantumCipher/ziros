@@ -4,7 +4,10 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zkf_backends::blackbox_gadgets::poseidon2_permutation_native;
-use zkf_core::{Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult, generate_witness};
+use zkf_core::{
+    Expr, FieldElement, FieldId, Program, Witness, WitnessInputs, ZkfError, ZkfResult,
+    generate_witness,
+};
 
 use super::builder::ProgramBuilder;
 use super::subsystem_support;
@@ -353,8 +356,14 @@ fn write_nonnegative_bound_support(
     let signal_name = signal_name.into();
     values.insert(signal_name, field_ref(value));
     let slack = bound - value;
-    values.insert(format!("{prefix}_nonnegative_bound_slack"), field_ref(&slack));
-    values.insert(format!("{prefix}_nonnegative_bound_anchor"), field_ref(&(&slack * &slack)));
+    values.insert(
+        format!("{prefix}_nonnegative_bound_slack"),
+        field_ref(&slack),
+    );
+    values.insert(
+        format!("{prefix}_nonnegative_bound_anchor"),
+        field_ref(&(&slack * &slack)),
+    );
     Ok(())
 }
 
@@ -371,7 +380,11 @@ fn write_exact_division_support(
     write_value(values, quotient_name, quotient.clone());
     write_value(values, remainder_name, remainder.clone());
     write_value(values, slack_name, slack.clone());
-    write_value(values, format!("{prefix}_exact_division_slack_anchor"), slack * slack);
+    write_value(
+        values,
+        format!("{prefix}_exact_division_slack_anchor"),
+        slack * slack,
+    );
 }
 
 fn write_floor_sqrt_support(
@@ -456,10 +469,7 @@ fn sum_exprs(names: &[String]) -> Expr {
     add_expr(names.iter().map(|name| signal_expr(name)).collect())
 }
 
-fn materialize_seeded_witness(
-    program: &Program,
-    values: WitnessInputs,
-) -> ZkfResult<Witness> {
+fn materialize_seeded_witness(program: &Program, values: WitnessInputs) -> ZkfResult<Witness> {
     generate_witness(program, &values)
 }
 
@@ -486,10 +496,7 @@ pub fn build_engine_health_certification_program(
     let amount_bits = bits_for_bound(&fh_goldilocks_amount_bound());
     let scale = fh_goldilocks_scale();
 
-    let mut builder = ProgramBuilder::new(
-        "falcon_heavy_engine_health_27",
-        FH_GOLDILOCKS_FIELD,
-    );
+    let mut builder = ProgramBuilder::new("falcon_heavy_engine_health_27", FH_GOLDILOCKS_FIELD);
     builder.metadata_entry("application", "falcon-heavy-certification")?;
     builder.metadata_entry("circuit", "engine-health")?;
     builder.metadata_entry("engine_count", FALCON_HEAVY_ENGINE_COUNT.to_string())?;
@@ -545,7 +552,10 @@ pub fn build_engine_health_certification_program(
     for e in 0..FALCON_HEAVY_ENGINE_COUNT {
         let flight_count_name = format!("ehc_engine_{e}_flight_count");
         builder.constrain_equal(
-            mul_expr(signal_expr(&flight_count_name), signal_expr("__ehc_anchor_one")),
+            mul_expr(
+                signal_expr(&flight_count_name),
+                signal_expr("__ehc_anchor_one"),
+            ),
             signal_expr(&flight_count_name),
         )?;
         for p in 0..FALCON_HEAVY_PARAMS_PER_ENGINE {
@@ -563,7 +573,10 @@ pub fn build_engine_health_certification_program(
         }
     }
     builder.constrain_equal(
-        mul_expr(signal_expr("ehc_max_rms_deviation"), signal_expr("__ehc_anchor_one")),
+        mul_expr(
+            signal_expr("ehc_max_rms_deviation"),
+            signal_expr("__ehc_anchor_one"),
+        ),
         signal_expr("ehc_max_rms_deviation"),
     )?;
 
@@ -735,13 +748,26 @@ pub fn engine_health_certification_witness_from_request(
         .enumerate()
         .map(|(i, v)| parse_goldilocks_amount(v, &format!("band_high_{}", PARAM_NAMES[i])))
         .collect::<ZkfResult<Vec<_>>>()?;
-    let max_rms_deviation = parse_goldilocks_amount(&request.max_rms_deviation, "max_rms_deviation")?;
+    let max_rms_deviation =
+        parse_goldilocks_amount(&request.max_rms_deviation, "max_rms_deviation")?;
 
     for p in 0..FALCON_HEAVY_PARAMS_PER_ENGINE {
-        write_value(&mut values, format!("ehc_band_low_{}", PARAM_NAMES[p]), bands_low[p].clone());
-        write_value(&mut values, format!("ehc_band_high_{}", PARAM_NAMES[p]), bands_high[p].clone());
+        write_value(
+            &mut values,
+            format!("ehc_band_low_{}", PARAM_NAMES[p]),
+            bands_low[p].clone(),
+        );
+        write_value(
+            &mut values,
+            format!("ehc_band_high_{}", PARAM_NAMES[p]),
+            bands_high[p].clone(),
+        );
     }
-    write_value(&mut values, "ehc_max_rms_deviation", max_rms_deviation.clone());
+    write_value(
+        &mut values,
+        "ehc_max_rms_deviation",
+        max_rms_deviation.clone(),
+    );
     write_value(&mut values, "ehc_chain_seed", zero());
 
     // Parse all engine parameters
@@ -788,10 +814,8 @@ pub fn engine_health_certification_witness_from_request(
             }
         }
         // Mixture ratio check
-        let ox_flow = parse_goldilocks_amount(
-            &request.engine_params[e][3],
-            &format!("engine_{e}_ox_flow"),
-        )?;
+        let ox_flow =
+            parse_goldilocks_amount(&request.engine_params[e][3], &format!("engine_{e}_ox_flow"))?;
         let fuel_flow = parse_goldilocks_amount(
             &request.engine_params[e][2],
             &format!("engine_{e}_fuel_flow"),
@@ -854,8 +878,7 @@ pub fn engine_health_certification_witness_from_request(
 
     let mean_square_deviation = &sum_squared_deviations / &engine_count;
     let mean_square_deviation_remainder = &sum_squared_deviations % &engine_count;
-    let mean_square_deviation_slack =
-        &engine_count - &mean_square_deviation_remainder - one();
+    let mean_square_deviation_slack = &engine_count - &mean_square_deviation_remainder - one();
     write_exact_division_support(
         &mut values,
         "ehc_mean_square_deviation",
@@ -900,23 +923,14 @@ pub fn engine_health_certification_witness_from_request(
             FH_GOLDILOCKS_FIELD,
             [
                 &all_thrusts[e],
-                &parse_goldilocks_amount(
-                    &request.engine_params[e][0],
-                    "chamber_pressure",
-                )?,
-                &parse_goldilocks_amount(
-                    &request.engine_params[e][4],
-                    "mixture_ratio",
-                )?,
+                &parse_goldilocks_amount(&request.engine_params[e][0], "chamber_pressure")?,
+                &parse_goldilocks_amount(&request.engine_params[e][4], "mixture_ratio")?,
                 &previous_digest,
             ],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("ehc_engine_commitment_{e}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("ehc_engine_commitment_{e}"), digest)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
@@ -938,11 +952,10 @@ pub fn engine_health_certification_witness_from_request(
 // Circuit 2 — Ascent Trajectory Certification (Goldilocks)
 // ---------------------------------------------------------------------------
 
-pub fn build_ascent_trajectory_program(
-    request: &AscentTrajectoryRequestV1,
-) -> ZkfResult<Program> {
+pub fn build_ascent_trajectory_program(request: &AscentTrajectoryRequestV1) -> ZkfResult<Program> {
     let steps = request.altitude.len();
-    if steps == 0 || steps != request.velocity.len()
+    if steps == 0
+        || steps != request.velocity.len()
         || steps != request.acceleration.len()
         || steps != request.dynamic_pressure.len()
         || steps != request.throttle_pct.len()
@@ -967,8 +980,12 @@ pub fn build_ascent_trajectory_program(
 
     // Structural limits
     for input in [
-        "at_max_q", "at_max_axial_load", "at_max_lateral_load",
-        "at_meco_altitude_min", "at_meco_velocity_min", "at_gravity",
+        "at_max_q",
+        "at_max_axial_load",
+        "at_max_lateral_load",
+        "at_meco_altitude_min",
+        "at_meco_velocity_min",
+        "at_gravity",
     ] {
         builder.private_input(input)?;
         builder.constrain_range(input, amount_bits)?;
@@ -976,7 +993,14 @@ pub fn build_ascent_trajectory_program(
 
     // Per-step inputs
     for step in 0..steps {
-        for name in ["altitude", "velocity", "acceleration", "dynamic_pressure", "throttle_pct", "mass"] {
+        for name in [
+            "altitude",
+            "velocity",
+            "acceleration",
+            "dynamic_pressure",
+            "throttle_pct",
+            "mass",
+        ] {
             let sig = format!("at_step_{step}_{name}");
             builder.private_input(&sig)?;
             builder.constrain_range(&sig, amount_bits)?;
@@ -989,7 +1013,12 @@ pub fn build_ascent_trajectory_program(
 
     // Nonlinear anchoring for signals that would otherwise be linear-only
     builder.constant_signal("__at_anchor_one", FieldElement::ONE)?;
-    for input in ["at_max_axial_load", "at_max_lateral_load", "at_meco_altitude_min", "at_meco_velocity_min"] {
+    for input in [
+        "at_max_axial_load",
+        "at_max_lateral_load",
+        "at_meco_altitude_min",
+        "at_meco_velocity_min",
+    ] {
         builder.constrain_equal(
             mul_expr(signal_expr(input), signal_expr("__at_anchor_one")),
             signal_expr(input),
@@ -1129,7 +1158,9 @@ pub fn ascent_trajectory_witness_from_request(
     let meco_vel_min = parse_goldilocks_amount(&request.meco_velocity_min, "meco_velocity_min")?;
     let gravity = parse_goldilocks_amount(&request.gravity, "gravity")?;
     if gravity == zero() {
-        return Err(ZkfError::InvalidArtifact("gravity must be nonzero".to_string()));
+        return Err(ZkfError::InvalidArtifact(
+            "gravity must be nonzero".to_string(),
+        ));
     }
 
     write_value(&mut values, "at_max_q", max_q.clone());
@@ -1145,9 +1176,11 @@ pub fn ascent_trajectory_witness_from_request(
     for step in 0..steps {
         let alt = parse_goldilocks_amount(&request.altitude[step], &format!("altitude_{step}"))?;
         let vel = parse_goldilocks_amount(&request.velocity[step], &format!("velocity_{step}"))?;
-        let acc = parse_goldilocks_amount(&request.acceleration[step], &format!("acceleration_{step}"))?;
+        let acc =
+            parse_goldilocks_amount(&request.acceleration[step], &format!("acceleration_{step}"))?;
         let q = parse_goldilocks_amount(&request.dynamic_pressure[step], &format!("q_{step}"))?;
-        let throttle = parse_goldilocks_amount(&request.throttle_pct[step], &format!("throttle_{step}"))?;
+        let throttle =
+            parse_goldilocks_amount(&request.throttle_pct[step], &format!("throttle_{step}"))?;
         let mass = parse_goldilocks_amount(&request.mass[step], &format!("mass_{step}"))?;
 
         if q > max_q {
@@ -1158,16 +1191,24 @@ pub fn ascent_trajectory_witness_from_request(
 
         write_value(&mut values, format!("at_step_{step}_altitude"), alt.clone());
         write_value(&mut values, format!("at_step_{step}_velocity"), vel.clone());
-        write_value(&mut values, format!("at_step_{step}_acceleration"), acc.clone());
-        write_value(&mut values, format!("at_step_{step}_dynamic_pressure"), q.clone());
-        write_value(&mut values, format!("at_step_{step}_throttle_pct"), throttle.clone());
-        write_value(&mut values, format!("at_step_{step}_mass"), mass.clone());
-
         write_value(
             &mut values,
-            format!("at_step_{step}_q_slack"),
-            &max_q - &q,
+            format!("at_step_{step}_acceleration"),
+            acc.clone(),
         );
+        write_value(
+            &mut values,
+            format!("at_step_{step}_dynamic_pressure"),
+            q.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("at_step_{step}_throttle_pct"),
+            throttle.clone(),
+        );
+        write_value(&mut values, format!("at_step_{step}_mass"), mass.clone());
+
+        write_value(&mut values, format!("at_step_{step}_q_slack"), &max_q - &q);
         write_value(
             &mut values,
             format!("at_step_{step}_throttle_slack"),
@@ -1176,7 +1217,11 @@ pub fn ascent_trajectory_witness_from_request(
 
         if step > 0 {
             let deviation: BigInt = &alt - &altitudes[step - 1];
-            write_value(&mut values, format!("at_step_{step}_deviation"), deviation.clone());
+            write_value(
+                &mut values,
+                format!("at_step_{step}_deviation"),
+                deviation.clone(),
+            );
             write_signed_bound_support(
                 &mut values,
                 &deviation,
@@ -1244,19 +1289,11 @@ pub fn ascent_trajectory_witness_from_request(
         let q = parse_goldilocks_amount(&request.dynamic_pressure[step], "q")?;
         let digest = poseidon_permutation4(
             FH_GOLDILOCKS_FIELD,
-            [
-                &altitudes[step],
-                &velocities[step],
-                &q,
-                &previous_digest,
-            ],
+            [&altitudes[step], &velocities[step], &q, &previous_digest],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("at_step_commitment_{step}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("at_step_commitment_{step}"), digest)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
@@ -1289,10 +1326,7 @@ pub fn build_booster_recovery_program(
     let amount_bits = bits_for_bound(&fh_goldilocks_amount_bound());
     let scale = fh_goldilocks_scale();
 
-    let mut builder = ProgramBuilder::new(
-        "falcon_heavy_booster_recovery_3",
-        FH_GOLDILOCKS_FIELD,
-    );
+    let mut builder = ProgramBuilder::new("falcon_heavy_booster_recovery_3", FH_GOLDILOCKS_FIELD);
     builder.metadata_entry("application", "falcon-heavy-certification")?;
     builder.metadata_entry("circuit", "booster-recovery")?;
     builder.metadata_entry("core_count", FALCON_HEAVY_CORE_COUNT.to_string())?;
@@ -1669,20 +1703,39 @@ pub fn booster_recovery_witness_from_request(
     }
     let mut values = BTreeMap::new();
 
-    let max_landing_vel = parse_goldilocks_amount(&request.max_landing_velocity, "max_landing_velocity")?;
-    let max_landing_err = parse_goldilocks_amount(&request.max_landing_position_error, "max_landing_position_error")?;
+    let max_landing_vel =
+        parse_goldilocks_amount(&request.max_landing_velocity, "max_landing_velocity")?;
+    let max_landing_err = parse_goldilocks_amount(
+        &request.max_landing_position_error,
+        "max_landing_position_error",
+    )?;
 
-    write_value(&mut values, "br_max_landing_velocity", max_landing_vel.clone());
-    write_value(&mut values, "br_max_landing_position_error", max_landing_err.clone());
+    write_value(
+        &mut values,
+        "br_max_landing_velocity",
+        max_landing_vel.clone(),
+    );
+    write_value(
+        &mut values,
+        "br_max_landing_position_error",
+        max_landing_err.clone(),
+    );
     write_value(&mut values, "br_chain_seed", zero());
 
     for core in 0..FALCON_HEAVY_CORE_COUNT {
         let c = &request.cores[core];
-        let sep_alt = parse_goldilocks_amount(&c.separation_altitude, &format!("core_{core}_sep_alt"))?;
-        let sep_vel = parse_goldilocks_amount(&c.separation_velocity, &format!("core_{core}_sep_vel"))?;
-        let propellant = parse_goldilocks_amount(&c.propellant_reserve, &format!("core_{core}_propellant"))?;
-        let landing_alt_error = parse_goldilocks_amount(&c.landing_altitude_error, &format!("core_{core}_landing_alt_error"))?;
-        let landing_vel = parse_goldilocks_amount(&c.landing_velocity, &format!("core_{core}_landing_vel"))?;
+        let sep_alt =
+            parse_goldilocks_amount(&c.separation_altitude, &format!("core_{core}_sep_alt"))?;
+        let sep_vel =
+            parse_goldilocks_amount(&c.separation_velocity, &format!("core_{core}_sep_vel"))?;
+        let propellant =
+            parse_goldilocks_amount(&c.propellant_reserve, &format!("core_{core}_propellant"))?;
+        let landing_alt_error = parse_goldilocks_amount(
+            &c.landing_altitude_error,
+            &format!("core_{core}_landing_alt_error"),
+        )?;
+        let landing_vel =
+            parse_goldilocks_amount(&c.landing_velocity, &format!("core_{core}_landing_vel"))?;
 
         if landing_vel > max_landing_vel {
             return Err(ZkfError::InvalidArtifact(format!(
@@ -1690,13 +1743,41 @@ pub fn booster_recovery_witness_from_request(
             )));
         }
 
-        write_value(&mut values, format!("br_core_{core}_sep_altitude"), sep_alt.clone());
-        write_value(&mut values, format!("br_core_{core}_sep_velocity"), sep_vel.clone());
-        write_value(&mut values, format!("br_core_{core}_propellant"), propellant.clone());
-        write_value(&mut values, format!("br_core_{core}_landing_alt_error"), landing_alt_error.clone());
-        write_value(&mut values, format!("br_core_{core}_landing_velocity"), landing_vel.clone());
-        write_value(&mut values, format!("br_core_{core}_tea_teb_ignitions"), BigInt::from(c.tea_teb_ignitions));
-        write_value(&mut values, format!("br_core_{core}_max_tea_teb"), BigInt::from(c.max_tea_teb));
+        write_value(
+            &mut values,
+            format!("br_core_{core}_sep_altitude"),
+            sep_alt.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_sep_velocity"),
+            sep_vel.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_propellant"),
+            propellant.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_landing_alt_error"),
+            landing_alt_error.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_landing_velocity"),
+            landing_vel.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_tea_teb_ignitions"),
+            BigInt::from(c.tea_teb_ignitions),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core}_max_tea_teb"),
+            BigInt::from(c.max_tea_teb),
+        );
         write_value(
             &mut values,
             format!("br_core_{core}_tea_teb_slack"),
@@ -1710,7 +1791,11 @@ pub fn booster_recovery_witness_from_request(
 
         // Position error
         let pos_err_sq = &landing_alt_error * &landing_alt_error;
-        write_value(&mut values, format!("br_core_{core}_position_error_sq"), pos_err_sq.clone());
+        write_value(
+            &mut values,
+            format!("br_core_{core}_position_error_sq"),
+            pos_err_sq.clone(),
+        );
         let pos_err = bigint_isqrt_floor(&pos_err_sq);
         let pos_err_remainder = &pos_err_sq - (&pos_err * &pos_err);
         let pos_err_upper_slack = ((&pos_err + one()) * (&pos_err + one())) - &pos_err_sq - one();
@@ -1741,13 +1826,31 @@ pub fn booster_recovery_witness_from_request(
         let recovery_steps = c.altitude_profile.len();
         let mut alts = Vec::with_capacity(recovery_steps);
         for step in 0..recovery_steps {
-            let alt = parse_goldilocks_amount(&c.altitude_profile[step], &format!("core_{core}_step_{step}_alt"))?;
-            let vel = parse_goldilocks_amount(&c.velocity_profile[step], &format!("core_{core}_step_{step}_vel"))?;
-            write_value(&mut values, format!("br_core_{core}_step_{step}_altitude"), alt.clone());
-            write_value(&mut values, format!("br_core_{core}_step_{step}_velocity"), vel.clone());
+            let alt = parse_goldilocks_amount(
+                &c.altitude_profile[step],
+                &format!("core_{core}_step_{step}_alt"),
+            )?;
+            let vel = parse_goldilocks_amount(
+                &c.velocity_profile[step],
+                &format!("core_{core}_step_{step}_vel"),
+            )?;
+            write_value(
+                &mut values,
+                format!("br_core_{core}_step_{step}_altitude"),
+                alt.clone(),
+            );
+            write_value(
+                &mut values,
+                format!("br_core_{core}_step_{step}_velocity"),
+                vel.clone(),
+            );
             if step > 0 {
                 let delta: BigInt = &alt - &alts[step - 1];
-                write_value(&mut values, format!("br_core_{core}_step_{step}_alt_delta"), delta.clone());
+                write_value(
+                    &mut values,
+                    format!("br_core_{core}_step_{step}_alt_delta"),
+                    delta.clone(),
+                );
                 write_signed_bound_support(
                     &mut values,
                     &delta,
@@ -1776,12 +1879,9 @@ pub fn booster_recovery_witness_from_request(
             FH_GOLDILOCKS_FIELD,
             [&sep_alt, &landing_vel, &propellant, &previous_digest],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("br_core_commitment_{core}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("br_core_commitment_{core}"), digest)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
@@ -1809,17 +1909,41 @@ pub fn single_core_recovery_witness_from_request(
     let mut values = BTreeMap::new();
 
     let max_landing_vel = parse_goldilocks_amount(max_landing_velocity, "max_landing_velocity")?;
-    let max_landing_err = parse_goldilocks_amount(max_landing_position_error, "max_landing_position_error")?;
+    let max_landing_err =
+        parse_goldilocks_amount(max_landing_position_error, "max_landing_position_error")?;
 
-    write_value(&mut values, "br_max_landing_velocity", max_landing_vel.clone());
-    write_value(&mut values, "br_max_landing_position_error", max_landing_err.clone());
+    write_value(
+        &mut values,
+        "br_max_landing_velocity",
+        max_landing_vel.clone(),
+    );
+    write_value(
+        &mut values,
+        "br_max_landing_position_error",
+        max_landing_err.clone(),
+    );
     write_value(&mut values, "br_chain_seed", zero());
 
-    let sep_alt = parse_goldilocks_amount(&data.separation_altitude, &format!("core_{core_id}_sep_alt"))?;
-    let sep_vel = parse_goldilocks_amount(&data.separation_velocity, &format!("core_{core_id}_sep_vel"))?;
-    let propellant = parse_goldilocks_amount(&data.propellant_reserve, &format!("core_{core_id}_propellant"))?;
-    let landing_alt_error = parse_goldilocks_amount(&data.landing_altitude_error, &format!("core_{core_id}_landing_alt_error"))?;
-    let landing_vel = parse_goldilocks_amount(&data.landing_velocity, &format!("core_{core_id}_landing_vel"))?;
+    let sep_alt = parse_goldilocks_amount(
+        &data.separation_altitude,
+        &format!("core_{core_id}_sep_alt"),
+    )?;
+    let sep_vel = parse_goldilocks_amount(
+        &data.separation_velocity,
+        &format!("core_{core_id}_sep_vel"),
+    )?;
+    let propellant = parse_goldilocks_amount(
+        &data.propellant_reserve,
+        &format!("core_{core_id}_propellant"),
+    )?;
+    let landing_alt_error = parse_goldilocks_amount(
+        &data.landing_altitude_error,
+        &format!("core_{core_id}_landing_alt_error"),
+    )?;
+    let landing_vel = parse_goldilocks_amount(
+        &data.landing_velocity,
+        &format!("core_{core_id}_landing_vel"),
+    )?;
 
     if landing_vel > max_landing_vel {
         return Err(ZkfError::InvalidArtifact(format!(
@@ -1827,13 +1951,41 @@ pub fn single_core_recovery_witness_from_request(
         )));
     }
 
-    write_value(&mut values, format!("br_core_{core_id}_sep_altitude"), sep_alt.clone());
-    write_value(&mut values, format!("br_core_{core_id}_sep_velocity"), sep_vel.clone());
-    write_value(&mut values, format!("br_core_{core_id}_propellant"), propellant.clone());
-    write_value(&mut values, format!("br_core_{core_id}_landing_alt_error"), landing_alt_error.clone());
-    write_value(&mut values, format!("br_core_{core_id}_landing_velocity"), landing_vel.clone());
-    write_value(&mut values, format!("br_core_{core_id}_tea_teb_ignitions"), BigInt::from(data.tea_teb_ignitions));
-    write_value(&mut values, format!("br_core_{core_id}_max_tea_teb"), BigInt::from(data.max_tea_teb));
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_sep_altitude"),
+        sep_alt.clone(),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_sep_velocity"),
+        sep_vel.clone(),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_propellant"),
+        propellant.clone(),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_landing_alt_error"),
+        landing_alt_error.clone(),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_landing_velocity"),
+        landing_vel.clone(),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_tea_teb_ignitions"),
+        BigInt::from(data.tea_teb_ignitions),
+    );
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_max_tea_teb"),
+        BigInt::from(data.max_tea_teb),
+    );
     write_value(
         &mut values,
         format!("br_core_{core_id}_tea_teb_slack"),
@@ -1847,7 +1999,11 @@ pub fn single_core_recovery_witness_from_request(
 
     // Position error
     let pos_err_sq = &landing_alt_error * &landing_alt_error;
-    write_value(&mut values, format!("br_core_{core_id}_position_error_sq"), pos_err_sq.clone());
+    write_value(
+        &mut values,
+        format!("br_core_{core_id}_position_error_sq"),
+        pos_err_sq.clone(),
+    );
     let pos_err = bigint_isqrt_floor(&pos_err_sq);
     let pos_err_remainder = &pos_err_sq - (&pos_err * &pos_err);
     let pos_err_upper_slack = ((&pos_err + one()) * (&pos_err + one())) - &pos_err_sq - one();
@@ -1878,13 +2034,31 @@ pub fn single_core_recovery_witness_from_request(
     let recovery_steps = data.altitude_profile.len();
     let mut alts = Vec::with_capacity(recovery_steps);
     for step in 0..recovery_steps {
-        let alt = parse_goldilocks_amount(&data.altitude_profile[step], &format!("core_{core_id}_step_{step}_alt"))?;
-        let vel = parse_goldilocks_amount(&data.velocity_profile[step], &format!("core_{core_id}_step_{step}_vel"))?;
-        write_value(&mut values, format!("br_core_{core_id}_step_{step}_altitude"), alt.clone());
-        write_value(&mut values, format!("br_core_{core_id}_step_{step}_velocity"), vel.clone());
+        let alt = parse_goldilocks_amount(
+            &data.altitude_profile[step],
+            &format!("core_{core_id}_step_{step}_alt"),
+        )?;
+        let vel = parse_goldilocks_amount(
+            &data.velocity_profile[step],
+            &format!("core_{core_id}_step_{step}_vel"),
+        )?;
+        write_value(
+            &mut values,
+            format!("br_core_{core_id}_step_{step}_altitude"),
+            alt.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("br_core_{core_id}_step_{step}_velocity"),
+            vel.clone(),
+        );
         if step > 0 {
             let delta: BigInt = &alt - &alts[step - 1];
-            write_value(&mut values, format!("br_core_{core_id}_step_{step}_alt_delta"), delta.clone());
+            write_value(
+                &mut values,
+                format!("br_core_{core_id}_step_{step}_alt_delta"),
+                delta.clone(),
+            );
             write_signed_bound_support(
                 &mut values,
                 &delta,
@@ -1913,12 +2087,29 @@ pub fn single_core_recovery_witness_from_request(
     );
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
-        [&core_digest_lane.as_bigint(), &max_landing_vel, &max_landing_err, &BigInt::from(1u64)],
+        [
+            &core_digest_lane.as_bigint(),
+            &max_landing_vel,
+            &max_landing_err,
+            &BigInt::from(1u64),
+        ],
     )?;
-    let commitment = write_hash_lanes(&mut values, &format!("br_core_{core_id}_final_commitment"), final_digest);
+    let commitment = write_hash_lanes(
+        &mut values,
+        &format!("br_core_{core_id}_final_commitment"),
+        final_digest,
+    );
     values.insert(format!("br_core_{core_id}_commitment"), commitment);
-    values.insert(format!("br_core_{core_id}_compliance_bit"), FieldElement::ONE);
-    let program = build_single_core_recovery_program(core_id, data, max_landing_velocity, max_landing_position_error)?;
+    values.insert(
+        format!("br_core_{core_id}_compliance_bit"),
+        FieldElement::ONE,
+    );
+    let program = build_single_core_recovery_program(
+        core_id,
+        data,
+        max_landing_velocity,
+        max_landing_position_error,
+    )?;
     materialize_seeded_witness(&program, values)
 }
 
@@ -1951,8 +2142,12 @@ pub fn build_upper_stage_multi_burn_program(
     builder.private_input("us_initial_propellant")?;
     builder.constrain_range("us_initial_propellant", amount_bits)?;
     for input in [
-        "us_perigee_tolerance", "us_apogee_tolerance", "us_inclination_tolerance",
-        "us_target_perigee", "us_target_apogee", "us_target_inclination",
+        "us_perigee_tolerance",
+        "us_apogee_tolerance",
+        "us_inclination_tolerance",
+        "us_target_perigee",
+        "us_target_apogee",
+        "us_target_inclination",
     ] {
         builder.private_input(input)?;
         builder.constrain_range(input, amount_bits)?;
@@ -1965,8 +2160,10 @@ pub fn build_upper_stage_multi_burn_program(
     // Nonlinear anchoring for tolerance / target / per-burn signals that are
     // otherwise linear-only.
     for input in [
-        "us_apogee_tolerance", "us_inclination_tolerance",
-        "us_target_apogee", "us_target_inclination",
+        "us_apogee_tolerance",
+        "us_inclination_tolerance",
+        "us_target_apogee",
+        "us_target_inclination",
     ] {
         builder.constrain_equal(
             mul_expr(signal_expr(input), signal_expr("__us_anchor_one")),
@@ -1979,7 +2176,14 @@ pub fn build_upper_stage_multi_burn_program(
         let active_name = format!("us_burn_{b}_active");
         builder.private_input(&active_name)?;
         builder.constrain_boolean(&active_name)?;
-        for field_name in ["delta_v", "burn_duration", "perigee", "apogee", "inclination", "propellant_consumed"] {
+        for field_name in [
+            "delta_v",
+            "burn_duration",
+            "perigee",
+            "apogee",
+            "inclination",
+            "propellant_consumed",
+        ] {
             let name = format!("us_burn_{b}_{field_name}");
             builder.private_input(&name)?;
             builder.constrain_range(&name, amount_bits)?;
@@ -2112,21 +2316,31 @@ pub fn upper_stage_multi_burn_witness_from_request(
     let num_burns = request.burns.len();
     let mut values = BTreeMap::new();
 
-    let initial_propellant = parse_goldilocks_amount(&request.initial_propellant, "initial_propellant")?;
+    let initial_propellant =
+        parse_goldilocks_amount(&request.initial_propellant, "initial_propellant")?;
     let perigee_tol = parse_goldilocks_amount(&request.perigee_tolerance, "perigee_tolerance")?;
     let apogee_tol = parse_goldilocks_amount(&request.apogee_tolerance, "apogee_tolerance")?;
     let inc_tol = parse_goldilocks_amount(&request.inclination_tolerance, "inclination_tolerance")?;
     let target_perigee = parse_goldilocks_amount(&request.target_perigee, "target_perigee")?;
     let target_apogee = parse_goldilocks_amount(&request.target_apogee, "target_apogee")?;
-    let target_inclination = parse_goldilocks_amount(&request.target_inclination, "target_inclination")?;
+    let target_inclination =
+        parse_goldilocks_amount(&request.target_inclination, "target_inclination")?;
 
-    write_value(&mut values, "us_initial_propellant", initial_propellant.clone());
+    write_value(
+        &mut values,
+        "us_initial_propellant",
+        initial_propellant.clone(),
+    );
     write_value(&mut values, "us_perigee_tolerance", perigee_tol.clone());
     write_value(&mut values, "us_apogee_tolerance", apogee_tol.clone());
     write_value(&mut values, "us_inclination_tolerance", inc_tol.clone());
     write_value(&mut values, "us_target_perigee", target_perigee.clone());
     write_value(&mut values, "us_target_apogee", target_apogee.clone());
-    write_value(&mut values, "us_target_inclination", target_inclination.clone());
+    write_value(
+        &mut values,
+        "us_target_inclination",
+        target_inclination.clone(),
+    );
     write_value(&mut values, "us_chain_seed", zero());
 
     let mut total_prop_consumed = zero();
@@ -2141,25 +2355,60 @@ pub fn upper_stage_multi_burn_witness_from_request(
         let prop = parse_goldilocks_amount(&burn.propellant_consumed, &format!("burn_{b}_prop"))?;
 
         write_value(&mut values, format!("us_burn_{b}_delta_v"), dv.clone());
-        write_value(&mut values, format!("us_burn_{b}_burn_duration"), dur.clone());
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_burn_duration"),
+            dur.clone(),
+        );
         write_value(&mut values, format!("us_burn_{b}_perigee"), perigee.clone());
         write_value(&mut values, format!("us_burn_{b}_apogee"), apogee.clone());
         write_value(&mut values, format!("us_burn_{b}_inclination"), inc.clone());
-        write_value(&mut values, format!("us_burn_{b}_propellant_consumed"), prop.clone());
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_propellant_consumed"),
+            prop.clone(),
+        );
 
         // Deviations
         let perigee_dev = &perigee - &target_perigee;
         let apogee_dev = &apogee - &target_apogee;
         let inc_dev = &inc - &target_inclination;
 
-        write_value(&mut values, format!("us_burn_{b}_perigee_deviation"), perigee_dev.clone());
-        write_signed_bound_support(&mut values, &perigee_dev, &fh_goldilocks_amount_bound(), &format!("us_burn_{b}_perigee_deviation"))?;
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_perigee_deviation"),
+            perigee_dev.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &perigee_dev,
+            &fh_goldilocks_amount_bound(),
+            &format!("us_burn_{b}_perigee_deviation"),
+        )?;
 
-        write_value(&mut values, format!("us_burn_{b}_apogee_deviation"), apogee_dev.clone());
-        write_signed_bound_support(&mut values, &apogee_dev, &fh_goldilocks_amount_bound(), &format!("us_burn_{b}_apogee_deviation"))?;
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_apogee_deviation"),
+            apogee_dev.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &apogee_dev,
+            &fh_goldilocks_amount_bound(),
+            &format!("us_burn_{b}_apogee_deviation"),
+        )?;
 
-        write_value(&mut values, format!("us_burn_{b}_inclination_deviation"), inc_dev.clone());
-        write_signed_bound_support(&mut values, &inc_dev, &fh_goldilocks_amount_bound(), &format!("us_burn_{b}_inclination_deviation"))?;
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_inclination_deviation"),
+            inc_dev.clone(),
+        );
+        write_signed_bound_support(
+            &mut values,
+            &inc_dev,
+            &fh_goldilocks_amount_bound(),
+            &format!("us_burn_{b}_inclination_deviation"),
+        )?;
 
         // Selected bound for conditional check
         let selected_bound = if burn.active {
@@ -2167,7 +2416,11 @@ pub fn upper_stage_multi_burn_witness_from_request(
         } else {
             fh_goldilocks_amount_bound()
         };
-        write_value(&mut values, format!("us_burn_{b}_perigee_selected_bound"), selected_bound);
+        write_value(
+            &mut values,
+            format!("us_burn_{b}_perigee_selected_bound"),
+            selected_bound,
+        );
 
         total_prop_consumed += &prop;
     }
@@ -2177,7 +2430,11 @@ pub fn upper_stage_multi_burn_witness_from_request(
             "total propellant consumed exceeds budget".to_string(),
         ));
     }
-    write_value(&mut values, "us_total_propellant_consumed", total_prop_consumed.clone());
+    write_value(
+        &mut values,
+        "us_total_propellant_consumed",
+        total_prop_consumed.clone(),
+    );
     write_value(
         &mut values,
         "us_propellant_budget_slack",
@@ -2195,12 +2452,8 @@ pub fn upper_stage_multi_burn_witness_from_request(
             FH_GOLDILOCKS_FIELD,
             [&dv, &perigee, &apogee, &previous_digest],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("us_burn_commitment_{b}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("us_burn_commitment_{b}"), digest).as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
@@ -2222,9 +2475,7 @@ pub fn upper_stage_multi_burn_witness_from_request(
 // Circuit 5 — Engine-Out Mission Assurance (BN254 / Groth16)
 // ---------------------------------------------------------------------------
 
-pub fn build_engine_out_mission_program(
-    request: &EngineOutMissionRequestV1,
-) -> ZkfResult<Program> {
+pub fn build_engine_out_mission_program(request: &EngineOutMissionRequestV1) -> ZkfResult<Program> {
     let steps = request.recalculated_thrust.len();
     if steps == 0
         || steps != request.recalculated_velocity.len()
@@ -2237,10 +2488,8 @@ pub fn build_engine_out_mission_program(
     let scale = fh_bn254_scale();
     let amount_bits = bits_for_bound(&fh_bn254_amount_bound());
 
-    let mut builder = ProgramBuilder::new(
-        format!("falcon_heavy_engine_out_{steps}"),
-        FH_BN254_FIELD,
-    );
+    let mut builder =
+        ProgramBuilder::new(format!("falcon_heavy_engine_out_{steps}"), FH_BN254_FIELD);
     builder.metadata_entry("application", "falcon-heavy-certification")?;
     builder.metadata_entry("circuit", "engine-out-mission")?;
     builder.metadata_entry("steps", steps.to_string())?;
@@ -2381,10 +2630,13 @@ pub fn engine_out_mission_witness_from_request(
     let scale = fh_bn254_scale();
     let mut values = BTreeMap::new();
 
-    let min_thrust_fraction = parse_bn254_amount(&request.min_thrust_fraction, "min_thrust_fraction")?;
+    let min_thrust_fraction =
+        parse_bn254_amount(&request.min_thrust_fraction, "min_thrust_fraction")?;
     let nominal_thrust = parse_bn254_amount(&request.nominal_total_thrust, "nominal_total_thrust")?;
     if nominal_thrust == zero() {
-        return Err(ZkfError::InvalidArtifact("nominal thrust must be nonzero".to_string()));
+        return Err(ZkfError::InvalidArtifact(
+            "nominal thrust must be nonzero".to_string(),
+        ));
     }
     if !request.mission_success {
         return Err(ZkfError::InvalidArtifact(
@@ -2392,15 +2644,31 @@ pub fn engine_out_mission_witness_from_request(
         ));
     }
 
-    write_value(&mut values, "eo_min_thrust_fraction", min_thrust_fraction.clone());
-    write_value(&mut values, "eo_nominal_total_thrust", nominal_thrust.clone());
+    write_value(
+        &mut values,
+        "eo_min_thrust_fraction",
+        min_thrust_fraction.clone(),
+    );
+    write_value(
+        &mut values,
+        "eo_nominal_total_thrust",
+        nominal_thrust.clone(),
+    );
     write_bool_value(&mut values, "eo_mission_success", true);
     write_value(&mut values, "eo_chain_seed", zero());
 
     // Shutdown events
     for (i, event) in request.shutdown_events.iter().enumerate() {
-        write_value(&mut values, format!("eo_shutdown_{i}_engine_index"), BigInt::from(event.engine_index));
-        write_value(&mut values, format!("eo_shutdown_{i}_step"), BigInt::from(event.shutdown_step));
+        write_value(
+            &mut values,
+            format!("eo_shutdown_{i}_engine_index"),
+            BigInt::from(event.engine_index),
+        );
+        write_value(
+            &mut values,
+            format!("eo_shutdown_{i}_step"),
+            BigInt::from(event.shutdown_step),
+        );
     }
 
     // Min thrust threshold
@@ -2422,9 +2690,18 @@ pub fn engine_out_mission_witness_from_request(
     // Per-step data
     let mut altitudes = Vec::with_capacity(steps);
     for step in 0..steps {
-        let thrust = parse_bn254_amount(&request.recalculated_thrust[step], &format!("step_{step}_thrust"))?;
-        let velocity = parse_bn254_amount(&request.recalculated_velocity[step], &format!("step_{step}_velocity"))?;
-        let altitude = parse_bn254_amount(&request.recalculated_altitude[step], &format!("step_{step}_altitude"))?;
+        let thrust = parse_bn254_amount(
+            &request.recalculated_thrust[step],
+            &format!("step_{step}_thrust"),
+        )?;
+        let velocity = parse_bn254_amount(
+            &request.recalculated_velocity[step],
+            &format!("step_{step}_velocity"),
+        )?;
+        let altitude = parse_bn254_amount(
+            &request.recalculated_altitude[step],
+            &format!("step_{step}_altitude"),
+        )?;
 
         if thrust < min_thrust_threshold {
             return Err(ZkfError::InvalidArtifact(format!(
@@ -2432,9 +2709,21 @@ pub fn engine_out_mission_witness_from_request(
             )));
         }
 
-        write_value(&mut values, format!("eo_step_{step}_thrust"), thrust.clone());
-        write_value(&mut values, format!("eo_step_{step}_velocity"), velocity.clone());
-        write_value(&mut values, format!("eo_step_{step}_altitude"), altitude.clone());
+        write_value(
+            &mut values,
+            format!("eo_step_{step}_thrust"),
+            thrust.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("eo_step_{step}_velocity"),
+            velocity.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("eo_step_{step}_altitude"),
+            altitude.clone(),
+        );
         write_value(
             &mut values,
             format!("eo_step_{step}_thrust_margin_slack"),
@@ -2443,7 +2732,11 @@ pub fn engine_out_mission_witness_from_request(
 
         if step > 0 {
             let delta: BigInt = &altitude - &altitudes[step - 1];
-            write_value(&mut values, format!("eo_step_{step}_alt_delta"), delta.clone());
+            write_value(
+                &mut values,
+                format!("eo_step_{step}_alt_delta"),
+                delta.clone(),
+            );
             write_signed_bound_support(
                 &mut values,
                 &delta,
@@ -2461,16 +2754,11 @@ pub fn engine_out_mission_witness_from_request(
         let thrust = parse_bn254_amount(&request.recalculated_thrust[step], "thrust")?;
         let vel = parse_bn254_amount(&request.recalculated_velocity[step], "vel")?;
         let alt = parse_bn254_amount(&request.recalculated_altitude[step], "alt")?;
-        let digest = poseidon_permutation4(
-            FH_BN254_FIELD,
-            [&thrust, &vel, &alt, &previous_digest],
-        )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("eo_step_commitment_{step}"),
-            digest,
-        )
-        .as_bigint();
+        let digest =
+            poseidon_permutation4(FH_BN254_FIELD, [&thrust, &vel, &alt, &previous_digest])?;
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("eo_step_commitment_{step}"), digest)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_BN254_FIELD,
@@ -2518,9 +2806,13 @@ pub fn build_payload_fairing_environment_program(
     builder.metadata_entry("backend_expectation", "plonky3-goldilocks")?;
 
     for input in [
-        "pf_max_acoustic", "pf_max_vibration", "pf_max_thermal",
-        "pf_fairing_jettison_altitude", "pf_fairing_jettison_pressure",
-        "pf_min_jettison_altitude", "pf_max_jettison_pressure",
+        "pf_max_acoustic",
+        "pf_max_vibration",
+        "pf_max_thermal",
+        "pf_fairing_jettison_altitude",
+        "pf_fairing_jettison_pressure",
+        "pf_min_jettison_altitude",
+        "pf_max_jettison_pressure",
     ] {
         builder.private_input(input)?;
         builder.constrain_range(input, amount_bits)?;
@@ -2541,8 +2833,11 @@ pub fn build_payload_fairing_environment_program(
     // Nonlinear anchoring for linear-only signals
     builder.constant_signal("__pf_anchor_one", FieldElement::ONE)?;
     for input in [
-        "pf_max_vibration", "pf_max_thermal",
-        "pf_fairing_jettison_pressure", "pf_min_jettison_altitude", "pf_max_jettison_pressure",
+        "pf_max_vibration",
+        "pf_max_thermal",
+        "pf_fairing_jettison_pressure",
+        "pf_min_jettison_altitude",
+        "pf_max_jettison_pressure",
     ] {
         builder.constrain_equal(
             mul_expr(signal_expr(input), signal_expr("__pf_anchor_one")),
@@ -2604,7 +2899,10 @@ pub fn build_payload_fairing_environment_program(
             &fh_goldilocks_amount_bound(),
             &format!("pf_step_{step}_acoustic_dev"),
         )?;
-        env_sq_exprs.push(mul_expr(signal_expr(&acoustic_dev), signal_expr(&acoustic_dev)));
+        env_sq_exprs.push(mul_expr(
+            signal_expr(&acoustic_dev),
+            signal_expr(&acoustic_dev),
+        ));
     }
 
     builder.private_signal("pf_mean_square_margin")?;
@@ -2675,10 +2973,14 @@ pub fn payload_fairing_environment_witness_from_request(
     let max_acoustic = parse_goldilocks_amount(&request.max_acoustic, "max_acoustic")?;
     let max_vibration = parse_goldilocks_amount(&request.max_vibration, "max_vibration")?;
     let max_thermal = parse_goldilocks_amount(&request.max_thermal, "max_thermal")?;
-    let jettison_alt = parse_goldilocks_amount(&request.fairing_jettison_altitude, "jettison_altitude")?;
-    let jettison_pressure = parse_goldilocks_amount(&request.fairing_jettison_pressure, "jettison_pressure")?;
-    let min_jettison_alt = parse_goldilocks_amount(&request.min_jettison_altitude, "min_jettison_altitude")?;
-    let max_jettison_pressure = parse_goldilocks_amount(&request.max_jettison_pressure, "max_jettison_pressure")?;
+    let jettison_alt =
+        parse_goldilocks_amount(&request.fairing_jettison_altitude, "jettison_altitude")?;
+    let jettison_pressure =
+        parse_goldilocks_amount(&request.fairing_jettison_pressure, "jettison_pressure")?;
+    let min_jettison_alt =
+        parse_goldilocks_amount(&request.min_jettison_altitude, "min_jettison_altitude")?;
+    let max_jettison_pressure =
+        parse_goldilocks_amount(&request.max_jettison_pressure, "max_jettison_pressure")?;
 
     if jettison_alt < min_jettison_alt {
         return Err(ZkfError::InvalidArtifact(
@@ -2694,40 +2996,103 @@ pub fn payload_fairing_environment_witness_from_request(
     write_value(&mut values, "pf_max_acoustic", max_acoustic.clone());
     write_value(&mut values, "pf_max_vibration", max_vibration.clone());
     write_value(&mut values, "pf_max_thermal", max_thermal.clone());
-    write_value(&mut values, "pf_fairing_jettison_altitude", jettison_alt.clone());
-    write_value(&mut values, "pf_fairing_jettison_pressure", jettison_pressure.clone());
-    write_value(&mut values, "pf_min_jettison_altitude", min_jettison_alt.clone());
-    write_value(&mut values, "pf_max_jettison_pressure", max_jettison_pressure.clone());
+    write_value(
+        &mut values,
+        "pf_fairing_jettison_altitude",
+        jettison_alt.clone(),
+    );
+    write_value(
+        &mut values,
+        "pf_fairing_jettison_pressure",
+        jettison_pressure.clone(),
+    );
+    write_value(
+        &mut values,
+        "pf_min_jettison_altitude",
+        min_jettison_alt.clone(),
+    );
+    write_value(
+        &mut values,
+        "pf_max_jettison_pressure",
+        max_jettison_pressure.clone(),
+    );
     write_value(&mut values, "pf_chain_seed", zero());
 
-    write_value(&mut values, "pf_jettison_altitude_slack", &jettison_alt - &min_jettison_alt);
-    write_value(&mut values, "pf_jettison_pressure_slack", &max_jettison_pressure - &jettison_pressure);
+    write_value(
+        &mut values,
+        "pf_jettison_altitude_slack",
+        &jettison_alt - &min_jettison_alt,
+    );
+    write_value(
+        &mut values,
+        "pf_jettison_pressure_slack",
+        &max_jettison_pressure - &jettison_pressure,
+    );
 
     let mut sum_squared_margins = zero();
     for step in 0..steps {
-        let acoustic = parse_goldilocks_amount(&request.acoustic_levels[step], &format!("acoustic_{step}"))?;
-        let vibration = parse_goldilocks_amount(&request.vibration_levels[step], &format!("vibration_{step}"))?;
-        let thermal = parse_goldilocks_amount(&request.thermal_levels[step], &format!("thermal_{step}"))?;
+        let acoustic =
+            parse_goldilocks_amount(&request.acoustic_levels[step], &format!("acoustic_{step}"))?;
+        let vibration = parse_goldilocks_amount(
+            &request.vibration_levels[step],
+            &format!("vibration_{step}"),
+        )?;
+        let thermal =
+            parse_goldilocks_amount(&request.thermal_levels[step], &format!("thermal_{step}"))?;
 
         if acoustic > max_acoustic {
-            return Err(ZkfError::InvalidArtifact(format!("step {step} acoustic exceeds max")));
+            return Err(ZkfError::InvalidArtifact(format!(
+                "step {step} acoustic exceeds max"
+            )));
         }
         if vibration > max_vibration {
-            return Err(ZkfError::InvalidArtifact(format!("step {step} vibration exceeds max")));
+            return Err(ZkfError::InvalidArtifact(format!(
+                "step {step} vibration exceeds max"
+            )));
         }
         if thermal > max_thermal {
-            return Err(ZkfError::InvalidArtifact(format!("step {step} thermal exceeds max")));
+            return Err(ZkfError::InvalidArtifact(format!(
+                "step {step} thermal exceeds max"
+            )));
         }
 
-        write_value(&mut values, format!("pf_step_{step}_acoustic"), acoustic.clone());
-        write_value(&mut values, format!("pf_step_{step}_vibration"), vibration.clone());
-        write_value(&mut values, format!("pf_step_{step}_thermal"), thermal.clone());
-        write_value(&mut values, format!("pf_step_{step}_acoustic_slack"), &max_acoustic - &acoustic);
-        write_value(&mut values, format!("pf_step_{step}_vibration_slack"), &max_vibration - &vibration);
-        write_value(&mut values, format!("pf_step_{step}_thermal_slack"), &max_thermal - &thermal);
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_acoustic"),
+            acoustic.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_vibration"),
+            vibration.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_thermal"),
+            thermal.clone(),
+        );
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_acoustic_slack"),
+            &max_acoustic - &acoustic,
+        );
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_vibration_slack"),
+            &max_vibration - &vibration,
+        );
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_thermal_slack"),
+            &max_thermal - &thermal,
+        );
 
         let acoustic_dev = &max_acoustic - &acoustic;
-        write_value(&mut values, format!("pf_step_{step}_acoustic_dev"), acoustic_dev.clone());
+        write_value(
+            &mut values,
+            format!("pf_step_{step}_acoustic_dev"),
+            acoustic_dev.clone(),
+        );
         write_signed_bound_support(
             &mut values,
             &acoustic_dev,
@@ -2753,7 +3118,8 @@ pub fn payload_fairing_environment_witness_from_request(
     );
     let rms_margin = bigint_isqrt_floor(&mean_square_margin);
     let rms_remainder = &mean_square_margin - (&rms_margin * &rms_margin);
-    let rms_upper_slack = ((&rms_margin + one()) * (&rms_margin + one())) - &mean_square_margin - one();
+    let rms_upper_slack =
+        ((&rms_margin + one()) * (&rms_margin + one())) - &mean_square_margin - one();
     write_floor_sqrt_support(
         &mut values,
         "pf_rms_margin",
@@ -2777,21 +3143,13 @@ pub fn payload_fairing_environment_witness_from_request(
             FH_GOLDILOCKS_FIELD,
             [&acoustic, &vibration, &thermal, &previous_digest],
         )?;
-        previous_digest = write_hash_lanes(
-            &mut values,
-            &format!("pf_step_commitment_{step}"),
-            digest,
-        )
-        .as_bigint();
+        previous_digest =
+            write_hash_lanes(&mut values, &format!("pf_step_commitment_{step}"), digest)
+                .as_bigint();
     }
     let final_digest = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
-        [
-            &previous_digest,
-            &jettison_alt,
-            &rms_margin,
-            &max_acoustic,
-        ],
+        [&previous_digest, &jettison_alt, &rms_margin, &max_acoustic],
     )?;
     let commitment = write_hash_lanes(&mut values, "pf_final_commitment", final_digest);
     values.insert("pf_commitment".to_string(), commitment);
@@ -2810,10 +3168,7 @@ pub fn build_full_mission_integration_program(
     let amount_bits = bits_for_bound(&fh_goldilocks_amount_bound());
     let scale = fh_goldilocks_scale();
 
-    let mut builder = ProgramBuilder::new(
-        "falcon_heavy_mission_integration",
-        FH_GOLDILOCKS_FIELD,
-    );
+    let mut builder = ProgramBuilder::new("falcon_heavy_mission_integration", FH_GOLDILOCKS_FIELD);
     builder.metadata_entry("application", "falcon-heavy-certification")?;
     builder.metadata_entry("circuit", "full-mission-integration")?;
     builder.metadata_entry("fixed_point_scale", scale.to_str_radix(10))?;
@@ -2839,7 +3194,10 @@ pub fn build_full_mission_integration_program(
 
     // Mission parameters
     for input in [
-        "fmi_vehicle_mass", "fmi_payload_mass", "fmi_mission_duration", "fmi_success_threshold",
+        "fmi_vehicle_mass",
+        "fmi_payload_mass",
+        "fmi_mission_duration",
+        "fmi_success_threshold",
     ] {
         builder.private_input(input)?;
         builder.constrain_range(input, amount_bits)?;
@@ -2898,10 +3256,7 @@ pub fn build_full_mission_integration_program(
         status_sq_exprs.push(mul_expr(signal_expr(&name), signal_expr(&name)));
     }
     builder.private_signal("fmi_status_sum_sq")?;
-    builder.constrain_equal(
-        signal_expr("fmi_status_sum_sq"),
-        add_expr(status_sq_exprs),
-    )?;
+    builder.constrain_equal(signal_expr("fmi_status_sum_sq"), add_expr(status_sq_exprs))?;
     builder.private_signal("fmi_certification_score")?;
     builder.private_signal("fmi_certification_score_remainder")?;
     builder.private_signal("fmi_certification_score_upper_slack")?;
@@ -2941,7 +3296,11 @@ pub fn full_mission_integration_witness_from_request(
         let parsed = BigInt::parse_bytes(commitment_str.as_bytes(), 10).ok_or_else(|| {
             ZkfError::InvalidArtifact(format!("circuit commitment {i} must be a base-10 integer"))
         })?;
-        write_value(&mut values, format!("fmi_circuit_commitment_{i}"), parsed.clone());
+        write_value(
+            &mut values,
+            format!("fmi_circuit_commitment_{i}"),
+            parsed.clone(),
+        );
         commitments.push(parsed);
     }
 
@@ -2958,29 +3317,53 @@ pub fn full_mission_integration_witness_from_request(
     let vehicle_mass = parse_goldilocks_amount(&request.vehicle_mass, "vehicle_mass")?;
     let payload_mass = parse_goldilocks_amount(&request.payload_mass, "payload_mass")?;
     let mission_duration = parse_goldilocks_amount(&request.mission_duration, "mission_duration")?;
-    let success_threshold = parse_goldilocks_amount(&request.success_threshold, "success_threshold")?;
+    let success_threshold =
+        parse_goldilocks_amount(&request.success_threshold, "success_threshold")?;
 
     write_value(&mut values, "fmi_vehicle_mass", vehicle_mass.clone());
     write_value(&mut values, "fmi_payload_mass", payload_mass.clone());
-    write_value(&mut values, "fmi_mission_duration", mission_duration.clone());
-    write_value(&mut values, "fmi_success_threshold", success_threshold.clone());
+    write_value(
+        &mut values,
+        "fmi_mission_duration",
+        mission_duration.clone(),
+    );
+    write_value(
+        &mut values,
+        "fmi_success_threshold",
+        success_threshold.clone(),
+    );
     write_value(&mut values, "fmi_chain_seed", zero());
 
     // Commitment roots (two groups of 4)
     let root_hi = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
-        [&commitments[0], &commitments[1], &commitments[2], &commitments[3]],
+        [
+            &commitments[0],
+            &commitments[1],
+            &commitments[2],
+            &commitments[3],
+        ],
     )?;
     let root_hi_lane = write_hash_lanes(&mut values, "fmi_commitment_root_hi", root_hi);
     let root_lo = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
-        [&commitments[4], &commitments[5], &commitments[6], &commitments[7]],
+        [
+            &commitments[4],
+            &commitments[5],
+            &commitments[6],
+            &commitments[7],
+        ],
     )?;
     let root_lo_lane = write_hash_lanes(&mut values, "fmi_commitment_root_lo", root_lo);
     // Merge the two roots
     let root_merged = poseidon_permutation4(
         FH_GOLDILOCKS_FIELD,
-        [&root_hi_lane.as_bigint(), &root_lo_lane.as_bigint(), &zero(), &zero()],
+        [
+            &root_hi_lane.as_bigint(),
+            &root_lo_lane.as_bigint(),
+            &zero(),
+            &zero(),
+        ],
     )?;
     let root_merged_lane = write_hash_lanes(&mut values, "fmi_commitment_root_merged", root_merged);
 
@@ -3052,13 +3435,13 @@ mod tests {
 
     fn sample_engine_health_request() -> EngineHealthCertificationRequestV1 {
         let single_engine_params = vec![
-            "6895.000".to_string(),   // chamber_pressure (kPa)
-            "36000.000".to_string(),  // turbopump_rpm
-            "260.000".to_string(),    // fuel_flow (kg/s)
-            "650.000".to_string(),    // ox_flow (kg/s)
-            "2.500".to_string(),      // mixture_ratio
-            "845.000".to_string(),    // thrust (kN)
-            "5.000".to_string(),      // gimbal_response (deg/s)
+            "6895.000".to_string(),  // chamber_pressure (kPa)
+            "36000.000".to_string(), // turbopump_rpm
+            "260.000".to_string(),   // fuel_flow (kg/s)
+            "650.000".to_string(),   // ox_flow (kg/s)
+            "2.500".to_string(),     // mixture_ratio
+            "845.000".to_string(),   // thrust (kN)
+            "5.000".to_string(),     // gimbal_response (deg/s)
         ];
         EngineHealthCertificationRequestV1 {
             engine_params: vec![single_engine_params; FALCON_HEAVY_ENGINE_COUNT],
@@ -3146,7 +3529,11 @@ mod tests {
                 separation_altitude: "80000.000".to_string(),
                 separation_velocity: "1500.000".to_string(),
                 propellant_reserve: "5000.000".to_string(),
-                burn_durations: vec!["30.000".to_string(), "15.000".to_string(), "20.000".to_string()],
+                burn_durations: vec![
+                    "30.000".to_string(),
+                    "15.000".to_string(),
+                    "20.000".to_string(),
+                ],
                 landing_altitude_error: "5.000".to_string(),
                 landing_velocity: "2.000".to_string(),
                 tea_teb_ignitions: 3,
@@ -3208,8 +3595,14 @@ mod tests {
         }
         EngineOutMissionRequestV1 {
             shutdown_events: vec![
-                EngineShutdownEventV1 { engine_index: 5, shutdown_step: 10 },
-                EngineShutdownEventV1 { engine_index: 14, shutdown_step: 15 },
+                EngineShutdownEventV1 {
+                    engine_index: 5,
+                    shutdown_step: 10,
+                },
+                EngineShutdownEventV1 {
+                    engine_index: 14,
+                    shutdown_step: 15,
+                },
             ],
             recalculated_thrust: thrust,
             recalculated_velocity: velocity,
@@ -3279,7 +3672,11 @@ mod tests {
             separation_altitude: format!("{sep_alt:.3}"),
             separation_velocity: format!("{sep_vel:.3}"),
             propellant_reserve: "5000.000".to_string(),
-            burn_durations: vec!["30.000".to_string(), "15.000".to_string(), "20.000".to_string()],
+            burn_durations: vec![
+                "30.000".to_string(),
+                "15.000".to_string(),
+                "20.000".to_string(),
+            ],
             landing_altitude_error: "5.000".to_string(),
             landing_velocity: "2.000".to_string(),
             tea_teb_ignitions: 3,
@@ -3294,8 +3691,8 @@ mod tests {
         run_fh_test_on_large_stack("fh-circuit-roundtrip", || {
             // --- Circuit 1 (C1): Engine Health ---
             let ehc_request = sample_engine_health_request();
-            let ehc_program = build_engine_health_certification_program(&ehc_request)
-                .expect("ehc program");
+            let ehc_program =
+                build_engine_health_certification_program(&ehc_request).expect("ehc program");
             let ehc_audit = audit_program_default(&ehc_program, Some(BackendKind::Plonky3));
             if ehc_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&ehc_program);
@@ -3314,8 +3711,7 @@ mod tests {
 
             // --- Circuit 2 (C2): Ascent Trajectory (187 steps) ---
             let at_request = sample_ascent_trajectory_request();
-            let at_program = build_ascent_trajectory_program(&at_request)
-                .expect("at program");
+            let at_program = build_ascent_trajectory_program(&at_request).expect("at program");
             let at_audit = audit_program_default(&at_program, Some(BackendKind::Plonky3));
             if at_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&at_program);
@@ -3324,8 +3720,8 @@ mod tests {
                     at_audit.checks, analysis
                 );
             }
-            let at_witness = ascent_trajectory_witness_from_request(&at_request)
-                .expect("at witness");
+            let at_witness =
+                ascent_trajectory_witness_from_request(&at_request).expect("at witness");
             let at_compiled = compile(&at_program, "plonky3", None).expect("at compile");
             let at_artifact = prove(&at_compiled, &at_witness).expect("at prove");
             assert!(verify(&at_compiled, &at_artifact).expect("at verify"));
@@ -3344,8 +3740,9 @@ mod tests {
                     c3a_audit.checks, analysis
                 );
             }
-            let c3a_witness = single_core_recovery_witness_from_request(0, &c3a_data, "3.000", "10.000")
-                .expect("c3a witness");
+            let c3a_witness =
+                single_core_recovery_witness_from_request(0, &c3a_data, "3.000", "10.000")
+                    .expect("c3a witness");
             let c3a_compiled = compile(&c3a_program, "plonky3", None).expect("c3a compile");
             let c3a_artifact = prove(&c3a_compiled, &c3a_witness).expect("c3a prove");
             assert!(verify(&c3a_compiled, &c3a_artifact).expect("c3a verify"));
@@ -3364,8 +3761,9 @@ mod tests {
                     c3b_audit.checks, analysis
                 );
             }
-            let c3b_witness = single_core_recovery_witness_from_request(1, &c3b_data, "3.000", "10.000")
-                .expect("c3b witness");
+            let c3b_witness =
+                single_core_recovery_witness_from_request(1, &c3b_data, "3.000", "10.000")
+                    .expect("c3b witness");
             let c3b_compiled = compile(&c3b_program, "plonky3", None).expect("c3b compile");
             let c3b_artifact = prove(&c3b_compiled, &c3b_witness).expect("c3b prove");
             assert!(verify(&c3b_compiled, &c3b_artifact).expect("c3b verify"));
@@ -3384,8 +3782,9 @@ mod tests {
                     c3c_audit.checks, analysis
                 );
             }
-            let c3c_witness = single_core_recovery_witness_from_request(2, &c3c_data, "3.000", "10.000")
-                .expect("c3c witness");
+            let c3c_witness =
+                single_core_recovery_witness_from_request(2, &c3c_data, "3.000", "10.000")
+                    .expect("c3c witness");
             let c3c_compiled = compile(&c3c_program, "plonky3", None).expect("c3c compile");
             let c3c_artifact = prove(&c3c_compiled, &c3c_witness).expect("c3c prove");
             assert!(verify(&c3c_compiled, &c3c_artifact).expect("c3c verify"));
@@ -3394,8 +3793,7 @@ mod tests {
 
             // --- Circuit 4 (C4): Upper Stage ---
             let us_request = sample_upper_stage_request();
-            let us_program = build_upper_stage_multi_burn_program(&us_request)
-                .expect("us program");
+            let us_program = build_upper_stage_multi_burn_program(&us_request).expect("us program");
             let us_audit = audit_program_default(&us_program, Some(BackendKind::Plonky3));
             if us_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&us_program);
@@ -3404,8 +3802,8 @@ mod tests {
                     us_audit.checks, analysis
                 );
             }
-            let us_witness = upper_stage_multi_burn_witness_from_request(&us_request)
-                .expect("us witness");
+            let us_witness =
+                upper_stage_multi_burn_witness_from_request(&us_request).expect("us witness");
             let us_compiled = compile(&us_program, "plonky3", None).expect("us compile");
             let us_artifact = prove(&us_compiled, &us_witness).expect("us prove");
             assert!(verify(&us_compiled, &us_artifact).expect("us verify"));
@@ -3414,8 +3812,7 @@ mod tests {
 
             // --- Circuit 5 (C5): Engine-Out (BN254 / Groth16) ---
             let eo_request = sample_engine_out_request();
-            let eo_program = build_engine_out_mission_program(&eo_request)
-                .expect("eo program");
+            let eo_program = build_engine_out_mission_program(&eo_request).expect("eo program");
             let eo_audit = audit_program_default(&eo_program, Some(BackendKind::ArkworksGroth16));
             if eo_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&eo_program);
@@ -3424,11 +3821,12 @@ mod tests {
                     eo_audit.checks, analysis
                 );
             }
-            let eo_witness = engine_out_mission_witness_from_request(&eo_request)
-                .expect("eo witness");
+            let eo_witness =
+                engine_out_mission_witness_from_request(&eo_request).expect("eo witness");
             let (eo_compiled, eo_artifact) =
                 with_allow_dev_deterministic_groth16_override(Some(true), || {
-                    let compiled = compile(&eo_program, "arkworks-groth16", None).expect("eo compile");
+                    let compiled =
+                        compile(&eo_program, "arkworks-groth16", None).expect("eo compile");
                     let artifact = prove(&compiled, &eo_witness).expect("eo prove");
                     (compiled, artifact)
                 });
@@ -3438,8 +3836,8 @@ mod tests {
 
             // --- Circuit 6 (C6): Payload Fairing (187 steps) ---
             let pf_request = sample_fairing_environment_request();
-            let pf_program = build_payload_fairing_environment_program(&pf_request)
-                .expect("pf program");
+            let pf_program =
+                build_payload_fairing_environment_program(&pf_request).expect("pf program");
             let pf_audit = audit_program_default(&pf_program, Some(BackendKind::Plonky3));
             if pf_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&pf_program);
@@ -3448,8 +3846,8 @@ mod tests {
                     pf_audit.checks, analysis
                 );
             }
-            let pf_witness = payload_fairing_environment_witness_from_request(&pf_request)
-                .expect("pf witness");
+            let pf_witness =
+                payload_fairing_environment_witness_from_request(&pf_request).expect("pf witness");
             let pf_compiled = compile(&pf_program, "plonky3", None).expect("pf compile");
             let pf_artifact = prove(&pf_compiled, &pf_witness).expect("pf prove");
             assert!(verify(&pf_compiled, &pf_artifact).expect("pf verify"));
@@ -3459,19 +3857,19 @@ mod tests {
             // --- Circuit 7 (C7): Full Mission Integration (8 sub-circuit commitments) ---
             let fmi_request = sample_mission_integration_request(
                 [
-                    ehc_artifact.public_inputs[0].to_decimal_string(),   // C1 engine health
-                    at_artifact.public_inputs[0].to_decimal_string(),    // C2 ascent trajectory
-                    c3a_artifact.public_inputs[0].to_decimal_string(),   // C3a side booster 1
-                    c3b_artifact.public_inputs[0].to_decimal_string(),   // C3b side booster 2
-                    c3c_artifact.public_inputs[0].to_decimal_string(),   // C3c center core
-                    us_artifact.public_inputs[0].to_decimal_string(),    // C4 upper stage
-                    eo_artifact.public_inputs[0].to_decimal_string(),    // C5 engine-out
-                    pf_artifact.public_inputs[0].to_decimal_string(),    // C6 payload fairing
+                    ehc_artifact.public_inputs[0].to_decimal_string(), // C1 engine health
+                    at_artifact.public_inputs[0].to_decimal_string(),  // C2 ascent trajectory
+                    c3a_artifact.public_inputs[0].to_decimal_string(), // C3a side booster 1
+                    c3b_artifact.public_inputs[0].to_decimal_string(), // C3b side booster 2
+                    c3c_artifact.public_inputs[0].to_decimal_string(), // C3c center core
+                    us_artifact.public_inputs[0].to_decimal_string(),  // C4 upper stage
+                    eo_artifact.public_inputs[0].to_decimal_string(),  // C5 engine-out
+                    pf_artifact.public_inputs[0].to_decimal_string(),  // C6 payload fairing
                 ],
                 [true, true, true, true, true, true, true, true],
             );
-            let fmi_program = build_full_mission_integration_program(&fmi_request)
-                .expect("fmi program");
+            let fmi_program =
+                build_full_mission_integration_program(&fmi_request).expect("fmi program");
             let fmi_audit = audit_program_default(&fmi_program, Some(BackendKind::Plonky3));
             if fmi_audit.summary.failed != 0 {
                 let analysis = analyze_underconstrained(&fmi_program);
@@ -3480,8 +3878,8 @@ mod tests {
                     fmi_audit.checks, analysis
                 );
             }
-            let fmi_witness = full_mission_integration_witness_from_request(&fmi_request)
-                .expect("fmi witness");
+            let fmi_witness =
+                full_mission_integration_witness_from_request(&fmi_request).expect("fmi witness");
             let fmi_compiled = compile(&fmi_program, "plonky3", None).expect("fmi compile");
             let fmi_artifact = prove(&fmi_compiled, &fmi_witness).expect("fmi prove");
             assert!(verify(&fmi_compiled, &fmi_artifact).expect("fmi verify"));

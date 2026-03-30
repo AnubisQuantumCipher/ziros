@@ -131,9 +131,7 @@ pub fn floor_sqrt_support(value: &BigInt) -> ZkfResult<(BigInt, BigInt, BigInt)>
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        bigint_isqrt_floor, decimal_scaled, euclidean_division, floor_sqrt_support, one,
-    };
+    use super::{bigint_isqrt_floor, decimal_scaled, euclidean_division, floor_sqrt_support, one};
     use num_bigint::BigInt;
     use zkf_core::ZkfError;
 

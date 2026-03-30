@@ -129,7 +129,7 @@
         "pasta-fq"
       ],
       "gpu_coverage": "0/0 GPU stages active on current host",
-      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds"
+      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. The checkout also ships `zkf midnight proof-server serve` as an official-compatible local proof-server facade, but the current backend row is not yet auto-routed to that CLI mode. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds"
     }
   ],
   "frontends": [

@@ -1076,7 +1076,10 @@ mod tests {
         ensure_security_covered_groth16_setup(&compiled)
             .expect("auto ceremony should satisfy security-covered Groth16 setup");
         assert_eq!(
-            compiled.metadata.get("setup_seed_source").map(String::as_str),
+            compiled
+                .metadata
+                .get("setup_seed_source")
+                .map(String::as_str),
             Some("auto-ceremony")
         );
         assert_eq!(
@@ -1089,7 +1092,8 @@ mod tests {
         let witness = witness_from_inputs(&program, &inputs, None).expect("witness");
         let proof = prove(&compiled, &witness).expect("strict prove should accept auto ceremony");
         assert_eq!(
-            proof.metadata
+            proof
+                .metadata
                 .get("groth16_ceremony_id")
                 .map(String::as_str),
             compiled

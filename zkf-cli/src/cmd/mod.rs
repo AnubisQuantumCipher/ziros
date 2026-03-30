@@ -1,3 +1,4 @@
+pub(crate) mod aerospace_qualification;
 pub(crate) mod app;
 pub(crate) mod audit;
 pub(crate) mod capabilities;
@@ -14,13 +15,14 @@ pub(crate) mod estimate_gas;
 pub(crate) mod explore;
 pub(crate) mod import;
 pub(crate) mod ir;
+pub(crate) mod keys;
+pub(crate) mod midnight;
 pub(crate) mod optimize;
 pub(crate) mod package;
 pub(crate) mod prove;
 pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
-pub(crate) mod aerospace_qualification;
 pub(crate) mod sovereign_economic_defense;
 pub(crate) mod storage;
 pub(crate) mod subsystem;
@@ -28,12 +30,11 @@ pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
 pub(crate) mod witness;
-pub(crate) mod keys;
 
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    SubsystemCommands, TelemetryCommands,
+    MidnightCommands, MidnightProofServerCommands, SubsystemCommands, TelemetryCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -53,6 +54,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
                 subsystem::handle_verify_release_pin(pin, binary, json)
             }
         },
+        Commands::Midnight { command } => midnight::handle_midnight(command),
         Commands::Credential { command } => credential::handle_credential(command),
         Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
@@ -551,6 +553,13 @@ fn command_name(command: &Commands) -> String {
             SubsystemCommands::VerifyReleasePin { .. } => {
                 "subsystem:verify-release-pin".to_string()
             }
+        },
+        Commands::Midnight { command } => match command {
+            MidnightCommands::ProofServer { command } => match command {
+                MidnightProofServerCommands::Serve { .. } => {
+                    "midnight:proof-server:serve".to_string()
+                }
+            },
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),
