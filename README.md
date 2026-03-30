@@ -582,6 +582,25 @@ ZirOS produces standalone subsystems — complete applications that run independ
 | **Aerospace Qualification Exchange** | Component thermal, vibration/shock, firmware provenance, lot genealogy, test campaign, flight readiness | [ziros-aerospace-qualification](https://github.com/AnubisQuantumCipher/ziros-aerospace-qualification) |
 | **EDL Monte Carlo Mission-Risk Exchange** | 500-step trajectory, 48K constraints, Monte Carlo risk, Midnight selective disclosure | [ziros-midnight-edl-monte-carlo-exchange](https://github.com/AnubisQuantumCipher/ziros-midnight-edl-monte-carlo-exchange) |
 
+### Subsystem Isolation
+
+Subsystems are consumers of the operating system, not modifiers. The `zkf` binary is a sealed black box — subsystems call it, they cannot change it. Same way an app on your iPhone cannot modify iOS.
+
+| | Subsystem CAN | Subsystem CANNOT |
+|---|---|---|
+| **Circuits** | Choose which circuits to prove | Modify the constraint system after compilation |
+| **Inputs** | Choose any valid inputs | Forge inputs that bypass audit |
+| **Backends** | Use any backend the circuit targets | Swap backends or weaken proof integrity |
+| **Signatures** | Receive ML-DSA-87 signed artifacts | Skip or forge post-quantum signatures |
+| **Witnesses** | Generate witnesses locally | Write witnesses to iCloud or any cloud path |
+| **Audit** | Pass the nonlinear anchoring audit | Bypass or disable the fail-closed audit |
+| **Swarm** | Run under swarm defense | Disable swarm monitoring or reputation |
+| **Scaling** | Scale via `zkf cluster` | Modify the cluster protocol or attestation |
+| **Ceremony** | Run auto-ceremony per circuit | Access another subsystem's ceremony seeds |
+| **Keys** | Use its own Keychain keys | Access another subsystem's keys or proofs |
+
+The binary is the boundary. The math is locked in. A compromised subsystem cannot affect any other subsystem or the operating system. Each subsystem has its own iCloud (per Apple ID), its own keys (Secure Enclave), its own auto-ceremony seeds (per circuit digest), and its own swarm identity.
+
 ---
 
 ## Distributed Proving And Cluster Scaling
