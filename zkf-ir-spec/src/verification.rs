@@ -1712,6 +1712,261 @@ pub fn verification_ledger() -> VerificationLedger {
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
+                theorem_id: "app.reentry_surface_constants".to_string(),
+                title:
+                    "Reentry assurance surface constants fix the shipped transparent mission profile"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_surface_constants` fixes the theorem-first reentry surface constants: 256-step horizon, 5 public outputs, 1e6 fixed-point scale, and the shipped altitude/velocity bounds."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_accepted_profile_fits_goldilocks".to_string(),
+                title:
+                    "Reentry accepted arithmetic profile stays below the Goldilocks modulus at the published velocity and rho*v^2 bounds"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_accepted_profile_fits_goldilocks_modulus` fixes the accepted 10^3-profile headroom statement used by the shipped RK4 reentry lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_signed_bound_slack_soundness".to_string(),
+                title:
+                    "Reentry signed-bound slack witnesses reconstruct the shipped square-bound relation"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_signed_bound_slack_reconstructs` fixes the bound^2 - value^2 slack relation used by the reentry app's signed residual checks."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_signed_residual_split_soundness".to_string(),
+                title:
+                    "Reentry signed residual splits reconstruct the shipped positive-minus-negative form"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_signed_residual_split_reconstructs` fixes the positive-minus-negative residual decomposition used by the theorem-first reentry surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_floor_sqrt_bracketing".to_string(),
+                title:
+                    "Reentry floor-sqrt witnesses reconstruct the shipped heating-support relation"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_floor_sqrt_brackets_value` fixes the equal-plus-remainder and next-square support relation consumed by the reentry heating-support square-root witnesses."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_exact_division_soundness".to_string(),
+                title:
+                    "Reentry exact-division witnesses reconstruct the shipped quotient-remainder relations"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_exact_division_reconstructs` fixes the exact-division relation used throughout the reentry state-transition and thermal-support witness surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_heating_factorization_soundness".to_string(),
+                title:
+                    "Reentry heating witnesses reconstruct the shipped staged Sutton-Graves factorization"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_heating_rate_factorization_reconstructs` fixes the staged exact-division factorization used to derive the shipped peak-heating witness from `k_sg`, `sqrt(rho/r_n)`, and the fixed-point cubic-speed term."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_running_max_monotonicity".to_string(),
+                title:
+                    "Reentry running maxima are monotonically non-decreasing on the shipped proof surface"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_running_max_is_monotone` fixes the monotone running-maximum relation used for the peak dynamic-pressure and peak heating outputs."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_compliance_bit_boolean".to_string(),
+                title:
+                    "Reentry compliance receipts project a boolean compliance bit on the shipped proof surface"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_compliance_bit_is_boolean` fixes the 0/1 receipt semantics used by the theorem-first reentry assurance bundle."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_manifest_window_contains_signed_pack".to_string(),
+                title:
+                    "Reentry signer manifests bound signed-pack validity windows on the shipped operator surface"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_manifest_window_contains_signed_pack` fixes the manifest-window containment relation enforced by signed reentry mission-pack validation."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_receipt_projection_preserves_signed_digests".to_string(),
+                title:
+                    "Reentry receipt projection preserves the signed mission-pack and manifest digests"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_receipt_projection_preserves_signed_digests` fixes the digest and horizon equality relation carried from the signed mission pack + signer manifest into the public reentry assurance receipt."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_rk4_weighted_step_soundness".to_string(),
+                title:
+                    "Reentry RK4 weighted-step witnesses reconstruct the shipped sixth-step averaging relation"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_rk4_weighted_step_reconstructs` fixes the k1 + 2k2 + 2k3 + k4 = 6*delta + remainder relation used by the accepted RK4 reentry kernel."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_interpolation_band_soundness".to_string(),
+                title:
+                    "Reentry atmosphere and sine interpolation witnesses stay inside the selected private band"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_interpolation_respects_selected_band` fixes the selected-band interpolation relation used by the accepted atmosphere and sine surfaces."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_cosine_closure_soundness".to_string(),
+                title:
+                    "Reentry cosine witnesses close the accepted unit-circle relation against the selected sine lane"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_cosine_closure_tracks_unit_circle` fixes the floor-sqrt closure used to derive cosine from 1 - sin^2 in the accepted RK4 surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_abort_latch_monotonicity".to_string(),
+                title:
+                    "Reentry abort latches are sticky across the accepted nominal-or-abort branch"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_abort_latch_is_sticky` fixes the previous || trigger transition used by the accepted reentry abort latch."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_first_trigger_legality".to_string(),
+                title:
+                    "Reentry first-trigger witnesses mark exactly the abort-latch rising edge"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_first_trigger_marks_latch_rise` fixes the first_trigger = trigger && !previous_latch relation used by the accepted reentry abort semantics."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "app.reentry_abort_branch_mode_selection".to_string(),
+                title:
+                    "Reentry abort branches select exactly the nominal or abort-corridor mode on the accepted surface"
+                        .to_string(),
+                scope: "zkf-runtime::proofs::verus::reentry_assurance_verus".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-runtime/proofs/verus/reentry_assurance_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reentry_abort_branch_selects_only_one_mode` fixes the boolean mode-selection relation for the accepted nominal-versus-abort corridor branch."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
                 theorem_id: "hybrid.and_verification_semantics_bounded".to_string(),
                 title: "Hybrid verify decision helper remains logical AND over the two shipped legs"
                     .to_string(),
@@ -2152,6 +2407,111 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 notes:
                     "Local Rocq theorem `private_identity_public_input_arity_guard_ok` proves the extracted private-identity arity helper is exactly equality against the shipped expected public-input arity helper."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.common.signed_bound_slack_nonnegative".to_string(),
+                title: "Signed bound slack is nonnegative when |value| <= bound".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `signed_bound_slack_nonnegative` proves the Sovereign Economic Defense signed-bound slack relation `bound^2 - value^2 >= 0` for all `|value| <= bound`, matching the shipped signed self-multiplication proof surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.common.floor_sqrt_satisfies_relation".to_string(),
+                title: "Floor sqrt satisfies sqrt^2 <= value < (sqrt+1)^2".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/SovereignEconomicDefenseProofs.v"
+                    .to_string(),
+                notes:
+                    "Local Rocq theorem `floor_sqrt_satisfies_relation` proves the Sovereign Economic Defense floor-sqrt decomposition enforces `sqrt^2 <= value < (sqrt + 1)^2`, with the bundled corollary also bounding the remainder on the same proof surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.common.exact_division_remainder_bounded".to_string(),
+                title: "Exact division remainder is strictly less than denominator".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/SovereignEconomicDefenseProofs.v"
+                    .to_string(),
+                notes:
+                    "Local Rocq theorem `exact_division_remainder_bounded` proves the Sovereign Economic Defense exact-division decomposition yields `0 <= remainder < denominator`, and the bundled quotient-uniqueness corollary closes the same helper surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.cooperative_treasury.reserve_ratio_ordering".to_string(),
+                title: "Reserve ratio division preserves ordering of reserve balances".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `reserve_ratio_ordering` proves the Sovereign Economic Defense reserve-ratio quotient is monotone in reserve balances when the denominator is shared and positive."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.anti_extraction.severity_classification_monotone".to_string(),
+                title: "Severity score classification is monotone in violation magnitudes"
+                    .to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `severity_classification_monotone` proves the Sovereign Economic Defense squared-magnitude severity score is monotone as violation magnitudes increase, and the supporting lemma `floor_sqrt_monotone` closes the RMS-to-floor-sqrt ordering argument on the same proof surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.recirculation.euler_step_capital_nonnegative".to_string(),
+                title: "Euler step capital transition preserves nonnegativity".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `euler_step_capital_nonnegative` proves the Sovereign Economic Defense Euler-step capital update preserves nonnegativity whenever both addends are nonnegative."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.recirculation.recirculation_rate_bounded".to_string(),
+                title: "Recirculation rate cannot exceed scale".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/SovereignEconomicDefenseProofs.v"
+                    .to_string(),
+                notes:
+                    "Local Rocq theorem `recirculation_rate_bounded` proves the Sovereign Economic Defense recirculation quotient `(internal * scale) / total` never exceeds `scale` under the shipped nonnegative-domain and positive-total preconditions, with bundled nonnegative and full-range corollaries on the same surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "sed.surface_constants".to_string(),
+                title: "Surface constants match Rust implementation values".to_string(),
+                scope: "zkf-lib::app::sovereign_economic_defense".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs"
+                    .to_string(),
+                notes:
+                    "Local Verus theorem `sed_surface_constants_match` proves the Sovereign Economic Defense proof-surface constants for Goldilocks scale, BN254 scale, integration steps, and range bounds, including the 63-bit squared-bound fit used by the shipped Goldilocks lane."
                         .to_string(),
                 trusted_assumptions: vec![],
             },

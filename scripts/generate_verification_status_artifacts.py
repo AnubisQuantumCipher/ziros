@@ -256,7 +256,7 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
         "formal-verification-zero-repo-assumption-program",
     )
     current_priority_progress = (
-        "March 25, 2026 release-grade closure complete. "
+        "Release-grade closure status on the current checkout. "
         f"Ledger inventory totals {total_entries} rows with {mechanized_total} machine-checked rows. "
         "Ledger counts: "
         f"{counts_summary}. "

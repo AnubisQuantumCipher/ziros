@@ -137,7 +137,7 @@ Proof.
   intros value sqrt remainder upper_slack
     Hval Hsqrt Hrem Hus Hdecomp Hupper.
   split.
-  - exact Hrem.
+  - lia.
   - (* remainder = value - sqrt^2
        upper_slack = (sqrt+1)^2 - value - 1 = 2*sqrt + 1 - 1 - remainder
                    = 2*sqrt - remainder
@@ -173,9 +173,7 @@ Proof.
        internal * scale <= (internal + external) * scale
      Dividing both sides by (internal + external) > 0:
        (internal * scale) / (internal + external) <= scale *)
-  apply Z.div_le_mono.
-  - lia.
-  - nia.
+  apply Z.div_le_upper_bound; nia.
 Qed.
 
 (**
