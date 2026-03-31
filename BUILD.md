@@ -1,6 +1,6 @@
 # Build
 
-ZirOS builds as a single Cargo workspace and writes artifacts to `target-local/`
+ZirOS builds as a single Cargo workspace and writes artifacts to `target-public/`
 via [`.cargo/config.toml`](.cargo/config.toml).
 
 ## Prerequisites
@@ -12,7 +12,8 @@ via [`.cargo/config.toml`](.cargo/config.toml).
 ## Standard Build
 
 Use the workspace build wrapper so Cargo job count and macOS allocator settings
-match the intended developer path:
+match the intended developer path. On macOS release builds, the wrapper also
+ensures the shipped `zkf-cli` binary is built with `metal-gpu`:
 
 ```bash
 ./zkf-build.sh --release
@@ -31,16 +32,9 @@ Useful variants:
 ## Fresh Clone Path
 
 ```bash
-./install.sh
+./zkf-build.sh --release -p zkf-cli
+./target-public/release/zkf-cli doctor
 ```
-
-That script:
-
-1. installs Rust with `rustup` if needed,
-2. verifies Xcode Command Line Tools,
-3. runs the release build through `zkf-build.sh`,
-4. installs `zkf-cli` into a local bin directory,
-5. runs `zkf-cli doctor`.
 
 ## Environment Notes
 
@@ -65,5 +59,5 @@ in a local build, compile `zkf-cli` with:
 The primary binary is:
 
 ```bash
-target-local/release/zkf-cli
+target-public/release/zkf-cli
 ```

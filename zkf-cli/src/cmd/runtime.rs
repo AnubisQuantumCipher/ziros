@@ -2687,14 +2687,21 @@ fn create_runtime_certification_temp_dir() -> PathBuf {
     std::env::temp_dir().join(format!("zkf-strict-certification-{pid}-{nanos}"))
 }
 
+fn default_zkf_cache_root() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".zkf").join("cache"))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
 fn strict_certification_cache_dir() -> PathBuf {
     if let Some(root) = std::env::var_os("ZKF_CACHE_DIR") {
         PathBuf::from(root)
             .join("stark-to-groth16")
             .join("certification")
     } else {
-        std::env::temp_dir()
-            .join("zkf-stark-to-groth16")
+        default_zkf_cache_root()
+            .join("stark-to-groth16")
             .join("certification")
     }
 }
@@ -7960,6 +7967,44 @@ mod tests {
 
         unsafe {
             std::env::remove_var("ZKF_CACHE_DIR");
+        }
+    }
+
+    #[test]
+    fn strict_certification_report_defaults_to_home_cache_root() {
+        let _guard = ENV_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let temp_root =
+            std::env::temp_dir().join(format!("zkf-runtime-cert-home-{}", std::process::id()));
+        let fake_home = temp_root.join("home");
+        fs::create_dir_all(&fake_home).unwrap();
+
+        let previous_home = std::env::var_os("HOME");
+        let previous_cache_dir = std::env::var_os("ZKF_CACHE_DIR");
+        unsafe {
+            std::env::set_var("HOME", &fake_home);
+            std::env::remove_var("ZKF_CACHE_DIR");
+        }
+
+        let path = strict_certification_report_path();
+        assert_eq!(
+            path,
+            fake_home
+                .join(".zkf")
+                .join("cache")
+                .join("stark-to-groth16")
+                .join("certification")
+                .join("strict-m4-max.json")
+        );
+
+        match previous_home {
+            Some(value) => unsafe { std::env::set_var("HOME", value) },
+            None => unsafe { std::env::remove_var("HOME") },
+        }
+        match previous_cache_dir {
+            Some(value) => unsafe { std::env::set_var("ZKF_CACHE_DIR", value) },
+            None => unsafe { std::env::remove_var("ZKF_CACHE_DIR") },
         }
     }
 

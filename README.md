@@ -481,13 +481,14 @@ zkf storage install
 ```bash
 git clone https://github.com/AnubisQuantumCipher/ziros.git
 cd ziros
-./install.sh
-export PATH="$HOME/.local/bin:$PATH"
-ziros doctor
-ziros capabilities
+./zkf-build.sh --release -p zkf-cli
+./target-public/release/zkf-cli doctor
+./target-public/release/zkf-cli capabilities
 ```
 
-`install.sh` builds `zkf-cli`, installs it to `~/.local/bin`, and also writes a `ziros` wrapper alongside it.
+On Apple Silicon, `./zkf-build.sh --release -p zkf-cli` also builds the release
+`zkf-cli` binary with `metal-gpu`, so the shipped macOS artifact is Metal-capable
+before strict certification is applied.
 
 ### Inspect What The Current Binary Claims
 

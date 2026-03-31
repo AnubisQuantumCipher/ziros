@@ -124,7 +124,10 @@ On the certified `AppleSiliconM4Max48GB` lane, the strict JSON report exposes:
 `strict_bn254_auto_route`, `strict_gpu_stage_coverage`,
 `strict_certification_present`, `strict_certification_match`,
 `strict_certified_at_unix_ms`, `strict_certification_report`, and
-`strict_gpu_busy_ratio_peak`.
+`strict_gpu_busy_ratio_peak`. Human output splits failures into binary support,
+runtime health, and strict certification so operators can see exactly why a host
+is not yet production-ready. When `ZKF_CACHE_DIR` is unset, the strict report is
+installed under `~/.zkf/cache/stark-to-groth16/certification/strict-m4-max.json`.
 
 ```bash
 zkf metal-doctor
@@ -386,6 +389,8 @@ fallback paths, ETA is explicitly labeled `non-sla-fallback` and must not be tre
 or countdown guarantee. The Neural Engine security detector is advisory only; deterministic policy
 is the enforcement boundary.
 
+`--mode soak` is the release-grade source of truth and installs the matching
+report used by `zkf metal-doctor --strict --json`.
 ```bash
 python3 -m pip install -r scripts/neural_engine_requirements.txt
 python3 scripts/build_fixture_neural_models.py
@@ -426,7 +431,8 @@ for training, validation, and rollback.
 
 The soak report is the source of truth for strict readiness. `zkf metal-doctor --strict --json`
 is only `production_ready=true` when the runtime is healthy and the current binary has a matching
-successful installed soak report.
+successful installed soak report under `ZKF_CACHE_DIR` or the default
+`~/.zkf/cache/stark-to-groth16/certification/strict-m4-max.json` path.
 
 ---
 

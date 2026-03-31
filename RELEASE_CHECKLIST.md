@@ -9,16 +9,22 @@
 6. Run `make test`.
 7. Run `make audit`.
 8. Run `./scripts/run_conformance_suite.sh`.
-9. Run `./target-local/release/zkf-cli doctor`.
-10. On Apple Silicon, run `./target-local/release/zkf-cli metal-doctor`.
-11. Run `make demo`.
-12. Remove `target-local/` and rerun `./install.sh` from a clean tree.
-13. Validate fresh-app bootstrap with:
+9. Build the release binary:
+   `./zkf-build.sh --release -p zkf-cli`
+10. Run `./target-public/release/zkf-cli doctor`.
+11. On Apple Silicon, run the Metal preflight on the final release binary:
+   `./target-public/release/zkf-cli metal-doctor --json`
+12. On Apple Silicon, after any strip/sign/package step that can change the binary
+    hash, generate and install the matching strict soak report for the final release binary:
+   `./target-public/release/zkf-cli runtime certify --mode soak --proof <proof.json> --compiled <compiled.json> --parallel-jobs auto`
+13. Rerun `./target-public/release/zkf-cli metal-doctor --strict --json` and require
+    `production_ready=true`.
+14. Run `make demo`.
+15. Remove `target-public/` and rerun `./zkf-build.sh --release -p zkf-cli` from a clean tree.
+16. Validate fresh-app bootstrap with:
     `zkf-cli app init --template range-proof --name test-app --out /tmp/test-fresh`
     followed by `cargo test --manifest-path /tmp/test-fresh/Cargo.toml`.
-14. Build the release binary:
-    `./zkf-build.sh --release -p zkf-cli`
-15. Confirm binary size and checksum.
-16. Tag the release: `git tag v0.1.0`.
-17. Create the GitHub release, attach the macOS ARM64 binary, and paste the
+17. Confirm binary size and checksum.
+18. Tag the release: `git tag v0.1.0`.
+19. Create the GitHub release, attach the macOS ARM64 binary, and paste the
     release notes from the verified changelog/truth surfaces.
