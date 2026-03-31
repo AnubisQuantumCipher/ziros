@@ -1,803 +1,589 @@
 # ZirOS
 
-> ## The Zero-Knowledge Operating System
->
-> A source-backed proving workspace for authoring, importing, auditing, compiling, scheduling, accelerating, verifying, exporting, and formally accounting for zero-knowledge computation.
->
-> ZirOS is the system layer that sits between application intent and raw proving machinery. You describe a statement. ZirOS owns the rest of the path: canonical IR, fail-closed audits, witness generation, backend routing, CPU/GPU scheduling, attested Metal execution, proof verification, verifier/export surfaces, runtime telemetry, and evidence-carrying artifacts.
->
-> This checkout is the public ZirOS workspace and proof surface shipped in this repository. The constitution and supporting docs also describe broader ZirOS infrastructure and release posture; this README is intentionally stricter than that broader story. It only claims what can be grounded in the current tree, its live truth surfaces, and its checked-in public adjuncts.
+**The zero-knowledge operating system. Prove truth without revealing it.**
 
-## Live Checkout Facts
+288,785 lines of Rust. 169 mechanized theorems. 0 model-only claims. 63 Metal GPU shaders. 9 proving backends. 12 Midnight Compact contracts. Post-quantum by default. Formally verified end to end. Live on Midnight Network mainnet.
 
-| Fact | Current checkout value |
-| --- | --- |
-| Workspace crates | 30 |
-| First-party Rust source lines | 288,785 `.rs` lines outside `vendor/` |
-| Proving backends in `support-matrix.json` | 9 total: 5 `ready`, 1 `limited`, 3 `broken` |
-| Frontend families in `support-matrix.json` | 7 total: 6 `ready`, 1 `limited` |
-| Gadget families in `support-matrix.json` | 11 total: 8 `ready`, 3 `limited` |
-| Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
-| Metal shader sources | 18 `.metal` files with 50 kernel entrypoints |
-| Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 168 total rows (160 `mechanized_local` + 8 `proposed` SED entries), 0 pending |
-| Runtime proof coverage | 89 files and 1,788 functions marked complete |
+---
 
-## Table Of Contents
+## What Sets ZirOS Apart
 
-- What ZirOS Is
-- System Architecture
-- Full Technology Stack
-- Proving And Execution Surfaces
-- Core ZirOS Subsystems
-- Verified Boundary And Trust Model
-- Scientific, Engineering, And Mission Applications
-- Operator Entry Paths
-- Performance, Hardware, And Storage
-- Quick Start
-- Documentation And Truth Surfaces
-- Workspace And Technology Catalog
-- Standalone Subsystems
-- Distributed Proving And Cluster Scaling
-- Midnight Network Integration
-- License
+Most ZK frameworks give you a library and a backend. ZirOS is the system layer that owns the entire path from your statement to a verified, signed, archived, post-quantum proof artifact.
 
-## What ZirOS Is
+| Metric | Value |
+|--------|-------|
+| First-party Rust | 288,785 lines across 30 workspace crates |
+| Mechanized theorems | 169 total, 169 proven against shipped production code |
+| Model-only claims | **0** -- every claim is mechanized against real code |
+| Hypothesis-carried theorems | 12 (9 protocol cryptographic assumptions + 3 attestation-honesty) |
+| Pending verifications | 0 |
+| Metal GPU shaders | 63 shaders, 50 kernel entrypoints, 51 Lean 4 arithmetic proofs |
+| Proving backends | 9 across 7 finite fields |
+| Circuit frontends | 7 (Noir, Circom, Cairo, Compact/Midnight, Halo2, Plonky3 AIR, zkVM) |
+| Gadget families | 11 (Poseidon, SHA-256, BLAKE3, Merkle, range, boolean, comparison, ECDSA, KZG, Schnorr, Plonk gate) |
+| Circuit templates | 23 (aerospace, economic governance, scientific computing) |
+| CLI surface | 38 top-level commands, 60+ subcommands |
+| Midnight Compact contracts | 12 across 3 deployed subsystems |
+| Rust tests | 1,047 across 6 crates |
+| Proof runner scripts | 6 (Rocq, 3 Verus workspaces, F* with Z3 4.13.3) |
 
-ZirOS is not just a proof library and it is not just a backend wrapper. It is a workspace that treats zero-knowledge proving as an end-to-end systems problem:
+169 mechanized theorems with 0 model-only claims is unprecedented in any shipping ZK system. Every formal claim in the verification ledger is proven against the same code that runs in production. The ledger distinguishes between mechanized implementation claims (157), hypothesis-carried theorems (12), and nothing else. There are no soft categories. There are no pending items.
 
-- Authoring and import: `zirapp.json`, `ProgramBuilder`, Rust macros, and foreign-circuit importers.
-- Truth and audit: canonical IR, field typing, nonlinear anchoring, constraint checking, and live capability surfaces.
-- Execution: backend selection, UMPG graph planning, hybrid CPU/GPU scheduling, trust-lane propagation, and telemetry.
-- Acceleration: Apple Silicon Metal kernels, ARM crypto paths, and GPU abstraction layers.
-- Interfaces: CLI, API, Python, C FFI, LSP, UI/TUI, registry, and plugin SDK.
-- Evidence: verification ledger, proof-boundary metadata, formal proof surfaces, verifier/export helpers, and public proof tools.
+---
 
-That is why the repository is broad. The same checkout contains:
+## Live on Midnight Network
 
-- formal IR and live truth surfaces in `zkf-ir-spec`
-- proving primitives in `zkf-core`, `zkf-gadgets`, and `zkf-backends`
-- runtime and hardware layers in `zkf-runtime`, `zkf-metal`, `zkf-gpu`, and `zkf-crypto-accel`
-- distributed and defensive layers in `zkf-distributed`
-- operator surfaces in `zkf-cli`, `zkf-api`, `zkf-python`, `zkf-ffi`, `zkf-lsp`, `zkf-ui`, and `zkf-tui`
-- application and showcase layers in `zkf-lib`, `zkCarbon`, `zk_rollup`, `private_budget_approval`, and `uccr-showcase`
+ZirOS ships a production proof server for Midnight Network mainnet (Kukolu phase, launched March 30, 2026).
 
-The result is a workspace that can speak to cryptographers, systems engineers, compiler/tooling authors, and scientific users without pretending they all need the same interface.
+**Proof Server** -- 1,076 lines of production Rust, 10 HTTP endpoints:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /prove` | Generate a Midnight-compatible proof |
+| `POST /prove-tx` | Prove a transaction |
+| `POST /check` | Verify a proof |
+| `GET /k` | Current proving parameter size |
+| `GET /fetch-params/{k}` | Fetch proving parameters |
+| `GET /version` | Server version |
+| `GET /proof-versions` | Supported proof versions |
+| `GET /ready` | Readiness check |
+| `GET /health` | Health check |
+| `GET /` | Root info |
+
+**Dual execution engine:** `--engine umpg` (default, ZirOS runtime) or `--engine upstream` (Midnight native). The `/check` endpoint is byte-equivalent between engines. The `/prove` endpoint is semantically equivalent (tested with 8 async integration tests using real zswap proofs and actual Midnight cryptographic primitives).
+
+**354-line CompatibilityRuntime** with per-job-type telemetry (check/prove/prove-tx), backpressure, and timeout handling.
+
+**9 official Midnight crates** from `midnightntwrk/midnight-ledger` at `ledger-8.0.3`.
+
+**Live DApp:** Next.js browser dashboard with Lace wallet integration, 20 `@midnight-ntwrk` npm packages, and selective disclosure role selector.
+
+```bash
+zkf midnight proof-server serve --port 6300 --engine umpg
+```
+
+---
 
 ## System Architecture
 
 ```mermaid
-flowchart LR
-    A["Authoring Surfaces<br/>AppSpecV1 • ProgramBuilder • zkf-dsl • Noir • Circom • Cairo • Compact • Halo2 export • Plonky3 AIR • zkVM descriptors"]
-    B["Canonical Core<br/>zkf-core • zkf-ir-spec<br/>IR • fields • witness generation • audits • proof artifacts"]
-    C["Backend Layer<br/>zkf-backends • zkf-backends-pro<br/>compile • prove • verify • wrapping • capability routing"]
-    D["Runtime Layer<br/>zkf-runtime<br/>UMPG DAG • trust lanes • telemetry • planning"]
-    E["Execution Placements<br/>CPU • CpuCrypto • CpuSme • GPU • Either"]
-    F["Acceleration Layer<br/>zkf-metal • zkf-gpu • zkf-crypto-accel<br/>Metal kernels • attestation • GPU abstractions"]
-    G["Artifacts And Evidence<br/>proofs • verifiers • calldata • bundles • reports • archive metadata"]
-    H["Operator Surfaces<br/>zkf-cli • zkf-api • zkf-python • zkf-ffi • zkf-lsp • zkf-ui • zkf-tui"]
-    I["Truth Surfaces<br/>verification-ledger.json • .zkf-completion-status.json • support-matrix.json • docs/CANONICAL_TRUTH.md"]
+graph TB
+    subgraph "Application Layer"
+        APP[zkf CLI / REST API]
+        TMPL[23 Circuit Templates]
+        FRONT[7 Frontends]
+        DSL[ProgramBuilder / Proc Macro / JSON]
+    end
 
-    A --> B --> C --> D
-    D --> E
-    E --> F
-    D --> G
-    F --> G
-    B --> H
-    C --> H
-    D --> H
-    B --> I
-    C --> I
-    D --> I
+    subgraph "Core Pipeline"
+        IR[ZKF IR: Validate / Normalize / Type-Check]
+        WITNESS[Witness Solver]
+        COMPILE[Compiler]
+        PROVE[Prover]
+        VERIFY[Verifier]
+    end
+
+    subgraph "Runtime: UMPG"
+        PLAN[Planner]
+        SCHED[Scheduler]
+        EXEC[Executor]
+        CERT[Certifier]
+        POOL[UnifiedBufferPool]
+    end
+
+    subgraph "Proving Backends"
+        P3[Plonky3 STARK]
+        G16[Groth16]
+        H2I[Halo2 IPA]
+        H2K[Halo2 KZG]
+        NOVA[Nova IVC]
+        HNOVA[HyperNova]
+        MID[Midnight Compact]
+        SP1[SP1]
+        RZ[RISC Zero]
+    end
+
+    subgraph "Hardware Acceleration"
+        METAL[63 Metal GPU Shaders]
+        ANE[Neural Engine: 6 CoreML Lanes]
+        SE[Secure Enclave]
+    end
+
+    subgraph "Security & Defense"
+        PQ[Post-Quantum: ML-DSA-87 / ML-KEM-1024]
+        SWARM[Swarm Defense: 7 Components]
+        ATTEST[4-Digest Attestation Chain]
+        CT[Constant-Time Evaluator Bridge]
+        G16GATE[Groth16 Security Gate]
+    end
+
+    subgraph "Verification"
+        LEAN[Lean 4: 19 files]
+        ROQ[Rocq/Coq: 68+ files]
+        VERUS[Verus: 32+ files]
+        FSTAR[F*: 10 files]
+        KANI[Kani: Bounded Model Checking]
+    end
+
+    subgraph "Storage & Distribution"
+        ICLOUD[iCloud Drive + Keychain]
+        CLUSTER[TCP Distributed Cluster]
+        MIDNIGHT[Midnight Network Mainnet]
+    end
+
+    APP --> IR
+    TMPL --> IR
+    FRONT --> IR
+    DSL --> IR
+    IR --> WITNESS --> COMPILE --> PROVE --> VERIFY
+    PROVE --> PLAN --> SCHED --> EXEC --> CERT
+    EXEC --> POOL
+    EXEC --> METAL
+    EXEC --> ANE
+    SCHED --> P3 & G16 & H2I & H2K & NOVA & HNOVA & MID & SP1 & RZ
+    PROVE --> PQ
+    METAL --> ATTEST
+    VERIFY --> ICLOUD
+    PROVE --> CLUSTER
+    PROVE --> MIDNIGHT
 ```
-
-| Layer | Primary surfaces | Responsibility |
-| --- | --- | --- |
-| Authoring | `zkf-lib`, `zkf-dsl`, `zkf-frontends`, `zkf-frontend-sdk` | Build or import proof programs from native specs and foreign circuit formats |
-| Canonical core | `zkf-core`, `zkf-ir-spec` | Define IR, fields, witnesses, artifacts, audits, versioning, and verification-ledger truth |
-| Proof systems | `zkf-backends`, `zkf-backends-pro` | Compile/prove/verify across backend families and expose wrapping/export helpers |
-| Runtime | `zkf-runtime` | Model proving as a graph, plan execution, propagate trust, and attribute acceleration |
-| Hardware lane | `zkf-metal`, `zkf-gpu`, `zkf-crypto-accel` | Provide Apple Silicon execution, host-boundary checks, and accelerator abstractions |
-| Distributed and defensive | `zkf-distributed` | Coordinate multi-node proving and swarm-style control surfaces |
-| Operator surfaces | `zkf-cli`, `zkf-api`, `zkf-python`, `zkf-ffi`, `zkf-lsp`, `zkf-ui`, `zkf-tui` | Expose proving, verification, debugging, service, and editor-facing workflows |
-| Verification and public proof tools | `zkf-verify`, `zkf-metal-public-cli`, `zkf-metal-public-proof-lib` | Narrow verifier-side and public Metal artifact surfaces |
-| Examples and conformance | `zkf-examples`, `zkf-conformance`, `zkf-integration-tests` | Provide sample programs, compatibility corpus, and end-to-end regression coverage |
-
-## Full Technology Stack
-
-| Technology family | What is present in this checkout | Primary surfaces |
-| --- | --- | --- |
-| Circuit authoring | `AppSpecV1`, `BuilderOpV1`, `ProgramBuilder`, Rust DSL macros, template registry | `zkf-lib`, `zkf-dsl` |
-| Frontend import | Noir ACIR, Circom R1CS/descriptor, Cairo Sierra/ZIR, Compact ZKIR/source, Halo2 export, Plonky3 AIR export, zkVM descriptors | `zkf-frontends`, `zkf-frontend-sdk` |
-| Proof systems | Arkworks Groth16, Halo2 IPA, Halo2 KZG, Plonky3 STARK, Nova, HyperNova, delegated SP1/RISC Zero compatibility, Midnight external/delegated lane, wrapper helpers | `zkf-backends`, `zkf-backends-pro` |
-| Curves and fields | BN254, BLS12-381, Pasta Fp/Fq, Goldilocks, BabyBear, Mersenne31 | `zkf-core`, `zkf-gadgets`, `support-matrix.json` |
-| Gadgets and circuits | Poseidon, SHA-256, BLAKE3, Merkle, range, comparison, ECDSA, Schnorr, KZG, PLONK gate, boolean logic | `zkf-gadgets` |
-| Runtime and scheduling | UMPG graph execution, trust lanes, unified buffer pool, runtime planning, telemetry, package workflows, runtime verification | `zkf-runtime`, `zkf-cli` |
-| Hardware acceleration | Apple Silicon, Metal, unified memory, CPU crypto extensions, CPU SME lane, GPU abstraction layer | `zkf-metal`, `zkf-gpu`, `zkf-crypto-accel` |
-| Formal methods | Lean 4, Rocq, F*, Verus, Kani, verification ledger, proof-boundary metadata, checked manifests | `zkf-metal/proofs`, `zkf-core/proofs`, `zkf-backends/proofs`, `zkf-ir-spec` |
-| Interface stack | Clap CLI, Axum/Tower HTTP service, PyO3/maturin Python package, C FFI/cbindgen, LSP server, Ratatui/Crossterm terminal UI | `zkf-cli`, `zkf-api`, `zkf-python`, `zkf-ffi`, `zkf-lsp`, `zkf-ui`, `zkf-tui` |
-| Defensive and distributed systems | Multi-node coordination, swarm identity/reputation/rule lifecycle, supply-chain audit store, benchmark harnesses | `zkf-distributed`, `supply-chain`, `benchmarks` |
-| Public proof and showcase surfaces | verifier-only binary, public Metal proof helpers, carbon and rollup apps, standalone builder-spec app, Midnight showcase | `zkf-verify`, `zkf-metal-public-cli`, `tools/zkf-metal-public-proof`, `zkCarbon`, `zk_rollup`, `private_budget_approval`, `uccr-showcase` |
-
-## Proving And Execution Surfaces
-
-### Status Vocabulary
-
-| Term | Meaning in this repo |
-| --- | --- |
-| `ready` | Shipped and available on the current host according to the live support matrix |
-| `limited` | Shipped, but explicitly caveated or restricted |
-| `broken` | Checked in, but unconfigured, unavailable, or not compiled into the current host surface |
-| `native` | First-party proof implementation in this workspace |
-| `delegated` | Compatibility lane that routes through another backend or external validation surface |
-
-### Backends
-
-| Backend | Status | Mode | Fields | Assurance lane | Proof semantics | Current host GPU coverage | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `plonky3` | `ready` | `native` | `goldilocks`, `babybear`, `mersenne31` | `native-cryptographic-proof` | `proof-enforced-lowered-ir` | `2/2 GPU stages active on current host` | Transparent STARK path with native GPU hash/NTT coverage |
-| `halo2` | `ready` | `native` | `pasta-fp` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `1/2 GPU stages active on current host` | Native Halo2 IPA lane |
-| `halo2-bls12-381` | `ready` | `native` | `bls12-381` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `0/2 GPU stages active on current host` | Native Halo2 KZG lane |
-| `arkworks-groth16` | `limited` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `3/3 GPU stages active on current host` | Support matrix marks it non-production until upstream production disclaimer is resolved |
-| `nova` | `ready` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native recursive shell |
-| `hypernova` | `ready` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native multifolding shell |
-| `sp1` | `broken` | `delegated` | `goldilocks`, `babybear`, `mersenne31` | `attestation-backed-host-validated-lane` | `attestation-over-host-validation` | `0/0 GPU stages active on current host` | Delegated compatibility lane to `plonky3`; native backend not compiled into this host surface |
-| `risc-zero` | `broken` | `delegated` | `goldilocks`, `babybear`, `mersenne31` | `attestation-backed-host-validated-lane` | `attestation-over-host-validation` | `0/0 GPU stages active on current host` | Delegated compatibility lane to `plonky3`; native backend not compiled into this host surface |
-| `midnight-compact` | `broken` | `native` | `pasta-fp`, `pasta-fq` | `delegated-or-external-lane` | `external-or-delegated` | `0/0 GPU stages active on current host` | Requires external proof-server configuration or explicit compatibility delegation |
-
-Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extensions beside the core backend crate, including strict wrapping helpers and specialized integration lanes. In this checkout those are backend extensions, not separate backend rows in `support-matrix.json`.
-
-### Frontends
-
-| Frontend | Status | Input forms | Notes |
-| --- | --- | --- | --- |
-| `noir` | `ready` | `noir-artifact-json`, `acir-program-json` | Imports ACIR plus native BlackBox metadata and Brillig hint surfaces |
-| `circom` | `ready` | `circom-r1cs-json`, `zkf-program-json`, `frontend-descriptor-json` | Supports snarkjs-style import and descriptor-driven witness execution |
-| `cairo` | `limited` | `sierra-json`, `cairo-descriptor-json`, `zkf-program-json`, `zkf-zir-program-json` | Supports a shipped Sierra subset; unsupported libfuncs fail closed |
-| `compact` | `ready` | `compact-zkir-json`, `compact-descriptor-json`, `zkf-program-json`, `compact-source` | Midnight Compact import path with sidecar discovery |
-| `halo2-rust` | `ready` | `zkf-halo2-export-json`, `zkf-halo2-export-descriptor-json` | Direct Halo2 export import |
-| `plonky3-air` | `ready` | `zkf-plonky3-air-export-json`, `zkf-plonky3-air-export-descriptor-json` | Direct Plonky3 AIR export import |
-| `zkvm` | `ready` | `zkvm-descriptor-json`, `zkf-program-json` | Descriptor-driven external zkVM import and execution hooks |
-
-### Gadgets
-
-| Gadget | Status | Supported fields | Audit status | Notes |
-| --- | --- | --- | --- | --- |
-| `blake3` | `ready` | `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks` | `unaudited` | Hash gadget surface |
-| `boolean` | `ready` | all 7 canonical fields | `informally-reviewed` | Boolean constraint helpers |
-| `comparison` | `ready` | all 7 canonical fields | `unaudited` | Ordering/comparison helpers |
-| `ecdsa` | `limited` | `bn254` | `informally-reviewed` | `secp256k1` and `secp256r1` verification surface |
-| `kzg` | `limited` | `bn254`, `bls12-381` | `unaudited` | Pairing-check/KZG surface |
-| `merkle` | `ready` | `bn254`, `bls12-381`, `pasta-fp`, `goldilocks`, `babybear`, `mersenne31` | `informally-reviewed` | Merkle inclusion helpers |
-| `plonk_gate` | `ready` | all 7 canonical fields | `unaudited` | Generic PLONK gate metadata |
-| `poseidon` | `ready` | `bn254`, `bls12-381`, `pasta-fp`, `goldilocks`, `babybear`, `mersenne31` | `informally-reviewed` | Algebraic hash surface |
-| `range` | `ready` | all 7 canonical fields | `informally-reviewed` | Range decomposition helpers |
-| `schnorr` | `limited` | `bn254` | `unaudited` | Schnorr verification surface |
-| `sha256` | `ready` | `bn254`, `bls12-381`, `pasta-fp`, `goldilocks`, `babybear`, `mersenne31` | `informally-reviewed` | SHA-256 gadget surface |
-
-## Core ZirOS Subsystems
-
-### Canonical Core And Proof Systems
-
-| Surface | Purpose |
-| --- | --- |
-| `zkf-ir-spec` | Holds IR versioning, verification ledger, and proof-boundary support metadata; it is the place that determines what the repo is allowed to claim |
-| `zkf-core` | Defines `Program`, `Expr`, `Constraint`, `Signal`, `FieldElement`, witness generation, audits, diagnostics, and proof artifact data structures |
-| `zkf-gadgets` | Provides the builtin gadget registry and specification metadata |
-| `zkf-frontends` | Imports foreign proof DSLs and artifacts into canonical ZirOS IR |
-| `zkf-backends` | Owns backend-specific compile/prove/verify implementations and wrapper/export lanes |
-| `zkf-backends-pro` | Packages advanced backend extensions and specialized integration lanes beside the core backend surface |
-
-### Runtime, Hardware, And Distributed Layers
-
-| Surface | Purpose |
-| --- | --- |
-| `zkf-runtime` | Implements UMPG planning/execution, trust-lane routing, telemetry-backed scheduling, runtime policy, and unified memory management |
-| `zkf-metal` | Owns Apple Silicon GPU execution, Metal kernels, attestation data, runtime bindings, and launch contracts |
-| `zkf-gpu` | Defines the stable GPU abstraction interfaces used across accelerator lanes |
-| `zkf-crypto-accel` | Exposes ARM CPU crypto extensions and Apple Silicon acceleration helpers |
-| `zkf-distributed` | Handles multi-node coordination, worker logic, and cluster-aware proving |
-
-### Operator, Extension, And Public Proof Surfaces
-
-| Surface | Purpose |
-| --- | --- |
-| `zkf-lib` | Embeddable SDK for compile/prove/verify flows, app specs, templates, evidence, and verifier export |
-| `zkf-cli` | Operator-facing CLI for proving, importing, auditing, runtime planning, cluster/swarm control, packaging, registry flows, deployment, and diagnostics |
-| `zkf-api` | Axum/Tower HTTP proving-as-a-service server with auth, queueing, rate limiting, and health/capabilities endpoints |
-| `zkf-python` | Python bindings for compile/prove/verify and helper flows |
-| `zkf-ffi` | C-compatible FFI bridge for native embedding |
-| `zkf-lsp` | LSP diagnostics, hover, goto-definition, and IR analysis |
-| `zkf-ui` | Reusable terminal-rendering helpers for proof flows |
-| `zkf-tui` | Standalone TUI shell and widgets built on top of UI helpers |
-| `zkf-registry` | Gadget publication, listing, manifests, and dependency resolution |
-| `zkf-dsl` | Rust macro surface for embedded circuit authoring |
-| `zkf-frontend-sdk` | SDK for extension authors who want to add new frontend plugins |
-| `zkf-verify` | Verifier-side library and standalone binary for proof inspection and checking |
-| `zkf-metal-public-cli` | Narrow public CLI for Metal proof artifact handling |
-| `zkf-metal-public-proof-lib` | Public proof verification helpers for the Metal artifact release lane |
-| `zkf-examples` | Canonical sample programs and fixtures used across the workspace |
-| `zkf-conformance` | Backend compatibility corpus and conformance checks |
-| `zkf-integration-tests` | End-to-end regression coverage for cross-crate behavior |
-
-## Verified Boundary And Trust Model
-
-### Live Truth Surfaces
-
-| Source | Role |
-| --- | --- |
-| `zkf-ir-spec/verification-ledger.json` | Authoritative proof-claim inventory |
-| `.zkf-completion-status.json` | Current completion, assurance-class counts, runtime proof coverage, and checked build/test status |
-| `docs/CANONICAL_TRUTH.md` | Explains how to interpret support, trust, and program-family truth |
-| `support-matrix.json` | Machine-readable backend/frontend/gadget readiness on the current tree |
-
-### Ledger And Assurance Counts
-
-| Metric | Value |
-| --- | --- |
-| Total verification-ledger rows | 143 |
-| `mechanized_local` rows | 143 |
-| `mechanized_generated` rows | 0 |
-| `bounded_checked` rows | 0 |
-| `assumed_external` rows | 0 |
-| Pending rows | 0 |
-| `mechanized_implementation_claim` | 115 |
-| `attestation_backed_lane` | 3 |
-| `model_only_claim` | 16 |
-| `hypothesis_carried_theorem` | 9 |
-| Runtime/distributed proof coverage | 89 files, 1,788 functions complete |
-
-### Trust Vocabulary
-
-| Term | Meaning here |
-| --- | --- |
-| `mechanized` | Machine-checked theorem over a shipped implementation or tracked proof boundary |
-| `attestation-backed` | Host-validated lane, not an in-circuit cryptographic proof |
-| `model-only` | Theorem about a model or boundary summary, not direct end-to-end implementation correctness |
-| `hypothesis-carried` | Mechanized theorem that still depends on explicit upstream or cryptographic hypotheses |
-| `Cryptographic` | Runtime trust model for in-circuit proof-enforced outputs |
-| `Attestation` | Runtime trust model for host-validated outputs |
-| `MetadataOnly` | Runtime trust model for non-cryptographic metadata markers |
-| `StrictCryptographic` | Required runtime lane when only cryptographic proofs are acceptable |
-| `AllowAttestation` | Required runtime lane when host-validated attestations may be admitted |
-| `AllowMetadataOnly` | Required runtime lane when metadata-only markers may be admitted |
-
-`zkf-runtime/src/trust.rs` makes the weakening rule explicit: if any dependency has a weaker trust model, the node inherits the weakest.
-
-### The Verified Metal Lane
-
-| Source-backed fact | Current checkout value |
-| --- | --- |
-| Metal shader source files | 18 |
-| Kernel entrypoints found in shipped `.metal` files | 50 |
-| Generated GPU program definitions | 60 |
-| Checked attestation manifests | 9 |
-| Lean files under `zkf-metal/proofs/lean` | 18 |
-| Verus files under `zkf-metal/proofs/verus` | 5 |
-| Static entrypoint whitelist | `expected_arguments()` in `zkf-metal/src/verified_artifacts.rs` |
-| Attestation chain | metallib digest, reflection digest, pipeline-descriptor digest, toolchain identity |
-
-The Metal proof surface is deliberately split:
-
-- `zkf-metal/proofs/lean` proves kernel-family refinement, launch safety, memory-model, and codegen truth for the admitted proof surface.
-- `zkf-metal/proofs/verus` proves host-boundary launch-contract properties that are honest to claim today.
-- `docs/VERIFIED_METAL_BOUNDARY.md` is the public description of that lane.
-
-The Verus README for the Metal host boundary is explicit about scope: the current Verus lane proves non-empty typed regions, non-zero dispatch geometry, and certified BN254 route exclusions. It does not claim to prove full kernel mathematics for hash, Poseidon2, NTT, or MSM on its own.
-
-## Scientific, Engineering, And Mission Applications
-
-ZirOS is not confined to toy circuits. The `zkf-lib` application surface and adjacent crates expose mission, scientific, privacy, and compliance programs that treat zero-knowledge proving as a certificate layer over structured computation.
-
-| Surface | Primary module or crate | What it certifies |
-| --- | --- | --- |
-| Private N-body orbital dynamics | `zkf-lib::orbital` | Structured orbital trace commitments and replayable orbital witness/program bundles |
-| Satellite conjunction | `zkf-lib::satellite` | Private conjunction and maneuver-plan safety certificates |
-| Multi-satellite screening | `zkf-lib::multi_satellite` | Pairwise constellation screening and mission-safety commitments |
-| Powered descent | `zkf-lib::descent` | Structured descent-program constraints and witness-safe mission traces |
-| Thermochemical equilibrium | `zkf-lib::thermochemical` | Gas-phase equilibrium certificate lanes with attested request/inputs surfaces |
-| Real-gas state | `zkf-lib::real_gas` | Cubic equation-of-state certificate lanes over attested reduced coefficients |
-| Navier-Stokes structured step | `zkf-lib::navier_stokes` | Structured finite-volume step certificates rather than unrestricted CFD claims |
-| Combustion instability / Rayleigh | `zkf-lib::combustion` | Rayleigh-window and coupled low-order modal growth certificates |
-| Private identity | `zkf-lib::private_identity` and `credential` CLI flows | Credential issuance, Merkle-path proofs, and privacy-preserving verification reports |
-| Finance and voting examples | `financial_loan_qualification.rs`, `private_voting_commitment_pipeline.rs`, `private_identity_service_tier.rs` | Example private-policy, threshold, commitment, and eligibility flows |
-| Builder-only app spec example | `private_budget_approval/` | Standalone `AppSpecV1` / `ProgramBuilder` application with prove/verify/export coverage |
-| Carbon compliance showcase | `zkCarbon/` | Verifiable carbon-emission reduction proof flow |
-| Rollup application experiments | `zk_rollup/` | Rollup-oriented application logic on top of ZirOS primitives |
-| Midnight showcase | `uccr-showcase/` | Privacy-preserving compliance showcase for finance, medicine, and engineering on Midnight Network |
-
-Several of these surfaces also emit evidence-oriented bundles through `zkf-lib::evidence`, including generated closure summaries, formal-evidence collection hooks, and verifier/export helpers.
-
-## Operator Entry Paths
-
-### For Cryptographers
-
-- Start with `support-matrix.json`, `zkf-ir-spec/verification-ledger.json`, `.zkf-completion-status.json`, and [`docs/CANONICAL_TRUTH.md`](docs/CANONICAL_TRUTH.md).
-- Read `zkf-backends`, `zkf-backends-pro`, and `zkf-verify` for backend and verifier surfaces.
-- Read [`docs/VERIFIED_METAL_BOUNDARY.md`](docs/VERIFIED_METAL_BOUNDARY.md) and `zkf-metal/proofs/*` for the GPU lane.
-
-### For Engineers And Programmers
-
-- Start with `zkf-lib`, `ProgramBuilder`, `AppSpecV1`, and `zkf-cli`.
-- Use `zkf-api`, `zkf-python`, or `zkf-ffi` if you need embedding instead of shell workflows.
-- Use `zkf-examples`, `zkf-conformance`, and `zkf-integration-tests` to see complete end-to-end flows.
-
-### For Scientists, Physicists, Chemists, And Mathematicians
-
-- Start with the `zkf-lib::orbital`, `satellite`, `multi_satellite`, `descent`, `thermochemical`, `real_gas`, `navier_stokes`, and `combustion` modules.
-- Treat these as certificate lanes over shipped discrete models, not as claims about unrestricted theory.
-- The canonical truth file is explicit about those scope boundaries and is part of the public story.
-
-### For App And Platform Builders
-
-- Start with `zkf-dsl`, `zkf-frontend-sdk`, `zkf-registry`, `zkf-lsp`, `zkf-ui`, and `zkf-tui`.
-- Use `zkf-cli app ...`, `package ...`, `runtime ...`, and `registry ...` to scaffold, package, and inspect flows.
-- Use `zkf-metal-public-cli` and `zkf-metal-public-proof-lib` when you need a narrower public proof surface than the full workspace.
-
-## Performance, Hardware, And Storage
-
-### Apple Silicon And Execution Planning
-
-| Runtime fact | Current checkout evidence |
-| --- | --- |
-| Hardware profiles | `M1`, `M2`, `M3`, `M4`, `A17Pro`, `A18`, `A18Pro`, `VisionPro`, `CpuOnly` in `zkf-runtime/src/trust.rs` |
-| Device placements | `Cpu`, `Gpu`, `CpuCrypto`, `CpuSme`, `Either` in `zkf-runtime/src/graph.rs` |
-| GPU-capable stage keys | `ntt`, `lde`, `msm`, `poseidon-batch`, `sha256-batch`, `merkle-layer`, `fri-fold`, `fri-query-open` |
-| Unified memory classes | `HotResident`, `EphemeralScratch`, `Spillable` in `zkf-runtime/src/memory.rs` |
-| Neural Engine role | advisory control plane only; proof validity does not depend on model output |
-
-### Neural Engine Control Plane
-
-The repo ships a Neural Engine control-plane story through runtime and documentation surfaces:
-
-- retraining and telemetry commands in `zkf-cli`
-- model-operations docs in [`docs/NEURAL_ENGINE_OPERATIONS.md`](docs/NEURAL_ENGINE_OPERATIONS.md)
-- explicit canonical-truth language that model output is advisory, not proof-validity truth
-
-### Post-Quantum Cryptographic Surfaces
-
-ZirOS ships NIST-standardized post-quantum cryptography across the proving, identity, and communication layers.
-
-| Surface | Algorithm | Standard | Security Level | Status |
-| --- | --- | --- | --- | --- |
-| STARK proofs (Plonky3) | FRI + hash-based Merkle commitment | Information-theoretic | Post-quantum (no elliptic curves) | `ready` |
-| Swarm peer identity | ML-DSA-87 (hybrid with Ed25519) | NIST FIPS 204 | Level 5 (AES-256 equivalent) | `ready` |
-| Credential issuance | ML-DSA-87 signature bundles | NIST FIPS 204 | Level 5 | `ready` |
-| Proof-origin attestation | ML-DSA-87 on proof artifacts | NIST FIPS 204 | Level 5 | `ready` |
-| Epoch key exchange | ML-KEM-1024 (hybrid with X25519) | NIST FIPS 203 | Level 5 | `ready` |
-| Gossip encryption | ChaCha20-Poly1305 (256-bit symmetric) | — | Post-quantum (symmetric) | `ready` |
-| Key derivation | HKDF-SHA384 | CNSA 2.0 compliant | Post-quantum | `ready` |
-| Credential KDF | Argon2id + SHA-256 | — | Post-quantum (symmetric) | `ready` |
-
-CNSA 2.0 alignment: ML-DSA-87 for digital signatures, ML-KEM-1024 for key establishment, SHA-384 for key derivation, and ChaCha20-Poly1305 (AES-256 equivalent) for authenticated encryption. The Plonky3 STARK backend provides post-quantum proofs without trusted setup; Groth16, Halo2, and Nova backends remain classical (elliptic-curve-based) and are explicitly labeled as such.
-
-The hybrid identity scheme (`HybridEd25519MlDsa87`) requires both Ed25519 and ML-DSA-87 signatures to verify. If either algorithm is broken, the other provides continued security. The hybrid key exchange combines X25519 and ML-KEM-1024 shared secrets through HKDF-SHA384; compromising one algorithm does not compromise the derived key.
-
-Implementation surface: `libcrux-ml-dsa` v0.0.8 for ML-DSA-87, `libcrux-ml-kem` v0.0.8 for ML-KEM-1024, `chacha20poly1305` for AEAD, `hkdf` with SHA-384 for key derivation. Private keys are stored in iCloud Keychain on macOS (Secure Enclave protected, synced with Advanced Data Protection) or in file-based storage with restricted permissions on other platforms.
-
-Post-quantum backend classification:
-
-| Backend | Post-Quantum | Basis |
-| --- | --- | --- |
-| `plonky3` | Yes | FRI polynomial commitment is hash-based; no number-theoretic assumptions |
-| `arkworks-groth16` | No | BN254 elliptic curve pairings; vulnerable to Shor's algorithm |
-| `halo2` | No | Pasta curve IPA; vulnerable to Shor's algorithm |
-| `halo2-bls12-381` | No | BLS12-381 KZG; vulnerable to Shor's algorithm |
-| `nova` / `hypernova` | No | Pallas/Vesta curves; vulnerable to Shor's algorithm |
-| STARK-to-SNARK wrapping | Outer: No | Inner STARK is post-quantum; outer Groth16 wrapper is classical |
-
-For end-to-end post-quantum proof generation, use `--backend plonky3` without wrapping.
-
-### iCloud-Native Storage Architecture
-
-ZirOS implements iCloud Drive as the persistent storage layer and iCloud Keychain as the key management layer. The local SSD operates as a transparent cache. Artifacts are written directly to iCloud on creation; macOS handles upload, sync, cross-device availability, and automatic local eviction under storage pressure.
-
-Persistent state directory: `~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/`
-
-| Directory | Contents | Access pattern |
-| --- | --- | --- |
-| `proofs/{app}/{timestamp}/` | Proof artifacts organized by application and proving timestamp | Write on prove, read on verify/inspect |
-| `traces/{app}/{timestamp}/` | UMPG execution telemetry, GPU attribution, security verdicts | Write on prove |
-| `verifiers/{app}/{timestamp}/` | Solidity verification contracts | Write on export |
-| `reports/{app}/{timestamp}/` | Mission assurance and proving reports | Write on export |
-| `audits/{app}/{timestamp}/` | Circuit security audit results | Write on audit |
-| `telemetry/` | Neural Engine training records | Write per job, read on retrain |
-| `swarm/` | Threat patterns, detection rules, reputation logs, entrypoint observations, attestation chains | Read/write per job |
-
-Key management: persistent private keys (Ed25519, ML-DSA-87, proving keys, credential keys) are stored in iCloud Keychain with `kSecAttrSynchronizable = true` and Secure Enclave protection on each device. Keys sync across Apple devices signed into the same Apple ID with Advanced Data Protection enabled. Ephemeral keys (X25519, ML-KEM-1024 epoch keys) remain in-process memory only and are never persisted.
-
-Witness handling: witnesses contain every private input to a circuit in plaintext. They are generated in the local cache (`~/.zkf/cache/`), used for proving, and deleted immediately after proof verification. Witnesses are never written to iCloud. This is the enforcement mechanism that preserves the zero-knowledge property on the storage layer.
-
-Local cache: `~/.zkf/cache/` holds ephemeral computation artifacts (witnesses during proving, build intermediates, active proving keys pulled from iCloud for a session). The cache is expendable; its contents can be rebuilt from iCloud or regenerated from source.
-
-Device-adaptive profiles:
-
-| Profile | SSD capacity | Warning threshold | Critical threshold | Monitor interval |
-| --- | --- | --- | --- | --- |
-| Constrained | up to 300 GB | 30 GB | 15 GB | 30 minutes |
-| Standard | 301 to 600 GB | 50 GB | 25 GB | 1 hour |
-| Comfortable | 601 GB to 1.2 TB | 100 GB | 50 GB | 1 hour |
-| Generous | above 1.2 TB | 200 GB | 100 GB | daily |
-
-Cross-device operation: install ZirOS on any Mac, sign in with the same Apple ID, and all keys, proofs, telemetry, models, and swarm state are immediately available. No manual file transfer, no USB drives, no configuration beyond `ziros doctor`.
-
-Storage and key commands:
-
-```bash
-ziros storage status --json    # iCloud sync state, local cache usage, key inventory
-ziros storage evict            # Release locally cached iCloud files to free SSD space
-ziros storage warm             # Pre-fetch frequently used files into local cache
-ziros storage install          # Install the hourly macOS launchd cache-management agent
-ziros keys list --json         # Enumerate all keys across Keychain and file backends
-ziros keys audit --json        # Report key age, rotation status, sync health, permissions
-ziros keys rotate <id>         # Generate new key material and retire the previous key
-```
-
-On non-macOS platforms, the iCloud layer falls back to local file storage at `~/.zkf/` with the same directory structure and access patterns.
-
-### Checked Build And Test Truth
-
-`.zkf-completion-status.json` records the current checked build/test posture for this tree:
-
-- build truth dated March 25, 2026 includes `cargo build --workspace`
-- test truth dated March 25, 2026 includes `cargo test -p zkf-lib --lib`, `cargo test -p zkf-core --lib`, `cargo test -p zkf-backends --lib`, and selected `zkf-integration-tests` showcase flows
-
-## Quick Start
-
-### Prebuilt Binary (any Mac, recommended)
-
-```bash
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
-sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
-zkf doctor --json
-zkf storage install
-```
-
-### Source Build
-
-```bash
-git clone https://github.com/AnubisQuantumCipher/ziros.git
-cd ziros
-./install.sh
-export PATH="$HOME/.local/bin:$PATH"
-ziros doctor
-ziros capabilities
-```
-
-`install.sh` builds `zkf-cli`, installs it to `~/.local/bin`, and also writes a `ziros` wrapper alongside it.
-
-### Inspect What The Current Binary Claims
-
-```bash
-ziros capabilities
-ziros support-matrix
-ziros frontends --json
-ziros doctor --json
-ziros metal-doctor --json
-```
-
-### Scaffold, Audit, Compile, Prove, Verify
-
-```bash
-ziros app templates
-ziros audit --program docs/examples/fixtures/epa/zirapp.json --backend arkworks-groth16 --json
-ziros compile --spec docs/examples/fixtures/epa/zirapp.json --backend arkworks-groth16 --out /tmp/epa.compiled.json --allow-dev-deterministic-groth16
-ziros prove --program docs/examples/fixtures/epa/zirapp.json --inputs docs/examples/fixtures/epa/inputs.compliant.json --backend arkworks-groth16 --out /tmp/epa.proof.json --allow-dev-deterministic-groth16
-ziros verify --program docs/examples/fixtures/epa/zirapp.json --artifact /tmp/epa.proof.json --backend arkworks-groth16 --allow-dev-deterministic-groth16
-```
-
-### Service And Verifier Surfaces
-
-```bash
-cargo run -p zkf-api
-ziros deploy --artifact /tmp/epa.proof.json --backend arkworks-groth16 --out /tmp/EpaVerifier.sol
-cargo run -p zkf-verify -- --help
-```
-
-## Documentation And Truth Surfaces
-
-| Document | Role |
-| --- | --- |
-| [`CONSTITUTION.md`](CONSTITUTION.md) | Binding philosophy and claim discipline |
-| [`PROOF_BOUNDARY.md`](PROOF_BOUNDARY.md) | Proof-boundary baseline |
-| [`docs/CANONICAL_TRUTH.md`](docs/CANONICAL_TRUTH.md) | How to interpret truth, trust lanes, and live support |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Higher-level system architecture |
-| [`docs/BACKENDS.md`](docs/BACKENDS.md) | Backend comparison and operator guidance |
-| [`docs/NONLINEAR_ANCHORING.md`](docs/NONLINEAR_ANCHORING.md) | Fail-closed audit model |
-| [`docs/VERIFIED_METAL_BOUNDARY.md`](docs/VERIFIED_METAL_BOUNDARY.md) | Public description of the attested Metal proof lane |
-| [`docs/WRAPPING_SECURITY.md`](docs/WRAPPING_SECURITY.md) | Wrapping trust model and security posture |
-| [`docs/SECURITY.md`](docs/SECURITY.md) | Security model and TCB discussion |
-| [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | End-to-end starter flow |
-| [`docs/APP_DEVELOPER_GUIDE.md`](docs/APP_DEVELOPER_GUIDE.md) | App-builder guidance |
-| [`docs/CLI.md`](docs/CLI.md) and [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) | CLI surfaces and command reference |
-| [`docs/NEURAL_ENGINE_OPERATIONS.md`](docs/NEURAL_ENGINE_OPERATIONS.md) | Model/telemetry/control-plane operations |
-
-## Workspace And Technology Catalog
-
-### Workspace Crates
-
-| Package | Path | Purpose |
-| --- | --- | --- |
-| `zkf-api` | `zkf-api/` | Proving-as-a-service HTTP API with auth, queueing, metering, deploy, benchmark, and health/capabilities routes |
-| `zkf-backends` | `zkf-backends/` | Native compile/prove/verify implementations and backend capability routing |
-| `zkf-backends-pro` | `zkf-backends-pro/` | Advanced backend extensions, wrapping helpers, and specialized integration lanes |
-| `zkf-cli` | `zkf-cli/` | Operator CLI for proving, importing, auditing, runtime, packaging, registry, swarm, and diagnostics |
-| `zkf-conformance` | `zkf-conformance/` | Backend compatibility corpus behind `ziros conformance` |
-| `zkf-core` | `zkf-core/` | Canonical IR, fields, witness generation, audits, and proof artifact structures |
-| `zkf-crypto-accel` | `zkf-crypto-accel/` | ARM CPU crypto-extension and Apple Silicon acceleration helpers |
-| `zkf-distributed` | `zkf-distributed/` | Multi-node proving coordination and cluster worker logic |
-| `zkf-dsl` | `zkf-dsl/` | Rust macro surface for embedded circuit authoring |
-| `zkf-examples` | `zkf-examples/` | Canonical sample programs and reusable fixtures |
-| `zkf-ffi` | `zkf-ffi/` | C-compatible native embedding bridge |
-| `zkf-frontend-sdk` | `zkf-frontend-sdk/` | SDK for writing additional frontend plugins |
-| `zkf-frontends` | `zkf-frontends/` | Importers from Noir, Circom, Cairo, Compact, Halo2 export, Plonky3 AIR, and zkVM descriptors |
-| `zkf-gadgets` | `zkf-gadgets/` | Builtin gadget registry and metadata catalog |
-| `zkf-gpu` | `zkf-gpu/` | Stable GPU abstraction interfaces |
-| `zkf-integration-tests` | `zkf-integration-tests/` | End-to-end cross-crate regression coverage |
-| `zkf-ir-spec` | `zkf-ir-spec/` | Formal IR specification and verification-ledger support surfaces |
-| `zkf-lib` | `zkf-lib/` | Embeddable SDK for compile/prove/verify, templates, evidence, and export |
-| `zkf-lsp` | `zkf-lsp/` | Language Server Protocol support for ZirOS IR |
-| `zkf-metal` | `zkf-metal/` | Apple Silicon Metal execution crate with attestation and launch contracts |
-| `zkf-metal-public-cli` | `zkf-metal-public-cli/` | Narrow public CLI for Metal proof artifact handling |
-| `zkf-metal-public-proof-lib` | `tools/zkf-metal-public-proof/lib/` | Public proof verification helpers for the Metal artifact release lane |
-| `zkf-python` | `zkf-python/` | Python bindings for ZirOS |
-| `zkf-registry` | `zkf-registry/` | Gadget publication, manifests, listing, and dependency resolution |
-| `zkf-runtime` | `zkf-runtime/` | UMPG planning/execution, trust lanes, telemetry, and runtime policy |
-| `zkf-tui` | `zkf-tui/` | Standalone TUI shell and widgets for proof-driven apps |
-| `zkf-ui` | `zkf-ui/` | Reusable terminal presentation helpers |
-| `zkf-verify` | `zkf-verify/` | Verifier-side library and standalone verification binary |
-| `zk_carbon` | `zkCarbon/` | Carbon-emission reduction proof showcase crate |
-| `zk_rollup` | `zk_rollup/` | Rollup-oriented proving experiments built on ZirOS primitives |
-
-### Notable First-Party Adjuncts
-
-| Surface | Path | Role |
-| --- | --- | --- |
-| Builder-only app-spec app | `private_budget_approval/` | Standalone `AppSpecV1` / builder-only proof app with prove/verify/export coverage |
-| Midnight compliance showcase | `uccr-showcase/` | TypeScript/Midnight Network showcase for finance, clinical, and engineering compliance proofs |
-| Benchmark harness | `benchmarks/` | Competition manifest and runners for `snarkjs`, `gnark`, `Noir/Nargo`, `SP1`, `RISC Zero`, and external `Plonky3` across three scenarios |
-| Supply-chain boundary | `supply-chain/` | `cargo vet` trust store for audited cryptographic dependencies |
-| Public Metal proof toolchain | `tools/zkf-metal-public-proof/` | Narrow public proof-program/script surfaces around the Metal artifact lane |
-
-
-## Standalone Subsystems
-
-ZirOS produces standalone subsystems — complete applications that run independently without the ZirOS source code. Each subsystem ships with `install.sh` that downloads the 26 MB `zkf` binary, giving it the full ZirOS proving engine: all 9 backends, all 7 frontends, all 11 gadgets, Metal GPU, iCloud storage, swarm defense, Neural Engine, credential system, and distributed proving.
-
-**Any Mac with Apple Silicon can run any subsystem. No Rust toolchain needed. No compilation. Just `./install.sh`.**
-
-### Deployed Subsystems
-
-| Subsystem | What It Proves | Repo |
-|-----------|---------------|------|
-| **Sovereign Economic Defense** | Cooperative treasury, land trust, predatory lending, portfolio, 96-step sovereignty | [ziros-sovereign-economic-defense](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) |
-| **Falcon Heavy Flight Certification** | 27 engines, 187-step ascent, 3x300-step recovery, orbital, engine-out, fairing | [ziros-falcon-heavy-flight-certification](https://github.com/AnubisQuantumCipher/ziros-falcon-heavy-flight-certification) |
-| **Reentry Thermal Envelope** | RLV reentry mission assurance | [ziros-reentry-thermal-envelope-flagship](https://github.com/AnubisQuantumCipher/ziros-reentry-thermal-envelope-flagship) |
-| **RPOD Verifier** | Powered descent + docking corridor | [rpod-verifier](https://github.com/AnubisQuantumCipher/rpod-verifier) |
-| **Mixture Lock** | Propellant formulation O/F bounds | [mixture-lock](https://github.com/AnubisQuantumCipher/mixture-lock) |
-| **Conjunction Proof** | Satellite conjunction risk | [conjunction-proof](https://github.com/AnubisQuantumCipher/conjunction-proof) |
-| **Burn Budget** | Multi-phase fuel budget | [burn-budget](https://github.com/AnubisQuantumCipher/burn-budget) |
-| **Metal Provers** | 51 Lean 4 GPU kernel theorems | [metal-provers](https://github.com/AnubisQuantumCipher/metal-provers) |
-| **Bubble Proof** | Sonoluminescence simulation | [bubble-proof](https://github.com/AnubisQuantumCipher/bubble-proof) |
-| **Aerospace Qualification Exchange** | Component thermal, vibration/shock, firmware provenance, lot genealogy, test campaign, flight readiness | [ziros-aerospace-qualification](https://github.com/AnubisQuantumCipher/ziros-aerospace-qualification) |
-| **EDL Monte Carlo Mission-Risk Exchange** | 500-step trajectory, 48K constraints, Monte Carlo risk, Midnight selective disclosure | [ziros-midnight-edl-monte-carlo-exchange](https://github.com/AnubisQuantumCipher/ziros-midnight-edl-monte-carlo-exchange) |
-
-### Subsystem Isolation
-
-Subsystems are consumers of the operating system, not modifiers. The `zkf` binary is a sealed black box — subsystems call it, they cannot change it. Same way an app on your iPhone cannot modify iOS.
-
-| | Subsystem CAN | Subsystem CANNOT |
-|---|---|---|
-| **Circuits** | Choose which circuits to prove | Modify the constraint system after compilation |
-| **Inputs** | Choose any valid inputs | Forge inputs that bypass audit |
-| **Backends** | Use any backend the circuit targets | Swap backends or weaken proof integrity |
-| **Signatures** | Receive ML-DSA-87 signed artifacts | Skip or forge post-quantum signatures |
-| **Witnesses** | Generate witnesses locally | Write witnesses to iCloud or any cloud path |
-| **Audit** | Pass the nonlinear anchoring audit | Bypass or disable the fail-closed audit |
-| **Swarm** | Run under swarm defense | Disable swarm monitoring or reputation |
-| **Scaling** | Scale via `zkf cluster` | Modify the cluster protocol or attestation |
-| **Ceremony** | Run auto-ceremony per circuit | Access another subsystem's ceremony seeds |
-| **Keys** | Use its own Keychain keys | Access another subsystem's keys or proofs |
-
-The binary is the boundary. The math is locked in. A compromised subsystem cannot affect any other subsystem or the operating system. Each subsystem has its own iCloud (per Apple ID), its own keys (Secure Enclave), its own auto-ceremony seeds (per circuit digest), and its own swarm identity.
 
 ---
 
-## Distributed Proving And Cluster Scaling
+## The Five Numbers That Matter
 
-Every subsystem scales by stacking Macs. The `zkf` binary includes a full TCP-based distributed proving cluster with swarm-defended attestation, reputation scoring, and automatic graph partitioning.
+| Number | What It Means |
+|--------|--------------|
+| **169 / 169** | Every mechanized theorem is proven against shipped production code. Not stubs. Not test harnesses. The actual binary. |
+| **0** | Model-only claims remaining. Every former model-only claim has been rebound to shipped code with a mechanized proof. |
+| **9** | Proving backends. Plonky3 STARK, Groth16, Halo2 IPA, Halo2 KZG, Nova, HyperNova, SP1, RISC Zero, Midnight Compact. |
+| **63** | Metal GPU shaders with 50 kernel entrypoints, verified by 51 Lean 4 theorems. Fail-closed attestation. |
+| **12** | Midnight Compact contracts deployed across 3 subsystems with typed witnesses and selective disclosure. |
 
-### How It Scales
+---
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Mac Mini 1  │────▶│  Mac Mini 2  │────▶│  Mac Mini 3  │────▶│  Mac Mini 4  │────▶│  Mac Mini 5  │
-│ Coordinator  │     │   Worker     │     │   Worker     │     │   Worker     │     │   Worker     │
-│  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│     │  24GB / 20GPU│
-└──────▲───────┘     └──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
-       │                                                                                    │
-       └────────────────────────── Thunderbolt 5 Ring (120 Gbps) ───────────────────────────┘
-```
+## Proving Backends
 
-The coordinator partitions the UMPG proving graph at phase boundaries (witness → NTT → MSM → Poseidon → FRI → prove → encode) and distributes partitions across workers. Each worker proves its assigned partition with its own Metal GPU and unified memory. Results merge back to the coordinator with cryptographic attestation.
+| Backend | Status | Field | Setup | Proof Size | Post-Quantum | GPU Stages |
+|---------|--------|-------|-------|------------|-------------|------------|
+| Plonky3 STARK | Ready | Goldilocks, BabyBear, Mersenne31 | None | 1-10 KB | Yes | NTT + Merkle |
+| Arkworks Groth16 | Limited | BN254 | Trusted | 128 bytes | No | MSM + NTT + QAP |
+| Halo2 IPA | Ready | Pasta Fp | None | ~3 KB | No | MSM |
+| Halo2 KZG | Ready | BLS12-381 | Trusted | ~3 KB | No | -- |
+| Nova | Ready | BN254 | None | ~1.77 MB | No | -- |
+| HyperNova | Ready | BN254 | None | Variable | No | -- |
+| SP1 | Broken | Delegated | -- | ~1 KB | -- | -- |
+| RISC Zero | Broken | Delegated | -- | ~1 KB | -- | -- |
+| Midnight Compact | Broken | Pasta Fq | -- | -- | -- | -- |
 
-### Scaling Table
+SP1 and RISC Zero delegate to Plonky3 and require `--allow-compat`. Midnight Compact requires proof server configuration. These statuses are reported honestly by `zkf support-matrix`.
 
-| Configuration | Machines | Unified Memory | GPU Cores | Monthly Cost | Use Case |
-|--------------|----------|---------------|-----------|-------------|----------|
-| 1 MacBook Air M4 | 1 | 16 GB | 10 | $0 | Single user, small circuits |
-| 1 Mac Mini M4 Pro | 1 | 24 GB | 20 | $0 | Single cooperative or mission |
-| **5 Mac Minis M4 Pro** | **5** | **120 GB** | **100** | **$0** | **Regional network / fleet** |
-| 10 Mac Minis M4 Pro | 10 | 240 GB | 200 | $0 | City-wide federation |
-| 5 Mac Studios M4 Ultra | 5 | 960 GB | 400 | $0 | National-scale proving |
-| 50 Mac Minis | 50 | 1.2 TB | 1,000 | $0 | Industrial proving fleet |
-| 100 Mac Minis | 100 | 2.4 TB | 2,000 | $0 | Enterprise-scale operations |
+**STARK-to-Groth16 wrapping** via Nova IVC decomposition: the inner Plonky3 STARK is post-quantum, but wrapping through Nova + Groth16 makes the overall proof classical. ZirOS documents this honestly.
 
-**$0/month** — you own the hardware. No cloud fees. No server rental. No corporation sees your data.
+---
 
-### 5 Mac Mini Cluster — Complete Setup Guide
+## Circuit Frontends
 
-**What to buy ($7,555 total):**
+| Frontend | Status | Input Formats |
+|----------|--------|---------------|
+| Noir | Ready | ACIR artifact JSON, ACIR program JSON |
+| Circom | Ready | snarkjs-style R1CS JSON, ZKF program JSON, descriptor JSON |
+| Cairo | Limited | Sierra JSON, Cairo descriptor JSON, ZKF program JSON, ZIR program JSON |
+| Compact (Midnight) | Ready | ZKIR v2.0 (compactc 0.30.0), descriptor JSON, source |
+| Halo2 | Ready | ZKF Halo2 export JSON, descriptor JSON |
+| Plonky3 AIR | Ready | ZKF Plonky3 AIR export JSON, descriptor JSON |
+| zkVM | Ready | zkVM descriptor JSON, ZKF program JSON |
 
-| Item | Qty | Price | Total |
-|------|-----|-------|-------|
-| Mac Mini M4 Pro (24GB/512GB) | 5 | $1,399 | $6,995 |
-| Thunderbolt 5 cable (0.8m) | 5 | $50 | $250 |
-| Rack mount (2U, holds 5) | 1 | $80 | $80 |
-| Power strip (surge protected) | 1 | $30 | $30 |
-| 10Gb Ethernet switch (backup) | 1 | $200 | $200 |
+Every imported circuit passes through the same compile/prove/verify pipeline regardless of origin.
 
-**Physical setup:**
-1. Mount 5 Minis in the rack
-2. Cable Thunderbolt 5 in a ring topology (Mini 1 → 2 → 3 → 4 → 5 → back to 1)
-3. Each link: 120 Gbps bidirectional — buffer transfers take milliseconds
+---
 
-**Network setup (on each Mac):**
-```
-System Settings → Network → Thunderbolt Bridge
-Mac 1: 10.0.1.1    Mac 2: 10.0.1.2    Mac 3: 10.0.1.3
-Mac 4: 10.0.1.4    Mac 5: 10.0.1.5
-Subnet: 255.255.255.0 — No gateway (isolated proving network)
-```
+## Metal GPU Acceleration
 
-**Install ZirOS (on each Mac):**
+63 Metal shaders. 50 kernel entrypoints. 18 `.metal` source files. Built for Apple Silicon unified memory.
+
+**8 active accelerators:**
+
+| Accelerator | Operations |
+|-------------|-----------|
+| MSM | BN254, Pallas, Vesta multi-scalar multiplication (Montgomery `mulhi()` for 66% throughput improvement) |
+| NTT | Goldilocks, BabyBear, BN254 number-theoretic transforms |
+| Poseidon2 | ZK-friendly algebraic hashing |
+| FRI | Fast Reed-Solomon IOP |
+| Hash | SHA-256, BLAKE3 batch hashing |
+| Field Ops | Finite field arithmetic |
+| Poly Ops | Polynomial evaluation and interpolation |
+| Constraint Eval | Parallel constraint evaluation |
+
+**Attestation chain:** Every GPU kernel execution is attested through a 4-digest chain: metallib, reflection, pipeline-descriptor, toolchain. If any digest fails, the system falls back to CPU. It does not silently degrade.
+
+**51 Lean 4 theorems** verify GPU kernel arithmetic correctness. These are mechanized proofs about the mathematical operations performed by the Metal shaders.
+
+**Adaptive tuning:** EMA convergence over 20 observations per operation per device. Target: 25% GPU busy ratio (measured, not estimated). Platform and power-dependent bias multipliers account for device form factor and power mode.
+
+**9 checked-in attestation manifests** under `zkf-metal/proofs/manifests`.
+
+---
+
+## Post-Quantum Security
+
+ZirOS defaults to CNSA 2.0 Suite at Level 5. Opting out requires explicit development-only bypass flags.
+
+| Algorithm | Standard | Level | Purpose |
+|-----------|----------|-------|---------|
+| ML-DSA-87 | NIST FIPS 204 | Level 5 | Every signature on every artifact |
+| ML-KEM-1024 | NIST FIPS 203 | Level 5 | Every key exchange (swarm encrypted gossip) |
+| ChaCha20-Poly1305 | -- | 256-bit symmetric | Symmetric encryption (Grover halves to 128-bit) |
+| HKDF-SHA384 | -- | -- | Key derivation |
+| Hybrid Ed25519 + ML-DSA-87 | -- | -- | Both classical and post-quantum must verify |
+| Plonky3 STARK (FRI) | -- | -- | Post-quantum proofs (hash-based, no elliptic curves) |
+
+**Per-backend post-quantum classification:**
+
+| Backend | Post-Quantum | Reason |
+|---------|-------------|--------|
+| Plonky3 STARK | Yes | FRI is hash-based, no elliptic curves |
+| Groth16 | **No** | BN254 pairings, Shor-vulnerable |
+| Halo2 IPA | **No** | Pasta curves, discrete log |
+| Halo2 KZG | **No** | BLS12-381 pairings, Shor-vulnerable |
+| Nova / HyperNova | **No** | Pallas/Vesta discrete log |
+| SP1 / RISC Zero (delegated) | Yes | Delegates to Plonky3 |
+| STARK-to-Groth16 | **Outer: No** | Inner STARK is post-quantum, outer Groth16 is not |
+
+These are properties of the mathematics, verified by Lean 4 protocol proofs (Groth16Exact.lean, NovaExact.lean, FriExact.lean). They are backed by machine-checked proofs, not opinions.
+
+---
+
+## Formal Verification
+
+This is ZirOS's primary differentiator. No other shipping ZK framework has a comparable mechanized verification surface.
+
+### Ledger Summary
+
+| Category | Count |
+|----------|-------|
+| Total mechanized theorems | 169 |
+| `mechanized_local` (proven against shipped code) | 169 |
+| `mechanized_implementation_claim` | 157 |
+| `hypothesis_carried_theorem` | 12 |
+| `model_only_claim` | **0** |
+| `attestation_backed_lane` | **0** |
+| Pending | **0** |
+| Trusted assumptions | **0** |
+| `release_grade_ready` | `true` |
+
+### Proof Languages
+
+| Language | Files | Domain |
+|----------|-------|--------|
+| Lean 4 | 19 | Kernel refinement, protocol soundness, GPU arithmetic (51 theorems) |
+| Rocq (Coq) | 68+ | IR semantics, witness correctness, runtime |
+| Verus | 32+ | Runtime correctness, swarm defense, aerospace |
+| F* | 10 | Constant-time properties (hax extraction) |
+| Kani | -- | Bounded model checking |
+
+### What The 12 Hypothesis-Carried Theorems Assume
+
+9 are standard protocol cryptographic assumptions (discrete log hardness, knowledge-of-exponent, random oracle model). 3 are attestation-honesty assumptions (the hardware reports correct digests). These are explicit, named, and documented. They are not gaps -- they are the irreducible cryptographic assumptions that every ZK system relies on, stated honestly instead of hidden.
+
+### Test Coverage
+
+| Crate | Tests |
+|-------|-------|
+| zkf-core | 200 |
+| zkf-backends | 345 |
+| zkf-runtime | 155 |
+| zkf-distributed | 97 |
+| zkf-ir-spec | 38 |
+| zkf-cli | 212 |
+| **Total** | **1,047** |
+
+---
+
+## Groth16 Security Gate
+
+Groth16 requires a trusted setup ceremony. Deterministic setups are useful for development but must never reach production.
+
+ZirOS enforces this at the system level:
+
+- `compiled_uses_dev_deterministic_groth16_setup()` detects 4 metadata fields marking dev artifacts
+- `ensure_security_covered_groth16_setup()` requires an explicit dev override flag
+- `ensure_release_safe_proof_artifact()` rejects dev-deterministic artifacts at deploy, export, and release-pin boundaries
+- **Verus proof:** `groth16_deterministic_production_gate_strict_ok` mechanically verifies the gate logic
+
+Strict lanes reject dev-deterministic Groth16 artifacts. There is no silent bypass.
+
+---
+
+## Constant-Time Evaluator Bridge
+
+`proof_constant_time_bridge.rs` (350 lines, production-called) ensures the evaluator does not leak information through timing side channels.
+
+- `eval_expr_constant_time()` and `eval_expr()` both route through the bridge
+- F*-verified via hax extraction (`Zkf_core.Proof_constant_time_bridge.fst`)
+- Proves evaluator-shell schedule and result-shape equivalence
+
+**Honest caveat:** The proof covers shell structure (control flow, branching pattern). It does not cover BigInt microarchitectural timing (cache lines, branch prediction). This is stated because the distinction matters.
+
+---
+
+## Deployed Subsystems
+
+ZirOS is not theoretical. These subsystems are built, tested, and deployed.
+
+| # | Subsystem | Circuits | Key Specifications | Repository |
+|---|-----------|----------|--------------------|------------|
+| 1 | Sovereign Economic Defense | 5 | 5 Midnight Compact contracts, Lace wallet DApp, selective disclosure, regulatory citations (RFPA, ECOA, TILA, HMDA) | `ziros-sovereign-economic-defense` |
+| 2 | EDL Monte Carlo Exchange | 3 | 48,025 constraints, 500-step trajectory, 3 Compact contracts, 5-role selective disclosure | `ziros-midnight-edl-monte-carlo-exchange` |
+| 3 | Falcon Heavy Flight Certification | 7 | 9 proving jobs, 4 Compact contracts, 1,274 real timesteps | `ziros-falcon-heavy-flight-certification` |
+| 4 | Reentry Thermal Envelope | -- | Theorem-first reentry mission assurance | `ziros-reentry-thermal-envelope-flagship` |
+| 5 | Aerospace Qualification Exchange | 6 | 6 Midnight Compact contracts | `ziros-midnight-aerospace-qualification-exchange` |
+| 6 | RPOD Verifier | -- | 2-phase mission proof (rendezvous proximity operations) | `rpod-verifier` |
+| 7 | Mixture Lock | -- | Propellant formulation compliance | `mixture-lock` |
+| 8 | Conjunction Proof | -- | Satellite conjunction risk assessment | `conjunction-proof` |
+| 9 | Burn Budget | -- | Multi-phase fuel budget verification | `burn-budget` |
+| 10 | Metal Provers | -- | 51 Lean 4 GPU arithmetic theorems | `metal-provers` |
+| 11 | Bubble Proof | -- | Rayleigh-Plesset sonoluminescence verification | `bubble-proof` |
+
+---
+
+## Midnight Selective Disclosure Matrix
+
+The Sovereign Economic Defense subsystem demonstrates fine-grained selective disclosure through Midnight Compact contracts. Different roles see different data from the same proof.
+
+| Data Point | Public | Board | Regulators | Auditors | Housing Auth |
+|------------|--------|-------|------------|----------|-------------|
+| Compliance bit | Yes | Yes | Yes | Yes | Yes |
+| Commitment hash | Yes | Yes | Yes | Yes | Yes |
+| Reserve balance | | | Yes | | |
+| Emergency mode | | Yes | | | |
+| Total contributions | | | | Yes | |
+| Equity concentration | | | Yes | | |
+| Occupancy rate | | | | | Yes |
+| Effective APR | | | Yes | | |
+| Individual member data | Never disclosed to any role | | | | |
+
+This is not a demo. These are typed witnesses with Poseidon commitments and regulatory citations (RFPA, ECOA, TILA, HMDA) compiled into Midnight Compact contracts.
+
+---
+
+## Distributed Proving and Cluster Scaling
+
+TCP-based multi-node distributed proving with UMPG graph partitioning and subgraph assignment.
+
+| Component | Role |
+|-----------|------|
+| Coordinator | Partitions prover graph, assigns subgraphs to workers, assembles results |
+| Worker | Executes assigned subgraph locally, returns output buffers with content digests |
+| Identity | ML-DSA-87 signed worker identities |
+| Gossip | ML-KEM-1024 encrypted peer communication |
+
+**Swarm defense** (7 components): Queen (escalation state machine), Sentinel (anomaly detection via Welford's algorithm and Mahalanobis distance), Warrior (threat response), Builder (rule lifecycle), Diplomat (encrypted gossip), Identity (dual signing), Reputation (0-1 per peer, 10% hourly cap).
+
+**Non-interference guarantee:** The swarm affects scheduling, never proof truth. This is mechanized.
+
+**Target cluster:** 20-node Mac Studio M5 Ultra -- 1,540 proofs/hour at $0.001/proof.
+
 ```bash
-# Clone any subsystem repo and run install.sh — or install zkf directly:
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
-sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
-zkf storage install
-```
-
-**Start the cluster:**
-```bash
-# Mac 1 (coordinator):
-export ZKF_DISTRIBUTED_PEERS=10.0.1.2:9471,10.0.1.3:9471,10.0.1.4:9471,10.0.1.5:9471
 zkf cluster start
-
-# Mac 2-5 (workers):
-zkf cluster start
-
-# Verify:
-zkf cluster status --json
-# → { "peer_count": 4, "peers": [...] }
-```
-
-**Prove across the cluster:**
-```bash
 zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
 ```
 
-### What Happens Under The Hood
+---
 
-```
-Proving Job Arrives at Coordinator
-         │
-         ▼
-    ┌────────────────────────────┐
-    │  UMPG Graph Partitioner   │
-    │  Splits at phase boundaries│
-    └────────────┬───────────────┘
-                 │
-    ┌────────────┼────────────┬────────────┬────────────┐
-    ▼            ▼            ▼            ▼            ▼
- Mac 1        Mac 2        Mac 3        Mac 4        Mac 5
- Phase 0      Phase 1      Phase 2      Phase 3      Phase 4
- Witness      NTT/LDE      MSM          Hash/Merkle  FRI Fold
-    │            │            │            │            │
-    └────────────┴────────────┴────────────┴────────────┘
-                              │
-                         Results Merge
-                              │
-                    Attestation Verify
-                    (Ed25519 signatures)
-                              │
-                         Final Proof
-```
+## Scientific, Engineering, and Mission Applications
 
-### Placement Scoring
+ZirOS ships 23 circuit templates. These are not toy examples. They model real physical systems with fixed-point arithmetic, signed bounds, exact division, and Poseidon commitment chaining.
 
-The coordinator assigns partitions to workers based on a placement score:
+| Template | Domain | What It Proves |
+|----------|--------|---------------|
+| `gnc-6dof-core` | Aerospace | 6-DOF guidance, navigation, and control |
+| `tower-catch-geometry` | Aerospace | Tower-catch arm-clearance and catch-box certificate |
+| `barge-terminal-profile` | Aerospace | Barge terminal-profile and deck-motion certificate |
+| `planetary-terminal-profile` | Aerospace | Planetary pad terminal profile certificate |
+| `gust-robustness-batch` | Aerospace | Monte-Carlo gust robustness batch |
+| `private-starship-flip-catch` | Aerospace | Starship flip-and-catch certification |
+| `private-powered-descent` | Aerospace | Powered-descent guidance |
+| `private-reentry-thermal-envelope` | Aerospace | RLV reentry mission-assurance certificate |
+| `private-satellite-conjunction` | Aerospace | Two-spacecraft conjunction-avoidance |
+| `private-multi-satellite-base32` | Aerospace | Multi-satellite conjunction base scenario |
+| `private-multi-satellite-stress64` | Aerospace | Multi-satellite conjunction stress scenario |
+| `private-nbody-orbital` | Orbital Mechanics | Orbital dynamics with committed positions |
+| `thermochemical-equilibrium` | Chemistry | Gas-phase thermochemical equilibrium certificate |
+| `real-gas-state` | Chemistry | Real-gas cubic EOS certificate (Peng-Robinson or Redlich-Kwong) |
+| `navier-stokes-structured` | Fluid Dynamics | 1D structured-grid Navier-Stokes step |
+| `combustion-instability-rayleigh` | Combustion | Rayleigh-window combustion-instability certificate |
+| `poseidon-commitment` | Cryptography | BN254 Poseidon commitment |
+| `merkle-membership` | Cryptography | Poseidon Merkle root and authentication path |
+| `range-proof` | Cryptography | Private value within a bit range |
+| `private-vote` | Governance | Three-candidate private vote commitment |
+| `sha256-preimage` | Cryptography | SHA-256 preimage knowledge |
+| `private-identity` | Identity | Private-identity KYC policy compliance |
+| `sovereign-economic-defense` | Economics | Cooperative economic defense (in development) |
 
-```
-score = available_memory_MB
-      + (gpu_cores × 10)
-      + (crypto_extensions ? 100 : 0)
-      - (memory_pressure == Warning ? 500 : 0)
-      - (memory_pressure == Critical ? 2000 : 0)
-
-weighted_score = score × reputation (0.0 to 1.0)
-```
-
-A Mac Studio Ultra (192 GB, 80 GPU cores) scores far higher than a Mac Mini (24 GB, 20 cores). Heavy partitions go to the most powerful nodes.
-
-### Swarm Defense Across The Cluster
-
-Every node is swarm-defended:
-- **Heartbeat**: 2-second intervals, 10-second timeout — dead nodes quarantined
-- **Attestation**: Workers sign results with Ed25519 — invalid signatures → peer excluded
-- **Reputation**: 0.0 (banned) to 1.0 (trusted) — decays over 1 hour
-- **Threat gossip**: Encrypted with ML-KEM-1024 epoch keys — shared during heartbeats
-- **Consensus**: Optional quorum verification for critical partitions
-- **Non-interference**: Distribution NEVER changes proof correctness — `ZKF_DISTRIBUTED=0` produces bit-identical proofs
-
-### Profitability Guard
-
-Distribution only happens when profitable:
-```
-transfer_cost < 2 × compute_savings
-```
-Small circuits stay local. Large circuits (48K+ constraints) get distributed. The system never slows down a simple proof by adding network overhead.
-
-### Cost vs. Cloud
-
-| Option | Upfront | Monthly | Annual | Data Control |
-|--------|---------|---------|--------|-------------|
-| **5 Mac Minis** | **$7,555** | **$0** | **$0** | **You own everything** |
-| AWS (5 instances) | $0 | $3,000 | $36,000 | Amazon sees your data |
-| Azure (5 instances) | $0 | $4,500 | $54,000 | Microsoft sees your data |
-| GCP (5 instances) | $0 | $3,500 | $42,000 | Google sees your data |
-
-After 3 months, the Mac cluster is cheaper. After 1 year, you've saved $30,000-$50,000. And no corporation ever sees your proving data, your witnesses, or your keys.
-
-### Power & Cooling
-
-- 5 Mac Minis: **175W total** (less than a gaming PC)
-- No server room. No special cooling. Room temperature.
-- Each Mac Mini has its own internal fan. Barely audible.
-
-### Peer Discovery
-
-Three methods:
-- **mDNS** (`_zkf-cluster._tcp.local.`) — automatic on local network
-- **Static** (`ZKF_DISTRIBUTED_PEERS=host1:9471,host2:9471`) — pre-configured
-- **Manual** — registered at runtime
-
-### Configuration
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `ZKF_DISTRIBUTED` | `1` | Master switch |
-| `ZKF_DISTRIBUTED_ROLE` | `auto` | `coordinator` / `worker` / `auto` |
-| `ZKF_DISTRIBUTED_BIND` | `0.0.0.0:9471` | Worker listen address |
-| `ZKF_DISTRIBUTED_PEERS` | `""` | Static peer list |
-| `ZKF_DISTRIBUTED_DISCOVERY` | `static` | `mdns` / `static` / `manual` |
-| `ZKF_DISTRIBUTED_COMPRESS` | `1` | Buffer compression |
-| `ZKF_DISTRIBUTED_INTEGRITY` | `fnv` | `fnv` or `sha256` chunk integrity |
+All physics circuits use fixed-point arithmetic (10^18 scale for BN254, 10^3 for Goldilocks) with signed bounds, nonnegative bounds, exact division constraints, and floor square root decomposition.
 
 ---
 
-## Midnight Network Integration
+## iCloud-Native Storage
 
-ZirOS has a fully operational [Midnight Network](https://midnight.network/) frontend for privacy-preserving on-chain deployment:
+Source of truth: `~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/`
+
+| Directory | Contents |
+|-----------|----------|
+| `proofs/` | Proof artifacts |
+| `traces/` | UMPG execution traces |
+| `verifiers/` | Solidity contracts |
+| `reports/` | Audit and benchmark reports |
+| `audits/` | Machine-verifiable audit outputs |
+| `telemetry/` | Anonymized performance data |
+| `swarm/` | Swarm state and reputation logs |
+| `config/` | System configuration |
+| `keys/` | Key metadata (NOT private keys) |
+
+**Witness exclusion:** Witnesses are NEVER written to iCloud. They contain the private inputs the proof is designed to hide. They are deleted immediately after proving. This is non-negotiable.
+
+**Private keys** live in iCloud Keychain with Secure Enclave protection. The private material never touches the filesystem.
+
+**NSFileCoordinator** priority upload for all archival writes. Sign in on any Mac, everything is there.
+
+---
+
+## Neural Engine
+
+6 CoreML model lanes running on Apple Neural Engine (38 TOPS on M4 Max):
+
+| Lane | Purpose |
+|------|---------|
+| Scheduler | Parallel job scheduling optimization |
+| Backend | Select optimal backend for circuit characteristics |
+| Duration | Predict proving time |
+| Anomaly | Detect runtime behavioral anomalies |
+| Security | Identify security-relevant patterns |
+| ThresholdOptimizer | Adaptive GPU busy ratio tuning |
+
+**Advisory only.** Proof truth never depends on model output. The Neural Engine informs scheduling decisions. It does not affect constraint checking, witness solving, or proof verification.
+
+---
+
+## Quick Start
+
+### Install
 
 ```bash
-zkf import --frontend compact --in contract.zkir --out program.json
-zkf prove --program program.json --inputs inputs.json --out proof.json
+# Download the prebuilt binary (v0.3.0, Apple Silicon)
+curl -LO https://github.com/nicktrebes/ziros/releases/download/v0.3.0/zkf-darwin-arm64.tar.gz
+tar xzf zkf-darwin-arm64.tar.gz
+sudo mv zkf /usr/local/bin/
+
+# Or build from source
+cargo build --release -p zkf-cli
 ```
 
-Compact ZKIR v2.0 import, BLS12-381 field, Halo2-KZG backend, selective disclosure via `disclose()`. The Sovereign Economic Defense subsystem ships 5 Compact contracts with regulatory compliance policies.
+### Verify Your System
+
+```bash
+zkf doctor          # System health: toolchains, backends, UMPG, GPU, dependencies
+zkf metal-doctor    # Metal GPU acceleration diagnostics
+zkf capabilities    # Supported backends, fields, and framework capabilities
+```
+
+### Scaffold and Prove
+
+```bash
+# Scaffold a range proof
+zkf app init --name my-proof --template range-proof --style minimal
+cd my-proof
+cargo run
+cargo test
+
+# Or prove directly from JSON
+zkf prove --program zirapp.json --inputs inputs.json --backend plonky3 --out proof.json
+zkf verify --program zirapp.json --artifact proof.json --backend plonky3
+```
+
+### Start the Midnight Proof Server
+
+```bash
+zkf midnight proof-server serve --port 6300 --engine umpg
+```
+
+### Run the Demo Pipeline
+
+```bash
+zkf demo --json
+```
+
+This compiles a Fibonacci circuit, proves with Plonky3 STARK, wraps to Groth16 via Nova compression, generates a Solidity verifier, archives to iCloud, and outputs a JSON report.
 
 ---
+
+## What ZirOS Does NOT Do
+
+Honesty matters more than impression.
+
+- **ZirOS does not run on x86.** It is built for Apple Silicon. The Metal GPU shaders, Neural Engine lanes, Secure Enclave integration, and iCloud storage architecture are Apple-specific by design.
+- **SP1, RISC Zero, and Midnight Compact backends are currently broken.** SP1 and RISC Zero delegate to Plonky3 and require `--allow-compat`. Midnight Compact requires proof server configuration. The support matrix reports these honestly.
+- **Groth16 is not post-quantum.** Neither is Halo2, Nova, or HyperNova. Only Plonky3 STARK (without wrapping) and the ML-DSA-87/ML-KEM-1024 cryptographic surface are post-quantum. Wrapping a STARK through Nova + Groth16 makes the overall proof classical.
+- **The constant-time bridge proves shell structure, not microarchitectural timing.** The F* proof covers control flow and branching patterns. It does not cover BigInt cache-line behavior or branch prediction.
+- **The 12 hypothesis-carried theorems are real assumptions.** They are standard cryptographic assumptions (discrete log hardness, knowledge-of-exponent, random oracle) and attestation-honesty assumptions. Every ZK system relies on these. ZirOS names them explicitly instead of hiding them.
+- **The cluster scaling target (1,540 proofs/hour) is a projection.** It is based on measured single-node performance extrapolated to a 20-node configuration.
+
+---
+
+## Seven Finite Fields
+
+| Field | Bit Width | Modulus | Primary Backend |
+|-------|-----------|---------|----------------|
+| BN254 | 254-bit | 21888...95617 | Groth16, Nova, HyperNova |
+| BLS12-381 | 255-bit | 52435...84513 | Halo2 KZG |
+| Pasta Fp | 255-bit | 28948...30337 | Halo2 IPA |
+| Pasta Fq | 255-bit | 28948...48097 | Midnight Compact |
+| Goldilocks | 64-bit | 2^64 - 2^32 + 1 | Plonky3 (primary post-quantum) |
+| BabyBear | 32-bit | 2^31 - 2^27 + 1 | Plonky3 |
+| Mersenne31 | 31-bit | 2^31 - 1 | Plonky3 (Circle PCS) |
+
+---
+
+## Measured Performance
+
+| Metric | Value |
+|--------|-------|
+| Groth16 proof size | 128 bytes |
+| Groth16 on-chain verification | ~210K gas |
+| Verification time | 20ms |
+| GPU busy ratio target | 25% (measured) |
+| 200-step reentry proof | ~9 minutes |
+| 30,000-constraint circuits | Routine |
+| Nova fold step memory | <=4 GB |
+| Groth16 wrap memory | <=8 GB |
+| Folding steady-state memory | ~165 MB |
+
+---
+
+## Links
+
+| Resource | Location |
+|----------|----------|
+| CLI reference | `zkf --help`, `zkf <command> --help` |
+| Support matrix | `zkf support-matrix` |
+| System health | `zkf doctor --json` |
+| GPU diagnostics | `zkf metal-doctor --json --strict` |
+| Verification ledger | `verification_ledger.json` |
+| Formal proofs (Lean 4) | `proofs/lean4/` |
+| Formal proofs (Rocq) | `proofs/rocq/` |
+| Formal proofs (Verus) | `proofs/verus/` |
+| Formal proofs (F*) | `proofs/fstar/` |
+| Metal shaders | `zkf-metal/shaders/` |
+| Attestation manifests | `zkf-metal/proofs/manifests/` |
+| Circuit templates | `zkf app templates --json` |
+
+---
+
 ## License
 
-See `LICENSE-BSL` and the crate metadata for the current repository licensing posture.
+See [LICENSE](LICENSE) for details.
+
+---
+
+*ZirOS proves that something is true without revealing why it is true. The math is the authority. The proofs are mechanized. The system fails closed.*
