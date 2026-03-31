@@ -2197,6 +2197,29 @@ pub(crate) fn render_zkf_error(err: ZkfError) -> String {
             }
             rendered
         }
+        ZkfError::RangeConstraintViolation {
+            index,
+            label,
+            signal,
+            bits,
+            value,
+        } => {
+            let max = ((BigInt::from(1u8) << bits) - BigInt::from(1u8)).to_string();
+            let location = label
+                .map(|label| format!("constraint #{index} ('{label}')"))
+                .unwrap_or_else(|| format!("constraint #{index}"));
+            format!(
+                "Range check failed for signal '{signal}' at {location}: value={value}, bits={bits}, max {max}. Run `ziros debug --program <program.json> --inputs <inputs.json> --out debug.json` to inspect the failing witness and constraint trace."
+            )
+        }
+        ZkfError::UnsupportedWitnessSolve {
+            unresolved_signals,
+            reason,
+        } => {
+            format!(
+                "Witness generation stalled for unresolved signals {unresolved_signals:?}: {reason}"
+            )
+        }
         other => other.to_string(),
     }
 }

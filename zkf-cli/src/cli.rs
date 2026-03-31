@@ -18,6 +18,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: AppCommands,
     },
+    /// Operate Midnight-compatible proof-server and verification gateway surfaces.
+    Midnight {
+        #[command(subcommand)]
+        command: MidnightCommands,
+    },
     /// Issue and prove private-identity credentials.
     Credential {
         #[command(subcommand)]
@@ -975,6 +980,80 @@ pub(crate) enum RuntimeCommands {
         /// Core ML compute units: all, cpu-and-neural-engine, or cpu-only.
         #[arg(long, default_value = "cpu-and-neural-engine")]
         compute_units: String,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightCommands {
+    /// Run the Midnight proof-server compatibility surface on port 6300.
+    #[command(name = "proof-server")]
+    ProofServer {
+        #[command(subcommand)]
+        command: MidnightProofServerCommands,
+    },
+    /// Run the public Compact verification gateway.
+    Gateway {
+        #[command(subcommand)]
+        command: MidnightGatewayCommands,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightProofServerCommands {
+    /// Serve the official Midnight proof-server wire contract through the ZirOS CLI.
+    Serve {
+        #[arg(
+            short,
+            long,
+            default_value_t = 6300,
+            env = "MIDNIGHT_PROOF_SERVER_PORT"
+        )]
+        port: u16,
+        #[arg(long, default_value_t = 0, env = "MIDNIGHT_PROOF_SERVER_JOB_CAPACITY")]
+        job_capacity: usize,
+        #[arg(long, default_value_t = 2, env = "MIDNIGHT_PROOF_SERVER_NUM_WORKERS")]
+        num_workers: usize,
+        #[arg(long, default_value = "umpg", env = "MIDNIGHT_PROOF_SERVER_ENGINE")]
+        engine: String,
+        #[arg(
+            long,
+            default_value_t = 600.0,
+            env = "MIDNIGHT_PROOF_SERVER_JOB_TIMEOUT"
+        )]
+        job_timeout: f64,
+        #[arg(
+            long,
+            default_value_t = false,
+            env = "MIDNIGHT_PROOF_SERVER_NO_FETCH_PARAMS"
+        )]
+        no_fetch_params: bool,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightGatewayCommands {
+    /// Serve the public Compact verification gateway through the ZirOS CLI.
+    Serve {
+        #[arg(short, long, default_value_t = 6311, env = "MIDNIGHT_GATEWAY_PORT")]
+        port: u16,
+        #[arg(long, default_value_t = 32, env = "MIDNIGHT_GATEWAY_JOB_CAPACITY")]
+        job_capacity: usize,
+        #[arg(long, default_value_t = 2, env = "MIDNIGHT_GATEWAY_NUM_WORKERS")]
+        num_workers: usize,
+        #[arg(
+            long,
+            default_value_t = 120.0,
+            env = "MIDNIGHT_GATEWAY_JOB_TIMEOUT"
+        )]
+        job_timeout: f64,
+        #[arg(long, env = "COMPACTC_BIN")]
+        compactc_bin: Option<PathBuf>,
+        #[arg(long, env = "MIDNIGHT_GATEWAY_ATTESTOR_KEY_PATH")]
+        attestor_key_path: Option<PathBuf>,
         #[arg(long)]
         json: bool,
     },

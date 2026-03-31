@@ -14,6 +14,7 @@ pub(crate) mod estimate_gas;
 pub(crate) mod explore;
 pub(crate) mod import;
 pub(crate) mod ir;
+pub(crate) mod midnight;
 pub(crate) mod optimize;
 pub(crate) mod package;
 pub(crate) mod prove;
@@ -30,7 +31,7 @@ pub(crate) mod keys;
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    TelemetryCommands,
+    MidnightCommands, MidnightGatewayCommands, MidnightProofServerCommands, TelemetryCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -42,6 +43,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     let guard = EntrypointGuard::begin(EntrypointSurface::Cli, command_name(&command));
     let result = match command {
         Commands::App { command } => app::handle_app(command),
+        Commands::Midnight { command } => midnight::handle_midnight(command),
         Commands::Credential { command } => credential::handle_credential(command),
         Commands::Capabilities => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
@@ -495,6 +497,16 @@ fn command_name(command: &Commands) -> String {
                     "app:reentry-assurance:handoff-fprime".to_string()
                 }
                 None => "app:reentry-assurance".to_string(),
+            },
+        },
+        Commands::Midnight { command } => match command {
+            MidnightCommands::ProofServer { command } => match command {
+                MidnightProofServerCommands::Serve { .. } => {
+                    "midnight:proof-server:serve".to_string()
+                }
+            },
+            MidnightCommands::Gateway { command } => match command {
+                MidnightGatewayCommands::Serve { .. } => "midnight:gateway:serve".to_string(),
             },
         },
         Commands::Credential { command } => match command {

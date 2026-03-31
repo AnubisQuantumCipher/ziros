@@ -78,6 +78,25 @@ These contracts implement privacy-preserving compliance for cooperative financia
 zkf midnight proof-server serve --port 6300 --engine umpg
 ```
 
+### Midnight Gateway
+
+Verify-only public safety service for AI-generated Compact contracts:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /v1/verify-compact` | Compile `.compact`, import ZKIR, audit, run witness/constraint checks, and return a signed pass/fail attestation |
+| `GET /ready` | Queue readiness plus pinned `compactc` version and ML-DSA-87 attestor public key |
+| `GET /health` | Liveness check |
+| `GET /version` | Gateway version |
+
+The gateway lives inside the existing Midnight CLI surface, not a separate server:
+
+```bash
+zkf midnight gateway serve --port 6311
+```
+
+Clients can pin both the compiler and attestor identity before sending source code by reading `GET /ready`. The response includes the required/detected `compactc 0.30.0` version and the gateway ML-DSA-87 public key fingerprint.
+
 ---
 
 ## System Architecture
@@ -192,7 +211,7 @@ graph TB
 | RISC Zero | Delegated | Goldilocks (via Plonky3) | None | ~1 KB | Yes (delegated) | -- |
 | **Midnight Compact** | **Integrated** | Pasta Fp, Pasta Fq | Trusted | BLS12-381 | No | -- |
 
-SP1 and RISC Zero are compatibility lanes that delegate to Plonky3 and require `--allow-compat`. **Midnight Compact is actively integrated** — ZirOS ships a 1,076-line proof server (`zkf midnight proof-server serve`) with 10 HTTP endpoints, dual execution engine, real zswap proof generation, and 12 deployed Compact contracts across 3 subsystems. The Compact frontend compiles `.compact` source via `compactc 0.30.0`, imports ZKIR v2.0, and maps to ZirOS IR.
+SP1 and RISC Zero are compatibility lanes that delegate to Plonky3 and require `--allow-compat`. **Midnight Compact is actively integrated** — ZirOS ships a 1,076-line proof server (`zkf midnight proof-server serve`) with 10 HTTP endpoints, dual execution engine, real zswap proof generation, and 12 deployed Compact contracts across 3 subsystems, plus a verify-only public safety gateway (`zkf midnight gateway serve`) that compiles `.compact` source via pinned `compactc 0.30.0`, imports ZKIR v2.0, audits fail closed, and signs the resulting attestation with ML-DSA-87.
 
 **STARK-to-Groth16 wrapping** via Nova IVC decomposition: the inner Plonky3 STARK is post-quantum, but wrapping through Nova + Groth16 makes the overall proof classical. ZirOS documents this honestly.
 
@@ -522,6 +541,12 @@ zkf verify --program zirapp.json --artifact proof.json --backend plonky3
 
 ```bash
 zkf midnight proof-server serve --port 6300 --engine umpg
+```
+
+### Start the Midnight Gateway
+
+```bash
+zkf midnight gateway serve --port 6311
 ```
 
 ### Run the Demo Pipeline

@@ -19,7 +19,7 @@ fn compactc_path() -> Option<PathBuf> {
         PathBuf::from(home)
             .join(".compact")
             .join("versions")
-            .join("0.29.0")
+            .join("0.30.0")
             .join("aarch64-darwin")
             .join("compactc")
     });
@@ -38,7 +38,7 @@ fn compactc_is_supported(path: &Path) -> bool {
         .output()
         .ok()
         .and_then(|output| String::from_utf8(output.stdout).ok())
-        .is_some_and(|version| version.trim() == "0.29.0")
+        .is_some_and(|version| version.trim() == "0.30.0")
 }
 
 fn compile_compact_contract(
@@ -49,7 +49,7 @@ fn compile_compact_contract(
 ) -> Option<PathBuf> {
     let compactc = compactc_path()?;
     if !compactc_is_supported(&compactc) {
-        eprintln!("skipping Compact live test because compactc 0.29.0 is not available");
+        eprintln!("skipping Compact live test because compactc 0.30.0 is not available");
         return None;
     }
 

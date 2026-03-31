@@ -54,7 +54,7 @@ fn compact_import_reads_raw_zkir_and_discovers_sidecars() {
             .metadata
             .get("compact_compiler_version")
             .map(String::as_str),
-        Some("0.29.0")
+        Some("0.30.0")
     );
     assert_eq!(
         program
