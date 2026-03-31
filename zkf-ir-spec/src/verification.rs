@@ -56,12 +56,12 @@ impl VerificationLedgerEntry {
             return VerificationAssuranceClass::BoundedCheck;
         }
 
-        let title_lower = self.title.to_ascii_lowercase();
-        let notes_lower = self.notes.to_ascii_lowercase();
-        if title_lower.contains("attestation")
-            || notes_lower.contains("attestation")
-            || self.theorem_id.contains("attestation")
-        {
+        if matches!(
+            self.theorem_id.as_str(),
+            "swarm.coordinator_acceptance_soundness"
+                | "swarm.memory_snapshot_identity"
+                | "distributed.acceptance_soundness"
+        ) {
             return VerificationAssuranceClass::AttestationBackedLane;
         }
 
@@ -592,6 +592,292 @@ pub fn verification_ledger() -> VerificationLedger {
                 evidence_path: "zkf-core/proofs/rocq/WitnessGenerationProofs.v".to_string(),
                 notes:
                     "For programs satisfying `supports_pure_witness_core`, the public `generate_witness` entrypoint now delegates directly to the extracted proof-facing generator `spec_generate_non_blackbox_witness_checked`, so Rocq theorem `generate_non_blackbox_witness_sound_ok` covers the shipped pure-core runtime path. BlackBox and external-solver-dependent witness enrichment remain tracked separately."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.verdict_is_logical_and".to_string(),
+                title: "Gateway pass verdict is exactly the conjunction of empty top-level diagnostics and all-passing circuit reports"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_verdict_is_logical_and_ok` fixes the proof-facing reduction boundary for `build_signed_gateway_attestation`: the modeled final pass bit is true exactly when the diagnostics list is empty and the counted passing-circuit reports equal the total emitted circuit reports."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.fail_closed_on_any_error".to_string(),
+                title: "Gateway verify-job error paths are fail-closed at the public response boundary"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_fail_closed_on_any_error_ok` models the fail-closed contract of `execute_gateway_verify_job`: when any stage is marked as erroneous, the public boundary cannot simultaneously report a transport-success path and a passing gateway verdict."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.source_digest_faithful".to_string(),
+                title: "Gateway source digest field is bound to the submitted Compact source boundary"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_source_digest_faithful_ok` fixes the owned boundary that `execute_gateway_verify_job` carries into the unsigned report: the modeled source digest tag is the exact digest tag of the submitted Compact source, with no alternate source boundary admitted by the proof surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.commitment_deterministic".to_string(),
+                title: "Gateway Poseidon report commitment is deterministic for a fixed digest input"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_commitment_deterministic_ok` proves the proof-facing commitment model used for `poseidon_commitment_from_sha256` is a pure function of the digest tag, so repeated evaluations at the same digest boundary cannot diverge."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.compactc_version_pinned".to_string(),
+                title: "Gateway compactc probe accepts only an exact pinned-version match"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_compactc_version_pinned_ok` models `probe_gateway_compactc` as an exact-match boundary: the proof-facing probe reports `Ok` if and only if the detected version byte sequence is non-empty and exactly equal to the required pinned version byte sequence."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.all_samples_checked".to_string(),
+                title: "Gateway circuit verification accounts for every caller sample and every generated smoke sample"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_all_samples_checked_ok` fixes the counting boundary of `verify_gateway_circuit`: the modeled processed sample count equals the caller-provided sample count plus the generated smoke-sample count, with neither bucket undercounted."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.all_circuits_checked".to_string(),
+                title: "Gateway verify-job processing accounts for every emitted circuit"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_all_circuits_checked_ok` fixes the map/collect boundary of `execute_gateway_verify_job`: the counted verified-circuit reports equal the counted emitted circuits from the compile step."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.sanitize_contract_name_nonempty".to_string(),
+                title: "Gateway contract-name sanitization is non-empty on the public filename boundary"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_sanitize_contract_name_nonempty_ok` fixes the exported shell contract of `sanitize_gateway_contract_name`: the modeled sanitized length is always strictly positive, matching the fallback-to-`contract` behavior on the owned boundary."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.hex_to_bytes_roundtrip".to_string(),
+                title: "Gateway hex decoding is exact on even valid input and fail-closed otherwise"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_hex_to_bytes_roundtrip_ok` fixes the public contract of `hex_to_bytes` on the owned boundary: acceptance requires even length plus valid hexadecimal digits, and accepted outputs have exactly half the input length."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.smoke_samples_cover_all_aliases".to_string(),
+                title: "Gateway smoke-sample generation either covers every input alias or returns empty conservatively"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_smoke_samples_cover_all_aliases_ok` fixes the proof-facing boundary of `gateway_smoke_samples`: if no unknown type is present, the covered-alias count equals the alias count; if an unknown type appears, the model returns the conservative empty-result branch."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.sample_verdict_faithful".to_string(),
+                title: "Gateway sample verdict follows witness-generation success and constraint-check success exactly"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_sample_verdict_faithful_ok` fixes the public verdict boundary of `run_gateway_sample_check`: the modeled pass bit is true exactly when witness generation succeeds and the subsequent constraint check succeeds."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.witness_generation_deterministic".to_string(),
+                title: "Gateway witness generation is deterministic on the proof-backed sample-check path"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/midnight_gateway_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_witness_generation_deterministic_ok` fixes the deterministic-result boundary that `run_gateway_sample_check` relies on for the supported pure witness path: for a fixed program tag and fixed resolved input tag, repeated modeled `generate_witness` evaluations return the same result, so identical submissions cannot diverge solely because witness generation is nondeterministic on that owned boundary."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "audit.underconstrained_detection_complete".to_string(),
+                title: "Underconstraint analysis covers every constraint and classifies the full private-signal set on the owned audit boundary"
+                    .to_string(),
+                scope: "zkf-core::debugger".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/verus/audit_pipeline_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `audit_underconstrained_detection_complete_ok` fixes the counted coverage boundary for `analyze_underconstrained`: the modeled visited-constraint count equals the total constraint count, and the modeled classified-private-signal count equals the private-signal count."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "audit.constraint_checker_evaluates_all".to_string(),
+                title: "Constraint checking either validates the whole constraint list or stops at the first reported failure with the mapped index preserved"
+                    .to_string(),
+                scope: "zkf-core::witness".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/verus/audit_pipeline_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `audit_constraint_checker_evaluates_all_ok` fixes the proof-facing result boundary of `check_constraints`: success implies the counted checked constraints equal the total count, while failure implies the first failing index is in range and the checked prefix length is exactly that first failing position plus one."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "audit.report_aggregation_correct".to_string(),
+                title: "Audit summary aggregation conserves pass, warn, fail, and skip counts"
+                    .to_string(),
+                scope: "zkf-core::audit".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/verus/audit_pipeline_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `audit_report_aggregation_correct_ok` fixes the arithmetic boundary of `AuditReport::finalize`: the modeled pass, warn, fail, and skip counters sum exactly to the modeled total-check count."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "compact.import_preserves_constraint_count".to_string(),
+                title: "Compact import performs a deterministic no-drop lowering of constraint-bearing opcodes into emitted IR constraints"
+                    .to_string(),
+                scope: "zkf-frontends::external::compact_zkir".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-frontends/proofs/verus/compact_import_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `compact_import_preserves_constraint_count_ok` fixes the honest lowering boundary of `compact_zkir`: the modeled emitted-constraint count is exactly the sum of source constraint-bearing opcodes plus explicit public-alias and structural lowering constraints, with zero silently dropped constraint-bearing opcodes."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "compact.import_preserves_signal_visibility".to_string(),
+                title: "Compact import preserves private signal visibility except for explicit public-alias materialization"
+                    .to_string(),
+                scope: "zkf-frontends::external::compact_zkir".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-frontends/proofs/verus/compact_import_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `compact_import_preserves_signal_visibility_ok` fixes the owned visibility boundary of `compact_zkir`: the modeled preserved-private-signal count equals the private-signal count, and only the explicitly requested public-alias boundary contributes modeled public signals."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "compact.disclose_transcript_preserved".to_string(),
+                title: "Compact disclose transcript metadata stays aligned with the emitted public-alias boundary"
+                    .to_string(),
+                scope: "zkf-frontends::external::compact_zkir".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-frontends/proofs/verus/compact_import_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `compact_disclose_transcript_preserved_ok` fixes the transcript/export boundary of `compact_zkir`: the modeled transcript-entry count, disclosed-signal count, and emitted public-alias count are equal."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.poseidon_lane_decomposition_injective".to_string(),
+                title: "Gateway report-digest lane decomposition is injective on the owned 4-lane byte boundary"
+                    .to_string(),
+                scope: "zkf-core::gateway_attestation_proofs".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/rocq/GatewayAttestationProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `poseidon_lane_decomposition_injective_ok` proves the proof-facing 32-byte digest decomposition into four 8-byte lanes is injective: equal modeled lane chunks reconstruct the same 32-byte digest."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.attestation_canonical_serialization".to_string(),
+                title: "Gateway unsigned-report serialization is canonical on the owned field-order boundary"
+                    .to_string(),
+                scope: "zkf-core::gateway_attestation_proofs".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/rocq/GatewayAttestationProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `attestation_canonical_serialization_ok` fixes the proof-facing field-order serialization boundary for the unsigned gateway report model: canonical serialization of a fixed modeled record is deterministic."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.ml_dsa_signature_binding".to_string(),
+                title: "Gateway ML-DSA signing bytes are bound to the unsigned report populated with report digest and Poseidon commitment"
+                    .to_string(),
+                scope: "zkf-core::gateway_attestation_proofs".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-core/proofs/rocq/GatewayAttestationProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `ml_dsa_signature_binding_ok` fixes the proof-facing signing-order boundary used by the gateway report model: the modeled signing bytes are exactly the canonical serialization of the modeled unsigned report after populating the report digest and Poseidon commitment fields."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gateway.end_to_end_safety".to_string(),
+                title: "Gateway end-to-end public boundary composes compile pinning, audit coverage, sample checking, and deterministic verdict reproduction"
+                    .to_string(),
+                scope: "zkf-cli::cmd::midnight".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-cli/proofs/verus/gateway_composition_verus.rs".to_string(),
+                notes:
+                    "Local Verus theorem `gateway_end_to_end_safety_ok` composes the 21 preceding gateway, audit, and Compact-import proof surfaces into one owned public-boundary theorem: a modeled passing gateway response simultaneously carries the pinned compiler version boundary, complete sample/circuit accounting, exact source-digest binding, audit-count conservation, no-drop Compact lowering, and reproducible verdicts for repeated identical submissions on the proof-backed witness path."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2257,6 +2543,10 @@ mod tests {
         );
         assert_eq!(
             classify("witness.generate_witness_soundness"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("gateway.attestation_canonical_serialization"),
             VerificationAssuranceClass::MechanizedImplementationClaim
         );
     }

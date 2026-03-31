@@ -8,6 +8,7 @@
 ./extraction/Zkf_core_Proof_transform_spec.v
 ./extraction/Zkf_core_Proof_witness_generation_spec.v
 ./KernelArithmetic.v
+./GatewayAttestationProofs.v
 ./KernelGenerated.v
 ./KernelSemantics.v
 ./KernelProofs.v
