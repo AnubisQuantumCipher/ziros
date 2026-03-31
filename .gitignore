@@ -2,3 +2,13 @@
 /target/
 /.DS_Store
 /.tmp/
+
+# Proof build artifacts
+.lia.cache
+.nia.cache
+.zkf-tools/
+*.aux
+*.glob
+*.vo
+*.vok
+*.vos
