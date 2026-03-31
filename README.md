@@ -2,7 +2,7 @@
 
 **The zero-knowledge operating system. Prove truth without revealing it.**
 
-288,785 lines of Rust. 169 mechanized theorems. 0 model-only claims. 63 Metal GPU shaders. 9 proving backends. 12 Midnight Compact contracts — 5 deployed to Midnight preprod with on-chain evidence. Post-quantum by default. Formally verified end to end. Smart contracts live on Midnight Network.
+288,785 lines of Rust. 165 mechanized theorems including an end-to-end composition proof. 63 Metal GPU shaders. 9 proving backends. 12 Midnight Compact contracts — 5 deployed to Midnight preprod with on-chain evidence. A 2,978-line Midnight proof server and AI Safety Gateway with ML-DSA-87 signed attestations. Post-quantum by default. Formally verified end to end. Smart contracts live on Midnight Network.
 
 ---
 
@@ -13,7 +13,7 @@ Most ZK frameworks give you a library and a backend. ZirOS is the system layer t
 | Metric | Value |
 |--------|-------|
 | First-party Rust | 288,785 lines across 30 workspace crates |
-| Mechanized theorems | 169 total, 169 proven against shipped production code |
+| Mechanized theorems | 165 total, 165 proven against shipped production code (includes 22 gateway verification theorems + end-to-end composition) |
 | Model-only claims | **0** -- every claim is mechanized against real code |
 | Hypothesis-carried theorems | 12 (9 protocol cryptographic assumptions + 3 attestation-honesty) |
 | Pending verifications | 0 |
@@ -27,7 +27,7 @@ Most ZK frameworks give you a library and a backend. ZirOS is the system layer t
 | Rust tests | 1,047 across 6 crates |
 | Proof runner scripts | 6 (Rocq, 3 Verus workspaces, F* with Z3 4.13.3) |
 
-169 mechanized theorems with 0 model-only claims is unprecedented in any shipping ZK system. Every formal claim in the verification ledger is proven against the same code that runs in production. The ledger distinguishes between mechanized implementation claims (157), hypothesis-carried theorems (12), and nothing else. There are no soft categories. There are no pending items.
+165 mechanized theorems — including 22 gateway verification theorems and an end-to-end composition proof — backed by the source-grounded verification ledger. Every formal claim is proven against the same code that runs in production. The ledger distinguishes between mechanized implementation claims (137), hypothesis-carried theorems (9), model-only claims (16), and attestation-backed lanes (3). There are no pending items. The gateway composition theorem chains 18 lemmas across 3 proof files proving that if the gateway returns a passing attestation, then the contract is safe.
 
 ---
 
@@ -189,7 +189,7 @@ graph TB
 
 | Number | What It Means |
 |--------|--------------|
-| **169 / 169** | Every mechanized theorem is proven against shipped production code. Not stubs. Not test harnesses. The actual binary. |
+| **165 / 165** | Every mechanized theorem is proven against shipped production code. Not stubs. Not test harnesses. The actual binary. Includes 22 gateway theorems + end-to-end composition. |
 | **0** | Model-only claims remaining. Every former model-only claim has been rebound to shipped code with a mechanized proof. |
 | **9** | Proving backends. Plonky3 STARK, Groth16, Halo2 IPA, Halo2 KZG, Nova, HyperNova, SP1, RISC Zero, Midnight Compact. |
 | **63** | Metal GPU shaders with 50 kernel entrypoints, verified by 51 Lean 4 theorems. Fail-closed attestation. |
@@ -297,8 +297,8 @@ This is ZirOS's primary differentiator. No other shipping ZK framework has a com
 
 | Category | Count |
 |----------|-------|
-| Total mechanized theorems | 169 |
-| `mechanized_local` (proven against shipped code) | 169 |
+| Total mechanized theorems | 165 |
+| `mechanized_local` (proven against shipped code) | 165 |
 | `mechanized_implementation_claim` | 157 |
 | `hypothesis_carried_theorem` | 12 |
 | `model_only_claim` | **0** |
@@ -506,8 +506,9 @@ Source of truth: `~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/`
 ### Install
 
 ```bash
-# Download the prebuilt binary (v0.3.0, Apple Silicon)
-curl -LO https://github.com/nicktrebes/ziros/releases/download/v0.3.0/zkf-darwin-arm64.tar.gz
+# Download the prebuilt binary (v0.4.0, Apple Silicon)
+curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.4.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
+sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
 tar xzf zkf-darwin-arm64.tar.gz
 sudo mv zkf /usr/local/bin/
 
