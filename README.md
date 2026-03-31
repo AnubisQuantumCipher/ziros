@@ -172,11 +172,11 @@ graph TB
 | Halo2 KZG | Ready | BLS12-381 | Trusted | ~3 KB | No | -- |
 | Nova | Ready | BN254 | None | ~1.77 MB | No | -- |
 | HyperNova | Ready | BN254 | None | Variable | No | -- |
-| SP1 | Broken | Delegated | -- | ~1 KB | -- | -- |
-| RISC Zero | Broken | Delegated | -- | ~1 KB | -- | -- |
-| Midnight Compact | Broken | Pasta Fq | -- | -- | -- | -- |
+| SP1 | Delegated | Goldilocks (via Plonky3) | None | ~1 KB | Yes (delegated) | -- |
+| RISC Zero | Delegated | Goldilocks (via Plonky3) | None | ~1 KB | Yes (delegated) | -- |
+| **Midnight Compact** | **Integrated** | Pasta Fp, Pasta Fq | Trusted | BLS12-381 | No | -- |
 
-SP1 and RISC Zero delegate to Plonky3 and require `--allow-compat`. Midnight Compact requires proof server configuration. These statuses are reported honestly by `zkf support-matrix`.
+SP1 and RISC Zero are compatibility lanes that delegate to Plonky3 and require `--allow-compat`. **Midnight Compact is actively integrated** — ZirOS ships a 1,076-line proof server (`zkf midnight proof-server serve`) with 10 HTTP endpoints, dual execution engine, real zswap proof generation, and 12 deployed Compact contracts across 3 subsystems. The Compact frontend compiles `.compact` source via `compactc 0.30.0`, imports ZKIR v2.0, and maps to ZirOS IR.
 
 **STARK-to-Groth16 wrapping** via Nova IVC decomposition: the inner Plonky3 STARK is post-quantum, but wrapping through Nova + Groth16 makes the overall proof classical. ZirOS documents this honestly.
 
@@ -523,7 +523,8 @@ This compiles a Fibonacci circuit, proves with Plonky3 STARK, wraps to Groth16 v
 Honesty matters more than impression.
 
 - **ZirOS does not run on x86.** It is built for Apple Silicon. The Metal GPU shaders, Neural Engine lanes, Secure Enclave integration, and iCloud storage architecture are Apple-specific by design.
-- **SP1, RISC Zero, and Midnight Compact backends are currently broken.** SP1 and RISC Zero delegate to Plonky3 and require `--allow-compat`. Midnight Compact requires proof server configuration. The support matrix reports these honestly.
+- **SP1 and RISC Zero are delegated compatibility lanes**, not native backends. They route through Plonky3 and require `--allow-compat`. They are not broken — they are honest about their delegation model.
+- **Midnight Compact is integrated but the `support-matrix.json` backend row still carries configuration caveats.** The proof server, Compact frontend, 12 contracts, and live DApp all work. The backend row reflects that the default compile/prove path requires the proof server to be running — it does not mean Midnight integration is broken.
 - **Groth16 is not post-quantum.** Neither is Halo2, Nova, or HyperNova. Only Plonky3 STARK (without wrapping) and the ML-DSA-87/ML-KEM-1024 cryptographic surface are post-quantum. Wrapping a STARK through Nova + Groth16 makes the overall proof classical.
 - **The constant-time bridge proves shell structure, not microarchitectural timing.** The F* proof covers control flow and branching patterns. It does not cover BigInt cache-line behavior or branch prediction.
 - **The 12 hypothesis-carried theorems are real assumptions.** They are standard cryptographic assumptions (discrete log hardness, knowledge-of-exponent, random oracle) and attestation-honesty assumptions. Every ZK system relies on these. ZirOS names them explicitly instead of hiding them.
