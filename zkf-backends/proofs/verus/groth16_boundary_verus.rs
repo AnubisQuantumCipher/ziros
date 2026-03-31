@@ -119,6 +119,59 @@ pub proof fn groth16_cached_shape_matrix_free_fail_closed_ok(
 {
 }
 
+pub open spec fn groth16_security_covered_setup(
+    imported_setup: bool,
+    streamed_local_ceremony: bool,
+    auto_ceremony: bool,
+    deterministic_dev_setup: bool,
+    allow_dev_override: bool,
+) -> bool {
+    imported_setup
+        || streamed_local_ceremony
+        || auto_ceremony
+        || (deterministic_dev_setup && allow_dev_override)
+}
+
+pub proof fn groth16_deterministic_production_gate_strict_ok(
+    imported_setup: bool,
+    streamed_local_ceremony: bool,
+    auto_ceremony: bool,
+    deterministic_dev_setup: bool,
+    allow_dev_override: bool,
+)
+    ensures
+        groth16_security_covered_setup(
+            imported_setup,
+            streamed_local_ceremony,
+            auto_ceremony,
+            deterministic_dev_setup,
+            allow_dev_override,
+        ) == (
+            imported_setup
+                || streamed_local_ceremony
+                || auto_ceremony
+                || (deterministic_dev_setup && allow_dev_override)
+        ),
+        deterministic_dev_setup && !allow_dev_override ==> (
+            groth16_security_covered_setup(
+                imported_setup,
+                streamed_local_ceremony,
+                auto_ceremony,
+                deterministic_dev_setup,
+                allow_dev_override,
+            ) == (imported_setup || streamed_local_ceremony || auto_ceremony)
+        ),
+        deterministic_dev_setup && !allow_dev_override && !imported_setup
+            && !streamed_local_ceremony && !auto_ceremony ==> !groth16_security_covered_setup(
+                imported_setup,
+                streamed_local_ceremony,
+                auto_ceremony,
+                deterministic_dev_setup,
+                allow_dev_override,
+            ),
+{
+}
+
 pub struct Halo2IpaBindingModel {
     pub proof_count: nat,
     pub proof_hash_count: nat,

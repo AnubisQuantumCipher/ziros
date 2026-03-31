@@ -1,9 +1,9 @@
-module Zkf_core.Proof_constant_time_spec
-#set-options "--fuel 0 --ifuel 1 --z3rlimit 15"
-open FStar.Mul
-open Core_models
+module Zkf_core.Proof_constant_time_bridge
 
-type t_CtWitnessMask = | CtWitnessMask : t_CtWitnessMask
+open Prims
+
+type t_CtWitnessMask =
+  | CtWitnessMask : t_CtWitnessMask
 
 type t_CtFieldMarker =
   | CtFieldMarker_Primary : t_CtFieldMarker
@@ -53,23 +53,19 @@ let rec eval_expr_reference_result
   | CtExpr_Add lhs rhs ->
     CtEvalResult_Add (eval_expr_reference_result lhs e_witness e_field)
       (eval_expr_reference_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Sub lhs rhs ->
     CtEvalResult_Sub (eval_expr_reference_result lhs e_witness e_field)
       (eval_expr_reference_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Mul lhs rhs ->
     CtEvalResult_Mul (eval_expr_reference_result lhs e_witness e_field)
       (eval_expr_reference_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Div lhs rhs ->
     CtEvalResult_Div (eval_expr_reference_result lhs e_witness e_field)
       (eval_expr_reference_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
 
 let rec eval_expr_constant_time_trace
       (expr: t_CtExpr)
@@ -82,23 +78,19 @@ let rec eval_expr_constant_time_trace
   | CtExpr_Add lhs rhs ->
     CtTrace_Add (eval_expr_constant_time_trace lhs e_witness e_field)
       (eval_expr_constant_time_trace rhs e_witness e_field)
-    <:
-    t_CtTrace
+      <: t_CtTrace
   | CtExpr_Sub lhs rhs ->
     CtTrace_Sub (eval_expr_constant_time_trace lhs e_witness e_field)
       (eval_expr_constant_time_trace rhs e_witness e_field)
-    <:
-    t_CtTrace
+      <: t_CtTrace
   | CtExpr_Mul lhs rhs ->
     CtTrace_Mul (eval_expr_constant_time_trace lhs e_witness e_field)
       (eval_expr_constant_time_trace rhs e_witness e_field)
-    <:
-    t_CtTrace
+      <: t_CtTrace
   | CtExpr_Div lhs rhs ->
     CtTrace_Div (eval_expr_constant_time_trace lhs e_witness e_field)
       (eval_expr_constant_time_trace rhs e_witness e_field)
-    <:
-    t_CtTrace
+      <: t_CtTrace
 
 let rec eval_expr_constant_time_result
       (expr: t_CtExpr)
@@ -111,20 +103,16 @@ let rec eval_expr_constant_time_result
   | CtExpr_Add lhs rhs ->
     CtEvalResult_Add (eval_expr_constant_time_result lhs e_witness e_field)
       (eval_expr_constant_time_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Sub lhs rhs ->
     CtEvalResult_Sub (eval_expr_constant_time_result lhs e_witness e_field)
       (eval_expr_constant_time_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Mul lhs rhs ->
     CtEvalResult_Mul (eval_expr_constant_time_result lhs e_witness e_field)
       (eval_expr_constant_time_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult
   | CtExpr_Div lhs rhs ->
     CtEvalResult_Div (eval_expr_constant_time_result lhs e_witness e_field)
       (eval_expr_constant_time_result rhs e_witness e_field)
-    <:
-    t_CtEvalResult
+      <: t_CtEvalResult

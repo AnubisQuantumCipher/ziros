@@ -8,7 +8,7 @@ pub mod error;
 pub mod field;
 pub mod ir;
 mod proof_ccs_spec;
-mod proof_constant_time_spec;
+mod proof_constant_time_bridge;
 mod proof_kernel;
 mod proof_kernel_spec;
 mod proof_transform_spec;

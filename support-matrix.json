@@ -13,11 +13,7 @@
         "babybear",
         "mersenne31"
       ],
-      "gpu_stages": [
-        "fft-ntt",
-        "hash-merkle"
-      ],
-      "gpu_coverage": "2/2 GPU stages active on current host",
+      "gpu_coverage": "0/2 GPU stages active on current host",
       "notes": "Plonky3 STARK backend with native field profiles: Goldilocks/BabyBear over FRI and Mersenne31 over Circle PCS. Supports Equal/Boolean constraints, range constraints via bit decomposition (field-safe bit cap), and division via derived quotient columns. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-lowered-ir aggregation_semantics=single-proof-with-optional-wrapper"
     },
     {
@@ -29,10 +25,7 @@
       "fields": [
         "pasta-fp"
       ],
-      "gpu_stages": [
-        "msm"
-      ],
-      "gpu_coverage": "1/2 GPU stages active on current host",
+      "gpu_coverage": "0/2 GPU stages active on current host",
       "notes": "Plonkish backend implemented with Halo2 (IPA). Supports Equal/Boolean/Range/Div. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only"
     },
     {
@@ -56,12 +49,7 @@
       "fields": [
         "bn254"
       ],
-      "gpu_stages": [
-        "fft-ntt",
-        "qap-witness-map",
-        "msm"
-      ],
-      "gpu_coverage": "3/3 GPU stages active on current host",
+      "gpu_coverage": "0/3 GPU stages active on current host",
       "notes": "Groth16 on BN254 for smallest proof size and cheap on-chain verification. implementation_type=native compiled_in=true production_ready=false assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only readiness_reason=upstream-ark-groth16-production-disclaimer operator_action=treat arkworks-groth16 as non-production until the upstream production disclaimer is resolved or the dependency is replaced"
     },
     {
@@ -129,7 +117,7 @@
         "pasta-fq"
       ],
       "gpu_coverage": "0/0 GPU stages active on current host",
-      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. The checkout also ships `zkf midnight proof-server serve` as an official-compatible local proof-server facade, but the current backend row is not yet auto-routed to that CLI mode. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds"
+      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds"
     }
   ],
   "frontends": [
@@ -345,68 +333,6 @@
       ],
       "audit_status": "informally-reviewed",
       "notes": "SHA-256 hash function circuit (NIST FIPS 180-4). blackbox_ops=sha256"
-    }
-  ],
-  "app_templates": [
-    {
-      "id": "gnc-6dof-core",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Reusable aerospace 6-DOF GNC core surface with fixed-step safety outputs, surrogate-band lookup binding, bounded replan latency, and nonlinear commitment links."
-    },
-    {
-      "id": "tower-catch-geometry",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Tower-catch landing-interface certificate with catch-box geometry, arm-clearance floor, and fail-closed closing-speed bounds."
-    },
-    {
-      "id": "barge-terminal-profile",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Barge terminal-profile certificate with deck-motion, lateral-clearance, and fail-closed terminal-velocity bounds."
-    },
-    {
-      "id": "planetary-terminal-profile",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Planetary pad terminal-profile certificate with pad-radius, slope, dust-clearance, and fail-closed landing bounds."
-    },
-    {
-      "id": "gust-robustness-batch",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Monte-Carlo gust robustness batch reducer with zero admitted failures, bounded replan latency, and production-target metadata for the larger 10,000-sample certification lane."
-    },
-    {
-      "id": "private-starship-flip-catch",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Flagship private Starship-class flip-and-catch certification surface with committed team subgraphs, imported-CRS-only production posture, TCP-counted transport, one-hot landing-profile selection, and nonlinear batch/subgraph commitments."
-    },
-    {
-      "id": "thermochemical-equilibrium",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Gas-phase thermochemical-equilibrium certificate with element balance, nonnegative species amounts, KKT-style complementarity, and Poseidon binding over the attested species/coefficient surface."
-    },
-    {
-      "id": "real-gas-state",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Real-gas cubic EOS state certificate for Peng-Robinson or Redlich-Kwong with reduced mixing arithmetic, admissible Z > B root selection, and committed coefficient binding."
-    },
-    {
-      "id": "navier-stokes-structured",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Structured-grid 1D finite-volume Navier-Stokes step certificate using attested Rusanov convective and central viscous flux witnesses. Discrete step-only surface; no claim of global PDE closure."
-    },
-    {
-      "id": "combustion-instability-rayleigh",
-      "status": "ready",
-      "field": "bn254",
-      "notes": "Rayleigh-window thermoacoustic instability certificate with a coupled low-order modal growth relation and explicit sign witnesses."
     }
   ],
   "registry": {

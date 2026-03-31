@@ -2,7 +2,7 @@ module ConstantTimeProofs
 
 #set-options "--fuel 0 --ifuel 1 --z3rlimit 40"
 
-open Zkf_core.Proof_constant_time_spec
+open Zkf_core.Proof_constant_time_bridge
 
 let rec eval_expr_constant_time_trace_shape_only
   (expr:t_CtExpr)

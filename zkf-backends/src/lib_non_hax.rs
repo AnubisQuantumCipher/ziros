@@ -515,8 +515,7 @@ pub const GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY: &str = "groth16_ceremony_subs
 pub const GROTH16_CEREMONY_ID_METADATA_KEY: &str = "groth16_ceremony_id";
 pub const GROTH16_CEREMONY_KIND_METADATA_KEY: &str = "groth16_ceremony_kind";
 pub const GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY: &str = "groth16_ceremony_report_path";
-pub const GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY: &str =
-    "groth16_ceremony_report_sha256";
+pub const GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY: &str = "groth16_ceremony_report_sha256";
 pub const GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY: &str =
     "groth16_ceremony_seed_commitment_sha256";
 pub const GROTH16_IMPORTED_SETUP_PROVENANCE: &str = "trusted-imported-blob";
@@ -712,6 +711,32 @@ pub fn compiled_uses_auto_ceremony_groth16_setup(compiled: &CompiledProgram) -> 
             .contains_key(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY)
 }
 
+pub fn compiled_uses_dev_deterministic_groth16_setup(compiled: &CompiledProgram) -> bool {
+    compiled.backend == BackendKind::ArkworksGroth16
+        && compiled
+            .metadata
+            .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+            .map(String::as_str)
+            == Some(GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY)
+        && compiled
+            .metadata
+            .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+            .map(String::as_str)
+            == Some(GROTH16_DETERMINISTIC_DEV_PROVENANCE)
+        && compiled
+            .metadata
+            .get("setup_deterministic")
+            .map(String::as_str)
+            == Some("true")
+        && matches!(
+            compiled
+                .metadata
+                .get("setup_seed_source")
+                .map(String::as_str),
+            Some("override" | "program-digest")
+        )
+}
+
 pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfResult<()> {
     if compiled.backend != BackendKind::ArkworksGroth16 {
         return Ok(());
@@ -720,9 +745,14 @@ pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfR
     if compiled_uses_trusted_imported_groth16_setup(compiled)
         || compiled_uses_local_ceremony_streamed_groth16_setup(compiled)
         || compiled_uses_auto_ceremony_groth16_setup(compiled)
-        || allow_dev_deterministic_groth16()
     {
         return Ok(());
+    }
+
+    if compiled_uses_dev_deterministic_groth16_setup(compiled) {
+        if allow_dev_deterministic_groth16() {
+            return Ok(());
+        }
     }
 
     let boundary = compiled
@@ -741,6 +771,58 @@ pub fn ensure_security_covered_groth16_setup(compiled: &CompiledProgram) -> ZkfR
         GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
         GROTH16_SETUP_BLOB_PATH_ENV,
         ALLOW_DEV_DETERMINISTIC_GROTH16_ENV,
+    )))
+}
+
+pub fn groth16_artifact_uses_dev_deterministic_seeds(artifact: &ProofArtifact) -> bool {
+    artifact.backend == BackendKind::ArkworksGroth16
+        && (artifact
+            .metadata
+            .get("prove_deterministic")
+            .map(String::as_str)
+            == Some("true")
+            || (artifact
+                .metadata
+                .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+                .map(String::as_str)
+                == Some(GROTH16_DETERMINISTIC_DEV_PROVENANCE)
+                && artifact
+                    .metadata
+                    .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+                    .map(String::as_str)
+                    == Some(GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY)))
+}
+
+pub fn ensure_strict_security_covered_groth16_artifact(
+    compiled: &CompiledProgram,
+    artifact: &ProofArtifact,
+) -> ZkfResult<()> {
+    ensure_security_covered_groth16_setup(compiled)?;
+    if !groth16_artifact_uses_dev_deterministic_seeds(artifact) {
+        return Ok(());
+    }
+    if allow_dev_deterministic_groth16() {
+        return Ok(());
+    }
+
+    let boundary = artifact
+        .metadata
+        .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+        .map(String::as_str)
+        .unwrap_or("unspecified");
+    let provenance = artifact
+        .metadata
+        .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+        .map(String::as_str)
+        .unwrap_or("unspecified");
+    let prove_deterministic = artifact
+        .metadata
+        .get("prove_deterministic")
+        .map(String::as_str)
+        .unwrap_or("unspecified");
+
+    Err(ZkfError::Backend(format!(
+        "strict cryptographic Groth16 artifacts reject dev-deterministic setup/proof provenance (boundary={boundary}, provenance={provenance}, prove_deterministic={prove_deterministic}); explicit development seeds are never admitted to strict lanes",
     )))
 }
 
@@ -1089,5 +1171,112 @@ mod tests {
                 .expect_err("compat should fail closed");
             assert!(err.contains("sp1-compat"));
         }
+    }
+
+    fn deterministic_dev_compiled_program() -> CompiledProgram {
+        let mut compiled = CompiledProgram::new(BackendKind::ArkworksGroth16, Program::default());
+        compiled.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string(),
+        );
+        compiled.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string(),
+        );
+        compiled
+            .metadata
+            .insert("setup_deterministic".to_string(), "true".to_string());
+        compiled.metadata.insert(
+            "setup_seed_source".to_string(),
+            "program-digest".to_string(),
+        );
+        compiled
+    }
+
+    fn imported_setup_compiled_program() -> CompiledProgram {
+        let mut compiled = CompiledProgram::new(BackendKind::ArkworksGroth16, Program::default());
+        compiled.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_PROVENANCE.to_string(),
+        );
+        compiled.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY.to_string(),
+        );
+        compiled
+    }
+
+    #[test]
+    fn strict_groth16_security_gate_rejects_dev_deterministic_setup_without_opt_in() {
+        let compiled = deterministic_dev_compiled_program();
+        let err = with_allow_dev_deterministic_groth16_override(Some(false), || {
+            ensure_security_covered_groth16_setup(&compiled)
+                .expect_err("strict gate should reject dev-deterministic setup")
+        });
+        assert!(err.to_string().contains("explicit development testing"));
+    }
+
+    #[test]
+    fn strict_groth16_security_gate_allows_dev_deterministic_setup_only_with_opt_in() {
+        let compiled = deterministic_dev_compiled_program();
+        with_allow_dev_deterministic_groth16_override(Some(true), || {
+            ensure_security_covered_groth16_setup(&compiled)
+                .expect("explicit dev override should allow deterministic-dev setup")
+        });
+    }
+
+    #[test]
+    fn strict_groth16_artifact_gate_rejects_deterministic_proof_metadata() {
+        let compiled = imported_setup_compiled_program();
+        let mut artifact = ProofArtifact::new(
+            BackendKind::ArkworksGroth16,
+            compiled.program_digest.clone(),
+            vec![],
+            vec![],
+            vec![],
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_PROVENANCE.to_string(),
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY.to_string(),
+        );
+        artifact
+            .metadata
+            .insert("prove_deterministic".to_string(), "true".to_string());
+
+        let err = ensure_strict_security_covered_groth16_artifact(&compiled, &artifact)
+            .expect_err("strict artifact gate should reject deterministic proof metadata");
+        assert!(err.to_string().contains("dev-deterministic"));
+    }
+
+    #[test]
+    fn strict_groth16_artifact_gate_allows_deterministic_proof_metadata_with_explicit_opt_in() {
+        let compiled = imported_setup_compiled_program();
+        let mut artifact = ProofArtifact::new(
+            BackendKind::ArkworksGroth16,
+            compiled.program_digest.clone(),
+            vec![],
+            vec![],
+            vec![],
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_PROVENANCE.to_string(),
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY.to_string(),
+        );
+        artifact
+            .metadata
+            .insert("prove_deterministic".to_string(), "true".to_string());
+
+        with_allow_dev_deterministic_groth16_override(Some(true), || {
+            ensure_strict_security_covered_groth16_artifact(&compiled, &artifact)
+                .expect("explicit dev override should allow deterministic proof metadata")
+        });
     }
 }

@@ -9,7 +9,9 @@ use std::io::Write;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_backends::{
-    BackendRoute, CapabilityReport, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
+    BackendRoute, CapabilityReport, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
+    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
+    GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
     assurance_lane_for_backend, backend_for, backend_for_route, backend_surface_status,
     capabilities_report, gpu_stage_coverage_for_backend_field, metal_first_benchmark_backends,
     preferred_backend_for_program, prover_acceleration_claimed_for_backend,
@@ -2360,12 +2362,53 @@ pub(crate) fn proof_artifact_assurance_lane(artifact: &zkf_core::ProofArtifact) 
         .unwrap_or_else(|| assurance_lane_for_backend(artifact.backend))
 }
 
+fn proof_artifact_uses_dev_deterministic_groth16(artifact: &zkf_core::ProofArtifact) -> bool {
+    artifact.backend == BackendKind::ArkworksGroth16
+        && (artifact
+            .metadata
+            .get("prove_deterministic")
+            .map(String::as_str)
+            == Some("true")
+            || (artifact
+                .metadata
+                .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+                .map(String::as_str)
+                == Some(GROTH16_DETERMINISTIC_DEV_PROVENANCE)
+                && artifact
+                    .metadata
+                    .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+                    .map(String::as_str)
+                    == Some(GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY)))
+}
+
 pub(crate) fn ensure_release_safe_proof_artifact(
     artifact: &zkf_core::ProofArtifact,
     context: &str,
 ) -> Result<(), String> {
     let trust_model = proof_artifact_trust_model(artifact);
     let assurance_lane = proof_artifact_assurance_lane(artifact);
+    if proof_artifact_uses_dev_deterministic_groth16(artifact)
+        && !zkf_backends::allow_dev_deterministic_groth16()
+    {
+        let setup_boundary = artifact
+            .metadata
+            .get(GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY)
+            .map(String::as_str)
+            .unwrap_or("unspecified");
+        let setup_provenance = artifact
+            .metadata
+            .get(GROTH16_SETUP_PROVENANCE_METADATA_KEY)
+            .map(String::as_str)
+            .unwrap_or("unspecified");
+        let prove_deterministic = artifact
+            .metadata
+            .get("prove_deterministic")
+            .map(String::as_str)
+            .unwrap_or("unspecified");
+        return Err(format!(
+            "{context} rejects dev-deterministic Groth16 artifacts (setup_boundary={setup_boundary}, setup_provenance={setup_provenance}, prove_deterministic={prove_deterministic}); explicit development seeds are never release-safe"
+        ));
+    }
     let is_native_lane = assurance_lane == "native-cryptographic-proof";
     if trust_model == "cryptographic" && is_native_lane {
         return Ok(());
@@ -2380,11 +2423,13 @@ pub(crate) fn ensure_release_safe_proof_artifact(
 mod tests {
     #[allow(unused_imports)]
     use super::{
+        GROTH16_DETERMINISTIC_DEV_PROVENANCE, GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
+        GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
         default_prove_mode, ensure_backend_supports_program_constraints,
         ensure_release_safe_proof_artifact, max_lookup_rows, parse_benchmark_backends,
         parse_export_scheme, parse_optimization_objective, parse_prove_mode, read_program_artifact,
-        resolve_backend_or_mode, resolve_backend_targets_or_mode, sha256_hex, write_json,
-        write_json_and_hash,
+        resolve_backend_or_mode, resolve_backend_targets_or_mode, sha256_hex,
+        with_allow_dev_deterministic_groth16_override, write_json, write_json_and_hash,
     };
     use std::collections::BTreeMap;
     use std::fs;
@@ -2625,6 +2670,79 @@ mod tests {
 
         let err = ensure_release_safe_proof_artifact(&artifact, "deploy").unwrap_err();
         assert!(err.contains("assurance_lane=attestation-backed-host-validated-lane"));
+    }
+
+    #[test]
+    fn release_safe_proof_artifact_rejects_dev_deterministic_groth16() {
+        let mut artifact = ProofArtifact {
+            backend: BackendKind::ArkworksGroth16,
+            program_digest: "digest".to_string(),
+            proof: vec![],
+            verification_key: vec![],
+            public_inputs: vec![],
+            metadata: Default::default(),
+            security_profile: None,
+            hybrid_bundle: None,
+            credential_bundle: None,
+            archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
+        };
+        artifact
+            .metadata
+            .insert("trust_model".to_string(), "cryptographic".to_string());
+        artifact.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string(),
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string(),
+        );
+        artifact
+            .metadata
+            .insert("prove_deterministic".to_string(), "true".to_string());
+
+        let err = ensure_release_safe_proof_artifact(&artifact, "deploy").unwrap_err();
+        assert!(err.contains("dev-deterministic Groth16 artifacts"));
+    }
+
+    #[test]
+    fn release_safe_proof_artifact_allows_dev_deterministic_groth16_with_explicit_opt_in() {
+        let mut artifact = ProofArtifact {
+            backend: BackendKind::ArkworksGroth16,
+            program_digest: "digest".to_string(),
+            proof: vec![],
+            verification_key: vec![],
+            public_inputs: vec![],
+            metadata: Default::default(),
+            security_profile: None,
+            hybrid_bundle: None,
+            credential_bundle: None,
+            archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
+        };
+        artifact
+            .metadata
+            .insert("trust_model".to_string(), "cryptographic".to_string());
+        artifact.metadata.insert(
+            GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string(),
+        );
+        artifact.metadata.insert(
+            GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+            GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string(),
+        );
+        artifact
+            .metadata
+            .insert("prove_deterministic".to_string(), "true".to_string());
+
+        with_allow_dev_deterministic_groth16_override(Some(true), || {
+            ensure_release_safe_proof_artifact(&artifact, "deploy")?;
+            Ok(())
+        })
+        .expect("explicit dev override should allow deterministic artifact");
     }
 
     #[test]
