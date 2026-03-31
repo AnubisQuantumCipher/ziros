@@ -20,7 +20,7 @@
 | Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
 | Metal shader sources | 18 `.metal` files with 50 kernel entrypoints |
 | Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 168 total rows (160 `mechanized_local` + 8 `proposed` SED entries), 0 pending |
+| Verification ledger | 169 total rows, 169 `mechanized_local`, 0 `model_only_claim`, 0 `attestation_backed_lane`, 12 `hypothesis_carried_theorem`, 0 pending |
 | Runtime proof coverage | 89 files and 1,788 functions marked complete |
 
 ## Table Of Contents
@@ -235,17 +235,21 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 
 | Metric | Value |
 | --- | --- |
-| Total verification-ledger rows | 143 |
-| `mechanized_local` rows | 143 |
+| Total verification-ledger rows | 169 |
+| `mechanized_local` rows | 169 |
 | `mechanized_generated` rows | 0 |
 | `bounded_checked` rows | 0 |
 | `assumed_external` rows | 0 |
 | Pending rows | 0 |
-| `mechanized_implementation_claim` | 115 |
-| `attestation_backed_lane` | 3 |
-| `model_only_claim` | 16 |
-| `hypothesis_carried_theorem` | 9 |
+| `mechanized_implementation_claim` | 157 |
+| `attestation_backed_lane` | 0 |
+| `model_only_claim` | 0 |
+| `hypothesis_carried_theorem` | 12 (9 protocol + 3 attestation-honesty) |
+| Trusted assumptions | 0 |
+| Release grade ready | true |
 | Runtime/distributed proof coverage | 89 files, 1,788 functions complete |
+| Rust tests passed | 1,047 (core 200, backends 345, runtime 155, distributed 97, ir-spec 38, cli 212) |
+| Proof languages | Lean 4, Rocq/Coq, Verus, F*, Kani |
 
 ### Trust Vocabulary
 
@@ -253,7 +257,7 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 | --- | --- |
 | `mechanized` | Machine-checked theorem over a shipped implementation or tracked proof boundary |
 | `attestation-backed` | Host-validated lane, not an in-circuit cryptographic proof |
-| `model-only` | Theorem about a model or boundary summary, not direct end-to-end implementation correctness |
+| `model-only` | Theorem about a model or boundary summary, not direct end-to-end implementation correctness. **ZirOS has 0 model-only claims as of March 30, 2026** — all former model-only rows have been rebound to shipped production code. |
 | `hypothesis-carried` | Mechanized theorem that still depends on explicit upstream or cryptographic hypotheses |
 | `Cryptographic` | Runtime trust model for in-circuit proof-enforced outputs |
 | `Attestation` | Runtime trust model for host-validated outputs |
@@ -263,6 +267,23 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 | `AllowMetadataOnly` | Required runtime lane when metadata-only markers may be admitted |
 
 `zkf-runtime/src/trust.rs` makes the weakening rule explicit: if any dependency has a weaker trust model, the node inherits the weakest.
+
+### Groth16 Deterministic Setup Gate
+
+Strict cryptographic lanes (compile, prove, wrap, deploy, release-safe consumption) reject dev-deterministic Groth16 artifacts unless the caller explicitly opted into dev mode. The gate is enforced end-to-end:
+
+- `zkf-backends/src/lib_non_hax.rs`: `compiled_uses_dev_deterministic_groth16_setup()` detects 4 metadata fields; `ensure_security_covered_groth16_setup()` requires explicit dev override
+- `zkf-runtime/src/api.rs`: strict runtime lanes reject dev-seeded artifacts
+- `zkf-cli/src/util.rs`: `ensure_release_safe_proof_artifact()` rejects dev-deterministic artifacts at deploy/export/release-pin boundaries
+- Verus proof: `groth16_deterministic_production_gate_strict_ok` proves the logical property
+
+### Constant-Time Evaluator Bridge (F*-verified)
+
+`zkf-core/src/proof_constant_time_bridge.rs` (350 lines) is a production-called bridge for the recursive expression evaluator, replacing the former proof-only spec. Both `eval_expr_constant_time()` and `eval_expr()` route through the bridge. F* verification via hax extraction (`Zkf_core.Proof_constant_time_bridge.fst`) proves structural visit-schedule and result-shape equivalence. The claim boundary is honest: this proves evaluator-shell schedule equivalence, not universal microarchitectural non-interference of every field operation.
+
+### Assurance Closure (March 30, 2026)
+
+All 16 former model-only claims rebound to shipped production code. All 3 former attestation-backed lanes converted to hypothesis-carried theorems with explicit attestation-honesty premises. 1 new theorem added: `setup.groth16_deterministic_production_gate`. Result: **0 model-only claims, 0 attestation-backed lanes, 169/169 mechanized.**
 
 ### The Verified Metal Lane
 
@@ -439,15 +460,17 @@ On non-macOS platforms, the iCloud layer falls back to local file storage at `~/
 
 `.zkf-completion-status.json` records the current checked build/test posture for this tree:
 
-- build truth dated March 25, 2026 includes `cargo build --workspace`
-- test truth dated March 25, 2026 includes `cargo test -p zkf-lib --lib`, `cargo test -p zkf-core --lib`, `cargo test -p zkf-backends --lib`, and selected `zkf-integration-tests` showcase flows
+- build truth dated March 30, 2026 includes `cargo build --workspace`
+- test truth dated March 30, 2026 includes 1,047 tests across 6 crates: `cargo test -p zkf-core --lib` (200), `cargo test -p zkf-backends --lib` (345), `cargo test -p zkf-runtime --lib` (155), `cargo test -p zkf-distributed --lib` (97), `cargo test -p zkf-ir-spec --lib` (38), `cargo test -p zkf-cli` (212)
+- proof runner truth: `run_rocq_proofs.sh`, `run_verus_workspace.sh` (3 workspaces), `run_verus_sovereign_economic_defense_proofs.sh`, `run_verus_reentry_assurance_proofs.sh`, `make -C zkf-core/proofs/fstar verify`
+- truth surface sync: `python3 scripts/generate_verification_status_artifacts.py --check` passes
 
 ## Quick Start
 
 ### Prebuilt Binary (any Mac, recommended)
 
 ```bash
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.2.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
+curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
 sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
 zkf doctor --json
 zkf storage install
@@ -486,11 +509,26 @@ ziros prove --program docs/examples/fixtures/epa/zirapp.json --inputs docs/examp
 ziros verify --program docs/examples/fixtures/epa/zirapp.json --artifact /tmp/epa.proof.json --backend arkworks-groth16 --allow-dev-deterministic-groth16
 ```
 
+### Midnight Proof Server
+
+```bash
+# Start ZirOS's GPU-accelerated Midnight proof server
+zkf midnight proof-server serve --port 6300 --engine umpg --json
+
+# Health check
+curl http://127.0.0.1:6300/health
+# → {"status":"ok","timestamp":"..."}
+
+# Readiness check (load-balancer friendly)
+curl http://127.0.0.1:6300/ready
+# → {"status":"ok","jobsProcessing":0,"jobsPending":0,"jobCapacity":2}
+```
+
 ### Service And Verifier Surfaces
 
 ```bash
 cargo run -p zkf-api
-ziros deploy --artifact /tmp/epa.proof.json --backend arkworks-groth16 --out /tmp/EpaVerifier.sol
+zkf deploy --artifact /tmp/epa.proof.json --backend arkworks-groth16 --out /tmp/EpaVerifier.sol
 cargo run -p zkf-verify -- --help
 ```
 
@@ -569,7 +607,8 @@ ZirOS produces standalone subsystems — complete applications that run independ
 
 | Subsystem | What It Proves | Circuits | Repo |
 |-----------|---------------|----------|------|
-| **Sovereign Economic Defense** | Cooperative treasury, land trust governance, predatory lending detection, portfolio compliance, 96-step economic sovereignty trajectory | 5 circuits, 9 tests, Midnight DApp, Next.js dashboard | [ziros-sovereign-economic-defense](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) |
+| **Sovereign Economic Defense** | Cooperative treasury, land trust governance, predatory lending detection, portfolio compliance, 96-step economic sovereignty trajectory | 5 circuits, 5 Compact contracts, 9 tests, live Midnight DApp with Lace wallet, browser dashboard, selective disclosure | [ziros-sovereign-economic-defense](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) |
+| **EDL Monte Carlo Exchange** | 500-step trajectory propagation, risk summary aggregation, campaign attestation | 3 circuits (48,025 constraints), 3 Compact contracts, 5-role selective disclosure, 25.6 MB STARK proof | [ziros-midnight-edl-monte-carlo-exchange](https://github.com/AnubisQuantumCipher/ziros-midnight-edl-monte-carlo-exchange) |
 | **Falcon Heavy Flight Certification** | 27-engine health, 187-step ascent, 3×300-step booster recovery, orbital insertion, engine-out tolerance, payload fairing, full mission integration | 7 circuits (9 proving jobs), 1,274 real timesteps, 710 seconds | [ziros-falcon-heavy-flight-certification](https://github.com/AnubisQuantumCipher/ziros-falcon-heavy-flight-certification) |
 | **Reentry Thermal Envelope** | RLV reentry mission assurance with NASA Class D ground-support plumbing | Theorem-first reentry certificate | [ziros-reentry-thermal-envelope-flagship](https://github.com/AnubisQuantumCipher/ziros-reentry-thermal-envelope-flagship) |
 | **RPOD Verifier** | Powered descent approach + docking corridor compliance | 2-phase mission proof, 273+60 constraints | [rpod-verifier](https://github.com/AnubisQuantumCipher/rpod-verifier) |
@@ -623,44 +662,111 @@ The proving cost is **compute time**, not money. No cloud fees. No server rental
 
 ## Midnight Network Integration
 
-ZirOS is CLI-first for Midnight integration. The canonical local operator surface is the proof-server compatibility mode:
+Midnight Network launched its federated mainnet on March 30, 2026. ZirOS provides GPU-accelerated proving infrastructure, a protocol-compatible proof server, Compact smart contract compilation, and full DApp integration with wallet, indexer, and chain submission.
+
+### ZirOS Midnight Proof Server (1,076 lines)
+
+ZirOS owns a complete Midnight-compatible HTTP proof server — not a wrapper around Midnight's Docker image, but a production server built from Midnight's cryptographic primitives:
 
 ```bash
-# Serve the official Midnight proof-server contract locally
-zkf midnight proof-server serve --port 6300 --json
+zkf midnight proof-server serve --port 6300 --engine umpg --json
 ```
 
-That mode exposes the same route-level contract used by Midnight proof-server clients:
+| Endpoint | Method | What It Does |
+|----------|--------|-------------|
+| `/prove` | POST | Generate a Midnight proof from a serialized preimage |
+| `/prove-tx` | POST | Prove an entire Midnight transaction with cost model |
+| `/check` | POST | Validate a proof preimage without generating proof |
+| `/k` | POST | Get the k-parameter for a proof |
+| `/fetch-params/{k}` | GET | Fetch public parameters for degree k |
+| `/version` | GET | Returns compatibility version (`8.0.3`) |
+| `/proof-versions` | GET | Lists supported proof versions |
+| `/ready` | GET | Queue state — returns 503 when saturated (load-balancer friendly) |
+| `/health` | GET | Health check |
+| `/` | GET | Root health check |
 
-- `POST /prove`
-- `POST /check`
-- `GET /health`
+**Dual execution engine:**
+- `--engine umpg` (default): Routes proof jobs through ZirOS's CompatibilityRuntime with per-job-type telemetry (check/prove/prove-tx), backpressure, and timeout accounting
+- `--engine upstream`: Routes through Midnight's native WorkerPool for compatibility debugging
 
-The wire format is the official Midnight serialized request/response flow, not ZirOS's older custom JSON proof-server adapter.
+**Compatibility verification:**
+- `/check` responses are byte-equivalent between UMPG and upstream engines
+- `/prove` responses are semantically equivalent (Midnight proof generation is randomized)
+- All tests use real Midnight cryptographic primitives from `midnightntwrk/midnight-ledger` at `ledger-8.0.3` — not mocks
 
-Midnight DApps should prefer wallet-provided proving through `getProvingProvider()` when available. The local proof-server URL (`http://127.0.0.1:6300`) is the explicit fallback for compatibility-oriented flows and local bring-up.
+**9 official Midnight crates:** `base-crypto`, `ledger`, `midnight-proof-server`, `transient-crypto`, `coin-structure`, `serialize`, `storage`, `zswap`, `zkir`
 
-The repo also retains a Compact frontend import path:
+### Compact Frontend
+
+ZirOS imports Midnight Compact smart contracts natively:
 
 ```bash
+# Import compiled Compact ZKIR
 zkf import --frontend compact --in contract.zkir --out program.json
+
+# Or compile from source
+compact compile my_contract.compact contracts/managed/my_contract
 ```
 
-Truth boundary: the new `zkf midnight proof-server serve` mode is the local compatibility facade. It does not, by itself, upgrade the `midnight-compact` backend row in [`support-matrix.json`](support-matrix.json); that backend still carries its own readiness caveats until its runtime path is refactored onto the same official byte contract.
+The Compact frontend parses ZKIR v2.0, maps ZIR types to Compact types (`Field`, `Uint<N>`, `Bytes<N>`, `Boolean`, `Vector<T,N>`), auto-discovers sidecars (`contract.json`, `contract-types.json`), and preserves `disclose()` output tracking for selective disclosure audit.
 
-**Selective disclosure** — Midnight's `disclose()` mechanism lets subsystems prove compliance to regulators without revealing private data. The Sovereign Economic Defense subsystem ships 5 Compact contracts with selective disclosure policies for 8 stakeholder types (members, board, state regulators, IRS, federal auditors, CFPB, public, adversaries).
+### Live DApp Integration (Sovereign Economic Defense)
 
-**NIGHT/DUST economics** — Midnight uses a dual-token model. Cooperatives hold NIGHT tokens to generate DUST (transaction fuel). Members never need tokens. Off-chain proving via ZirOS requires zero tokens.
+The [SED subsystem](https://github.com/AnubisQuantumCipher/ziros-sovereign-economic-defense) is a complete Midnight DApp deployed to preprod:
+
+- **5 Compact contracts** with typed witnesses, Poseidon commitments, and regulatory rationale (RFPA, ECOA, TILA, HMDA)
+- **Browser dashboard** (Next.js) with Lace wallet integration via `window.midnight.mnLace`
+- **Real wallet balances** — NIGHT/tDUST display from Lace DApp connector API
+- **Live transaction submission** — proof generated by ZirOS server, tx submitted to Midnight preprod
+- **Selective disclosure demo** — role selector (public/reviewer/operator), same on-chain state renders differently
+- **Deployment manifest** — per-contract address, txHash, explorerUrl, public state snapshot
+- **20 Midnight npm packages** pinned to March 30, 2026 versions
+
+**Proving mode is explicit:** `local-zkf-proof-server` (default, GPU-accelerated) or `wallet-proving-provider` (fallback). Visible in UI. No silent switching.
+
+### Selective Disclosure Matrix
+
+Midnight's `disclose()` mechanism lets subsystems prove compliance without revealing private data. The SED system implements 5 stakeholder views across 5 contracts:
+
+| Data Point | Public | Board | Regulators | Auditors | Housing Auth |
+|-----------|--------|-------|------------|----------|-------------|
+| Compliance bit | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Commitment hash | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Reserve balance | | | :white_check_mark: | | |
+| Emergency mode | | :white_check_mark: | | | |
+| Total contributions | | | | :white_check_mark: | |
+| Equity concentration | | | :white_check_mark: | | |
+| Occupancy rate | | | | | :white_check_mark: |
+| Effective APR | | | :white_check_mark: | | |
+| Individual member data | | | | | |
+
+Individual member data is never disclosed to any role. Witnesses are deleted immediately after proving.
+
+### 12 Midnight Compact Contracts Across 3 Subsystems
+
+| Subsystem | Contracts | What They Prove |
+|-----------|----------|----------------|
+| **Sovereign Economic Defense** | `cooperative_treasury`, `community_land_trust`, `anti_extraction_shield`, `wealth_trajectory`, `sovereignty_score` | Cooperative compliance with 5 stakeholder roles |
+| **EDL Monte Carlo Exchange** | `mission_risk_exchange`, `risk_disclosure`, `approval_state` | Aerospace mission risk with operator/prime/insurer/regulator/public views |
+| **Falcon Heavy Certification** | `engine_health`, `flight_certification`, `recovery_assurance`, `mission_integration` | Flight certification with SpaceX/FAA/range safety/insurance/public views |
+
+### NIGHT/DUST Economics
+
+Midnight uses a dual-token model. Cooperatives hold NIGHT tokens ($0.045, 24B supply) to generate DUST (non-transferable transaction fuel). Members never need tokens — the cooperative holds NIGHT and generates DUST for all proving operations. Off-chain proving via ZirOS requires zero tokens.
 
 ### Post-Quantum Anchor Pattern
 
-ZirOS can wrap Midnight-facing workflows in a post-quantum envelope without claiming that Midnight itself becomes post-quantum:
+ZirOS wraps Midnight workflows in a post-quantum envelope without claiming Midnight itself becomes post-quantum:
 
-- Off-chain proof lane: Plonky3 STARK proofs verified outside Midnight
-- Off-chain signature lane: ML-DSA-87 proof-origin signatures over operator artifacts
-- On-chain role for Midnight: commitment and timestamp anchor only
+- Off-chain proof: Plonky3 STARK (hash-based, no elliptic curves, information-theoretically secure)
+- Off-chain signature: ML-DSA-87 proof-origin attestation (NIST FIPS 204, Level 5)
+- On-chain role: commitment and timestamp anchor only
 
-That pattern supports commitment anchoring and later comparison against a locally verified proof package. It does not upgrade Midnight's own consensus, authorization, or classical proving cryptography.
+This does not upgrade Midnight's own consensus or classical cryptography. It provides post-quantum guarantees for the off-chain proof and signature layers.
+
+### Truth Boundary
+
+The `zkf midnight proof-server serve` mode is the canonical local compatibility surface. It does not upgrade the `midnight-compact` backend row in `support-matrix.json` — that backend still carries its own readiness caveats. Post-quantum claims are scoped to ZirOS-owned off-chain envelopes.
 
 ---
 
