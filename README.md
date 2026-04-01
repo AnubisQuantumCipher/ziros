@@ -8,6 +8,10 @@
 >
 > This checkout is the public ZirOS workspace and proof surface shipped in this repository. The constitution and supporting docs also describe broader ZirOS infrastructure and release posture; this README is intentionally stricter than that broader story. It only claims what can be grounded in the current tree, its live truth surfaces, and its checked-in public adjuncts.
 
+## License Summary
+
+ZirOS is source-available under the Business Source License 1.1. You can read, build, and test the code for development, personal projects, and academic research. Production use, commercial deployment, and offering ZirOS as a service require a separate commercial license from the licensor. On April 1, 2030, this code converts to Apache License 2.0.
+
 ## Live Checkout Facts
 
 | Fact | Current checkout value |
@@ -794,4 +798,11 @@ The `zkf midnight proof-server serve` mode is the canonical local compatibility 
 
 ## License
 
-See `LICENSE-BSL` and the crate metadata for the current repository licensing posture.
+ZirOS is source-available under the Business Source License 1.1.
+
+- You can read, build, and test the code for non-production use.
+- Development, testing, academic research, and personal projects are allowed.
+- Production use, commercial deployment, and offering ZirOS as a service require a separate commercial license from the licensor.
+- On April 1, 2030, this repository converts to Apache License 2.0.
+
+See [LICENSE.md](/Users/sicarii/Desktop/ZirOS/LICENSE.md) and [NOTICE.md](/Users/sicarii/Desktop/ZirOS/NOTICE.md) for the full licensing terms.

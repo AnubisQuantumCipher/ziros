@@ -1,3 +1,16 @@
+// Copyright (c) 2026 AnubisQuantumCipher. All rights reserved.
+// Licensed under the Business Source License 1.1 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://mariadb.com/bsl11/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// Change Date: April 1, 2030
+// Change License: Apache License 2.0
+
 const INTERNAL_MATRIX_DIAGONAL_HEX: [&str; 4] = [
     "10dc6e9c006ea38b04b1e03b4bd9490c0d03f98929ca1d7fb56821fd19d3b6e7",
     "0c28145b6a44df3e0149b3d0a30b3bb599df9756d4dd9b84a86b38cfb45a740b",
