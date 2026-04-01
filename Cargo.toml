@@ -9,6 +9,7 @@ members = [
   "zkf-ir-spec",
   "zkf-conformance",
   "zkf-cli",
+  "zkf-sdk",
   "zkf-lib",
   "zkf-examples",
   "zkf-keymanager",

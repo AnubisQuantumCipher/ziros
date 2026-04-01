@@ -1,0 +1,14 @@
+[package]
+name = "zkf-sdk"
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+description = "Public SDK for building applications on ZirOS"
+
+[dependencies]
+zkf-core = { path = "../zkf-core" }
+zkf-lib = { path = "../zkf-lib" }
+
+[lints]
+workspace = true
