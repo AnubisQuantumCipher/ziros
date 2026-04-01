@@ -6,11 +6,11 @@
 >
 > ZirOS is the system layer that sits between application intent and raw proving machinery. You describe a statement. ZirOS owns the rest of the path: canonical IR, fail-closed audits, witness generation, backend routing, CPU/GPU scheduling, attested Metal execution, proof verification, verifier/export surfaces, runtime telemetry, and evidence-carrying artifacts.
 >
-> This checkout is the public ZirOS workspace and proof surface shipped in this repository. The constitution and supporting docs also describe broader ZirOS infrastructure and release posture; this README is intentionally stricter than that broader story. It only claims what can be grounded in the current tree, its live truth surfaces, and its checked-in public adjuncts.
+> This checkout is the ZirOS core workspace and proof surface maintained in a private repository. The constitution and supporting docs also describe broader ZirOS infrastructure and release posture; this README is intentionally stricter than that broader story. It only claims what can be grounded in the current tree, its live truth surfaces, and its checked-in adjuncts.
 
 ## License Summary
 
-ZirOS is source-available under the Business Source License 1.1. You can read, build, and test the code for development, personal projects, and academic research. Production use, commercial deployment, and offering ZirOS as a service require a separate commercial license from the licensor. On April 1, 2030, this code converts to Apache License 2.0.
+ZirOS core is proprietary and private. No public source-use grant, Change Date, or automatic Apache conversion applies to the core workspace. Developers should integrate through separately licensed binary artifacts and the future `zkf-sdk` crate, which is intended to be the only Apache-2.0 public API surface.
 
 ## Live Checkout Facts
 
@@ -798,11 +798,10 @@ The `zkf midnight proof-server serve` mode is the canonical local compatibility 
 
 ## License
 
-ZirOS is source-available under the Business Source License 1.1.
+ZirOS core is proprietary and private.
 
-- You can read, build, and test the code for non-production use.
-- Development, testing, academic research, and personal projects are allowed.
-- Production use, commercial deployment, and offering ZirOS as a service require a separate commercial license from the licensor.
-- On April 1, 2030, this repository converts to Apache License 2.0.
+- No rights to copy, modify, redistribute, host, or use the core source or binaries are granted except under a separate written license.
+- No Change Date or automatic open-source conversion applies to ZirOS core.
+- The future `zkf-sdk` crate is intended to be the only Apache-2.0 public integration surface.
 
-See [LICENSE.md](/Users/sicarii/Desktop/ZirOS/LICENSE.md) and [NOTICE.md](/Users/sicarii/Desktop/ZirOS/NOTICE.md) for the full licensing terms.
+See `LICENSE` for the governing terms.
