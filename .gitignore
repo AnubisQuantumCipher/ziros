@@ -1,5 +1,7 @@
 /target-public/
 /target/
+/target-local/
+/dist/
 /.DS_Store
 /.tmp/
 

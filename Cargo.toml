@@ -17,6 +17,7 @@ members = [
   "zkf-storage",
   "zkf-distributed",
   "zkf-ui",
+  "zkf-ffi",
 ]
 exclude = [
   "vendor/ark-relations-patched",
