@@ -1,0 +1,187 @@
+pragma language_version 0.22;
+
+import CompactStandardLibrary;
+
+export ledger attestation_commitment: Bytes<32>;
+export ledger verification_count: Uint<64>;
+export ledger conformance_pass_count: Uint<64>;
+export ledger theorem_count: Uint<64>;
+export ledger last_verified_at: Uint<64>;
+export ledger compliance_bit: Boolean;
+export ledger version_hash: Bytes<32>;
+export ledger backend_compliance: Boolean;
+export ledger formal_coverage_compliance: Boolean;
+export ledger audit_compliance: Boolean;
+
+witness attestationRoot0(): Uint<64>;
+witness attestationRoot1(): Uint<64>;
+witness attestationRoot2(): Uint<64>;
+witness attestationRoot3(): Uint<64>;
+witness timestampUnix(): Uint<64>;
+witness versionMajor(): Uint<16>;
+witness versionMinor(): Uint<16>;
+witness versionPatch(): Uint<16>;
+
+witness plonky3Present(): Uint<8>;
+witness plonky3TestsRun(): Uint<32>;
+witness plonky3TestsPassed(): Uint<32>;
+witness halo2Present(): Uint<8>;
+witness halo2TestsRun(): Uint<32>;
+witness halo2TestsPassed(): Uint<32>;
+witness novaPresent(): Uint<8>;
+witness novaTestsRun(): Uint<32>;
+witness novaTestsPassed(): Uint<32>;
+witness hyperNovaPresent(): Uint<8>;
+witness hyperNovaTestsRun(): Uint<32>;
+witness hyperNovaTestsPassed(): Uint<32>;
+
+witness ledgerTotalEntries(): Uint<32>;
+witness ledgerMechanizedEntries(): Uint<32>;
+witness ledgerPendingEntries(): Uint<32>;
+
+witness auditUnderconstrainedSignals(): Uint<32>;
+witness auditTotalChecks(): Uint<32>;
+witness auditFailedChecks(): Uint<32>;
+
+export circuit prove_backend_correctness(): [] {
+  const root = persistentHash<[Uint<64>, Uint<64>, Uint<64>, Uint<64>]>(
+    disclose([
+      attestationRoot0(),
+      attestationRoot1(),
+      attestationRoot2(),
+      attestationRoot3()
+    ])
+  );
+  const version = persistentHash<[Uint<16>, Uint<16>, Uint<16>]>(
+    disclose([
+      versionMajor(),
+      versionMinor(),
+      versionPatch()
+    ])
+  );
+  const backendEvidence = persistentHash<[Uint<8>, Uint<32>, Uint<32>, Uint<8>, Uint<32>, Uint<32>, Uint<8>, Uint<32>, Uint<32>, Uint<8>, Uint<32>, Uint<32>]>(
+    disclose([
+      plonky3Present(),
+      plonky3TestsRun(),
+      plonky3TestsPassed(),
+      halo2Present(),
+      halo2TestsRun(),
+      halo2TestsPassed(),
+      novaPresent(),
+      novaTestsRun(),
+      novaTestsPassed(),
+      hyperNovaPresent(),
+      hyperNovaTestsRun(),
+      hyperNovaTestsPassed()
+    ])
+  );
+
+  const plonky3Ok = (plonky3Present() == 1) && (plonky3TestsRun() == plonky3TestsPassed());
+  const halo2Ok = (halo2Present() == 1) && (halo2TestsRun() == halo2TestsPassed());
+  const novaOk = (novaPresent() == 1) && (novaTestsRun() == novaTestsPassed());
+  const hyperNovaOk = (hyperNovaPresent() == 1) && (hyperNovaTestsRun() == hyperNovaTestsPassed());
+  const backendOk = plonky3Ok && halo2Ok && novaOk && hyperNovaOk;
+  const disclosedBackendOk = disclose(backendOk);
+
+  const totalPassed =
+    plonky3TestsPassed() +
+    halo2TestsPassed() +
+    novaTestsPassed() +
+    hyperNovaTestsPassed();
+
+  attestation_commitment = disclose(root);
+  version_hash = disclose(version);
+  verification_count = disclose(totalPassed as Uint<64>);
+  conformance_pass_count = disclose(totalPassed as Uint<64>);
+  theorem_count = disclose(ledgerTotalEntries() as Uint<64>);
+  last_verified_at = disclose(timestampUnix());
+  backend_compliance = disclosedBackendOk;
+  compliance_bit = disclose(disclosedBackendOk && formal_coverage_compliance && audit_compliance);
+}
+
+export circuit prove_formal_coverage(): [] {
+  const root = persistentHash<[Uint<64>, Uint<64>, Uint<64>, Uint<64>]>(
+    disclose([
+      attestationRoot0(),
+      attestationRoot1(),
+      attestationRoot2(),
+      attestationRoot3()
+    ])
+  );
+  const version = persistentHash<[Uint<16>, Uint<16>, Uint<16>]>(
+    disclose([
+      versionMajor(),
+      versionMinor(),
+      versionPatch()
+    ])
+  );
+  const coverageEvidence = persistentHash<[Uint<32>, Uint<32>, Uint<32>]>(
+    disclose([
+      ledgerTotalEntries(),
+      ledgerMechanizedEntries(),
+      ledgerPendingEntries()
+    ])
+  );
+  const totalPassed =
+    plonky3TestsPassed() +
+    halo2TestsPassed() +
+    novaTestsPassed() +
+    hyperNovaTestsPassed();
+  const coverageOk =
+    (ledgerPendingEntries() == 0) &&
+    (ledgerMechanizedEntries() == ledgerTotalEntries());
+  const disclosedCoverageOk = disclose(coverageOk);
+
+  attestation_commitment = disclose(root);
+  version_hash = disclose(version);
+  verification_count = disclose(totalPassed as Uint<64>);
+  conformance_pass_count = disclose(totalPassed as Uint<64>);
+  theorem_count = disclose(ledgerTotalEntries() as Uint<64>);
+  last_verified_at = disclose(timestampUnix());
+  formal_coverage_compliance = disclosedCoverageOk;
+  compliance_bit = disclose(backend_compliance && disclosedCoverageOk && audit_compliance);
+}
+
+export circuit prove_audit_clean(): [] {
+  const root = persistentHash<[Uint<64>, Uint<64>, Uint<64>, Uint<64>]>(
+    disclose([
+      attestationRoot0(),
+      attestationRoot1(),
+      attestationRoot2(),
+      attestationRoot3()
+    ])
+  );
+  const version = persistentHash<[Uint<16>, Uint<16>, Uint<16>]>(
+    disclose([
+      versionMajor(),
+      versionMinor(),
+      versionPatch()
+    ])
+  );
+  const auditEvidence = persistentHash<[Uint<32>, Uint<32>, Uint<32>]>(
+    disclose([
+      auditUnderconstrainedSignals(),
+      auditTotalChecks(),
+      auditFailedChecks()
+    ])
+  );
+  const totalPassed =
+    plonky3TestsPassed() +
+    halo2TestsPassed() +
+    novaTestsPassed() +
+    hyperNovaTestsPassed();
+  const auditOk =
+    (auditUnderconstrainedSignals() == 0) &&
+    (auditFailedChecks() == 0) &&
+    (auditTotalChecks() > 0);
+  const disclosedAuditOk = disclose(auditOk);
+
+  attestation_commitment = disclose(root);
+  version_hash = disclose(version);
+  verification_count = disclose(totalPassed as Uint<64>);
+  conformance_pass_count = disclose(totalPassed as Uint<64>);
+  theorem_count = disclose(ledgerTotalEntries() as Uint<64>);
+  last_verified_at = disclose(timestampUnix());
+  audit_compliance = disclosedAuditOk;
+  compliance_bit = disclose(backend_compliance && formal_coverage_compliance && disclosedAuditOk);
+}
