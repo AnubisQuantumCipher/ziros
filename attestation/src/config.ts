@@ -2,7 +2,7 @@ import { resolve } from 'node:path';
 
 import { setNetworkId, type NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
-export type MidnightNetwork = 'preprod' | 'mainnet' | 'undeployed' | 'offline';
+export type MidnightNetwork = 'preprod' | 'preview' | 'mainnet' | 'undeployed' | 'offline';
 export type MidnightProvingMode = 'local-zkf-proof-server' | 'wallet-proving-provider';
 
 export interface MidnightRuntimeConfig {
@@ -36,6 +36,15 @@ const NETWORK_DEFAULTS: Record<
     compactArtifactRoot: './contracts/compiled',
     explorerUrl: 'https://explorer.preprod.midnight.network',
   },
+  preview: {
+    network: 'preview',
+    proofServerUrl: 'http://127.0.0.1:6300',
+    rpcUrl: 'https://rpc.preview.midnight.network',
+    indexerUrl: 'https://indexer.preview.midnight.network/api/v4/graphql',
+    indexerWsUrl: 'wss://indexer.preview.midnight.network/api/v4/graphql/ws',
+    compactArtifactRoot: './contracts/compiled',
+    explorerUrl: 'https://explorer.preview.midnight.network',
+  },
   mainnet: {
     network: 'mainnet',
     proofServerUrl: 'http://127.0.0.1:6300',
@@ -63,7 +72,7 @@ function normalizeNetwork(value: string | undefined): MidnightNetwork {
   if (value === 'offline') {
     return 'offline';
   }
-  if (value === 'preprod' || value === 'mainnet' || value === 'undeployed') {
+  if (value === 'preprod' || value === 'preview' || value === 'mainnet' || value === 'undeployed') {
     return value;
   }
   return 'preprod';
@@ -123,6 +132,21 @@ export function explorerLink(baseUrl: string, txHash?: string, contractAddress?:
     return `${baseUrl}/contracts/${contractAddress}`;
   }
   return baseUrl;
+}
+
+export function networkLabel(network: MidnightNetwork): string {
+  switch (network) {
+    case 'preprod':
+      return 'Midnight Preprod';
+    case 'preview':
+      return 'Midnight Preview';
+    case 'mainnet':
+      return 'Midnight Mainnet';
+    case 'undeployed':
+      return 'Midnight Undeployed';
+    case 'offline':
+      return 'Midnight Offline';
+  }
 }
 
 export function proofServerUnavailableMessage(proofServerUrl: string): string {

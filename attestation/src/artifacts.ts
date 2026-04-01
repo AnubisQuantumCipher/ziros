@@ -5,8 +5,29 @@ import { pathToFileURL } from 'node:url';
 import { CompiledContract } from '@midnight-ntwrk/compact-js';
 
 import { getRuntimeConfig, type MidnightRuntimeConfig } from './config.js';
-import { ATTESTATION_CONTRACT } from './contracts.js';
+import {
+  CONTRACTS,
+  getContractDefinition,
+  type ContractDefinition,
+  type ContractKey,
+} from './contracts.js';
+import { normalizeStateSnapshot } from './util.js';
 import { buildCompactWitnesses, type AttestationWitnessPayload } from './witness-data.js';
+
+export interface ArtifactStatus {
+  contract: ContractDefinition;
+  artifactDir: string;
+  contractModulePath: string;
+  ready: boolean;
+}
+
+export interface LoadedContractArtifacts {
+  contract: ContractDefinition;
+  artifactDir: string;
+  contractModule: Record<string, unknown>;
+  compiledContract: unknown;
+  decodeLedgerState: (contractState: unknown) => Record<string, unknown>;
+}
 
 async function isReadable(pathname: string): Promise<boolean> {
   try {
@@ -18,21 +39,18 @@ async function isReadable(pathname: string): Promise<boolean> {
 }
 
 export function resolveArtifactDirectory(
+  contractKey: ContractKey,
   config: MidnightRuntimeConfig = getRuntimeConfig(),
 ): string {
-  return resolve(config.compactArtifactRoot, ATTESTATION_CONTRACT.artifactDirectory);
+  return resolve(config.compactArtifactRoot, getContractDefinition(contractKey).artifactDirectory);
 }
 
-export async function loadCompiledContract(
-  payload: AttestationWitnessPayload,
+export async function getArtifactStatus(
+  contractKey: ContractKey,
   config: MidnightRuntimeConfig = getRuntimeConfig(),
-): Promise<{
-  artifactDir: string;
-  contractModule: Record<string, unknown>;
-  compiledContract: unknown;
-  decodeLedgerState: (contractState: unknown) => Record<string, unknown>;
-}> {
-  const artifactDir = resolveArtifactDirectory(config);
+): Promise<ArtifactStatus> {
+  const contract = getContractDefinition(contractKey);
+  const artifactDir = resolveArtifactDirectory(contractKey, config);
   const contractModulePath = join(artifactDir, 'contract', 'index.js');
   const keysDir = join(artifactDir, 'keys');
   const zkirDir = join(artifactDir, 'zkir');
@@ -42,24 +60,54 @@ export async function loadCompiledContract(
     (await isReadable(keysDir)) &&
     (await isReadable(zkirDir));
 
-  if (!ready) {
-    throw new Error('Compiled Midnight artifacts are missing. Run `npm run compile-contracts` first.');
+  return {
+    contract,
+    artifactDir,
+    contractModulePath,
+    ready,
+  };
+}
+
+export async function listArtifactStatuses(
+  config: MidnightRuntimeConfig = getRuntimeConfig(),
+): Promise<ArtifactStatus[]> {
+  return Promise.all(CONTRACTS.map((contract) => getArtifactStatus(contract.key, config)));
+}
+
+export async function loadCompiledContract(
+  contractKey: ContractKey,
+  options: {
+    payload: AttestationWitnessPayload;
+    config?: MidnightRuntimeConfig;
+    contractSnapshots?: Partial<Record<ContractKey, Record<string, unknown>>>;
+  },
+): Promise<LoadedContractArtifacts> {
+  const config = options.config ?? getRuntimeConfig();
+  const status = await getArtifactStatus(contractKey, config);
+
+  if (!status.ready) {
+    throw new Error(
+      `Compiled Midnight artifacts are missing for ${contractKey}. Run "npm run compile-contracts" first.`,
+    );
   }
 
-  const moduleUrl = pathToFileURL(contractModulePath).href;
+  const moduleUrl = pathToFileURL(status.contractModulePath).href;
   const contractModule = (await import(moduleUrl)) as Record<string, unknown>;
   const contractCtor = contractModule.Contract as never;
-  const witnesses = buildCompactWitnesses(payload);
+  const witnesses = buildCompactWitnesses(contractKey, options.payload, {
+    contractSnapshots: options.contractSnapshots,
+  });
   const compiledContract = CompiledContract.make(
-    ATTESTATION_CONTRACT.artifactDirectory,
+    status.contract.artifactDirectory,
     contractCtor,
   ).pipe(
     CompiledContract.withWitnesses(witnesses as never),
-    CompiledContract.withCompiledFileAssets(artifactDir),
+    CompiledContract.withCompiledFileAssets(status.artifactDir),
   );
 
   return {
-    artifactDir,
+    contract: status.contract,
+    artifactDir: status.artifactDir,
     contractModule,
     compiledContract,
     decodeLedgerState(contractState: unknown) {
@@ -73,7 +121,7 @@ export async function loadCompiledContract(
         'data' in (contractState as Record<string, unknown>)
           ? (contractState as Record<string, unknown>).data
           : contractState;
-      return ledgerDecoder(maybeData);
+      return normalizeStateSnapshot(ledgerDecoder(maybeData));
     },
   };
 }

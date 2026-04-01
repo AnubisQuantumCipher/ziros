@@ -1,61 +1,92 @@
-import { sampleSigningKey } from '@midnight-ntwrk/ledger-v8';
-import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
-
 import { loadCompiledContract } from './artifacts.js';
-import { explorerLink, getRuntimeConfig } from './config.js';
-import { readDeploymentManifest, writeDeploymentManifest } from './manifest.js';
-import { buildHeadlessWallet, collectDustDiagnostics, createDeployProviders, formatDust } from './providers.js';
+import { explorerLink, getRuntimeConfig, networkLabel } from './config.js';
+import { CONTRACTS, type ContractKey } from './contracts.js';
+import {
+  readDeploymentManifest,
+  upsertDeploymentManifestEntry,
+} from './manifest.js';
+import {
+  buildHeadlessWallet,
+  waitForSpendableDust,
+} from './providers.js';
+import { withMidnightApi } from './runtime-probe.js';
+import { resolveSelectedCompatibilityStrategy } from './strategy-selection.js';
+import { probeSubmitStrategy } from './submit-strategy.js';
+import { buildPreparedDeployTransaction } from './tx-pipeline.js';
+import { stringifyJson } from './util.js';
 import { loadWitnessPayload } from './witness-data.js';
+import { buildCompatibilityProfile } from './runtime-probe.js';
+
+async function deploySingleContract(
+  contractKey: ContractKey,
+  payload: Awaited<ReturnType<typeof loadWitnessPayload>>,
+  walletProvider: Awaited<ReturnType<typeof buildHeadlessWallet>>,
+): Promise<void> {
+  const config = getRuntimeConfig();
+  const selection = await resolveSelectedCompatibilityStrategy(config);
+  const profile = await buildCompatibilityProfile(config.network, config);
+  const prepared = await buildPreparedDeployTransaction(contractKey, payload, walletProvider, config);
+  const submission = await withMidnightApi(config, async (api) =>
+    probeSubmitStrategy(selection.strategy, prepared.balancedTx, prepared.innerTxHex, {
+      api,
+      wallet: walletProvider,
+    }),
+  );
+  if (submission.submit.outcome !== 'accepted') {
+    throw new Error(
+      `Deploy submit failed for ${contractKey} via ${selection.strategy}: ${submission.submit.detail}`,
+    );
+  }
+
+  const txData = await prepared.providers.publicDataProvider.watchForTxData(prepared.txId as never);
+  const address = String(prepared.contractAddress);
+  const txHash = txData.txHash;
+  const onChainState = await prepared.providers.publicDataProvider.queryContractState(address as never);
+  const snapshot = onChainState ? prepared.loaded.decodeLedgerState(onChainState) : null;
+
+  await upsertDeploymentManifestEntry(
+    {
+      name: contractKey,
+      address,
+      txHash,
+      deployedAt: new Date().toISOString(),
+      explorerUrl: explorerLink(config.explorerUrl, txHash, address),
+      publicStateSnapshot: snapshot,
+    },
+    {
+      network: config.network,
+      networkName: networkLabel(config.network),
+      selectedMatrixId: selection.matrixId === 'current' ? undefined : selection.matrixId,
+      selectedSubmitStrategy: selection.strategy,
+      runtimeFingerprint: {
+        specVersion: profile.specVersion,
+        transactionVersion: profile.transactionVersion,
+        rawLedgerVersion: profile.rawLedgerVersion,
+        signedExtensions: profile.signedExtensions,
+      },
+      manifestPath: config.manifestPath,
+    },
+  );
+}
 
 async function deploy() {
   const witnessPath = process.env.ATTESTATION_WITNESS_PATH ?? './data/witness.json';
   const payload = await loadWitnessPayload(witnessPath);
   const config = getRuntimeConfig();
-  const loaded = await loadCompiledContract(payload, config);
   const walletProvider = await buildHeadlessWallet(config);
 
   try {
-    const dust = await collectDustDiagnostics(walletProvider);
-    if (dust.spendableDustRaw <= 0n) {
-      throw new Error(
-        `Deployment blocked: spendable tDUST is ${formatDust(dust.spendableDustRaw)} across ${dust.spendableDustCoins} coin(s).`,
-      );
+    await waitForSpendableDust(walletProvider);
+
+    for (const contract of CONTRACTS) {
+      await deploySingleContract(contract.key, payload, walletProvider);
     }
-
-    const providers = createDeployProviders(
-      config,
-      loaded.artifactDir,
-      walletProvider,
-      'ziros-attestation',
-      config.provingMode,
-    );
-
-    const deployed = await deployContract(providers, {
-      compiledContract: loaded.compiledContract as never,
-      args: [],
-      signingKey: sampleSigningKey(),
-    });
-
-    const contractAddress = String(deployed.deployTxData.public.contractAddress);
-    const txHash = deployed.deployTxData.public.txHash;
-    const onChainState = await providers.publicDataProvider.queryContractState(contractAddress as never);
-    const snapshot = onChainState ? loaded.decodeLedgerState(onChainState) : null;
-    const manifest = {
-      network: config.network,
-      deployedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      contractAddress,
-      deployTxHash: txHash,
-      explorerUrl: explorerLink(config.explorerUrl, txHash, contractAddress),
-      circuitTxHashes: (await readDeploymentManifest(config.manifestPath))?.circuitTxHashes ?? {},
-      publicStateSnapshot: snapshot,
-    };
-
-    await writeDeploymentManifest(config.manifestPath, manifest);
-    console.log(JSON.stringify(manifest, null, 2));
   } finally {
     await walletProvider.stop();
   }
+
+  const manifest = await readDeploymentManifest(config.manifestPath);
+  console.log(stringifyJson(manifest));
 }
 
 deploy().catch((error: unknown) => {

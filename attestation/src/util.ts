@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 
@@ -44,6 +45,14 @@ export async function readJson<T>(pathname: string): Promise<T> {
   return JSON.parse(raw) as T;
 }
 
+export function jsonReplacer(_key: string, value: unknown): unknown {
+  return typeof value === 'bigint' ? value.toString() : value;
+}
+
+export function stringifyJson(value: unknown): string {
+  return JSON.stringify(value, jsonReplacer, 2);
+}
+
 export function canonicalJson(value: unknown): string {
   return JSON.stringify(value, Object.keys(value as Record<string, unknown>).sort(), 2);
 }
@@ -68,4 +77,85 @@ export function ensureHex32(value: string): string {
     throw new Error(`Expected a 32-byte hex string, got '${value}'.`);
   }
   return normalized;
+}
+
+export function bytesToHex(value: Uint8Array): string {
+  return Buffer.from(value).toString('hex');
+}
+
+export function valueToUint64Limbs(value: unknown): [bigint, bigint, bigint, bigint] {
+  if (value instanceof Uint8Array) {
+    return hexToUint64Limbs(bytesToHex(value));
+  }
+  if (Array.isArray(value) && value.every((entry) => typeof entry === 'number')) {
+    return hexToUint64Limbs(bytesToHex(Uint8Array.from(value)));
+  }
+  if (typeof value === 'string') {
+    return hexToUint64Limbs(ensureHex32(value));
+  }
+  throw new Error(`Cannot convert value to 32-byte commitment limbs: ${String(value)}.`);
+}
+
+export function asBigInt(value: unknown): bigint {
+  if (typeof value === 'bigint') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return BigInt(value);
+  }
+  if (typeof value === 'boolean') {
+    return value ? 1n : 0n;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return 0n;
+    }
+    return trimmed.startsWith('0x') ? BigInt(trimmed) : BigInt(trimmed);
+  }
+  throw new Error(`Cannot convert value to bigint: ${String(value)}.`);
+}
+
+export function asBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'bigint') {
+    return value !== 0n;
+  }
+  if (typeof value === 'number') {
+    return value !== 0;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim().toLowerCase();
+    if (trimmed === 'true') {
+      return true;
+    }
+    if (trimmed === 'false' || trimmed === '') {
+      return false;
+    }
+    return asBigInt(trimmed) !== 0n;
+  }
+  return Boolean(value);
+}
+
+function normalizeStateValue(value: unknown): unknown {
+  if (value instanceof Uint8Array) {
+    return `0x${bytesToHex(value)}`;
+  }
+  if (Array.isArray(value)) {
+    return value.map((entry) => normalizeStateValue(entry));
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, entry]) => [key, normalizeStateValue(entry)]),
+    );
+  }
+  return value;
+}
+
+export function normalizeStateSnapshot(
+  snapshot: Record<string, unknown>,
+): Record<string, unknown> {
+  return normalizeStateValue(snapshot) as Record<string, unknown>;
 }

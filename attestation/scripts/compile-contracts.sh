@@ -7,6 +7,7 @@ OUTPUT="$SCRIPT_DIR/../contracts/compiled"
 COMPACT_RUNNER="${COMPACT_RUNNER:-run-compactc}"
 
 mkdir -p "$OUTPUT"
+rm -rf "$OUTPUT"/*
 
 if command -v "$COMPACT_RUNNER" &>/dev/null; then
   COMPILE_CMD=("$COMPACT_RUNNER")
