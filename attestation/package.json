@@ -14,6 +14,7 @@
     "submit-attestation": "tsx src/submit-attestation.ts",
     "test:local-attestation": "tsx src/test-local-attestation.ts",
     "probe:runtime": "tsx src/probe-runtime.ts",
+    "probe:chain-control": "tsx src/probe-chain-control.ts",
     "probe:attestation-backend": "tsx src/probe-attestation-backend.ts",
     "probe:sed-canary": "tsx src/probe-sed-canary.ts",
     "probe:matrix": "tsx src/probe-matrix.ts"

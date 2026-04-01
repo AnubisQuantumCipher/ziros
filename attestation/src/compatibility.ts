@@ -24,6 +24,8 @@ export interface CompatibilityProfile {
   specVersion: string;
   transactionVersion: string;
   signedExtensions: string[];
+  injectedSignedExtensions: string[];
+  unknownSignedExtensions: string[];
   rawLedgerVersion: string;
   configurableTransactionSizeWeight: RuntimeWeightValue | null;
   txPause: {
@@ -177,6 +179,39 @@ export function withProbe(report: CompatibilityReport | null, probe: ProbeResult
     matrices: report?.matrices ?? [],
     selected: report?.selected ?? null,
   };
+}
+
+export function probeHasValidationPanic(
+  probe: Pick<ProbeResult, 'validation'>,
+): boolean {
+  return probe.validation.some((result) => result.outcome === 'panic');
+}
+
+export function findProbe(
+  report: CompatibilityReport | null,
+  predicate: (probe: ProbeResult) => boolean,
+): ProbeResult | null {
+  return (report?.probes ?? []).find(predicate) ?? null;
+}
+
+export function findLatestChainControlProbe(
+  report: CompatibilityReport | null,
+  network: MidnightNetwork,
+  matrixId?: MidnightStackMatrixId | 'current',
+): ProbeResult | null {
+  const candidates = (report?.probes ?? []).filter((probe) => {
+    if (probe.probeId !== 'chain-control-accepted-midnight') {
+      return false;
+    }
+    if (probe.network !== network) {
+      return false;
+    }
+    if (matrixId != null && probe.matrixId !== matrixId) {
+      return false;
+    }
+    return true;
+  });
+  return candidates.at(-1) ?? null;
 }
 
 export function withMatrixAttempt(

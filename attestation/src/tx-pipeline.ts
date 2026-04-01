@@ -51,7 +51,7 @@ function txInspection(tx: FinalizedTransaction) {
 }
 
 function requireTxId(tx: FinalizedTransaction): string {
-  const txId = tx.identifiers()[0];
+  const txId = tx.identifiers().at(-1);
   if (!txId) {
     throw new Error('Balanced Midnight transaction did not expose a transaction identifier.');
   }

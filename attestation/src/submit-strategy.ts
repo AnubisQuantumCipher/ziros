@@ -7,6 +7,11 @@ import type {
   ProbeSubmitResult,
   ProbeValidationResult,
 } from './compatibility.js';
+import {
+  buildMidnightOuterTx,
+  submitMidnightOuterTx,
+  validateMidnightOuterTx,
+} from './midnight-polkadot.js';
 import type { MidnightWalletProvider } from './providers.js';
 
 interface SubmitStrategyContext {
@@ -47,48 +52,14 @@ function classifyOutcome(error: unknown): ProbeOutcome {
   return 'error';
 }
 
-async function validateOuterTx(outerTxHex: string, api: ApiPromise): Promise<ProbeValidationResult[]> {
-  const bestHash = await api.rpc.chain.getBlockHash();
-  const results: ProbeValidationResult[] = [];
-
-  for (const source of ['External', 'Local', 'InBlock'] as const) {
-    try {
-      const validity = await api.call.taggedTransactionQueue.validateTransaction(
-        source,
-        outerTxHex,
-        bestHash,
-      );
-      results.push({
-        source,
-        outcome: 'accepted',
-        detail: validity.toString(),
-        raw: {
-          human: validity.toHuman?.() ?? null,
-          json: validity.toJSON?.() ?? null,
-          text: validity.toString(),
-        },
-      });
-    } catch (error) {
-      results.push({
-        source,
-        outcome: classifyOutcome(error),
-        detail: error instanceof Error ? error.message : String(error),
-        raw: errorRecord(error),
-      });
-    }
-  }
-
-  return results;
-}
-
 function makeWalletSdkStrategy(finalizedTx: FinalizedTransaction): MidnightSubmitStrategy {
   return {
     id: 'wallet-sdk',
     async buildOuter(innerTxHex: string, api: ApiPromise): Promise<string> {
-      return api.tx.midnight.sendMnTransaction(innerTxHex).toHex();
+      return buildMidnightOuterTx(innerTxHex, api);
     },
     validate(outerTxHex: string, api: ApiPromise) {
-      return validateOuterTx(outerTxHex, api);
+      return validateMidnightOuterTx(outerTxHex, api);
     },
     async submit(_outerTxHex: string, _api: ApiPromise, wallet?: MidnightWalletProvider): Promise<ProbeSubmitResult> {
       if (!wallet) {
@@ -105,7 +76,7 @@ function makeWalletSdkStrategy(finalizedTx: FinalizedTransaction): MidnightSubmi
           strategy: 'wallet-sdk',
           outcome: 'accepted',
           txHash,
-          detail: `Wallet SDK accepted transaction ${txHash}.`,
+          detail: `Wallet-backed submitter accepted Midnight transaction ${txHash}.`,
         };
       } catch (error) {
         return {
@@ -124,10 +95,10 @@ function makeMetadataStrategy(innerTxHex: string): MidnightSubmitStrategy {
   return {
     id: 'metadata-midnight-extrinsic',
     async buildOuter(_innerTxHex: string, api: ApiPromise): Promise<string> {
-      return api.tx.midnight.sendMnTransaction(innerTxHex).toHex();
+      return buildMidnightOuterTx(innerTxHex, api);
     },
     validate(outerTxHex: string, api: ApiPromise) {
-      return validateOuterTx(outerTxHex, api);
+      return validateMidnightOuterTx(outerTxHex, api);
     },
     async submit(_outerTxHex: string, api: ApiPromise): Promise<ProbeSubmitResult> {
       try {
@@ -174,19 +145,19 @@ function makeCompatNodeClientStrategy(innerTxHex: string): MidnightSubmitStrateg
   return {
     id: 'compat-node-client',
     async buildOuter(_innerTxHex: string, api: ApiPromise): Promise<string> {
-      return api.tx.midnight.sendMnTransaction(innerTxHex).toHex();
+      return buildMidnightOuterTx(innerTxHex, api);
     },
     validate(outerTxHex: string, api: ApiPromise) {
-      return validateOuterTx(outerTxHex, api);
+      return validateMidnightOuterTx(outerTxHex, api);
     },
     async submit(outerTxHex: string, api: ApiPromise): Promise<ProbeSubmitResult> {
       try {
-        const txHash = await api.rpc.author.submitExtrinsic(outerTxHex);
+        const txHash = await submitMidnightOuterTx(outerTxHex, api);
         return {
           strategy: 'compat-node-client',
           outcome: 'accepted',
-          txHash: txHash.toString(),
-          detail: `Raw author_submitExtrinsic accepted transaction ${txHash.toString()}.`,
+          txHash,
+          detail: `Raw author_submitExtrinsic accepted transaction ${txHash}.`,
           raw: { innerTxHexLength: innerTxHex.length, outerTxHexLength: outerTxHex.length },
         };
       } catch (error) {

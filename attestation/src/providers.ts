@@ -31,6 +31,7 @@ import { InMemoryTransactionHistoryStorage, createKeystore } from '@midnight-ntw
 import * as Rx from 'rxjs';
 
 import type { MidnightProvingMode, MidnightRuntimeConfig } from './config.js';
+import { submitFinalizedMidnightTx } from './midnight-polkadot.js';
 
 // @ts-expect-error Midnight SDK expects a global WebSocket implementation in Node.
 globalThis.WebSocket = WebSocket;
@@ -117,6 +118,7 @@ export class MidnightWalletProvider implements MidnightProvider, WalletProvider 
     wallet: WalletFacade,
     private readonly zswapSecretKeys: ZswapSecretKeys,
     private readonly dustSecretKey: DustSecretKey,
+    private readonly config: MidnightRuntimeConfig,
   ) {
     this.wallet = wallet;
   }
@@ -141,8 +143,9 @@ export class MidnightWalletProvider implements MidnightProvider, WalletProvider 
     return this.wallet.finalizeRecipe(recipe);
   }
 
-  submitTx(tx: FinalizedTransaction): Promise<string> {
-    return this.wallet.submitTransaction(tx);
+  async submitTx(tx: FinalizedTransaction): Promise<string> {
+    const submission = await submitFinalizedMidnightTx(tx, this.config);
+    return submission.txId;
   }
 
   async start(): Promise<void> {
@@ -202,6 +205,7 @@ export class MidnightWalletProvider implements MidnightProvider, WalletProvider 
       wallet,
       ZswapSecretKeys.fromSeed(seeds.shielded) as unknown as ZswapSecretKeys,
       DustSecretKey.fromSeed(seeds.dust) as unknown as DustSecretKey,
+      config,
     );
   }
 }

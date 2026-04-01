@@ -1,12 +1,17 @@
 import { Buffer } from 'node:buffer';
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import { createUnprovenDeployTx } from '@midnight-ntwrk/midnight-js-contracts';
 import { sampleSigningKey } from '@midnight-ntwrk/compact-runtime';
 import { LedgerParameters } from '@midnight-ntwrk/ledger-v8';
 
 import { loadCompiledContract } from './artifacts.js';
 import { getRuntimeConfig } from './config.js';
+import {
+  buildMidnightOuterTx,
+  submitMidnightOuterTx,
+  validateMidnightOuterTx,
+  withMidnightApi,
+} from './midnight-polkadot.js';
 import {
   buildHeadlessWallet,
   createDeployProviders,
@@ -70,13 +75,10 @@ async function main() {
       ),
     );
 
-    const api = await ApiPromise.create({ provider: new WsProvider('wss://rpc.preprod.midnight.network') });
-    try {
+    await withMidnightApi(config, async (api) => {
       const runtimeCost = await api.call.midnightRuntimeApi.getTransactionCost(innerTxHex);
       const decodedTx = await api.call.midnightRuntimeApi.getDecodedTransaction(innerTxHex);
-      const outerTx = api.tx.midnight.sendMnTransaction(innerTxHex);
-      const outerTxHex = outerTx.toHex();
-      const bestHash = await api.rpc.chain.getBlockHash();
+      const outerTxHex = buildMidnightOuterTx(innerTxHex, api);
 
       console.log(
         JSON.stringify(
@@ -93,49 +95,16 @@ async function main() {
         ),
       );
 
-      for (const source of ['External', 'Local', 'InBlock'] as const) {
-        try {
-          const validity = await api.call.taggedTransactionQueue.validateTransaction(
-            source,
-            outerTxHex,
-            bestHash,
-          );
-          console.log(
-            JSON.stringify(
-              {
-                validateTransaction: {
-                  source,
-                  human: validity.toHuman?.() ?? null,
-                  json: validity.toJSON?.() ?? null,
-                  text: validity.toString(),
-                },
-              },
-              null,
-              2,
-            ),
-          );
-        } catch (error) {
-          console.log(
-            JSON.stringify(
-              {
-                validateTransactionError:
-                  error instanceof Error
-                    ? {
-                        source,
-                        name: error.name,
-                        message: error.message,
-                        stack: error.stack ?? null,
-                        code:
-                          'code' in error && typeof error.code === 'number' ? error.code : null,
-                        data: 'data' in error ? error.data ?? null : null,
-                      }
-                    : { source, message: String(error) },
-              },
-              null,
-              2,
-            ),
-          );
-        }
+      for (const result of await validateMidnightOuterTx(outerTxHex, api)) {
+        console.log(
+          JSON.stringify(
+            {
+              validateTransaction: result,
+            },
+            null,
+            2,
+          ),
+        );
       }
 
       try {
@@ -176,21 +145,8 @@ async function main() {
       }
 
       try {
-        const unsubscribe = await api.tx.midnight
-          .sendMnTransaction(innerTxHex)
-          .send((result) => {
-            console.log(
-              JSON.stringify(
-                {
-                  rawSubmitStatus: result.status.toString(),
-                  txHash: result.txHash.toString(),
-                },
-                null,
-                2,
-              ),
-            );
-          });
-        unsubscribe();
+        const txHash = await submitMidnightOuterTx(outerTxHex, api);
+        console.log(JSON.stringify({ rawSubmitTxHash: txHash }, null, 2));
       } catch (error) {
         console.log(
           JSON.stringify(
@@ -216,9 +172,7 @@ async function main() {
           ),
         );
       }
-    } finally {
-      await api.disconnect();
-    }
+    });
 
     try {
       const txHash = await wallet.submitTx(balancedTx);

@@ -1,7 +1,11 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import type { ApiPromise } from '@polkadot/api';
 
 import type { CompatibilityProfile, RuntimeWeightValue } from './compatibility.js';
 import { getRuntimeConfig, type MidnightNetwork, type MidnightRuntimeConfig } from './config.js';
+import {
+  describeMidnightSignedExtensions,
+  withMidnightApi as withConfiguredMidnightApi,
+} from './midnight-polkadot.js';
 
 function unknownToString(value: unknown): string {
   if (typeof value === 'string') {
@@ -64,13 +68,7 @@ export async function withMidnightApi<T>(
   config: MidnightRuntimeConfig,
   task: (api: ApiPromise) => Promise<T>,
 ): Promise<T> {
-  const provider = new WsProvider(config.rpcUrl.replace(/^http/, 'ws'));
-  const api = await ApiPromise.create({ provider });
-  try {
-    return await task(api);
-  } finally {
-    await api.disconnect();
-  }
+  return withConfiguredMidnightApi(config, task);
 }
 
 export async function buildCompatibilityProfile(
@@ -97,6 +95,8 @@ export async function buildCompatibilityProfile(
       accountUsage = null;
     }
 
+    const signedExtensionStatus = describeMidnightSignedExtensions(api);
+
     return {
       observedAt: new Date().toISOString(),
       network,
@@ -104,7 +104,9 @@ export async function buildCompatibilityProfile(
       indexerUrl: config.indexerUrl,
       specVersion: api.runtimeVersion.specVersion.toString(),
       transactionVersion: api.runtimeVersion.transactionVersion.toString(),
-      signedExtensions: [...api.registry.signedExtensions],
+      signedExtensions: signedExtensionStatus.runtimeSignedExtensions,
+      injectedSignedExtensions: signedExtensionStatus.injectedSignedExtensions,
+      unknownSignedExtensions: signedExtensionStatus.unknownSignedExtensions,
       rawLedgerVersion:
         typeof ledgerVersionCodec.toHex === 'function'
           ? ledgerVersionCodec.toHex()

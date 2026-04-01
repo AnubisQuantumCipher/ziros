@@ -157,7 +157,7 @@ async function main() {
     const balancedTx = await wallet.balanceTx(provenTx as never);
 
     const innerTxHex = `0x${Buffer.from(balancedTx.serialize()).toString('hex')}`;
-    const txId = String(balancedTx.identifiers()[0] ?? '');
+    const txId = String(balancedTx.identifiers().at(-1) ?? '');
     const profile = await buildCompatibilityProfile(network);
 
     const probe = await withMidnightApi(config, async (api) => {

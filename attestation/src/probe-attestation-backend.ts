@@ -42,7 +42,7 @@ async function main() {
   const matrixId = parseMatrix(optionalFlag(flags, 'matrix'));
   const network = parseNetwork(optionalFlag(flags, 'network'));
   const reportPath = optionalFlag(flags, 'out') ?? DEFAULT_COMPATIBILITY_REPORT_PATH;
-  const witnessPath = optionalFlag(flags, 'witness') ?? './data/witness.json';
+  const witnessPath = optionalFlag(flags, 'witness') ?? './.tmp/local-attestation/witness.json';
   const skipSubmit = flags.has('skip-submit');
 
   const config = getRuntimeConfig({ network });

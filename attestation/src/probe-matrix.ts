@@ -6,6 +6,8 @@ import { promisify } from 'node:util';
 
 import {
   DEFAULT_COMPATIBILITY_REPORT_PATH,
+  findLatestChainControlProbe,
+  probeHasValidationPanic,
   readCompatibilityReport,
   type CompatibilityMatrixAttempt,
   type MidnightStackMatrixId,
@@ -92,10 +94,10 @@ function parseMatrixes(values: string[] | undefined): MidnightStackMatrixId[] {
 }
 
 function parseStrategy(value: string | undefined): MidnightSubmitStrategyId {
-  if (value === 'wallet-sdk' || value === 'compat-node-client') {
+  if (value === 'metadata-midnight-extrinsic' || value === 'compat-node-client') {
     return value;
   }
-  return 'metadata-midnight-extrinsic';
+  return 'wallet-sdk';
 }
 
 async function runCommand(
@@ -166,14 +168,20 @@ async function runMatrix(
   };
   const probeArgs = liveSubmit ? [] : ['--skip-submit'];
   const probeIds = includeSedCanary
-    ? ['attestation-backend', 'sed-contract-canary']
-    : ['attestation-backend'];
+    ? ['chain-control-accepted-midnight', 'attestation-backend', 'sed-contract-canary']
+    : ['chain-control-accepted-midnight', 'attestation-backend'];
 
   try {
     await runCommand('npm', ['install', '--no-audit', '--no-fund'], workspaceDir, env);
     await runCommand('npm', ['run', 'fetch-compactc'], workspaceDir, env);
     await runCommand('npm', ['run', 'compile-contracts'], workspaceDir, env);
     await runCommand('npm', ['run', 'probe:runtime', '--', '--out', localReportPath], workspaceDir, env);
+    await runCommand(
+      'npm',
+      ['run', 'probe:chain-control', '--', '--matrix', matrixId, '--out', localReportPath],
+      workspaceDir,
+      env,
+    );
     await runCommand(
       'npm',
       ['run', 'probe:attestation-backend', '--', '--matrix', matrixId, '--strategy', strategy, '--out', localReportPath, ...probeArgs],
@@ -191,13 +199,17 @@ async function runMatrix(
 
     const report = await readCompatibilityReport(localReportPath);
     const matrixProbes = (report?.probes ?? []).filter((probe) => probe.matrixId === matrixId);
+    const chainControlProbe = findLatestChainControlProbe(report, 'preprod', matrixId);
+    const validatorHealthy = chainControlProbe ? !probeHasValidationPanic(chainControlProbe) : true;
     const succeeded =
       matrixProbes.length >= probeIds.length &&
-      matrixProbes.every(
-        (probe) =>
-          !probe.validation.some((result) => result.outcome === 'panic') &&
-          (probe.submit.outcome === 'accepted' || probe.submit.outcome === 'skipped'),
-      );
+      Boolean(chainControlProbe) &&
+      matrixProbes
+        .filter((probe) => probe.probeId !== 'chain-control-accepted-midnight')
+        .every((probe) => {
+          const validationOkay = validatorHealthy ? !probeHasValidationPanic(probe) : true;
+          return validationOkay && (probe.submit.outcome === 'accepted' || probe.submit.outcome === 'skipped');
+        });
 
     return {
       matrixId,
@@ -206,7 +218,15 @@ async function runMatrix(
       compactcVersion: matrix.compactcVersion,
       succeeded,
       probeIds,
-      note: succeeded ? 'Matrix probes completed without validation panics.' : 'Matrix probes still panicked or failed.',
+      note: succeeded
+        ? validatorHealthy
+          ? 'Matrix probes completed with a healthy validator control.'
+          : 'Matrix probes completed while validateTransaction remained broken on the accepted chain-control transaction.'
+        : chainControlProbe == null
+          ? 'Matrix probes failed before establishing a chain-control baseline.'
+          : validatorHealthy
+            ? 'Matrix probes still failed despite a healthy validator control.'
+            : 'Matrix probes still failed after ignoring validator panics proven to occur on accepted chain traffic.',
     };
   } catch (error) {
     return {

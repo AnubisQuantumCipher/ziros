@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-04-01T17:20:02.039Z",
+  "generatedAt": "2026-04-01T18:07:25.152Z",
   "profiles": [
     {
-      "observedAt": "2026-04-01T17:11:15.884Z",
+      "observedAt": "2026-04-01T18:03:58.446Z",
       "network": "preprod",
       "rpcUrl": "https://rpc.preprod.midnight.network",
       "indexerUrl": "https://indexer.preprod.midnight.network/api/v4/graphql",
@@ -19,6 +19,11 @@
         "CheckCallFilter",
         "CheckThrottle"
       ],
+      "injectedSignedExtensions": [
+        "CheckCallFilter",
+        "CheckThrottle"
+      ],
+      "unknownSignedExtensions": [],
       "rawLedgerVersion": "0x183d382e302e32",
       "configurableTransactionSizeWeight": {
         "refTime": "20000000000",
@@ -198,6 +203,127 @@
         }
       },
       "note": "{\n  \"contractKey\": \"backend\",\n  \"contractAddress\": \"18c6a0ef6833648f9ed5f91ecbe8331cb60c34d372474601d99107fffa08704e\",\n  \"localCost\": {\n    \"readTime\": \"3655000000\",\n    \"computeTime\": \"5777661095\",\n    \"blockUsage\": \"5844\",\n    \"bytesWritten\": \"3833\",\n    \"bytesChurned\": \"15432\"\n  }\n}"
+    },
+    {
+      "probeId": "attestation-backend",
+      "network": "preprod",
+      "matrixId": "current",
+      "strategy": "wallet-sdk",
+      "observedAt": "2026-04-01T17:46:07.256Z",
+      "innerTxHexLength": 11824,
+      "outerTxHexLength": 11838,
+      "serializedLength": 5911,
+      "txId": "007bbb6bac3b5368d166d8f0f6e1225888526429445f789118d66d29046391e03b",
+      "runtimeInnerCost": "{\"ok\":153320000001}",
+      "validation": [
+        {
+          "source": "External",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        },
+        {
+          "source": "Local",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        },
+        {
+          "source": "InBlock",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        }
+      ],
+      "submit": {
+        "strategy": "wallet-sdk",
+        "outcome": "skipped",
+        "txHash": null,
+        "detail": "Submission skipped by --skip-submit."
+      },
+      "note": "{\n  \"contractKey\": \"backend\",\n  \"contractAddress\": \"d8cb9859b3b8595ec02b148d54b76981c4a648988e0047eeff12aaf16bd32bd8\",\n  \"localCost\": {\n    \"readTime\": \"3655000000\",\n    \"computeTime\": \"5777661095\",\n    \"blockUsage\": \"5844\",\n    \"bytesWritten\": \"3833\",\n    \"bytesChurned\": \"15432\"\n  }\n}"
+    },
+    {
+      "probeId": "chain-control-accepted-midnight",
+      "network": "preprod",
+      "matrixId": "current",
+      "strategy": "compat-node-client",
+      "observedAt": "2026-04-01T18:04:03.458Z",
+      "innerTxHexLength": 19478,
+      "outerTxHexLength": 19492,
+      "serializedLength": 9745,
+      "txId": null,
+      "runtimeInnerCost": "{\"ok\":24320000001}",
+      "validation": [
+        {
+          "source": "External",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        },
+        {
+          "source": "Local",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        },
+        {
+          "source": "InBlock",
+          "outcome": "panic",
+          "detail": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+          "raw": {
+            "name": "RpcError",
+            "message": "4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction",
+            "stack": "RpcError: 4003: Client error: Execution failed: Execution aborted due to trap: wasm trap: wasm `unreachable` instruction executed\nWASM backtrace:\nerror while executing at wasm backtrace:\n    0: 0x1f48af - midnight_node_runtime.wasm!__rustc[9e6a08e89e4b9111]::rust_begin_unwind\n    1:   0xff88 - midnight_node_runtime.wasm!core::panicking::panic_fmt::h1b94dc4a4696f2b8\n    2:  0xe0ef0 - midnight_node_runtime.wasm!TaggedTransactionQueue_validate_transaction\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+            "code": 4003,
+            "data": null
+          }
+        }
+      ],
+      "submit": {
+        "strategy": "compat-node-client",
+        "outcome": "error",
+        "txHash": null,
+        "detail": "1010: Invalid Transaction: Custom error: 193",
+        "raw": {
+          "name": "RpcError",
+          "message": "1010: Invalid Transaction: Custom error: 193",
+          "stack": "RpcError: 1010: Invalid Transaction: Custom error: 193\n    at checkError (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:19:15)\n    at RpcCoder.decodeResponse (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/coder/index.js:35:9)\n    at #onSocketMessageResult (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:429:40)\n    at #onSocketMessage (file:///Users/sicarii/Desktop/ZirOS/attestation/node_modules/@polkadot/rpc-provider/ws/index.js:418:42)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:845:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:778:26)\n    at fireEvent (node:internal/deps/undici/undici:11855:14)\n    at websocketMessageReceived (node:internal/deps/undici/undici:11877:7)\n    at ByteParser.run (node:internal/deps/undici/undici:12499:19)\n    at ByteParser._write (node:internal/deps/undici/undici:12392:14)",
+          "code": 1010,
+          "data": "Custom error: 193"
+        }
+      },
+      "note": "{\n  \"blockNumber\": 161960,\n  \"blockHash\": \"0xd16c0a648ffd192d411c9d06b703f18eb83ae39013f601524a5d675e012b7679\",\n  \"extrinsicIndex\": 3\n}"
     }
   ],
   "matrices": [
@@ -250,7 +376,55 @@
         "attestation-backend"
       ],
       "note": "Command failed: npm run fetch-compactc\nfile:///private/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/ziros-attestation-v3-compat-BDbBJB/node_modules/@midnight-ntwrk/midnight-js-compact/dist/fetch-compact.mjs:56\n        throw new Error(`No GitHub token present. Expected GITHUB_TOKEN env var to be present`);\n              ^\n\nError: No GitHub token present. Expected GITHUB_TOKEN env var to be present\n    at fetchCompact (file:///private/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/ziros-attestation-v3-compat-BDbBJB/node_modules/@midnight-ntwrk/midnight-js-compact/dist/fetch-compact.mjs:56:15)\n    at file:///private/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/ziros-attestation-v3-compat-BDbBJB/node_modules/@midnight-ntwrk/midnight-js-compact/dist/fetch-compact.mjs:168:11\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.22.0\n"
+    },
+    {
+      "matrixId": "v4-stable",
+      "workspaceDir": "/var/folders/bg/pt9l6y1j47q642kp3z5blrmh0000gn/T/ziros-attestation-v4-stable-W4aPag",
+      "packageVersions": {
+        "@midnight-ntwrk/compact-js": "2.5.0",
+        "@midnight-ntwrk/compact-runtime": "0.15.0",
+        "@midnight-ntwrk/ledger-v8": "8.0.3",
+        "@midnight-ntwrk/midnight-js-compact": "4.0.2",
+        "@midnight-ntwrk/midnight-js-contracts": "4.0.2",
+        "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.0.2",
+        "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.0.2",
+        "@midnight-ntwrk/midnight-js-level-private-state-provider": "4.0.2",
+        "@midnight-ntwrk/midnight-js-network-id": "4.0.2",
+        "@midnight-ntwrk/midnight-js-node-zk-config-provider": "4.0.2",
+        "@midnight-ntwrk/midnight-js-types": "4.0.2",
+        "@midnight-ntwrk/midnight-js-utils": "4.0.2",
+        "@midnight-ntwrk/testkit-js": "4.0.2"
+      },
+      "compactcVersion": "0.30.0",
+      "succeeded": true,
+      "probeIds": [
+        "chain-control-accepted-midnight",
+        "attestation-backend"
+      ],
+      "note": "Matrix probes completed while validateTransaction remained broken on the accepted chain-control transaction."
     }
   ],
-  "selected": null
+  "selected": {
+    "matrixId": "v4-stable",
+    "strategy": "wallet-sdk",
+    "network": "preprod",
+    "selectedAt": "2026-04-01T18:07:26.827Z",
+    "runtimeFingerprint": {
+      "network": "preprod",
+      "specVersion": "22000",
+      "transactionVersion": "2",
+      "signedExtensions": [
+        "CheckNonZeroSender",
+        "CheckSpecVersion",
+        "CheckTxVersion",
+        "CheckGenesis",
+        "CheckMortality",
+        "CheckNonce",
+        "CheckWeight",
+        "CheckCallFilter",
+        "CheckThrottle"
+      ],
+      "rawLedgerVersion": "0x183d382e302e32"
+    }
+  }
 }
