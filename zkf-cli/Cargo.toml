@@ -51,11 +51,13 @@ rand.workspace = true
 serde.workspace = true
 serde_cbor = "0.11"
 serde_json.workspace = true
+semver.workspace = true
 chrono.workspace = true
 serialize = { package = "midnight-serialize", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 sha2.workspace = true
 storage = { package = "midnight-storage", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 transient_crypto = { package = "midnight-transient-crypto", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
+ureq.workspace = true
 zkir = { package = "midnight-zkir", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 zkf-backends = { path = "../zkf-backends", default-features = false }
 zkf-conformance = { path = "../zkf-conformance" }

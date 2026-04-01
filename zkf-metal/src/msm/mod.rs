@@ -80,8 +80,16 @@ impl MsmAccelerator for MetalMsmAccelerator {
         // The certified BN254 lane is classic-only: hybrid, full-GPU, and
         // tensor-routed variants remain available only through explicit
         // experimental call sites and are not part of the promoted claim.
-        let result = pippenger::metal_msm(self.ctx, &ark_scalars, &ark_bases)
-            .unwrap_or_else(|| pippenger::cpu_pippenger(&ark_scalars, &ark_bases));
+        let result = match pippenger::metal_msm_dispatch(self.ctx, &ark_scalars, &ark_bases) {
+            pippenger::Bn254MsmDispatch::Metal(projective) => projective,
+            pippenger::Bn254MsmDispatch::BelowThreshold
+            | pippenger::Bn254MsmDispatch::Unavailable => {
+                pippenger::cpu_pippenger(&ark_scalars, &ark_bases)
+            }
+            pippenger::Bn254MsmDispatch::DispatchFailed(reason) => {
+                return Err(ZkfError::Backend(reason));
+            }
+        };
         let affine = result.into_affine();
         if !affine.is_on_curve() || !affine.is_in_correct_subgroup_assuming_on_curve() {
             return Err(ZkfError::Backend(

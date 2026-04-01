@@ -16,8 +16,8 @@ use crate::{
     GROTH16_SETUP_BLOB_PATH_METADATA_KEY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
     GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY, GROTH16_STREAMED_PK_PATH_METADATA_KEY,
     GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_VALUE,
-    GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY, allow_dev_deterministic_groth16,
-    proof_seed_override, requested_groth16_setup_blob_path, setup_seed_override,
+    GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY, allow_dev_deterministic_groth16, proof_seed_override,
+    requested_groth16_setup_blob_path, setup_seed_override,
 };
 use ark_bn254::{Bn254, Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use ark_ec::{AffineRepr, CurveGroup, VariableBaseMSM, scalar_mul::BatchMulPreprocessing};
@@ -185,10 +185,7 @@ fn groth16_auto_ceremony_subsystem_id(program: &Program) -> String {
     .unwrap_or_else(|| program.name.clone())
 }
 
-fn ensure_auto_ceremony_subsystem_manifest(
-    cache_dir: &Path,
-    subsystem_id: &str,
-) -> ZkfResult<()> {
+fn ensure_auto_ceremony_subsystem_manifest(cache_dir: &Path, subsystem_id: &str) -> ZkfResult<()> {
     let manifest_path = cache_dir.join("subsystem.json");
     if manifest_path.exists() {
         return Ok(());
@@ -213,7 +210,10 @@ fn legacy_auto_ceremony_seed_path(program_digest: &str) -> PathBuf {
     groth16_auto_ceremony_cache_dir().join(format!("{program_digest}.seed"))
 }
 
-fn auto_ceremony_context(program: &Program, program_digest: &str) -> ZkfResult<AutoCeremonyContext> {
+fn auto_ceremony_context(
+    program: &Program,
+    program_digest: &str,
+) -> ZkfResult<AutoCeremonyContext> {
     let subsystem_id = groth16_auto_ceremony_subsystem_id(program);
     let subsystem_slug = sanitize_ceremony_path_component(&subsystem_id);
     let subsystem_dir = groth16_auto_ceremony_cache_dir().join(subsystem_slug);
@@ -314,8 +314,8 @@ fn write_auto_ceremony_report(
         streamed_shape_path: streamed_setup.map(|value| value.shape_path.display().to_string()),
         security_boundary: GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string(),
     };
-    let bytes =
-        serde_json::to_vec_pretty(&report).map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    let bytes = serde_json::to_vec_pretty(&report)
+        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
     fs::write(&context.report_path, &bytes).map_err(|err| {
         ZkfError::Io(format!(
             "failed to write Groth16 auto-ceremony report '{}': {err}",
@@ -613,15 +613,14 @@ fn annotate_setup_metadata(
     used_seed_override: bool,
     auto_ceremony: Option<(&AutoCeremonyContext, &str)>,
 ) {
-    let clear_auto_ceremony_metadata =
-        |metadata: &mut BTreeMap<String, String>| {
-            metadata.remove(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY);
-            metadata.remove(GROTH16_CEREMONY_ID_METADATA_KEY);
-            metadata.remove(GROTH16_CEREMONY_KIND_METADATA_KEY);
-            metadata.remove(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY);
-            metadata.remove(GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY);
-            metadata.remove(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY);
-        };
+    let clear_auto_ceremony_metadata = |metadata: &mut BTreeMap<String, String>| {
+        metadata.remove(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_ID_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_KIND_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY);
+    };
 
     match imported_path {
         Some(path) => {
@@ -885,17 +884,17 @@ impl BackendEngine for ArkworksGroth16Backend {
 
             let imported_setup = imported_setup_blob_for_program(program)?;
             let program_digest = lowered_program.digest_hex();
-            let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some()
-            {
-                (None, false, None)
-            } else if let Some(seed) = setup_seed_override() {
-                (Some(seed), true, None)
-            } else {
-                match auto_ceremony_context(program, &program_digest) {
-                    Ok(context) => (Some(context.seed), true, Some(context)),
-                    Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
-                }
-            };
+            let (setup_seed, used_seed_override, auto_ceremony_context) =
+                if imported_setup.is_some() {
+                    (None, false, None)
+                } else if let Some(seed) = setup_seed_override() {
+                    (Some(seed), true, None)
+                } else {
+                    match auto_ceremony_context(program, &program_digest) {
+                        Ok(context) => (Some(context.seed), true, Some(context)),
+                        Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
+                    }
+                };
             if trace_arkworks_compile_enabled() {
                 eprintln!(
                     "[arkworks-groth16-compile] program={} signals={} constraints={} imported_setup={} seed_present={}",
@@ -1586,6 +1585,7 @@ pub(crate) struct Groth16MsmDispatch {
     used_metal: bool,
     metal_available: bool,
     saw_below_threshold: bool,
+    saw_unavailable: bool,
     saw_dispatch_failed: bool,
     dispatch_failure_detail: Option<String>,
     total_msm_invocations: usize,
@@ -1604,6 +1604,7 @@ impl Groth16MsmDispatch {
         self.used_metal |= other.used_metal;
         self.metal_available |= other.metal_available;
         self.saw_below_threshold |= other.saw_below_threshold;
+        self.saw_unavailable |= other.saw_unavailable;
         self.saw_dispatch_failed |= other.saw_dispatch_failed;
         if self.dispatch_failure_detail.is_none() {
             self.dispatch_failure_detail = other.dispatch_failure_detail;
@@ -1629,6 +1630,7 @@ impl Groth16MsmDispatch {
 
     fn no_cpu_fallback(&self) -> bool {
         self.used_metal
+            && !self.saw_unavailable
             && !self.saw_dispatch_failed
             && self.eligible_msm_invocations > 0
             && self.eligible_msm_invocations == self.metal_msm_invocations
@@ -1644,12 +1646,15 @@ impl Groth16MsmDispatch {
     }
 
     fn fallback_reason(&self) -> Option<&'static str> {
-        if !self.metal_available {
-            Some("metal-unavailable")
-        } else if self.eligible_msm_invocations == 0 && self.total_msm_invocations > 0 {
-            Some("below-threshold")
-        } else if self.saw_dispatch_failed {
+        if self.saw_dispatch_failed {
             Some("metal-dispatch-failed")
+        } else if self.saw_unavailable || !self.metal_available {
+            Some("metal-unavailable")
+        } else if self.saw_below_threshold
+            && self.eligible_msm_invocations == 0
+            && self.total_msm_invocations > 0
+        {
+            Some("below-threshold")
         } else if self.eligible_msm_invocations > self.metal_msm_invocations || !self.used_metal {
             Some("cpu-selected")
         } else {
@@ -1700,6 +1705,15 @@ impl Groth16MsmDispatch {
             "cpu-only"
         }
     }
+}
+
+#[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
+#[derive(Debug)]
+enum Bn254MetalMsmDispatch {
+    Metal(G1Projective),
+    BelowThreshold,
+    Unavailable,
+    DispatchFailed(String),
 }
 
 #[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
@@ -4453,83 +4467,77 @@ fn msm_g1_bigint(
     if size == 0 {
         return Ok(G1Projective::zero());
     }
-    let dispatch_plan = {
+    let (accelerator_name, min_batch_size, metal_available) = {
         let registry = accelerator_registry()
             .lock()
             .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
-        _msm_dispatch.metal_available = registry
+        let metal_available = registry
             .msm_accelerators()
             .iter()
             .any(|acc| acc.is_available() && acc.name().starts_with("metal-"));
         let accelerator = registry.best_msm();
-        let accelerator_name = accelerator.name().to_string();
-        let min_batch_size = accelerator.min_batch_size();
-        if accelerator_name.starts_with("metal-") && size < min_batch_size {
-            _msm_dispatch.saw_below_threshold = true;
-            None
-        } else if accelerator_name.starts_with("metal-") {
-            _msm_dispatch.eligible_msm_invocations += 1;
-            Some((accelerator_name, min_batch_size))
-        } else {
-            None
-        }
+        (
+            accelerator.name().to_string(),
+            accelerator.min_batch_size(),
+            metal_available,
+        )
     };
+    _msm_dispatch.metal_available = metal_available;
 
-    if let Some((accelerator_name, min_batch_size)) = dispatch_plan {
-        let result = if accelerator_name.starts_with("metal-") {
-            dispatch_metal_msm_affine(&query[..size], &assignment[..size])
-        } else {
-            let scalars = assignment[..size]
-                .iter()
-                .map(|scalar| FieldElement::from_le_bytes(&scalar.to_bytes_le()))
-                .collect::<Vec<_>>();
-            let bases = query[..size]
-                .iter()
-                .map(|base| {
-                    let mut bytes = Vec::new();
-                    base.serialize_compressed(&mut bytes)
-                        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
-                    Ok(bytes)
-                })
-                .collect::<ZkfResult<Vec<_>>>()?;
-            let registry = accelerator_registry()
-                .lock()
-                .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
-            let accelerator = registry.best_msm();
-            if size < min_batch_size {
-                return Ok(G1Projective::msm_bigint(
-                    &query[..size],
-                    &assignment[..size],
-                ));
+    if accelerator_name.starts_with("metal-") {
+        match dispatch_metal_msm_affine(&query[..size], &assignment[..size]) {
+            Bn254MetalMsmDispatch::Metal(projective) => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.eligible_msm_invocations += 1;
+                _msm_dispatch.used_metal = true;
+                _msm_dispatch.metal_msm_invocations += 1;
+                return Ok(projective);
             }
-            accelerator.msm_g1(&scalars, &bases).and_then(|bytes| {
-                let affine = G1Affine::deserialize_compressed(bytes.as_slice())
-                    .map_err(|err| ZkfError::Backend(format!("invalid MSM result: {err}")))?;
-                Ok(affine.into_group())
-            })
-        };
-        match result {
-            Ok(projective) => {
-                let affine = projective.into_affine();
-                if affine.is_on_curve() && affine.is_in_correct_subgroup_assuming_on_curve() {
-                    _msm_dispatch.used_metal = accelerator_name.starts_with("metal-");
-                    if accelerator_name.starts_with("metal-") {
-                        _msm_dispatch.metal_msm_invocations += 1;
-                    }
-                    return Ok(affine.into_group());
-                }
-                if accelerator_name.starts_with("metal-") {
-                    _msm_dispatch.saw_dispatch_failed = true;
-                    _msm_dispatch.dispatch_failure_detail =
-                        Some("metal MSM produced an invalid BN254 point".to_string());
-                }
+            Bn254MetalMsmDispatch::BelowThreshold => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.saw_below_threshold = true;
             }
-            Err(err) if accelerator_name.starts_with("metal-") => {
+            Bn254MetalMsmDispatch::Unavailable => {
+                _msm_dispatch.saw_unavailable = true;
+            }
+            Bn254MetalMsmDispatch::DispatchFailed(detail) => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.eligible_msm_invocations += 1;
                 _msm_dispatch.saw_dispatch_failed = true;
-                _msm_dispatch.dispatch_failure_detail = Some(err.to_string());
+                if _msm_dispatch.dispatch_failure_detail.is_none() {
+                    _msm_dispatch.dispatch_failure_detail = Some(detail);
+                }
             }
-            Err(err) => return Err(err),
         }
+    } else {
+        let scalars = assignment[..size]
+            .iter()
+            .map(|scalar| FieldElement::from_le_bytes(&scalar.to_bytes_le()))
+            .collect::<Vec<_>>();
+        let bases = query[..size]
+            .iter()
+            .map(|base| {
+                let mut bytes = Vec::new();
+                base.serialize_compressed(&mut bytes)
+                    .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+                Ok(bytes)
+            })
+            .collect::<ZkfResult<Vec<_>>>()?;
+        let registry = accelerator_registry()
+            .lock()
+            .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
+        let accelerator = registry.best_msm();
+        if size < min_batch_size {
+            return Ok(G1Projective::msm_bigint(
+                &query[..size],
+                &assignment[..size],
+            ));
+        }
+        return accelerator.msm_g1(&scalars, &bases).and_then(|bytes| {
+            let affine = G1Affine::deserialize_compressed(bytes.as_slice())
+                .map_err(|err| ZkfError::Backend(format!("invalid MSM result: {err}")))?;
+            Ok(affine.into_group())
+        });
     }
 
     Ok(G1Projective::msm_bigint(
@@ -4542,13 +4550,14 @@ fn msm_g1_bigint(
 fn dispatch_metal_msm_affine(
     bases: &[G1Affine],
     assignment: &[ScalarBigInt],
-) -> ZkfResult<G1Projective> {
+) -> Bn254MetalMsmDispatch {
     use ark_bn254::Fr;
     use ark_ec::CurveGroup;
     use ark_ff::PrimeField;
 
-    let ctx = zkf_metal::global_context()
-        .ok_or_else(|| ZkfError::Backend("metal MSM accelerator became unavailable".to_string()))?;
+    let Some(ctx) = zkf_metal::global_context() else {
+        return Bn254MetalMsmDispatch::Unavailable;
+    };
     let scalars = assignment
         .iter()
         .map(|scalar| Fr::from_le_bytes_mod_order(&scalar.to_bytes_le()))
@@ -4563,32 +4572,31 @@ fn dispatch_metal_msm_affine(
         }
     }
 
-    let mut failures = Vec::new();
-    if let Some(projective) = zkf_metal::msm::pippenger::metal_msm(ctx, &scalars, bases) {
-        match validate_projective("metal-msm-bn254", projective) {
-            Ok(valid) => return Ok(valid),
-            Err(reason) => failures.push(reason),
+    match zkf_metal::msm::pippenger::metal_msm_dispatch(ctx, &scalars, bases) {
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::Metal(projective) => {
+            match validate_projective("metal-msm-bn254", projective) {
+                Ok(valid) => Bn254MetalMsmDispatch::Metal(valid),
+                Err(reason) => Bn254MetalMsmDispatch::DispatchFailed(reason),
+            }
+        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::BelowThreshold => {
+            Bn254MetalMsmDispatch::BelowThreshold
+        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::Unavailable => {
+            Bn254MetalMsmDispatch::Unavailable
+        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::DispatchFailed(reason) => {
+            Bn254MetalMsmDispatch::DispatchFailed(reason)
         }
     }
-
-    Err(ZkfError::Backend(if failures.is_empty() {
-        "metal MSM dispatch fell back".to_string()
-    } else {
-        format!(
-            "metal MSM dispatch failed after pure-GPU retries: {}",
-            failures.join("; ")
-        )
-    }))
 }
 
 #[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
 fn dispatch_metal_msm_affine(
     _bases: &[G1Affine],
     _assignment: &[ScalarBigInt],
-) -> ZkfResult<G1Projective> {
-    Err(ZkfError::Backend(
-        "metal MSM dispatch is unavailable in this build".to_string(),
-    ))
+) -> Bn254MetalMsmDispatch {
+    Bn254MetalMsmDispatch::Unavailable
 }
 
 pub(crate) fn append_groth16_metal_metadata(
@@ -5307,7 +5315,11 @@ mod tests {
         let stale_path = base.join(".shape.bin.tmp-999999-1-0");
         fs::write(&stale_path, b"stale").expect("stale temp");
         std::process::Command::new("touch")
-            .args(["-t", "200001010000", stale_path.to_str().expect("utf8 path")])
+            .args([
+                "-t",
+                "200001010000",
+                stale_path.to_str().expect("utf8 path"),
+            ])
             .status()
             .expect("touch stale temp");
 
@@ -5460,6 +5472,7 @@ mod tests {
                 used_metal: true,
                 metal_available: true,
                 saw_below_threshold: false,
+                saw_unavailable: false,
                 saw_dispatch_failed: true,
                 dispatch_failure_detail: Some(
                     "metal MSM dispatch failed after pure-GPU retries".to_string(),
@@ -5503,11 +5516,53 @@ mod tests {
     }
 
     #[test]
+    fn append_groth16_metal_metadata_marks_below_threshold_cpu_fallback() {
+        let mut metadata = BTreeMap::new();
+        append_groth16_metal_metadata(
+            &mut metadata,
+            Groth16MsmDispatch {
+                used_metal: false,
+                metal_available: true,
+                saw_below_threshold: true,
+                saw_unavailable: false,
+                saw_dispatch_failed: false,
+                dispatch_failure_detail: None,
+                total_msm_invocations: 4,
+                eligible_msm_invocations: 0,
+                metal_msm_invocations: 0,
+                max_inflight_jobs: 0,
+                counter_source: "sequential-msm-estimate",
+                witness_map_engine: "ark-libsnark-reduction",
+                witness_map_reason: "bn254-witness-map-cpu-engine",
+                witness_map_parallelism: 1,
+                stage_breakdown: BTreeMap::new(),
+            },
+        );
+
+        assert_eq!(
+            metadata.get("groth16_msm_engine").map(String::as_str),
+            Some("cpu-bn254-msm")
+        );
+        assert_eq!(
+            metadata.get("groth16_msm_reason").map(String::as_str),
+            Some("below-threshold")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_fallback_state")
+                .map(String::as_str),
+            Some("cpu-only")
+        );
+        assert!(!metadata.contains_key("groth16_msm_dispatch_failure"));
+    }
+
+    #[test]
     fn below_threshold_msm_does_not_poison_eligible_metal_success() {
         let dispatch = Groth16MsmDispatch {
             used_metal: true,
             metal_available: true,
             saw_below_threshold: true,
+            saw_unavailable: false,
             saw_dispatch_failed: false,
             dispatch_failure_detail: None,
             total_msm_invocations: 4,

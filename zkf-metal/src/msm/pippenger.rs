@@ -25,19 +25,45 @@ pub fn gpu_threshold() -> usize {
     gpu_threshold_val()
 }
 
-/// Execute Pippenger MSM on Metal GPU.
-///
-/// For inputs below `gpu_threshold_val()`, returns `None` to signal CPU fallback.
-pub fn metal_msm(ctx: &MetalContext, scalars: &[Fr], bases: &[G1Affine]) -> Option<G1Projective> {
+#[derive(Debug)]
+pub enum Bn254MsmDispatch {
+    Metal(G1Projective),
+    BelowThreshold,
+    Unavailable,
+    DispatchFailed(String),
+}
+
+fn dispatch_failure_reason(ctx: &MetalContext, fallback: &str) -> String {
+    ctx.last_dispatch_failure()
+        .unwrap_or_else(|| fallback.to_string())
+}
+
+/// Execute the certified classic BN254 MSM route and report whether Metal was
+/// actually used, skipped below threshold, unavailable, or failed mid-dispatch.
+pub fn metal_msm_dispatch(
+    ctx: &MetalContext,
+    scalars: &[Fr],
+    bases: &[G1Affine],
+) -> Bn254MsmDispatch {
     let n = scalars.len();
-    if n != bases.len() || n < gpu_threshold_val() {
-        return None;
+    if n != bases.len() {
+        return Bn254MsmDispatch::DispatchFailed(format!(
+            "MSM size mismatch: {} scalars vs {} bases",
+            n,
+            bases.len()
+        ));
+    }
+    if n < gpu_threshold_val() {
+        return Bn254MsmDispatch::BelowThreshold;
+    }
+    if !ctx.dispatch_allowed() {
+        return Bn254MsmDispatch::Unavailable;
     }
 
     let c = optimal_window_size(n);
     let num_windows = bn254::num_windows(c);
     let num_buckets = bn254::num_buckets(c) as usize;
-    launch_contracts::msm_contract(MsmContractInput {
+    if launch_contracts::msm_contract(MsmContractInput {
         kernel: "msm_bucket_acc",
         curve: CurveFamily::Bn254,
         route: MsmRouteClass::Classic,
@@ -53,9 +79,34 @@ pub fn metal_msm(ctx: &MetalContext, scalars: &[Fr], bases: &[G1Affine]) -> Opti
         max_threads_per_group: 256,
         certified_route: true,
     })
-    .ok()?;
-    let window_results = metal_msm_partial(ctx, scalars, bases, c, 0, num_windows)?;
-    Some(bn254::combine_windows(&window_results, c))
+    .is_err()
+    {
+        return Bn254MsmDispatch::DispatchFailed(dispatch_failure_reason(
+            ctx,
+            "metal MSM launch contract rejected the classic BN254 route",
+        ));
+    }
+
+    match metal_msm_partial(ctx, scalars, bases, c, 0, num_windows) {
+        Some(window_results) => Bn254MsmDispatch::Metal(bn254::combine_windows(&window_results, c)),
+        None => Bn254MsmDispatch::DispatchFailed(dispatch_failure_reason(
+            ctx,
+            "metal MSM classic route returned no result",
+        )),
+    }
+}
+
+/// Execute Pippenger MSM on Metal GPU.
+///
+/// Returns `None` for non-Metal outcomes so existing callers can continue to
+/// fall back to CPU without handling the structured dispatch enum directly.
+pub fn metal_msm(ctx: &MetalContext, scalars: &[Fr], bases: &[G1Affine]) -> Option<G1Projective> {
+    match metal_msm_dispatch(ctx, scalars, bases) {
+        Bn254MsmDispatch::Metal(projective) => Some(projective),
+        Bn254MsmDispatch::BelowThreshold
+        | Bn254MsmDispatch::Unavailable
+        | Bn254MsmDispatch::DispatchFailed(_) => None,
+    }
 }
 
 fn encode_scalar_data(scalars: &[Fr], bases: &[G1Affine]) -> Vec<u64> {
@@ -637,6 +688,62 @@ mod tests {
     }
 
     /// Test GPU by reading raw bucket data for trivial MSM
+    #[test]
+    fn metal_msm_dispatch_reports_below_threshold() {
+        use crate::device;
+        use ark_ec::AffineRepr;
+
+        let ctx = match device::global_context() {
+            Some(c) => c,
+            None => {
+                eprintln!("No Metal GPU available, skipping");
+                return;
+            }
+        };
+
+        let n = gpu_threshold_val().saturating_sub(1).max(1);
+        let scalars = vec![Fr::from(1u64); n];
+        let bases = vec![G1Affine::generator(); n];
+
+        assert!(matches!(
+            metal_msm_dispatch(ctx, &scalars, &bases),
+            Bn254MsmDispatch::BelowThreshold
+        ));
+    }
+
+    #[test]
+    fn metal_msm_dispatch_reports_metal_success() {
+        use crate::device;
+        use ark_ff::UniformRand;
+
+        let ctx = match device::global_context() {
+            Some(c) => c,
+            None => {
+                eprintln!("No Metal GPU available, skipping");
+                return;
+            }
+        };
+        if !ctx.dispatch_allowed() {
+            eprintln!("Metal dispatch circuit is open, skipping");
+            return;
+        }
+
+        let mut rng = ark_std::test_rng();
+        let n = gpu_threshold_val();
+        let scalars: Vec<Fr> = (0..n).map(|_| Fr::rand(&mut rng)).collect();
+        let bases: Vec<G1Affine> = (0..n)
+            .map(|_| G1Projective::rand(&mut rng).into_affine())
+            .collect();
+        let cpu_result = cpu_pippenger(&scalars, &bases);
+
+        match metal_msm_dispatch(ctx, &scalars, &bases) {
+            Bn254MsmDispatch::Metal(gpu_result) => {
+                assert_eq!(gpu_result.into_affine(), cpu_result.into_affine());
+            }
+            other => panic!("expected Metal dispatch result, got {other:?}"),
+        }
+    }
+
     #[test]
     fn metal_msm_trivial() {
         use crate::device;

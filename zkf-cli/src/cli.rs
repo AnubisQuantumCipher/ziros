@@ -586,6 +586,52 @@ pub(crate) enum MidnightCommands {
         #[command(subcommand)]
         command: MidnightProofServerCommands,
     },
+    /// Serve the Midnight Compact admission gateway on port 6311.
+    #[command(name = "gateway")]
+    Gateway {
+        #[command(subcommand)]
+        command: MidnightGatewayCommands,
+    },
+    /// List the built-in ZirOS Midnight DApp templates.
+    #[command(name = "templates")]
+    Templates {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Generate a pinned Midnight DApp project from a verified template.
+    #[command(name = "init")]
+    Init {
+        #[arg(long)]
+        name: String,
+        #[arg(long)]
+        template: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+    },
+    /// Diagnose Midnight-specific toolchain, package, wallet, and network readiness.
+    #[command(name = "doctor")]
+    Doctor {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        proof_server_url: Option<String>,
+        #[arg(long)]
+        gateway_url: Option<String>,
+        #[arg(long, conflicts_with = "no_browser_check")]
+        browser_check: bool,
+        #[arg(long, conflicts_with = "browser_check")]
+        no_browser_check: bool,
+        #[arg(long)]
+        require_wallet: bool,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -617,6 +663,17 @@ pub(crate) enum MidnightProofServerCommands {
             env = "MIDNIGHT_PROOF_SERVER_NO_FETCH_PARAMS"
         )]
         no_fetch_params: bool,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightGatewayCommands {
+    /// Serve the verified-admission Compact gateway.
+    Serve {
+        #[arg(short, long, default_value_t = 6311, env = "MIDNIGHT_GATEWAY_PORT")]
+        port: u16,
         #[arg(long)]
         json: bool,
     },

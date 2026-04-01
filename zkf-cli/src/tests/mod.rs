@@ -109,6 +109,7 @@ mod core_util;
 mod debug;
 mod equivalence;
 mod negative_paths;
+mod midnight_platform;
 mod package_bundle;
 mod package_migrate;
 mod package_prove;

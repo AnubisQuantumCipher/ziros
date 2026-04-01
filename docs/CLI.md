@@ -277,7 +277,27 @@ zkf compile --program ir/program.json --backend nova --out compiled.json --seed 
 | `sp1-compat` | - | Explicit SP1 compatibility/delegated backend alias (requires `--allow-compat`) |
 | `risc-zero` | - | Native RISC Zero zkVM backend name |
 | `risc-zero-compat` | - | Explicit RISC Zero compatibility/delegated backend alias (requires `--allow-compat`) |
-| `midnight-compact` (`midnight`, `compact` accepted) | Pasta Fp | Midnight Compact |
+| `midnight-compact` (`midnight`, `compact` accepted) | Pasta Fp | Midnight Compact import path targeting `compactc 0.30.0` sidecars; backend readiness still follows the live support matrix |
+
+### `zkf midnight`
+
+Midnight developer-platform commands extend the existing proof-server compatibility surface.
+
+```bash
+zkf midnight proof-server serve --port 6300 --engine umpg --json
+zkf midnight gateway serve --port 6311 --json
+zkf midnight templates --json
+zkf midnight doctor --json --network preprod
+zkf midnight init --name my-dapp --template token-transfer
+```
+
+| Command | Purpose |
+|---------|---------|
+| `zkf midnight proof-server serve` | Serve the official Midnight proof-server HTTP contract through the native ZirOS runtime |
+| `zkf midnight gateway serve` | Admit Compact contracts through the fail-closed ZirOS gateway, pinned to `compactc 0.30.0` and ML-DSA-87 attestations |
+| `zkf midnight templates` | List the six shipped Midnight DApp templates and their backend lanes |
+| `zkf midnight doctor` | Report Midnight-specific toolchain, package, network, wallet, Lace, and DUST readiness in one shot |
+| `zkf midnight init` | Scaffold a pinned, production-mode Midnight DApp that reuses the native proof server and SED-style dashboard/runtime surface |
 
 ### `zkf prove`
 
@@ -369,6 +389,8 @@ zkf runtime execute --plan /tmp/zkf-wrapper.plan.json --out /tmp/zkf-wrapper.gro
 ### `zkf runtime certify`
 
 Certify the strict M4 Max production lane and emit a typed certification report.
+`--mode soak` is the release-grade source of truth and installs the matching
+report used by `zkf metal-doctor --strict --json`.
 
 ```bash
 zkf runtime certify --mode gate --proof stark-proof.json --compiled stark-compiled.json
@@ -389,8 +411,6 @@ fallback paths, ETA is explicitly labeled `non-sla-fallback` and must not be tre
 or countdown guarantee. The Neural Engine security detector is advisory only; deterministic policy
 is the enforcement boundary.
 
-`--mode soak` is the release-grade source of truth and installs the matching
-report used by `zkf metal-doctor --strict --json`.
 ```bash
 python3 -m pip install -r scripts/neural_engine_requirements.txt
 python3 scripts/build_fixture_neural_models.py

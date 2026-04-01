@@ -560,6 +560,14 @@ fn command_name(command: &Commands) -> String {
                     "midnight:proof-server:serve".to_string()
                 }
             },
+            MidnightCommands::Gateway { command } => match command {
+                crate::cli::MidnightGatewayCommands::Serve { .. } => {
+                    "midnight:gateway:serve".to_string()
+                }
+            },
+            MidnightCommands::Templates { .. } => "midnight:templates".to_string(),
+            MidnightCommands::Init { .. } => "midnight:init".to_string(),
+            MidnightCommands::Doctor { .. } => "midnight:doctor".to_string(),
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),

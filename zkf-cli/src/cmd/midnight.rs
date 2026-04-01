@@ -37,7 +37,13 @@ use zkf_runtime::{
 };
 use zkir as zkir_v2;
 
-use crate::cli::{MidnightCommands, MidnightProofServerCommands};
+mod doctor;
+mod gateway;
+mod init;
+pub(crate) mod shared;
+mod templates;
+
+use crate::cli::{MidnightCommands, MidnightGatewayCommands, MidnightProofServerCommands};
 
 const DEFAULT_KEY_LOCATIONS: [&str; 4] = [
     "midnight/zswap/spend",
@@ -45,7 +51,7 @@ const DEFAULT_KEY_LOCATIONS: [&str; 4] = [
     "midnight/zswap/sign",
     "midnight/dust/spend",
 ];
-const MIDNIGHT_PROOF_SERVER_COMPAT_VERSION: &str = "8.0.3";
+pub(crate) const MIDNIGHT_PROOF_SERVER_COMPAT_VERSION: &str = "8.0.3";
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 enum MidnightProofServerEngine {
@@ -244,6 +250,37 @@ pub(crate) fn handle_midnight(command: MidnightCommands) -> Result<(), String> {
                 json,
             ),
         },
+        MidnightCommands::Gateway { command } => match command {
+            MidnightGatewayCommands::Serve { port, json } => gateway::handle_serve(port, json),
+        },
+        MidnightCommands::Templates { json } => templates::handle_templates(json),
+        MidnightCommands::Init {
+            name,
+            template,
+            out,
+            network,
+        } => init::handle_init(name, template, out, network),
+        MidnightCommands::Doctor {
+            json,
+            strict,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            browser_check,
+            no_browser_check,
+            require_wallet,
+        } => doctor::handle_doctor(doctor::DoctorArgs {
+            json,
+            strict,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            browser_check,
+            no_browser_check,
+            require_wallet,
+        }),
     }
 }
 
