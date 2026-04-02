@@ -46,10 +46,10 @@ order.
 - `zkf midnight proof-server serve` is the canonical local Midnight proof-server compatibility
   surface in this checkout. It owns the route-level contract (`/prove`, `/check`, `/health`) but
   does not by itself upgrade the `midnight-compact` backend row to production-ready status.
-- `zkf midnight gateway serve`, `zkf midnight doctor`, `zkf midnight templates`, and
-  `zkf midnight init` are the shipped Midnight developer-platform surfaces in this checkout. They
-  are pinned to `compactc 0.30.0` and inherit the same backend-readiness caveat above rather than
-  silently upgrading the `midnight-compact` backend row.
+- `zkf midnight gateway serve`, `zkf midnight doctor`, `zkf midnight disclosure`, `zkf midnight resolve`,
+  `zkf midnight templates`, and `zkf midnight init` are the shipped Midnight developer-platform
+  surfaces in this checkout. They are pinned to `compactc 0.30.0` and inherit the same
+  backend-readiness caveat above rather than silently upgrading the `midnight-compact` backend row.
 - Subsystem bundles consume a pinned `zkf` release binary as a black box. The shipped contract is
   author-fixed backend policy per circuit/lane, not end-user-selectable backend mutation.
 - Native BN254 Groth16 is the supported on-chain subsystem lane. Public STARK-to-Groth16 wrapping

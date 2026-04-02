@@ -541,6 +541,12 @@ zkf midnight templates --json
 # Diagnose the full Midnight toolchain lane
 zkf midnight doctor --json --network preprod
 
+# Analyze Compact disclosure boundaries from an imported program
+zkf midnight disclosure --program /tmp/my-contract.program.json --json
+
+# Fix pinned Midnight package drift for an existing project
+zkf midnight resolve --network preprod --project /tmp/my-dapp --dry-run
+
 # Scaffold a production-mode Midnight DApp
 zkf midnight init --name my-dapp --template token-transfer
 ```
@@ -746,6 +752,8 @@ The [SED subsystem](https://github.com/AnubisQuantumCipher/ziros-sovereign-econo
 The developer-platform surface built into `zkf midnight` extends this DApp pattern directly:
 - `zkf midnight gateway serve` admits Compact contracts through a fail-closed audit path, `compactc 0.30.0`, ML-DSA-87 signatures, and a BN254 Poseidon commitment over the report digest
 - `zkf midnight doctor` reports Compact, Node, npm, package pins, proof-server health, gateway readiness, network reachability, Lace detection, and DUST readiness in one pass
+- `zkf midnight disclosure` classifies tracked `disclose()` outputs, commitment-backed public hashes, private-only signals, and conditional/manual-review cases from imported Compact IR
+- `zkf midnight resolve` fixes pinned `@midnight-ntwrk/*` package drift in-place, can refresh dependencies with `npm install`, compiles `contracts/compact/*.compact`, and validates the compiled artifact lane before deployment
 - `zkf midnight init` scaffolds a pinned project with `contracts/compact/`, `src/midnight/`, `src/dashboard/`, `scripts/`, `data/`, and production-mode `build` / `start` commands
 
 **Proving mode is explicit:** `local-zkf-proof-server` (default, Apple-Silicon-native proof-server lane) or `wallet-proving-provider` (fallback). Visible in UI. GPU acceleration remains host-dependent and must be read from `zkf metal-doctor`.

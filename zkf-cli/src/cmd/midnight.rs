@@ -37,9 +37,11 @@ use zkf_runtime::{
 };
 use zkir as zkir_v2;
 
+mod disclosure;
 mod doctor;
 mod gateway;
 mod init;
+mod resolve;
 pub(crate) mod shared;
 mod templates;
 
@@ -280,6 +282,28 @@ pub(crate) fn handle_midnight(command: MidnightCommands) -> Result<(), String> {
             browser_check,
             no_browser_check,
             require_wallet,
+        }),
+        MidnightCommands::Disclosure { program, json } => {
+            disclosure::handle_disclosure(program, json)
+        }
+        MidnightCommands::Resolve {
+            network,
+            project,
+            dry_run,
+            skip_install,
+            skip_compile,
+            skip_test,
+            json,
+            verbose,
+        } => resolve::handle_resolve(resolve::ResolveArgs {
+            network,
+            project,
+            dry_run,
+            skip_install,
+            skip_compile,
+            skip_test,
+            json,
+            verbose,
         }),
     }
 }

@@ -632,6 +632,34 @@ pub(crate) enum MidnightCommands {
         #[arg(long)]
         require_wallet: bool,
     },
+    /// Analyze Compact disclosure boundaries and flag untracked public exposure.
+    #[command(name = "disclosure")]
+    Disclosure {
+        #[arg(long)]
+        program: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Auto-resolve Midnight SDK version mismatches for a project.
+    #[command(name = "resolve")]
+    Resolve {
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(long)]
+        skip_install: bool,
+        #[arg(long)]
+        skip_compile: bool,
+        #[arg(long)]
+        skip_test: bool,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        verbose: bool,
+    },
 }
 
 #[derive(Debug, Subcommand)]

@@ -568,6 +568,8 @@ fn command_name(command: &Commands) -> String {
             MidnightCommands::Templates { .. } => "midnight:templates".to_string(),
             MidnightCommands::Init { .. } => "midnight:init".to_string(),
             MidnightCommands::Doctor { .. } => "midnight:doctor".to_string(),
+            MidnightCommands::Disclosure { .. } => "midnight:disclosure".to_string(),
+            MidnightCommands::Resolve { .. } => "midnight:resolve".to_string(),
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),

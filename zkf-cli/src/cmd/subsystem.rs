@@ -1323,15 +1323,23 @@ PIN="$ROOT/20_release/zkf-release-pin.json"
 TARGET_DIR="${{ZKF_SUBSYSTEM_INSTALL_DIR:-$ROOT/.runtime/bin}}"
 TARGET="$TARGET_DIR/zkf"
 
+if [[ "${{1:-}}" == "--check-only" ]]; then
+  if [[ ! -f "$BINARY" ]]; then
+    echo "missing bundled zkf binary: $BINARY" >&2
+    exit 66
+  fi
+  if [[ ! -f "$PIN" ]]; then
+    echo "missing release pin: $PIN" >&2
+    exit 66
+  fi
+  exit 0
+fi
+
 if [[ ! -x "$BINARY" ]]; then
   chmod +x "$BINARY"
 fi
 
 "$BINARY" subsystem verify-release-pin --pin "$PIN" --binary "$BINARY"
-
-if [[ "${{1:-}}" == "--check-only" ]]; then
-  exit 0
-fi
 
 mkdir -p "$TARGET_DIR"
 cp "$BINARY" "$TARGET"

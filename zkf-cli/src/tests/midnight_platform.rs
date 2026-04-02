@@ -159,6 +159,76 @@ fn cli_parses_midnight_doctor_command() {
 }
 
 #[test]
+fn cli_parses_midnight_disclosure_command() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "midnight",
+        "disclosure",
+        "--program",
+        "/tmp/compact.program.json",
+        "--json",
+    ]);
+
+    match cli.command {
+        crate::cli::Commands::Midnight {
+            command: crate::cli::MidnightCommands::Disclosure { program, json },
+        } => {
+            assert_eq!(
+                program,
+                std::path::PathBuf::from("/tmp/compact.program.json")
+            );
+            assert!(json);
+        }
+        other => panic!("expected midnight disclosure command, got {other:?}"),
+    }
+}
+
+#[test]
+fn cli_parses_midnight_resolve_command() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "midnight",
+        "resolve",
+        "--network",
+        "preview",
+        "--project",
+        "/tmp/my-dapp",
+        "--dry-run",
+        "--skip-install",
+        "--skip-compile",
+        "--skip-test",
+        "--json",
+        "--verbose",
+    ]);
+
+    match cli.command {
+        crate::cli::Commands::Midnight {
+            command:
+                crate::cli::MidnightCommands::Resolve {
+                    network,
+                    project,
+                    dry_run,
+                    skip_install,
+                    skip_compile,
+                    skip_test,
+                    json,
+                    verbose,
+                },
+        } => {
+            assert_eq!(network, "preview");
+            assert_eq!(project, Some(std::path::PathBuf::from("/tmp/my-dapp")));
+            assert!(dry_run);
+            assert!(skip_install);
+            assert!(skip_compile);
+            assert!(skip_test);
+            assert!(json);
+            assert!(verbose);
+        }
+        other => panic!("expected midnight resolve command, got {other:?}"),
+    }
+}
+
+#[test]
 fn cli_parses_midnight_gateway_serve_command() {
     let cli = crate::cli::Cli::parse_from([
         "zkf", "midnight", "gateway", "serve", "--port", "6311", "--json",

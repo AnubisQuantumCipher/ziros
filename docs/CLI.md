@@ -288,6 +288,8 @@ zkf midnight proof-server serve --port 6300 --engine umpg --json
 zkf midnight gateway serve --port 6311 --json
 zkf midnight templates --json
 zkf midnight doctor --json --network preprod
+zkf midnight disclosure --program /tmp/my-contract.program.json --json
+zkf midnight resolve --network preprod --project /tmp/my-dapp --dry-run
 zkf midnight init --name my-dapp --template token-transfer
 ```
 
@@ -297,6 +299,8 @@ zkf midnight init --name my-dapp --template token-transfer
 | `zkf midnight gateway serve` | Admit Compact contracts through the fail-closed ZirOS gateway, pinned to `compactc 0.30.0` and ML-DSA-87 attestations |
 | `zkf midnight templates` | List the six shipped Midnight DApp templates and their backend lanes |
 | `zkf midnight doctor` | Report Midnight-specific toolchain, package, network, wallet, Lace, and DUST readiness in one shot |
+| `zkf midnight disclosure` | Analyze Compact transcript boundaries, classify disclosed vs commitment-backed outputs, and fail closed on untracked public exposure |
+| `zkf midnight resolve` | Auto-fix pinned `@midnight-ntwrk/*` version drift, optionally run `npm install`, compile Compact contracts, and validate compiled artifacts |
 | `zkf midnight init` | Scaffold a pinned, production-mode Midnight DApp that reuses the native proof server and SED-style dashboard/runtime surface |
 
 ### `zkf prove`
