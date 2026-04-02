@@ -11,7 +11,7 @@ DIST_ROOT="$ROOT_DIR/dist"
 DIST_DIR="$DIST_ROOT/$TARGET_TRIPLE"
 HARNESS_BIN="$ROOT_DIR/$CARGO_TARGET_DIR/ffi_smoke"
 BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-VERSION="0.4.0"
+VERSION="0.4.1"
 
 rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"

@@ -109,10 +109,10 @@ async function buildWitness() {
     schema: 'ziros-code-attestation-witness-v1' as const,
     generatedAt: new Date().toISOString(),
     version: {
-      string: '0.4.0',
+      string: '0.4.1',
       major: 0,
       minor: 4,
-      patch: 0,
+      patch: 1,
     },
     conformance,
     audit: {
