@@ -17,7 +17,6 @@ rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
 
 cargo build --workspace --release --features metal-gpu,neural-engine
-cargo build -p zkf-ffi --release
 
 cp "$ROOT_DIR/$CARGO_TARGET_DIR/release/zkf-cli" "$DIST_DIR/zkf"
 cp "$ROOT_DIR/$CARGO_TARGET_DIR/release/libzkf_ffi.dylib" "$DIST_DIR/libzkf_ffi.dylib"
