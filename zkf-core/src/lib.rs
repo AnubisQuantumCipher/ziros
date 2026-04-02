@@ -41,6 +41,8 @@ pub mod ccs;
 #[cfg(feature = "full")]
 pub mod debugger;
 #[cfg(feature = "full")]
+pub mod disclosure;
+#[cfg(feature = "full")]
 pub mod diagnostics;
 #[cfg(feature = "full")]
 pub mod hir;
@@ -130,6 +132,12 @@ pub use debugger::{
     SymbolicOrigin, SymbolicSignal, UnderconstrainedAnalysis, WitnessFlowEdge, WitnessFlowGraph,
     WitnessFlowNode, WitnessFlowStep, analyze_underconstrained, analyze_underconstrained_zir,
     build_witness_flow, build_witness_flow_zir, debug_program, debug_program_zir,
+};
+#[cfg(feature = "full")]
+pub use disclosure::{
+    DisclosureClassification, DisclosureFinding, DisclosureReport, DisclosureSeverity,
+    DisclosureSidecarStatus, DisclosureStatus, DisclosureSummary, DisclosureSurface,
+    analyze_midnight_disclosure,
 };
 #[cfg(feature = "full")]
 pub use diagnostics::{
