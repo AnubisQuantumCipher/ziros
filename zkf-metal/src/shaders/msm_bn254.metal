@@ -437,6 +437,56 @@ kernel void msm_bucket_acc(
     }
 }
 
+// Kernel: Segmented bucket accumulation — each thread processes one bucket over
+// a bounded point slice [point_start, point_start + segment_point_count).
+kernel void msm_bucket_acc_segmented(
+    device const uint64_t *bases_x [[buffer(0)]],
+    device const uint64_t *bases_y [[buffer(1)]],
+    device const uint32_t *point_bucket_map [[buffer(2)]],
+    device uint64_t *bucket_results [[buffer(3)]],
+    constant uint32_t &n_points [[buffer(4)]],
+    constant uint32_t &c [[buffer(5)]],
+    constant uint32_t &num_windows [[buffer(6)]],
+    constant uint32_t &point_start [[buffer(7)]],
+    constant uint32_t &segment_point_count [[buffer(8)]],
+    uint tid [[thread_position_in_grid]])
+{
+    uint32_t num_buckets = 1u << c;
+    uint32_t total_buckets = num_windows * num_buckets;
+    if (tid >= total_buckets) return;
+
+    uint32_t window = tid / num_buckets;
+    uint32_t bucket = tid % num_buckets;
+
+    if (bucket == 0) {
+        uint32_t out = tid * 12;
+        for (int i = 0; i < 12; i++) bucket_results[out + i] = 0;
+        return;
+    }
+
+    uint32_t start = min(point_start, n_points);
+    uint32_t point_end = min(n_points, point_start + segment_point_count);
+    G1Proj acc = g1_identity();
+
+    for (uint32_t i = start; i < point_end; i++) {
+        if (point_bucket_map[i * num_windows + window] == bucket) {
+            Fp px, py;
+            for (int j = 0; j < 4; j++) {
+                px.limbs[j] = bases_x[i * 4 + j];
+                py.limbs[j] = bases_y[i * 4 + j];
+            }
+            acc = g1_add_mixed(acc, px, py);
+        }
+    }
+
+    uint32_t out = tid * 12;
+    for (int j = 0; j < 4; j++) {
+        bucket_results[out + j]     = acc.x.limbs[j];
+        bucket_results[out + 4 + j] = acc.y.limbs[j];
+        bucket_results[out + 8 + j] = acc.z.limbs[j];
+    }
+}
+
 // SIMD-cooperative bucket accumulation: multiple threads per bucket
 // Each thread in a SIMD group handles a strided subset of points for one bucket,
 // then results are reduced within the SIMD group.

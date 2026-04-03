@@ -1588,6 +1588,9 @@ pub(crate) struct Groth16MsmDispatch {
     saw_unavailable: bool,
     saw_dispatch_failed: bool,
     dispatch_failure_detail: Option<String>,
+    segment_count: Option<usize>,
+    points_per_segment: Option<usize>,
+    segment_bucket_bytes: Option<usize>,
     total_msm_invocations: usize,
     eligible_msm_invocations: usize,
     metal_msm_invocations: usize,
@@ -1608,6 +1611,15 @@ impl Groth16MsmDispatch {
         self.saw_dispatch_failed |= other.saw_dispatch_failed;
         if self.dispatch_failure_detail.is_none() {
             self.dispatch_failure_detail = other.dispatch_failure_detail;
+        }
+        if self.segment_count.is_none() {
+            self.segment_count = other.segment_count;
+        }
+        if self.points_per_segment.is_none() {
+            self.points_per_segment = other.points_per_segment;
+        }
+        if self.segment_bucket_bytes.is_none() {
+            self.segment_bucket_bytes = other.segment_bucket_bytes;
         }
         self.total_msm_invocations += other.total_msm_invocations;
         self.eligible_msm_invocations += other.eligible_msm_invocations;
@@ -1708,12 +1720,26 @@ impl Groth16MsmDispatch {
 }
 
 #[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+struct Bn254MetalMsmTelemetry {
+    segment_count: usize,
+    points_per_segment: usize,
+    segment_bucket_bytes: usize,
+}
+
+#[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
 #[derive(Debug)]
 enum Bn254MetalMsmDispatch {
-    Metal(G1Projective),
+    Metal {
+        projective: G1Projective,
+        telemetry: Bn254MetalMsmTelemetry,
+    },
     BelowThreshold,
     Unavailable,
-    DispatchFailed(String),
+    DispatchFailed {
+        detail: String,
+        telemetry: Option<Bn254MetalMsmTelemetry>,
+    },
 }
 
 #[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
@@ -4456,6 +4482,13 @@ fn parallel_msm_job_count<const N: usize>(job_sizes: [usize; N]) -> ZkfResult<us
         .count())
 }
 
+fn groth16_metal_no_cpu_fallback_enabled() -> bool {
+    matches!(
+        std::env::var("ZKF_GROTH16_METAL_NO_CPU_FALLBACK").as_deref(),
+        Ok("1") | Ok("true") | Ok("TRUE") | Ok("yes") | Ok("YES") | Ok("on") | Ok("ON")
+    )
+}
+
 fn msm_g1_bigint(
     query: &[G1Affine],
     assignment: &[ScalarBigInt],
@@ -4483,29 +4516,56 @@ fn msm_g1_bigint(
         )
     };
     _msm_dispatch.metal_available = metal_available;
+    let no_cpu_fallback = groth16_metal_no_cpu_fallback_enabled();
 
     if accelerator_name.starts_with("metal-") {
         match dispatch_metal_msm_affine(&query[..size], &assignment[..size]) {
-            Bn254MetalMsmDispatch::Metal(projective) => {
+            Bn254MetalMsmDispatch::Metal {
+                projective,
+                telemetry,
+            } => {
                 _msm_dispatch.metal_available = true;
                 _msm_dispatch.eligible_msm_invocations += 1;
                 _msm_dispatch.used_metal = true;
                 _msm_dispatch.metal_msm_invocations += 1;
+                _msm_dispatch.segment_count = Some(telemetry.segment_count);
+                _msm_dispatch.points_per_segment = Some(telemetry.points_per_segment);
+                _msm_dispatch.segment_bucket_bytes = Some(telemetry.segment_bucket_bytes);
                 return Ok(projective);
             }
             Bn254MetalMsmDispatch::BelowThreshold => {
                 _msm_dispatch.metal_available = true;
                 _msm_dispatch.saw_below_threshold = true;
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(format!(
+                        "Groth16 MSM requires the certified Metal path, but the batch of {size} points fell below the Metal threshold"
+                    )));
+                }
             }
             Bn254MetalMsmDispatch::Unavailable => {
                 _msm_dispatch.saw_unavailable = true;
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(
+                        "Groth16 MSM requires the certified Metal path, but Metal MSM is unavailable on this host".to_string(),
+                    ));
+                }
             }
-            Bn254MetalMsmDispatch::DispatchFailed(detail) => {
+            Bn254MetalMsmDispatch::DispatchFailed { detail, telemetry } => {
                 _msm_dispatch.metal_available = true;
                 _msm_dispatch.eligible_msm_invocations += 1;
                 _msm_dispatch.saw_dispatch_failed = true;
+                if let Some(telemetry) = telemetry {
+                    _msm_dispatch.segment_count = Some(telemetry.segment_count);
+                    _msm_dispatch.points_per_segment = Some(telemetry.points_per_segment);
+                    _msm_dispatch.segment_bucket_bytes = Some(telemetry.segment_bucket_bytes);
+                }
                 if _msm_dispatch.dispatch_failure_detail.is_none() {
-                    _msm_dispatch.dispatch_failure_detail = Some(detail);
+                    _msm_dispatch.dispatch_failure_detail = Some(detail.clone());
+                }
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(format!(
+                        "Groth16 MSM requires the certified Metal path, but Metal dispatch failed: {detail}"
+                    )));
                 }
             }
         }
@@ -4573,20 +4633,42 @@ fn dispatch_metal_msm_affine(
     }
 
     match zkf_metal::msm::pippenger::metal_msm_dispatch(ctx, &scalars, bases) {
-        zkf_metal::msm::pippenger::Bn254MsmDispatch::Metal(projective) => {
-            match validate_projective("metal-msm-bn254", projective) {
-                Ok(valid) => Bn254MetalMsmDispatch::Metal(valid),
-                Err(reason) => Bn254MetalMsmDispatch::DispatchFailed(reason),
-            }
-        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::Metal {
+            projective,
+            telemetry,
+        } => match validate_projective("metal-msm-bn254", projective) {
+            Ok(valid) => Bn254MetalMsmDispatch::Metal {
+                projective: valid,
+                telemetry: Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                },
+            },
+            Err(reason) => Bn254MetalMsmDispatch::DispatchFailed {
+                detail: reason,
+                telemetry: Some(Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                }),
+            },
+        },
         zkf_metal::msm::pippenger::Bn254MsmDispatch::BelowThreshold => {
             Bn254MetalMsmDispatch::BelowThreshold
         }
         zkf_metal::msm::pippenger::Bn254MsmDispatch::Unavailable => {
             Bn254MetalMsmDispatch::Unavailable
         }
-        zkf_metal::msm::pippenger::Bn254MsmDispatch::DispatchFailed(reason) => {
-            Bn254MetalMsmDispatch::DispatchFailed(reason)
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::DispatchFailed { detail, telemetry } => {
+            Bn254MetalMsmDispatch::DispatchFailed {
+                detail,
+                telemetry: telemetry.map(|telemetry| Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                }),
+            }
         }
     }
 }
@@ -4632,6 +4714,24 @@ pub(crate) fn append_groth16_metal_metadata(
     );
     if let Some(detail) = msm_dispatch.dispatch_failure_detail.clone() {
         metadata.insert("groth16_msm_dispatch_failure".to_string(), detail);
+    }
+    if let Some(segment_count) = msm_dispatch.segment_count {
+        metadata.insert(
+            "groth16_msm_segment_count".to_string(),
+            segment_count.to_string(),
+        );
+    }
+    if let Some(points_per_segment) = msm_dispatch.points_per_segment {
+        metadata.insert(
+            "groth16_msm_points_per_segment".to_string(),
+            points_per_segment.to_string(),
+        );
+    }
+    if let Some(segment_bucket_bytes) = msm_dispatch.segment_bucket_bytes {
+        metadata.insert(
+            "groth16_msm_segment_bucket_bytes".to_string(),
+            segment_bucket_bytes.to_string(),
+        );
     }
     metadata.insert(
         "metal_gpu_busy_ratio".to_string(),
@@ -5477,6 +5577,9 @@ mod tests {
                 dispatch_failure_detail: Some(
                     "metal MSM dispatch failed after pure-GPU retries".to_string(),
                 ),
+                segment_count: Some(46),
+                points_per_segment: Some(1_464_843),
+                segment_bucket_bytes: Some(144_703_488),
                 total_msm_invocations: 4,
                 eligible_msm_invocations: 4,
                 metal_msm_invocations: 1,
@@ -5513,6 +5616,24 @@ mod tests {
                 .map(String::as_str),
             Some("none")
         );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_segment_count")
+                .map(String::as_str),
+            Some("46")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_points_per_segment")
+                .map(String::as_str),
+            Some("1464843")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_segment_bucket_bytes")
+                .map(String::as_str),
+            Some("144703488")
+        );
     }
 
     #[test]
@@ -5527,6 +5648,9 @@ mod tests {
                 saw_unavailable: false,
                 saw_dispatch_failed: false,
                 dispatch_failure_detail: None,
+                segment_count: None,
+                points_per_segment: None,
+                segment_bucket_bytes: None,
                 total_msm_invocations: 4,
                 eligible_msm_invocations: 0,
                 metal_msm_invocations: 0,
@@ -5565,6 +5689,9 @@ mod tests {
             saw_unavailable: false,
             saw_dispatch_failed: false,
             dispatch_failure_detail: None,
+            segment_count: Some(4),
+            points_per_segment: Some(256),
+            segment_bucket_bytes: Some(393_216),
             total_msm_invocations: 4,
             eligible_msm_invocations: 3,
             metal_msm_invocations: 3,

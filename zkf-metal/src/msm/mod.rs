@@ -81,12 +81,12 @@ impl MsmAccelerator for MetalMsmAccelerator {
         // tensor-routed variants remain available only through explicit
         // experimental call sites and are not part of the promoted claim.
         let result = match pippenger::metal_msm_dispatch(self.ctx, &ark_scalars, &ark_bases) {
-            pippenger::Bn254MsmDispatch::Metal(projective) => projective,
+            pippenger::Bn254MsmDispatch::Metal { projective, .. } => projective,
             pippenger::Bn254MsmDispatch::BelowThreshold
             | pippenger::Bn254MsmDispatch::Unavailable => {
                 pippenger::cpu_pippenger(&ark_scalars, &ark_bases)
             }
-            pippenger::Bn254MsmDispatch::DispatchFailed(reason) => {
+            pippenger::Bn254MsmDispatch::DispatchFailed { detail: reason, .. } => {
                 return Err(ZkfError::Backend(reason));
             }
         };

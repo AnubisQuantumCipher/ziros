@@ -6,6 +6,57 @@
 // from msm_bn254.metal (concatenated before this file at compile time).
 // ============================================================================
 
+/// Segment merge: fold segment-local bucket accumulators into one final bucket
+/// buffer for the classic certified reduction stage.
+kernel void msm_bucket_segment_reduce(
+    device const uint64_t* segment_bucket_data [[buffer(0)]],
+    device uint64_t* bucket_results [[buffer(1)]],
+    constant uint32_t& num_segments [[buffer(2)]],
+    constant uint32_t& num_buckets [[buffer(3)]],
+    constant uint32_t& num_windows [[buffer(4)]],
+    uint tid [[thread_position_in_grid]])
+{
+    uint total_buckets = uint(num_windows) * uint(num_buckets);
+    if (tid >= total_buckets) return;
+
+    uint bucket_offset = tid * 12;
+    G1Proj acc = g1_identity();
+
+    for (uint segment = 0; segment < num_segments; segment++) {
+        uint segment_offset = (segment * total_buckets + tid) * 12;
+        G1Proj partial;
+        partial.x.limbs[0] = segment_bucket_data[segment_offset + 0];
+        partial.x.limbs[1] = segment_bucket_data[segment_offset + 1];
+        partial.x.limbs[2] = segment_bucket_data[segment_offset + 2];
+        partial.x.limbs[3] = segment_bucket_data[segment_offset + 3];
+        partial.y.limbs[0] = segment_bucket_data[segment_offset + 4];
+        partial.y.limbs[1] = segment_bucket_data[segment_offset + 5];
+        partial.y.limbs[2] = segment_bucket_data[segment_offset + 6];
+        partial.y.limbs[3] = segment_bucket_data[segment_offset + 7];
+        partial.z.limbs[0] = segment_bucket_data[segment_offset + 8];
+        partial.z.limbs[1] = segment_bucket_data[segment_offset + 9];
+        partial.z.limbs[2] = segment_bucket_data[segment_offset + 10];
+        partial.z.limbs[3] = segment_bucket_data[segment_offset + 11];
+
+        if (!g1_is_identity(partial)) {
+            acc = g1_add_proj(acc, partial);
+        }
+    }
+
+    bucket_results[bucket_offset + 0] = acc.x.limbs[0];
+    bucket_results[bucket_offset + 1] = acc.x.limbs[1];
+    bucket_results[bucket_offset + 2] = acc.x.limbs[2];
+    bucket_results[bucket_offset + 3] = acc.x.limbs[3];
+    bucket_results[bucket_offset + 4] = acc.y.limbs[0];
+    bucket_results[bucket_offset + 5] = acc.y.limbs[1];
+    bucket_results[bucket_offset + 6] = acc.y.limbs[2];
+    bucket_results[bucket_offset + 7] = acc.y.limbs[3];
+    bucket_results[bucket_offset + 8] = acc.z.limbs[0];
+    bucket_results[bucket_offset + 9] = acc.z.limbs[1];
+    bucket_results[bucket_offset + 10] = acc.z.limbs[2];
+    bucket_results[bucket_offset + 11] = acc.z.limbs[3];
+}
+
 /// Bucket reduction: running-sum accumulation within each window.
 /// One thread per window. All windows run in parallel.
 /// Input: bucket_data[num_windows * num_buckets * 12] (G1Proj as 12 u64s)

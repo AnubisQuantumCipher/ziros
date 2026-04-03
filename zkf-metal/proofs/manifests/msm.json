@@ -88,6 +88,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -120,10 +128,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -205,10 +237,10 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
-          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
-          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
-          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_bn254.metal": "21392f6f4ee53f794d5ca03a5705f0375196d04824b5c90dfbd115fa92036887",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
           "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
         },
         "source_paths": [
@@ -222,7 +254,7 @@
           "msm_bucket_assign"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -230,12 +262,12 @@
           {
             "library_id": "bn254_msm_library",
             "entrypoint": "msm_bucket_assign",
-            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
             "reflection_sha256": "f0c32adf5230ef361c025072ed5391606ea1f1d7823f4d2ac575baec7a232624",
             "public_reflection_sha256": "624efea199cec488fe78c5375574faa06c85e4bba498276da40bd4639422fbff",
             "pipeline_descriptor_sha256": "cd1f10d6066c2514b1c596c758bf02bba1d1c86f963ee1f9fa67ebb5f0a22622",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -371,6 +403,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -403,10 +443,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -582,10 +646,10 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
-          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
-          "zkf-metal/src/shaders/msm_bn254.metal": "09158a0e5f443374a84ef31b43ac84469b016f9d23f9249b584062976e5b44d9",
-          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_bn254.metal": "21392f6f4ee53f794d5ca03a5705f0375196d04824b5c90dfbd115fa92036887",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
           "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
         },
         "source_paths": [
@@ -599,7 +663,7 @@
           "msm_bucket_acc"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -607,12 +671,12 @@
           {
             "library_id": "bn254_msm_library",
             "entrypoint": "msm_bucket_acc",
-            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
             "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
             "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
             "pipeline_descriptor_sha256": "d4e47f1cdb0c200d4115e7b218aa673d1d8cabf94d7e970d28c31394dfdc3f15",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -671,6 +735,838 @@
             "source_path": "zkf-metal/src/shaders/msm_bn254.metal",
             "library": "bn254_msm_library",
             "binding_kind": "classic_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_accumulate_segmented",
+      "family": "msm",
+      "kernel": "msm_bucket_acc_segmented",
+      "variant": "classic_segmented_accumulate",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "segment_point_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "le_expr": [
+                {
+                  "add": [
+                    {
+                      "symbol": "point_start"
+                    },
+                    {
+                      "symbol": "segment_point_count"
+                    }
+                  ]
+                },
+                {
+                  "symbol": "point_count"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "scalars",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_start"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "len": {
+            "mul": [
+              {
+                "symbol": "segment_point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "scalar_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_x",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_start"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "mul": [
+              {
+                "symbol": "segment_point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bases_y",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_start"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "len": {
+            "mul": [
+              {
+                "symbol": "segment_point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "base_limbs"
+              }
+            ]
+          },
+          "element_bytes": 8
+        },
+        {
+          "name": "bucket_map",
+          "kind": "scratch",
+          "start": {
+            "mul": [
+              {
+                "symbol": "point_start"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "len": {
+            "mul": [
+              {
+                "symbol": "segment_point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "bound": {
+            "mul": [
+              {
+                "symbol": "point_count"
+              },
+              {
+                "symbol": "num_windows"
+              }
+            ]
+          },
+          "element_bytes": 4
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_segmented_accumulate",
+          "operator": "msm_bucket_accumulate",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "scalars",
+            "bases_x",
+            "bases_y",
+            "bucket_map"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_bn254.metal": "21392f6f4ee53f794d5ca03a5705f0375196d04824b5c90dfbd115fa92036887",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_bn254.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_bucket_acc_segmented"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_acc_segmented",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
+            "reflection_sha256": "27d7cc28b49276ff3e4afafdbe52b61a616d17856394d7f537dae5df0d69c62e",
+            "public_reflection_sha256": "32e2d95ad7564a59dc31b35e37ea87895cd78a7bd864a81d06ce990a593b7c8f",
+            "pipeline_descriptor_sha256": "fd47b2137e2ff4a1811f078d11d50fe832cd32919e040d82a15ad59bd07c9cfc",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "bases_x",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bases_y",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_bucket_map",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "n_points",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "c",
+                "index": 5,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 6,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "point_start",
+                "index": 7,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "segment_point_count",
+                "index": 8,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_acc_segmented",
+            "source_path": "zkf-metal/src/shaders/msm_bn254.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_segmented_accumulate"
+          }
+        ]
+      },
+      "certified_claim": true
+    },
+    {
+      "theorem_id": "gpu.msm_differential_bounded",
+      "program_id": "msm_bn254_classic_segment_reduce",
+      "family": "msm",
+      "kernel": "msm_bucket_segment_reduce",
+      "variant": "classic_segment_reduce",
+      "field": null,
+      "curve": "bn254",
+      "route": "classic",
+      "index_map": {
+        "global_index": {
+          "symbol": "bucket_index"
+        },
+        "lane_index": null,
+        "batch_index": {
+          "symbol": "window_index"
+        },
+        "guard": {
+          "all_of": [
+            {
+              "ge_expr": [
+                {
+                  "symbol": "segment_count"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_windows"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            },
+            {
+              "ge_expr": [
+                {
+                  "symbol": "num_buckets"
+                },
+                {
+                  "nat_const": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "symbols": [
+        {
+          "name": "point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_windows",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "num_buckets",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "scalar_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "base_limbs",
+          "min_value": 4,
+          "max_value": 4,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "window_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "bucket_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        }
+      ],
+      "read_regions": [
+        {
+          "name": "segment_buckets",
+          "kind": "global_input",
+          "start": {
+            "mul": [
+              {
+                "add": [
+                  {
+                    "mul": [
+                      {
+                        "symbol": "segment_index"
+                      },
+                      {
+                        "mul": [
+                          {
+                            "symbol": "num_windows"
+                          },
+                          {
+                            "symbol": "num_buckets"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "symbol": "bucket_index"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "mul": [
+                      {
+                        "symbol": "segment_count"
+                      },
+                      {
+                        "symbol": "num_windows"
+                      }
+                    ]
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "write_regions": [
+        {
+          "name": "buckets",
+          "kind": "global_output",
+          "start": {
+            "mul": [
+              {
+                "symbol": "bucket_index"
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "len": {
+            "nat_const": 12
+          },
+          "bound": {
+            "mul": [
+              {
+                "mul": [
+                  {
+                    "symbol": "num_windows"
+                  },
+                  {
+                    "symbol": "num_buckets"
+                  }
+                ]
+              },
+              {
+                "nat_const": 12
+              }
+            ]
+          },
+          "element_bytes": 8
+        }
+      ],
+      "shared_regions": [],
+      "barriers": [],
+      "steps": [
+        {
+          "name": "classic_segment_reduce",
+          "operator": "msm_bucket_segment_reduce",
+          "arithmetic_domain": "curve_groups",
+          "reads": [
+            "segment_buckets"
+          ],
+          "writes": [
+            "buckets"
+          ]
+        }
+      ],
+      "lowering": {
+        "source_sha256": {
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
+          "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
+        },
+        "source_paths": [
+          "zkf-metal/src/shaders/msm_reduce.metal",
+          "zkf-metal/src/msm/mod.rs",
+          "zkf-metal/src/msm/pippenger.rs",
+          "zkf-metal/src/shaders/msm_sort.metal",
+          "zkf-metal/src/shaders/msm_reduce.metal"
+        ],
+        "entrypoints": [
+          "msm_bucket_segment_reduce"
+        ],
+        "toolchain": {
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
+          "xcode_version": "Xcode 26.3 | Build version 17C529",
+          "sdk_version": "26.2"
+        },
+        "entrypoint_attestations": [
+          {
+            "library_id": "bn254_msm_library",
+            "entrypoint": "msm_bucket_segment_reduce",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
+            "reflection_sha256": "6ecbb38f2bf1a61f5aeeeab2451ae0fc64fafc3291655b1353d5271dac06ede5",
+            "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
+            "pipeline_descriptor_sha256": "d84e6244a381b4d81b585ef43cf9d6cda942cfa8f5d3bb9099adaa18392425a2",
+            "toolchain": {
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
+              "xcode_version": "Xcode 26.3 | Build version 17C529",
+              "sdk_version": "26.2"
+            },
+            "arguments": [
+              {
+                "name": "segment_bucket_data",
+                "index": 0,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "bucket_results",
+                "index": 1,
+                "kind": "buffer",
+                "access": "read_write"
+              },
+              {
+                "name": "num_segments",
+                "index": 2,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_buckets",
+                "index": 3,
+                "kind": "buffer",
+                "access": "read_only"
+              },
+              {
+                "name": "num_windows",
+                "index": 4,
+                "kind": "buffer",
+                "access": "read_only"
+              }
+            ]
+          }
+        ],
+        "reflection_policy": "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "workgroup_policy": "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        "step_bindings": [
+          {
+            "step_index": 0,
+            "entrypoint": "msm_bucket_segment_reduce",
+            "source_path": "zkf-metal/src/shaders/msm_reduce.metal",
+            "library": "bn254_msm_library",
+            "binding_kind": "classic_segment_reduce"
           }
         ]
       },
@@ -754,6 +1650,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -786,10 +1690,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -878,9 +1806,9 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
-          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
-          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
           "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
         },
         "source_paths": [
@@ -894,7 +1822,7 @@
           "msm_bucket_reduce"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -902,12 +1830,12 @@
           {
             "library_id": "bn254_msm_library",
             "entrypoint": "msm_bucket_reduce",
-            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
             "reflection_sha256": "77646a40d8b7cae1383dc3d0a9db7fdb0518d3e290f78b70f6457cb00b44a840",
             "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
             "pipeline_descriptor_sha256": "8220fe36e48eaf1f063704e47b6dce267e020d10957b06e15468ef71bd3277aa",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -1031,6 +1959,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -1063,10 +1999,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -1134,9 +2094,9 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
-          "zkf-metal/src/msm/pippenger.rs": "82b8f8a7efec4ea2c5c1f35c8104c83823ab43b82b37d7e4ee373c2f6a429b10",
-          "zkf-metal/src/shaders/msm_reduce.metal": "36f11c733334ee41af93a9780469b575d1d6dc91b0b19d7a98e0506f58e00532",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
+          "zkf-metal/src/msm/pippenger.rs": "950baf93d5439ffd19c60c7b280c9b1ec6aac6475b0b62848a60bcb19f144910",
+          "zkf-metal/src/shaders/msm_reduce.metal": "668122e6114ab878d4f5cdc67a5ee9ec6d85a3abb30f7b662a4810125cbbda93",
           "zkf-metal/src/shaders/msm_sort.metal": "cfd5781fa2be6e85cb3e8ad849c1fa5607c83dce6c552dd0419e8476ee92a1a3"
         },
         "source_paths": [
@@ -1150,7 +2110,7 @@
           "msm_window_combine"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -1158,12 +2118,12 @@
           {
             "library_id": "bn254_msm_library",
             "entrypoint": "msm_window_combine",
-            "metallib_sha256": "7aba50ebe48c4cfcb6e7120da9178e61c627a8fa9e333aea2113dd4878779160",
+            "metallib_sha256": "d77d960edb62b63f15c73a3556826a88be2ecad7c7673d8276a2263f7a95f74d",
             "reflection_sha256": "e2fe49f8e466eda4fca6fbd0ef5c635a95d1b26a1fe210589e54b56c4b93dd0c",
             "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
             "pipeline_descriptor_sha256": "f989e63f2d16aba29ea90a4aa9fbae64c6ba7754824f6ab80facfcd8fadd694b",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -1287,6 +2247,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -1319,10 +2287,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -1404,7 +2396,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
           "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
         },
@@ -1417,7 +2409,7 @@
           "msm_bucket_assign"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -1425,12 +2417,12 @@
           {
             "library_id": "pallas_msm_library",
             "entrypoint": "msm_bucket_assign",
-            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "metallib_sha256": "bff00a68d12471edbbffe92a0c020ba1431d1197ee20e6e2e53a0b67a041d9bc",
             "reflection_sha256": "5f82892d0d7a473db2a5c5e8bb16473cbafff5a805ecbd8c5aed926d5064555b",
             "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
             "pipeline_descriptor_sha256": "55f416afd92beed4d5f31cf28d634d1232c9bae7a977b2aa4d74149c78692d3d",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -1560,6 +2552,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -1592,10 +2592,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -1771,7 +2795,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
           "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
         },
@@ -1784,7 +2808,7 @@
           "msm_bucket_acc"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -1792,12 +2816,12 @@
           {
             "library_id": "pallas_msm_library",
             "entrypoint": "msm_bucket_acc",
-            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "metallib_sha256": "bff00a68d12471edbbffe92a0c020ba1431d1197ee20e6e2e53a0b67a041d9bc",
             "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
             "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
             "pipeline_descriptor_sha256": "7dbd88997ad443aa2c27c6f5e5ddb737ad41c1d241fdf6daea639d42143ef946",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -1939,6 +2963,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -1971,10 +3003,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -2121,7 +3177,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/pallas_pippenger.rs": "adeffcad6ce4a6b38ade9abeba8510b0b92e6a4a7de8e334cf21ac955e81560b",
           "zkf-metal/src/shaders/msm_pallas.metal": "6f5a5da83a69f48410c9d3cfd12bff49f7b764c269efeb1995f4cd2869187509"
         },
@@ -2134,7 +3190,7 @@
           "msm_bucket_acc_naf"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -2142,12 +3198,12 @@
           {
             "library_id": "pallas_msm_library",
             "entrypoint": "msm_bucket_acc_naf",
-            "metallib_sha256": "89a7eb04fa018c48eab1a17b80fb2ab26c788d33209e4336f732633c2a5a9d79",
+            "metallib_sha256": "bff00a68d12471edbbffe92a0c020ba1431d1197ee20e6e2e53a0b67a041d9bc",
             "reflection_sha256": "e7e80bf1b4db369e50678fb8f2ba910acd9addd404c2278d2c414c87e50f938f",
             "public_reflection_sha256": "27086095d7923f2fb726ad734d9e1bb552099b2442a0996932d62f937e1e6773",
             "pipeline_descriptor_sha256": "ed68b5ba3eb822045e1d6c1b7a1970cdbb23301afa523041fb274be4175c02d5",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -2295,6 +3351,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -2327,10 +3391,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -2412,7 +3500,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
           "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
         },
@@ -2425,7 +3513,7 @@
           "msm_bucket_assign"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -2433,12 +3521,12 @@
           {
             "library_id": "vesta_msm_library",
             "entrypoint": "msm_bucket_assign",
-            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "metallib_sha256": "aad556b8cb346d943060317f13354c5eaac1381ec2d10b9dd3d33e2e83d0e7e3",
             "reflection_sha256": "5f82892d0d7a473db2a5c5e8bb16473cbafff5a805ecbd8c5aed926d5064555b",
             "public_reflection_sha256": "efd8193c723aaa37604115c0cec75b7911aef704c11d0af2a9a4706668636006",
             "pipeline_descriptor_sha256": "aa724063fb6f50ce7f39220b481cc885474d12dda342e252dff106fc31f0a5ec",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -2568,6 +3656,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -2600,10 +3696,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -2779,7 +3899,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
           "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
         },
@@ -2792,7 +3912,7 @@
           "msm_bucket_acc"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -2800,12 +3920,12 @@
           {
             "library_id": "vesta_msm_library",
             "entrypoint": "msm_bucket_acc",
-            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "metallib_sha256": "aad556b8cb346d943060317f13354c5eaac1381ec2d10b9dd3d33e2e83d0e7e3",
             "reflection_sha256": "8095574b900d72670f4e6cf53a39083d765a4dec65015c9f192410c3a1c9249f",
             "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
             "pipeline_descriptor_sha256": "bf7454b0e69423391b9fa6add59acfaf7ed0d18f33c3c46d8faad2b0fbc062e7",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -2947,6 +4067,14 @@
           "multiple_of": null
         },
         {
+          "name": "segment_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "scalar_limbs",
           "min_value": 4,
           "max_value": 4,
@@ -2979,10 +4107,34 @@
           "multiple_of": null
         },
         {
+          "name": "segment_index",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
           "name": "point_index",
           "min_value": 0,
           "max_value": null,
           "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "point_start",
+          "min_value": 0,
+          "max_value": null,
+          "non_zero": false,
+          "power_of_two": false,
+          "multiple_of": null
+        },
+        {
+          "name": "segment_point_count",
+          "min_value": 1,
+          "max_value": null,
+          "non_zero": true,
           "power_of_two": false,
           "multiple_of": null
         }
@@ -3129,7 +4281,7 @@
       ],
       "lowering": {
         "source_sha256": {
-          "zkf-metal/src/msm/mod.rs": "bba63dd8fc5a5f1e19d159d7866ef7ad818c922dae54aca3e93ada5a01d1dec2",
+          "zkf-metal/src/msm/mod.rs": "6702c6b377aaf746f2e4977c19dd424f507c79b7686789a895c96929d03c28a1",
           "zkf-metal/src/msm/vesta_pippenger.rs": "6c0b1838329bdf3eb8dca42e619d8ec60e6958cca615537a043e6ac315420040",
           "zkf-metal/src/shaders/msm_vesta.metal": "61dde06b5ce65cb20c4a4e3db011f729def5d0632f44ba96443b5367a6dbcea7"
         },
@@ -3142,7 +4294,7 @@
           "msm_bucket_acc_naf"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -3150,12 +4302,12 @@
           {
             "library_id": "vesta_msm_library",
             "entrypoint": "msm_bucket_acc_naf",
-            "metallib_sha256": "3e8e22cd33838e97651695d4daf0aa6ea45133bb8af25362ac2440634718fdfb",
+            "metallib_sha256": "aad556b8cb346d943060317f13354c5eaac1381ec2d10b9dd3d33e2e83d0e7e3",
             "reflection_sha256": "e7e80bf1b4db369e50678fb8f2ba910acd9addd404c2278d2c414c87e50f938f",
             "public_reflection_sha256": "27086095d7923f2fb726ad734d9e1bb552099b2442a0996932d62f937e1e6773",
             "pipeline_descriptor_sha256": "a8bcd59eafe6f48bab4195683ab5966408999caa68b6d31720c5efb0bcd9ed02",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },

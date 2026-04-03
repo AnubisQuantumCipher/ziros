@@ -33,6 +33,18 @@ def bn254ClassicAccumulateSpec : KernelSpec :=
     CurveFamily.bn254 MsmRoute.classic TransitionOperator.msmBucketAccumulate
     ["scalars", "bases_x", "bases_y", "bucket_map"] ["buckets"]
 
+def bn254ClassicSegmentedAccumulateSpec : KernelSpec :=
+  msmSpec "msm_bn254_classic_accumulate_segmented" "msm_bucket_acc_segmented"
+    "classic_segmented_accumulate"
+    CurveFamily.bn254 MsmRoute.classic TransitionOperator.msmBucketAccumulate
+    ["scalars", "bases_x", "bases_y", "bucket_map"] ["buckets"]
+
+def bn254ClassicSegmentReduceSpec : KernelSpec :=
+  msmSpec "msm_bn254_classic_segment_reduce" "msm_bucket_segment_reduce"
+    "classic_segment_reduce"
+    CurveFamily.bn254 MsmRoute.classic TransitionOperator.msmBucketSegmentReduce
+    ["segment_buckets"] ["buckets"]
+
 def bn254ClassicReduceSpec : KernelSpec :=
   msmSpec "msm_bn254_classic_reduce" "msm_bucket_reduce" "classic_reduce"
     CurveFamily.bn254 MsmRoute.classic TransitionOperator.msmBucketReduce
@@ -76,6 +88,7 @@ def vestaNafAccumulateSpec : KernelSpec :=
 inductive MsmExecutionStage where
   | assign
   | accumulate
+  | segmentReduce
   | reduce
   | combine
   deriving Repr
@@ -148,28 +161,34 @@ def ProgramImplementsMsmPippengerSemantics
     ∧ program.HasCertifiedClaim
 
 def Bn254ClassicChainSurface
-    (assign accumulate reduce combine : Program) : Prop :=
+    (assign segmentedAccumulate segmentReduce reduce combine : Program) : Prop :=
   assign.curve = some CurveFamily.bn254
-    ∧ accumulate.curve = some CurveFamily.bn254
+    ∧ segmentedAccumulate.curve = some CurveFamily.bn254
+    ∧ segmentReduce.curve = some CurveFamily.bn254
     ∧ reduce.curve = some CurveFamily.bn254
     ∧ combine.curve = some CurveFamily.bn254
     ∧ assign.route = some MsmRoute.classic
-    ∧ accumulate.route = some MsmRoute.classic
+    ∧ segmentedAccumulate.route = some MsmRoute.classic
+    ∧ segmentReduce.route = some MsmRoute.classic
     ∧ reduce.route = some MsmRoute.classic
     ∧ combine.route = some MsmRoute.classic
     ∧ ProgramStepOperators assign = [TransitionOperator.msmBucketAssign]
-    ∧ ProgramStepOperators accumulate = [TransitionOperator.msmBucketAccumulate]
+    ∧ ProgramStepOperators segmentedAccumulate = [TransitionOperator.msmBucketAccumulate]
+    ∧ ProgramStepOperators segmentReduce = [TransitionOperator.msmBucketSegmentReduce]
     ∧ ProgramStepOperators reduce = [TransitionOperator.msmBucketReduce]
     ∧ ProgramStepOperators combine = [TransitionOperator.msmWindowCombine]
     ∧ ProgramWriteRegionNames assign = ["bucket_map"]
-    ∧ ProgramWriteRegionNames accumulate = ["buckets"]
+    ∧ ProgramWriteRegionNames segmentedAccumulate = ["buckets"]
+    ∧ ProgramWriteRegionNames segmentReduce = ["buckets"]
     ∧ ProgramWriteRegionNames reduce = ["window_results"]
     ∧ ProgramWriteRegionNames combine = ["final_result"]
-    ∧ assign.lowering.reflectionPolicy = accumulate.lowering.reflectionPolicy
-    ∧ accumulate.lowering.reflectionPolicy = reduce.lowering.reflectionPolicy
+    ∧ assign.lowering.reflectionPolicy = segmentedAccumulate.lowering.reflectionPolicy
+    ∧ segmentedAccumulate.lowering.reflectionPolicy = segmentReduce.lowering.reflectionPolicy
+    ∧ segmentReduce.lowering.reflectionPolicy = reduce.lowering.reflectionPolicy
     ∧ reduce.lowering.reflectionPolicy = combine.lowering.reflectionPolicy
-    ∧ assign.lowering.workgroupPolicy = accumulate.lowering.workgroupPolicy
-    ∧ accumulate.lowering.workgroupPolicy = reduce.lowering.workgroupPolicy
+    ∧ assign.lowering.workgroupPolicy = segmentedAccumulate.lowering.workgroupPolicy
+    ∧ segmentedAccumulate.lowering.workgroupPolicy = segmentReduce.lowering.workgroupPolicy
+    ∧ segmentReduce.lowering.workgroupPolicy = reduce.lowering.workgroupPolicy
     ∧ reduce.lowering.workgroupPolicy = combine.lowering.workgroupPolicy
 
 def CurveClassicOrNafSurface
@@ -220,6 +239,7 @@ def msmSemantics
       match executionStage with
       | MsmExecutionStage.assign => [TransitionOperator.msmBucketAssign]
       | MsmExecutionStage.accumulate => [TransitionOperator.msmBucketAccumulate]
+      | MsmExecutionStage.segmentReduce => [TransitionOperator.msmBucketSegmentReduce]
       | MsmExecutionStage.reduce => [TransitionOperator.msmBucketReduce]
       | MsmExecutionStage.combine => [TransitionOperator.msmWindowCombine]
     readRegions := readRegions
@@ -292,6 +312,44 @@ def bn254ClassicAccumulateSemantics : MsmPippengerSemantics :=
     [8, 8, 8, 4]
     [8]
     bn254SourcePaths
+
+def bn254ClassicSegmentedAccumulateSemantics : MsmPippengerSemantics :=
+  msmSemantics
+    "msm_bn254_classic_accumulate_segmented"
+    "msm_bucket_acc_segmented"
+    "classic_segmented_accumulate"
+    "msm_bucket_acc_segmented"
+    "classic_segmented_accumulate"
+    "bn254_msm_library"
+    "zkf-metal/src/shaders/msm_bn254.metal"
+    CurveFamily.bn254
+    MsmRoute.classic
+    MsmExecutionStage.accumulate
+    MsmDigitSemantics.classic
+    ["scalars", "bases_x", "bases_y", "bucket_map"]
+    ["buckets"]
+    [8, 8, 8, 4]
+    [8]
+    bn254SourcePaths
+
+def bn254ClassicSegmentReduceSemantics : MsmPippengerSemantics :=
+  msmSemantics
+    "msm_bn254_classic_segment_reduce"
+    "msm_bucket_segment_reduce"
+    "classic_segment_reduce"
+    "msm_bucket_segment_reduce"
+    "classic_segment_reduce"
+    "bn254_msm_library"
+    "zkf-metal/src/shaders/msm_reduce.metal"
+    CurveFamily.bn254
+    MsmRoute.classic
+    MsmExecutionStage.segmentReduce
+    MsmDigitSemantics.classic
+    ["segment_buckets"]
+    ["buckets"]
+    [8]
+    [8]
+    bn254ReduceSourcePaths
 
 def bn254ClassicReduceSemantics : MsmPippengerSemantics :=
   msmSemantics

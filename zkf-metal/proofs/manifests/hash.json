@@ -200,7 +200,7 @@
           "batch_sha256"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -208,12 +208,12 @@
           {
             "library_id": "hash_library",
             "entrypoint": "batch_sha256",
-            "metallib_sha256": "45d8123d3fe035e09b1631a36750aebcd9f84f1f5a22ac3d710f625fc759ec26",
+            "metallib_sha256": "af2bbf5db08037e66f7c5df3f21cbd86cec9a243cc61f6953681e7f5c65c97a0",
             "reflection_sha256": "b0003fc166e44e21b6c17da07d42f3b686c5faa8815a3fd3dfbdfb346addc15d",
             "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
             "pipeline_descriptor_sha256": "d5f19c88282eed469cddb5421105b334c1cecbc8155533a750051b4423596d73",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },
@@ -474,7 +474,7 @@
           "batch_keccak256"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -482,12 +482,12 @@
           {
             "library_id": "hash_library",
             "entrypoint": "batch_keccak256",
-            "metallib_sha256": "45d8123d3fe035e09b1631a36750aebcd9f84f1f5a22ac3d710f625fc759ec26",
+            "metallib_sha256": "af2bbf5db08037e66f7c5df3f21cbd86cec9a243cc61f6953681e7f5c65c97a0",
             "reflection_sha256": "b0003fc166e44e21b6c17da07d42f3b686c5faa8815a3fd3dfbdfb346addc15d",
             "public_reflection_sha256": "c83cf19da8ff96883405bd007977cda68def806af57854630e18179bb86e073b",
             "pipeline_descriptor_sha256": "623c7b272980a5443314962b13aa924d0550caf51d8170e21f63f743500980f1",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },

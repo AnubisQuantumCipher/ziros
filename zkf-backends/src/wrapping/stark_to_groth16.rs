@@ -1163,6 +1163,7 @@ fn wrap_direct_fri_v2(
     let circuit = FriVerifierCircuit::with_witness(witness, fri_params.clone());
     let proof_seed = deterministic_proof_seed(&source_proof.program_digest, &source_proof.proof);
     let mut rng = StdRng::from_seed(proof_seed);
+    let _msm_fail_closed = ScopedEnvVar::set("ZKF_GROTH16_METAL_NO_CPU_FALLBACK", "1");
 
     let prove_start = Instant::now();
     let (groth16_proof, groth16_dispatch) = if let Some(prove_shape) = setup.prove_shape.as_deref()
@@ -1252,6 +1253,35 @@ fn wrap_direct_fri_v2(
         proof_origin_signature: None,
         proof_origin_public_keys: None,
     })
+}
+
+struct ScopedEnvVar {
+    key: &'static str,
+    previous: Option<std::ffi::OsString>,
+}
+
+impl ScopedEnvVar {
+    fn set(key: &'static str, value: &str) -> Self {
+        let previous = std::env::var_os(key);
+        unsafe {
+            std::env::set_var(key, value);
+        }
+        Self { key, previous }
+    }
+}
+
+impl Drop for ScopedEnvVar {
+    fn drop(&mut self) {
+        if let Some(previous) = self.previous.take() {
+            unsafe {
+                std::env::set_var(self.key, previous);
+            }
+        } else {
+            unsafe {
+                std::env::remove_var(self.key);
+            }
+        }
+    }
 }
 
 #[cfg(feature = "nova-compression")]

@@ -193,6 +193,9 @@ pub fn prewarm_default_pipelines() -> usize {
             for kernel in [
                 shader_library::msm_kernels::BUCKET_ASSIGN,
                 shader_library::msm_kernels::BUCKET_ACC,
+                shader_library::msm_kernels::BUCKET_ACC_SEGMENTED,
+                shader_library::msm_kernels::BUCKET_SEGMENT_REDUCE,
+                shader_library::msm_kernels::BUCKET_REDUCE,
                 shader_library::msm_kernels::WINDOW_COMBINE,
             ] {
                 if ctx.pipeline_from_library(msm_library, kernel).is_some() {

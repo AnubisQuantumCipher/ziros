@@ -57,6 +57,21 @@ pub struct ThroughputConfig {
     pub batch_profile_cap: usize,
     /// Desired fraction of available working-set headroom to use for GPU job scheduling.
     pub working_set_headroom_target_pct: u8,
+    /// Hard cap for classic BN254 MSM windows encoded into a single command buffer.
+    pub msm_max_windows_per_dispatch: u32,
+    /// Target point-bucket work budget for one classic BN254 MSM command buffer.
+    ///
+    /// The classic certified kernel launches one thread per bucket and each thread
+    /// scans every point, so total work grows as `point_count * num_buckets *
+    /// batch_windows`. Oversized batches can trip the macOS Metal watchdog on
+    /// large wraps even when the host has ample RAM and GPU cores.
+    pub msm_point_bucket_work_budget: u64,
+    /// Segment-local point-bucket work budget for a single strict BN254 classic
+    /// bucket-accumulation dispatch.
+    pub msm_segment_point_bucket_work_budget: u64,
+    /// Hard cap on the number of points admitted to one strict BN254 classic
+    /// bucket-accumulation segment.
+    pub msm_max_points_per_segment: usize,
 }
 
 /// Full Metal tuning profile for a device class.
@@ -102,6 +117,10 @@ impl ThroughputConfig {
         pipeline_max_in_flight: 3,
         batch_profile_cap: 4,
         working_set_headroom_target_pct: 70,
+        msm_max_windows_per_dispatch: 8,
+        msm_point_bucket_work_budget: 275_000_000_000,
+        msm_segment_point_bucket_work_budget: 12_000_000_000,
+        msm_max_points_per_segment: 524_288,
     };
 
     pub const MODERATE: Self = Self {
@@ -110,6 +129,10 @@ impl ThroughputConfig {
         pipeline_max_in_flight: 4,
         batch_profile_cap: 8,
         working_set_headroom_target_pct: 80,
+        msm_max_windows_per_dispatch: 12,
+        msm_point_bucket_work_budget: 550_000_000_000,
+        msm_segment_point_bucket_work_budget: 24_000_000_000,
+        msm_max_points_per_segment: 1_048_576,
     };
 
     pub const AGGRESSIVE: Self = Self {
@@ -118,6 +141,10 @@ impl ThroughputConfig {
         pipeline_max_in_flight: 8,
         batch_profile_cap: 16,
         working_set_headroom_target_pct: 85,
+        msm_max_windows_per_dispatch: 16,
+        msm_point_bucket_work_budget: 1_100_000_000_000,
+        msm_segment_point_bucket_work_budget: 48_000_000_000,
+        msm_max_points_per_segment: 2_097_152,
     };
 }
 
@@ -293,7 +320,7 @@ pub fn current_device_tuning() -> &'static DeviceTuning {
         if let Some(ctx) = crate::device::global_context() {
             let name = ctx.device_name();
             log::info!(
-                "[zkf-metal] Tuning for '{}' ({}, gpu_cores={}): msm={}, ntt={}, poseidon2={}, field_ops={}, merkle={}, queues={}/{}, pipeline={}, batch_cap={}, headroom_target={}%",
+                "[zkf-metal] Tuning for '{}' ({}, gpu_cores={}): msm={}, ntt={}, poseidon2={}, field_ops={}, merkle={}, queues={}/{}, pipeline={}, batch_cap={}, headroom_target={}%, msm_windows_per_dispatch={}, msm_point_bucket_work_budget={}",
                 name,
                 platform.identity.chip_family.as_str(),
                 platform.identity.gpu.core_count.unwrap_or_default(),
@@ -306,7 +333,9 @@ pub fn current_device_tuning() -> &'static DeviceTuning {
                 tuning.throughput.secondary_queue_depth,
                 tuning.throughput.pipeline_max_in_flight,
                 tuning.throughput.batch_profile_cap,
-                tuning.throughput.working_set_headroom_target_pct
+                tuning.throughput.working_set_headroom_target_pct,
+                tuning.throughput.msm_max_windows_per_dispatch,
+                tuning.throughput.msm_point_bucket_work_budget
             );
             tuning
         } else {
@@ -480,5 +509,7 @@ mod tests {
         assert_eq!(cfg.pipeline_max_in_flight, 8);
         assert_eq!(cfg.batch_profile_cap, 16);
         assert_eq!(cfg.working_set_headroom_target_pct, 85);
+        assert_eq!(cfg.msm_max_windows_per_dispatch, 16);
+        assert_eq!(cfg.msm_point_bucket_work_budget, 1_100_000_000_000);
     }
 }

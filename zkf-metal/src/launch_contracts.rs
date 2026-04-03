@@ -168,6 +168,19 @@ pub fn certified_bn254_routes() -> &'static [MsmRouteClass] {
     &[MsmRouteClass::Classic]
 }
 
+fn certified_bn254_route_error(
+    curve: CurveFamily,
+    route: MsmRouteClass,
+    certified_route: bool,
+) -> Option<String> {
+    if certified_route && curve == CurveFamily::Bn254 && !certified_bn254_routes().contains(&route)
+    {
+        Some("certified BN254 route excludes hybrid/full-gpu/tensor dispatch".to_string())
+    } else {
+        None
+    }
+}
+
 pub fn hash_contract(
     kernel: &str,
     batch_count: usize,
@@ -261,6 +274,35 @@ pub fn msm_contract_accepts(input: &MsmContractInput<'_>) -> bool {
         && (input.window_entries == 0
             || input.window_entries >= (input.num_windows as usize).saturating_mul(12))
         && (input.final_entries == 0 || input.final_entries >= 12)
+        && !(input.certified_route
+            && input.curve == CurveFamily::Bn254
+            && !certified_bn254_routes().contains(&input.route))
+}
+
+pub fn msm_segmented_accumulate_contract_accepts(
+    input: &MsmSegmentedAccumulateContractInput<'_>,
+) -> bool {
+    let total_buckets = (input.num_windows as usize).saturating_mul(input.num_buckets);
+    input.point_count > 0
+        && input.point_start < input.point_count
+        && input.segment_point_count > 0
+        && input.point_start.saturating_add(input.segment_point_count) <= input.point_count
+        && input.map_entries >= input.point_count.saturating_mul(input.num_windows as usize)
+        && input.bucket_entries >= total_buckets.saturating_mul(12)
+        && !(input.certified_route
+            && input.curve == CurveFamily::Bn254
+            && !certified_bn254_routes().contains(&input.route))
+}
+
+pub fn msm_segment_reduce_contract_accepts(input: &MsmSegmentReduceContractInput<'_>) -> bool {
+    let total_buckets = (input.num_windows as usize).saturating_mul(input.num_buckets);
+    input.segment_count > 0
+        && input.segment_bucket_entries
+            >= input
+                .segment_count
+                .saturating_mul(total_buckets)
+                .saturating_mul(12)
+        && input.bucket_entries >= total_buckets.saturating_mul(12)
         && !(input.certified_route
             && input.curve == CurveFamily::Bn254
             && !certified_bn254_routes().contains(&input.route))
@@ -466,8 +508,10 @@ pub fn msm_contract(input: MsmContractInput<'_>) -> Result<ValidatedDispatch, La
             && !certified_bn254_routes().contains(&input.route)
             && input.curve == CurveFamily::Bn254
         {
-            errors
-                .push("certified BN254 route excludes hybrid/full-gpu/tensor dispatch".to_string());
+            errors.push(
+                certified_bn254_route_error(input.curve, input.route, input.certified_route)
+                    .expect("validated above"),
+            );
         }
     }
 
@@ -535,6 +579,156 @@ pub fn msm_contract(input: MsmContractInput<'_>) -> Result<ValidatedDispatch, La
     validate_dispatch_or_reject(contract)
 }
 
+pub fn msm_segmented_accumulate_contract(
+    input: MsmSegmentedAccumulateContractInput<'_>,
+) -> Result<ValidatedDispatch, LaunchContractError> {
+    let capped_tpg = input
+        .max_threads_per_group
+        .clamp(1, MAX_HOST_THREADS_PER_GROUP);
+    let total_buckets = (input.num_windows as usize).saturating_mul(input.num_buckets);
+    let threadgroups_x = total_buckets.div_ceil(capped_tpg);
+    let mut errors = Vec::new();
+    if !msm_segmented_accumulate_contract_accepts(&input) {
+        if input.point_count == 0 {
+            errors.push("point_count must be non-zero".to_string());
+        }
+        if input.point_start >= input.point_count {
+            errors.push("point_start must be within point_count".to_string());
+        }
+        if input.segment_point_count == 0 {
+            errors.push("segment_point_count must be non-zero".to_string());
+        }
+        if input.point_start.saturating_add(input.segment_point_count) > input.point_count {
+            errors.push("segment range must stay within point_count".to_string());
+        }
+        if input.point_count != 0
+            && input.map_entries < input.point_count.saturating_mul(input.num_windows as usize)
+        {
+            errors.push("bucket map must cover point_count * num_windows entries".to_string());
+        }
+        if input.bucket_entries < total_buckets.saturating_mul(12) {
+            errors.push("bucket storage must cover all projective bucket outputs".to_string());
+        }
+        if let Some(detail) =
+            certified_bn254_route_error(input.curve, input.route, input.certified_route)
+        {
+            errors.push(detail);
+        }
+    }
+
+    let contract = LaunchContract {
+        family: KernelFamily::Msm,
+        kernel: input.kernel.to_string(),
+        route: Some(format!("{:?}", input.route).to_ascii_lowercase()),
+        field: None,
+        curve: Some(input.curve),
+        certified_route: input.certified_route,
+        zero_copy: false,
+        scratch_bytes: 0,
+        dispatch: DispatchGrid {
+            threadgroups_x,
+            threadgroups_y: 1,
+            threads_per_group_x: capped_tpg,
+            threads_per_group_y: 1,
+            total_threads: threadgroups_x.saturating_mul(capped_tpg),
+        },
+        read_regions: vec![
+            BufferRegion {
+                name: "bases_x".to_string(),
+                elements: input
+                    .segment_point_count
+                    .saturating_mul(input.base_coordinate_limbs),
+                element_bytes: std::mem::size_of::<u64>(),
+            },
+            BufferRegion {
+                name: "bases_y".to_string(),
+                elements: input
+                    .segment_point_count
+                    .saturating_mul(input.base_coordinate_limbs),
+                element_bytes: std::mem::size_of::<u64>(),
+            },
+            BufferRegion {
+                name: "bucket_map".to_string(),
+                elements: input
+                    .segment_point_count
+                    .saturating_mul(input.num_windows as usize),
+                element_bytes: std::mem::size_of::<u32>(),
+            },
+        ],
+        write_regions: vec![BufferRegion {
+            name: "segment_buckets".to_string(),
+            elements: input.bucket_entries,
+            element_bytes: std::mem::size_of::<u64>(),
+        }],
+        errors,
+    };
+    validate_dispatch_or_reject(contract)
+}
+
+pub fn msm_segment_reduce_contract(
+    input: MsmSegmentReduceContractInput<'_>,
+) -> Result<ValidatedDispatch, LaunchContractError> {
+    let capped_tpg = input
+        .max_threads_per_group
+        .clamp(1, MAX_HOST_THREADS_PER_GROUP);
+    let total_buckets = (input.num_windows as usize).saturating_mul(input.num_buckets);
+    let threadgroups_x = total_buckets.div_ceil(capped_tpg);
+    let mut errors = Vec::new();
+    if !msm_segment_reduce_contract_accepts(&input) {
+        if input.segment_count == 0 {
+            errors.push("segment_count must be non-zero".to_string());
+        }
+        if input.segment_bucket_entries
+            < input
+                .segment_count
+                .saturating_mul(total_buckets)
+                .saturating_mul(12)
+        {
+            errors.push(
+                "segment bucket storage must cover all segment-local bucket outputs".to_string(),
+            );
+        }
+        if input.bucket_entries < total_buckets.saturating_mul(12) {
+            errors.push("bucket storage must cover all final bucket outputs".to_string());
+        }
+        if let Some(detail) =
+            certified_bn254_route_error(input.curve, input.route, input.certified_route)
+        {
+            errors.push(detail);
+        }
+    }
+
+    let contract = LaunchContract {
+        family: KernelFamily::Msm,
+        kernel: input.kernel.to_string(),
+        route: Some(format!("{:?}", input.route).to_ascii_lowercase()),
+        field: None,
+        curve: Some(input.curve),
+        certified_route: input.certified_route,
+        zero_copy: false,
+        scratch_bytes: 0,
+        dispatch: DispatchGrid {
+            threadgroups_x,
+            threadgroups_y: 1,
+            threads_per_group_x: capped_tpg,
+            threads_per_group_y: 1,
+            total_threads: threadgroups_x.saturating_mul(capped_tpg),
+        },
+        read_regions: vec![BufferRegion {
+            name: "segment_bucket_data".to_string(),
+            elements: input.segment_bucket_entries,
+            element_bytes: std::mem::size_of::<u64>(),
+        }],
+        write_regions: vec![BufferRegion {
+            name: "buckets".to_string(),
+            elements: input.bucket_entries,
+            element_bytes: std::mem::size_of::<u64>(),
+        }],
+        errors,
+    };
+    validate_dispatch_or_reject(contract)
+}
+
 pub struct Poseidon2ContractInput<'a> {
     pub kernel: &'a str,
     pub field: FieldFamily,
@@ -572,6 +766,35 @@ pub struct MsmContractInput<'a> {
     pub bucket_entries: usize,
     pub window_entries: usize,
     pub final_entries: usize,
+    pub num_windows: u32,
+    pub num_buckets: usize,
+    pub max_threads_per_group: usize,
+    pub certified_route: bool,
+}
+
+pub struct MsmSegmentedAccumulateContractInput<'a> {
+    pub kernel: &'a str,
+    pub curve: CurveFamily,
+    pub route: MsmRouteClass,
+    pub point_count: usize,
+    pub point_start: usize,
+    pub segment_point_count: usize,
+    pub base_coordinate_limbs: usize,
+    pub map_entries: usize,
+    pub bucket_entries: usize,
+    pub num_windows: u32,
+    pub num_buckets: usize,
+    pub max_threads_per_group: usize,
+    pub certified_route: bool,
+}
+
+pub struct MsmSegmentReduceContractInput<'a> {
+    pub kernel: &'a str,
+    pub curve: CurveFamily,
+    pub route: MsmRouteClass,
+    pub segment_count: usize,
+    pub segment_bucket_entries: usize,
+    pub bucket_entries: usize,
     pub num_windows: u32,
     pub num_buckets: usize,
     pub max_threads_per_group: usize,
@@ -649,5 +872,44 @@ mod tests {
         })
         .expect_err("certified route must reject hybrid");
         assert!(err.detail.contains("certified BN254 route"));
+    }
+
+    #[test]
+    fn segmented_accumulate_contract_rejects_out_of_bounds_segment() {
+        let err = msm_segmented_accumulate_contract(MsmSegmentedAccumulateContractInput {
+            kernel: "msm_bucket_acc_segmented",
+            curve: CurveFamily::Bn254,
+            route: MsmRouteClass::Classic,
+            point_count: 1024,
+            point_start: 900,
+            segment_point_count: 200,
+            base_coordinate_limbs: 4,
+            map_entries: 1024 * 4,
+            bucket_entries: 4 * 16 * 12,
+            num_windows: 4,
+            num_buckets: 16,
+            max_threads_per_group: 256,
+            certified_route: true,
+        })
+        .expect_err("segment range must stay within point_count");
+        assert!(err.detail.contains("segment range"));
+    }
+
+    #[test]
+    fn segment_reduce_contract_rejects_short_segment_buffer() {
+        let err = msm_segment_reduce_contract(MsmSegmentReduceContractInput {
+            kernel: "msm_bucket_segment_reduce",
+            curve: CurveFamily::Bn254,
+            route: MsmRouteClass::Classic,
+            segment_count: 8,
+            segment_bucket_entries: 7 * 4 * 16 * 12,
+            bucket_entries: 4 * 16 * 12,
+            num_windows: 4,
+            num_buckets: 16,
+            max_threads_per_group: 256,
+            certified_route: true,
+        })
+        .expect_err("segment reduce must cover all segment buckets");
+        assert!(err.detail.contains("segment bucket storage"));
     }
 }
