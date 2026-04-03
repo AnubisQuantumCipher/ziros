@@ -337,11 +337,15 @@ fn generate_key_material(key_type: KeyType) -> io::Result<Vec<u8>> {
     match key_type {
         KeyType::Ed25519Seed => Ok(Ed25519Seed(random_array::<32>()?).0.to_vec()),
         KeyType::MlDsa87Private => {
-            let pair = generate_ml_dsa_key_pair(random_array::<KEY_GENERATION_RANDOMNESS_SIZE>()?);
+            let pair = generate_ml_dsa_key_pair(
+                random_array::<{ KEY_GENERATION_RANDOMNESS_SIZE }>()?,
+            );
             Ok(pair.signing_key.as_slice().to_vec())
         }
         KeyType::MlKem1024Decapsulation => {
-            let pair = generate_ml_kem_key_pair(random_array::<ML_KEM_KEY_GENERATION_SEED_SIZE>()?);
+            let pair = generate_ml_kem_key_pair(
+                random_array::<{ ML_KEM_KEY_GENERATION_SEED_SIZE }>()?,
+            );
             Ok(pair.sk().to_vec())
         }
         KeyType::ApiKey | KeyType::CredentialIssuerKey | KeyType::Symmetric => {

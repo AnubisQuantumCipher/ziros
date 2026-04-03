@@ -201,7 +201,7 @@ impl LocalThreatEpochKeys {
         let x25519_secret_key = StaticSecret::from(x25519_secret.0);
         let x25519_public_key = PublicKey::from(&x25519_secret_key).to_bytes();
         let ml_kem_key_pair =
-            kem_generate(secure_random_array::<ML_KEM_KEY_GENERATION_SEED_SIZE>());
+            kem_generate(secure_random_array::<{ ML_KEM_KEY_GENERATION_SEED_SIZE }>());
         Self {
             x25519_secret,
             x25519_public_key,
@@ -469,7 +469,7 @@ fn derive_sender_peer_key(
     let remote_ml_kem_public_key = remote_epoch_keys.ml_kem_public_key()?;
     let (ml_kem_ciphertext, shared_secret_kem) = kem_encapsulate(
         &remote_ml_kem_public_key,
-        secure_random_array::<ML_KEM_SHARED_SECRET_SIZE>(),
+        secure_random_array::<{ ML_KEM_SHARED_SECRET_SIZE }>(),
     );
     let key = derive_combined_peer_key(
         shared_secret_x25519.as_bytes(),

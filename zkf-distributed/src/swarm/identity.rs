@@ -146,7 +146,7 @@ impl LocalPeerIdentitySet {
             self.backend_kind,
         )
         .expect("local swarm ML-DSA identity must remain readable while the process is alive");
-        let randomness = secure_random_array::<SIGNING_RANDOMNESS_SIZE>()
+        let randomness = secure_random_array::<{ SIGNING_RANDOMNESS_SIZE }>()
             .expect("ML-DSA signing randomness must be available");
         let signature = mldsa_sign(&signing_key, bytes, ML_DSA_CONTEXT, randomness)
             .expect("local swarm ML-DSA identity must sign successfully");
@@ -438,7 +438,7 @@ fn load_or_create_ml_dsa_material(
                     ml_dsa_provenance(path, label, backend_kind),
                 ));
             }
-            let randomness = secure_random_array::<KEY_GENERATION_RANDOMNESS_SIZE>()?;
+            let randomness = secure_random_array::<{ KEY_GENERATION_RANDOMNESS_SIZE }>()?;
             let keypair = generate_key_pair(randomness);
             key_manager
                 .store_key(label, SWARM_MLDSA87_SERVICE, keypair.signing_key.as_slice())
@@ -462,7 +462,7 @@ fn load_or_create_ml_dsa_material(
         ));
     }
 
-    let randomness = secure_random_array::<KEY_GENERATION_RANDOMNESS_SIZE>()?;
+    let randomness = secure_random_array::<{ KEY_GENERATION_RANDOMNESS_SIZE }>()?;
     let keypair = generate_key_pair(randomness);
     write_private_file(path, keypair.signing_key.as_slice())?;
     sync_ml_dsa_sidecars(path, label, backend_kind, &keypair.verification_key)?;
@@ -486,7 +486,7 @@ fn regenerate_ml_dsa_material(
     DistributedError,
 > {
     ensure_identity_dir(path)?;
-    let randomness = secure_random_array::<KEY_GENERATION_RANDOMNESS_SIZE>()?;
+    let randomness = secure_random_array::<{ KEY_GENERATION_RANDOMNESS_SIZE }>()?;
     let keypair = generate_key_pair(randomness);
     if backend_kind == SwarmKeyBackend::Enclave {
         #[cfg(target_os = "macos")]
