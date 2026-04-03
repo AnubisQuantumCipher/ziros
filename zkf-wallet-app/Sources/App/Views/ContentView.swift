@@ -400,30 +400,32 @@ private struct UnlockedWalletView: View {
                     .padding(20)
             }
             .background(WalletChrome.background)
-            .navigationTitle(section.title)
+            .navigationTitle(coordinator.isVisualAuditMode ? "" : section.title)
 #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(coordinator.isVisualAuditMode ? .automatic : .inline)
 #endif
             .toolbar {
+                if !coordinator.isVisualAuditMode {
 #if os(iOS)
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Refresh") {
-                        Task { await coordinator.refresh() }
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button("Refresh") {
+                            Task { await coordinator.refresh() }
+                        }
+                        Button("Lock") {
+                            Task { await coordinator.lock() }
+                        }
                     }
-                    Button("Lock") {
-                        Task { await coordinator.lock() }
-                    }
-                }
 #else
-                ToolbarItemGroup(placement: .automatic) {
-                    Button("Refresh") {
-                        Task { await coordinator.refresh() }
+                    ToolbarItemGroup(placement: .automatic) {
+                        Button("Refresh") {
+                            Task { await coordinator.refresh() }
+                        }
+                        Button("Lock") {
+                            Task { await coordinator.lock() }
+                        }
                     }
-                    Button("Lock") {
-                        Task { await coordinator.lock() }
-                    }
-                }
 #endif
+                }
             }
         }
         .tabItem {
@@ -1080,28 +1082,35 @@ private struct TransactScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            WalletPanel {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Transact")
-                        .font(WalletTypography.sectionTitle)
-                    Text(transactSubtitle)
-                        .foregroundStyle(.secondary)
-                    transactModeSelector
+            if coordinator.isVisualAuditMode {
+                transactDetail
+            } else {
+                WalletPanel {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Transact")
+                            .font(WalletTypography.sectionTitle)
+                        Text(transactSubtitle)
+                            .foregroundStyle(.secondary)
+                        transactModeSelector
+                    }
                 }
             }
 
-            Group {
-                switch coordinator.selectedTransactMode {
-                case .send:
-                    SendScreen(coordinator: coordinator)
-                case .receive:
-                    ReceiveScreen(coordinator: coordinator)
-                case .shield:
-                    ShieldScreen(coordinator: coordinator)
-                case .unshield:
-                    ShieldScreen(coordinator: coordinator, mode: .unshield)
-                }
-            }
+            transactDetail
+        }
+    }
+
+    @ViewBuilder
+    private var transactDetail: some View {
+        switch coordinator.selectedTransactMode {
+        case .send:
+            SendScreen(coordinator: coordinator)
+        case .receive:
+            ReceiveScreen(coordinator: coordinator)
+        case .shield:
+            ShieldScreen(coordinator: coordinator)
+        case .unshield:
+            ShieldScreen(coordinator: coordinator, mode: .unshield)
         }
     }
 

@@ -17,9 +17,15 @@ final class WalletCoordinator {
             case unlocked
         }
 
+        enum ApprovalMode: String {
+            case transaction
+            case message
+        }
+
         let state: State
         let section: WalletSection
         let transactMode: TransactMode
+        let approvalMode: ApprovalMode?
 
         static func fromProcessInfo() -> VisualAuditConfig? {
             let arguments = ProcessInfo.processInfo.arguments
@@ -36,11 +42,14 @@ final class WalletCoordinator {
             let transactMode = arguments.value(after: "-wallet-audit-transact-mode")
                 .flatMap(TransactMode.init(rawValue:))
                 ?? .send
+            let approvalMode = arguments.value(after: "-wallet-audit-approval")
+                .flatMap(ApprovalMode.init(rawValue:))
 
             return VisualAuditConfig(
                 state: state,
                 section: section,
-                transactMode: transactMode
+                transactMode: transactMode,
+                approvalMode: approvalMode
             )
         }
     }
@@ -1407,10 +1416,83 @@ final class WalletCoordinator {
                 ),
             ]
         )
-        selectedSection = config.section
-        selectedTransactMode = config.transactMode
+        if let approvalMode = config.approvalMode {
+            switch approvalMode {
+            case .transaction:
+                let review = TxReviewPayload(
+                    origin: "wallet-demo.midnight.network",
+                    network: "preprod",
+                    method: "transfer",
+                    txDigest: "0x4e0f8b8bcfd4217e1de7c7cf4af77f76d293ce5a5f7c271aa8320f6dc6a1545e",
+                    outputs: [
+                        ReviewOutput(
+                            recipient: "midnight1shieldedziros0w2n6a8w5h9n2u0d9y3m4c7p5",
+                            tokenKind: "NIGHT",
+                            amountRaw: "125000000000000000"
+                        ),
+                    ],
+                    nightTotalRaw: "125000000000000000",
+                    dustTotalRaw: "1000000",
+                    feeRaw: "1000000",
+                    dustImpact: "1 mailbox post",
+                    shielded: true,
+                    proverRoute: "Local Prover",
+                    warnings: ["This action spends DUST and changes shielded balance."],
+                    humanSummary: "Send 125 NIGHT shielded and spend 1 DUST for the transaction lane."
+                )
+                pendingApproval = PendingApprovalFlow(
+                    handle: OpaquePointer(bitPattern: 1)!,
+                    review: ApprovalReviewPayload(
+                        kind: "transaction",
+                        transaction: review,
+                        channelOpen: nil,
+                        messageSend: nil
+                    ),
+                    prepared: PreparedTransactionHandle(
+                        sessionId: "visual-audit-session",
+                        txDigest: review.txDigest,
+                        review: review,
+                        method: review.method
+                    ),
+                    messagingCommit: nil,
+                    bridgeRequest: nil
+                )
+                selectedSection = .transact
+                selectedTransactMode = .send
+            case .message:
+                let review = MessageSendReviewPayload(
+                    origin: "wallet-demo.midnight.network",
+                    network: "preprod",
+                    method: "send-message",
+                    txDigest: "0x9f41d18b8a2e7cc440b9f6d81a1d2fbc6d501ae4",
+                    peerId: remoteInvite.peerId,
+                    channelId: remoteInvite.channelId,
+                    messageKind: "text",
+                    dustCostRaw: "1000000",
+                    messagePreview: "Fuel ring still looks strong. I can keep this channel active for roughly ninety-four more posts.",
+                    humanSummary: "Review one DUST-spending Midnight message send before Face ID.",
+                    warnings: ["Mailbox transport is live on macOS only in this tranche."],
+                )
+                pendingApproval = PendingApprovalFlow(
+                    handle: OpaquePointer(bitPattern: 1)!,
+                    review: ApprovalReviewPayload(
+                        kind: "message-send",
+                        transaction: nil,
+                        channelOpen: nil,
+                        messageSend: review
+                    ),
+                    prepared: nil,
+                    messagingCommit: .sendMessage,
+                    bridgeRequest: nil
+                )
+                selectedSection = .messages
+                selectedTransactMode = config.transactMode
+            }
+        } else {
+            selectedSection = config.section
+            selectedTransactMode = config.transactMode
+        }
         isBusy = false
-        pendingApproval = nil
         pendingSitePermission = nil
         lastSubmittedTransactionID = "0x9f41d18b8a2e7cc440b9f6d81a1d2fbc6d501ae4"
         statusMessage = nil
