@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZirOS Wallet DApp Harness</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4efe6;
+      --panel: rgba(255, 252, 247, 0.92);
+      --line: #d7c8ae;
+      --ink: #1f1d1a;
+      --muted: #756a59;
+      --accent: #0d5c63;
+      --accent-soft: #d8eeef;
+      --danger: #8f2d26;
+    }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(13, 92, 99, 0.16), transparent 32%),
+        linear-gradient(160deg, #f6f1e7 0%, #ede4d2 100%);
+      color: var(--ink);
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      letter-spacing: -0.03em;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(31, 29, 26, 0.08);
+      padding: 18px;
+    }
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      font: inherit;
+      border-radius: 12px;
+    }
+    input, textarea, select {
+      border: 1px solid var(--line);
+      background: white;
+      padding: 10px 12px;
+      margin-top: 6px;
+    }
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+    button {
+      border: 0;
+      padding: 11px 14px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 140ms ease, opacity 140ms ease;
+    }
+    button.secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    button.danger {
+      background: var(--danger);
+    }
+    button:hover {
+      transform: translateY(-1px);
+    }
+    pre {
+      background: #1b1a18;
+      color: #f8f1dc;
+      padding: 16px;
+      border-radius: 16px;
+      overflow: auto;
+      min-height: 220px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ZirOS Midnight DApp Harness</h1>
+    <p>Use this page in Safari after enabling the bundled ZirOS Wallet extension. Every write action should foreground the native app and require the full Rust-controlled approval flow.</p>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Connection</h2>
+        <label>Network ID
+          <input id="networkId" value="preprod">
+        </label>
+        <button id="connectButton">Connect</button>
+        <button class="secondary" id="statusButton">Get Connection Status</button>
+        <button class="secondary" id="configButton">Get Configuration</button>
+        <button class="secondary" id="provingButton">Get Proving Provider</button>
+      </section>
+
+      <section class="panel">
+        <h2>Transfer</h2>
+        <label>Receiver Address
+          <input id="receiverAddress" placeholder="midnight1...">
+        </label>
+        <div class="row">
+          <label>Amount Raw
+            <input id="amountRaw" value="1000000000000000">
+          </label>
+          <label>Output Mode
+            <select id="outputMode">
+              <option value="unshielded">unshielded</option>
+              <option value="shielded">shielded</option>
+            </select>
+          </label>
+        </div>
+        <button id="transferButton">Make Transfer</button>
+      </section>
+
+      <section class="panel">
+        <h2>Intent</h2>
+        <label>Desired Inputs JSON
+          <textarea id="intentInputs">[]</textarea>
+        </label>
+        <label>Desired Outputs JSON
+          <textarea id="intentOutputs">[
+  {
+    "mode": "unshielded",
+    "receiverAddress": "midnight1...",
+    "tokenType": "NIGHT",
+    "amountRaw": "1000000000000000"
+  }
+]</textarea>
+        </label>
+        <button id="intentButton">Make Intent</button>
+      </section>
+
+      <section class="panel">
+        <h2>Log</h2>
+        <button class="danger" id="clearLogButton">Clear Log</button>
+        <pre id="output"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const output = document.getElementById("output");
+
+    function log(label, payload) {
+      const rendered = typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
+      output.textContent += `[${new Date().toLocaleTimeString()}] ${label}\n${rendered}\n\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function provider() {
+      return window.midnight?.ziros;
+    }
+
+    async function call(label, action) {
+      try {
+        if (!provider()) {
+          throw new Error("window.midnight.ziros is not available. Enable the Safari extension first.");
+        }
+        const result = await action();
+        log(label, result);
+      } catch (error) {
+        log(`${label} failed`, error?.message ?? String(error));
+      }
+    }
+
+    document.getElementById("clearLogButton").addEventListener("click", () => {
+      output.textContent = "";
+    });
+
+    document.getElementById("connectButton").addEventListener("click", () => {
+      const networkId = document.getElementById("networkId").value.trim() || "preprod";
+      call("connect", () => provider().connect(networkId));
+    });
+
+    document.getElementById("statusButton").addEventListener("click", () => {
+      call("getConnectionStatus", () => provider().getConnectionStatus());
+    });
+
+    document.getElementById("configButton").addEventListener("click", () => {
+      call("getConfiguration", () => provider().getConfiguration());
+    });
+
+    document.getElementById("provingButton").addEventListener("click", () => {
+      call("getProvingProvider", () => provider().getProvingProvider());
+    });
+
+    document.getElementById("transferButton").addEventListener("click", () => {
+      const receiverAddress = document.getElementById("receiverAddress").value.trim();
+      const amountRaw = document.getElementById("amountRaw").value.trim();
+      const mode = document.getElementById("outputMode").value;
+      call("makeTransfer", () => provider().makeTransfer({
+        desiredOutputs: [
+          {
+            mode,
+            receiverAddress,
+            tokenType: "NIGHT",
+            amountRaw
+          }
+        ],
+        options: {
+          payFees: true
+        }
+      }));
+    });
+
+    document.getElementById("intentButton").addEventListener("click", () => {
+      const desiredInputs = JSON.parse(document.getElementById("intentInputs").value);
+      const desiredOutputs = JSON.parse(document.getElementById("intentOutputs").value);
+      call("makeIntent", () => provider().makeIntent({
+        desiredInputs,
+        desiredOutputs,
+        options: {
+          payFees: true
+        }
+      }));
+    });
+
+    log("harness", "Ready. Waiting for Safari extension provider.");
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+[package]
+name = "zkf-wallet"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Native ZirOS Midnight wallet policy core"
+
+[dependencies]
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-keymanager = { path = "../zkf-keymanager" }
+chrono.workspace = true
+hkdf = "0.12"
+chacha20poly1305 = "0.10"
+hex = "0.4"
+libcrux-ml-dsa.workspace = true
+libcrux-ml-kem.workspace = true
+postcard.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+ureq.workspace = true
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+zeroize.workspace = true
+
+[target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
+core-foundation = "0.9"
+security-framework = "2"
+security-framework-sys = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

@@ -6,7 +6,26 @@
 /.tmp/
 /attestation/.tmp/
 /attestation/node_modules/
+/zkf-wallet-helper/node_modules/
+/zkf-wallet-helper/dist/
+/zkf-wallet-helper/*.tgz
+/zkf-wallet-mailbox/node_modules/
+/zkf-wallet-mailbox/dist/
+/zkf-wallet-mailbox/logs/
+/ziros-twitter-mcp/node_modules/
+/ziros-twitter-mcp/build/
+/zkf-wallet-app/build/
+/zkf-wallet-app/build-release/
+/zkf-wallet-app/artifacts/
+/zkf-wallet-app/ZirOSWallet.xcodeproj/xcuserdata/
+/zkf-wallet-app/ZirOSWallet.xcodeproj/project.xcworkspace/xcuserdata/
+/target-ios-sim/
+/.cache/
+/.automation-staging/
+/attestation/logs/
 /attestation/contracts/compiled/
+system-health-*.md
+morning-briefing-*.md
 
 # Proof build artifacts
 .lia.cache

@@ -1,0 +1,141 @@
+name: ZirOSWallet
+options:
+  minimumXcodeGenVersion: 2.45.3
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    MACOSX_DEPLOYMENT_TARGET: 15.0
+    CODE_SIGN_STYLE: Automatic
+    ARCHS: arm64
+targets:
+  ZirOSWallet:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Sources/App
+      - path: Sources/Shared
+      - path: Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet
+        PRODUCT_NAME: ZirOSWallet
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: ZirOS Wallet
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.finance
+        INFOPLIST_KEY_CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - ziros-wallet
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/App/WalletFFI/ZkfFFI.h
+        HEADER_SEARCH_PATHS:
+          - "$(SRCROOT)/Sources/App/WalletFFI"
+        ENABLE_HARDENED_RUNTIME: YES
+        SYMROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS"
+        OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates"
+      configs:
+        Debug:
+          OTHER_LDFLAGS:
+            - "$(SRCROOT)/../target-public/debug/libzkf_ffi.a"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: Sources/App/ZirOSWallet.entitlements
+          OTHER_LDFLAGS:
+            - "$(SRCROOT)/../target-public/release/libzkf_ffi.a"
+    dependencies:
+      - target: ZirOSWalletExtension
+        embed: true
+    preBuildScripts:
+      - name: Prepare Wallet Runtime
+        script: |
+          chmod +x "${SRCROOT}/Scripts/prepare_wallet_bundle.sh"
+          /bin/sh "${SRCROOT}/Scripts/prepare_wallet_bundle.sh"
+    postCompileScripts:
+      - name: Sanitize macOS App Bundle
+        script: |
+          if [ -d "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" ]; then
+            xattr -cr "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" || true
+          fi
+  ZirOSWalletiOS:
+    type: application
+    platform: iOS
+    supportedDestinations:
+      - iOS
+      - iOS Simulator
+    deploymentTarget: "18.0"
+    sources:
+      - path: Sources/App
+      - path: Sources/Shared
+      - path: Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet.ios
+        PRODUCT_NAME: ZirOSWalletiOS
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: ZirOS Wallet
+        INFOPLIST_KEY_CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - ziros-wallet
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/App/WalletFFI/ZkfFFI.h
+        HEADER_SEARCH_PATHS:
+          - "$(SRCROOT)/Sources/App/WalletFFI"
+        SUPPORTED_DEVICE_FAMILIES: 1
+        TARGETED_DEVICE_FAMILY: 1
+        ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+        SYMROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS"
+        OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS/Intermediates"
+        OTHER_LDFLAGS[sdk=iphonesimulator*]:
+          - "$(SRCROOT)/../target-ios-sim/aarch64-apple-ios-sim/debug/libzkf_ffi.a"
+        OTHER_LDFLAGS[sdk=iphoneos*]:
+          - "$(SRCROOT)/../target-ios-device/aarch64-apple-ios/debug/libzkf_ffi.a"
+      configs:
+        Release:
+          OTHER_LDFLAGS[sdk=iphonesimulator*]:
+            - "$(SRCROOT)/../target-ios-sim/aarch64-apple-ios-sim/release/libzkf_ffi.a"
+          OTHER_LDFLAGS[sdk=iphoneos*]:
+            - "$(SRCROOT)/../target-ios-device/aarch64-apple-ios/release/libzkf_ffi.a"
+    preBuildScripts:
+      - name: Prepare Wallet Runtime
+        script: |
+          chmod +x "${SRCROOT}/Scripts/prepare_wallet_bundle.sh"
+          /bin/sh "${SRCROOT}/Scripts/prepare_wallet_bundle.sh"
+    postCompileScripts:
+      - name: Sanitize iOS App Bundle
+        script: |
+          if [ -d "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" ]; then
+            xattr -cr "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" || true
+          fi
+  ZirOSWalletExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Sources/Extension
+      - path: Sources/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet.extension
+        PRODUCT_NAME: ZirOSWalletExtension
+        GENERATE_INFOPLIST_FILE: YES
+        SYMROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS"
+        OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates"
+        INFOPLIST_KEY_CFBundleDisplayName: ZirOS Wallet Extension
+        INFOPLIST_KEY_NSExtension:
+          NSExtensionPointIdentifier: com.apple.Safari.web-extension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).SafariWebExtensionHandler
+      configs:
+        Release:
+          CODE_SIGN_ENTITLEMENTS: Sources/Extension/ZirOSWalletExtension.entitlements
+    postCompileScripts:
+      - name: Sanitize Extension Bundle
+        script: |
+          if [ -d "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" ]; then
+            xattr -cr "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" || true
+          fi
+schemes:
+  ZirOSWallet:
+    build:
+      targets:
+        ZirOSWallet: all
+  ZirOSWalletiOS:
+    build:
+      targets:
+        ZirOSWalletiOS: all

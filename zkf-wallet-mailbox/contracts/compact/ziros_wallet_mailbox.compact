@@ -1,0 +1,73 @@
+pragma language_version 0.22;
+
+import CompactStandardLibrary;
+
+export ledger latest_sender_fingerprint: Bytes<32>;
+export ledger latest_receiver_fingerprint: Bytes<32>;
+export ledger latest_channel_fingerprint: Bytes<32>;
+export ledger latest_message_kind: Uint<8>;
+export ledger latest_sequence: Uint<64>;
+export ledger latest_epoch_id: Uint<64>;
+export ledger latest_posted_at: Uint<64>;
+export ledger latest_envelope_hash: Bytes<32>;
+
+export ledger latest_nonce: Bytes<12>;
+export ledger latest_ciphertext_length: Uint<32>;
+export ledger latest_ciphertext: Bytes<1024>;
+export ledger latest_ml_kem_ciphertext_length: Uint<32>;
+export ledger latest_ml_kem_ciphertext: Bytes<1568>;
+export ledger latest_sender_x25519_public_key_length: Uint<32>;
+export ledger latest_sender_x25519_public_key: Bytes<32>;
+export ledger latest_sender_identity_public_key_length: Uint<32>;
+export ledger latest_sender_identity_public_key: Bytes<2592>;
+export ledger latest_sender_signature_length: Uint<32>;
+export ledger latest_sender_signature: Bytes<4627>;
+
+export ledger mailbox_message_count: Uint<64>;
+
+witness senderFingerprint(): Bytes<32>;
+witness receiverFingerprint(): Bytes<32>;
+witness channelFingerprint(): Bytes<32>;
+witness messageKind(): Uint<8>;
+witness sequence(): Uint<64>;
+witness epochId(): Uint<64>;
+witness postedAt(): Uint<64>;
+witness envelopeHash(): Bytes<32>;
+
+witness nonce(): Bytes<12>;
+witness ciphertextLength(): Uint<32>;
+witness ciphertext(): Bytes<1024>;
+witness mlKemCiphertextLength(): Uint<32>;
+witness mlKemCiphertext(): Bytes<1568>;
+witness senderX25519PublicKeyLength(): Uint<32>;
+witness senderX25519PublicKey(): Bytes<32>;
+witness senderIdentityPublicKeyLength(): Uint<32>;
+witness senderIdentityPublicKey(): Bytes<2592>;
+witness senderSignatureLength(): Uint<32>;
+witness senderSignature(): Bytes<4627>;
+witness nextMessageCount(): Uint<64>;
+
+export circuit post_mailbox_envelope(): [] {
+  latest_sender_fingerprint = disclose(senderFingerprint());
+  latest_receiver_fingerprint = disclose(receiverFingerprint());
+  latest_channel_fingerprint = disclose(channelFingerprint());
+  latest_message_kind = disclose(messageKind());
+  latest_sequence = disclose(sequence());
+  latest_epoch_id = disclose(epochId());
+  latest_posted_at = disclose(postedAt());
+  latest_envelope_hash = disclose(envelopeHash());
+
+  latest_nonce = disclose(nonce());
+  latest_ciphertext_length = disclose(ciphertextLength());
+  latest_ciphertext = disclose(ciphertext());
+  latest_ml_kem_ciphertext_length = disclose(mlKemCiphertextLength());
+  latest_ml_kem_ciphertext = disclose(mlKemCiphertext());
+  latest_sender_x25519_public_key_length = disclose(senderX25519PublicKeyLength());
+  latest_sender_x25519_public_key = disclose(senderX25519PublicKey());
+  latest_sender_identity_public_key_length = disclose(senderIdentityPublicKeyLength());
+  latest_sender_identity_public_key = disclose(senderIdentityPublicKey());
+  latest_sender_signature_length = disclose(senderSignatureLength());
+  latest_sender_signature = disclose(senderSignature());
+
+  mailbox_message_count = disclose(nextMessageCount());
+}

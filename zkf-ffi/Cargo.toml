@@ -11,9 +11,15 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 zkf-core = { path = "../zkf-core" }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
 zkf-lib = { path = "../zkf-lib", features = ["full"] }
+zkf-wallet = { path = "../zkf-wallet" }
 once_cell.workspace = true
+serde.workspace = true
 serde_json.workspace = true
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+tempfile = "3"

@@ -10,31 +10,31 @@ struct RootTabView: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            OverviewScreen()
+            LegacyOverviewScreen()
                 .tabItem {
                     Label("Overview", systemImage: "house")
                 }
                 .tag(Tab.overview)
             
-            TransactScreen()
+            LegacyTransactScreen()
                 .tabItem {
                     Label("Transact", systemImage: "arrow.left.arrow.right")
                 }
                 .tag(Tab.transact)
             
-            DustScreen()
+            LegacyDustScreen()
                 .tabItem {
                     Label {
                         Text("DUST")
                     } icon: {
                         Image(systemName: "flame")
                             .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(selection == .dust ? WalletBrandAssets.Color.amber : WalletBrandAssets.Color.textPrimary)
+                            .foregroundStyle(selection == .dust ? WalletBrandAssets.Color.dustAmber : WalletBrandAssets.Color.textPrimary)
                     }
                 }
                 .tag(Tab.dust)
             
-            MessagesScreen()
+            LegacyMessagesScreen()
                 .tabItem {
                     Label("Messages", systemImage: "bubble.left.and.bubble.right")
                 }
@@ -48,12 +48,19 @@ struct RootTabView: View {
         }
         .tint(WalletBrandAssets.Color.midnightBlue)
         .background(WalletBrandAssets.Color.background)
+        .brandBackground()
+        .onReceive(NotificationCenter.default.publisher(for: .selectTransactSegment)) { output in
+            if let segment = output.object as? LegacyTransactScreen.Segment {
+                selection = .transact
+                NotificationCenter.default.post(name: .applyTransactSegment, object: segment)
+            }
+        }
     }
 }
 
-// MARK: - OverviewScreen
+// MARK: - LegacyOverviewScreen
 
-struct OverviewScreen: View {
+struct LegacyOverviewScreen: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("3,482,053.94")
@@ -61,33 +68,49 @@ struct OverviewScreen: View {
                 .foregroundColor(WalletBrandAssets.Color.textPrimary)
             
             Text("NIGHT")
-                .font(.caption)
+                .font(WalletBrandAssets.Typography.caption)
                 .foregroundColor(WalletBrandAssets.Color.textPrimary.opacity(0.8))
                 .textCase(.uppercase)
             
-            PrivacyGauge(value: 0.73)
+            HStack(spacing: 16) {
+                QuickActionButton(title: "Send", systemImage: "arrow.up", filled: true) {
+                    WalletBrandAssets.Haptics.tapLight()
+                    // Switch to Transact tab and select Send
+                    NotificationCenter.default.post(name: .selectTransactSegment, object: LegacyTransactScreen.Segment.send)
+                }
+                QuickActionButton(title: "Receive", systemImage: "arrow.down", filled: false) {
+                    WalletBrandAssets.Haptics.tapLight()
+                    NotificationCenter.default.post(name: .selectTransactSegment, object: LegacyTransactScreen.Segment.receive)
+                }
+                QuickActionButton(title: "Shield", systemImage: "lock.fill", filled: false) {
+                    WalletBrandAssets.Haptics.tapLight()
+                    NotificationCenter.default.post(name: .selectTransactSegment, object: LegacyTransactScreen.Segment.shield)
+                }
+                QuickActionButton(title: "Unshield", systemImage: "lock.open.fill", filled: false) {
+                    WalletBrandAssets.Haptics.tapLight()
+                    NotificationCenter.default.post(name: .selectTransactSegment, object: LegacyTransactScreen.Segment.unshield)
+                }
+            }
+            
+            // Privacy posture
+            PrivacyGauge(shielded: 38_400, unshielded: 41_600)
                 .frame(width: 64, height: 64)
             
             HStack(spacing: 8) {
                 Text("DUST: 47.2M  •  ~94 txns")
-                    .font(.system(.body, design: .monospaced))
+                    .brandMono()
                     .foregroundColor(WalletBrandAssets.Color.textPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(WalletBrandAssets.Color.cardBackground)
-                    )
+                    .brandPill()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(WalletBrandAssets.Color.background)
+        .brandBackground()
     }
 }
 
-// MARK: - TransactScreen
+// MARK: - LegacyTransactScreen
 
-struct TransactScreen: View {
+struct LegacyTransactScreen: View {
     enum Segment: String, CaseIterable, Identifiable {
         case send = "Send"
         case receive = "Receive"
@@ -126,8 +149,13 @@ struct TransactScreen: View {
             
             Spacer()
         }
-        .background(WalletBrandAssets.Color.background)
+        .brandBackground()
         .foregroundColor(WalletBrandAssets.Color.textPrimary)
+        .onReceive(NotificationCenter.default.publisher(for: .applyTransactSegment)) { output in
+            if let segment = output.object as? Segment {
+                selectedSegment = segment
+            }
+        }
     }
 }
 
@@ -140,12 +168,12 @@ private struct PlaceholderContentView: View {
     }
 }
 
-// MARK: - DustScreen
+// MARK: - LegacyDustScreen
 
-struct DustScreen: View {
+struct LegacyDustScreen: View {
     var body: some View {
         VStack(spacing: 32) {
-            DustFuelRing(progress: 0.67, fuelValue: 47_200_000, generationRate: 0.023)
+            DustFuelRing(currentDust: 47_200_000, targetDustFor100Txns: 50_000_000)
                 .frame(width: 160, height: 160)
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -170,7 +198,7 @@ struct DustScreen: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(WalletBrandAssets.Color.background)
+        .brandBackground()
         .foregroundColor(WalletBrandAssets.Color.textPrimary)
     }
 }
@@ -193,7 +221,7 @@ struct MetricCard: View {
                 .monospacedDigit()
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 16).fill(WalletBrandAssets.Color.cardBackground))
+        .background(RoundedRectangle(cornerRadius: 16).fill(WalletBrandAssets.Color.card))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(WalletBrandAssets.Color.cardBorder, lineWidth: 1)
@@ -202,9 +230,9 @@ struct MetricCard: View {
     }
 }
 
-// MARK: - MessagesScreen
+// MARK: - LegacyMessagesScreen
 
-struct MessagesScreen: View {
+struct LegacyMessagesScreen: View {
     var body: some View {
         NavigationView {
             List {
@@ -216,7 +244,7 @@ struct MessagesScreen: View {
                         .padding(.horizontal, 10)
                         .background(
                             Capsule()
-                                .fill(WalletBrandAssets.Color.cardBackground)
+                                .fill(WalletBrandAssets.Color.card)
                         )
                         .foregroundColor(WalletBrandAssets.Color.textPrimary)
                         .listRowBackground(Color.clear)
@@ -248,7 +276,7 @@ struct MessagesScreen: View {
                     .padding(.vertical, 8)
                 }
             }
-            .listStyle(InsetGroupedListStyle())
+            .listStyle(.inset)
             .background(WalletBrandAssets.Color.background)
             .navigationTitle("Messages")
         }
@@ -267,7 +295,7 @@ struct MoreScreen: View {
                     Text("Settings")
                 }
             }
-            .listStyle(InsetGroupedListStyle())
+            .listStyle(.inset)
             .background(WalletBrandAssets.Color.background)
             .navigationTitle("More")
             .foregroundColor(WalletBrandAssets.Color.textPrimary)
@@ -275,55 +303,40 @@ struct MoreScreen: View {
     }
 }
 
-// MARK: - Supporting Views
+private struct QuickActionButton: View {
+    let title: String
+    let systemImage: String
+    let filled: Bool
+    let action: () -> Void
 
-struct PrivacyGauge: View {
-    let value: CGFloat // 0 to 1
-    
     var body: some View {
-        ZStack {
-            Circle()
-                .stroke(WalletBrandAssets.Color.cardBorder, lineWidth: 8)
-            Circle()
-                .trim(from: 0, to: value)
-                .stroke(WalletBrandAssets.Color.midnightBlue, style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            Text("\(Int(value * 100))%")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(WalletBrandAssets.Color.textPrimary)
+        Button(action: action) {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(filled ? WalletBrandAssets.Color.midnightBlue : .clear)
+                        .overlay(
+                            Circle().stroke(WalletBrandAssets.Color.cardBorder, lineWidth: filled ? 0 : 1)
+                        )
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            Image(systemName: systemImage)
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(filled ? .white : WalletBrandAssets.Color.textPrimary)
+                        )
+                }
+                Text(title)
+                    .font(WalletBrandAssets.Typography.caption)
+                    .foregroundColor(WalletBrandAssets.Color.textSecondary)
+            }
         }
+        .buttonStyle(.plain)
     }
 }
 
-struct DustFuelRing: View {
-    let progress: CGFloat // 0 to 1
-    let fuelValue: Int
-    let generationRate: Double
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(WalletBrandAssets.Color.cardBorder, lineWidth: 14)
-                .opacity(0.3)
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(WalletBrandAssets.Color.amber, style: StrokeStyle(lineWidth: 14, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            VStack(spacing: 4) {
-                Text("\(fuelValue.formatted(.number))")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(WalletBrandAssets.Color.textPrimary)
-                Text("DUST")
-                    .font(.caption)
-                    .foregroundColor(WalletBrandAssets.Color.textPrimary.opacity(0.7))
-                Text("~\(generationRate, specifier: "%.3f") DUST/sec")
-                    .font(.caption2)
-                    .foregroundColor(WalletBrandAssets.Color.textPrimary.opacity(0.5))
-            }
-        }
-    }
+extension Notification.Name {
+    static let selectTransactSegment = Notification.Name("selectTransactSegment")
+    static let applyTransactSegment = Notification.Name("applyTransactSegment")
 }
 
 #Preview {

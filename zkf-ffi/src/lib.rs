@@ -1,3 +1,5 @@
+mod wallet_ffi;
+
 use once_cell::sync::Lazy;
 use serde_json::Value;
 use std::ffi::{CStr, CString, c_char, c_int};
@@ -10,7 +12,9 @@ use zkf_lib::{
     witness_from_inputs, witness_inputs_from_json_map,
 };
 
-static LAST_ERROR: Lazy<Mutex<Option<CString>>> = Lazy::new(|| Mutex::new(None));
+pub use wallet_ffi::*;
+
+pub(crate) static LAST_ERROR: Lazy<Mutex<Option<CString>>> = Lazy::new(|| Mutex::new(None));
 
 #[repr(C)]
 pub struct ZkfProgramBuilderHandle {
@@ -32,7 +36,7 @@ pub struct ZkfProofArtifactHandle {
     _private: [u8; 0],
 }
 
-fn sanitize_cstring(message: String) -> CString {
+pub(crate) fn sanitize_cstring(message: String) -> CString {
     let filtered = message.replace('\0', " ");
     match CString::new(filtered) {
         Ok(value) => value,
@@ -40,34 +44,34 @@ fn sanitize_cstring(message: String) -> CString {
     }
 }
 
-fn set_last_error(message: impl Into<String>) {
+pub(crate) fn set_last_error(message: impl Into<String>) {
     if let Ok(mut slot) = LAST_ERROR.lock() {
         *slot = Some(sanitize_cstring(message.into()));
     }
 }
 
-fn clear_last_error() {
+pub(crate) fn clear_last_error() {
     if let Ok(mut slot) = LAST_ERROR.lock() {
         *slot = None;
     }
 }
 
-fn c_int_error(message: impl Into<String>) -> c_int {
+pub(crate) fn c_int_error(message: impl Into<String>) -> c_int {
     set_last_error(message);
     -1
 }
 
-fn null_error<T>(message: impl Into<String>) -> *mut T {
+pub(crate) fn null_error<T>(message: impl Into<String>) -> *mut T {
     set_last_error(message);
     ptr::null_mut()
 }
 
-fn false_error(message: impl Into<String>) -> bool {
+pub(crate) fn false_error(message: impl Into<String>) -> bool {
     set_last_error(message);
     false
 }
 
-fn string_arg(ptr: *const c_char, label: &str) -> Result<String, String> {
+pub(crate) fn string_arg(ptr: *const c_char, label: &str) -> Result<String, String> {
     if ptr.is_null() {
         return Err(format!("{label} pointer is null"));
     }
@@ -160,6 +164,17 @@ pub extern "C" fn zkf_last_error_message() -> *const c_char {
     match LAST_ERROR.lock() {
         Ok(slot) => slot.as_ref().map_or(ptr::null(), |value| value.as_ptr()),
         Err(_) => ptr::null(),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn zkf_string_free(value: *mut c_char) {
+    if value.is_null() {
+        return;
+    }
+
+    unsafe {
+        drop(CString::from_raw(value));
     }
 }
 

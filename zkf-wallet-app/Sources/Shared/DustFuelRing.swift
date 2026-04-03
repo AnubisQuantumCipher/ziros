@@ -1,5 +1,12 @@
 import SwiftUI
 import Foundation
+#if canImport(UIKit)
+import UIKit
+private typealias PlatformColor = UIColor
+#elseif canImport(AppKit)
+import AppKit
+private typealias PlatformColor = NSColor
+#endif
 
 struct DustFuelRing: View {
     let currentDust: Double
@@ -26,6 +33,67 @@ struct DustFuelRing: View {
         }
     }
 
+    private var ringLineWidth: CGFloat {
+#if os(iOS)
+        16
+#else
+        18
+#endif
+    }
+
+    private var numberFont: Font {
+#if os(iOS)
+        return .custom("Outfit-ExtraBold", size: 30)
+#else
+        return .custom("Outfit-ExtraBold", size: 34)
+#endif
+    }
+
+    private var captionFont: Font {
+#if os(iOS)
+        return .custom("Outfit-Medium", size: 11)
+#else
+        return WalletBrandAssets.Typography.caption
+#endif
+    }
+
+    private var ringFrame: CGFloat {
+#if os(iOS)
+        136
+#else
+        144
+#endif
+    }
+
+    private var centerBoxSize: CGFloat {
+#if os(iOS)
+        78
+#else
+        84
+#endif
+    }
+
+    private var abbreviatedDustValue: String {
+        let value = max(currentDust, 0)
+        switch value {
+        case 1_000_000_000...:
+            return abbreviated(value / 1_000_000_000, suffix: "B")
+        case 1_000_000...:
+            return abbreviated(value / 1_000_000, suffix: "M")
+        case 1_000...:
+            return abbreviated(value / 1_000, suffix: "K")
+        default:
+            return formatIntWithGroupingSeparator(Int(value.rounded(.down)))
+        }
+    }
+
+    private var statusLine: String {
+        if progress == 0 {
+            return "Empty"
+        }
+        return "~\(estimatedTransactionsRemaining) transactions remaining"
+    }
+
     init(currentDust: Double, targetDustFor100Txns: Double, estimatedTransactionsRemaining: Int? = nil) {
         self.currentDust = currentDust
         self.targetDustFor100Txns = targetDustFor100Txns
@@ -40,54 +108,57 @@ struct DustFuelRing: View {
     var body: some View {
         let pulseAnimation = Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
 
-        ZStack {
-            Circle()
-                .stroke(Color.white.opacity(0.05), lineWidth: 20)
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    ringColor,
-                    style: StrokeStyle(lineWidth: 20, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.4), value: progress)
-                .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.04 : 1.0) : 1.0)
-                .animation(progress < 0.25 && progress > 0 ? pulseAnimation : .default, value: pulse)
-                .onAppear {
-                    if progress < 0.25 && progress > 0 {
-                        pulse = true
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.05), lineWidth: ringLineWidth)
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(
+                        ringColor,
+                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut(duration: 0.4), value: progress)
+                    .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.04 : 1.0) : 1.0)
+                    .animation(progress < 0.25 && progress > 0 ? pulseAnimation : .default, value: pulse)
+                    .onAppear {
+                        if progress < 0.25 && progress > 0 {
+                            pulse = true
+                        }
                     }
-                }
-                .onChange(of: progress) { newValue in
-                    if newValue < 0.25 && newValue > 0 {
-                        pulse = true
-                    } else {
-                        pulse = false
+                    .onChange(of: progress) { newValue in
+                        if newValue < 0.25 && newValue > 0 {
+                            pulse = true
+                        } else {
+                            pulse = false
+                        }
                     }
-                }
 
-            VStack(spacing: 2) {
-                Text("DUST Fuel")
-                    .font(WalletBrandAssets.Typography.caption)
-                    .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                Text(formatIntWithGroupingSeparator(Int(currentDust)))
-                    .font(WalletBrandAssets.Typography.monoMetric)
-                    .foregroundColor(WalletBrandAssets.Color.textPrimary)
-                if progress == 0 {
-                    Text("Empty")
-                        .font(WalletBrandAssets.Typography.caption)
-                        .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                } else {
-                    Text("~\(estimatedTransactionsRemaining) transactions remaining")
-                        .font(WalletBrandAssets.Typography.caption)
+                VStack(spacing: 4) {
+                    Text(abbreviatedDustValue)
+                        .font(numberFont)
+                        .foregroundColor(WalletBrandAssets.Color.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text("DUST Fuel")
+                        .font(captionFont)
                         .foregroundColor(WalletBrandAssets.Color.textSecondary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.5)
+                        .minimumScaleFactor(0.8)
                 }
+                .frame(width: centerBoxSize, height: centerBoxSize)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 4)
             }
-            .padding(.horizontal, 6)
+            .frame(width: ringFrame, height: ringFrame)
+
+            Text(statusLine)
+                .font(captionFont)
+                .foregroundColor(WalletBrandAssets.Color.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
-        .frame(width: 140, height: 140)
     }
 
     private func formatIntWithGroupingSeparator(_ value: Int) -> String {
@@ -97,12 +168,21 @@ struct DustFuelRing: View {
         formatter.groupingSize = 3
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
+
+    private func abbreviated(_ value: Double, suffix: String) -> String {
+        let rounded = (value * 10).rounded() / 10
+        if rounded.rounded() == rounded {
+            return "\(Int(rounded))\(suffix)"
+        }
+        return "\(rounded.formatted(.number.precision(.fractionLength(1))))\(suffix)"
+    }
 }
 
 private extension Color {
     func interpolate(to: Color, fraction: Double) -> Color {
-        let fromComponents = UIColor(self).cgColor.components ?? [0,0,0,1]
-        let toComponents = UIColor(to).cgColor.components ?? [0,0,0,1]
+        #if canImport(UIKit) || canImport(AppKit)
+        let fromComponents = PlatformColor(self).cgColor.components ?? [0, 0, 0, 1]
+        let toComponents = PlatformColor(to).cgColor.components ?? [0, 0, 0, 1]
 
         // UIColor components can have 2 or 4 components (grayscale or RGBA)
         // Normalize to RGBA 4 components
@@ -115,6 +195,9 @@ private extension Color {
         let a = fromRGBA[3] + (toRGBA[3] - fromRGBA[3]) * CGFloat(fraction)
 
         return Color(red: Double(r), green: Double(g), blue: Double(b), opacity: Double(a))
+        #else
+        return self
+        #endif
     }
 }
 

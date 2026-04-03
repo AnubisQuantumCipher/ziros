@@ -12,11 +12,9 @@ public struct BrandPrimaryButtonStyle: ButtonStyle {
             .cornerRadius(14)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .onChange(of: configuration.isPressed) { pressed in
-                #if canImport(UIKit)
                 if pressed {
                     WalletBrandAssets.Haptics.tapLight()
                 }
-                #endif
             }
     }
 }
