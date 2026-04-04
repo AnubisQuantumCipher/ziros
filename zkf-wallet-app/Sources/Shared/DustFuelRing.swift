@@ -9,9 +9,16 @@ private typealias PlatformColor = NSColor
 #endif
 
 struct DustFuelRing: View {
+    enum Style {
+        case standard
+        case hero
+        case dashboard
+    }
+
     let currentDust: Double
     let targetDustFor100Txns: Double
     let estimatedTransactionsRemaining: Int
+    let style: Style
 
     @State private var pulse = false
 
@@ -24,53 +31,112 @@ struct DustFuelRing: View {
         case 0:
             return WalletBrandAssets.Color.critical
         case 0..<0.25:
+            return WalletBrandAssets.Color.critical
+        case 0.25..<0.5:
             return WalletBrandAssets.Color.warning
-        case 0.25...0.75:
-            let amt = (progress - 0.25) / (0.75 - 0.25)
-            return WalletBrandAssets.Color.warning.interpolate(to: WalletBrandAssets.Color.dustAmber, fraction: amt)
         default:
             return WalletBrandAssets.Color.dustAmber
         }
     }
 
     private var ringLineWidth: CGFloat {
+        switch style {
+        case .standard:
 #if os(iOS)
-        16
+            return 16
 #else
-        18
+            return 18
 #endif
+        case .hero:
+#if os(iOS)
+            return 14
+#else
+            return 16
+#endif
+        case .dashboard:
+#if os(iOS)
+            return 16
+#else
+            return 18
+#endif
+        }
     }
 
     private var numberFont: Font {
+        switch style {
+        case .standard:
 #if os(iOS)
-        return .custom("Outfit-ExtraBold", size: 30)
+            return .custom("Outfit-ExtraBold", size: 30)
 #else
-        return .custom("Outfit-ExtraBold", size: 34)
+            return .custom("Outfit-ExtraBold", size: 34)
 #endif
+        case .hero:
+#if os(iOS)
+            return .custom("Outfit-ExtraBold", size: 32)
+#else
+            return .custom("Outfit-ExtraBold", size: 38)
+#endif
+        case .dashboard:
+#if os(iOS)
+            return .custom("Outfit-ExtraBold", size: 34)
+#else
+            return .custom("Outfit-ExtraBold", size: 40)
+#endif
+        }
     }
 
     private var captionFont: Font {
 #if os(iOS)
-        return .custom("Outfit-Medium", size: 11)
+        return .custom("Outfit-Medium", size: style == .dashboard ? 12 : 11)
 #else
         return WalletBrandAssets.Typography.caption
 #endif
     }
 
     private var ringFrame: CGFloat {
+        switch style {
+        case .standard:
 #if os(iOS)
-        136
+            return 136
 #else
-        144
+            return 144
 #endif
+        case .hero:
+#if os(iOS)
+            return 148
+#else
+            return 164
+#endif
+        case .dashboard:
+#if os(iOS)
+            return 160
+#else
+            return 180
+#endif
+        }
     }
 
     private var centerBoxSize: CGFloat {
+        switch style {
+        case .standard:
 #if os(iOS)
-        78
+            return 78
 #else
-        84
+            return 84
 #endif
+        case .hero:
+#if os(iOS)
+            return 86
+#else
+            return 94
+#endif
+        case .dashboard:
+#if os(iOS)
+            return 94
+#else
+            return 108
+#endif
+        }
     }
 
     private var abbreviatedDustValue: String {
@@ -94,7 +160,7 @@ struct DustFuelRing: View {
         return "~\(estimatedTransactionsRemaining) transactions remaining"
     }
 
-    init(currentDust: Double, targetDustFor100Txns: Double, estimatedTransactionsRemaining: Int? = nil) {
+    init(currentDust: Double, targetDustFor100Txns: Double, estimatedTransactionsRemaining: Int? = nil, style: Style = .standard) {
         self.currentDust = currentDust
         self.targetDustFor100Txns = targetDustFor100Txns
         if let remaining = estimatedTransactionsRemaining {
@@ -103,6 +169,7 @@ struct DustFuelRing: View {
             let ratio = targetDustFor100Txns > 0 ? currentDust / targetDustFor100Txns : 0
             self.estimatedTransactionsRemaining = Int((ratio * 100).rounded(.down))
         }
+        self.style = style
     }
 
     var body: some View {
@@ -120,7 +187,8 @@ struct DustFuelRing: View {
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut(duration: 0.4), value: progress)
-                    .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.04 : 1.0) : 1.0)
+                    .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.02 : 1.0) : 1.0)
+                    .opacity(progress < 0.25 && progress > 0 ? (pulse ? 0.62 : 1.0) : 1.0)
                     .animation(progress < 0.25 && progress > 0 ? pulseAnimation : .default, value: pulse)
                     .onAppear {
                         if progress < 0.25 && progress > 0 {

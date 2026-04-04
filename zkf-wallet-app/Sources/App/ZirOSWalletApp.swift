@@ -15,12 +15,15 @@ struct ZirOSWalletApp: App {
 #if os(macOS)
                 .frame(minWidth: 1100, minHeight: 760)
 #endif
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(ColorScheme.dark)
                 .tint(Color(red: 0.0, green: 0.0, blue: 0.996))
                 .onOpenURL { url in
                     coordinator.handleIncomingBridgeURL(url)
                 }
         }
+#if os(macOS)
+        .defaultSize(width: 1360, height: 860)
+#endif
 #if os(macOS)
         .commands {
             CommandMenu("Wallet") {
@@ -52,6 +55,11 @@ struct ZirOSWalletApp: App {
                 Button("Open More") {
                     coordinator.selectedSection = .more
                 }
+
+                Button("Open Settings") {
+                    coordinator.selectedSection = .more
+                }
+                .keyboardShortcut(",", modifiers: [.command])
             }
         }
 #endif

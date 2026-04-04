@@ -67,6 +67,7 @@ targets:
       - path: Resources
     settings:
       base:
+        DEVELOPMENT_TEAM: M454G64BS4
         PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet.ios
         PRODUCT_NAME: ZirOSWalletiOS
         GENERATE_INFOPLIST_FILE: YES
@@ -80,6 +81,7 @@ targets:
         SUPPORTED_DEVICE_FAMILIES: 1
         TARGETED_DEVICE_FAMILY: 1
         ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+        CODE_SIGN_IDENTITY: Apple Development
         SYMROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS"
         OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS/Intermediates"
         OTHER_LDFLAGS[sdk=iphonesimulator*]:

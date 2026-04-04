@@ -19,6 +19,14 @@ enum WalletPlatformSupport {
 #endif
     }
 
+    static var biometricSymbol: String {
+#if os(iOS)
+        return "faceid"
+#else
+        return "touchid"
+#endif
+    }
+
     static func pastedString() -> String? {
 #if os(iOS)
         return UIPasteboard.general.string
@@ -34,6 +42,14 @@ enum WalletPlatformSupport {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(value, forType: .string)
+#endif
+    }
+
+    static func openURL(_ url: URL) {
+#if os(iOS)
+        UIApplication.shared.open(url)
+#else
+        NSWorkspace.shared.open(url)
 #endif
     }
 

@@ -234,6 +234,17 @@ final class WalletCoordinator {
         Task { await bridgePumpTick() }
     }
 
+    func openExplorerTransaction(txHash: String) {
+        guard let baseURL = snapshot?.services?.explorerUrl,
+              let url = URL(string: "\(baseURL)/transactions/\(txHash)")
+        else {
+            WalletPlatformSupport.copyToPasteboard(txHash)
+            statusMessage = "Transaction hash copied for external verification."
+            return
+        }
+        WalletPlatformSupport.openURL(url)
+    }
+
     func beginSelectedAction() async {
         await withBusyState { [self] in
             guard self.helperExecutionAvailability.isAvailable else {
