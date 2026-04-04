@@ -91,11 +91,20 @@ When prose and generated evidence disagree, trust the live truth surfaces:
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
 - Total ledger entries: 169.
-- Machine-checked rows: 169 total (169 `mechanized_local`, 0 `mechanized_generated`).
-- Remaining bounded/external/pending rows: 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
+- Machine-checked rows: 160 total (160 `mechanized_local`, 0 `mechanized_generated`).
+- Remaining non-machine-checked rows: 9 `hypothesis_stated`, 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
 - Assurance classes: 157 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 0 `model_only_claim`, 12 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
-- Rows with non-empty `trusted_assumptions`: 0.
-- All protocol rows are `mechanized_local`.
+- Rows with non-empty `trusted_assumptions`: 9.
+- Open protocol rows:
+  - `protocol.fri_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.fri_proximity_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.groth16_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.groth16_knowledge_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.groth16_zero_knowledge`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.hypernova_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.hypernova_folding_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.nova_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
+  - `protocol.nova_folding_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
 <!-- END GENERATED VERIFICATION STATUS -->

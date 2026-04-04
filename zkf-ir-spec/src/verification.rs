@@ -21,6 +21,7 @@ pub enum VerificationStatus {
     BoundedChecked,
     MechanizedLocal,
     MechanizedGenerated,
+    HypothesisStated,
     AssumedExternal,
 }
 
@@ -50,6 +51,13 @@ impl VerificationLedgerEntry {
     pub fn assurance_class(&self) -> VerificationAssuranceClass {
         if self.status == VerificationStatus::BoundedChecked {
             return VerificationAssuranceClass::BoundedCheck;
+        }
+
+        if matches!(
+            self.status,
+            VerificationStatus::HypothesisStated | VerificationStatus::AssumedExternal
+        ) {
+            return VerificationAssuranceClass::HypothesisCarriedTheorem;
         }
 
         if self.theorem_id.starts_with("protocol.")
@@ -108,7 +116,7 @@ pub struct VerificationLedger {
 
 pub fn verification_ledger() -> VerificationLedger {
     VerificationLedger {
-        schema: "zkf-verification-ledger-v5".to_string(),
+        schema: "zkf-verification-ledger-v6".to_string(),
         entries: vec![
             VerificationLedgerEntry {
                 theorem_id: "ccs.fail_closed_conversion".to_string(),
@@ -2251,13 +2259,15 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `groth16_exact_completeness` now proves the shipped exact BN254 Groth16 surface reduces verifier acceptance to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the imported CRS boundary carried as an explicit theorem hypothesis instead of a ledger trust note."
+                    "Exact Groth16 completeness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to reduce to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "groth16ImportedCrsValidityHypothesis".to_string(),
+                    "groth16ExactCompletenessHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.groth16_knowledge_soundness".to_string(),
@@ -2265,13 +2275,15 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `groth16_exact_knowledge_soundness` now binds the shipped exact BN254 Groth16 verifier surface directly to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, removing the prior abstract-model transport shell."
+                    "Exact Groth16 knowledge soundness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the shipped boundary is still understood to depend on `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "groth16ImportedCrsValidityHypothesis".to_string(),
+                    "groth16KnowledgeOfExponentHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.groth16_zero_knowledge".to_string(),
@@ -2279,13 +2291,15 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `groth16_exact_zero_knowledge` now proves equality of the shipped public-view surface under `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, so the imported CRS and simulator assumptions live in theorem hypotheses rather than ledger notes."
+                    "Exact Groth16 zero knowledge remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the public-view equivalence claim still depends on `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, without claiming a local mechanized proof artifact."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "groth16ImportedCrsValidityHypothesis".to_string(),
+                    "groth16ExactZeroKnowledgeHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.fri_completeness".to_string(),
@@ -2293,13 +2307,12 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `fri_exact_completeness` now proves shipped-surface verifier acceptance from `friExactCompletenessHypothesis` over the exact Plonky3 transcript, seed, and verifier-guard surface."
+                    "Exact FRI completeness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `friExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec!["friExactCompletenessHypothesis".to_string()],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.fri_proximity_soundness".to_string(),
@@ -2307,13 +2320,14 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `fri_exact_proximity_soundness` now binds the shipped Plonky3 FRI verifier surface directly to `friReedSolomonProximitySoundnessHypothesis` over the exact transcript and replayed seed boundary."
+                    "Exact FRI proximity soundness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `friReedSolomonProximitySoundnessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "friReedSolomonProximitySoundnessHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.nova_completeness".to_string(),
@@ -2321,13 +2335,15 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `nova_exact_completeness` now proves shipped classic-Nova verifier acceptance from `novaExactCompletenessHypothesis` plus the explicit `completeClassicNovaIvcMetadata` side condition carried on the exact artifact surface."
+                    "Exact Nova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "novaExactCompletenessHypothesis".to_string(),
+                    "completeClassicNovaIvcMetadata".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.nova_folding_soundness".to_string(),
@@ -2335,13 +2351,14 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `nova_exact_folding_sound` now ties the shipped classic-Nova verifier surface to `novaExactFoldingSoundnessHypothesis` over the exact native profile metadata and verifier guards."
+                    "Exact Nova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `novaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "novaExactFoldingSoundnessHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.hypernova_completeness".to_string(),
@@ -2349,13 +2366,14 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `hypernova_exact_completeness` now proves shipped HyperNova verifier acceptance from `hypernovaExactCompletenessHypothesis` over the exact CCS profile metadata and verifier guards."
+                    "Exact HyperNova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `hypernovaExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "hypernovaExactCompletenessHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.hypernova_folding_soundness".to_string(),
@@ -2363,13 +2381,14 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
                 checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
-                    .to_string(),
+                status: VerificationStatus::HypothesisStated,
+                evidence_path: String::new(),
                 notes:
-                    "Local Lean theorem `hypernova_exact_folding_sound` now ties the shipped HyperNova verifier surface to `hypernovaExactFoldingSoundnessHypothesis` over the exact CCS profile metadata and verifier guards."
+                    "Exact HyperNova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `hypernovaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "hypernovaExactFoldingSoundnessHypothesis".to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "private_identity.merkle_direction_fail_closed_bounded".to_string(),
@@ -2542,7 +2561,7 @@ mod tests {
                         entry.theorem_id
                     );
                 }
-                VerificationStatus::Pending => {}
+                VerificationStatus::Pending | VerificationStatus::HypothesisStated => {}
             }
         }
     }
@@ -2552,7 +2571,9 @@ mod tests {
         let ledger = verification_ledger();
         for entry in &ledger.entries {
             match entry.status {
-                VerificationStatus::Pending | VerificationStatus::AssumedExternal => {
+                VerificationStatus::Pending
+                | VerificationStatus::HypothesisStated
+                | VerificationStatus::AssumedExternal => {
                     assert!(
                         !entry.trusted_assumptions.is_empty(),
                         "entry {} should explain its remaining trust boundary",

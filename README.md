@@ -24,7 +24,7 @@ ZirOS core is proprietary and private. No public source-use grant, Change Date, 
 | Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
 | Metal shader sources | 18 `.metal` files with 50 kernel entrypoints |
 | Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 169 total rows, 169 `mechanized_local`, 0 `model_only_claim`, 0 `attestation_backed_lane`, 12 `hypothesis_carried_theorem`, 0 pending |
+| Verification ledger | 169 total rows, 160 `mechanized_local`, 9 `hypothesis_stated`, 0 `model_only_claim`, 0 `attestation_backed_lane`, 12 `hypothesis_carried_theorem`, 0 pending |
 | Runtime proof coverage | 89 files and 1,788 functions marked complete |
 
 ## Table Of Contents
@@ -240,8 +240,9 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 | Metric | Value |
 | --- | --- |
 | Total verification-ledger rows | 169 |
-| `mechanized_local` rows | 169 |
+| `mechanized_local` rows | 160 |
 | `mechanized_generated` rows | 0 |
+| `hypothesis_stated` rows | 9 |
 | `bounded_checked` rows | 0 |
 | `assumed_external` rows | 0 |
 | Pending rows | 0 |
@@ -249,8 +250,8 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 | `attestation_backed_lane` | 0 |
 | `model_only_claim` | 0 |
 | `hypothesis_carried_theorem` | 12 (9 protocol + 3 attestation-honesty) |
-| Trusted assumptions | 0 |
-| Release grade ready | true |
+| Trusted assumptions | 9 |
+| Release grade ready | false |
 | Runtime/distributed proof coverage | 89 files, 1,788 functions complete |
 | Rust tests passed | 1,047 (core 200, backends 345, runtime 155, distributed 97, ir-spec 38, cli 212) |
 | Proof languages | Lean 4, Rocq/Coq, Verus, F*, Kani |
@@ -287,7 +288,7 @@ Strict cryptographic lanes (compile, prove, wrap, deploy, release-safe consumpti
 
 ### Assurance Closure (March 30, 2026)
 
-All 16 former model-only claims rebound to shipped production code. All 3 former attestation-backed lanes converted to hypothesis-carried theorems with explicit attestation-honesty premises. 1 new theorem added: `setup.groth16_deterministic_production_gate`. Result: **0 model-only claims, 0 attestation-backed lanes, 169/169 mechanized.**
+All 16 former model-only claims rebound to shipped production code. All 3 former attestation-backed lanes converted to hypothesis-carried theorems with explicit attestation-honesty premises. 1 new theorem added: `setup.groth16_deterministic_production_gate`. The current checkout now carries the nine protocol rows honestly as hypothesis-stated because the referenced exact proof artifacts are not present in-tree. Result: **0 model-only claims, 0 attestation-backed lanes, 160/169 machine-checked with 9 protocol rows explicitly hypothesis-stated.**
 
 ### The Verified Metal Lane
 

@@ -258,6 +258,7 @@ fn ensure_repo_relative_path_exists(relative_path: &str) -> ZkfResult<()> {
 fn normalized_classification(entry: &LedgerEntry) -> &'static str {
     match entry.status.as_str() {
         "bounded_checked" => "bounded",
+        "hypothesis_stated" => "hypothesis-carried",
         _ => match entry.assurance_class.as_str() {
             "mechanized_implementation_claim" => "mechanized",
             "bounded_check" => "bounded",
@@ -344,46 +345,54 @@ fn ledger_surface_specs() -> Vec<LedgerSurfaceSpec> {
             ],
         },
         LedgerSurfaceSpec {
-            surface_id: "core.proof_constant_time_spec",
-            label: "Constant-time proof-facing evaluator surface",
-            source_path: "zkf-core/src/proof_constant_time_spec.rs",
+            surface_id: "core.proof_constant_time_bridge",
+            label: "Constant-time proof-facing evaluator bridge surface",
+            source_path: "zkf-core/src/proof_constant_time_bridge.rs",
             claims: &[
                 LedgerClaimSpec {
                     theorem_id: "swarm.constant_time_eval_equivalence",
-                    expected_scope: "zkf-core::proof_constant_time_spec",
+                    expected_scope: "zkf-core::proof_constant_time_bridge",
                 },
                 LedgerClaimSpec {
                     theorem_id: "security.constant_time_secret_independence",
-                    expected_scope: "zkf-core::proof_constant_time_spec",
+                    expected_scope: "zkf-core::proof_constant_time_bridge",
                 },
             ],
             extraction_paths: &["zkf-core/proofs/fstar/ConstantTimeProofs.fst"],
         },
         LedgerSurfaceSpec {
-            surface_id: "runtime.proof_runtime_spec",
-            label: "Runtime proof-facing decision helpers",
-            source_path: "zkf-runtime/src/proof_runtime_spec.rs",
+            surface_id: "runtime.hybrid_core",
+            label: "Hybrid runtime decision helpers",
+            source_path: "zkf-runtime/src/hybrid_core.rs",
             claims: &[
                 LedgerClaimSpec {
                     theorem_id: "hybrid.and_verification_semantics_bounded",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
+                    expected_scope: "zkf-runtime::hybrid_core",
                 },
                 LedgerClaimSpec {
                     theorem_id: "hybrid.transcript_hash_binding_bounded",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
+                    expected_scope: "zkf-runtime::hybrid_core",
                 },
                 LedgerClaimSpec {
                     theorem_id: "hybrid.hardware_probe_rejection_bounded",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
+                    expected_scope: "zkf-runtime::hybrid_core",
                 },
                 LedgerClaimSpec {
                     theorem_id: "hybrid.primary_leg_outer_artifact_binding_bounded",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
+                    expected_scope: "zkf-runtime::hybrid_core",
                 },
                 LedgerClaimSpec {
                     theorem_id: "hybrid.replay_manifest_determinism_bounded",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
+                    expected_scope: "zkf-runtime::hybrid_core",
                 },
+            ],
+            extraction_paths: &["zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"],
+        },
+        LedgerSurfaceSpec {
+            surface_id: "runtime.proof_runtime_spec",
+            label: "Runtime CLI/pipeline proof helpers",
+            source_path: "zkf-runtime/src/proof_runtime_spec.rs",
+            claims: &[
                 LedgerClaimSpec {
                     theorem_id: "pipeline.cli_runtime_path_composition",
                     expected_scope: "zkf-runtime::proof_runtime_spec",
@@ -491,7 +500,7 @@ fn ledger_surface_specs() -> Vec<LedgerSurfaceSpec> {
         LedgerSurfaceSpec {
             surface_id: "protocol.groth16_exact",
             label: "Groth16 exact shipped protocol surface",
-            source_path: "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
+            source_path: "zkf-backends/src/arkworks.rs",
             claims: &[
                 LedgerClaimSpec {
                     theorem_id: "protocol.groth16_completeness",
@@ -536,7 +545,8 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "truth.backend.arkworks_groth16",
                 "truth.runtime_proof_coverage",
                 "core.proof_witness_generation_spec",
-                "core.proof_constant_time_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
                 "runtime.proof_runtime_spec",
                 "lib.proof_embedded_app_spec",
                 "backend.audited_backend_boundary",
@@ -579,7 +589,8 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "truth.backend.arkworks_groth16",
                 "truth.runtime_proof_coverage",
                 "core.proof_witness_generation_spec",
-                "core.proof_constant_time_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
                 "runtime.proof_runtime_spec",
                 "lib.proof_embedded_app_spec",
                 "backend.audited_backend_boundary",
@@ -623,7 +634,8 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "truth.backend.arkworks_groth16",
                 "truth.runtime_proof_coverage",
                 "core.proof_witness_generation_spec",
-                "core.proof_constant_time_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
                 "runtime.proof_runtime_spec",
                 "lib.proof_embedded_app_spec",
                 "backend.audited_backend_boundary",
@@ -655,7 +667,8 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "truth.backend.arkworks_groth16",
                 "truth.runtime_proof_coverage",
                 "core.proof_witness_generation_spec",
-                "core.proof_constant_time_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
                 "runtime.proof_runtime_spec",
                 "lib.proof_embedded_app_spec",
                 "backend.audited_backend_boundary",
@@ -678,7 +691,7 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "truth.canonical_truth_active_boundaries",
                 "truth.backend.arkworks_groth16",
                 "core.proof_witness_generation_spec",
-                "core.proof_constant_time_spec",
+                "core.proof_constant_time_bridge",
                 "lib.proof_embedded_app_spec",
                 "backend.audited_backend_boundary",
                 "backend.groth16_boundary_model",
@@ -694,7 +707,12 @@ fn build_ledger_claim(
     extraction_paths: &[&str],
 ) -> ZkfResult<serde_json::Value> {
     ensure_repo_relative_path_exists(surface_source_path)?;
-    ensure_repo_relative_path_exists(&entry.evidence_path)?;
+    let proof_path = if entry.evidence_path.trim().is_empty() {
+        serde_json::Value::Null
+    } else {
+        ensure_repo_relative_path_exists(&entry.evidence_path)?;
+        json!(entry.evidence_path)
+    };
     for extraction_path in extraction_paths {
         ensure_repo_relative_path_exists(extraction_path)?;
     }
@@ -706,7 +724,7 @@ fn build_ledger_claim(
         "source": "verification-ledger",
         "source_scope": entry.scope,
         "source_path": surface_source_path,
-        "proof_path": entry.evidence_path,
+        "proof_path": proof_path,
         "checker": entry.checker,
         "status": entry.status,
         "source_assurance_class": entry.assurance_class,
@@ -733,7 +751,9 @@ fn build_ledger_surface(
                 claim_spec.expected_scope, entry.scope
             )));
         }
-        evidence_paths.insert(entry.evidence_path.clone());
+        if !entry.evidence_path.trim().is_empty() {
+            evidence_paths.insert(entry.evidence_path.clone());
+        }
         claims.push(build_ledger_claim(
             entry,
             spec.source_path,
@@ -1510,6 +1530,7 @@ pub fn effective_gpu_attribution_summary(
 ) -> serde_json::Value {
     let mut evidence_sources = BTreeSet::new();
     let mut artifact_metadata_evidence = serde_json::Map::new();
+    let mut realized_gpu_capable_stages = BTreeSet::new();
     let mut effective_gpu_busy_ratio = runtime_gpu_busy_ratio.max(0.0);
 
     if runtime_gpu_nodes > 0 {
@@ -1522,6 +1543,7 @@ pub fn effective_gpu_attribution_summary(
     let metadata_keys = [
         "best_msm_accelerator",
         "gpu_stage_coverage",
+        "groth16_execution_classification",
         "groth16_msm_engine",
         "metal_available",
         "metal_compiled",
@@ -1535,36 +1557,38 @@ pub fn effective_gpu_attribution_summary(
         }
     }
 
-    let backend_uses_metal = [
-        "best_msm_accelerator",
-        "groth16_msm_engine",
-        "qap_witness_map_engine",
-    ]
-    .iter()
-    .any(|key| {
-        artifact_metadata
-            .get(*key)
-            .map(|value| value.to_ascii_lowercase().contains("metal"))
-            .unwrap_or(false)
-    });
-    if backend_uses_metal {
-        evidence_sources.insert("artifact.metadata.backend_engine".to_string());
+    let groth16_execution_realized = artifact_metadata
+        .get("groth16_execution_classification")
+        .map(|value| {
+            let normalized = value.to_ascii_lowercase();
+            normalized.contains("metal-realized") || normalized.contains("metal_complete")
+        })
+        .unwrap_or(false);
+    if groth16_execution_realized {
+        evidence_sources.insert("artifact.metadata.groth16_execution.classification".to_string());
     }
 
-    let gpu_stage_coverage_mentions_metal = artifact_metadata
-        .get("gpu_stage_coverage")
+    let msm_realized = artifact_metadata
+        .get("groth16_msm_engine")
         .map(|value| value.to_ascii_lowercase().contains("metal"))
         .unwrap_or(false);
-    if gpu_stage_coverage_mentions_metal {
-        evidence_sources.insert("artifact.metadata.gpu_stage_coverage".to_string());
+    if msm_realized {
+        realized_gpu_capable_stages.insert("msm".to_string());
+        evidence_sources.insert("artifact.metadata.groth16_execution.msm".to_string());
+    }
+
+    let witness_map_realized = artifact_metadata
+        .get("qap_witness_map_engine")
+        .map(|value| value.to_ascii_lowercase().contains("metal"))
+        .unwrap_or(false);
+    if witness_map_realized {
+        realized_gpu_capable_stages.insert("witness_map".to_string());
+        evidence_sources.insert("artifact.metadata.groth16_execution.witness_map".to_string());
     }
 
     let metal_stack_ready = ["metal_available", "metal_compiled", "metal_complete"]
         .iter()
         .all(|key| artifact_metadata.get(*key).map(String::as_str) == Some("true"));
-    if metal_stack_ready {
-        evidence_sources.insert("artifact.metadata.metal_ready".to_string());
-    }
 
     let artifact_busy_ratio = artifact_metadata
         .get("metal_gpu_busy_ratio")
@@ -1576,11 +1600,15 @@ pub fn effective_gpu_attribution_summary(
         evidence_sources.insert("artifact.metadata.metal_gpu_busy_ratio".to_string());
     }
 
+    let backend_realized = groth16_execution_realized
+        || msm_realized
+        || witness_map_realized
+        || (metal_stack_ready && artifact_busy_ratio > 0.0);
+
     let effective_gpu_participation = runtime_gpu_nodes > 0
         || runtime_gpu_busy_ratio > 0.0
         || artifact_busy_ratio > 0.0
-        || backend_uses_metal
-        || gpu_stage_coverage_mentions_metal;
+        || backend_realized;
 
     let classification = if runtime_gpu_nodes > 0 || runtime_gpu_busy_ratio > 0.0 {
         "runtime-direct"
@@ -1597,6 +1625,7 @@ pub fn effective_gpu_attribution_summary(
         "artifact_metal_gpu_busy_ratio": artifact_busy_ratio,
         "effective_gpu_busy_ratio": effective_gpu_busy_ratio,
         "effective_gpu_participation": effective_gpu_participation,
+        "realized_gpu_capable_stages": realized_gpu_capable_stages.into_iter().collect::<Vec<_>>(),
         "evidence_sources": evidence_sources.into_iter().collect::<Vec<_>>(),
         "artifact_metadata_evidence": artifact_metadata_evidence,
     })

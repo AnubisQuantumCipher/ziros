@@ -1,5 +1,5 @@
 {
-  "schema": "zkf-verification-ledger-v5",
+  "schema": "zkf-verification-ledger-v6",
   "entries": [
     {
       "theorem_id": "ccs.fail_closed_conversion",
@@ -1656,99 +1656,121 @@
       "title": "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses",
       "scope": "zkf-backends::arkworks",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
-      "notes": "Local Lean theorem `groth16_exact_completeness` now proves the shipped exact BN254 Groth16 surface reduces verifier acceptance to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the imported CRS boundary carried as an explicit theorem hypothesis instead of a ledger trust note.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact Groth16 completeness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to reduce to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "groth16ImportedCrsValidityHypothesis",
+        "groth16ExactCompletenessHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.groth16_knowledge_soundness",
       "title": "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses",
       "scope": "zkf-backends::arkworks",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
-      "notes": "Local Lean theorem `groth16_exact_knowledge_soundness` now binds the shipped exact BN254 Groth16 verifier surface directly to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, removing the prior abstract-model transport shell.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact Groth16 knowledge soundness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the shipped boundary is still understood to depend on `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "groth16ImportedCrsValidityHypothesis",
+        "groth16KnowledgeOfExponentHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.groth16_zero_knowledge",
       "title": "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses",
       "scope": "zkf-backends::arkworks",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
-      "notes": "Local Lean theorem `groth16_exact_zero_knowledge` now proves equality of the shipped public-view surface under `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, so the imported CRS and simulator assumptions live in theorem hypotheses rather than ledger notes.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact Groth16 zero knowledge remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the public-view equivalence claim still depends on `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, without claiming a local mechanized proof artifact.",
+      "trusted_assumptions": [
+        "groth16ImportedCrsValidityHypothesis",
+        "groth16ExactZeroKnowledgeHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.fri_completeness",
       "title": "FRI exact Plonky3 shipped surface satisfies completeness under explicit Reed-Solomon completeness hypotheses",
       "scope": "zkf-backends::plonky3",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
-      "notes": "Local Lean theorem `fri_exact_completeness` now proves shipped-surface verifier acceptance from `friExactCompletenessHypothesis` over the exact Plonky3 transcript, seed, and verifier-guard surface.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact FRI completeness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `friExactCompletenessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "friExactCompletenessHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.fri_proximity_soundness",
       "title": "FRI exact Plonky3 shipped surface reduces proximity soundness to explicit Reed-Solomon hypotheses",
       "scope": "zkf-backends::plonky3",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
-      "notes": "Local Lean theorem `fri_exact_proximity_soundness` now binds the shipped Plonky3 FRI verifier surface directly to `friReedSolomonProximitySoundnessHypothesis` over the exact transcript and replayed seed boundary.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact FRI proximity soundness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `friReedSolomonProximitySoundnessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "friReedSolomonProximitySoundnessHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.nova_completeness",
       "title": "Classic Nova exact native profile satisfies completeness under explicit folding hypotheses",
       "scope": "zkf-backends::nova_native",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
-      "notes": "Local Lean theorem `nova_exact_completeness` now proves shipped classic-Nova verifier acceptance from `novaExactCompletenessHypothesis` plus the explicit `completeClassicNovaIvcMetadata` side condition carried on the exact artifact surface.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact Nova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "novaExactCompletenessHypothesis",
+        "completeClassicNovaIvcMetadata"
+      ]
     },
     {
       "theorem_id": "protocol.nova_folding_soundness",
       "title": "Classic Nova exact native profile reduces folding soundness to explicit commitment-binding hypotheses",
       "scope": "zkf-backends::nova_native",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
-      "notes": "Local Lean theorem `nova_exact_folding_sound` now ties the shipped classic-Nova verifier surface to `novaExactFoldingSoundnessHypothesis` over the exact native profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact Nova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `novaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "novaExactFoldingSoundnessHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.hypernova_completeness",
       "title": "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses",
       "scope": "zkf-backends::nova_native",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
-      "notes": "Local Lean theorem `hypernova_exact_completeness` now proves shipped HyperNova verifier acceptance from `hypernovaExactCompletenessHypothesis` over the exact CCS profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact HyperNova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `hypernovaExactCompletenessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "hypernovaExactCompletenessHypothesis"
+      ]
     },
     {
       "theorem_id": "protocol.hypernova_folding_soundness",
       "title": "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses",
       "scope": "zkf-backends::nova_native",
       "checker": "lean",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "assurance_class": "hypothesis_carried_theorem",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
-      "notes": "Local Lean theorem `hypernova_exact_folding_sound` now ties the shipped HyperNova verifier surface to `hypernovaExactFoldingSoundnessHypothesis` over the exact CCS profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "evidence_path": "",
+      "notes": "Exact HyperNova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `hypernovaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof.",
+      "trusted_assumptions": [
+        "hypernovaExactFoldingSoundnessHypothesis"
+      ]
     },
     {
       "theorem_id": "private_identity.merkle_direction_fail_closed_bounded",
