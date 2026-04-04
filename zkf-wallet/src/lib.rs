@@ -580,11 +580,11 @@ impl WalletHandle {
     }
 
     pub fn unlock(&mut self, prompt: &str) -> Result<(), WalletError> {
-        self.seed_store.require_seed_material(self.network)?;
+        let seed = self.seed_store.unlock_seed_material(self.network, prompt)?;
         self.authorizer.ensure_material(self.network)?;
-        self.authorizer.authenticate(self.network, prompt)?;
         let now = self.clock.now();
         self.session.unlocked = true;
+        self.session.seed_material = Some(seed);
         self.session.unlocked_at = Some(now);
         self.session.last_activity_at = Some(now);
         self.record_history("unlock", "wallet unlocked with biometrics");
@@ -693,7 +693,7 @@ impl WalletHandle {
     pub fn open_helper_session(&mut self) -> Result<HelperSessionBundle, WalletError> {
         self.ensure_session_active()?;
         let now = self.clock.now();
-        let seed = self.seed_store.read_seed_material(self.network)?;
+        let seed = self.active_seed_material()?;
         let session = HelperSession {
             helper_session_id: random_token(),
             network: self.network,
@@ -961,7 +961,7 @@ impl WalletHandle {
 
     pub fn derive_auxiliary_key(&mut self, label: &str) -> Result<Vec<u8>, WalletError> {
         self.ensure_session_active()?;
-        let seed = self.seed_store.read_seed_material(self.network)?;
+        let seed = self.active_seed_material()?;
         let hk = Hkdf::<Sha384>::new(
             Some(self.network.as_str().as_bytes()),
             seed.value.as_bytes(),
@@ -1588,12 +1588,20 @@ impl WalletHandle {
         self.messaging.clear_volatile();
     }
 
+    fn active_seed_material(&self) -> Result<SeedImportMaterial, WalletError> {
+        self.session
+            .seed_material
+            .clone()
+            .ok_or(WalletError::AuthRequired)
+    }
+
     fn import_seed_material(
         &mut self,
         kind: SeedImportKind,
         value: String,
     ) -> Result<SeedImportSummary, WalletError> {
         let now = self.clock.now();
+        self.authorizer.ensure_material(self.network)?;
         let material = SeedImportMaterial {
             kind,
             value,
@@ -1673,13 +1681,16 @@ impl Clock for SystemClock {
 }
 
 pub trait SeedStore: Send + Sync {
-    fn require_seed_material(&self, network: WalletNetwork) -> Result<(), WalletError>;
     fn store_seed_material(
         &self,
         network: WalletNetwork,
         material: &SeedImportMaterial,
     ) -> Result<(), WalletError>;
-    fn read_seed_material(&self, network: WalletNetwork) -> Result<SeedImportMaterial, WalletError>;
+    fn unlock_seed_material(
+        &self,
+        network: WalletNetwork,
+        prompt: &str,
+    ) -> Result<SeedImportMaterial, WalletError>;
 }
 
 #[derive(Debug, Clone)]
@@ -1696,45 +1707,80 @@ impl KeyManagerSeedStore {
 }
 
 impl SeedStore for KeyManagerSeedStore {
-    fn require_seed_material(&self, network: WalletNetwork) -> Result<(), WalletError> {
-        let service = master_seed_service(network);
-        let account = master_seed_account(network);
-        match self.manager.retrieve_key(account.as_str(), service.as_str()) {
-            Ok(_) => Ok(()),
-            Err(error) if error.kind() == io::ErrorKind::NotFound => Err(
-                WalletError::BridgePolicyViolation(
-                    "wallet seed import required before unlock".to_string(),
-                ),
-            ),
-            Err(error) => Err(WalletError::Storage(error)),
-        }
-    }
-
     fn store_seed_material(
         &self,
         network: WalletNetwork,
         material: &SeedImportMaterial,
     ) -> Result<(), WalletError> {
-        let service = master_seed_service(network);
-        let account = master_seed_account(network);
         let serialized = serde_json::to_vec(material).map_err(|error| {
             WalletError::BridgePolicyViolation(format!(
                 "failed to serialize imported seed material: {error}"
             ))
         })?;
-        self.manager
-            .store_key(account.as_str(), service.as_str(), serialized.as_slice())
-            .map_err(WalletError::Storage)
+        #[cfg(any(target_os = "macos", target_os = "ios"))]
+        {
+            store_secure_seed_item(network, serialized.as_slice()).map_err(WalletError::Storage)?;
+            let _ = self
+                .manager
+                .delete_key(master_seed_account(network).as_str(), master_seed_service(network).as_str());
+            Ok(())
+        }
+        #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+        {
+            let service = master_seed_service(network);
+            let account = master_seed_account(network);
+            self.manager
+                .store_key(account.as_str(), service.as_str(), serialized.as_slice())
+                .map_err(WalletError::Storage)
+        }
     }
 
-    fn read_seed_material(&self, network: WalletNetwork) -> Result<SeedImportMaterial, WalletError> {
-        let service = master_seed_service(network);
-        let account = master_seed_account(network);
-        let seed = self
-            .manager
-            .retrieve_key(account.as_str(), service.as_str())
-            .map_err(WalletError::Storage)?;
-        decode_seed_material(seed, network)
+    fn unlock_seed_material(
+        &self,
+        network: WalletNetwork,
+        prompt: &str,
+    ) -> Result<SeedImportMaterial, WalletError> {
+        #[cfg(any(target_os = "macos", target_os = "ios"))]
+        {
+            match retrieve_secure_seed_item(network, Some(prompt)) {
+                Ok(seed) => decode_seed_material(seed, network),
+                Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                    let service = master_seed_service(network);
+                    let account = master_seed_account(network);
+                    let legacy = match self.manager.retrieve_key(account.as_str(), service.as_str()) {
+                        Ok(seed) => seed,
+                        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                            return Err(WalletError::BridgePolicyViolation(
+                                "wallet seed import required before unlock".to_string(),
+                            ));
+                        }
+                        Err(error) => return Err(WalletError::Storage(error)),
+                    };
+                    store_secure_seed_item(network, legacy.as_slice()).map_err(WalletError::Storage)?;
+                    let _ = self.manager.delete_key(account.as_str(), service.as_str());
+                    decode_seed_material(legacy, network)
+                }
+                Err(error) => Err(WalletError::BiometricFailed(error.to_string())),
+            }
+        }
+        #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+        {
+            let service = master_seed_service(network);
+            let account = master_seed_account(network);
+            let seed = self
+                .manager
+                .retrieve_key(account.as_str(), service.as_str())
+                .map_err(|error| {
+                    if error.kind() == io::ErrorKind::NotFound {
+                        WalletError::BridgePolicyViolation(
+                            "wallet seed import required before unlock".to_string(),
+                        )
+                    } else {
+                        WalletError::Storage(error)
+                    }
+                })?;
+            decode_seed_material(seed, network)
+        }
     }
 }
 
@@ -1813,6 +1859,7 @@ struct SessionState {
     unlocked: bool,
     unlocked_at: Option<DateTime<Utc>>,
     last_activity_at: Option<DateTime<Utc>>,
+    seed_material: Option<SeedImportMaterial>,
     helper_session: Option<HelperSession>,
 }
 
@@ -2007,6 +2054,16 @@ fn master_seed_account(network: WalletNetwork) -> String {
     format!("{}-master-seed", network.as_str())
 }
 
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn secure_seed_service(network: WalletNetwork) -> String {
+    format!("com.ziros.midnight.wallet.{}.secure-seed", network.as_str())
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn secure_seed_account(network: WalletNetwork) -> String {
+    format!("{}-secure-seed", network.as_str())
+}
+
 fn decode_seed_material(
     stored: Vec<u8>,
     _network: WalletNetwork,
@@ -2148,12 +2205,27 @@ fn authenticate_biometric_gate_item(
     network: WalletNetwork,
     prompt: &str,
 ) -> Result<(), WalletError> {
+    match copy_biometric_gate_payload(network, prompt) {
+        Ok(payload) => validate_biometric_gate_payload(payload),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            create_biometric_gate_item(network)?;
+            let payload = copy_biometric_gate_payload(network, prompt)
+                .map_err(|retry_error| WalletError::BiometricFailed(retry_error.to_string()))?;
+            validate_biometric_gate_payload(payload)
+        }
+        Err(error) => Err(WalletError::BiometricFailed(error.to_string())),
+    }
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn copy_biometric_gate_payload(network: WalletNetwork, prompt: &str) -> io::Result<Vec<u8>> {
     use core_foundation::base::CFTypeRef;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::data::CFData;
     use core_foundation::dictionary::CFDictionary;
     use core_foundation::string::CFString;
+    use security_framework_sys::base::errSecItemNotFound;
     use security_framework_sys::item::{
         kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
         kSecClassGenericPassword, kSecReturnData,
@@ -2194,15 +2266,27 @@ fn authenticate_biometric_gate_item(
     ];
     let dict = CFDictionary::from_CFType_pairs(&query);
     let mut value: CFTypeRef = std::ptr::null();
-    cvt_status(unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) })
-        .map_err(WalletError::BiometricFailed)?;
+    let status = unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) };
+    if status == errSecItemNotFound {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("missing biometric gate item {service}/{account}"),
+        ));
+    }
+    cvt_status(status).map_err(io::Error::other)?;
     if value.is_null() {
-        return Err(WalletError::BiometricFailed(
-            "biometric gate returned no data".to_string(),
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("missing biometric gate item {service}/{account}"),
         ));
     }
     let data = unsafe { CFData::wrap_under_create_rule(value as _) };
-    if data.bytes().is_empty() {
+    Ok(data.bytes().to_vec())
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn validate_biometric_gate_payload(payload: Vec<u8>) -> Result<(), WalletError> {
+    if payload.is_empty() {
         return Err(WalletError::BiometricFailed(
             "biometric gate item returned empty payload".to_string(),
         ));
@@ -2215,6 +2299,156 @@ fn random_gate_payload() -> Vec<u8> {
     let mut bytes = [0u8; 32];
     OsRng.fill_bytes(&mut bytes);
     bytes.to_vec()
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn store_secure_seed_item(network: WalletNetwork, bytes: &[u8]) -> io::Result<()> {
+    use core_foundation::base::TCFType;
+    use core_foundation::boolean::CFBoolean;
+    use core_foundation::data::CFData;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::CFString;
+    use security_framework::access_control::{ProtectionMode, SecAccessControl};
+    use security_framework_sys::access_control::kSecAccessControlBiometryCurrentSet;
+    use security_framework_sys::base::errSecItemNotFound;
+    use security_framework_sys::item::{
+        kSecAttrAccessControl, kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable,
+        kSecClass, kSecClassGenericPassword, kSecValueData,
+    };
+    use security_framework_sys::keychain_item::{SecItemAdd, SecItemDelete};
+
+    let access_control = SecAccessControl::create_with_protection(
+        Some(ProtectionMode::AccessibleWhenPasscodeSetThisDeviceOnly),
+        kSecAccessControlBiometryCurrentSet,
+    )
+    .map_err(|error| io::Error::other(error.to_string()))?;
+    let service = secure_seed_service(network);
+    let account = secure_seed_account(network);
+    let selector = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(false).into_CFType(),
+        ),
+    ];
+    let selector_dict = CFDictionary::from_CFType_pairs(&selector);
+    let delete_status = unsafe { SecItemDelete(selector_dict.as_concrete_TypeRef()) };
+    if delete_status != 0 && delete_status != errSecItemNotFound {
+        cvt_status(delete_status).map_err(io::Error::other)?;
+    }
+
+    let query = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(false).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccessControl) },
+            access_control.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecValueData) },
+            CFData::from_buffer(bytes).into_CFType(),
+        ),
+    ];
+    let dict = CFDictionary::from_CFType_pairs(&query);
+    let status = unsafe { SecItemAdd(dict.as_concrete_TypeRef(), std::ptr::null_mut()) };
+    cvt_status(status).map_err(io::Error::other)
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+fn retrieve_secure_seed_item(
+    network: WalletNetwork,
+    prompt: Option<&str>,
+) -> io::Result<Vec<u8>> {
+    use core_foundation::base::CFTypeRef;
+    use core_foundation::base::TCFType;
+    use core_foundation::boolean::CFBoolean;
+    use core_foundation::data::CFData;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::CFString;
+    use security_framework_sys::base::errSecItemNotFound;
+    use security_framework_sys::item::{
+        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
+        kSecClassGenericPassword, kSecReturnData,
+    };
+    use security_framework_sys::keychain_item::SecItemCopyMatching;
+
+    unsafe extern "C" {
+        static kSecUseOperationPrompt: *const core_foundation::string::__CFString;
+    }
+
+    let service = secure_seed_service(network);
+    let account = secure_seed_account(network);
+    let mut query = vec![
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecClass) },
+            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            CFString::from(service.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            CFString::from(account.as_str()).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            CFBoolean::from(false).into_CFType(),
+        ),
+        (
+            unsafe { CFString::wrap_under_get_rule(kSecReturnData) },
+            CFBoolean::from(true).into_CFType(),
+        ),
+    ];
+    if let Some(prompt) = prompt {
+        query.push((
+            unsafe { CFString::wrap_under_get_rule(kSecUseOperationPrompt) },
+            CFString::from(prompt).into_CFType(),
+        ));
+    }
+    let dict = CFDictionary::from_CFType_pairs(&query);
+    let mut value: CFTypeRef = std::ptr::null();
+    let status = unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) };
+    if status == errSecItemNotFound {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("missing secure seed item {service}/{account}"),
+        ));
+    }
+    cvt_status(status).map_err(io::Error::other)?;
+    if value.is_null() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("missing secure seed item {service}/{account}"),
+        ));
+    }
+    let data = unsafe { CFData::wrap_under_create_rule(value as _) };
+    Ok(data.bytes().to_vec())
 }
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
@@ -2275,17 +2509,6 @@ mod tests {
     }
 
     impl SeedStore for MemorySeedStore {
-        fn require_seed_material(&self, network: WalletNetwork) -> Result<(), WalletError> {
-            let guard = self.seeds.lock().expect("seed lock");
-            if guard.contains_key(&network) {
-                Ok(())
-            } else {
-                Err(WalletError::BridgePolicyViolation(
-                    "wallet seed import required before unlock".to_string(),
-                ))
-            }
-        }
-
         fn store_seed_material(
             &self,
             network: WalletNetwork,
@@ -2298,30 +2521,36 @@ mod tests {
             Ok(())
         }
 
-        fn read_seed_material(
+        fn unlock_seed_material(
             &self,
             network: WalletNetwork,
+            _prompt: &str,
         ) -> Result<SeedImportMaterial, WalletError> {
             let guard = self.seeds.lock().expect("seed lock");
             guard
                 .get(&network)
                 .cloned()
                 .ok_or_else(|| {
-                    WalletError::Storage(io::Error::new(
-                        io::ErrorKind::NotFound,
-                        "missing test seed",
-                    ))
+                    WalletError::BridgePolicyViolation(
+                        "wallet seed import required before unlock".to_string(),
+                    )
                 })
         }
     }
 
     #[derive(Debug, Default)]
     struct CountingAuthorizer {
+        ensures: Mutex<usize>,
         prompts: Mutex<Vec<String>>,
         fail: Mutex<bool>,
+        fail_ensure: Mutex<bool>,
     }
 
     impl CountingAuthorizer {
+        fn ensure_count(&self) -> usize {
+            *self.ensures.lock().expect("ensure lock")
+        }
+
         fn prompt_count(&self) -> usize {
             self.prompts.lock().expect("prompt lock").len()
         }
@@ -2333,6 +2562,12 @@ mod tests {
 
     impl BiometricAuthorizer for Arc<CountingAuthorizer> {
         fn ensure_material(&self, _network: WalletNetwork) -> Result<(), WalletError> {
+            if *self.fail_ensure.lock().expect("fail ensure lock") {
+                return Err(WalletError::BiometricFailed(
+                    "failed to provision biometric gate".to_string(),
+                ));
+            }
+            *self.ensures.lock().expect("ensure lock") += 1;
             Ok(())
         }
 
@@ -2444,11 +2679,10 @@ mod tests {
                 &grant,
             )
             .expect("consume grant");
-        assert_eq!(authorizer.prompt_count(), 3);
+        assert_eq!(authorizer.prompt_count(), 2);
         assert_eq!(
             authorizer.recorded_prompts(),
             vec![
-                "Unlock".to_string(),
                 "Approve transfer".to_string(),
                 "Approve large transfer".to_string()
             ]
@@ -2594,6 +2828,34 @@ mod tests {
         let mut wallet = wallet_fixture(authorizer, clock);
         let error = wallet.unlock("Unlock").expect_err("unlock should fail without import");
         assert!(matches!(error, WalletError::BridgePolicyViolation(_)));
+    }
+
+    #[test]
+    fn import_provisions_biometric_material_before_persisting_seed() {
+        let authorizer = Arc::new(CountingAuthorizer::default());
+        let clock = FixedClock::new(Utc::now());
+        let mut wallet = wallet_fixture(authorizer.clone(), clock);
+        import_test_seed(&mut wallet);
+        assert_eq!(authorizer.ensure_count(), 1);
+        assert!(wallet.snapshot().expect("snapshot").has_imported_seed);
+    }
+
+    #[test]
+    fn import_fails_closed_when_biometric_material_cannot_be_provisioned() {
+        let authorizer = Arc::new(CountingAuthorizer::default());
+        *authorizer
+            .fail_ensure
+            .lock()
+            .expect("fail ensure lock") = true;
+        let clock = FixedClock::new(Utc::now());
+        let mut wallet = wallet_fixture(authorizer, clock);
+        let error = wallet
+            .import_master_seed(
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            )
+            .expect_err("import should fail when biometric provisioning fails");
+        assert!(matches!(error, WalletError::BiometricFailed(_)));
+        assert!(!wallet.snapshot().expect("snapshot").has_imported_seed);
     }
 
     #[test]

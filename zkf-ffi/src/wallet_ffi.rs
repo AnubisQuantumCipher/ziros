@@ -1,7 +1,6 @@
 use crate::{c_int_error, clear_last_error, null_error, sanitize_cstring, string_arg};
 use std::collections::HashMap;
 use std::ffi::{c_char, c_int};
-use std::io;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use zkf_cloudfs::CloudFS;
@@ -62,21 +61,6 @@ struct TestingSeedStore {
 }
 
 impl SeedStore for TestingSeedStore {
-    fn require_seed_material(&self, network: WalletNetwork) -> Result<(), WalletError> {
-        if self
-            .materials
-            .lock()
-            .map_err(|_| WalletError::BridgePolicyViolation("testing seed store poisoned".to_string()))?
-            .contains_key(&network)
-        {
-            Ok(())
-        } else {
-            Err(WalletError::BridgePolicyViolation(
-                "wallet seed import required before unlock".to_string(),
-            ))
-        }
-    }
-
     fn store_seed_material(
         &self,
         network: WalletNetwork,
@@ -89,17 +73,20 @@ impl SeedStore for TestingSeedStore {
         Ok(())
     }
 
-    fn read_seed_material(&self, network: WalletNetwork) -> Result<SeedImportMaterial, WalletError> {
+    fn unlock_seed_material(
+        &self,
+        network: WalletNetwork,
+        _prompt: &str,
+    ) -> Result<SeedImportMaterial, WalletError> {
         self.materials
             .lock()
             .map_err(|_| WalletError::BridgePolicyViolation("testing seed store poisoned".to_string()))?
             .get(&network)
             .cloned()
             .ok_or_else(|| {
-                WalletError::Storage(io::Error::new(
-                    io::ErrorKind::NotFound,
-                    "missing testing seed material",
-                ))
+                WalletError::BridgePolicyViolation(
+                    "wallet seed import required before unlock".to_string(),
+                )
             })
     }
 }

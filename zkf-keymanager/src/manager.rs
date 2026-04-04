@@ -190,7 +190,27 @@ impl KeyManager {
             KeyBackend::IcloudKeychain => {
                 #[cfg(target_os = "macos")]
                 {
-                    retrieve_keychain_item(service, id)
+                    match retrieve_keychain_item(service, id) {
+                        Ok(bytes) => Ok(bytes),
+                        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                            let fallback_path = self.file_key_path(id, service);
+                            match retrieve_encrypted_file(&fallback_path) {
+                                Ok(bytes) => {
+                                    // Migrate old fallback-backed material into the now-available
+                                    // synchronizable keychain so subsequent unlocks stay on the
+                                    // primary secure storage path.
+                                    store_keychain_item(service, id, bytes.as_slice())?;
+                                    let _ = delete_encrypted_file(&fallback_path);
+                                    Ok(bytes)
+                                }
+                                Err(file_error) if file_error.kind() == io::ErrorKind::NotFound => {
+                                    Err(error)
+                                }
+                                Err(file_error) => Err(file_error),
+                            }
+                        }
+                        Err(error) => Err(error),
+                    }
                 }
                 #[cfg(not(target_os = "macos"))]
                 {
@@ -500,6 +520,7 @@ fn retrieve_keychain_item(service: &str, account: &str) -> io::Result<Vec<u8>> {
     use core_foundation::data::CFData;
     use core_foundation::dictionary::CFDictionary;
     use core_foundation::string::CFString;
+    use security_framework_sys::base::errSecItemNotFound;
     use security_framework_sys::item::{
         kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
         kSecClassGenericPassword, kSecReturnData,
@@ -530,7 +551,14 @@ fn retrieve_keychain_item(service: &str, account: &str) -> io::Result<Vec<u8>> {
     ];
     let dict = CFDictionary::from_CFType_pairs(&query);
     let mut value: CFTypeRef = std::ptr::null();
-    cvt_status(unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) })?;
+    let status = unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) };
+    if status == errSecItemNotFound {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("missing keychain item {service}/{account}"),
+        ));
+    }
+    cvt_status(status)?;
     if value.is_null() {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
