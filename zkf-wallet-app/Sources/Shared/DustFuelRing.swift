@@ -43,21 +43,21 @@ struct DustFuelRing: View {
         switch style {
         case .standard:
 #if os(iOS)
-            return 16
+            return 12
 #else
-            return 18
+            return 14
 #endif
         case .hero:
 #if os(iOS)
-            return 14
+            return 12
 #else
-            return 16
+            return 14
 #endif
         case .dashboard:
 #if os(iOS)
-            return 16
+            return 12
 #else
-            return 18
+            return 14
 #endif
         }
     }
@@ -66,30 +66,30 @@ struct DustFuelRing: View {
         switch style {
         case .standard:
 #if os(iOS)
-            return .custom("Outfit-ExtraBold", size: 30)
+            return .system(size: 22, weight: .bold, design: .monospaced)
 #else
-            return .custom("Outfit-ExtraBold", size: 34)
+            return .system(size: 26, weight: .bold, design: .monospaced)
 #endif
         case .hero:
 #if os(iOS)
-            return .custom("Outfit-ExtraBold", size: 32)
+            return .system(size: 22, weight: .bold, design: .monospaced)
 #else
-            return .custom("Outfit-ExtraBold", size: 38)
+            return .system(size: 26, weight: .bold, design: .monospaced)
 #endif
         case .dashboard:
 #if os(iOS)
-            return .custom("Outfit-ExtraBold", size: 34)
+            return .system(size: 22, weight: .bold, design: .monospaced)
 #else
-            return .custom("Outfit-ExtraBold", size: 40)
+            return .system(size: 26, weight: .bold, design: .monospaced)
 #endif
         }
     }
 
     private var captionFont: Font {
 #if os(iOS)
-        return .custom("Outfit-Medium", size: style == .dashboard ? 12 : 11)
+        return .system(size: 11, weight: .medium, design: .monospaced)
 #else
-        return WalletBrandAssets.Typography.caption
+        return .system(size: 11, weight: .medium, design: .monospaced)
 #endif
     }
 
@@ -97,21 +97,21 @@ struct DustFuelRing: View {
         switch style {
         case .standard:
 #if os(iOS)
-            return 136
+            return 120
 #else
-            return 144
+            return 140
 #endif
         case .hero:
 #if os(iOS)
-            return 148
+            return 120
 #else
-            return 164
+            return 140
 #endif
         case .dashboard:
 #if os(iOS)
-            return 160
+            return 120
 #else
-            return 180
+            return 140
 #endif
         }
     }
@@ -120,21 +120,21 @@ struct DustFuelRing: View {
         switch style {
         case .standard:
 #if os(iOS)
-            return 78
+            return 76
 #else
             return 84
 #endif
         case .hero:
 #if os(iOS)
-            return 86
+            return 76
 #else
-            return 94
+            return 84
 #endif
         case .dashboard:
 #if os(iOS)
-            return 94
+            return 76
 #else
-            return 108
+            return 84
 #endif
         }
     }
@@ -153,11 +153,35 @@ struct DustFuelRing: View {
         }
     }
 
+    private var dustRawString: String {
+        String(Int(max(currentDust, 0).rounded(.down)))
+    }
+
     private var statusLine: String {
-        if progress == 0 {
-            return "Empty"
+        "~\(estimatedTransactionsRemaining) txns"
+    }
+
+    private var ringGradient: LinearGradient {
+        switch progress {
+        case 0..<0.25:
+            return LinearGradient(
+                colors: [WalletBrandAssets.Color.critical.opacity(0.75), WalletBrandAssets.Color.critical, WalletBrandAssets.Color.warning],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case 0.25..<0.5:
+            return LinearGradient(
+                colors: [WalletBrandAssets.Color.warning.opacity(0.82), WalletBrandAssets.Color.warning, WalletBrandAssets.Color.dustAmber],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        default:
+            return LinearGradient(
+                colors: [WalletBrandAssets.Color.dustAmber.opacity(0.82), WalletBrandAssets.Color.dustAmber, Color(red: 0.957, green: 0.773, blue: 0.259)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
-        return "~\(estimatedTransactionsRemaining) transactions remaining"
     }
 
     init(currentDust: Double, targetDustFor100Txns: Double, estimatedTransactionsRemaining: Int? = nil, style: Style = .standard) {
@@ -175,58 +199,50 @@ struct DustFuelRing: View {
     var body: some View {
         let pulseAnimation = Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
 
-        VStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.05), lineWidth: ringLineWidth)
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(
-                        ringColor,
-                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.4), value: progress)
-                    .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.02 : 1.0) : 1.0)
-                    .opacity(progress < 0.25 && progress > 0 ? (pulse ? 0.62 : 1.0) : 1.0)
-                    .animation(progress < 0.25 && progress > 0 ? pulseAnimation : .default, value: pulse)
-                    .onAppear {
-                        if progress < 0.25 && progress > 0 {
-                            pulse = true
-                        }
+        ZStack {
+            Circle()
+                .stroke(WalletBrandAssets.Color.cardBorder.opacity(0.75), lineWidth: ringLineWidth)
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(
+                    ringGradient,
+                    style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeInOut(duration: 0.4), value: progress)
+                .scaleEffect(progress < 0.25 && progress > 0 ? (pulse ? 1.02 : 1.0) : 1.0)
+                .opacity(progress < 0.25 && progress > 0 ? (pulse ? 0.7 : 1.0) : 1.0)
+                .animation(progress < 0.25 && progress > 0 ? pulseAnimation : .default, value: pulse)
+                .onAppear {
+                    if progress < 0.25 && progress > 0 {
+                        pulse = true
                     }
-                    .onChange(of: progress) { newValue in
-                        if newValue < 0.25 && newValue > 0 {
-                            pulse = true
-                        } else {
-                            pulse = false
-                        }
-                    }
-
-                VStack(spacing: 4) {
-                    Text(abbreviatedDustValue)
-                        .font(numberFont)
-                        .foregroundColor(WalletBrandAssets.Color.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                    Text("DUST Fuel")
-                        .font(captionFont)
-                        .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
                 }
-                .frame(width: centerBoxSize, height: centerBoxSize)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 4)
-            }
-            .frame(width: ringFrame, height: ringFrame)
+                .onChange(of: progress) { newValue in
+                    if newValue < 0.25 && newValue > 0 {
+                        pulse = true
+                    } else {
+                        pulse = false
+                    }
+                }
 
-            Text(statusLine)
-                .font(captionFont)
-                .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            VStack(spacing: 4) {
+                Text(WalletDisplay.formattedDustCompactValue(fromRaw: dustRawString))
+                    .font(numberFont)
+                    .foregroundColor(ringColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Text(statusLine)
+                    .font(captionFont)
+                    .foregroundColor(WalletBrandAssets.Color.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(width: centerBoxSize, height: centerBoxSize)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 4)
         }
+        .frame(width: ringFrame, height: ringFrame)
     }
 
     private func formatIntWithGroupingSeparator(_ value: Int) -> String {

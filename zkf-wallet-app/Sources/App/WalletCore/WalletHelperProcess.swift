@@ -521,7 +521,7 @@ actor WalletHelperProcess: WalletHelperRuntime {
             throw NSError(domain: "WalletHelperProcess", code: 2, userInfo: [NSLocalizedDescriptionKey: "Helper stdout is unavailable"])
         }
         guard let line = try stdoutHandle.read(upToCount: 65_536), !line.isEmpty else {
-            throw NSError(domain: "WalletHelperProcess", code: 3, userInfo: [NSLocalizedDescriptionKey: "Helper returned no response"])
+            throw NSError(domain: "WalletHelperProcess", code: 3, userInfo: [NSLocalizedDescriptionKey: "Connecting to Midnight..."])
         }
         let trimmed: Data
         if let newlineIndex = line.firstIndex(of: 0x0A) {

@@ -18,7 +18,23 @@ xcodebuild \
   -derivedDataPath "${DERIVED_DATA}" \
   build
 
-APP_BINARY="${DERIVED_DATA}/Build/Products/Debug/ZirOSWallet.app/Contents/MacOS/ZirOSWallet"
+DERIVED_APP_BINARY="${DERIVED_DATA}/Build/Products/Debug/ZirOSWallet.app/Contents/MacOS/ZirOSWallet"
+SYMROOT_APP_BINARY="${HOME}/Library/Developer/Xcode/ZirOSWalletmacOS/Debug/ZirOSWallet.app/Contents/MacOS/ZirOSWallet"
+
+APP_BINARY="${DERIVED_APP_BINARY}"
+if [[ ! -x "${APP_BINARY}" && -x "${SYMROOT_APP_BINARY}" ]]; then
+  APP_BINARY="${SYMROOT_APP_BINARY}"
+fi
+
+if [[ ! -x "${APP_BINARY}" ]]; then
+  echo "Unable to find built ZirOSWallet binary." >&2
+  echo "Checked: ${DERIVED_APP_BINARY}" >&2
+  echo "Checked: ${SYMROOT_APP_BINARY}" >&2
+  exit 1
+fi
+
+LOG_PATH="/tmp/ziros-wallet-visual-audit.log"
+: > "${LOG_PATH}"
 
 ARGS=(
   "-wallet-visual-audit"
@@ -31,5 +47,5 @@ if [[ -n "${AUDIT_APPROVAL}" ]]; then
   ARGS+=("-wallet-audit-approval" "${AUDIT_APPROVAL}")
 fi
 
-"${APP_BINARY}" "${ARGS[@]}" >/tmp/ziros-wallet-visual-audit.log 2>&1 &
+"${APP_BINARY}" "${ARGS[@]}" >"${LOG_PATH}" 2>&1 &
 echo "Launched visual audit app with args: ${ARGS[*]}"

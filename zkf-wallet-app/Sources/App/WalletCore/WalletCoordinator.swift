@@ -80,9 +80,12 @@ final class WalletCoordinator {
     var messageComposerText: String = ""
     var sendRecipient: String = ""
     var sendAmountRaw: String = "1000000000000000"
+    var sendAmountDisplay: String = WalletDisplay.editableNight(fromRaw: "1000000000000000")
     var sendShielded: Bool = false
     var shieldAmountRaw: String = "1000000000000000"
+    var shieldAmountDisplay: String = WalletDisplay.editableNight(fromRaw: "1000000000000000")
     var unshieldAmountRaw: String = "1000000000000000"
+    var unshieldAmountDisplay: String = WalletDisplay.editableNight(fromRaw: "1000000000000000")
     var selectedDustOperation: DustOperationKind = .register
     var selectedDustCandidateIndexes: Set<Int> = []
     var dustReceiverAddress: String = ""
@@ -117,6 +120,7 @@ final class WalletCoordinator {
         visualAuditConfig = VisualAuditConfig.fromProcessInfo()
         isVisualAuditMode = visualAuditConfig != nil
         helperExecutionAvailability = helper.executionAvailability
+        syncDisplayAmountsFromRaw()
         if let visualAuditConfig {
             applyVisualAudit(config: visualAuditConfig)
             return
@@ -317,6 +321,42 @@ final class WalletCoordinator {
         selectedTransactMode = .unshield
         selectedAction = .unshield
         await beginSelectedAction()
+    }
+
+    func updateSendAmountDisplay(_ value: String) {
+        updateNightAmountInput(value, rawValue: &sendAmountRaw, displayValue: &sendAmountDisplay)
+    }
+
+    func updateShieldAmountDisplay(_ value: String) {
+        updateNightAmountInput(value, rawValue: &shieldAmountRaw, displayValue: &shieldAmountDisplay)
+    }
+
+    func updateUnshieldAmountDisplay(_ value: String) {
+        updateNightAmountInput(value, rawValue: &unshieldAmountRaw, displayValue: &unshieldAmountDisplay)
+    }
+
+    func fillMaxSendAmount() {
+        guard let rawAmount = WalletDisplay.rawNight(fromBalanceDisplay: overview?.balances.unshielded["NIGHT"]) else {
+            return
+        }
+        sendAmountRaw = rawAmount
+        sendAmountDisplay = WalletDisplay.editableNight(fromRaw: rawAmount)
+    }
+
+    func fillMaxShieldAmount() {
+        guard let rawAmount = WalletDisplay.rawNight(fromBalanceDisplay: overview?.balances.unshielded["NIGHT"]) else {
+            return
+        }
+        shieldAmountRaw = rawAmount
+        shieldAmountDisplay = WalletDisplay.editableNight(fromRaw: rawAmount)
+    }
+
+    func fillMaxUnshieldAmount() {
+        guard let rawAmount = WalletDisplay.rawNight(fromBalanceDisplay: overview?.balances.shielded["NIGHT"]) else {
+            return
+        }
+        unshieldAmountRaw = rawAmount
+        unshieldAmountDisplay = WalletDisplay.editableNight(fromRaw: rawAmount)
     }
 
     func beginDustOperation() async {
@@ -795,6 +835,23 @@ final class WalletCoordinator {
 
     private func refreshLocalSnapshot() {
         snapshot = try? ffi.snapshot()
+        syncDisplayAmountsFromRaw()
+    }
+
+    private func updateNightAmountInput(
+        _ value: String,
+        rawValue: inout String,
+        displayValue: inout String
+    ) {
+        let sanitized = WalletDisplay.sanitizedDecimalInput(value, maxFractionDigits: 3)
+        displayValue = sanitized
+        rawValue = WalletDisplay.rawNight(fromDisplay: sanitized) ?? ""
+    }
+
+    private func syncDisplayAmountsFromRaw() {
+        sendAmountDisplay = WalletDisplay.editableNight(fromRaw: sendAmountRaw)
+        shieldAmountDisplay = WalletDisplay.editableNight(fromRaw: shieldAmountRaw)
+        unshieldAmountDisplay = WalletDisplay.editableNight(fromRaw: unshieldAmountRaw)
     }
 
     private func refreshHelperCompatibilityReport() async {
@@ -1387,6 +1444,8 @@ final class WalletCoordinator {
         self.dustReceiverAddress = addresses.dustAddress
         self.sendRecipient = "midnight1auditreceiver9u2q7p4t5m8d1c6x3w0r9z2"
         self.sendAmountRaw = "125000000000000000"
+        self.shieldAmountRaw = "11600000000000000000"
+        self.unshieldAmountRaw = "38400000000000000000"
         self.messageComposerText = "Fuel ring looks strong. Posting one more encrypted update now."
         self.remoteInviteJSON = sampleInviteJSON(for: remoteInvite)
         self.snapshot = WalletSnapshot(
@@ -1507,6 +1566,7 @@ final class WalletCoordinator {
         pendingSitePermission = nil
         lastSubmittedTransactionID = "0x9f41d18b8a2e7cc440b9f6d81a1d2fbc6d501ae4"
         statusMessage = nil
+        syncDisplayAmountsFromRaw()
     }
 
     private func sampleInviteJSON(for invite: WalletChannelInvite) -> String {

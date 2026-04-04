@@ -13,14 +13,6 @@ struct PrivacyGauge: View {
         shielded / total
     }
     
-    private func formattedAmount(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = ","
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "0"
-    }
-    
     var body: some View {
         VStack(spacing: 10) {
             GeometryReader { geo in
@@ -48,7 +40,7 @@ struct PrivacyGauge: View {
                     Text("Shielded")
                         .font(.footnote)
                         .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                    Text("\(formattedAmount(shielded)) NIGHT")
+                    Text("\(WalletDisplay.formattedNightPrimary(Decimal(shielded))) NIGHT")
                         .font(.system(.body, design: .monospaced))
                         .foregroundColor(WalletBrandAssets.Color.textPrimary)
                 }
@@ -59,7 +51,7 @@ struct PrivacyGauge: View {
                     Text("Unshielded")
                         .font(.footnote)
                         .foregroundColor(WalletBrandAssets.Color.textSecondary)
-                    Text("\(formattedAmount(unshielded)) NIGHT")
+                    Text("\(WalletDisplay.formattedNightPrimary(Decimal(unshielded))) NIGHT")
                         .font(.system(.body, design: .monospaced))
                         .foregroundColor(WalletBrandAssets.Color.textPrimary)
                 }

@@ -83,11 +83,11 @@ private struct LockedWalletView: View {
                     }
 
                     VStack(spacing: 12) {
-                        Text("ZirOS Midnight Wallet")
+                        Text("Your Midnight. Your Proof.")
                             .font(WalletTypography.lockedHero)
                             .foregroundStyle(Color.white.opacity(0.87))
                             .multilineTextAlignment(.center)
-                        Text("Rust-enforced approvals. Post-quantum messaging. DUST-first.")
+                        Text("Native wallet with hardware-accelerated proving and quantum-safe messaging.")
                             .font(WalletTypography.bodyStrong)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -407,40 +407,15 @@ private struct DesktopSidebar: View {
         coordinator.conversations.reduce(0) { $0 + $1.unreadCount }
     }
 
-    private var activeRouteLabel: String {
-        if let activeURL = coordinator.configuration?.proverServerUri,
-           let route = coordinator.configuration?.proveRoutes?.first(where: { $0.proofServerUrl == activeURL }) {
-            return route.label
-        }
-        return coordinator.configuration?.proverServerUri ?? "Unavailable"
-    }
-
-    private var dustValue: String {
-        coordinator.overview?.balances.dust.spendableRaw ?? "0"
-    }
-
-    private var helperStateLabel: String {
-        coordinator.helperExecutionAvailability.isAvailable ? "Ready" : "Blocked"
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            WalletPanel {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("MIDNIGHT NATIVE WALLET")
-                        .font(WalletTypography.caption)
-                        .kerning(1.2)
-                        .foregroundStyle(WalletChrome.midnightBlue)
-                    Text("ZirOS Wallet")
-                        .font(WalletTypography.heroTitle)
-                    Text("DUST-first desktop control over balances, privacy posture, proof routes, and encrypted messaging.")
-                        .font(WalletTypography.bodyStrong)
-                        .foregroundStyle(.secondary)
-                    HStack(spacing: 10) {
-                        SidebarStatCapsule(title: "Fuel", value: dustValue, style: .dust)
-                        SidebarStatCapsule(title: "Prover", value: activeRouteLabel, style: .standard)
-                    }
-                }
+        VStack(alignment: .leading, spacing: WalletChrome.cardSpacing) {
+            HStack(spacing: 12) {
+                ClockMotif()
+                    .stroke(WalletChrome.midnightBlue, style: StrokeStyle(lineWidth: 1.6, lineCap: .round))
+                    .frame(width: 32, height: 32)
+                Text("Your Midnight")
+                    .font(.custom("Outfit-Bold", size: 16))
+                    .foregroundStyle(.white.opacity(0.92))
             }
 
             WalletPanel {
@@ -456,23 +431,18 @@ private struct DesktopSidebar: View {
                 }
             }
 
-            WalletPanel {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Desktop State")
-                        .font(WalletTypography.sectionTitle)
-                    PolicyRow(label: "Network", value: coordinator.snapshot?.network.capitalized ?? "Preprod")
-                    PolicyRow(label: "Helper", value: helperStateLabel)
-                    PolicyRow(label: "Unread", value: unreadCount == 0 ? "None" : "\(unreadCount)")
-                    if coordinator.pendingApproval != nil {
-                        PolicyRow(label: "Approval", value: "Review waiting")
-                    }
-                    if let lastSubmitted = coordinator.lastSubmittedTransactionID {
-                        PolicyRow(label: "Last submit", value: lastSubmitted)
-                    }
-                }
-            }
-
             Spacer(minLength: 0)
+
+            HStack(spacing: 8) {
+                Image(systemName: "flame.fill")
+                    .foregroundStyle(WalletChrome.dustGold)
+                Text("\(WalletDisplay.formattedDustCompact(fromRaw: coordinator.overview?.balances.dust.spendableRaw))  •  \(WalletDisplay.estimatedTransactionText(fromDustRaw: coordinator.overview?.balances.dust.spendableRaw))")
+                    .font(WalletTypography.caption)
+                    .foregroundStyle(WalletChrome.dustInk)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+            .padding(.horizontal, 2)
         }
         .padding(20)
         .frame(minWidth: 310, idealWidth: 320, maxWidth: 340, maxHeight: .infinity, alignment: .topLeading)
@@ -483,10 +453,6 @@ private struct DesktopSidebar: View {
         switch section {
         case .messages:
             return unreadCount > 0 ? "\(unreadCount)" : nil
-        case .dust:
-            return coordinator.overview.map { String($0.balances.dust.registeredNightUtxos) }
-        case .more:
-            return coordinator.pendingApproval == nil ? nil : "!"
         default:
             return nil
         }
@@ -505,14 +471,8 @@ private struct SidebarDestinationButton: View {
                 Image(systemName: section.systemImage)
                     .font(.system(size: 14, weight: .semibold))
                     .frame(width: 18)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(section.title)
-                        .font(WalletTypography.bodyStrong)
-                    Text(description)
-                        .font(WalletTypography.caption)
-                        .foregroundStyle(isSelected ? Color.white.opacity(0.76) : .secondary)
-                        .lineLimit(1)
-                }
+                Text(section.title)
+                    .font(WalletTypography.bodyStrong)
                 Spacer(minLength: 0)
                 if let badge {
                     Text(badge)
@@ -538,21 +498,6 @@ private struct SidebarDestinationButton: View {
             )
         }
         .buttonStyle(.plain)
-    }
-
-    private var description: String {
-        switch section {
-        case .overview:
-            return "Balances and privacy posture"
-        case .transact:
-            return "Send, receive, shield, unshield"
-        case .dust:
-            return "Fuel inventory and UTXOs"
-        case .messages:
-            return "Encrypted DUST-powered mail"
-        case .more:
-            return "Activity, permissions, settings"
-        }
     }
 }
 
@@ -596,23 +541,13 @@ private struct HeaderBar: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center, spacing: 18) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text((coordinator.selectedSection ?? .overview).title)
-                        .font(WalletTypography.heroTitle)
-                    Text(headerSubtitle)
-                        .foregroundStyle(.secondary)
-                }
+                Text((coordinator.selectedSection ?? .overview).title)
+                    .font(WalletTypography.heroTitle)
                 Spacer()
 #if os(macOS)
                 HStack(spacing: 10) {
-                    HeaderStatusPill(title: "Network", value: coordinator.configuration?.networkId.capitalized ?? "Preprod")
-                    HeaderStatusPill(title: "Prover", value: activeProverLabel)
-                    if unreadCount > 0 {
-                        HeaderStatusPill(title: "Unread", value: "\(unreadCount)", style: .dust)
-                    }
-                    if coordinator.pendingApproval != nil {
-                        HeaderStatusPill(title: "Review", value: "Waiting", style: .dust)
-                    }
+                    HeaderStatusPill(value: coordinator.configuration?.networkId.capitalized ?? "Preprod", tone: networkTone)
+                    HeaderStatusPill(value: activeProverLabel, tone: proverTone)
                 }
 #endif
                 Button("Refresh") {
@@ -624,7 +559,7 @@ private struct HeaderBar: View {
                     WalletBrandAssets.Haptics.tapLight()
                     Task { await coordinator.lock() }
                 }
-                .buttonStyle(PrimaryWalletButtonStyle())
+                .buttonStyle(SecondaryWalletButtonStyle())
             }
             .padding(.horizontal, 28)
             .padding(.vertical, 16)
@@ -650,19 +585,35 @@ private struct HeaderBar: View {
         .background(WalletChrome.headerMaterial)
     }
 
-    private var headerSubtitle: String {
-        if let configuration = coordinator.configuration {
-            return "Network: \(configuration.networkId)  •  Prover: \(configuration.proverServerUri ?? "Unavailable")"
+    private var activeProverLabel: String {
+        guard coordinator.helperExecutionAvailability.isAvailable else {
+            return "Unavailable"
         }
-        return "Midnight native wallet"
+        if let activeURL = coordinator.configuration?.proverServerUri,
+           let route = coordinator.configuration?.proveRoutes?.first(where: { $0.proofServerUrl == activeURL }),
+           route.kind == "upstream"
+        {
+            return "Upstream"
+        }
+        return coordinator.configuration == nil ? "Unavailable" : "Local ZirOS"
     }
 
-    private var activeProverLabel: String {
-        if let activeURL = coordinator.configuration?.proverServerUri,
-           let route = coordinator.configuration?.proveRoutes?.first(where: { $0.proofServerUrl == activeURL }) {
-            return route.label
+    private var networkTone: HeaderStatusPill.Tone {
+        guard let overview = coordinator.overview else { return .disconnected }
+        return (overview.sync.synced || overview.sync.shieldedConnected || overview.sync.unshieldedConnected || overview.sync.dustConnected)
+            ? .connected
+            : .disconnected
+    }
+
+    private var proverTone: HeaderStatusPill.Tone {
+        switch activeProverLabel {
+        case "Local ZirOS":
+            return .connected
+        case "Upstream":
+            return .warning
+        default:
+            return .disconnected
         }
-        return coordinator.configuration?.proverServerUri ?? "Unavailable"
     }
 
     private var unreadCount: Int {
@@ -671,33 +622,42 @@ private struct HeaderBar: View {
 }
 
 private struct HeaderStatusPill: View {
-    enum Style {
-        case standard
-        case dust
+    enum Tone {
+        case connected
+        case warning
+        case disconnected
     }
 
-    let title: String
     let value: String
-    var style: Style = .standard
+    let tone: Tone
 
     var body: some View {
         HStack(spacing: 8) {
-            Text(title)
-                .foregroundStyle(.secondary)
+            Circle()
+                .fill(dotColor)
+                .frame(width: 7, height: 7)
             Text(value)
-                .foregroundStyle(style == .dust ? WalletChrome.dustInk : .primary)
+                .foregroundStyle(WalletChrome.midnightBlue)
         }
         .font(WalletTypography.caption)
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(
-            style == .dust ? AnyShapeStyle(WalletChrome.dustFill) : AnyShapeStyle(Color.white.opacity(0.06)),
-            in: Capsule()
-        )
+        .background(WalletChrome.midnightBlue.opacity(0.12), in: Capsule())
         .overlay(
             Capsule()
-                .stroke(style == .dust ? WalletChrome.dustStroke : WalletChrome.panelStroke, lineWidth: 1)
+                .stroke(WalletChrome.midnightBlue.opacity(0.18), lineWidth: 1)
         )
+    }
+
+    private var dotColor: Color {
+        switch tone {
+        case .connected:
+            return WalletBrandAssets.Color.success
+        case .warning:
+            return WalletBrandAssets.Color.warning
+        case .disconnected:
+            return WalletBrandAssets.Color.critical
+        }
     }
 }
 
@@ -854,8 +814,8 @@ private struct OverviewScreen: View {
                 )
                 DUSTSummaryPill(
                     title: "Spendable DUST",
-                    value: formattedInteger(dustRaw),
-                    detail: "~\(estimatedTransactionsRemaining) transactions remaining"
+                    value: WalletDisplay.formattedDustCompact(fromRaw: coordinator.overview?.balances.dust.spendableRaw),
+                    detail: WalletDisplay.estimatedTransactionText(fromDustRaw: coordinator.overview?.balances.dust.spendableRaw)
                 )
             }
             .frame(width: 260)
@@ -866,7 +826,7 @@ private struct OverviewScreen: View {
     private var balanceCluster: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(formattedNight(totalNight))
+                Text(WalletDisplay.formattedNightPrimary(Decimal(totalNight)))
                     .font(WalletTypography.balanceHero)
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
@@ -921,18 +881,18 @@ private struct OverviewScreen: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 16)], spacing: 16) {
             WalletMetricCard(
                 title: "Shielded NIGHT",
-                value: formattedNight(shieldedNight),
+                value: WalletDisplay.formattedNightPrimary(Decimal(shieldedNight)),
                 detail: "Private balance"
             )
             WalletMetricCard(
                 title: "Unshielded NIGHT",
-                value: formattedNight(unshieldedNight),
+                value: WalletDisplay.formattedNightPrimary(Decimal(unshieldedNight)),
                 detail: "Spendable base layer"
             )
             WalletMetricCard(
                 title: "DUST",
-                value: formattedInteger(dustRaw),
-                detail: "~\(estimatedTransactionsRemaining) transactions remaining",
+                value: WalletDisplay.formattedDustCompact(fromRaw: coordinator.overview?.balances.dust.spendableRaw),
+                detail: WalletDisplay.estimatedTransactionText(fromDustRaw: coordinator.overview?.balances.dust.spendableRaw),
                 style: .dust
             )
             WalletMetricCard(
@@ -955,22 +915,6 @@ private struct OverviewScreen: View {
             return NSDecimalNumber(decimal: decimal).doubleValue
         }
         return Double(normalized) ?? 0
-    }
-
-    private func formattedNight(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = ","
-        formatter.maximumFractionDigits = value >= 1_000 ? 0 : 2
-        return formatter.string(from: NSNumber(value: value)) ?? "0"
-    }
-
-    private func formattedInteger(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = ","
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value.rounded(.down))) ?? "0"
     }
 
     private func statusRow(_ label: String, value: String) -> some View {
@@ -997,7 +941,7 @@ private struct MessagesScreen: View {
     }
 
     private var estimatedMessagesRemaining: String {
-        return "\(spendableDustValue / estimatedDustCostRaw)"
+        WalletDisplay.estimatedPostText(fromDustRaw: spendableDustRaw, costRaw: "\(estimatedDustCostRaw)")
     }
 
     private var hasDustBudget: Bool {
@@ -1115,12 +1059,13 @@ private struct MessagesScreen: View {
                     if coordinator.conversations.isEmpty {
                         WalletEmptyState(
                             title: "Start an encrypted conversation",
-                            message: "Paste a peer invite to open a hybrid post-quantum channel and spend DUST on the mailbox lane.",
+                            message: "Paste a peer invite to open a post-quantum channel with DUST-backed delivery.",
                             actionTitle: "Open Channel",
                             action: {
                                 WalletBrandAssets.Haptics.tapLight()
                                 Task { await coordinator.openMessagingChannel() }
-                            }
+                            },
+                            motifSize: 60
                         )
                     } else {
                         ForEach(coordinator.conversations) { conversation in
@@ -1166,6 +1111,20 @@ private struct MessagesScreen: View {
 
     private var conversationDetail: some View {
         VStack(alignment: .leading, spacing: 18) {
+            if coordinator.conversations.isEmpty {
+                WalletPanel {
+                    WalletEmptyState(
+                        title: "Start an encrypted conversation",
+                        message: "Open a channel to begin secure Midnight messaging.",
+                        actionTitle: "Open Channel",
+                        action: {
+                            WalletBrandAssets.Haptics.tapLight()
+                            Task { await coordinator.openMessagingChannel() }
+                        },
+                        motifSize: 60
+                    )
+                }
+            } else {
             WalletPanel {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .top) {
@@ -1243,7 +1202,7 @@ private struct MessagesScreen: View {
                         .padding(10)
                         .background(WalletChrome.codeBackground, in: RoundedRectangle(cornerRadius: 16))
                     HStack {
-                        Text("Estimated DUST cost: \(estimatedDustCostRaw)")
+                        Text("Estimated DUST cost: \(WalletDisplay.formattedDustCompact(fromRaw: "\(estimatedDustCostRaw)"))")
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(WalletChrome.dustInk)
                         Spacer()
@@ -1286,6 +1245,7 @@ private struct MessagesScreen: View {
                     }
                 }
             }
+            }
         }
     }
 }
@@ -1294,21 +1254,8 @@ private struct TransactScreen: View {
     @Bindable var coordinator: WalletCoordinator
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            if coordinator.isVisualAuditMode {
-                transactDetail
-            } else {
-                WalletPanel {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Transact")
-                            .font(WalletTypography.sectionTitle)
-                        Text(transactSubtitle)
-                            .foregroundStyle(.secondary)
-                        transactModeSelector
-                    }
-                }
-            }
-
+        VStack(alignment: .leading, spacing: WalletChrome.cardSpacing) {
+            transactModeSelector
             transactDetail
         }
     }
@@ -1329,10 +1276,10 @@ private struct TransactScreen: View {
 
     @ViewBuilder
     private var transactModeSelector: some View {
-#if os(iOS)
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+        HStack(spacing: 8) {
             ForEach(TransactMode.allCases) { mode in
                 Button {
+                    WalletBrandAssets.Haptics.tapLight()
                     coordinator.selectedTransactMode = mode
                 } label: {
                     HStack(spacing: 8) {
@@ -1341,13 +1288,13 @@ private struct TransactScreen: View {
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .frame(minHeight: 40)
                     .background(
                         WalletChrome.selectionFill(isSelected: coordinator.selectedTransactMode == mode),
-                        in: RoundedRectangle(cornerRadius: 14)
+                        in: RoundedRectangle(cornerRadius: 12)
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: 12)
                             .stroke(
                                 coordinator.selectedTransactMode == mode ? WalletChrome.midnightBlue.opacity(0.55) : WalletChrome.panelStroke,
                                 lineWidth: 1
@@ -1357,32 +1304,23 @@ private struct TransactScreen: View {
                 .buttonStyle(.plain)
             }
         }
-#else
-        Picker("Transact Mode", selection: $coordinator.selectedTransactMode) {
-            ForEach(TransactMode.allCases) { mode in
-                Label(mode.title, systemImage: mode.systemImage)
-                    .tag(mode)
-            }
-        }
-        .pickerStyle(.segmented)
-#endif
-    }
-
-    private var transactSubtitle: String {
-#if os(iOS)
-        "Move funds and switch privacy from one surface."
-#else
-        "Send, receive, shield, and unshield all live here so every money movement starts from one deliberate surface."
-#endif
+        .padding(4)
+        .background(WalletChrome.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(WalletChrome.panelStroke, lineWidth: 1)
+        )
     }
 }
 
 private struct SendScreen: View {
     @Bindable var coordinator: WalletCoordinator
 
+    private let estimatedFeeRaw = "1000000"
+
     private var sendFormIsValid: Bool {
         !coordinator.sendRecipient.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && !coordinator.sendAmountRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && WalletDisplay.isPositiveRawNight(coordinator.sendAmountRaw)
     }
 
     var body: some View {
@@ -1418,23 +1356,14 @@ private struct SendScreen: View {
                         }
                     }
                 }
-                LabeledField(title: "Amount (raw)") {
-                    WalletInputSurface {
-                        HStack(spacing: 10) {
-                            TextField("1000000000000000", text: $coordinator.sendAmountRaw)
-                                .textFieldStyle(.plain)
-                                .font(.system(.body, design: .monospaced))
-                            Button("MAX") {
-                                coordinator.statusMessage = "MAX remains manual in this beta because sends still accept raw NIGHT units."
-                            }
-                            .buttonStyle(.plain)
-                            .font(WalletTypography.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.08), in: Capsule())
-                        }
-                    }
-                }
+                NightAmountField(
+                    title: "Amount",
+                    amountDisplay: coordinator.sendAmountDisplay,
+                    rawAmount: coordinator.sendAmountRaw,
+                    placeholder: "0.000",
+                    onChange: coordinator.updateSendAmountDisplay,
+                    onMax: coordinator.fillMaxSendAmount
+                )
                 Toggle("Send to shielded receiver", isOn: $coordinator.sendShielded)
                     .toggleStyle(.switch)
                     .tint(WalletChrome.midnightBlue)
@@ -1447,7 +1376,7 @@ private struct SendScreen: View {
                     }
                 }
                 if sendFormIsValid {
-                    Text("Estimated DUST fee appears in review before biometric approval.")
+                    Text("Estimated fee: \(WalletDisplay.formattedDustFee(fromRaw: estimatedFeeRaw))")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(WalletChrome.dustInk)
                 }
@@ -1455,7 +1384,7 @@ private struct SendScreen: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 HStack(spacing: 14) {
-                    Button(coordinator.sendShielded ? "Review Shielded Transaction" : "Review Transaction") {
+                    Button("Review & Send") {
                         WalletBrandAssets.Haptics.tapLight()
                         Task { await coordinator.beginSend() }
                     }
@@ -1467,11 +1396,7 @@ private struct SendScreen: View {
     }
 
     private var sendSubtitle: String {
-#if os(iOS)
-        "Every send pauses for review and \(WalletPlatformSupport.biometricLabel)."
-#else
-        "Every send request becomes a native pending approval with a full transaction review before \(WalletPlatformSupport.biometricLabel)."
-#endif
+        "Enter NIGHT, review the fee, and confirm with \(WalletPlatformSupport.biometricLabel)."
     }
 }
 
@@ -1523,49 +1448,121 @@ private struct ShieldScreen: View {
     @Bindable var coordinator: WalletCoordinator
     let mode: Mode
 
+    private let estimatedFeeRaw = "1000000"
+
     init(coordinator: WalletCoordinator, mode: Mode = .shield) {
         self.coordinator = coordinator
         self.mode = mode
     }
 
     var body: some View {
-        WalletPanel {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(mode == .shield ? "Shield NIGHT" : "Unshield NIGHT")
-                    .font(.title3.weight(.bold))
-                Text(modeSubtitle)
-                    .foregroundStyle(.secondary)
-                if let message = coordinator.helperExecutionAvailability.message {
-                    HelperAvailabilityBanner(message: message)
-                }
-                TextField("Amount (raw)", text: mode == .shield ? $coordinator.shieldAmountRaw : $coordinator.unshieldAmountRaw)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(.body, design: .monospaced))
-                Button(mode == .shield ? "Create Shield Approval" : "Create Unshield Approval") {
-                    Task {
-                        if mode == .shield {
-                            await coordinator.beginShield()
-                        } else {
-                            await coordinator.beginUnshield()
+        VStack(alignment: .leading, spacing: WalletChrome.cardSpacing) {
+            WalletPanel {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(mode == .shield ? "Shield NIGHT" : "Unshield NIGHT")
+                        .font(WalletTypography.sectionTitle)
+                    Text(modeSubtitle)
+                        .foregroundStyle(.secondary)
+                    if let message = coordinator.helperExecutionAvailability.message {
+                        HelperAvailabilityBanner(message: message)
+                    }
+                    balanceSummary(
+                        title: mode == .shield ? "Available Balance" : "Shielded Balance",
+                        value: mode == .shield
+                            ? WalletDisplay.formattedNightMetric(fromDisplay: coordinator.overview?.balances.unshielded["NIGHT"])
+                            : WalletDisplay.formattedNightMetric(fromDisplay: coordinator.overview?.balances.shielded["NIGHT"])
+                    )
+                    NightAmountField(
+                        title: "Amount",
+                        amountDisplay: mode == .shield ? coordinator.shieldAmountDisplay : coordinator.unshieldAmountDisplay,
+                        rawAmount: mode == .shield ? coordinator.shieldAmountRaw : coordinator.unshieldAmountRaw,
+                        placeholder: "0.000",
+                        onChange: { value in
+                            if mode == .shield {
+                                coordinator.updateShieldAmountDisplay(value)
+                            } else {
+                                coordinator.updateUnshieldAmountDisplay(value)
+                            }
+                        },
+                        onMax: {
+                            if mode == .shield {
+                                coordinator.fillMaxShieldAmount()
+                            } else {
+                                coordinator.fillMaxUnshieldAmount()
+                            }
+                        }
+                    )
+                    Text("Estimated fee: \(WalletDisplay.formattedDustFee(fromRaw: estimatedFeeRaw))")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(WalletChrome.dustInk)
+                    Button(mode == .shield ? "Review & Shield" : "Review & Unshield") {
+                        WalletBrandAssets.Haptics.tapLight()
+                        Task {
+                            if mode == .shield {
+                                await coordinator.beginShield()
+                            } else {
+                                await coordinator.beginUnshield()
+                            }
+                        }
+                    }
+                    .buttonStyle(PrimaryWalletButtonStyle())
+                    .disabled(!coordinator.helperExecutionAvailability.isAvailable || !isValid)
+                    if mode == .unshield {
+                        WalletInfoCard(accent: WalletChrome.panelStroke) {
+                            Text("Unshielding moves NIGHT from the private pool to your public balance. The amount becomes visible on-chain.")
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
-                .buttonStyle(PrimaryWalletButtonStyle())
-                .disabled(!coordinator.helperExecutionAvailability.isAvailable)
+            }
+
+            if mode == .unshield, !recentUnshieldActivity.isEmpty {
+                WalletPanel {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Recent Unshields")
+                            .font(WalletTypography.sectionTitle)
+                        ForEach(recentUnshieldActivity) { entry in
+                            ActivityRow(entry: entry)
+                            if entry.id != recentUnshieldActivity.last?.id {
+                                Divider()
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private var isValid: Bool {
+        WalletDisplay.isPositiveRawNight(mode == .shield ? coordinator.shieldAmountRaw : coordinator.unshieldAmountRaw)
+    }
+
+    private var recentUnshieldActivity: [WalletActivityEntry] {
+        Array(
+            coordinator.activity.filter { entry in
+                entry.identifiers.contains { $0.localizedCaseInsensitiveContains("unshield") }
+            }
+            .prefix(3)
+        )
     }
 
     private var modeSubtitle: String {
         switch mode {
         case .shield:
-#if os(iOS)
-            return "Move NIGHT into the shielded pool using the same approval chain as send."
-#else
-            return "Moves spendable NIGHT into the shielded pool using the same Rust-enforced approval chain as send."
-#endif
+            return "Move public NIGHT into the private pool with native review and biometric approval."
         case .unshield:
-            return "Move NIGHT back to the unshielded side for standard spending."
+            return "Move private NIGHT back to your public balance for standard spending."
+        }
+    }
+
+    private func balanceSummary(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(WalletTypography.caption)
+                .foregroundStyle(.secondary)
+            Text("\(value) NIGHT")
+                .font(.system(size: 28, weight: .bold, design: .monospaced))
+                .foregroundStyle(.primary)
         }
     }
 }
@@ -1597,12 +1594,12 @@ private struct DustScreen: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: WalletChrome.cardSpacing) {
             WalletPanel {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("DUST Management")
+                    Text("DUST")
                         .font(WalletTypography.heroTitle)
-                    Text("DUST is fuel.")
+                    Text("Fuel for proving, transfers, and encrypted messaging.")
                         .font(WalletTypography.bodyStrong)
                         .foregroundStyle(WalletChrome.dustInk)
                     if let message = coordinator.helperExecutionAvailability.message {
@@ -1625,7 +1622,11 @@ private struct DustScreen: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            DUSTSummaryPill(title: "Spendable", value: formattedInteger(dustRaw), detail: "raw DUST")
+                            DUSTSummaryPill(
+                                title: "Spendable",
+                                value: WalletDisplay.formattedDustCompact(fromRaw: coordinator.overview?.balances.dust.spendableRaw),
+                                detail: WalletDisplay.estimatedTransactionText(fromDustRaw: coordinator.overview?.balances.dust.spendableRaw)
+                            )
                             DUSTSummaryPill(title: "Registered", value: "\(coordinator.overview?.balances.dust.registeredNightUtxos ?? 0) UTXOs", detail: "fuel generating")
                             DUSTSummaryPill(title: "Generating", value: dustGenerationReadiness, detail: "selection aware")
                         }
@@ -2073,7 +2074,7 @@ private struct ApprovalSheet: View {
                     .buttonStyle(PrimaryWalletButtonStyle())
                     .frame(maxWidth: .infinity)
                 Button("Reject", action: onReject)
-                    .buttonStyle(CriticalTextButtonStyle())
+                    .buttonStyle(SecondaryWalletButtonStyle())
                     .frame(maxWidth: .infinity)
             }
         }
@@ -2130,7 +2131,7 @@ private struct ApprovalSheet: View {
                     ApprovalDetailRow(label: "Shielded", value: transaction.shielded ? "Yes" : "No")
                     ApprovalDetailRow(label: "Prover", value: transaction.proverRoute ?? "Unavailable")
                     ApprovalDetailRow(label: "Network", value: transaction.network.capitalized)
-                    ApprovalDetailRow(label: "Fee", value: transaction.feeRaw)
+                    ApprovalDetailRow(label: "Fee", value: WalletDisplay.formattedDustCompact(fromRaw: transaction.feeRaw))
                     if let dustImpact = transaction.dustImpact {
                         ApprovalDetailRow(label: "DUST Impact", value: dustImpact)
                     }
@@ -2138,7 +2139,7 @@ private struct ApprovalSheet: View {
                         Divider()
                         ForEach(transaction.outputs) { output in
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("\(output.amountRaw) \(output.tokenKind)")
+                                Text("\(WalletDisplay.formattedNightPrimary(fromRaw: output.amountRaw)) \(output.tokenKind)")
                                     .font(WalletTypography.bodyStrong)
                                 Text(output.recipient)
                                     .font(.system(.caption, design: .monospaced))
@@ -2155,7 +2156,7 @@ private struct ApprovalSheet: View {
                     ApprovalDetailRow(label: "Channel", value: messageSend.channelId)
                     ApprovalDetailRow(label: "Message Kind", value: messageSend.messageKind)
                     ApprovalDetailRow(label: "Network", value: messageSend.network.capitalized)
-                    ApprovalDetailRow(label: "Fee", value: messageSend.dustCostRaw)
+                    ApprovalDetailRow(label: "Fee", value: WalletDisplay.formattedDustCompact(fromRaw: messageSend.dustCostRaw))
                     Divider()
                     Text(messageSend.messagePreview)
                         .foregroundStyle(.secondary)
@@ -2183,10 +2184,10 @@ private struct ApprovalSheet: View {
 
     private var heroAmount: String {
         if let transaction = flow.review.transaction {
-            return "\(transaction.nightTotalRaw) NIGHT"
+            return "\(WalletDisplay.formattedNightPrimary(fromRaw: transaction.nightTotalRaw)) NIGHT"
         }
         if let messageSend = flow.review.messageSend {
-            return "\(messageSend.dustCostRaw) DUST"
+            return WalletDisplay.formattedDustCompact(fromRaw: messageSend.dustCostRaw)
         }
         if let channelOpen = flow.review.channelOpen {
             return channelOpen.displayName ?? channelOpen.peerId
@@ -2196,10 +2197,10 @@ private struct ApprovalSheet: View {
 
     private var feeLine: String? {
         if let transaction = flow.review.transaction {
-            return "Fee \(transaction.feeRaw) • DUST \(transaction.dustTotalRaw)"
+            return "Fee \(WalletDisplay.formattedDustCompact(fromRaw: transaction.feeRaw)) • Fuel \(WalletDisplay.formattedDustCompact(fromRaw: transaction.dustTotalRaw))"
         }
         if let messageSend = flow.review.messageSend {
-            return "Mailbox post • DUST \(messageSend.dustCostRaw)"
+            return "Mailbox post • \(WalletDisplay.formattedDustCompact(fromRaw: messageSend.dustCostRaw))"
         }
         return nil
     }
@@ -2210,20 +2211,12 @@ private struct WalletPanel<Content: View>: View {
 
     var body: some View {
         content
-            .padding(panelPadding)
-            .background(WalletChrome.panelMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .padding(WalletChrome.cardPadding)
+            .background(WalletChrome.panelMaterial, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                     .stroke(WalletChrome.panelStroke, lineWidth: 1)
             )
-    }
-
-    private var panelPadding: CGFloat {
-#if os(iOS)
-        16
-#else
-        22
-#endif
     }
 }
 
@@ -2231,26 +2224,15 @@ private struct DustFuelChip: View {
     let value: String
     let remaining: String
 
-    private var formattedValue: String {
-        let digits = value.replacingOccurrences(of: ",", with: "")
-        guard let number = Int(digits) else {
-            return value
-        }
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = ","
-        return formatter.string(from: NSNumber(value: number)) ?? value
-    }
-
     var body: some View {
         VStack(alignment: .trailing, spacing: 4) {
             Text("DUST Fuel")
                 .font(WalletTypography.caption)
                 .foregroundStyle(WalletChrome.dustInk)
-            Text(formattedValue)
+            Text(WalletDisplay.formattedDustCompact(fromRaw: value))
                 .font(WalletTypography.dustNumber)
                 .foregroundStyle(WalletChrome.dustInk)
-            Text("~\(remaining) text posts")
+            Text(remaining)
                 .font(.caption)
                 .foregroundStyle(WalletChrome.dustInk.opacity(0.8))
                 .lineLimit(1)
@@ -2308,7 +2290,7 @@ private struct ConversationRow: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(WalletChrome.midnightBlue)
                         Spacer()
-                        Text("DUST \(conversation.dustSpentRaw)")
+                        Text(WalletDisplay.formattedDustConversationTotal(fromRaw: conversation.dustSpentRaw))
                             .font(.caption)
                             .foregroundStyle(WalletChrome.dustInk)
                     }
@@ -2339,7 +2321,7 @@ private struct MessageBubble: View {
                     Text(statusLabel)
                     Spacer()
                     Text(message.sentAt.formatted(date: .omitted, time: .shortened))
-                    Text("DUST \(message.dustCostRaw)")
+                    Text(WalletDisplay.formattedDustCompact(fromRaw: message.dustCostRaw))
                 }
                 .font(.system(size: 9, weight: .medium))
                 .foregroundStyle(message.direction == .outbound ? .white.opacity(0.65) : WalletChrome.dustInk)
@@ -2472,10 +2454,10 @@ private struct WalletMetricCard: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(cardPadding)
-        .background(cardBackground, in: RoundedRectangle(cornerRadius: 18))
+        .padding(WalletChrome.cardPadding)
+        .background(cardBackground, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                 .stroke(style == .dust ? WalletChrome.dustStroke : WalletChrome.panelStroke, lineWidth: 1)
         )
     }
@@ -2487,14 +2469,6 @@ private struct WalletMetricCard: View {
         case .dust:
             return AnyShapeStyle(WalletChrome.dustFill)
         }
-    }
-
-    private var cardPadding: CGFloat {
-#if os(iOS)
-        16
-#else
-        20
-#endif
     }
 }
 
@@ -2615,11 +2589,12 @@ private struct DustCandidateRow: View {
     var body: some View {
         Button(action: onToggle) {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: candidate.registeredForDustGeneration ? "circle.fill" : "circle")
-                    .foregroundStyle(candidate.registeredForDustGeneration ? WalletChrome.dustGold : .secondary)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(formattedNightDisplay(candidate.valueRaw)) \(candidate.tokenType)")
-                        .font(.system(.body, design: .monospaced).weight(.bold))
+                    HStack(alignment: .center, spacing: 12) {
+                        Text("\(WalletDisplay.formattedNightPrimary(fromRaw: candidate.valueRaw)) \(candidate.tokenType)")
+                            .font(.system(.body, design: .monospaced).weight(.bold))
+                        DustRegistrationChip(isRegistered: candidate.registeredForDustGeneration)
+                    }
                     Text("Intent \(candidate.intentHash) • output #\(candidate.outputNo)")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.secondary)
@@ -2634,21 +2609,33 @@ private struct DustCandidateRow: View {
                 }
             }
             .padding(14)
-            .background(WalletChrome.selectionFill(isSelected: isSelected), in: RoundedRectangle(cornerRadius: 18))
+            .background(WalletChrome.selectionFill(isSelected: isSelected), in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                     .stroke(isSelected ? WalletChrome.midnightBlue.opacity(0.48) : WalletChrome.panelStroke, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
     }
+}
 
-    private func formattedNightDisplay(_ raw: String) -> String {
-        let normalized = raw.replacingOccurrences(of: ",", with: "")
-        let decimal = Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX")) ?? 0
-        let divisor = Decimal(string: "1000000000000000", locale: Locale(identifier: "en_US_POSIX")) ?? 1
-        let result = decimal / divisor
-        return result.formatted(.number.precision(.fractionLength(0...2)))
+private struct DustRegistrationChip: View {
+    let isRegistered: Bool
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: isRegistered ? "circle.fill" : "circle")
+            Text(isRegistered ? "Registered" : "Unregistered")
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(isRegistered ? WalletChrome.dustInk : .secondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(isRegistered ? WalletChrome.dustFill : Color.white.opacity(0.05), in: Capsule())
+        .overlay(
+            Capsule()
+                .stroke(isRegistered ? WalletChrome.dustStroke : WalletChrome.panelStroke, lineWidth: 1)
+        )
     }
 }
 
@@ -2659,12 +2646,12 @@ private struct ActivityRow: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(entry.hash)
                 .font(.system(.body, design: .monospaced))
-            Text("\(entry.status) • \(entry.timestamp.formatted(date: .abbreviated, time: .shortened))")
+            Text("\(entry.status.capitalized) • \(entry.timestamp.formatted(date: .abbreviated, time: .shortened))")
                 .foregroundStyle(.secondary)
             if let feesRaw = entry.feesRaw {
-                Text("Fees: \(feesRaw)")
+                Text("Fees: \(WalletDisplay.formattedDustCompact(fromRaw: feesRaw))")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(WalletChrome.dustInk)
             }
         }
         .padding(.vertical, 4)
@@ -2696,6 +2683,46 @@ private struct LabeledField<Content: View>: View {
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.secondary)
             content
+        }
+    }
+}
+
+private struct NightAmountField: View {
+    let title: String
+    let amountDisplay: String
+    let rawAmount: String
+    let placeholder: String
+    let onChange: (String) -> Void
+    let onMax: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+            WalletInputSurface {
+                HStack(spacing: 12) {
+                    TextField(placeholder, text: Binding(get: { amountDisplay }, set: onChange))
+                        .textFieldStyle(.plain)
+                        .font(.system(.body, design: .monospaced))
+                    Text("NIGHT")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                    Button("MAX") {
+                        WalletBrandAssets.Haptics.tapLight()
+                        onMax()
+                    }
+                    .buttonStyle(.plain)
+                    .font(WalletTypography.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.08), in: Capsule())
+                }
+                .frame(minHeight: WalletChrome.inputHeight)
+            }
+            Text(WalletDisplay.rawCaption(rawAmount))
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -2748,16 +2775,32 @@ private struct QRCodeView: View {
 
 private struct HelperAvailabilityBanner: View {
     let message: String
+    var networkName: String = "Preprod"
 
     var body: some View {
-        Text(message)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
-            .background(Color.orange.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color.orange.opacity(0.35), lineWidth: 1)
-            )
+        let copy = WalletDisplay.helperStatus(message: message, networkName: networkName)
+
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "info.circle")
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(copy.title)
+                    .font(WalletTypography.bodyStrong)
+                if let detail = copy.detail {
+                    Text(detail)
+                        .font(WalletTypography.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(WalletChrome.cardPadding)
+        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
+                .stroke(WalletChrome.panelStroke, lineWidth: 1)
+        )
     }
 }
 
@@ -2768,9 +2811,9 @@ private struct WalletInputSurface<Content: View>: View {
         content
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(Color(red: 0.04, green: 0.04, blue: 0.04), in: RoundedRectangle(cornerRadius: 16))
+            .background(WalletChrome.inputBackground, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                     .stroke(WalletChrome.panelStroke, lineWidth: 1)
             )
     }
@@ -2782,10 +2825,10 @@ private struct WalletInfoCard<Content: View>: View {
 
     var body: some View {
         content
-            .padding(16)
-            .background(Color(red: 0.04, green: 0.04, blue: 0.04), in: RoundedRectangle(cornerRadius: 16))
+            .padding(WalletChrome.cardPadding)
+            .background(WalletChrome.inputBackground, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                     .stroke(accent, lineWidth: 1)
             )
     }
@@ -2825,27 +2868,13 @@ private struct MessagingEncryptionBadge: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 10) {
-                Image(systemName: "lock.shield.fill")
-                    .foregroundStyle(WalletChrome.midnightBlue)
-                Text("ML-KEM-1024 + X25519 Hybrid")
-                    .font(.custom("Outfit-Medium", size: 10))
-                    .foregroundStyle(WalletChrome.midnightBlue)
-                Text("•")
-                    .foregroundStyle(.secondary)
-                Text(rotationLine)
-                    .font(.custom("Outfit-Medium", size: 10))
-                    .foregroundStyle(.secondary)
-                Text("•")
-                    .foregroundStyle(.secondary)
-                Text("ChaCha20-Poly1305")
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                badgeContent
             }
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 10) {
                     Image(systemName: "lock.shield.fill")
                         .foregroundStyle(WalletChrome.midnightBlue)
-                    Text("ML-KEM-1024 + X25519 Hybrid")
+                    Text("ML-KEM-1024 + X25519")
                         .font(.custom("Outfit-Medium", size: 10))
                         .foregroundStyle(WalletChrome.midnightBlue)
                 }
@@ -2855,12 +2884,33 @@ private struct MessagingEncryptionBadge: View {
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(WalletChrome.midnightBlue.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+        .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+        .background(WalletChrome.midnightBlue.opacity(0.06), in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                 .stroke(WalletChrome.midnightBlue.opacity(0.12), lineWidth: 1)
         )
+    }
+
+    private var badgeContent: some View {
+        Group {
+            Image(systemName: "lock.shield.fill")
+                .foregroundStyle(WalletChrome.midnightBlue)
+                .font(.system(size: 14, weight: .semibold))
+            Text("ML-KEM-1024 + X25519")
+                .font(.custom("Outfit-Medium", size: 10))
+                .foregroundStyle(WalletChrome.midnightBlue)
+            Text("•")
+                .foregroundStyle(.secondary)
+            Text(rotationLine)
+                .font(.custom("Outfit-Medium", size: 10))
+                .foregroundStyle(.secondary)
+            Text("•")
+                .foregroundStyle(.secondary)
+            Text("ChaCha20-Poly1305")
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
@@ -2869,12 +2919,13 @@ private struct WalletEmptyState: View {
     let message: String
     let actionTitle: String
     let action: () -> Void
+    var motifSize: CGFloat = 44
 
     var body: some View {
         VStack(spacing: 14) {
             ClockMotif()
                 .stroke(WalletChrome.midnightBlue.opacity(0.75), lineWidth: 1.4)
-                .frame(width: 44, height: 44)
+                .frame(width: motifSize, height: motifSize)
             Text(title)
                 .font(WalletTypography.sectionTitle)
             Text(message)
@@ -2915,10 +2966,10 @@ private struct DUSTActionBar: View {
                 actionButton(title: "Redesignate", active: selectedOperation == .redesignate, action: onRedesignate)
             }
         }
-        .padding(16)
-        .background(Color(red: 0.04, green: 0.04, blue: 0.04), in: RoundedRectangle(cornerRadius: 18))
+        .padding(WalletChrome.cardPadding)
+        .background(WalletChrome.inputBackground, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                 .stroke(WalletChrome.dustStroke, lineWidth: 1)
         )
     }
@@ -3043,13 +3094,13 @@ private struct StatusBanner: View {
     let message: String?
 
     var body: some View {
-        if let message {
-            Text(message)
+        if let userFacingMessage = WalletDisplay.userFacingError(message) {
+            Text(userFacingMessage)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(14)
-                .background(WalletChrome.statusBackground, in: RoundedRectangle(cornerRadius: 14))
+                .padding(WalletChrome.cardPadding)
+                .background(WalletChrome.statusBackground, in: RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: WalletChrome.cardCornerRadius)
                         .stroke(WalletChrome.statusStroke, lineWidth: 1)
                 )
         }
@@ -3172,6 +3223,10 @@ private enum WalletChrome {
     static let warningAccent = Color(red: 1.0, green: 0.584, blue: 0.0)
     static let badgeBackground = midnightBlue.opacity(0.12)
     static let codeBackground = Color.white.opacity(0.04)
+    static let inputBackground = Color(red: 0.04, green: 0.04, blue: 0.04)
+    static let cardCornerRadius: CGFloat = 16
+    static let cardSpacing: CGFloat = 16
+    static let inputHeight: CGFloat = 48
 
     static let background = midnightBlack
 
@@ -3182,6 +3237,14 @@ private enum WalletChrome {
     static let panelStroke = Color(red: 0.102, green: 0.102, blue: 0.102)
     static let statusBackground = midnightBlue.opacity(0.12)
     static let statusStroke = midnightBlue.opacity(0.24)
+
+    static var cardPadding: CGFloat {
+#if os(iOS)
+        16
+#else
+        20
+#endif
+    }
 
     static func selectionFill(isSelected: Bool) -> some ShapeStyle {
         if isSelected {
