@@ -421,27 +421,27 @@ actor WalletHelperProcess: WalletHelperRuntime {
         }
 
 #if DEBUG
-        let repoRoot = URL(fileURLWithPath: "/Users/sicarii/Desktop/ZirOS", isDirectory: true)
-        let repoHelperRoot = repoRoot.appendingPathComponent("zkf-wallet-helper", isDirectory: true)
-        let repoNodeCandidates = [
-            "/opt/homebrew/opt/node@22/bin/node",
-            "/usr/local/bin/node",
-            "/opt/homebrew/bin/node",
-        ]
-        let repoNodePath = repoNodeCandidates.first(where: { fileManager.isExecutableFile(atPath: $0) })
+        if let repoHelperRoot = repoHelperOverrideRoot() {
+            let repoNodeCandidates = [
+                "/opt/homebrew/opt/node@22/bin/node",
+                "/usr/local/bin/node",
+                "/opt/homebrew/bin/node",
+            ]
+            let repoNodePath = repoNodeCandidates.first(where: { fileManager.isExecutableFile(atPath: $0) })
 
-        let repoScriptCandidates = [
-            repoHelperRoot.appendingPathComponent("dist/src/main.js", isDirectory: false),
-            repoHelperRoot.appendingPathComponent("dist/main.js", isDirectory: false),
-        ]
-        let repoScript = repoScriptCandidates.first(where: { fileManager.fileExists(atPath: $0.path) })
+            let repoScriptCandidates = [
+                repoHelperRoot.appendingPathComponent("dist/src/main.js", isDirectory: false),
+                repoHelperRoot.appendingPathComponent("dist/main.js", isDirectory: false),
+            ]
+            let repoScript = repoScriptCandidates.first(where: { fileManager.fileExists(atPath: $0.path) })
 
-        if let repoNodePath, let repoScript {
-            return HelperRuntime(
-                executableURL: URL(fileURLWithPath: repoNodePath),
-                scriptURL: repoScript,
-                workingDirectoryURL: repoHelperRoot
-            )
+            if let repoNodePath, let repoScript {
+                return HelperRuntime(
+                    executableURL: URL(fileURLWithPath: repoNodePath),
+                    scriptURL: repoScript,
+                    workingDirectoryURL: repoHelperRoot
+                )
+            }
         }
 #endif
 
@@ -487,6 +487,20 @@ actor WalletHelperProcess: WalletHelperRuntime {
 
         return true
     }
+
+#if DEBUG
+    private func repoHelperOverrideRoot() -> URL? {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["ZIROS_WALLET_ALLOW_REPO_FALLBACKS"] == "1" else {
+            return nil
+        }
+        guard let repoRoot = environment["ZIROS_WALLET_REPO_ROOT"], repoRoot.isEmpty == false else {
+            return nil
+        }
+        return URL(fileURLWithPath: repoRoot, isDirectory: true)
+            .appendingPathComponent("zkf-wallet-helper", isDirectory: true)
+    }
+#endif
 
     private func call<Params: Encodable, Result: Decodable>(method: String, params: Params) async throws -> Result {
         try await ensureRunning()

@@ -1810,7 +1810,9 @@ final class WalletCoordinator {
 
     #if os(macOS) && DEBUG
     private func debugMailboxTransportConfig() -> MailboxTransportConfig? {
-        let repoRoot = URL(fileURLWithPath: "/Users/sicarii/Desktop/ZirOS", isDirectory: true)
+        guard let repoRoot = debugRepoRoot() else {
+            return nil
+        }
         let deploymentRoot = repoRoot.appendingPathComponent("zkf-wallet-mailbox/deployment", isDirectory: true)
         let manifestCandidates = [
             deploymentRoot.appendingPathComponent("mailbox.deployment.json", isDirectory: false),
@@ -1822,6 +1824,17 @@ final class WalletCoordinator {
             return nil
         }
         return MailboxTransportConfig(contractAddress: contractAddress, manifestPath: manifestURL.path)
+    }
+
+    private func debugRepoRoot() -> URL? {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["ZIROS_WALLET_ALLOW_REPO_FALLBACKS"] == "1" else {
+            return nil
+        }
+        guard let repoRoot = environment["ZIROS_WALLET_REPO_ROOT"], repoRoot.isEmpty == false else {
+            return nil
+        }
+        return URL(fileURLWithPath: repoRoot, isDirectory: true)
     }
     #endif
 

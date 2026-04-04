@@ -358,9 +358,11 @@
 						ProvisioningStyle = Automatic;
 					};
 					2C7BF1962EF671E086772B92 = {
+						DevelopmentTeam = E9VB3VKZKH;
 						ProvisioningStyle = Automatic;
 					};
 					813655A1BFFF4EFA05745F1F = {
+						DevelopmentTeam = E9VB3VKZKH;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -604,7 +606,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWallet.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -793,10 +797,13 @@
 		4D2C90D32575E02C6C091242 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet Extension";
-				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\", \"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\"]";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\", \"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\"]";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -815,10 +822,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet Extension";
-				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\", \"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\"]";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\", \"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\"]";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -837,7 +846,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWallet.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (

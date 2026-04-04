@@ -18,6 +18,9 @@ targets:
       - path: Resources
     settings:
       base:
+        DEVELOPMENT_TEAM: E9VB3VKZKH
+        CODE_SIGN_IDENTITY: Apple Development
+        CODE_SIGN_ENTITLEMENTS: Sources/App/ZirOSWallet.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet
         PRODUCT_NAME: ZirOSWallet
         GENERATE_INFOPLIST_FILE: YES
@@ -37,7 +40,6 @@ targets:
           OTHER_LDFLAGS:
             - "$(SRCROOT)/../target-public/debug/libzkf_ffi.a"
         Release:
-          CODE_SIGN_ENTITLEMENTS: Sources/App/ZirOSWallet.entitlements
           OTHER_LDFLAGS:
             - "$(SRCROOT)/../target-public/release/libzkf_ffi.a"
     dependencies:
@@ -114,6 +116,9 @@ targets:
       - path: Sources/Shared
     settings:
       base:
+        DEVELOPMENT_TEAM: E9VB3VKZKH
+        CODE_SIGN_IDENTITY: Apple Development
+        CODE_SIGN_ENTITLEMENTS: Sources/Extension/ZirOSWalletExtension.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.ziros.wallet.extension
         PRODUCT_NAME: ZirOSWalletExtension
         GENERATE_INFOPLIST_FILE: YES
@@ -123,9 +128,6 @@ targets:
         INFOPLIST_KEY_NSExtension:
           NSExtensionPointIdentifier: com.apple.Safari.web-extension
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).SafariWebExtensionHandler
-      configs:
-        Release:
-          CODE_SIGN_ENTITLEMENTS: Sources/Extension/ZirOSWalletExtension.entitlements
     postCompileScripts:
       - name: Sanitize Extension Bundle
         script: |

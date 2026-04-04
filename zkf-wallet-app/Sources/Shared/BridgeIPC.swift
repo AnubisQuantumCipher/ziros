@@ -106,15 +106,19 @@ final class WalletBridgeStore {
     }
 
     static func sharedRootURL() -> URL {
+#if DEBUG
+        // In debug builds, skip the app-group container call entirely to avoid
+        // the macOS TCC "would like to access data from other apps" prompt that
+        // fires on unsigned / locally-signed builds. The containerURL call
+        // itself triggers the prompt before the nil-check can fall through.
+        return FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".ziros-wallet-debug", isDirectory: true)
+#else
         if let groupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupIdentifier
         ) {
             return groupURL
         }
-#if DEBUG
-        return URL(fileURLWithPath: NSHomeDirectory())
-            .appendingPathComponent("Library/Application Support/ZirOSWallet", isDirectory: true)
-#else
         preconditionFailure("App group '\(appGroupIdentifier)' is required for release builds.")
 #endif
     }
