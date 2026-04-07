@@ -2,6 +2,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use serde::Serialize;
+#[cfg(test)]
+use serde_json::{Value, json};
 use zkf_core::{
     AuditCategory, AuditStatus, CompiledProgram, Program, ProofArtifact, UnderconstrainedAnalysis,
     program_v2_to_zir, solve_and_validate_witness, solver_by_name,
@@ -35,6 +37,62 @@ pub(crate) struct ProveArgs {
     pub(crate) groth16_setup_blob: Option<PathBuf>,
     pub(crate) allow_dev_deterministic_groth16: bool,
     pub(crate) hybrid: bool,
+}
+
+#[cfg(test)]
+pub(crate) fn direct_prove_success_payload(
+    backend_name: &str,
+    proof_path: &PathBuf,
+    compiled_path: Option<&PathBuf>,
+    artifact: &ProofArtifact,
+    hybrid: bool,
+    distributed: bool,
+    _mode: Option<&str>,
+    _export: Option<&str>,
+) -> Value {
+    let thresholds = artifact
+        .metadata
+        .get("metal_thresholds")
+        .map(|raw| parse_threshold_summary(raw))
+        .unwrap_or_default();
+    let acceleration = json!({
+        "classification": artifact.metadata.get("groth16_execution_classification"),
+        "msm": {
+            "engine": artifact.metadata.get("groth16_msm_engine"),
+            "reason": artifact.metadata.get("groth16_msm_reason"),
+            "accelerator": artifact.metadata.get("msm_accelerator"),
+        },
+        "witness_map": {
+            "engine": artifact.metadata.get("qap_witness_map_engine"),
+            "reason": artifact.metadata.get("qap_witness_map_reason"),
+        },
+        "threshold_profile": artifact.metadata.get("metal_threshold_profile"),
+        "thresholds": thresholds,
+    });
+    json!({
+        "status": "ok",
+        "backend": backend_name,
+        "proof_path": proof_path,
+        "compiled_path": compiled_path,
+        "hybrid": hybrid,
+        "distributed": distributed,
+        "public_inputs": artifact.public_inputs,
+        "acceleration": acceleration,
+    })
+}
+
+#[cfg(test)]
+fn parse_threshold_summary(raw: &str) -> serde_json::Map<String, Value> {
+    let mut out = serde_json::Map::new();
+    for entry in raw.split(',') {
+        let Some((key, value)) = entry.split_once('=') else {
+            continue;
+        };
+        if let Ok(value) = value.trim().parse::<u64>() {
+            out.insert(key.trim().to_string(), json!(value));
+        }
+    }
+    out
 }
 
 #[derive(Debug, Serialize)]

@@ -38,6 +38,25 @@ order.
   validated, and the truth surfaces are updated again.
 - Public/release-safe flows are strict cryptographic unless the caller explicitly opts into an
   attestation trust lane.
+- Groth16 setup trust must be read from emitted metadata, not narrative prose. The live reporting
+  contract is `setup_seed_source`, `groth16_setup_provenance`, `groth16_setup_security_boundary`,
+  and, for the auto-ceremony lane, `groth16_ceremony_subsystem`,
+  `groth16_ceremony_id`, `groth16_ceremony_kind`, `groth16_ceremony_report_path`,
+  `groth16_ceremony_report_sha256`, and `groth16_ceremony_seed_commitment_sha256`.
+- `zkf midnight proof-server serve` is the canonical local Midnight proof-server compatibility
+  surface in this checkout. It owns the route-level contract (`/prove`, `/check`, `/health`) but
+  does not by itself upgrade the `midnight-compact` backend row to production-ready status.
+- `zkf midnight gateway serve`, `zkf midnight doctor`, `zkf midnight disclosure`, `zkf midnight resolve`,
+  `zkf midnight templates`, and `zkf midnight init` are the shipped Midnight developer-platform
+  surfaces in this checkout. They are pinned to `compactc 0.30.0` and inherit the same
+  backend-readiness caveat above rather than silently upgrading the `midnight-compact` backend row.
+- Subsystem bundles consume a pinned `zkf` release binary as a black box. The shipped contract is
+  author-fixed backend policy per circuit/lane, not end-user-selectable backend mutation.
+- Native BN254 Groth16 is the supported on-chain subsystem lane. Public STARK-to-Groth16 wrapping
+  remains non-primary and must not be described as the default subsystem publication route.
+- Post-quantum Midnight claims must be scoped to ZirOS-owned off-chain envelopes: Plonky3 proof
+  verification, ML-DSA proof-origin signatures, and commitment comparison against Midnight anchors.
+  They must not be described as an upgrade to Midnight's own consensus or classical cryptography.
 
 Additional trust semantics guidance lives in
 `WRAPPING_SECURITY.md`.

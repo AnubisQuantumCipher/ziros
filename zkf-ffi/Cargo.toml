@@ -1,0 +1,25 @@
+[package]
+name = "zkf-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "C ABI bridge for ZirOS binary distribution"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+zkf-core = { path = "../zkf-core" }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-lib = { path = "../zkf-lib", features = ["full"] }
+zkf-wallet = { path = "../zkf-wallet" }
+once_cell.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tempfile = "3"

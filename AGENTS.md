@@ -21,12 +21,14 @@ Do not revive the historical "10 gaps" list as if it were current. Several forme
 - Format check: `cargo fmt --all -- --check`
 
 ## Working agreements
+- Run `/Users/sicarii/.jacobian/bin/codex-memory resume --cwd /Users/sicarii/Desktop/ZirOS` before substantial work so the ZirOS context pack and global memory spine are current.
 - Run `cargo build --workspace` after modifications. Never leave the build broken.
 - Run `cargo test -p <crate>` on every crate you change before considering work done.
 - Write real implementations. Do not land placeholders, TODO deliverables, or documentation that advertises capabilities the checkout does not have.
 - Read existing code before writing new code. Match established patterns and naming.
 - Never delete or weaken passing tests to make changes land.
 - Update `.zkf-completion-status.json`, generated proof-boundary summaries, and forensic reports when status-bearing claims change.
+- After substantial work, run `/Users/sicarii/.jacobian/bin/codex-memory handoff --cwd /Users/sicarii/Desktop/ZirOS --summary "..." --next-step "..."` so `.ops/context/` and the global memory store stay synchronized.
 
 ## Architecture
 - **zkf-core/src/ir.rs**: IR v2 — `Expr`, `Signal`, `Constraint`, `Program`

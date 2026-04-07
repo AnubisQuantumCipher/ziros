@@ -33,7 +33,7 @@ use std::sync::Arc;
 use std::sync::mpsc;
 use zkf_backends::{
     BackendRoute, backend_for_route, capability_report_for_backend,
-    ensure_security_covered_groth16_setup, prepare_witness_for_proving,
+    ensure_strict_security_covered_groth16_artifact, prepare_witness_for_proving,
 };
 use zkf_cloudfs::CloudFS;
 use zkf_core::SupportClass;
@@ -881,10 +881,6 @@ impl RuntimeExecutor {
                         "runtime backend prove did not materialize a compiled artifact".into(),
                     )
                 })?;
-            if trust == RequiredTrustLane::StrictCryptographic {
-                ensure_security_covered_groth16_setup(&compiled)
-                    .map_err(|err| RuntimeError::Execution(err.to_string()))?;
-            }
             let mut artifact = preserve_successful_proof_artifact(
                 emission.exec_ctx.take_proof_artifact().ok_or_else(|| {
                     RuntimeError::Execution(
@@ -892,6 +888,10 @@ impl RuntimeExecutor {
                     )
                 })?,
             );
+            if trust == RequiredTrustLane::StrictCryptographic {
+                ensure_strict_security_covered_groth16_artifact(&compiled, &artifact)
+                    .map_err(|err| RuntimeError::Execution(err.to_string()))?;
+            }
             sign_proof_origin_if_configured(&mut artifact, &SwarmConfig::from_env());
             if let Err(err) = telemetry_collector::emit_prove_telemetry(
                 program.as_ref(),
@@ -1097,6 +1097,10 @@ impl RuntimeExecutor {
                 )
             })?,
         );
+        if trust == RequiredTrustLane::StrictCryptographic {
+            ensure_strict_security_covered_groth16_artifact(&compiled, &artifact)
+                .map_err(|err| RuntimeError::Execution(err.to_string()))?;
+        }
         sign_proof_origin_if_configured(&mut artifact, &SwarmConfig::from_env());
         if let Err(err) = telemetry_collector::emit_fold_telemetry(
             &compiled,
@@ -1261,7 +1265,7 @@ mod tests {
     use std::fs;
     use std::path::Path;
     use std::sync::{Mutex, OnceLock};
-    use zkf_backends::backend_for_route;
+    use zkf_backends::{backend_for_route, with_setup_seed_override};
     use zkf_core::ir::{Constraint, Expr, Signal, Visibility, WitnessPlan};
     use zkf_core::{FieldElement, FieldId, SupportClass};
 
@@ -1533,13 +1537,22 @@ mod tests {
     #[test]
     fn strict_runtime_lane_rejects_deterministic_groth16_artifacts() {
         let program = Arc::new(sample_program());
+        let engine = backend_for_route(
+            zkf_core::artifact::BackendKind::ArkworksGroth16,
+            BackendRoute::Auto,
+        );
+        let compiled = with_setup_seed_override(Some([7u8; 32]), || {
+            engine
+                .compile(program.as_ref())
+                .expect("compile deterministic-dev groth16 artifact")
+        });
         let result = RuntimeExecutor::run_backend_prove_job_with_objective(
             zkf_core::artifact::BackendKind::ArkworksGroth16,
             BackendRoute::Auto,
             Arc::clone(&program),
             None,
             Some(Arc::new(witness(2, 3))),
-            None,
+            Some(Arc::new(compiled)),
             OptimizationObjective::FastestProve,
             RequiredTrustLane::StrictCryptographic,
             ExecutionMode::Deterministic,
@@ -1550,8 +1563,10 @@ mod tests {
         };
 
         assert!(
-            err.to_string()
-                .contains("requires imported trusted CRS material"),
+            err.to_string().contains("dev-deterministic")
+                || err
+                    .to_string()
+                    .contains("requires imported trusted CRS material"),
             "unexpected error: {err}"
         );
     }

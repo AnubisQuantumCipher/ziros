@@ -1,0 +1,971 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0393B554DE7B86AA52B3DD4D /* BridgeIPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACEC15810E4A57E719C7894 /* BridgeIPC.swift */; };
+		0C948F2C7117DD1CCA059075 /* WalletHelperProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2132F463195A1887B198839E /* WalletHelperProcess.swift */; };
+		0CDFABCF5FF66C250182CD2C /* ZirOSWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97246B2C0DBDC9FEEAF852A2 /* ZirOSWalletApp.swift */; };
+		0D68E472F05132B647421776 /* Outfit-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ACF792A399E126E3647AA8F5 /* Outfit-SemiBold.ttf */; };
+		10AA4348C57BAD8F82C84441 /* Outfit-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E650A570C2852C45BF990CC1 /* Outfit-ExtraBold.ttf */; };
+		10E977BF5957F9C0B82AB7F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F112614CEFB49FABDE263C77 /* Assets.xcassets */; };
+		19B8D4CC2A99FC86F35C18A4 /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0851525287DB0643B4BF8047 /* Outfit-Regular.ttf */; };
+		28E47130F3969AE367D2A520 /* WalletPlatformSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C801643F0CBE68B743A7204 /* WalletPlatformSupport.swift */; };
+		2CA329F040A850E4B21F61EC /* WalletHelperRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D58FAD22342219A4C409B8 /* WalletHelperRuntime.swift */; };
+		2D76CB1DC17831B2B6E02483 /* WalletFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA71E1D36693DEFA1D5552F /* WalletFFI.swift */; };
+		3390EBAA5DC69B9947BAB9EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F112614CEFB49FABDE263C77 /* Assets.xcassets */; };
+		34576B9FD9D0B52FC45BFAB9 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB5113ADAEC547046FFA6C4 /* SafariWebExtensionHandler.swift */; };
+		36444C5CC2317492E3E09113 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F020F91C22056C81A2CE29 /* RootTabView.swift */; };
+		41BAADB7D81C6E0229523C7E /* WalletHelperProcess+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D59E374C6D3CC65E31767F /* WalletHelperProcess+iOS.swift */; };
+		49C88F929B8001A95C9AB408 /* WalletHelperWebKitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0F96BEBF2A912CFEFE977C /* WalletHelperWebKitBridge.swift */; };
+		4AE992C8C9BD2A4FD2F0B5BC /* DustFuelRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B2F9D839B109A0AB266BAE /* DustFuelRing.swift */; };
+		4AF3C5665A29600B9E20230C /* WalletCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76E6832759606C00A9E456A /* WalletCoordinator.swift */; };
+		4BDDCFE270EA51780BDD93F5 /* WalletDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8D127E7D8E65780A238EB4 /* WalletDisplay.swift */; };
+		51C3B8069FBF6DC9D1A9F24D /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F020F91C22056C81A2CE29 /* RootTabView.swift */; };
+		51EFD4953EEBD759604AA6E7 /* WalletModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014820069E1FAF19EE879722 /* WalletModels.swift */; };
+		522956F411E9EDED485E4FAE /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = B5D8DF6A843937DC16429077 /* background.js */; };
+		5255F72FB0D41B61833233C0 /* Outfit-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1AB3B97771A0331906E9C55F /* Outfit-Bold.ttf */; };
+		657369163F5261F244035419 /* WalletHelperProcess+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D59E374C6D3CC65E31767F /* WalletHelperProcess+iOS.swift */; };
+		675BF58CB33188E94FAD3ECE /* ZirOSWallet-AppIcon-1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BDB41C2C4BE9CD45E4E882A /* ZirOSWallet-AppIcon-1024.png */; };
+		6762117B3F29B295BE4A0EC7 /* Outfit-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEDC216F370AE96E57DBE224 /* Outfit-Medium.ttf */; };
+		6896F6E0D5DDD001314C5689 /* Outfit-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ACF792A399E126E3647AA8F5 /* Outfit-SemiBold.ttf */; };
+		6AC146CF840C1838BC23FD04 /* ZKFWalletWebViewHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 3481789F62119929F379DA3D /* ZKFWalletWebViewHost.m */; };
+		6DA187C04C640FD1564BD22D /* WalletModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014820069E1FAF19EE879722 /* WalletModels.swift */; };
+		7626A4B49B62A7191F4B227A /* BridgeRequestModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A98D86CF3678E6C9A0EB6 /* BridgeRequestModels.swift */; };
+		78FBAB858673CA3CD17C8209 /* PrivacyGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB3BBEB6CFE6A0D7DD72FC2 /* PrivacyGauge.swift */; };
+		791D71DC699D2398F01968ED /* WalletCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76E6832759606C00A9E456A /* WalletCoordinator.swift */; };
+		7D73BC49049CDC43B2B8A8CC /* ZirOSWalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97246B2C0DBDC9FEEAF852A2 /* ZirOSWalletApp.swift */; };
+		807D92B3A06E0937AB97E565 /* WalletBrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */; };
+		8117A3AF101DE7F6E5C5C028 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F786C8A8DECD3F7BCEB0977 /* ContentView.swift */; };
+		812ECC2F47535F1F06ECBDF5 /* Outfit-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1AB3B97771A0331906E9C55F /* Outfit-Bold.ttf */; };
+		82FCFDB5453765A850EA6633 /* WalletBrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */; };
+		88B83D1AB98C88A52D211D72 /* WalletPlatformSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C801643F0CBE68B743A7204 /* WalletPlatformSupport.swift */; };
+		89D8DCB1263BBD2FF0AC13EA /* WalletDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8D127E7D8E65780A238EB4 /* WalletDisplay.swift */; };
+		8E061B408E079152E6702504 /* Outfit-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9EC8CB19E93D84AB8416434B /* Outfit-OFL.txt */; };
+		9AC6C506FF3E5A849C93A750 /* BridgeIPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACEC15810E4A57E719C7894 /* BridgeIPC.swift */; };
+		A157367541A6D17B993AE786 /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0851525287DB0643B4BF8047 /* Outfit-Regular.ttf */; };
+		A3B2A0C289B1096B6BDE922A /* DustFuelRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B2F9D839B109A0AB266BAE /* DustFuelRing.swift */; };
+		A898D80BEE3397E843B7D757 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F786C8A8DECD3F7BCEB0977 /* ContentView.swift */; };
+		A955F9A69CED1475D26B9848 /* BrandViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78FB39D850E61570329D784 /* BrandViewModifiers.swift */; };
+		AA6FC50E789B9650706F6082 /* BrandViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78FB39D850E61570329D784 /* BrandViewModifiers.swift */; };
+		AB664E1414CC16CAB5D8C193 /* WalletDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8D127E7D8E65780A238EB4 /* WalletDisplay.swift */; };
+		ACE354328F1DD49E3BFF1423 /* Outfit-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEDC216F370AE96E57DBE224 /* Outfit-Medium.ttf */; };
+		B2115A0DE0F2158C73D36C1E /* BrandViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78FB39D850E61570329D784 /* BrandViewModifiers.swift */; };
+		B21F4DD942C43F310C0D23E6 /* BridgeIPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACEC15810E4A57E719C7894 /* BridgeIPC.swift */; };
+		B35C65F95A8C8F8E371967E2 /* WalletHelperProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2132F463195A1887B198839E /* WalletHelperProcess.swift */; };
+		B6CE97CE5EAD74E16F5221FE /* ZKFWalletWebViewHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 3481789F62119929F379DA3D /* ZKFWalletWebViewHost.m */; };
+		B99F960F368FEBDE98657CC7 /* WalletBrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */; };
+		BDA1D195CE9B08FAFD95B6AC /* Outfit-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9EC8CB19E93D84AB8416434B /* Outfit-OFL.txt */; };
+		CAF13A5139059643437A281B /* ZirOSWallet-AppIcon-1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BDB41C2C4BE9CD45E4E882A /* ZirOSWallet-AppIcon-1024.png */; };
+		D3D68A36F3A598E391FADFBB /* WalletPlatformSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C801643F0CBE68B743A7204 /* WalletPlatformSupport.swift */; };
+		DF9C04B9FAA17D977308100E /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 3E8C05FE3A9C0EAFF4143A04 /* content.js */; };
+		E10186C0C3E4BE3EB4F4C3F5 /* WalletHelperRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D58FAD22342219A4C409B8 /* WalletHelperRuntime.swift */; };
+		E1FACA711E1FD8393CCABA87 /* ZirOSWalletExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BBC8987934331E0AA811D0F2 /* ZirOSWalletExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E417BE2CBB7E1BAC0B7BEE43 /* PrivacyGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB3BBEB6CFE6A0D7DD72FC2 /* PrivacyGauge.swift */; };
+		E6092C10BFFCB59A4C925160 /* DustFuelRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B2F9D839B109A0AB266BAE /* DustFuelRing.swift */; };
+		E632842AF74B7E01838C5C3F /* WalletHelperWebKitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0F96BEBF2A912CFEFE977C /* WalletHelperWebKitBridge.swift */; };
+		E99875EA4DDB4C8F12062B30 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F020F91C22056C81A2CE29 /* RootTabView.swift */; };
+		F40D94B81A577A28E5C07E5A /* Outfit-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E650A570C2852C45BF990CC1 /* Outfit-ExtraBold.ttf */; };
+		F726C8AA73CE96E427FF959D /* PrivacyGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB3BBEB6CFE6A0D7DD72FC2 /* PrivacyGauge.swift */; };
+		F914CA8B1F08EE305B875F70 /* BridgeRequestModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A98D86CF3678E6C9A0EB6 /* BridgeRequestModels.swift */; };
+		FB8EBD2B9EFD33415F9C6D47 /* WalletFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA71E1D36693DEFA1D5552F /* WalletFFI.swift */; };
+		FD251637DC2FB0F9AD3B6D5A /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 508D1B2C2F15EAF5C6B87D9A /* manifest.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0D057A660EA66829444255C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96F7BF69BC760A5BFA0BC57D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 813655A1BFFF4EFA05745F1F;
+			remoteInfo = ZirOSWalletExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FD2459C345BFA6F301F8BBCE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E1FACA711E1FD8393CCABA87 /* ZirOSWalletExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		00B2F9D839B109A0AB266BAE /* DustFuelRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DustFuelRing.swift; sourceTree = "<group>"; };
+		014820069E1FAF19EE879722 /* WalletModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletModels.swift; sourceTree = "<group>"; };
+		0851525287DB0643B4BF8047 /* Outfit-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-Regular.ttf"; sourceTree = "<group>"; };
+		0D7F79E5EA92A413DBB4A31C /* ZirOSWalletiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ZirOSWalletiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1AB3B97771A0331906E9C55F /* Outfit-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-Bold.ttf"; sourceTree = "<group>"; };
+		1BDB41C2C4BE9CD45E4E882A /* ZirOSWallet-AppIcon-1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ZirOSWallet-AppIcon-1024.png"; sourceTree = "<group>"; };
+		2132F463195A1887B198839E /* WalletHelperProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHelperProcess.swift; sourceTree = "<group>"; };
+		3481789F62119929F379DA3D /* ZKFWalletWebViewHost.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZKFWalletWebViewHost.m; sourceTree = "<group>"; };
+		3E8C05FE3A9C0EAFF4143A04 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		3EE4C92E23D9084CBB456AE3 /* ZirOSWalletExtensionDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWalletExtensionDebug.entitlements; sourceTree = "<group>"; };
+		432A98D86CF3678E6C9A0EB6 /* BridgeRequestModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeRequestModels.swift; sourceTree = "<group>"; };
+		46E2BBAFD1BD8D1910857716 /* ZirOSWallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWallet.entitlements; sourceTree = "<group>"; };
+		47D58FAD22342219A4C409B8 /* WalletHelperRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHelperRuntime.swift; sourceTree = "<group>"; };
+		4F786C8A8DECD3F7BCEB0977 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		508D1B2C2F15EAF5C6B87D9A /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		5B8D127E7D8E65780A238EB4 /* WalletDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletDisplay.swift; sourceTree = "<group>"; };
+		5BB3BBEB6CFE6A0D7DD72FC2 /* PrivacyGauge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyGauge.swift; sourceTree = "<group>"; };
+		6C801643F0CBE68B743A7204 /* WalletPlatformSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPlatformSupport.swift; sourceTree = "<group>"; };
+		7DA71E1D36693DEFA1D5552F /* WalletFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletFFI.swift; sourceTree = "<group>"; };
+		8C0F96BEBF2A912CFEFE977C /* WalletHelperWebKitBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHelperWebKitBridge.swift; sourceTree = "<group>"; };
+		97246B2C0DBDC9FEEAF852A2 /* ZirOSWalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZirOSWalletApp.swift; sourceTree = "<group>"; };
+		9B669A24EF97D26415EEBE91 /* ZkfFFI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZkfFFI.h; sourceTree = "<group>"; };
+		9EC8CB19E93D84AB8416434B /* Outfit-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Outfit-OFL.txt"; sourceTree = "<group>"; };
+		A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBrandAssets.swift; sourceTree = "<group>"; };
+		A78FB39D850E61570329D784 /* BrandViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandViewModifiers.swift; sourceTree = "<group>"; };
+		A8499400D8F08B28045C663C /* ZirOSWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZirOSWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9E1912CD96D8067A5FB3A6A /* ZirOSWalletDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWalletDebug.entitlements; sourceTree = "<group>"; };
+		ACF792A399E126E3647AA8F5 /* Outfit-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-SemiBold.ttf"; sourceTree = "<group>"; };
+		B5D8DF6A843937DC16429077 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		B76E6832759606C00A9E456A /* WalletCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCoordinator.swift; sourceTree = "<group>"; };
+		BBC8987934331E0AA811D0F2 /* ZirOSWalletExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ZirOSWalletExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEDC216F370AE96E57DBE224 /* Outfit-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-Medium.ttf"; sourceTree = "<group>"; };
+		C0F020F91C22056C81A2CE29 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		CACEC15810E4A57E719C7894 /* BridgeIPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeIPC.swift; sourceTree = "<group>"; };
+		E650A570C2852C45BF990CC1 /* Outfit-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-ExtraBold.ttf"; sourceTree = "<group>"; };
+		F112614CEFB49FABDE263C77 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F240A27717E51F0061679FF1 /* ZKFWalletWebViewHost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZKFWalletWebViewHost.h; sourceTree = "<group>"; };
+		F3D59E374C6D3CC65E31767F /* WalletHelperProcess+iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletHelperProcess+iOS.swift"; sourceTree = "<group>"; };
+		F7CF00CA5AEAEA09532FCDA8 /* ZirOSWalletExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWalletExtension.entitlements; sourceTree = "<group>"; };
+		FEB5113ADAEC547046FFA6C4 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0D0107236ECEFC1ED603C851 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				432A98D86CF3678E6C9A0EB6 /* BridgeRequestModels.swift */,
+				014820069E1FAF19EE879722 /* WalletModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		151174C038C2D665FD3FA5FC = {
+			isa = PBXGroup;
+			children = (
+				CB63C763D8209A36BE0B8645 /* App */,
+				20B9691686E00E810AC3D8EB /* Extension */,
+				9143FD7B91E29AB5F9E621DF /* Resources */,
+				1D515EBECA0B91F10EFAD8AA /* Shared */,
+				94D09301CC6213C6E407C561 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1D515EBECA0B91F10EFAD8AA /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A78FB39D850E61570329D784 /* BrandViewModifiers.swift */,
+				CACEC15810E4A57E719C7894 /* BridgeIPC.swift */,
+				00B2F9D839B109A0AB266BAE /* DustFuelRing.swift */,
+				5BB3BBEB6CFE6A0D7DD72FC2 /* PrivacyGauge.swift */,
+				C0F020F91C22056C81A2CE29 /* RootTabView.swift */,
+				A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */,
+				5B8D127E7D8E65780A238EB4 /* WalletDisplay.swift */,
+				6C801643F0CBE68B743A7204 /* WalletPlatformSupport.swift */,
+			);
+			name = Shared;
+			path = Sources/Shared;
+			sourceTree = "<group>";
+		};
+		20B9691686E00E810AC3D8EB /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				FEB5113ADAEC547046FFA6C4 /* SafariWebExtensionHandler.swift */,
+				F7CF00CA5AEAEA09532FCDA8 /* ZirOSWalletExtension.entitlements */,
+				3EE4C92E23D9084CBB456AE3 /* ZirOSWalletExtensionDebug.entitlements */,
+				A699F5F92EDB0D2797E16585 /* Resources */,
+			);
+			name = Extension;
+			path = Sources/Extension;
+			sourceTree = "<group>";
+		};
+		220D04ADA914067C772D0620 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				1AB3B97771A0331906E9C55F /* Outfit-Bold.ttf */,
+				E650A570C2852C45BF990CC1 /* Outfit-ExtraBold.ttf */,
+				BEDC216F370AE96E57DBE224 /* Outfit-Medium.ttf */,
+				9EC8CB19E93D84AB8416434B /* Outfit-OFL.txt */,
+				0851525287DB0643B4BF8047 /* Outfit-Regular.ttf */,
+				ACF792A399E126E3647AA8F5 /* Outfit-SemiBold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		54309D9A0AC3F039F88BADCD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4F786C8A8DECD3F7BCEB0977 /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		7965D118A22BB9DCA27600B6 /* IconSource */ = {
+			isa = PBXGroup;
+			children = (
+				1BDB41C2C4BE9CD45E4E882A /* ZirOSWallet-AppIcon-1024.png */,
+			);
+			path = IconSource;
+			sourceTree = "<group>";
+		};
+		9143FD7B91E29AB5F9E621DF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F112614CEFB49FABDE263C77 /* Assets.xcassets */,
+				220D04ADA914067C772D0620 /* Fonts */,
+				7965D118A22BB9DCA27600B6 /* IconSource */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		94D09301CC6213C6E407C561 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A8499400D8F08B28045C663C /* ZirOSWallet.app */,
+				BBC8987934331E0AA811D0F2 /* ZirOSWalletExtension.appex */,
+				0D7F79E5EA92A413DBB4A31C /* ZirOSWalletiOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		99F245D23EB7946ED984303B /* WalletFFI */ = {
+			isa = PBXGroup;
+			children = (
+				7DA71E1D36693DEFA1D5552F /* WalletFFI.swift */,
+				9B669A24EF97D26415EEBE91 /* ZkfFFI.h */,
+			);
+			path = WalletFFI;
+			sourceTree = "<group>";
+		};
+		A699F5F92EDB0D2797E16585 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B5D8DF6A843937DC16429077 /* background.js */,
+				3E8C05FE3A9C0EAFF4143A04 /* content.js */,
+				508D1B2C2F15EAF5C6B87D9A /* manifest.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		BA5EB5A54139B92127371C6D /* WalletCore */ = {
+			isa = PBXGroup;
+			children = (
+				B76E6832759606C00A9E456A /* WalletCoordinator.swift */,
+				2132F463195A1887B198839E /* WalletHelperProcess.swift */,
+				F3D59E374C6D3CC65E31767F /* WalletHelperProcess+iOS.swift */,
+				47D58FAD22342219A4C409B8 /* WalletHelperRuntime.swift */,
+				8C0F96BEBF2A912CFEFE977C /* WalletHelperWebKitBridge.swift */,
+				F240A27717E51F0061679FF1 /* ZKFWalletWebViewHost.h */,
+				3481789F62119929F379DA3D /* ZKFWalletWebViewHost.m */,
+			);
+			path = WalletCore;
+			sourceTree = "<group>";
+		};
+		CB63C763D8209A36BE0B8645 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				46E2BBAFD1BD8D1910857716 /* ZirOSWallet.entitlements */,
+				97246B2C0DBDC9FEEAF852A2 /* ZirOSWalletApp.swift */,
+				A9E1912CD96D8067A5FB3A6A /* ZirOSWalletDebug.entitlements */,
+				0D0107236ECEFC1ED603C851 /* Models */,
+				54309D9A0AC3F039F88BADCD /* Views */,
+				BA5EB5A54139B92127371C6D /* WalletCore */,
+				99F245D23EB7946ED984303B /* WalletFFI */,
+			);
+			name = App;
+			path = Sources/App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		19C091C247051B7FC956A152 /* ZirOSWalletiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 45CEC9375339B7DAD558E264 /* Build configuration list for PBXNativeTarget "ZirOSWalletiOS" */;
+			buildPhases = (
+				C79FA531E53812DCC3B3144D /* Prepare Wallet Runtime */,
+				02AC3AA22AFFAF563AC607AB /* Sources */,
+				5129CFD5EC9C0F23E7346828 /* Sanitize iOS App Bundle */,
+				5BC6270912F14ADCBDAFCA2D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZirOSWalletiOS;
+			packageProductDependencies = (
+			);
+			productName = ZirOSWalletiOS;
+			productReference = 0D7F79E5EA92A413DBB4A31C /* ZirOSWalletiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		2C7BF1962EF671E086772B92 /* ZirOSWallet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DF5D96C3E2C05B6E03AC8112 /* Build configuration list for PBXNativeTarget "ZirOSWallet" */;
+			buildPhases = (
+				E63FCC70B7E341F82A7DE9E1 /* Prepare Wallet Runtime */,
+				1BAE289D8F97E556ECEB3EF5 /* Sources */,
+				2BE5D586C215C2E7C714B425 /* Sanitize macOS App Bundle */,
+				7987CA28881E85EAA6D06265 /* Resources */,
+				FD2459C345BFA6F301F8BBCE /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				74A4AF770DB2C1335BC46AA2 /* PBXTargetDependency */,
+			);
+			name = ZirOSWallet;
+			packageProductDependencies = (
+			);
+			productName = ZirOSWallet;
+			productReference = A8499400D8F08B28045C663C /* ZirOSWallet.app */;
+			productType = "com.apple.product-type.application";
+		};
+		813655A1BFFF4EFA05745F1F /* ZirOSWalletExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A1493CE00481B51099C10B9 /* Build configuration list for PBXNativeTarget "ZirOSWalletExtension" */;
+			buildPhases = (
+				3A2BED5D03DE11680489366D /* Sources */,
+				35066A62DB524801DC0CBE4A /* Sanitize Extension Bundle */,
+				AD49B128B1B8F3CFC344A2B2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZirOSWalletExtension;
+			packageProductDependencies = (
+			);
+			productName = ZirOSWalletExtension;
+			productReference = BBC8987934331E0AA811D0F2 /* ZirOSWalletExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		96F7BF69BC760A5BFA0BC57D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					19C091C247051B7FC956A152 = {
+						DevelopmentTeam = M454G64BS4;
+						ProvisioningStyle = Automatic;
+					};
+					2C7BF1962EF671E086772B92 = {
+						DevelopmentTeam = E9VB3VKZKH;
+						ProvisioningStyle = Automatic;
+					};
+					813655A1BFFF4EFA05745F1F = {
+						DevelopmentTeam = E9VB3VKZKH;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 278DA296024C22501BF7F2C1 /* Build configuration list for PBXProject "ZirOSWallet" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 151174C038C2D665FD3FA5FC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 94D09301CC6213C6E407C561 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2C7BF1962EF671E086772B92 /* ZirOSWallet */,
+				813655A1BFFF4EFA05745F1F /* ZirOSWalletExtension */,
+				19C091C247051B7FC956A152 /* ZirOSWalletiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5BC6270912F14ADCBDAFCA2D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10E977BF5957F9C0B82AB7F5 /* Assets.xcassets in Resources */,
+				5255F72FB0D41B61833233C0 /* Outfit-Bold.ttf in Resources */,
+				10AA4348C57BAD8F82C84441 /* Outfit-ExtraBold.ttf in Resources */,
+				ACE354328F1DD49E3BFF1423 /* Outfit-Medium.ttf in Resources */,
+				BDA1D195CE9B08FAFD95B6AC /* Outfit-OFL.txt in Resources */,
+				19B8D4CC2A99FC86F35C18A4 /* Outfit-Regular.ttf in Resources */,
+				6896F6E0D5DDD001314C5689 /* Outfit-SemiBold.ttf in Resources */,
+				675BF58CB33188E94FAD3ECE /* ZirOSWallet-AppIcon-1024.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7987CA28881E85EAA6D06265 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3390EBAA5DC69B9947BAB9EE /* Assets.xcassets in Resources */,
+				812ECC2F47535F1F06ECBDF5 /* Outfit-Bold.ttf in Resources */,
+				F40D94B81A577A28E5C07E5A /* Outfit-ExtraBold.ttf in Resources */,
+				6762117B3F29B295BE4A0EC7 /* Outfit-Medium.ttf in Resources */,
+				8E061B408E079152E6702504 /* Outfit-OFL.txt in Resources */,
+				A157367541A6D17B993AE786 /* Outfit-Regular.ttf in Resources */,
+				0D68E472F05132B647421776 /* Outfit-SemiBold.ttf in Resources */,
+				CAF13A5139059643437A281B /* ZirOSWallet-AppIcon-1024.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD49B128B1B8F3CFC344A2B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				522956F411E9EDED485E4FAE /* background.js in Resources */,
+				DF9C04B9FAA17D977308100E /* content.js in Resources */,
+				FD251637DC2FB0F9AD3B6D5A /* manifest.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2BE5D586C215C2E7C714B425 /* Sanitize macOS App Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sanitize macOS App Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -d \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" ]; then\n  xattr -cr \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" || true\nfi\n";
+		};
+		35066A62DB524801DC0CBE4A /* Sanitize Extension Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sanitize Extension Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -d \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" ]; then\n  xattr -cr \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" || true\nfi\n";
+		};
+		5129CFD5EC9C0F23E7346828 /* Sanitize iOS App Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sanitize iOS App Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -d \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" ]; then\n  xattr -cr \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" || true\nfi\n";
+		};
+		C79FA531E53812DCC3B3144D /* Prepare Wallet Runtime */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Wallet Runtime";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "chmod +x \"${SRCROOT}/Scripts/prepare_wallet_bundle.sh\"\n/bin/sh \"${SRCROOT}/Scripts/prepare_wallet_bundle.sh\"\n";
+		};
+		E63FCC70B7E341F82A7DE9E1 /* Prepare Wallet Runtime */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Wallet Runtime";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "chmod +x \"${SRCROOT}/Scripts/prepare_wallet_bundle.sh\"\n/bin/sh \"${SRCROOT}/Scripts/prepare_wallet_bundle.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		02AC3AA22AFFAF563AC607AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2115A0DE0F2158C73D36C1E /* BrandViewModifiers.swift in Sources */,
+				B21F4DD942C43F310C0D23E6 /* BridgeIPC.swift in Sources */,
+				F914CA8B1F08EE305B875F70 /* BridgeRequestModels.swift in Sources */,
+				A898D80BEE3397E843B7D757 /* ContentView.swift in Sources */,
+				4AE992C8C9BD2A4FD2F0B5BC /* DustFuelRing.swift in Sources */,
+				78FBAB858673CA3CD17C8209 /* PrivacyGauge.swift in Sources */,
+				E99875EA4DDB4C8F12062B30 /* RootTabView.swift in Sources */,
+				B99F960F368FEBDE98657CC7 /* WalletBrandAssets.swift in Sources */,
+				791D71DC699D2398F01968ED /* WalletCoordinator.swift in Sources */,
+				AB664E1414CC16CAB5D8C193 /* WalletDisplay.swift in Sources */,
+				2D76CB1DC17831B2B6E02483 /* WalletFFI.swift in Sources */,
+				41BAADB7D81C6E0229523C7E /* WalletHelperProcess+iOS.swift in Sources */,
+				B35C65F95A8C8F8E371967E2 /* WalletHelperProcess.swift in Sources */,
+				E10186C0C3E4BE3EB4F4C3F5 /* WalletHelperRuntime.swift in Sources */,
+				E632842AF74B7E01838C5C3F /* WalletHelperWebKitBridge.swift in Sources */,
+				6DA187C04C640FD1564BD22D /* WalletModels.swift in Sources */,
+				D3D68A36F3A598E391FADFBB /* WalletPlatformSupport.swift in Sources */,
+				6AC146CF840C1838BC23FD04 /* ZKFWalletWebViewHost.m in Sources */,
+				7D73BC49049CDC43B2B8A8CC /* ZirOSWalletApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1BAE289D8F97E556ECEB3EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA6FC50E789B9650706F6082 /* BrandViewModifiers.swift in Sources */,
+				9AC6C506FF3E5A849C93A750 /* BridgeIPC.swift in Sources */,
+				7626A4B49B62A7191F4B227A /* BridgeRequestModels.swift in Sources */,
+				8117A3AF101DE7F6E5C5C028 /* ContentView.swift in Sources */,
+				A3B2A0C289B1096B6BDE922A /* DustFuelRing.swift in Sources */,
+				E417BE2CBB7E1BAC0B7BEE43 /* PrivacyGauge.swift in Sources */,
+				36444C5CC2317492E3E09113 /* RootTabView.swift in Sources */,
+				807D92B3A06E0937AB97E565 /* WalletBrandAssets.swift in Sources */,
+				4AF3C5665A29600B9E20230C /* WalletCoordinator.swift in Sources */,
+				4BDDCFE270EA51780BDD93F5 /* WalletDisplay.swift in Sources */,
+				FB8EBD2B9EFD33415F9C6D47 /* WalletFFI.swift in Sources */,
+				657369163F5261F244035419 /* WalletHelperProcess+iOS.swift in Sources */,
+				0C948F2C7117DD1CCA059075 /* WalletHelperProcess.swift in Sources */,
+				2CA329F040A850E4B21F61EC /* WalletHelperRuntime.swift in Sources */,
+				49C88F929B8001A95C9AB408 /* WalletHelperWebKitBridge.swift in Sources */,
+				51EFD4953EEBD759604AA6E7 /* WalletModels.swift in Sources */,
+				88B83D1AB98C88A52D211D72 /* WalletPlatformSupport.swift in Sources */,
+				B6CE97CE5EAD74E16F5221FE /* ZKFWalletWebViewHost.m in Sources */,
+				0CDFABCF5FF66C250182CD2C /* ZirOSWalletApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3A2BED5D03DE11680489366D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A955F9A69CED1475D26B9848 /* BrandViewModifiers.swift in Sources */,
+				0393B554DE7B86AA52B3DD4D /* BridgeIPC.swift in Sources */,
+				E6092C10BFFCB59A4C925160 /* DustFuelRing.swift in Sources */,
+				F726C8AA73CE96E427FF959D /* PrivacyGauge.swift in Sources */,
+				51C3B8069FBF6DC9D1A9F24D /* RootTabView.swift in Sources */,
+				34576B9FD9D0B52FC45BFAB9 /* SafariWebExtensionHandler.swift in Sources */,
+				82FCFDB5453765A850EA6633 /* WalletBrandAssets.swift in Sources */,
+				89D8DCB1263BBD2FF0AC13EA /* WalletDisplay.swift in Sources */,
+				28E47130F3969AE367D2A520 /* WalletPlatformSupport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		74A4AF770DB2C1335BC46AA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 813655A1BFFF4EFA05745F1F /* ZirOSWalletExtension */;
+			targetProxy = 0D057A660EA66829444255C2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		03E47960026473902C6CB87A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWallet.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Sources/App/WalletFFI",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet";
+				INFOPLIST_KEY_CFBundleURLTypes = "[[\"CFBundleURLSchemes\": [\"ziros-wallet\"]]]";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates";
+				OTHER_LDFLAGS = (
+					"$(SRCROOT)/../target-public/release/libzkf_ffi.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet;
+				PRODUCT_NAME = ZirOSWallet;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/App/WalletFFI/ZkfFFI.h;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS";
+			};
+			name = Release;
+		};
+		05A77B9FD8676BFFF5C6ADAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = M454G64BS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Sources/App/WalletFFI",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet";
+				INFOPLIST_KEY_CFBundleURLTypes = "[[\"CFBundleURLSchemes\": [\"ziros-wallet\"]]]";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS/Intermediates";
+				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+					"$(SRCROOT)/../target-ios-device/aarch64-apple-ios/release/libzkf_ffi.a",
+				);
+				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
+					"$(SRCROOT)/../target-ios-sim/aarch64-apple-ios-sim/release/libzkf_ffi.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet.ios;
+				PRODUCT_NAME = ZirOSWalletiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_DEVICE_FAMILIES = 1;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/App/WalletFFI/ZkfFFI.h;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		0D5D6C8DD089C8C5B362E509 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		3382149919D0108594CD6E1D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		4D2C90D32575E02C6C091242 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtensionDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet Extension";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\", \"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\"]";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet.extension;
+				PRODUCT_NAME = ZirOSWalletExtension;
+				SDKROOT = macosx;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS";
+			};
+			name = Debug;
+		};
+		99CFE7C5D2573D608933ADFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet Extension";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPrincipalClass\": \"$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler\", \"NSExtensionPointIdentifier\": \"com.apple.Safari.web-extension\"]";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet.extension;
+				PRODUCT_NAME = ZirOSWalletExtension;
+				SDKROOT = macosx;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS";
+			};
+			name = Release;
+		};
+		9A8F8A07DC916CECBD1EABCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWalletDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = E9VB3VKZKH;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Sources/App/WalletFFI",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet";
+				INFOPLIST_KEY_CFBundleURLTypes = "[[\"CFBundleURLSchemes\": [\"ziros-wallet\"]]]";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates";
+				OTHER_LDFLAGS = (
+					"$(SRCROOT)/../target-public/debug/libzkf_ffi.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet;
+				PRODUCT_NAME = ZirOSWallet;
+				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/App/WalletFFI/ZkfFFI.h;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS";
+			};
+			name = Debug;
+		};
+		E79F81A3EAB155B6A95391A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = M454G64BS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Sources/App/WalletFFI",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "ZirOS Wallet";
+				INFOPLIST_KEY_CFBundleURLTypes = "[[\"CFBundleURLSchemes\": [\"ziros-wallet\"]]]";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OBJROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS/Intermediates";
+				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+					"$(SRCROOT)/../target-ios-device/aarch64-apple-ios/debug/libzkf_ffi.a",
+				);
+				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
+					"$(SRCROOT)/../target-ios-sim/aarch64-apple-ios-sim/debug/libzkf_ffi.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ziros.wallet.ios;
+				PRODUCT_NAME = ZirOSWalletiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_DEVICE_FAMILIES = 1;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = Sources/App/WalletFFI/ZkfFFI.h;
+				SYMROOT = "$(HOME)/Library/Developer/Xcode/ZirOSWalletiOS";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A1493CE00481B51099C10B9 /* Build configuration list for PBXNativeTarget "ZirOSWalletExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D2C90D32575E02C6C091242 /* Debug */,
+				99CFE7C5D2573D608933ADFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		278DA296024C22501BF7F2C1 /* Build configuration list for PBXProject "ZirOSWallet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3382149919D0108594CD6E1D /* Debug */,
+				0D5D6C8DD089C8C5B362E509 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		45CEC9375339B7DAD558E264 /* Build configuration list for PBXNativeTarget "ZirOSWalletiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E79F81A3EAB155B6A95391A2 /* Debug */,
+				05A77B9FD8676BFFF5C6ADAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DF5D96C3E2C05B6E03AC8112 /* Build configuration list for PBXNativeTarget "ZirOSWallet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A8F8A07DC916CECBD1EABCE /* Debug */,
+				03E47960026473902C6CB87A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 96F7BF69BC760A5BFA0BC57D /* Project object */;
+}

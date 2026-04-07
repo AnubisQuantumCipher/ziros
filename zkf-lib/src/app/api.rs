@@ -1024,7 +1024,7 @@ mod tests {
     }
 
     #[test]
-    fn prove_rejects_deterministic_groth16_on_security_covered_surface() {
+    fn prove_accepts_auto_ceremony_groth16_on_security_covered_surface() {
         let program = Program {
             name: "strict-groth16-boundary".to_string(),
             field: zkf_core::FieldId::Bn254,
@@ -1073,13 +1073,33 @@ mod tests {
             ("y".to_string(), FieldElement::from_i64(5)),
         ]);
         let compiled = compile_default(&program, None).expect("compile");
+        ensure_security_covered_groth16_setup(&compiled)
+            .expect("auto ceremony should satisfy security-covered Groth16 setup");
+        assert_eq!(
+            compiled
+                .metadata
+                .get("setup_seed_source")
+                .map(String::as_str),
+            Some("auto-ceremony")
+        );
+        assert_eq!(
+            compiled
+                .metadata
+                .get("groth16_ceremony_subsystem")
+                .map(String::as_str),
+            Some("strict-groth16-boundary")
+        );
         let witness = witness_from_inputs(&program, &inputs, None).expect("witness");
-
-        let err = prove(&compiled, &witness).expect_err("strict prove should reject");
-        assert!(
-            err.to_string()
-                .contains("requires imported trusted CRS material"),
-            "unexpected error: {err}"
+        let proof = prove(&compiled, &witness).expect("strict prove should accept auto ceremony");
+        assert_eq!(
+            proof
+                .metadata
+                .get("groth16_ceremony_id")
+                .map(String::as_str),
+            compiled
+                .metadata
+                .get("groth16_ceremony_id")
+                .map(String::as_str)
         );
     }
 }

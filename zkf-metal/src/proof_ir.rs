@@ -120,6 +120,7 @@ pub enum TransitionOperator {
     ConstraintEval,
     MsmBucketAssign,
     MsmBucketAccumulate,
+    MsmBucketSegmentReduce,
     MsmBucketReduce,
     MsmWindowCombine,
     MsmBucketCount,
@@ -1718,11 +1719,15 @@ fn msm_common_symbols() -> Vec<SymbolDomain> {
         domain("point_count", 1, None, true, false, None),
         domain("num_windows", 1, None, true, false, None),
         domain("num_buckets", 1, None, true, false, None),
+        domain("segment_count", 1, None, true, false, None),
         domain("scalar_limbs", 4, Some(4), true, false, None),
         domain("base_limbs", 4, Some(4), true, false, None),
         domain("window_index", 0, None, false, false, None),
         domain("bucket_index", 0, None, false, false, None),
+        domain("segment_index", 0, None, false, false, None),
         domain("point_index", 0, None, false, false, None),
+        domain("point_start", 0, None, false, false, None),
+        domain("segment_point_count", 1, None, true, false, None),
     ]
 }
 
@@ -1782,6 +1787,29 @@ fn msm_read_regions(route: MsmRouteClass, stage: TransitionOperator) -> Vec<Regi
             }
             reads
         }
+        TransitionOperator::MsmBucketSegmentReduce => vec![region(
+            "segment_buckets",
+            MemoryRegionKind::GlobalInput,
+            mul(
+                add(
+                    mul(
+                        symbol("segment_index"),
+                        mul(symbol("num_windows"), symbol("num_buckets")),
+                    ),
+                    symbol("bucket_index"),
+                ),
+                c(12),
+            ),
+            c(12),
+            mul(
+                mul(
+                    mul(symbol("segment_count"), symbol("num_windows")),
+                    symbol("num_buckets"),
+                ),
+                c(12),
+            ),
+            8,
+        )],
         TransitionOperator::MsmBucketReduce => vec![region(
             "buckets",
             MemoryRegionKind::GlobalInput,
@@ -1820,6 +1848,14 @@ fn msm_write_regions(stage: TransitionOperator) -> Vec<RegionSlice> {
             mul(mul(symbol("num_windows"), symbol("num_buckets")), c(12)),
             8,
         )],
+        TransitionOperator::MsmBucketSegmentReduce => vec![region(
+            "buckets",
+            MemoryRegionKind::GlobalOutput,
+            mul(symbol("bucket_index"), c(12)),
+            c(12),
+            mul(mul(symbol("num_windows"), symbol("num_buckets")), c(12)),
+            8,
+        )],
         TransitionOperator::MsmBucketReduce => vec![region(
             "window_results",
             MemoryRegionKind::GlobalOutput,
@@ -1838,6 +1874,53 @@ fn msm_write_regions(stage: TransitionOperator) -> Vec<RegionSlice> {
         )],
         _ => vec![],
     }
+}
+
+fn msm_segmented_accumulate_read_regions(route: MsmRouteClass) -> Vec<RegionSlice> {
+    let mut reads = vec![
+        region(
+            "bases_x",
+            MemoryRegionKind::GlobalInput,
+            mul(symbol("point_start"), symbol("base_limbs")),
+            mul(symbol("segment_point_count"), symbol("base_limbs")),
+            mul(symbol("point_count"), symbol("base_limbs")),
+            8,
+        ),
+        region(
+            "bases_y",
+            MemoryRegionKind::GlobalInput,
+            mul(symbol("point_start"), symbol("base_limbs")),
+            mul(symbol("segment_point_count"), symbol("base_limbs")),
+            mul(symbol("point_count"), symbol("base_limbs")),
+            8,
+        ),
+        region(
+            "bucket_map",
+            if route == MsmRouteClass::Naf {
+                MemoryRegionKind::GlobalInput
+            } else {
+                MemoryRegionKind::Scratch
+            },
+            mul(symbol("point_start"), symbol("num_windows")),
+            mul(symbol("segment_point_count"), symbol("num_windows")),
+            mul(symbol("point_count"), symbol("num_windows")),
+            4,
+        ),
+    ];
+    if route != MsmRouteClass::Naf {
+        reads.insert(
+            0,
+            region(
+                "scalars",
+                MemoryRegionKind::GlobalInput,
+                mul(symbol("point_start"), symbol("scalar_limbs")),
+                mul(symbol("segment_point_count"), symbol("scalar_limbs")),
+                mul(symbol("point_count"), symbol("scalar_limbs")),
+                8,
+            ),
+        );
+    }
+    reads
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1904,9 +1987,9 @@ fn msm_program(
         ThreadIndexMap {
             global_index: match stage {
                 TransitionOperator::MsmBucketAssign => symbol("point_index"),
-                TransitionOperator::MsmBucketAccumulate | TransitionOperator::MsmBucketReduce => {
-                    symbol("bucket_index")
-                }
+                TransitionOperator::MsmBucketAccumulate
+                | TransitionOperator::MsmBucketSegmentReduce
+                | TransitionOperator::MsmBucketReduce => symbol("bucket_index"),
                 TransitionOperator::MsmWindowCombine => symbol("window_index"),
                 _ => symbol("point_index"),
             },
@@ -1921,6 +2004,68 @@ fn msm_program(
         msm_common_symbols(),
         msm_read_regions(route, stage.clone()),
         msm_write_regions(stage),
+        vec![],
+        vec![],
+        steps,
+        lowering,
+        true,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn msm_custom_program(
+    theorem_id: &str,
+    program_id: &str,
+    kernel: &str,
+    variant: &str,
+    curve: CurveFamily,
+    route: MsmRouteClass,
+    stage: TransitionOperator,
+    source_path: &str,
+    library: &str,
+    index_map: ThreadIndexMap,
+    read_regions: Vec<RegionSlice>,
+    write_regions: Vec<RegionSlice>,
+) -> KernelProgram {
+    let steps = vec![step(
+        variant,
+        stage.clone(),
+        "curve_groups",
+        &read_regions
+            .iter()
+            .map(|region| region.name.as_str())
+            .collect::<Vec<_>>(),
+        &write_regions
+            .iter()
+            .map(|region| region.name.as_str())
+            .collect::<Vec<_>>(),
+    )];
+    let source_paths = vec![
+        source_path,
+        "zkf-metal/src/msm/mod.rs",
+        "zkf-metal/src/msm/pippenger.rs",
+        "zkf-metal/src/shaders/msm_sort.metal",
+        "zkf-metal/src/shaders/msm_reduce.metal",
+    ];
+    let lowering = lowering(
+        &source_paths,
+        "SPIR-V reflection entrypoints must match the shipped MSM bucket and reduction kernels",
+        "certified BN254 route is classic-only; Pallas and Vesta may use classic and NAF entrypoints",
+        vec![binding(0, kernel, source_path, library, variant)],
+    );
+    program(
+        theorem_id,
+        program_id,
+        KernelFamily::Msm,
+        kernel,
+        variant,
+        None,
+        Some(curve),
+        Some(route),
+        index_map,
+        msm_common_symbols(),
+        read_regions,
+        write_regions,
         vec![],
         vec![],
         steps,
@@ -1957,6 +2102,60 @@ fn msm_manifest() -> FamilyProofManifest {
                 TransitionOperator::MsmBucketAccumulate,
                 "zkf-metal/src/shaders/msm_bn254.metal",
                 "bn254_msm_library",
+            ),
+            msm_custom_program(
+                "gpu.msm_differential_bounded",
+                "msm_bn254_classic_accumulate_segmented",
+                "msm_bucket_acc_segmented",
+                "classic_segmented_accumulate",
+                CurveFamily::Bn254,
+                MsmRouteClass::Classic,
+                TransitionOperator::MsmBucketAccumulate,
+                "zkf-metal/src/shaders/msm_bn254.metal",
+                "bn254_msm_library",
+                ThreadIndexMap {
+                    global_index: symbol("bucket_index"),
+                    lane_index: None,
+                    batch_index: Some(symbol("window_index")),
+                    guard: all_of(vec![
+                        ge(symbol("point_count"), c(1)),
+                        ge(symbol("num_windows"), c(1)),
+                        ge(symbol("num_buckets"), c(1)),
+                        ge(symbol("segment_point_count"), c(1)),
+                        le(
+                            add(symbol("point_start"), symbol("segment_point_count")),
+                            symbol("point_count"),
+                        ),
+                    ]),
+                },
+                msm_segmented_accumulate_read_regions(MsmRouteClass::Classic),
+                msm_write_regions(TransitionOperator::MsmBucketAccumulate),
+            ),
+            msm_custom_program(
+                "gpu.msm_differential_bounded",
+                "msm_bn254_classic_segment_reduce",
+                "msm_bucket_segment_reduce",
+                "classic_segment_reduce",
+                CurveFamily::Bn254,
+                MsmRouteClass::Classic,
+                TransitionOperator::MsmBucketSegmentReduce,
+                "zkf-metal/src/shaders/msm_reduce.metal",
+                "bn254_msm_library",
+                ThreadIndexMap {
+                    global_index: symbol("bucket_index"),
+                    lane_index: None,
+                    batch_index: Some(symbol("window_index")),
+                    guard: all_of(vec![
+                        ge(symbol("segment_count"), c(1)),
+                        ge(symbol("num_windows"), c(1)),
+                        ge(symbol("num_buckets"), c(1)),
+                    ]),
+                },
+                msm_read_regions(
+                    MsmRouteClass::Classic,
+                    TransitionOperator::MsmBucketSegmentReduce,
+                ),
+                msm_write_regions(TransitionOperator::MsmBucketSegmentReduce),
             ),
             msm_program(
                 "gpu.msm_differential_bounded",
@@ -2098,6 +2297,7 @@ fn msm_aux_program(
                     symbol("point_index")
                 }
                 TransitionOperator::MsmBucketAccumulate
+                | TransitionOperator::MsmBucketSegmentReduce
                 | TransitionOperator::MsmSortedAccumulate
                 | TransitionOperator::MsmBucketReduce => symbol("bucket_index"),
                 TransitionOperator::MsmWindowCombine => symbol("window_index"),
@@ -2520,6 +2720,7 @@ fn lean_transition_operator(value: &TransitionOperator) -> &'static str {
         TransitionOperator::ConstraintEval => "TransitionOperator.constraintEval",
         TransitionOperator::MsmBucketAssign => "TransitionOperator.msmBucketAssign",
         TransitionOperator::MsmBucketAccumulate => "TransitionOperator.msmBucketAccumulate",
+        TransitionOperator::MsmBucketSegmentReduce => "TransitionOperator.msmBucketSegmentReduce",
         TransitionOperator::MsmBucketReduce => "TransitionOperator.msmBucketReduce",
         TransitionOperator::MsmWindowCombine => "TransitionOperator.msmWindowCombine",
         TransitionOperator::MsmBucketCount => "TransitionOperator.msmBucketCount",

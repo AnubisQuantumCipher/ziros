@@ -1,0 +1,4 @@
+interface:
+  display_name: "ZirOS Wallet Mac Finish"
+  short_description: "Finish the Mac wallet shell and visual audit flow."
+  default_prompt: "Use $ziros-wallet-mac-finish to close the ZirOS macOS wallet polish tranche, keep the proof-route and approval behavior intact, and leave the Mac app buildable with the shared workspace commands."

@@ -9,6 +9,7 @@ members = [
   "zkf-ir-spec",
   "zkf-conformance",
   "zkf-cli",
+  "zkf-sdk",
   "zkf-lib",
   "zkf-examples",
   "zkf-keymanager",
@@ -16,6 +17,10 @@ members = [
   "zkf-storage",
   "zkf-distributed",
   "zkf-ui",
+  "zkf-ffi",
+  "zkf-wallet",
+  "zkf-command-surface",
+  "zkf-agent",
 ]
 exclude = [
   "vendor/ark-relations-patched",
@@ -25,7 +30,7 @@ exclude = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.5.0"
 edition = "2024"
 license = "LicenseRef-ZirOS-Proprietary"
 authors = ["AnubisQuantumCipher"]

@@ -12,12 +12,15 @@ use std::collections::{BTreeMap, BTreeSet};
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DebugOptions {
     pub stop_on_first_failure: bool,
+    #[serde(default)]
+    pub include_poseidon_trace: bool,
 }
 
 impl Default for DebugOptions {
     fn default() -> Self {
         Self {
             stop_on_first_failure: true,
+            include_poseidon_trace: false,
         }
     }
 }
@@ -37,6 +40,36 @@ pub struct DebugReport {
     pub symbolic_witness: Vec<SymbolicSignal>,
     pub underconstrained: UnderconstrainedAnalysis,
     pub witness_flow: WitnessFlowGraph,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub poseidon_trace: Vec<PoseidonTraceEntry>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct PoseidonTraceEntry {
+    pub constraint_index: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    pub op: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub inputs: Vec<PoseidonTraceValue>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub outputs: Vec<PoseidonTraceSignal>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct PoseidonTraceValue {
+    pub expr: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub signal_names: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<FieldElement>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct PoseidonTraceSignal {
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<FieldElement>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -180,6 +213,7 @@ pub struct UnderconstrainedAnalysis {
     pub linear_constraint_count: usize,
     pub linear_rank: usize,
     pub linear_nullity: usize,
+    pub linear_only_signals: Vec<String>,
     pub linearly_underdetermined_private_signals: Vec<String>,
     pub nonlinear_constraint_count: usize,
     pub nonlinear_private_signal_count: usize,
@@ -244,6 +278,11 @@ pub fn debug_program(program: &Program, witness: &Witness, options: DebugOptions
         symbolic_witness,
         underconstrained: analyze_underconstrained(program),
         witness_flow: build_witness_flow(program),
+        poseidon_trace: if options.include_poseidon_trace {
+            build_poseidon_trace(program, witness)
+        } else {
+            Vec::new()
+        },
     }
 }
 
@@ -453,6 +492,7 @@ pub fn analyze_underconstrained(program: &Program) -> UnderconstrainedAnalysis {
         linear_constraint_count,
         linear_rank: rank,
         linear_nullity: private_signals.len().saturating_sub(rank),
+        linear_only_signals: linearly_underdetermined_private_signals.clone(),
         linearly_underdetermined_private_signals,
         nonlinear_constraint_count,
         nonlinear_private_signal_count: nonlinear_private_signals.len(),
@@ -464,6 +504,64 @@ pub fn analyze_underconstrained(program: &Program) -> UnderconstrainedAnalysis {
         private_signal_constraint_counts,
         note: "Linear rank/nullity is conservative. Non-linear participation and component anchoring highlight private signal clusters that may remain underdetermined without public anchors.".to_string(),
     }
+}
+
+fn build_poseidon_trace(program: &Program, witness: &Witness) -> Vec<PoseidonTraceEntry> {
+    let mut trace = Vec::new();
+    for (constraint_index, constraint) in program.constraints.iter().enumerate() {
+        let Constraint::BlackBox {
+            op,
+            inputs,
+            outputs,
+            label,
+            ..
+        } = constraint
+        else {
+            continue;
+        };
+        if *op != BlackBoxOp::Poseidon {
+            continue;
+        }
+
+        let inputs = inputs
+            .iter()
+            .map(|expr| {
+                let mut signal_names = BTreeSet::new();
+                collect_expr_signal_names(expr, &mut signal_names);
+                let value = eval_expr(expr, &witness.values, program.field)
+                    .ok()
+                    .map(|value| FieldElement::from_bigint_with_field(value, program.field));
+                PoseidonTraceValue {
+                    expr: render_symbolic_expr(expr),
+                    signal_names: signal_names.into_iter().collect(),
+                    value,
+                }
+            })
+            .collect::<Vec<_>>();
+        let outputs = outputs
+            .iter()
+            .map(|name| PoseidonTraceSignal {
+                name: name.clone(),
+                value: witness
+                    .values
+                    .get(name)
+                    .cloned()
+                    .or_else(|| {
+                        witness_value_as_bigint(name, &witness.values, program.field)
+                            .ok()
+                            .map(|value| FieldElement::from_bigint_with_field(value, program.field))
+                    }),
+            })
+            .collect::<Vec<_>>();
+        trace.push(PoseidonTraceEntry {
+            constraint_index,
+            label: label.clone(),
+            op: op.as_str().to_string(),
+            inputs,
+            outputs,
+        });
+    }
+    trace
 }
 
 pub fn analyze_underconstrained_zir(program: &zir::Program) -> ZkfResult<UnderconstrainedAnalysis> {

@@ -1,0 +1,35 @@
+pragma language_version 0.22;
+
+import CompactStandardLibrary;
+
+export ledger attestation_commitment: Bytes<32>;
+export ledger theorem_count: Uint<64>;
+export ledger compliance_bit: Boolean;
+
+witness attestationRoot0(): Uint<64>;
+witness attestationRoot1(): Uint<64>;
+witness attestationRoot2(): Uint<64>;
+witness attestationRoot3(): Uint<64>;
+
+witness ledgerTotalEntries(): Uint<32>;
+witness ledgerMechanizedEntries(): Uint<32>;
+witness ledgerPendingEntries(): Uint<32>;
+
+export circuit prove_formal_coverage(): [] {
+  const root = persistentHash<[Uint<64>, Uint<64>, Uint<64>, Uint<64>]>(
+    disclose([
+      attestationRoot0(),
+      attestationRoot1(),
+      attestationRoot2(),
+      attestationRoot3()
+    ])
+  );
+
+  const coverageOk =
+    (ledgerPendingEntries() == 0) &&
+    (ledgerMechanizedEntries() == ledgerTotalEntries());
+
+  attestation_commitment = disclose(root);
+  theorem_count = disclose(ledgerTotalEntries() as Uint<64>);
+  compliance_bit = disclose(coverageOk);
+}

@@ -1,0 +1,50 @@
+pragma language_version 0.22;
+
+import CompactStandardLibrary;
+
+export ledger attestation_commitment: Bytes<32>;
+export ledger verification_count: Uint<64>;
+export ledger theorem_count: Uint<64>;
+export ledger compliance_bit: Boolean;
+
+witness attestationRoot0(): Uint<64>;
+witness attestationRoot1(): Uint<64>;
+witness attestationRoot2(): Uint<64>;
+witness attestationRoot3(): Uint<64>;
+
+witness verificationCount(): Uint<64>;
+witness theoremCount(): Uint<64>;
+
+witness backendCompliance(): Uint<8>;
+witness formalCompliance(): Uint<8>;
+witness upstreamCommitmentsAgree(): Uint<8>;
+
+witness auditUnderconstrainedSignals(): Uint<32>;
+witness auditTotalChecks(): Uint<32>;
+witness auditFailedChecks(): Uint<32>;
+
+export circuit prove_audit_clean(): [] {
+  const root = persistentHash<[Uint<64>, Uint<64>, Uint<64>, Uint<64>]>(
+    disclose([
+      attestationRoot0(),
+      attestationRoot1(),
+      attestationRoot2(),
+      attestationRoot3()
+    ])
+  );
+
+  const upstreamOk =
+    (backendCompliance() == 1) &&
+    (formalCompliance() == 1) &&
+    (upstreamCommitmentsAgree() == 1);
+
+  const auditOk =
+    (auditUnderconstrainedSignals() == 0) &&
+    (auditFailedChecks() == 0) &&
+    (auditTotalChecks() > 0);
+
+  attestation_commitment = disclose(root);
+  verification_count = disclose(verificationCount());
+  theorem_count = disclose(theoremCount());
+  compliance_bit = disclose(upstreamOk && auditOk);
+}

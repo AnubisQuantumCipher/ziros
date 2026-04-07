@@ -311,6 +311,28 @@ pub fn strict_bn254_auto_route_ready() -> bool {
 }
 
 pub fn metal_runtime_report() -> MetalRuntimeReport {
+    use std::sync::Mutex;
+    use std::time::{Duration, Instant};
+
+    static CACHE: Mutex<Option<(MetalRuntimeReport, Instant)>> = Mutex::new(None);
+    const TTL: Duration = Duration::from_secs(10);
+
+    if let Ok(guard) = CACHE.lock() {
+        if let Some((ref report, ref when)) = *guard {
+            if when.elapsed() < TTL {
+                return report.clone();
+            }
+        }
+    }
+
+    let report = metal_runtime_report_uncached();
+    if let Ok(mut guard) = CACHE.lock() {
+        *guard = Some((report.clone(), Instant::now()));
+    }
+    report
+}
+
+fn metal_runtime_report_uncached() -> MetalRuntimeReport {
     crate::init_accelerators();
 
     let (active_accelerators, registered_accelerators) = {

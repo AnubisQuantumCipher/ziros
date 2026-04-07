@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "ZirOS Midnight Wallet",
+  "description": "Safari bridge for the ZirOS Midnight Wallet",
+  "version": "0.4.1",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["nativeMessaging", "storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

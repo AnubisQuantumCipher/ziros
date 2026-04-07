@@ -1,0 +1,22 @@
+{
+  "schema": "ziros-wallet-mailbox-deployment-v1",
+  "contractName": "ziros_wallet_mailbox",
+  "description": "Template manifest consumed by ZirOS wallet messaging once a mailbox contract is deployed.",
+  "networks": {
+    "preprod": {
+      "contractAddress": null,
+      "compiledArtifactDir": "../contracts/compiled/ziros_wallet_mailbox",
+      "status": "pending-deployment"
+    },
+    "preview": {
+      "contractAddress": null,
+      "compiledArtifactDir": "../contracts/compiled/ziros_wallet_mailbox",
+      "status": "pending-deployment"
+    }
+  },
+  "notes": [
+    "Fill in contract addresses after a real deployment.",
+    "The wallet helper adapter and Rust-owned approval flow are implemented; transport remains fail-closed until a real shared mailbox contract deployment is accepted on-chain for the target network.",
+    "Preprod deployment should be treated as network-gated until the runtime accepts proof-backed Compact deploy transactions."
+  ]
+}

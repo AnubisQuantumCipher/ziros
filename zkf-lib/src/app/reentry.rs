@@ -13,6 +13,7 @@ use zkf_core::{
 use zkf_core::{ZkfError, ZkfResult};
 
 use super::builder::ProgramBuilder;
+use super::subsystem_support;
 use super::templates::TemplateProgram;
 
 // ---------------------------------------------------------------------------
@@ -2612,42 +2613,11 @@ fn euclidean_division(
     numerator: &BigInt,
     denominator: &BigInt,
 ) -> ZkfResult<(BigInt, BigInt, BigInt)> {
-    if *denominator <= zero() {
-        return Err(ZkfError::InvalidArtifact(
-            "exact division denominator must be positive".to_string(),
-        ));
-    }
-    let mut quotient = numerator / denominator;
-    let mut remainder = numerator % denominator;
-    if remainder.sign() == Sign::Minus {
-        quotient -= one();
-        remainder += denominator;
-    }
-    let slack = denominator - &remainder - one();
-    if remainder < zero() || slack < zero() {
-        return Err(ZkfError::InvalidArtifact(
-            "exact division support underflow".to_string(),
-        ));
-    }
-    Ok((quotient, remainder, slack))
+    subsystem_support::euclidean_division(numerator, denominator)
 }
 
 fn floor_sqrt_support(value: &BigInt) -> ZkfResult<(BigInt, BigInt, BigInt)> {
-    if *value < zero() {
-        return Err(ZkfError::InvalidArtifact(
-            "sqrt support expects a nonnegative value".to_string(),
-        ));
-    }
-    let sqrt = bigint_isqrt_floor(value);
-    let remainder = value - (&sqrt * &sqrt);
-    let next = &sqrt + one();
-    let upper_slack = (&next * &next) - value - one();
-    if remainder < zero() || upper_slack < zero() {
-        return Err(ZkfError::InvalidArtifact(
-            "sqrt support underflow".to_string(),
-        ));
-    }
-    Ok((sqrt, remainder, upper_slack))
+    subsystem_support::floor_sqrt_support(value)
 }
 
 // ---------------------------------------------------------------------------

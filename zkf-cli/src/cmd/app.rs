@@ -2960,17 +2960,38 @@ pub(crate) fn handle_app(command: AppCommands) -> Result<(), String> {
                 .or(name_positional)
                 .ok_or_else(|| "app init requires a name".to_string())?;
             let template_args = parse_template_args(&template_arg)?;
-            let style = AppStyle::parse(&style)?;
-            let path = scaffold_app(&name, &template, &template_args, style, out)?;
-            println!(
-                "app scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo run\n  cargo test\n  edit {}/zirapp.json\n  read {}/README.md",
-                template,
-                style.as_str(),
-                path.display(),
-                path.display(),
-                path.display(),
-                path.display(),
-            );
+            if template == "subsystem" {
+                let subsystem_style = if style == "auto" {
+                    "full"
+                } else {
+                    style.as_str()
+                };
+                let path = crate::cmd::subsystem::scaffold_subsystem(&name, subsystem_style, out)?;
+                println!(
+                    "subsystem scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo test --manifest-path 01_source/Cargo.toml\n  bash 05_scripts/install.sh --check-only\n  ./19_cli/prove.sh\n  bash 05_scripts/run-midnight-proof-server.sh\n  zkf subsystem verify-completeness --root {}",
+                    template,
+                    subsystem_style,
+                    path.display(),
+                    path.display(),
+                    path.display(),
+                );
+            } else {
+                let style = if style == "auto" {
+                    AppStyle::Colored
+                } else {
+                    AppStyle::parse(&style)?
+                };
+                let path = scaffold_app(&name, &template, &template_args, style, out)?;
+                println!(
+                    "app scaffold created: template={} style={} -> {}\nnext:\n  cd {}\n  cargo run\n  cargo test\n  edit {}/zirapp.json\n  read {}/README.md",
+                    template,
+                    style.as_str(),
+                    path.display(),
+                    path.display(),
+                    path.display(),
+                    path.display(),
+                );
+            }
             Ok(())
         }
         AppCommands::Gallery => {
@@ -2997,6 +3018,12 @@ pub(crate) fn handle_app(command: AppCommands) -> Result<(), String> {
             trusted_setup_manifest,
         ),
         AppCommands::ReentryAssurance(args) => handle_reentry_assurance_command(args),
+        AppCommands::SovereignEconomicDefense(args) => {
+            crate::cmd::sovereign_economic_defense::handle_sovereign_economic_defense_command(args)
+        }
+        AppCommands::AerospaceQualification(args) => {
+            crate::cmd::aerospace_qualification::handle_aerospace_qualification_command(args)
+        }
     }
 }
 

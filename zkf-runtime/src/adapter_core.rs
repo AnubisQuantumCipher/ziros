@@ -49,12 +49,18 @@ pub(crate) fn delegated_backend_artifact_bytes(backend: BackendKind, constraints
         BackendKind::ArkworksGroth16 | BackendKind::Halo2 | BackendKind::Halo2Bls12381 => {
             512 * 1024
         }
-        BackendKind::Plonky3 => 8 * 1024 * 1024,
+        BackendKind::Plonky3 => 16 * 1024 * 1024,
         BackendKind::Nova | BackendKind::HyperNova => 4 * 1024 * 1024,
         _ => 2 * 1024 * 1024,
     };
+    // Plonky3 STARK proofs scale with constraint count — large circuits
+    // (e.g. 96-step Euler integration) produce proofs exceeding 8 MB.
+    let max_bytes = match backend {
+        BackendKind::Plonky3 => 64 * 1024 * 1024,
+        _ => 16 * 1024 * 1024,
+    };
     base.max(constraints.saturating_mul(64))
-        .clamp(256 * 1024, 16 * 1024 * 1024)
+        .clamp(256 * 1024, max_bytes)
 }
 
 pub(crate) fn backend_prove_graph_spec(

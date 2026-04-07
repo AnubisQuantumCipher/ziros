@@ -47,7 +47,9 @@ pub mod kernels {
 pub mod msm_kernels {
     pub const BUCKET_ASSIGN: &str = "msm_bucket_assign";
     pub const BUCKET_ACC: &str = "msm_bucket_acc";
+    pub const BUCKET_ACC_SEGMENTED: &str = "msm_bucket_acc_segmented";
     pub const BUCKET_ACC_SIMD: &str = "msm_bucket_acc_simd";
+    pub const BUCKET_SEGMENT_REDUCE: &str = "msm_bucket_segment_reduce";
     pub const BUCKET_REDUCE: &str = "msm_bucket_reduce";
     pub const WINDOW_COMBINE: &str = "msm_window_combine";
     pub const SORT_COUNT: &str = "msm_sort_count";

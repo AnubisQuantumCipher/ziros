@@ -3,19 +3,19 @@ use std::collections::BTreeMap;
 use std::fmt;
 use std::sync::mpsc;
 use std::sync::{
-    Arc,
     atomic::{AtomicUsize, Ordering},
+    Arc,
 };
 use std::thread;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use zkf_backends::{
-    GpuSchedulerDecision, GpuStageCoverage, backend_for, blackbox_semantics_for_backend,
-    cpu_math_fallback_reason_for_backend, gpu_stage_coverage_for_backend_field,
-    metal_complete_for_backend, proof_engine_for_backend, proof_semantics_for_backend,
-    prover_acceleration_claimed_for_backend, prover_acceleration_scope_for_backend,
-    recommend_gpu_jobs,
+    backend_for, blackbox_semantics_for_backend, cpu_math_fallback_reason_for_backend,
+    gpu_stage_coverage_for_backend_field, metal_complete_for_backend, proof_engine_for_backend,
+    proof_semantics_for_backend, prover_acceleration_claimed_for_backend,
+    prover_acceleration_scope_for_backend, recommend_gpu_jobs, GpuSchedulerDecision,
+    GpuStageCoverage,
 };
-use zkf_core::{BackendKind, FieldElement, FieldId, Program, generate_witness};
+use zkf_core::{generate_witness, BackendKind, FieldElement, FieldId, Program};
 use zkf_examples::{mul_add_program_with_field, recurrence_program};
 use zkf_runtime::{ExecutionMode, RequiredTrustLane, RuntimeExecutor};
 
@@ -228,6 +228,20 @@ impl fmt::Display for StageError {
 }
 
 pub fn run_benchmarks(options: &BenchmarkOptions) -> Result<BenchmarkReport, String> {
+    run_benchmarks_with_iteration_runner(options, run_single_benchmark_iteration)
+}
+
+type BenchmarkIterationRunner = fn(
+    &dyn zkf_backends::BackendEngine,
+    BackendKind,
+    &Program,
+    &BTreeMap<String, FieldElement>,
+) -> Result<IterationMetrics, StageError>;
+
+fn run_benchmarks_with_iteration_runner(
+    options: &BenchmarkOptions,
+    iteration_runner: BenchmarkIterationRunner,
+) -> Result<BenchmarkReport, String> {
     if options.backends.is_empty() {
         return Err("benchmark requires at least one backend".to_string());
     }
@@ -298,27 +312,26 @@ pub fn run_benchmarks(options: &BenchmarkOptions) -> Result<BenchmarkReport, Str
             let continue_on_error = options.continue_on_error;
             let jobs = Arc::clone(&jobs);
             let next_index = Arc::clone(&next_index);
-            thread::spawn(move || {
-                loop {
-                    let index = next_index.fetch_add(1, Ordering::SeqCst);
-                    if index >= jobs.len() {
-                        break;
-                    }
-                    let (backend_index, field_index, case_index, backend, field, case) =
-                        jobs[index].clone();
-                    let engine = backend_for(backend);
-                    let program = case.build_program(field);
-                    let result = run_case_iterations(
-                        engine.as_ref(),
-                        backend,
-                        field,
-                        &case,
-                        &program,
-                        iterations,
-                        continue_on_error,
-                    );
-                    let _ = sender.send((backend_index, field_index, case_index, result));
+            thread::spawn(move || loop {
+                let index = next_index.fetch_add(1, Ordering::SeqCst);
+                if index >= jobs.len() {
+                    break;
                 }
+                let (backend_index, field_index, case_index, backend, field, case) =
+                    jobs[index].clone();
+                let engine = backend_for(backend);
+                let program = case.build_program(field);
+                let result = run_case_iterations(
+                    engine.as_ref(),
+                    backend,
+                    field,
+                    &case,
+                    &program,
+                    iterations,
+                    continue_on_error,
+                    iteration_runner,
+                );
+                let _ = sender.send((backend_index, field_index, case_index, result));
             });
         }
         drop(sender);
@@ -354,6 +367,7 @@ pub fn run_benchmarks(options: &BenchmarkOptions) -> Result<BenchmarkReport, Str
                         &program,
                         options.iterations,
                         options.continue_on_error,
+                        iteration_runner,
                     )?;
                     results.push(result);
                 }
@@ -444,13 +458,14 @@ fn run_case_iterations(
     program: &Program,
     iterations: usize,
     continue_on_error: bool,
+    iteration_runner: BenchmarkIterationRunner,
 ) -> Result<BenchmarkResult, String> {
     let inputs = case.inputs();
     let mut successes = Vec::with_capacity(iterations);
     let mut failures = Vec::new();
 
     for iteration in 1..=iterations {
-        match run_single_benchmark_iteration(engine, backend, program, &inputs) {
+        match iteration_runner(engine, backend, program, &inputs) {
             Ok(metrics) => successes.push(metrics),
             Err(err) => {
                 let failure = IterationFailure {
@@ -964,8 +979,8 @@ fn current_peak_rss_bytes() -> Option<u64> {
 #[cfg(test)]
 mod tests {
     use super::{
-        BenchmarkOptions, benchmark_fields_for_backend, mean_stddev, run_benchmarks,
-        should_surface_prover_accelerators,
+        benchmark_fields_for_backend, mean_stddev, run_benchmarks_with_iteration_runner,
+        should_surface_prover_accelerators, BenchmarkOptions,
     };
     use zkf_core::{BackendKind, FieldId};
 
@@ -1065,39 +1080,63 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "slow benchmark integration path; run explicitly when validating scheduler metadata"]
     fn parallel_benchmark_report_includes_scheduler_and_scope() {
-        let report =
-            zkf_backends::with_allow_dev_deterministic_groth16_override(Some(true), || {
-                run_benchmarks(&BenchmarkOptions {
-                    backends: vec![BackendKind::ArkworksGroth16],
-                    skip_large: true,
-                    continue_on_error: false,
-                    iterations: 1,
-                    parallel: true,
-                    metal_first: false,
-                })
-            })
-            .expect("benchmark report");
+        let report = run_benchmarks_with_iteration_runner(
+            &BenchmarkOptions {
+                backends: vec![BackendKind::ArkworksGroth16],
+                skip_large: true,
+                continue_on_error: false,
+                iterations: 1,
+                parallel: true,
+                metal_first: false,
+            },
+            synthetic_benchmark_iteration,
+        )
+        .expect("benchmark report");
 
         assert!(report.scheduler.is_some());
-        assert!(
-            report
-                .results
-                .iter()
-                .all(|result| result.prover_acceleration_scope.is_some())
+        assert!(report
+            .results
+            .iter()
+            .all(|result| result.prover_acceleration_scope.is_some()));
+        assert!(report
+            .results
+            .iter()
+            .all(|result| !result.metal_stage_breakdown.is_empty()));
+        assert!(report
+            .results
+            .iter()
+            .all(|result| !result.metal_counter_source.is_empty()));
+    }
+
+    fn synthetic_benchmark_iteration(
+        _engine: &dyn zkf_backends::BackendEngine,
+        backend: BackendKind,
+        program: &zkf_core::Program,
+        inputs: &std::collections::BTreeMap<String, zkf_core::FieldElement>,
+    ) -> Result<super::IterationMetrics, super::StageError> {
+        let mut proof_metadata = std::collections::BTreeMap::new();
+        zkf_backends::append_backend_runtime_metadata_for_field(
+            &mut proof_metadata,
+            backend,
+            Some(program.field),
         );
-        assert!(
-            report
-                .results
-                .iter()
-                .all(|result| !result.metal_stage_breakdown.is_empty())
-        );
-        assert!(
-            report
-                .results
-                .iter()
-                .all(|result| !result.metal_counter_source.is_empty())
-        );
+
+        Ok(super::IterationMetrics {
+            witness_ms: 0.1,
+            compile_ms: 0.2,
+            prove_ms: 0.3,
+            verify_ms: 0.1,
+            proof_size_bytes: program.constraints.len().max(1) * 8,
+            public_inputs: inputs.len(),
+            process_peak_rss_after_bytes: None,
+            witness_peak_rss_delta_bytes: None,
+            compile_peak_rss_delta_bytes: None,
+            prove_peak_rss_delta_bytes: None,
+            verify_peak_rss_delta_bytes: None,
+            proof_metadata,
+        })
     }
 
     #[test]

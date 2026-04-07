@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
+use num_bigint::BigInt;
 use zkf_core::ir::{BlackBoxOp, Expr, Program, Visibility};
 use zkf_core::zir;
 use zkf_core::{FieldElement, FieldId, ZkfError, ZkfResult, program_zir_to_v2};
@@ -27,6 +28,14 @@ fn expr_to_zir(expr: &Expr) -> zir::Expr {
 
 fn field_type() -> zir::SignalType {
     zir::SignalType::Field
+}
+
+fn bits_for_bigint_bound(bound: &BigInt) -> u32 {
+    if *bound <= BigInt::from(0u8) {
+        1
+    } else {
+        bound.to_str_radix(2).len() as u32
+    }
 }
 
 fn collect_expr_signal_refs(expr: &zir::Expr, refs: &mut Vec<String>) {
@@ -131,6 +140,15 @@ fn matrix_names(prefix: &str, rows: usize, cols: usize) -> ZkfResult<Vec<Vec<Str
         })
         .collect())
 }
+
+const SUBSYSTEM_IDENTITY_METADATA_KEYS: &[&str] = &[
+    "subsystem_id",
+    "subsystem",
+    "application",
+    "app_id",
+    "app",
+    "owner",
+];
 
 fn rewrite_zir_expr(expr: &zir::Expr, signal_names: &BTreeMap<String, String>) -> zir::Expr {
     match expr {
@@ -850,6 +868,12 @@ impl ProgramBuilder {
         Ok(self)
     }
 
+    pub fn subsystem_id(&mut self, subsystem_id: impl Into<String>) -> ZkfResult<&mut Self> {
+        self.metadata
+            .insert("subsystem_id".to_string(), subsystem_id.into());
+        Ok(self)
+    }
+
     pub fn constrain_equal(&mut self, lhs: Expr, rhs: Expr) -> ZkfResult<&mut Self> {
         self.constrain_equal_labeled(lhs, rhs, None::<String>)
     }
@@ -1200,6 +1224,168 @@ impl ProgramBuilder {
             state,
             scoped_label(label.as_deref(), "final"),
         )
+    }
+
+    pub fn append_signed_bound(
+        &mut self,
+        signal: &str,
+        bound: &BigInt,
+        prefix: &str,
+    ) -> ZkfResult<&mut Self> {
+        self.ensure_signal_known(signal)?;
+        let slack = format!("{prefix}_signed_bound_slack");
+        let bound_squared = bound * bound;
+        self.private_signal(&slack)?;
+        self.constrain_equal(
+            Expr::Add(vec![
+                Expr::Mul(
+                    Box::new(Expr::signal(signal)),
+                    Box::new(Expr::signal(signal)),
+                ),
+                Expr::signal(&slack),
+            ]),
+            Expr::Const(FieldElement::from_bigint(bound_squared.clone())),
+        )?;
+        self.constrain_range(&slack, bits_for_bigint_bound(&bound_squared))
+    }
+
+    pub fn append_nonnegative_bound(
+        &mut self,
+        signal: &str,
+        bound: &BigInt,
+        prefix: &str,
+    ) -> ZkfResult<&mut Self> {
+        self.ensure_signal_known(signal)?;
+        let slack = format!("{prefix}_nonnegative_bound_slack");
+        let anchor = format!("{prefix}_nonnegative_bound_anchor");
+        self.private_signal(&slack)?;
+        self.private_signal(&anchor)?;
+        self.constrain_range(signal, bits_for_bigint_bound(bound))?;
+        self.constrain_equal(
+            Expr::Add(vec![Expr::signal(signal), Expr::signal(&slack)]),
+            Expr::Const(FieldElement::from_bigint(bound.clone())),
+        )?;
+        self.constrain_range(&slack, bits_for_bigint_bound(bound))?;
+        self.constrain_equal(
+            Expr::signal(&anchor),
+            Expr::Mul(
+                Box::new(Expr::signal(&slack)),
+                Box::new(Expr::signal(&slack)),
+            ),
+        )
+    }
+
+    pub fn append_poseidon_hash(&mut self, prefix: &str, inputs: [Expr; 4]) -> ZkfResult<String> {
+        let states = [
+            format!("{prefix}_poseidon_state_0"),
+            format!("{prefix}_poseidon_state_1"),
+            format!("{prefix}_poseidon_state_2"),
+            format!("{prefix}_poseidon_state_3"),
+        ];
+        for lane in &states {
+            self.private_signal(lane)?;
+        }
+        let params = BTreeMap::from([("width".to_string(), "4".to_string())]);
+        self.constrain_blackbox(
+            BlackBoxOp::Poseidon,
+            &inputs,
+            &[
+                states[0].as_str(),
+                states[1].as_str(),
+                states[2].as_str(),
+                states[3].as_str(),
+            ],
+            &params,
+        )?;
+        Ok(states[0].clone())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn append_exact_division_constraints(
+        &mut self,
+        numerator: Expr,
+        denominator: Expr,
+        quotient: &str,
+        remainder: &str,
+        slack: &str,
+        remainder_bound: &BigInt,
+        prefix: &str,
+    ) -> ZkfResult<&mut Self> {
+        let slack_anchor = format!("{prefix}_exact_division_slack_anchor");
+        self.private_signal(quotient)?;
+        self.private_signal(remainder)?;
+        self.private_signal(slack)?;
+        self.private_signal(&slack_anchor)?;
+        self.constrain_equal(
+            numerator,
+            Expr::Add(vec![
+                Expr::Mul(
+                    Box::new(denominator.clone()),
+                    Box::new(Expr::signal(quotient)),
+                ),
+                Expr::signal(remainder),
+            ]),
+        )?;
+        self.constrain_equal(
+            denominator,
+            Expr::Add(vec![
+                Expr::signal(remainder),
+                Expr::signal(slack),
+                Expr::Const(FieldElement::ONE),
+            ]),
+        )?;
+        self.constrain_range(remainder, bits_for_bigint_bound(remainder_bound))?;
+        self.constrain_range(slack, bits_for_bigint_bound(remainder_bound))?;
+        self.constrain_equal(
+            Expr::signal(&slack_anchor),
+            Expr::Mul(Box::new(Expr::signal(slack)), Box::new(Expr::signal(slack))),
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn append_floor_sqrt_constraints(
+        &mut self,
+        value: Expr,
+        sqrt_signal: &str,
+        remainder_signal: &str,
+        upper_slack_signal: &str,
+        sqrt_bound: &BigInt,
+        support_bound: &BigInt,
+        prefix: &str,
+    ) -> ZkfResult<&mut Self> {
+        self.private_signal(sqrt_signal)?;
+        self.private_signal(remainder_signal)?;
+        self.private_signal(upper_slack_signal)?;
+        self.append_nonnegative_bound(sqrt_signal, sqrt_bound, &format!("{prefix}_sqrt_bound"))?;
+        self.constrain_equal(
+            value.clone(),
+            Expr::Add(vec![
+                Expr::Mul(
+                    Box::new(Expr::signal(sqrt_signal)),
+                    Box::new(Expr::signal(sqrt_signal)),
+                ),
+                Expr::signal(remainder_signal),
+            ]),
+        )?;
+        self.constrain_equal(
+            Expr::Add(vec![
+                value,
+                Expr::signal(upper_slack_signal),
+                Expr::Const(FieldElement::ONE),
+            ]),
+            Expr::Mul(
+                Box::new(Expr::Add(vec![
+                    Expr::signal(sqrt_signal),
+                    Expr::Const(FieldElement::ONE),
+                ])),
+                Box::new(Expr::Add(vec![
+                    Expr::signal(sqrt_signal),
+                    Expr::Const(FieldElement::ONE),
+                ])),
+            ),
+        )?;
+        self.constrain_range(remainder_signal, bits_for_bigint_bound(support_bound))?;
+        self.constrain_range(upper_slack_signal, bits_for_bigint_bound(support_bound))
     }
 
     pub fn poseidon_hash(&mut self, inputs: &[Expr], outputs: &[&str]) -> ZkfResult<&mut Self> {
@@ -1602,6 +1788,16 @@ impl ProgramBuilder {
     }
 
     pub fn build(&self) -> ZkfResult<Program> {
+        let mut metadata = self.metadata.clone();
+        let has_explicit_subsystem_identity = SUBSYSTEM_IDENTITY_METADATA_KEYS.iter().any(|key| {
+            metadata
+                .get(*key)
+                .is_some_and(|value| !value.trim().is_empty())
+        });
+        if !has_explicit_subsystem_identity {
+            metadata.insert("subsystem_id".to_string(), self.name.clone());
+        }
+
         let zir_program = zir::Program {
             name: self.name.clone(),
             field: self.field,
@@ -1615,7 +1811,7 @@ impl ProgramBuilder {
             lookup_tables: self.lookup_tables.clone(),
             memory_regions: self.memory_regions.clone(),
             custom_gates: self.custom_gates.clone(),
-            metadata: self.metadata.clone(),
+            metadata,
         };
 
         let declared_signals = zir_program
@@ -1915,6 +2111,61 @@ mod tests {
             }]
         );
         assert_eq!(program.metadata.get("owner"), Some(&"builder".to_string()));
+    }
+
+    #[test]
+    fn builder_auto_stamps_subsystem_id_when_identity_metadata_is_missing() {
+        let mut builder = ProgramBuilder::new("subsystem_default", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("subsystem_id"),
+            Some(&"subsystem_default".to_string())
+        );
+    }
+
+    #[test]
+    fn builder_does_not_override_existing_subsystem_identity_metadata() {
+        let mut builder = ProgramBuilder::new("subsystem_default", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+        builder
+            .metadata_entry("application", "explicit-subsystem")
+            .expect("application metadata");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("application"),
+            Some(&"explicit-subsystem".to_string())
+        );
+        assert_eq!(program.metadata.get("subsystem_id"), None);
+    }
+
+    #[test]
+    fn builder_subsystem_id_helper_sets_explicit_identity() {
+        let mut builder = ProgramBuilder::new("default_name", FieldId::Bn254);
+        builder.private_input("x").unwrap();
+        builder.public_output("y").unwrap();
+        builder
+            .add_assignment("y", Expr::signal("x"))
+            .expect("assignment registration");
+        builder
+            .subsystem_id("builder-subsystem")
+            .expect("subsystem metadata");
+
+        let program = builder.build().expect("build");
+        assert_eq!(
+            program.metadata.get("subsystem_id"),
+            Some(&"builder-subsystem".to_string())
+        );
     }
 
     #[test]

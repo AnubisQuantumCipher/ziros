@@ -13,6 +13,9 @@ pub(crate) enum SpecPlonky3LoweringError {
         field: FieldId,
         bits: u32,
         max_bits: u32,
+        signal: Option<String>,
+        label: Option<String>,
+        constraint_index: Option<usize>,
     },
     UnsupportedConstraint(String),
     DivisionByZero,
@@ -107,10 +110,18 @@ impl From<SpecPlonky3LoweringError> for ZkfError {
                 field,
                 bits,
                 max_bits,
+                signal,
+                label,
+                constraint_index,
             } => ZkfError::UnsupportedBackend {
                 backend: "plonky3".to_string(),
-                message: format!(
-                    "plonky3 adapter currently supports range constraints up to {max_bits} bits for field {field}; found {bits}"
+                message: unsupported_range_bits_message(
+                    field,
+                    bits,
+                    max_bits,
+                    signal.as_deref(),
+                    label.as_deref(),
+                    constraint_index,
                 ),
             },
             SpecPlonky3LoweringError::UnsupportedConstraint(kind) => ZkfError::Backend(format!(
@@ -154,6 +165,39 @@ impl From<SpecPlonky3LoweringError> for ZkfError {
             }
         }
     }
+}
+
+fn unsupported_range_bits_message(
+    field: FieldId,
+    bits: u32,
+    max_bits: u32,
+    signal: Option<&str>,
+    label: Option<&str>,
+    constraint_index: Option<usize>,
+) -> String {
+    let mut message = format!(
+        "plonky3 adapter currently supports range constraints up to {max_bits} bits for field {field}; found {bits}"
+    );
+    if signal.is_some() || label.is_some() || constraint_index.is_some() {
+        message.push_str(" for");
+        if let Some(signal) = signal {
+            message.push_str(&format!(" signal {signal}"));
+        }
+        if let Some(constraint_index) = constraint_index {
+            message.push_str(&format!(" at constraint #{constraint_index}"));
+        }
+        if let Some(label) = label {
+            message.push_str(&format!(" ({label})"));
+        }
+    }
+    message
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+struct RangeConstraintProvenance {
+    signal: String,
+    label: Option<String>,
+    constraint_index: usize,
 }
 
 pub(crate) fn plonky3_supported_field(field: FieldId) -> bool {
@@ -486,6 +530,7 @@ fn runtime_lower_expr(
 
 fn runtime_lower_constraint(
     constraint: &Constraint,
+    constraint_index: usize,
     context: &mut RuntimeLoweringContext,
 ) -> Result<(), SpecPlonky3LoweringError> {
     match constraint {
@@ -508,13 +553,16 @@ fn runtime_lower_constraint(
             ));
             Ok(())
         }
-        Constraint::Range { signal, bits, .. } => {
+        Constraint::Range { signal, bits, label } => {
             let max_bits = max_safe_range_bits(context.field);
             if *bits > max_bits {
                 return Err(SpecPlonky3LoweringError::UnsupportedRangeBits {
                     field: context.field,
                     bits: *bits,
                     max_bits,
+                    signal: Some(signal.clone()),
+                    label: label.clone(),
+                    constraint_index: Some(constraint_index),
                 });
             }
             let source_index = context
@@ -692,6 +740,9 @@ fn from_surface_error(error: surface::SpecPlonky3LoweringError) -> SpecPlonky3Lo
             },
             bits: unsupported_bits,
             max_bits: unsupported_max_bits,
+            signal: None,
+            label: None,
+            constraint_index: None,
         },
         surface::SpecPlonky3LoweringError::UnsupportedConstraint(kind) => {
             SpecPlonky3LoweringError::UnsupportedConstraint(kind)
@@ -752,9 +803,10 @@ pub(crate) fn is_supported_plonky3_program(program: &Program) -> bool {
 
 pub(crate) fn lower_program(program: &Program) -> Result<LoweredProgram, SpecPlonky3LoweringError> {
     let spec_program = to_surface_program(program)?;
-    surface::lower_program(&spec_program)
-        .map(|lowered| to_runtime_lowered_program(&lowered))
-        .map_err(from_surface_error)
+    match surface::lower_program(&spec_program) {
+        Ok(lowered) => Ok(to_runtime_lowered_program(&lowered)),
+        Err(error) => Err(from_surface_error_with_program(program, error)),
+    }
 }
 
 pub(crate) fn lower_program_runtime_fast(
@@ -791,8 +843,8 @@ pub(crate) fn lower_program_runtime_fast(
         derived_columns: Vec::new(),
     };
 
-    for constraint in &program.constraints {
-        runtime_lower_constraint(constraint, &mut context)?;
+    for (constraint_index, constraint) in program.constraints.iter().enumerate() {
+        runtime_lower_constraint(constraint, constraint_index, &mut context)?;
     }
 
     Ok(LoweredProgram {
@@ -802,6 +854,53 @@ pub(crate) fn lower_program_runtime_fast(
         constraints: context.constraints,
         derived_columns: context.derived_columns,
     })
+}
+
+fn locate_unsupported_range_constraint(
+    program: &Program,
+    max_bits: u32,
+) -> Option<RangeConstraintProvenance> {
+    for (constraint_index, constraint) in program.constraints.iter().enumerate() {
+        if let Constraint::Range {
+            signal,
+            bits,
+            label,
+        } = constraint
+            && *bits > max_bits
+        {
+            return Some(RangeConstraintProvenance {
+                signal: signal.clone(),
+                label: label.clone(),
+                constraint_index,
+            });
+        }
+    }
+    None
+}
+
+fn from_surface_error_with_program(
+    program: &Program,
+    error: surface::SpecPlonky3LoweringError,
+) -> SpecPlonky3LoweringError {
+    match from_surface_error(error) {
+        SpecPlonky3LoweringError::UnsupportedRangeBits {
+            field,
+            bits,
+            max_bits,
+            ..
+        } => {
+            let provenance = locate_unsupported_range_constraint(program, max_bits);
+            SpecPlonky3LoweringError::UnsupportedRangeBits {
+                field,
+                bits,
+                max_bits,
+                signal: provenance.as_ref().map(|item| item.signal.clone()),
+                label: provenance.as_ref().and_then(|item| item.label.clone()),
+                constraint_index: provenance.map(|item| item.constraint_index),
+            }
+        }
+        other => other,
+    }
 }
 
 pub(crate) fn validate_lowered_program(
@@ -915,8 +1014,9 @@ pub(crate) fn build_trace_row_runtime_fast(
 #[cfg(test)]
 mod tests {
     use super::{
-        AirExpr, build_trace_row, build_trace_row_runtime_fast, eval_air_expr_concrete_checked,
-        is_supported_plonky3_program, lower_program, lower_program_runtime_fast,
+        AirExpr, SpecPlonky3LoweringError, build_trace_row, build_trace_row_runtime_fast,
+        eval_air_expr_concrete_checked, is_supported_plonky3_program, lower_program,
+        lower_program_runtime_fast,
         public_input_positions_preserved_checked,
     };
     use std::collections::BTreeMap;
@@ -1007,6 +1107,43 @@ mod tests {
         let fast_lowered =
             lower_program_runtime_fast(&program).expect("fast runtime lowering should pass");
         assert_eq!(fast_lowered, lowered);
+    }
+
+    #[test]
+    fn unsupported_range_bits_names_signal_and_constraint() {
+        let program = Program {
+            field: FieldId::Goldilocks,
+            signals: vec![Signal {
+                name: "value".to_string(),
+                visibility: Visibility::Private,
+                constant: None,
+                ty: None,
+            }],
+            constraints: vec![Constraint::Range {
+                signal: "value".to_string(),
+                bits: 67,
+                label: Some("value_range".to_string()),
+            }],
+            ..Default::default()
+        };
+
+        let error = lower_program(&program).expect_err("range should overflow Goldilocks");
+        assert_eq!(
+            error,
+            SpecPlonky3LoweringError::UnsupportedRangeBits {
+                field: FieldId::Goldilocks,
+                bits: 67,
+                max_bits: 63,
+                signal: Some("value".to_string()),
+                label: Some("value_range".to_string()),
+                constraint_index: Some(0),
+            }
+        );
+
+        let rendered = zkf_core::ZkfError::from(error).to_string();
+        assert!(rendered.contains("signal value"));
+        assert!(rendered.contains("constraint #0"));
+        assert!(rendered.contains("value_range"));
     }
 
     #[test]

@@ -22,17 +22,45 @@
   "rust_files": [
     {
       "path": "zkf-backends/src/arkworks.rs",
-      "sha256": "5e8548e9b5642a3b596acbb98c2fa7d27b19be910c377edc776f4536114fc1ad"
+      "sha256": "fcb4338e82b5023c68239a34300e5900684b0b3a65f2e7d87738fdfb0a356870"
     },
     {
       "path": "zkf-backends/src/lib_non_hax.rs",
-      "sha256": "14745acef99b37b0bd7d0de6a406e148770ec8cbca1aa4cb1dd9b160eafac857"
+      "sha256": "b8c0adfc585cb590194e04a861f3264efe270651d74b68907327fbfec6a2f670"
     }
   ],
   "scheme": "groth16",
   "security_boundary": "trusted-imported",
   "setup_blob_version": 1,
   "setup_provenance": "trusted-imported-blob",
+  "setup_reporting_contracts": [
+    {
+      "when_setup_provenance": "trusted-imported-blob",
+      "required_compiled_metadata": [
+        "groth16_setup_blob_path"
+      ],
+      "required_proof_metadata": []
+    },
+    {
+      "when_setup_provenance": "auto-ceremony-cached-entropy",
+      "required_compiled_metadata": [
+        "groth16_ceremony_subsystem",
+        "groth16_ceremony_id",
+        "groth16_ceremony_kind",
+        "groth16_ceremony_report_path",
+        "groth16_ceremony_report_sha256",
+        "groth16_ceremony_seed_commitment_sha256"
+      ],
+      "required_proof_metadata": [
+        "groth16_ceremony_subsystem",
+        "groth16_ceremony_id",
+        "groth16_ceremony_kind",
+        "groth16_ceremony_report_path",
+        "groth16_ceremony_report_sha256",
+        "groth16_ceremony_seed_commitment_sha256"
+      ]
+    }
+  ],
   "surface": "groth16",
   "verifier_checks": [
     "compiled_backend_matches",

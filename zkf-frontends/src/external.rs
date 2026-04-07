@@ -39,7 +39,7 @@ impl FrontendEngine for CompactFrontend {
                 "zkf-program-json".to_string(),
                 "compact-source".to_string(),
             ],
-            notes: "Midnight Compact frontend: imports local compactc 0.29.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows.".to_string(),
+            notes: "Midnight Compact frontend: imports local compactc 0.30.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows.".to_string(),
         }
     }
 

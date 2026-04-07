@@ -317,14 +317,16 @@ fn poseidon_identity_flow_uses_source_witness_and_prepares_proving_witness_in_me
     .expect("prove package");
     assert_eq!(prove.backend, "arkworks-groth16");
 
-    let verify = cmd::package::verify_proof::verify_package_proof(
-        &manifest_path,
-        &crate::util::BackendRequest::native(BackendKind::ArkworksGroth16),
-        "main",
-        None,
-        None,
-        false,
-    )
+    let verify = zkf_backends::with_allow_dev_deterministic_groth16_override(Some(true), || {
+        cmd::package::verify_proof::verify_package_proof(
+            &manifest_path,
+            &crate::util::BackendRequest::native(BackendKind::ArkworksGroth16),
+            "main",
+            None,
+            None,
+            false,
+        )
+    })
     .expect("verify proof");
     assert!(verify.ok);
 

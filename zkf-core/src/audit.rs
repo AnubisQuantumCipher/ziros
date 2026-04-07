@@ -7,6 +7,7 @@
 
 use crate::FieldId;
 use crate::artifact::BackendKind;
+use crate::debugger::UnderconstrainedAnalysis;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::time::Instant;
@@ -145,6 +146,8 @@ pub struct AuditReport {
     pub lookup_semantics: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub aggregation_semantics: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub underconstrained_analysis: Option<UnderconstrainedAnalysis>,
     pub checks: Vec<AuditCheck>,
     pub findings: Vec<AuditFinding>,
     pub summary: AuditSummary,
@@ -181,6 +184,7 @@ impl AuditReport {
             lookup_lowering_support: None,
             lookup_semantics: None,
             aggregation_semantics: None,
+            underconstrained_analysis: None,
             checks: Vec::new(),
             findings: Vec::new(),
             summary: AuditSummary::default(),
@@ -677,6 +681,7 @@ pub fn audit_program_with_capability_matrix(
             } else {
                 match crate::debugger::analyze_underconstrained_zir(program) {
                     Ok(analysis) => {
+                        report.underconstrained_analysis = Some(analysis.clone());
                         let elapsed = start.elapsed().as_millis() as u64;
 
                         let nonlinear_private_signal_set = analysis
@@ -772,6 +777,7 @@ pub fn audit_program_with_capability_matrix(
         } else {
             match crate::debugger::analyze_underconstrained_zir(program) {
                 Ok(analysis) => {
+                    report.underconstrained_analysis = Some(analysis.clone());
                     let elapsed = start.elapsed().as_millis() as u64;
 
                     let nonlinear_private_signal_set = analysis

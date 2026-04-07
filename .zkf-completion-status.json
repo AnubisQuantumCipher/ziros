@@ -2,25 +2,26 @@
   "schema": "zkf-completion-status-v2",
   "generated_from": "zkf-ir-spec/verification-ledger.json",
   "current_priority": "formal-verification-zero-repo-assumption-program",
-  "current_priority_progress": "March 25, 2026 release-grade closure complete. Ledger inventory totals 160 rows with 160 machine-checked rows. Ledger counts: 160 mechanized_local, 0 mechanized_generated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 132 mechanized_implementation_claim, 0 bounded_check, 3 attestation_backed_lane, 16 model_only_claim, 9 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. All protocol rows are mechanized_local.",
-  "build_status": "March 29, 2026: the reentry mission-ops release-closure tranche still builds cleanly on the current private tree after the shared aerospace-kit extraction and staged public-mirror tooling pass, and the staged open-core mirror now also builds from clone root on the release Apple Silicon host. Passed checks this tranche: `cargo build --workspace`; `python3 scripts/stage_ziros_public_mirror.py --out target/ziros-public-mirror`; and `cargo build --workspace` from `target/ziros-public-mirror`. The staged public mirror still emits two existing dead-code warnings in `zkf-backends/src/metal_runtime.rs`, but the prior hidden private-Metal detachment failures are closed. Historical accepted checks remain: `cargo build -p zkf-lib --example private_nbody_orbital_showcase`; `cargo build -p zkf-lib --example private_satellite_conjunction_showcase`; and `cargo build -p zkf-lib --example private_voting_commitment_pipeline`.",
-  "test_status": "March 29, 2026: the reentry mission-ops release-closure tranche is green on the current tree, including explicit frozen-schema regression coverage for the live proof-bearing and governed mission-ops contracts, deterministic-oracle parity gating, public bundle leakage checks, new shared mission-ops/aerospace-kit helper tests, staged public-mirror script tests, and a clone-root staged-mirror build gate. Passed checks this tranche: `bash ./scripts/run_verus_reentry_assurance_proofs.sh`; `python3 scripts/generate_verification_status_artifacts.py --check`; `cargo test -p zkf-lib --lib app::mission_ops::tests:: -- --nocapture`; `cargo test -p zkf-lib --lib app::reentry::tests:: -- --nocapture`; `cargo test -p zkf-lib --lib app::reentry_ops::tests:: -- --nocapture`; `cargo test -p zkf-cli reentry_assurance -- --nocapture`; `python3 -m unittest scripts.tests.test_stage_ziros_public_mirror`; `cargo test -p zkf-lib --lib --no-fail-fast`; `python3 scripts/stage_ziros_public_mirror.py --out target/ziros-public-mirror`; and `cargo build --workspace` from `target/ziros-public-mirror`. An unrelated live Compact/Halo2 integration inside the broader `cargo test -p zkf-cli -- --nocapture` sweep remained long-running and was not used as a release blocker for this scoped reentry tranche. Historical accepted checks remain: `cargo test -p zkf-lib implementation_closure_generated_outputs_match_repo_files --lib -- --nocapture`; `cargo test -p zkf-lib satellite_plan_commitment_tamper_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_state_commitment_tamper_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_tampered_running_minimum_fails --lib -- --nocapture`; `cargo test -p zkf-lib satellite_small_step_witness_satisfies_constraints --lib -- --nocapture`; `cargo test -p zkf-core --lib`; `cargo test -p zkf-backends --lib`; `cargo test -p zkf-integration-tests --test private_nbody_orbital_showcase -- --nocapture`; `cargo test -p zkf-integration-tests --test private_satellite_conjunction_showcase -- --nocapture`; and `cargo test -p zkf-integration-tests --test private_voting_commitment_pipeline -- --nocapture`.",
-  "recent_delivery": "Extended the theorem-first reentry mission-ops tranche into the first reusable aerospace-kit and staged public-mirror layer: extracted shared mission-ops boundary, artifact classification, public/private export filtering, public-export scrubbing, and deterministic-oracle release-gate helpers into `zkf-lib/src/app/mission_ops.rs`; rewired the reentry CLI/report/export path to consume those shared helpers without changing the eight frozen reentry schemas; added explicit aerospace-kit and public-monorepo-mirror docs; and hardened `scripts/stage_ziros_public_mirror.py` so the first `AnubisQuantumCipher/ziros` mirror is staged as an Apache-2.0-safe open-core CPU-first slice that rewrites hidden Metal defaults out of the included workspace and now builds from clone root instead of only looking plausible on paper.",
+  "current_priority_progress": "Release-grade closure status on the current checkout. Ledger inventory totals 169 rows with 160 machine-checked rows. Ledger counts: 160 mechanized_local, 0 mechanized_generated, 9 hypothesis_stated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 160 mechanized_implementation_claim, 0 bounded_check, 0 attestation_backed_lane, 0 model_only_claim, 9 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. Open protocol rows: protocol.fri_completeness, protocol.fri_proximity_soundness, protocol.groth16_completeness, protocol.groth16_knowledge_soundness, protocol.groth16_zero_knowledge, protocol.hypernova_completeness, protocol.hypernova_folding_soundness, protocol.nova_completeness, protocol.nova_folding_soundness.",
+  "build_status": "March 30, 2026: the formal-closure repair tranche builds cleanly on the current tree. Passed checks this tranche: `cargo build -p zkf-ir-spec`, `cargo build --workspace`. The workspace still emits existing warnings in `zkf-backends/src/metal_runtime.rs`, `zkf-runtime/src/metal_dispatch_macos.rs`, and `zkf-lib/src/app/edl_monte_carlo.rs`, but the repaired verification-ledger source export, the restored reentry rows, the SED proof runners, and the `zkf-core` isolated-build gate all compile together.",
+  "test_status": "March 30, 2026: the formal-closure repair tranche passes the directly affected proof and crate gates on the current tree: `bash ./scripts/run_rocq_proofs.sh`; `bash ./scripts/run_verus_sovereign_economic_defense_proofs.sh`; `bash ./scripts/run_verus_reentry_assurance_proofs.sh`; `cargo test -p zkf-core --lib`; `cargo test -p zkf-ir-spec --lib`; and `python3 scripts/generate_verification_status_artifacts.py --check`. `cargo test -p zkf-core --lib` passed with 198 tests green; `cargo test -p zkf-ir-spec --lib` passed with 38 tests green, including `verification::tests::json_export_stays_in_sync` after the source-truth repair.",
+  "recent_delivery": "Promoted the eight Sovereign Economic Defense theorem rows into `zkf-ir-spec/src/verification.rs` as real mechanized claims, restored seventeen JSON-only reentry rows back into the Rust ledger source so the exported ledger again reflects the full 168-row mechanized inventory, fixed the SED Rocq proof file until `coqc` accepted it, gated `zkf-core::swarm_signer` behind the `full` feature so `zkf-ir-spec` builds in isolation again, and added pinned Verus/Rocq runner scripts so the SED and reentry proof surfaces are executable from this checkout instead of depending on out-of-band tooling.",
   "authoritative_status_source": "zkf-ir-spec/verification-ledger.json",
-  "total_entries": 160,
+  "total_entries": 169,
   "mechanized_total": 160,
   "counts": {
     "mechanized_local": 160,
     "mechanized_generated": 0,
+    "hypothesis_stated": 9,
     "bounded_checked": 0,
     "assumed_external": 0,
     "pending": 0
   },
   "assurance_class_counts": {
-    "mechanized_implementation_claim": 132,
+    "mechanized_implementation_claim": 160,
     "bounded_check": 0,
-    "attestation_backed_lane": 3,
-    "model_only_claim": 16,
+    "attestation_backed_lane": 0,
+    "model_only_claim": 0,
     "hypothesis_carried_theorem": 9
   },
   "runtime_proof_coverage": {
@@ -145,63 +146,76 @@
     },
     "closed": true
   },
-  "trusted_assumption_rows": [],
-  "release_grade_ready": true,
-  "release_grade_blockers": [],
+  "trusted_assumption_rows": [
+    "protocol.fri_completeness",
+    "protocol.fri_proximity_soundness",
+    "protocol.groth16_completeness",
+    "protocol.groth16_knowledge_soundness",
+    "protocol.groth16_zero_knowledge",
+    "protocol.hypernova_completeness",
+    "protocol.hypernova_folding_soundness",
+    "protocol.nova_completeness",
+    "protocol.nova_folding_soundness"
+  ],
+  "release_grade_ready": false,
+  "release_grade_blockers": [
+    "9 hypothesis_stated row(s) remain",
+    "9 row(s) still carry trusted_assumptions"
+  ],
   "protocol_rows": [
     {
       "theorem_id": "protocol.fri_completeness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::plonky3",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.fri_proximity_soundness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::plonky3",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.groth16_completeness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::arkworks",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.groth16_knowledge_soundness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::arkworks",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.groth16_zero_knowledge",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::arkworks",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.hypernova_completeness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::nova_native",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.hypernova_folding_soundness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::nova_native",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.nova_completeness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::nova_native",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
+      "evidence_path": ""
     },
     {
       "theorem_id": "protocol.nova_folding_soundness",
-      "status": "mechanized_local",
+      "status": "hypothesis_stated",
       "scope": "zkf-backends::nova_native",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean"
+      "evidence_path": ""
     }
   ]
 }

@@ -1,12 +1,9 @@
 use crate::FieldId;
-use crate::field::{
-    add as field_add, div as field_div, equal as field_equal, fits_in_bits, is_boolean,
-    mul as field_mul, normalize as field_normalize, sub as field_sub,
-};
+use crate::field::{equal as field_equal, fits_in_bits, is_boolean, normalize as field_normalize};
+use crate::proof_constant_time_bridge::eval_expr_constant_time_impl;
 use num_bigint::BigInt;
 use num_traits::Zero;
 use std::collections::BTreeMap;
-use std::sync::atomic::{Ordering, compiler_fence};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub(crate) enum KernelExpr {
@@ -100,7 +97,7 @@ pub(crate) enum KernelCheckError {
     },
 }
 
-fn kernel_signal_value(
+pub(crate) fn kernel_signal_value(
     witness: &KernelWitness,
     signal_index: usize,
     field: FieldId,
@@ -150,82 +147,12 @@ pub(crate) fn eval_expr_reference(
     }
 }
 
-fn combine_binary_results(
-    lhs_result: Result<BigInt, KernelCheckError>,
-    rhs_result: Result<BigInt, KernelCheckError>,
-    op: impl FnOnce(BigInt, BigInt) -> Result<BigInt, KernelCheckError>,
-) -> Result<BigInt, KernelCheckError> {
-    match (lhs_result, rhs_result) {
-        (Err(error), _) => Err(error),
-        (_, Err(error)) => Err(error),
-        (Ok(lhs), Ok(rhs)) => op(lhs, rhs),
-    }
-}
-
 pub(crate) fn eval_expr_constant_time(
     expr: &KernelExpr,
     witness: &KernelWitness,
     field: FieldId,
 ) -> Result<BigInt, KernelCheckError> {
-    match expr {
-        KernelExpr::Const(value) => Ok(field_normalize(value.clone(), field)),
-        KernelExpr::Signal(signal_index) => {
-            compiler_fence(Ordering::SeqCst);
-            let value = kernel_signal_value(witness, *signal_index, field);
-            compiler_fence(Ordering::SeqCst);
-            value
-        }
-        KernelExpr::Add(items) => {
-            let mut acc = BigInt::zero();
-            let mut first_error = None;
-            for item in items {
-                compiler_fence(Ordering::SeqCst);
-                match eval_expr_constant_time(item, witness, field) {
-                    Ok(value) => {
-                        compiler_fence(Ordering::SeqCst);
-                        acc = field_add(&acc, &value, field);
-                    }
-                    Err(error) => {
-                        if first_error.is_none() {
-                            first_error = Some(error);
-                        }
-                    }
-                }
-                compiler_fence(Ordering::SeqCst);
-            }
-            first_error.map_or(Ok(acc), Err)
-        }
-        KernelExpr::Sub(lhs, rhs) => {
-            compiler_fence(Ordering::SeqCst);
-            let lhs_result = eval_expr_constant_time(lhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            let rhs_result = eval_expr_constant_time(rhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            combine_binary_results(lhs_result, rhs_result, |lhs, rhs| {
-                Ok(field_sub(&lhs, &rhs, field))
-            })
-        }
-        KernelExpr::Mul(lhs, rhs) => {
-            compiler_fence(Ordering::SeqCst);
-            let lhs_result = eval_expr_constant_time(lhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            let rhs_result = eval_expr_constant_time(rhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            combine_binary_results(lhs_result, rhs_result, |lhs, rhs| {
-                Ok(field_mul(&lhs, &rhs, field))
-            })
-        }
-        KernelExpr::Div(lhs, rhs) => {
-            compiler_fence(Ordering::SeqCst);
-            let lhs_result = eval_expr_constant_time(lhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            let rhs_result = eval_expr_constant_time(rhs, witness, field);
-            compiler_fence(Ordering::SeqCst);
-            combine_binary_results(lhs_result, rhs_result, |lhs, rhs| {
-                field_div(&lhs, &rhs, field).ok_or(KernelCheckError::DivisionByZero)
-            })
-        }
-    }
+    eval_expr_constant_time_impl(expr, witness, field)
 }
 
 pub(crate) fn eval_expr(

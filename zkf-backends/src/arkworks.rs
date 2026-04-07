@@ -7,16 +7,17 @@ use crate::blackbox_native::validate_blackbox_constraints;
 use crate::metal_runtime::append_backend_runtime_metadata;
 use crate::r1cs_lowering::lower_program_for_backend;
 use crate::{
-    BackendEngine, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
-    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
-    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
-    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
-    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY,
-    GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
-    GROTH16_STREAMED_PK_PATH_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY,
-    GROTH16_STREAMED_SETUP_STORAGE_VALUE, GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY,
-    allow_dev_deterministic_groth16, proof_seed_override, requested_groth16_setup_blob_path,
-    setup_seed_override,
+    BackendEngine, GROTH16_AUTO_CEREMONY_PROVENANCE, GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY,
+    GROTH16_CEREMONY_ID_METADATA_KEY, GROTH16_CEREMONY_KIND_METADATA_KEY,
+    GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY, GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY,
+    GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY, GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY,
+    GROTH16_DETERMINISTIC_DEV_PROVENANCE, GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY,
+    GROTH16_IMPORTED_SETUP_PROVENANCE, GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY,
+    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, GROTH16_SETUP_PROVENANCE_METADATA_KEY,
+    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY, GROTH16_STREAMED_PK_PATH_METADATA_KEY,
+    GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_VALUE,
+    GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY, allow_dev_deterministic_groth16, proof_seed_override,
+    requested_groth16_setup_blob_path, setup_seed_override,
 };
 use ark_bn254::{Bn254, Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use ark_ec::{AffineRepr, CurveGroup, VariableBaseMSM, scalar_mul::BatchMulPreprocessing};
@@ -34,6 +35,7 @@ use ark_relations::r1cs::{
 };
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_snark::SNARK;
+use rand::Rng;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use serde::{Deserialize, Serialize};
@@ -72,6 +74,255 @@ struct StreamedSetupBlob {
     blob: Vec<u8>,
     pk_path: PathBuf,
     shape_path: PathBuf,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum AutoCeremonySeedSource {
+    ExistingCache,
+    Generated,
+    MigratedLegacyCache,
+}
+
+impl AutoCeremonySeedSource {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::ExistingCache => "existing-cache",
+            Self::Generated => "generated-os-rng",
+            Self::MigratedLegacyCache => "migrated-legacy-cache",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AutoCeremonyContext {
+    subsystem_id: String,
+    ceremony_id: String,
+    seed_path: PathBuf,
+    report_path: PathBuf,
+    seed: [u8; 32],
+    seed_source: AutoCeremonySeedSource,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AutoCeremonySubsystemManifest {
+    schema: String,
+    backend: String,
+    subsystem_id: String,
+    created_at_unix: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AutoCeremonyProgramReport {
+    schema: String,
+    backend: String,
+    subsystem_id: String,
+    ceremony_id: String,
+    ceremony_kind: String,
+    program_name: String,
+    program_digest: String,
+    created_at_unix: u64,
+    seed_source: String,
+    seed_commitment_sha256: String,
+    seed_path: String,
+    setup_storage: String,
+    setup_blob_version: u8,
+    setup_blob_sha256: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    streamed_pk_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    streamed_shape_path: Option<String>,
+    security_boundary: String,
+}
+
+fn unix_timestamp_now() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+fn sanitize_ceremony_path_component(value: &str) -> String {
+    let sanitized: String = value
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.') {
+                ch
+            } else {
+                '-'
+            }
+        })
+        .collect();
+    sanitized
+        .trim_matches('-')
+        .chars()
+        .take(96)
+        .collect::<String>()
+}
+
+fn groth16_auto_ceremony_subsystem_id(program: &Program) -> String {
+    [
+        "subsystem_id",
+        "subsystem",
+        "application",
+        "app_id",
+        "app",
+        "owner",
+    ]
+    .iter()
+    .find_map(|key| program.metadata.get(*key))
+    .filter(|value| !value.trim().is_empty())
+    .cloned()
+    .unwrap_or_else(|| program.name.clone())
+}
+
+fn ensure_auto_ceremony_subsystem_manifest(cache_dir: &Path, subsystem_id: &str) -> ZkfResult<()> {
+    let manifest_path = cache_dir.join("subsystem.json");
+    if manifest_path.exists() {
+        return Ok(());
+    }
+    let manifest = AutoCeremonySubsystemManifest {
+        schema: "zkf-groth16-auto-ceremony-subsystem-v1".to_string(),
+        backend: BackendKind::ArkworksGroth16.as_str().to_string(),
+        subsystem_id: subsystem_id.to_string(),
+        created_at_unix: unix_timestamp_now(),
+    };
+    let bytes = serde_json::to_vec_pretty(&manifest)
+        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    fs::write(&manifest_path, bytes).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony subsystem manifest '{}': {err}",
+            manifest_path.display()
+        ))
+    })
+}
+
+fn legacy_auto_ceremony_seed_path(program_digest: &str) -> PathBuf {
+    groth16_auto_ceremony_cache_dir().join(format!("{program_digest}.seed"))
+}
+
+fn auto_ceremony_context(
+    program: &Program,
+    program_digest: &str,
+) -> ZkfResult<AutoCeremonyContext> {
+    let subsystem_id = groth16_auto_ceremony_subsystem_id(program);
+    let subsystem_slug = sanitize_ceremony_path_component(&subsystem_id);
+    let subsystem_dir = groth16_auto_ceremony_cache_dir().join(subsystem_slug);
+    let program_dir = subsystem_dir.join("programs").join(program_digest);
+    fs::create_dir_all(&program_dir).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to create Groth16 auto-ceremony cache dir '{}': {err}",
+            program_dir.display()
+        ))
+    })?;
+    ensure_auto_ceremony_subsystem_manifest(&subsystem_dir, &subsystem_id)?;
+
+    let seed_path = program_dir.join("phase2.seed");
+    let report_path = program_dir.join("report.json");
+
+    if let Ok(bytes) = fs::read(&seed_path)
+        && bytes.len() == 32
+    {
+        let mut seed = [0u8; 32];
+        seed.copy_from_slice(&bytes);
+        return Ok(AutoCeremonyContext {
+            subsystem_id: subsystem_id.clone(),
+            ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+            seed_path,
+            report_path,
+            seed,
+            seed_source: AutoCeremonySeedSource::ExistingCache,
+        });
+    }
+
+    let legacy_seed_path = legacy_auto_ceremony_seed_path(program_digest);
+    if let Ok(bytes) = fs::read(&legacy_seed_path)
+        && bytes.len() == 32
+    {
+        fs::write(&seed_path, &bytes).map_err(|err| {
+            ZkfError::Io(format!(
+                "failed to migrate Groth16 legacy auto-ceremony seed to '{}': {err}",
+                seed_path.display()
+            ))
+        })?;
+        let mut seed = [0u8; 32];
+        seed.copy_from_slice(&bytes);
+        return Ok(AutoCeremonyContext {
+            subsystem_id: subsystem_id.clone(),
+            ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+            seed_path,
+            report_path,
+            seed,
+            seed_source: AutoCeremonySeedSource::MigratedLegacyCache,
+        });
+    }
+
+    let mut seed = [0u8; 32];
+    StdRng::from_entropy().fill(&mut seed);
+    fs::write(&seed_path, seed).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony seed to '{}': {err}",
+            seed_path.display()
+        ))
+    })?;
+    Ok(AutoCeremonyContext {
+        subsystem_id: subsystem_id.clone(),
+        ceremony_id: format!("{}/{}", subsystem_id, program_digest),
+        seed_path,
+        report_path,
+        seed,
+        seed_source: AutoCeremonySeedSource::Generated,
+    })
+}
+
+fn write_auto_ceremony_report(
+    context: &AutoCeremonyContext,
+    program: &Program,
+    program_digest: &str,
+    setup_blob: &[u8],
+    streamed_setup: Option<&StreamedSetupBlob>,
+) -> ZkfResult<String> {
+    let report = AutoCeremonyProgramReport {
+        schema: "zkf-groth16-auto-ceremony-report-v1".to_string(),
+        backend: BackendKind::ArkworksGroth16.as_str().to_string(),
+        subsystem_id: context.subsystem_id.clone(),
+        ceremony_id: context.ceremony_id.clone(),
+        ceremony_kind: "subsystem-scoped-auto-phase2".to_string(),
+        program_name: program.name.clone(),
+        program_digest: program_digest.to_string(),
+        created_at_unix: unix_timestamp_now(),
+        seed_source: context.seed_source.as_str().to_string(),
+        seed_commitment_sha256: sha256_hex(&context.seed),
+        seed_path: context.seed_path.display().to_string(),
+        setup_storage: if streamed_setup.is_some() {
+            GROTH16_STREAMED_SETUP_STORAGE_VALUE.to_string()
+        } else {
+            "compiled-blob".to_string()
+        },
+        setup_blob_version: SETUP_BLOB_VERSION,
+        setup_blob_sha256: sha256_hex(setup_blob),
+        streamed_pk_path: streamed_setup.map(|value| value.pk_path.display().to_string()),
+        streamed_shape_path: streamed_setup.map(|value| value.shape_path.display().to_string()),
+        security_boundary: GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string(),
+    };
+    let bytes = serde_json::to_vec_pretty(&report)
+        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    fs::write(&context.report_path, &bytes).map_err(|err| {
+        ZkfError::Io(format!(
+            "failed to write Groth16 auto-ceremony report '{}': {err}",
+            context.report_path.display()
+        ))
+    })?;
+    Ok(sha256_hex(&bytes))
 }
 
 fn load_requested_setup_blob(path: impl AsRef<Path>) -> ZkfResult<Vec<u8>> {
@@ -360,7 +611,17 @@ fn annotate_setup_metadata(
     imported_path: Option<&str>,
     setup_seed: Option<[u8; 32]>,
     used_seed_override: bool,
+    auto_ceremony: Option<(&AutoCeremonyContext, &str)>,
 ) {
+    let clear_auto_ceremony_metadata = |metadata: &mut BTreeMap<String, String>| {
+        metadata.remove(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_ID_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_KIND_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY);
+        metadata.remove(GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY);
+    };
+
     match imported_path {
         Some(path) => {
             compiled
@@ -383,50 +644,97 @@ fn annotate_setup_metadata(
                 GROTH16_SETUP_BLOB_PATH_METADATA_KEY.to_string(),
                 path.to_string(),
             );
+            clear_auto_ceremony_metadata(&mut compiled.metadata);
         }
         None => {
             let setup_seed = setup_seed.expect("deterministic setup seed must be present");
-            let is_streamed_local_ceremony = compiled
-                .metadata
-                .get(GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY)
-                .map(String::as_str)
-                == Some(GROTH16_STREAMED_SETUP_STORAGE_VALUE)
-                && used_seed_override;
             compiled
                 .metadata
                 .insert("setup_deterministic".to_string(), "true".to_string());
-            compiled.metadata.insert(
-                "setup_seed_source".to_string(),
-                if is_streamed_local_ceremony {
-                    "local-ceremony-phase2".to_string()
-                } else if used_seed_override {
-                    "override".to_string()
-                } else {
-                    "program-digest".to_string()
-                },
-            );
-            compiled
-                .metadata
-                .insert("setup_seed_hex".to_string(), hex_seed(&setup_seed));
-            compiled.metadata.insert(
-                GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
-                if is_streamed_local_ceremony {
-                    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE.to_string()
-                } else {
-                    GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string()
-                },
-            );
-            compiled.metadata.insert(
-                GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
-                if is_streamed_local_ceremony {
-                    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY.to_string()
-                } else {
-                    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string()
-                },
-            );
+            if let Some((context, report_sha256)) = auto_ceremony {
+                compiled
+                    .metadata
+                    .insert("setup_seed_source".to_string(), "auto-ceremony".to_string());
+                compiled.metadata.remove("setup_seed_hex");
+                compiled.metadata.insert(
+                    GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+                    GROTH16_AUTO_CEREMONY_PROVENANCE.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+                    GROTH16_AUTO_CEREMONY_SECURITY_BOUNDARY.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY.to_string(),
+                    context.subsystem_id.clone(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_ID_METADATA_KEY.to_string(),
+                    context.ceremony_id.clone(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_KIND_METADATA_KEY.to_string(),
+                    "subsystem-scoped-auto-phase2".to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY.to_string(),
+                    context.report_path.display().to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY.to_string(),
+                    report_sha256.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY.to_string(),
+                    sha256_hex(&context.seed),
+                );
+            } else {
+                compiled.metadata.insert(
+                    "setup_seed_source".to_string(),
+                    if used_seed_override {
+                        "override".to_string()
+                    } else {
+                        "program-digest".to_string()
+                    },
+                );
+                compiled
+                    .metadata
+                    .insert("setup_seed_hex".to_string(), hex_seed(&setup_seed));
+                compiled.metadata.insert(
+                    GROTH16_SETUP_PROVENANCE_METADATA_KEY.to_string(),
+                    GROTH16_DETERMINISTIC_DEV_PROVENANCE.to_string(),
+                );
+                compiled.metadata.insert(
+                    GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY.to_string(),
+                    GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY.to_string(),
+                );
+                clear_auto_ceremony_metadata(&mut compiled.metadata);
+            }
             compiled
                 .metadata
                 .remove(GROTH16_SETUP_BLOB_PATH_METADATA_KEY);
+        }
+    }
+}
+
+fn propagate_setup_metadata_to_proof(
+    compiled: &CompiledProgram,
+    metadata: &mut BTreeMap<String, String>,
+) {
+    for key in [
+        "setup_deterministic",
+        "setup_seed_source",
+        GROTH16_SETUP_PROVENANCE_METADATA_KEY,
+        GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
+        GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY,
+        GROTH16_CEREMONY_ID_METADATA_KEY,
+        GROTH16_CEREMONY_KIND_METADATA_KEY,
+        GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY,
+        GROTH16_CEREMONY_REPORT_SHA256_METADATA_KEY,
+        GROTH16_CEREMONY_SEED_COMMITMENT_METADATA_KEY,
+    ] {
+        if let Some(value) = compiled.metadata.get(key) {
+            metadata.insert(key.to_string(), value.clone());
         }
     }
 }
@@ -575,11 +883,18 @@ impl BackendEngine for ArkworksGroth16Backend {
             let lowered_program = lowered.program.clone();
 
             let imported_setup = imported_setup_blob_for_program(program)?;
-            let used_seed_override = setup_seed_override().is_some();
             let program_digest = lowered_program.digest_hex();
-            let setup_seed = imported_setup.is_none().then(|| {
-                setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-            });
+            let (setup_seed, used_seed_override, auto_ceremony_context) =
+                if imported_setup.is_some() {
+                    (None, false, None)
+                } else if let Some(seed) = setup_seed_override() {
+                    (Some(seed), true, None)
+                } else {
+                    match auto_ceremony_context(program, &program_digest) {
+                        Ok(context) => (Some(context.seed), true, Some(context)),
+                        Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
+                    }
+                };
             if trace_arkworks_compile_enabled() {
                 eprintln!(
                     "[arkworks-groth16-compile] program={} signals={} constraints={} imported_setup={} seed_present={}",
@@ -625,6 +940,18 @@ impl BackendEngine for ArkworksGroth16Backend {
                     .map_err(|err| ZkfError::Serialization(err.to_string()))?;
                 pack_setup_blob(&pk_bytes, &vk_bytes)?
             };
+            let auto_ceremony_report_sha256 = auto_ceremony_context
+                .as_ref()
+                .map(|context| {
+                    write_auto_ceremony_report(
+                        context,
+                        program,
+                        &program_digest,
+                        &setup_blob,
+                        streamed_setup.as_ref(),
+                    )
+                })
+                .transpose()?;
 
             let mut compiled =
                 build_audited_compiled_program(self.kind(), program, lowered_program)?;
@@ -647,6 +974,9 @@ impl BackendEngine for ArkworksGroth16Backend {
                 imported_setup.as_ref().map(|setup| setup.path.as_str()),
                 setup_seed,
                 used_seed_override,
+                auto_ceremony_context
+                    .as_ref()
+                    .zip(auto_ceremony_report_sha256.as_deref()),
             );
             annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
             attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -720,6 +1050,7 @@ impl BackendEngine for ArkworksGroth16Backend {
             metadata.insert("curve".to_string(), "bn254".to_string());
             metadata.insert("scheme".to_string(), "groth16".to_string());
             annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+            propagate_setup_metadata_to_proof(compiled, &mut metadata);
             append_groth16_metal_metadata(&mut metadata, msm_dispatch);
             append_backend_runtime_metadata(&mut metadata, self.kind());
 
@@ -828,11 +1159,17 @@ impl BackendEngine for ArkworksGroth16Backend {
         // Build Groth16 setup directly from ZIR-lowered R1CS constraints
         // instead of re-lowering from v2.
         let imported_setup = imported_setup_blob_for_program(&v2_raw)?;
-        let used_seed_override = setup_seed_override().is_some();
         let program_digest = v2.digest_hex();
-        let setup_seed = imported_setup.is_none().then(|| {
-            setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-        });
+        let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some() {
+            (None, false, None)
+        } else if let Some(seed) = setup_seed_override() {
+            (Some(seed), true, None)
+        } else {
+            match auto_ceremony_context(&v2_raw, &program_digest) {
+                Ok(context) => (Some(context.seed), true, Some(context)),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
+            }
+        };
         let setup_blob = if let Some(imported_setup) = imported_setup.as_ref() {
             imported_setup.blob.clone()
         } else {
@@ -851,6 +1188,12 @@ impl BackendEngine for ArkworksGroth16Backend {
                 .map_err(|err| ZkfError::Serialization(err.to_string()))?;
             pack_setup_blob(&pk_bytes, &vk_bytes)?
         };
+        let auto_ceremony_report_sha256 = auto_ceremony_context
+            .as_ref()
+            .map(|context| {
+                write_auto_ceremony_report(context, &v2_raw, &program_digest, &setup_blob, None)
+            })
+            .transpose()?;
 
         let mut compiled = build_audited_compiled_program(self.kind(), &v2_raw, v2)?;
         compiled.compiled_data = Some(setup_blob);
@@ -869,6 +1212,9 @@ impl BackendEngine for ArkworksGroth16Backend {
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
+            auto_ceremony_context
+                .as_ref()
+                .zip(auto_ceremony_report_sha256.as_deref()),
         );
         compiled.metadata.insert(
             "zir_r1cs_constraints".to_string(),
@@ -941,6 +1287,7 @@ impl BackendEngine for ArkworksGroth16Backend {
         metadata.insert("curve".to_string(), "bn254".to_string());
         metadata.insert("scheme".to_string(), "groth16".to_string());
         annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+        propagate_setup_metadata_to_proof(compiled, &mut metadata);
         metadata.insert("zir_native_prove".to_string(), "true".to_string());
         append_groth16_metal_metadata(&mut metadata, msm_dispatch);
         append_backend_runtime_metadata(&mut metadata, self.kind());
@@ -985,11 +1332,17 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
         let lowered = lower_program_for_backend(program, BackendKind::ArkworksGroth16)?;
         let lowered_program = lowered.program.clone();
         let imported_setup = imported_setup_blob_for_program(program)?;
-        let used_seed_override = setup_seed_override().is_some();
         let program_digest = lowered_program.digest_hex();
-        let setup_seed = imported_setup.is_none().then(|| {
-            setup_seed_override().unwrap_or_else(|| deterministic_setup_seed(&program_digest))
-        });
+        let (setup_seed, used_seed_override, auto_ceremony_context) = if imported_setup.is_some() {
+            (None, false, None)
+        } else if let Some(seed) = setup_seed_override() {
+            (Some(seed), true, None)
+        } else {
+            match auto_ceremony_context(program, &program_digest) {
+                Ok(context) => (Some(context.seed), true, Some(context)),
+                Err(_) => (Some(deterministic_setup_seed(&program_digest)), false, None),
+            }
+        };
         let streamed_setup = match (imported_setup.as_ref(), setup_seed) {
             (None, Some(seed)) => {
                 maybe_build_streamed_groth16_setup(&lowered_program, &program_digest, seed)?
@@ -1018,6 +1371,18 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
                 .map_err(|err| ZkfError::Serialization(err.to_string()))?;
             pack_setup_blob(&pk_bytes, &vk_bytes)?
         };
+        let auto_ceremony_report_sha256 = auto_ceremony_context
+            .as_ref()
+            .map(|context| {
+                write_auto_ceremony_report(
+                    context,
+                    program,
+                    &program_digest,
+                    &setup_blob,
+                    streamed_setup.as_ref(),
+                )
+            })
+            .transpose()?;
 
         let mut compiled = CompiledProgram::new(BackendKind::ArkworksGroth16, lowered_program);
         if program.digest_hex() != compiled.program_digest {
@@ -1039,6 +1404,9 @@ pub fn compile_arkworks_unchecked(program: &Program) -> ZkfResult<CompiledProgra
             imported_setup.as_ref().map(|setup| setup.path.as_str()),
             setup_seed,
             used_seed_override,
+            auto_ceremony_context
+                .as_ref()
+                .zip(auto_ceremony_report_sha256.as_deref()),
         );
         annotate_streamed_setup_metadata(&mut compiled, streamed_setup.as_ref());
         attach_r1cs_lowering_metadata(&mut compiled, &lowered);
@@ -1158,6 +1526,7 @@ pub fn compile_and_prove_arkworks_unchecked_for_test_fixture(
         metadata.insert("curve".to_string(), "bn254".to_string());
         metadata.insert("scheme".to_string(), "groth16".to_string());
         annotate_proof_metadata(&mut metadata, proof_seed_source, proof_seed);
+        propagate_setup_metadata_to_proof(&compiled, &mut metadata);
         append_groth16_metal_metadata(&mut metadata, msm_dispatch);
         append_backend_runtime_metadata(&mut metadata, BackendKind::ArkworksGroth16);
 
@@ -1216,8 +1585,12 @@ pub(crate) struct Groth16MsmDispatch {
     used_metal: bool,
     metal_available: bool,
     saw_below_threshold: bool,
+    saw_unavailable: bool,
     saw_dispatch_failed: bool,
     dispatch_failure_detail: Option<String>,
+    segment_count: Option<usize>,
+    points_per_segment: Option<usize>,
+    segment_bucket_bytes: Option<usize>,
     total_msm_invocations: usize,
     eligible_msm_invocations: usize,
     metal_msm_invocations: usize,
@@ -1234,9 +1607,19 @@ impl Groth16MsmDispatch {
         self.used_metal |= other.used_metal;
         self.metal_available |= other.metal_available;
         self.saw_below_threshold |= other.saw_below_threshold;
+        self.saw_unavailable |= other.saw_unavailable;
         self.saw_dispatch_failed |= other.saw_dispatch_failed;
         if self.dispatch_failure_detail.is_none() {
             self.dispatch_failure_detail = other.dispatch_failure_detail;
+        }
+        if self.segment_count.is_none() {
+            self.segment_count = other.segment_count;
+        }
+        if self.points_per_segment.is_none() {
+            self.points_per_segment = other.points_per_segment;
+        }
+        if self.segment_bucket_bytes.is_none() {
+            self.segment_bucket_bytes = other.segment_bucket_bytes;
         }
         self.total_msm_invocations += other.total_msm_invocations;
         self.eligible_msm_invocations += other.eligible_msm_invocations;
@@ -1259,6 +1642,7 @@ impl Groth16MsmDispatch {
 
     fn no_cpu_fallback(&self) -> bool {
         self.used_metal
+            && !self.saw_unavailable
             && !self.saw_dispatch_failed
             && self.eligible_msm_invocations > 0
             && self.eligible_msm_invocations == self.metal_msm_invocations
@@ -1274,12 +1658,15 @@ impl Groth16MsmDispatch {
     }
 
     fn fallback_reason(&self) -> Option<&'static str> {
-        if !self.metal_available {
-            Some("metal-unavailable")
-        } else if self.eligible_msm_invocations == 0 && self.total_msm_invocations > 0 {
-            Some("below-threshold")
-        } else if self.saw_dispatch_failed {
+        if self.saw_dispatch_failed {
             Some("metal-dispatch-failed")
+        } else if self.saw_unavailable || !self.metal_available {
+            Some("metal-unavailable")
+        } else if self.saw_below_threshold
+            && self.eligible_msm_invocations == 0
+            && self.total_msm_invocations > 0
+        {
+            Some("below-threshold")
         } else if self.eligible_msm_invocations > self.metal_msm_invocations || !self.used_metal {
             Some("cpu-selected")
         } else {
@@ -1330,6 +1717,29 @@ impl Groth16MsmDispatch {
             "cpu-only"
         }
     }
+}
+
+#[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+struct Bn254MetalMsmTelemetry {
+    segment_count: usize,
+    points_per_segment: usize,
+    segment_bucket_bytes: usize,
+}
+
+#[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
+#[derive(Debug)]
+enum Bn254MetalMsmDispatch {
+    Metal {
+        projective: G1Projective,
+        telemetry: Bn254MetalMsmTelemetry,
+    },
+    BelowThreshold,
+    Unavailable,
+    DispatchFailed {
+        detail: String,
+        telemetry: Option<Bn254MetalMsmTelemetry>,
+    },
 }
 
 #[cfg_attr(not(all(target_os = "macos", feature = "metal-gpu")), allow(dead_code))]
@@ -4072,6 +4482,13 @@ fn parallel_msm_job_count<const N: usize>(job_sizes: [usize; N]) -> ZkfResult<us
         .count())
 }
 
+fn groth16_metal_no_cpu_fallback_enabled() -> bool {
+    matches!(
+        std::env::var("ZKF_GROTH16_METAL_NO_CPU_FALLBACK").as_deref(),
+        Ok("1") | Ok("true") | Ok("TRUE") | Ok("yes") | Ok("YES") | Ok("on") | Ok("ON")
+    )
+}
+
 fn msm_g1_bigint(
     query: &[G1Affine],
     assignment: &[ScalarBigInt],
@@ -4083,83 +4500,104 @@ fn msm_g1_bigint(
     if size == 0 {
         return Ok(G1Projective::zero());
     }
-    let dispatch_plan = {
+    let (accelerator_name, min_batch_size, metal_available) = {
         let registry = accelerator_registry()
             .lock()
             .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
-        _msm_dispatch.metal_available = registry
+        let metal_available = registry
             .msm_accelerators()
             .iter()
             .any(|acc| acc.is_available() && acc.name().starts_with("metal-"));
         let accelerator = registry.best_msm();
-        let accelerator_name = accelerator.name().to_string();
-        let min_batch_size = accelerator.min_batch_size();
-        if accelerator_name.starts_with("metal-") && size < min_batch_size {
-            _msm_dispatch.saw_below_threshold = true;
-            None
-        } else if accelerator_name.starts_with("metal-") {
-            _msm_dispatch.eligible_msm_invocations += 1;
-            Some((accelerator_name, min_batch_size))
-        } else {
-            None
-        }
+        (
+            accelerator.name().to_string(),
+            accelerator.min_batch_size(),
+            metal_available,
+        )
     };
+    _msm_dispatch.metal_available = metal_available;
+    let no_cpu_fallback = groth16_metal_no_cpu_fallback_enabled();
 
-    if let Some((accelerator_name, min_batch_size)) = dispatch_plan {
-        let result = if accelerator_name.starts_with("metal-") {
-            dispatch_metal_msm_affine(&query[..size], &assignment[..size])
-        } else {
-            let scalars = assignment[..size]
-                .iter()
-                .map(|scalar| FieldElement::from_le_bytes(&scalar.to_bytes_le()))
-                .collect::<Vec<_>>();
-            let bases = query[..size]
-                .iter()
-                .map(|base| {
-                    let mut bytes = Vec::new();
-                    base.serialize_compressed(&mut bytes)
-                        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
-                    Ok(bytes)
-                })
-                .collect::<ZkfResult<Vec<_>>>()?;
-            let registry = accelerator_registry()
-                .lock()
-                .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
-            let accelerator = registry.best_msm();
-            if size < min_batch_size {
-                return Ok(G1Projective::msm_bigint(
-                    &query[..size],
-                    &assignment[..size],
-                ));
+    if accelerator_name.starts_with("metal-") {
+        match dispatch_metal_msm_affine(&query[..size], &assignment[..size]) {
+            Bn254MetalMsmDispatch::Metal {
+                projective,
+                telemetry,
+            } => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.eligible_msm_invocations += 1;
+                _msm_dispatch.used_metal = true;
+                _msm_dispatch.metal_msm_invocations += 1;
+                _msm_dispatch.segment_count = Some(telemetry.segment_count);
+                _msm_dispatch.points_per_segment = Some(telemetry.points_per_segment);
+                _msm_dispatch.segment_bucket_bytes = Some(telemetry.segment_bucket_bytes);
+                return Ok(projective);
             }
-            accelerator.msm_g1(&scalars, &bases).and_then(|bytes| {
-                let affine = G1Affine::deserialize_compressed(bytes.as_slice())
-                    .map_err(|err| ZkfError::Backend(format!("invalid MSM result: {err}")))?;
-                Ok(affine.into_group())
-            })
-        };
-        match result {
-            Ok(projective) => {
-                let affine = projective.into_affine();
-                if affine.is_on_curve() && affine.is_in_correct_subgroup_assuming_on_curve() {
-                    _msm_dispatch.used_metal = accelerator_name.starts_with("metal-");
-                    if accelerator_name.starts_with("metal-") {
-                        _msm_dispatch.metal_msm_invocations += 1;
-                    }
-                    return Ok(affine.into_group());
-                }
-                if accelerator_name.starts_with("metal-") {
-                    _msm_dispatch.saw_dispatch_failed = true;
-                    _msm_dispatch.dispatch_failure_detail =
-                        Some("metal MSM produced an invalid BN254 point".to_string());
+            Bn254MetalMsmDispatch::BelowThreshold => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.saw_below_threshold = true;
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(format!(
+                        "Groth16 MSM requires the certified Metal path, but the batch of {size} points fell below the Metal threshold"
+                    )));
                 }
             }
-            Err(err) if accelerator_name.starts_with("metal-") => {
+            Bn254MetalMsmDispatch::Unavailable => {
+                _msm_dispatch.saw_unavailable = true;
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(
+                        "Groth16 MSM requires the certified Metal path, but Metal MSM is unavailable on this host".to_string(),
+                    ));
+                }
+            }
+            Bn254MetalMsmDispatch::DispatchFailed { detail, telemetry } => {
+                _msm_dispatch.metal_available = true;
+                _msm_dispatch.eligible_msm_invocations += 1;
                 _msm_dispatch.saw_dispatch_failed = true;
-                _msm_dispatch.dispatch_failure_detail = Some(err.to_string());
+                if let Some(telemetry) = telemetry {
+                    _msm_dispatch.segment_count = Some(telemetry.segment_count);
+                    _msm_dispatch.points_per_segment = Some(telemetry.points_per_segment);
+                    _msm_dispatch.segment_bucket_bytes = Some(telemetry.segment_bucket_bytes);
+                }
+                if _msm_dispatch.dispatch_failure_detail.is_none() {
+                    _msm_dispatch.dispatch_failure_detail = Some(detail.clone());
+                }
+                if no_cpu_fallback {
+                    return Err(ZkfError::Backend(format!(
+                        "Groth16 MSM requires the certified Metal path, but Metal dispatch failed: {detail}"
+                    )));
+                }
             }
-            Err(err) => return Err(err),
         }
+    } else {
+        let scalars = assignment[..size]
+            .iter()
+            .map(|scalar| FieldElement::from_le_bytes(&scalar.to_bytes_le()))
+            .collect::<Vec<_>>();
+        let bases = query[..size]
+            .iter()
+            .map(|base| {
+                let mut bytes = Vec::new();
+                base.serialize_compressed(&mut bytes)
+                    .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+                Ok(bytes)
+            })
+            .collect::<ZkfResult<Vec<_>>>()?;
+        let registry = accelerator_registry()
+            .lock()
+            .map_err(|_| ZkfError::Backend("accelerator registry lock poisoned".to_string()))?;
+        let accelerator = registry.best_msm();
+        if size < min_batch_size {
+            return Ok(G1Projective::msm_bigint(
+                &query[..size],
+                &assignment[..size],
+            ));
+        }
+        return accelerator.msm_g1(&scalars, &bases).and_then(|bytes| {
+            let affine = G1Affine::deserialize_compressed(bytes.as_slice())
+                .map_err(|err| ZkfError::Backend(format!("invalid MSM result: {err}")))?;
+            Ok(affine.into_group())
+        });
     }
 
     Ok(G1Projective::msm_bigint(
@@ -4172,13 +4610,14 @@ fn msm_g1_bigint(
 fn dispatch_metal_msm_affine(
     bases: &[G1Affine],
     assignment: &[ScalarBigInt],
-) -> ZkfResult<G1Projective> {
+) -> Bn254MetalMsmDispatch {
     use ark_bn254::Fr;
     use ark_ec::CurveGroup;
     use ark_ff::PrimeField;
 
-    let ctx = zkf_metal::global_context()
-        .ok_or_else(|| ZkfError::Backend("metal MSM accelerator became unavailable".to_string()))?;
+    let Some(ctx) = zkf_metal::global_context() else {
+        return Bn254MetalMsmDispatch::Unavailable;
+    };
     let scalars = assignment
         .iter()
         .map(|scalar| Fr::from_le_bytes_mod_order(&scalar.to_bytes_le()))
@@ -4193,32 +4632,53 @@ fn dispatch_metal_msm_affine(
         }
     }
 
-    let mut failures = Vec::new();
-    if let Some(projective) = zkf_metal::msm::pippenger::metal_msm(ctx, &scalars, bases) {
-        match validate_projective("metal-msm-bn254", projective) {
-            Ok(valid) => return Ok(valid),
-            Err(reason) => failures.push(reason),
+    match zkf_metal::msm::pippenger::metal_msm_dispatch(ctx, &scalars, bases) {
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::Metal {
+            projective,
+            telemetry,
+        } => match validate_projective("metal-msm-bn254", projective) {
+            Ok(valid) => Bn254MetalMsmDispatch::Metal {
+                projective: valid,
+                telemetry: Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                },
+            },
+            Err(reason) => Bn254MetalMsmDispatch::DispatchFailed {
+                detail: reason,
+                telemetry: Some(Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                }),
+            },
+        },
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::BelowThreshold => {
+            Bn254MetalMsmDispatch::BelowThreshold
+        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::Unavailable => {
+            Bn254MetalMsmDispatch::Unavailable
+        }
+        zkf_metal::msm::pippenger::Bn254MsmDispatch::DispatchFailed { detail, telemetry } => {
+            Bn254MetalMsmDispatch::DispatchFailed {
+                detail,
+                telemetry: telemetry.map(|telemetry| Bn254MetalMsmTelemetry {
+                    segment_count: telemetry.segment_count,
+                    points_per_segment: telemetry.points_per_segment,
+                    segment_bucket_bytes: telemetry.segment_bucket_bytes,
+                }),
+            }
         }
     }
-
-    Err(ZkfError::Backend(if failures.is_empty() {
-        "metal MSM dispatch fell back".to_string()
-    } else {
-        format!(
-            "metal MSM dispatch failed after pure-GPU retries: {}",
-            failures.join("; ")
-        )
-    }))
 }
 
 #[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
 fn dispatch_metal_msm_affine(
     _bases: &[G1Affine],
     _assignment: &[ScalarBigInt],
-) -> ZkfResult<G1Projective> {
-    Err(ZkfError::Backend(
-        "metal MSM dispatch is unavailable in this build".to_string(),
-    ))
+) -> Bn254MetalMsmDispatch {
+    Bn254MetalMsmDispatch::Unavailable
 }
 
 pub(crate) fn append_groth16_metal_metadata(
@@ -4254,6 +4714,24 @@ pub(crate) fn append_groth16_metal_metadata(
     );
     if let Some(detail) = msm_dispatch.dispatch_failure_detail.clone() {
         metadata.insert("groth16_msm_dispatch_failure".to_string(), detail);
+    }
+    if let Some(segment_count) = msm_dispatch.segment_count {
+        metadata.insert(
+            "groth16_msm_segment_count".to_string(),
+            segment_count.to_string(),
+        );
+    }
+    if let Some(points_per_segment) = msm_dispatch.points_per_segment {
+        metadata.insert(
+            "groth16_msm_points_per_segment".to_string(),
+            points_per_segment.to_string(),
+        );
+    }
+    if let Some(segment_bucket_bytes) = msm_dispatch.segment_bucket_bytes {
+        metadata.insert(
+            "groth16_msm_segment_bucket_bytes".to_string(),
+            segment_bucket_bytes.to_string(),
+        );
     }
     metadata.insert(
         "metal_gpu_busy_ratio".to_string(),
@@ -4692,6 +5170,17 @@ fn deterministic_setup_seed(program_digest: &str) -> [u8; 32] {
     seed
 }
 
+fn groth16_auto_ceremony_cache_dir() -> PathBuf {
+    std::env::var_os("ZKF_GROTH16_CEREMONY_CACHE_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            let home = std::env::var_os("HOME")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."));
+            home.join(".zkf").join("groth16-ceremony")
+        })
+}
+
 fn hex_seed(seed: &[u8; 32]) -> String {
     seed.iter().map(|byte| format!("{byte:02x}")).collect()
 }
@@ -4926,7 +5415,11 @@ mod tests {
         let stale_path = base.join(".shape.bin.tmp-999999-1-0");
         fs::write(&stale_path, b"stale").expect("stale temp");
         std::process::Command::new("touch")
-            .args(["-t", "200001010000", stale_path.to_str().expect("utf8 path")])
+            .args([
+                "-t",
+                "200001010000",
+                stale_path.to_str().expect("utf8 path"),
+            ])
             .status()
             .expect("touch stale temp");
 
@@ -5079,10 +5572,14 @@ mod tests {
                 used_metal: true,
                 metal_available: true,
                 saw_below_threshold: false,
+                saw_unavailable: false,
                 saw_dispatch_failed: true,
                 dispatch_failure_detail: Some(
                     "metal MSM dispatch failed after pure-GPU retries".to_string(),
                 ),
+                segment_count: Some(46),
+                points_per_segment: Some(1_464_843),
+                segment_bucket_bytes: Some(144_703_488),
                 total_msm_invocations: 4,
                 eligible_msm_invocations: 4,
                 metal_msm_invocations: 1,
@@ -5119,6 +5616,68 @@ mod tests {
                 .map(String::as_str),
             Some("none")
         );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_segment_count")
+                .map(String::as_str),
+            Some("46")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_points_per_segment")
+                .map(String::as_str),
+            Some("1464843")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_segment_bucket_bytes")
+                .map(String::as_str),
+            Some("144703488")
+        );
+    }
+
+    #[test]
+    fn append_groth16_metal_metadata_marks_below_threshold_cpu_fallback() {
+        let mut metadata = BTreeMap::new();
+        append_groth16_metal_metadata(
+            &mut metadata,
+            Groth16MsmDispatch {
+                used_metal: false,
+                metal_available: true,
+                saw_below_threshold: true,
+                saw_unavailable: false,
+                saw_dispatch_failed: false,
+                dispatch_failure_detail: None,
+                segment_count: None,
+                points_per_segment: None,
+                segment_bucket_bytes: None,
+                total_msm_invocations: 4,
+                eligible_msm_invocations: 0,
+                metal_msm_invocations: 0,
+                max_inflight_jobs: 0,
+                counter_source: "sequential-msm-estimate",
+                witness_map_engine: "ark-libsnark-reduction",
+                witness_map_reason: "bn254-witness-map-cpu-engine",
+                witness_map_parallelism: 1,
+                stage_breakdown: BTreeMap::new(),
+            },
+        );
+
+        assert_eq!(
+            metadata.get("groth16_msm_engine").map(String::as_str),
+            Some("cpu-bn254-msm")
+        );
+        assert_eq!(
+            metadata.get("groth16_msm_reason").map(String::as_str),
+            Some("below-threshold")
+        );
+        assert_eq!(
+            metadata
+                .get("groth16_msm_fallback_state")
+                .map(String::as_str),
+            Some("cpu-only")
+        );
+        assert!(!metadata.contains_key("groth16_msm_dispatch_failure"));
     }
 
     #[test]
@@ -5127,8 +5686,12 @@ mod tests {
             used_metal: true,
             metal_available: true,
             saw_below_threshold: true,
+            saw_unavailable: false,
             saw_dispatch_failed: false,
             dispatch_failure_detail: None,
+            segment_count: Some(4),
+            points_per_segment: Some(256),
+            segment_bucket_bytes: Some(393_216),
             total_msm_invocations: 4,
             eligible_msm_invocations: 3,
             metal_msm_invocations: 3,

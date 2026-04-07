@@ -333,6 +333,20 @@ fn msm_bucket_acc_arguments(map_name: &str) -> Vec<ExpectedArgument> {
     ]
 }
 
+fn msm_bucket_acc_segmented_arguments() -> Vec<ExpectedArgument> {
+    vec![
+        ro_buffer("bases_x", 0),
+        ro_buffer("bases_y", 1),
+        ro_buffer("point_bucket_map", 2),
+        rw_buffer("bucket_results", 3),
+        ro_buffer("n_points", 4),
+        ro_buffer("c", 5),
+        ro_buffer("num_windows", 6),
+        ro_buffer("point_start", 7),
+        ro_buffer("segment_point_count", 8),
+    ]
+}
+
 fn msm_bucket_acc_naf_arguments() -> Vec<ExpectedArgument> {
     vec![
         ro_buffer("bases_x", 0),
@@ -352,6 +366,16 @@ fn msm_reduce_arguments() -> Vec<ExpectedArgument> {
         rw_buffer("window_results", 1),
         ro_buffer("num_buckets", 2),
         ro_buffer("num_windows", 3),
+    ]
+}
+
+fn msm_segment_reduce_arguments() -> Vec<ExpectedArgument> {
+    vec![
+        ro_buffer("segment_bucket_data", 0),
+        rw_buffer("bucket_results", 1),
+        ro_buffer("num_segments", 2),
+        ro_buffer("num_buckets", 3),
+        ro_buffer("num_windows", 4),
     ]
 }
 
@@ -447,7 +471,11 @@ fn expected_arguments(library_id: &str, entrypoint: &str) -> Option<Vec<Expected
         ("bn254_msm_library", "msm_bucket_acc") => {
             Some(msm_bucket_acc_arguments("point_bucket_map"))
         }
+        ("bn254_msm_library", "msm_bucket_acc_segmented") => {
+            Some(msm_bucket_acc_segmented_arguments())
+        }
         ("bn254_msm_library", "msm_bucket_acc_simd") => Some(msm_bucket_acc_simd_arguments()),
+        ("bn254_msm_library", "msm_bucket_segment_reduce") => Some(msm_segment_reduce_arguments()),
         ("bn254_msm_library", "msm_bucket_reduce") => Some(msm_reduce_arguments()),
         ("bn254_msm_library", "msm_window_combine") => Some(msm_combine_arguments()),
         ("bn254_msm_library", "msm_sort_count") => Some(msm_sort_count_arguments(
@@ -701,7 +729,9 @@ mod tests {
             ("main_library", "constraint_eval_goldilocks"),
             ("bn254_msm_library", "msm_bucket_assign"),
             ("bn254_msm_library", "msm_bucket_acc"),
+            ("bn254_msm_library", "msm_bucket_acc_segmented"),
             ("bn254_msm_library", "msm_bucket_acc_simd"),
+            ("bn254_msm_library", "msm_bucket_segment_reduce"),
             ("bn254_msm_library", "msm_bucket_reduce"),
             ("bn254_msm_library", "msm_window_combine"),
             ("bn254_msm_library", "msm_sort_count"),

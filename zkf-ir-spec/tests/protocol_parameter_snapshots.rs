@@ -100,6 +100,34 @@ fn protocol_parameter_snapshots_match_live_repo_state() {
         "security_boundary": "trusted-imported",
         "development_boundary": "development-only",
         "setup_provenance": "trusted-imported-blob",
+        "setup_reporting_contracts": [
+            {
+                "when_setup_provenance": "trusted-imported-blob",
+                "required_compiled_metadata": [
+                    "groth16_setup_blob_path",
+                ],
+                "required_proof_metadata": [],
+            },
+            {
+                "when_setup_provenance": "auto-ceremony-cached-entropy",
+                "required_compiled_metadata": [
+                    "groth16_ceremony_subsystem",
+                    "groth16_ceremony_id",
+                    "groth16_ceremony_kind",
+                    "groth16_ceremony_report_path",
+                    "groth16_ceremony_report_sha256",
+                    "groth16_ceremony_seed_commitment_sha256",
+                ],
+                "required_proof_metadata": [
+                    "groth16_ceremony_subsystem",
+                    "groth16_ceremony_id",
+                    "groth16_ceremony_kind",
+                    "groth16_ceremony_report_path",
+                    "groth16_ceremony_report_sha256",
+                    "groth16_ceremony_seed_commitment_sha256",
+                ],
+            },
+        ],
         "required_compiled_metadata": [
             "curve",
             "scheme",

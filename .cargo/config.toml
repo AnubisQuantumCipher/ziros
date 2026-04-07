@@ -9,7 +9,7 @@ target-dir = "target-public"
 RUST_TEST_THREADS = "1"
 MallocSpaceEfficient = "1"
 MallocMaxMagazines = "1"
-MACOSX_DEPLOYMENT_TARGET = "26.2"
+MACOSX_DEPLOYMENT_TARGET = "15.0"
 
 [target.wasm32-unknown-unknown]
 rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]

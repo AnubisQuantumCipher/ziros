@@ -21,9 +21,14 @@ use num_bigint::BigInt;
 use once_cell::sync::Lazy;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashMap};
+use std::fs::{self, File, OpenOptions};
+use std::io::{BufReader, Cursor, Read, Write};
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zkf_core::{
     BackendCapabilities, BackendKind, BackendMode, CompiledProgram, Constraint, Expr, FieldElement,
     FieldId, Program, ProofArtifact, Signal, Visibility, Witness, ZkfError, ZkfResult,
@@ -33,6 +38,12 @@ use zkf_core::{
 const HALO2_BLS_SETUP_BLOB_PARAMS_VERSION: u8 = 2;
 const HALO2_BLS_SETUP_BLOB_K_VERSION: u8 = 3;
 const HALO2_BLS_MAX_RANGE_BITS: u32 = 16;
+const HALO2_BLS_PARAMS_CACHE_VERSION: &str = "v3";
+const HALO2_BLS_SETUP_CACHE_VERSION: &str = "v1";
+const HALO2_BLS_SETUP_CACHE_BUNDLE_SCHEMA: &str = "zkf-halo2-bls-setup-cache-v1";
+const HALO2_BLS_SETUP_PK_CACHE_FORMAT: &str = "raw-bytes-unchecked-v1";
+const HALO2_BLS_SETUP_CACHE_MAGIC: &[u8] = b"ZKFH2BLS01\n";
+const HALO2_BLS_ATOMIC_TEMP_STALE_AGE: Duration = Duration::from_secs(24 * 60 * 60);
 
 /// Halo2 backend targeting BLS12-381 with KZG polynomial commitment.
 ///
@@ -46,6 +57,16 @@ struct Halo2BlsSetupBundle {
     pk: halo2_proofs_pse::plonk::ProvingKey<G1Affine>,
     vk: halo2_proofs_pse::plonk::VerifyingKey<G1Affine>,
     vk_fingerprint: Vec<u8>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct Halo2BlsSetupCacheManifest {
+    bundle_schema: String,
+    setup_program_digest: String,
+    k: u32,
+    params_cache_version: String,
+    pk_cache_format: String,
+    vk_fingerprint_hex: String,
 }
 
 static HALO2_BLS_SETUP_CACHE: Lazy<Mutex<BoundedStringCache<Arc<Halo2BlsSetupBundle>>>> =
@@ -900,9 +921,427 @@ fn derive_setup_seed(k: u32) -> [u8; 32] {
     seed
 }
 
-fn cache_insert(program_digest: String, bundle: Arc<Halo2BlsSetupBundle>) {
+fn default_halo2_bls_params_cache_base_root() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".zkf").join("cache"))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
+fn halo2_bls_cache_base_root() -> PathBuf {
+    std::env::var_os("ZKF_CACHE_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(default_halo2_bls_params_cache_base_root)
+        .join("halo2-bls12-381")
+}
+
+fn halo2_bls_params_cache_root() -> PathBuf {
+    halo2_bls_cache_base_root()
+        .join("params")
+        .join(HALO2_BLS_PARAMS_CACHE_VERSION)
+}
+
+fn halo2_bls_params_cache_path(k: u32) -> PathBuf {
+    halo2_bls_params_cache_root().join(format!("k-{k}.bin"))
+}
+
+fn halo2_bls_setup_cache_root() -> PathBuf {
+    halo2_bls_cache_base_root()
+        .join("setup")
+        .join(HALO2_BLS_SETUP_CACHE_VERSION)
+        .join(format!("params-{HALO2_BLS_PARAMS_CACHE_VERSION}"))
+}
+
+fn cleanup_stale_atomic_temp_siblings(path: &Path) {
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    let file_name = match path.file_name().and_then(|name| name.to_str()) {
+        Some(name) => name,
+        None => return,
+    };
+    let prefix = format!(".{file_name}.tmp-");
+    let baseline_modified = fs::metadata(path)
+        .and_then(|metadata| metadata.modified())
+        .ok();
+    let now = SystemTime::now();
+    let entries = match fs::read_dir(parent) {
+        Ok(entries) => entries,
+        Err(_) => return,
+    };
+
+    for entry in entries.flatten() {
+        let entry_name = entry.file_name();
+        let entry_name = entry_name.to_string_lossy();
+        if !entry_name.starts_with(&prefix) {
+            continue;
+        }
+        let entry_modified = entry
+            .metadata()
+            .and_then(|metadata| metadata.modified())
+            .ok();
+        let should_remove = if let Some(baseline) = baseline_modified {
+            entry_modified
+                .map(|modified| modified <= baseline)
+                .unwrap_or(false)
+        } else {
+            entry_modified
+                .and_then(|modified| now.duration_since(modified).ok())
+                .map(|age| age >= HALO2_BLS_ATOMIC_TEMP_STALE_AGE)
+                .unwrap_or(false)
+        };
+        if should_remove {
+            let _ = fs::remove_file(entry.path());
+        }
+    }
+}
+
+fn write_file_atomic<F>(path: &Path, write_fn: F) -> ZkfResult<()>
+where
+    F: FnOnce(&mut File) -> ZkfResult<()>,
+{
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    fs::create_dir_all(parent).map_err(|err| {
+        ZkfError::Backend(format!(
+            "Failed to create cache dir {}: {err}",
+            parent.display()
+        ))
+    })?;
+    cleanup_stale_atomic_temp_siblings(path);
+
+    let file_name = path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("cache.bin");
+    let pid = std::process::id();
+
+    for attempt in 0..16 {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_err(|err| {
+                ZkfError::Backend(format!("Failed to get clock time for cache write: {err}"))
+            })?
+            .as_nanos();
+        let temp_path = parent.join(format!(".{file_name}.tmp-{pid}-{nanos}-{attempt}"));
+        match OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&temp_path)
+        {
+            Ok(mut file) => {
+                if let Err(err) = write_fn(&mut file) {
+                    let _ = fs::remove_file(&temp_path);
+                    return Err(err);
+                }
+                if let Err(err) = file.sync_all() {
+                    let _ = fs::remove_file(&temp_path);
+                    return Err(ZkfError::Backend(format!(
+                        "Failed to sync cache file {}: {err}",
+                        temp_path.display()
+                    )));
+                }
+                drop(file);
+                if let Err(err) = fs::rename(&temp_path, path) {
+                    let _ = fs::remove_file(&temp_path);
+                    return Err(ZkfError::Backend(format!(
+                        "Failed to atomically replace cache file {}: {err}",
+                        path.display()
+                    )));
+                }
+                if let Ok(dir) = File::open(parent) {
+                    let _ = dir.sync_all();
+                }
+                cleanup_stale_atomic_temp_siblings(path);
+                return Ok(());
+            }
+            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(err) => {
+                return Err(ZkfError::Backend(format!(
+                    "Failed to create temporary cache file {}: {err}",
+                    temp_path.display()
+                )));
+            }
+        }
+    }
+
+    Err(ZkfError::Backend(format!(
+        "Failed to create temporary cache file for atomic write: {}",
+        path.display()
+    )))
+}
+
+fn deserialize_params(bytes: &[u8]) -> ZkfResult<ParamsKZG<Bls12381>> {
+    use halo2_proofs_pse::poly::commitment::Params as _;
+
+    let mut cursor = Cursor::new(bytes);
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        ParamsKZG::<Bls12381>::read(&mut cursor)
+    }))
+    .map_err(|_| ZkfError::InvalidArtifact("halo2-bls params reader panicked".to_string()))?
+    .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))
+}
+
+fn serialize_params(params: &ParamsKZG<Bls12381>) -> ZkfResult<Vec<u8>> {
+    use halo2_proofs_pse::poly::commitment::Params as _;
+
+    let mut params_bytes = Vec::new();
+    params
+        .write(&mut params_bytes)
+        .map_err(|err| ZkfError::Serialization(err.to_string()))?;
+    Ok(params_bytes)
+}
+
+fn load_params_from_disk_cache(k: u32) -> Option<Arc<ParamsKZG<Bls12381>>> {
+    let bytes = fs::read(halo2_bls_params_cache_path(k)).ok()?;
+    deserialize_params(&bytes).ok().map(Arc::new)
+}
+
+fn persist_params_to_disk_cache(k: u32, params: &ParamsKZG<Bls12381>) {
+    let path = halo2_bls_params_cache_path(k);
+    let _ = write_file_atomic(&path, |file| {
+        let params_bytes = serialize_params(params)?;
+        file.write_all(&params_bytes)
+            .map_err(|err| ZkfError::Backend(format!("Failed to write {}: {err}", path.display())))
+    });
+}
+
+fn compiled_setup_k(compiled: &CompiledProgram) -> ZkfResult<u32> {
+    if let Some(value) = compiled.metadata.get("k")
+        && let Ok(k) = value.parse::<u32>()
+    {
+        return Ok(k);
+    }
+
+    let blob = compiled
+        .compiled_data
+        .as_deref()
+        .ok_or(ZkfError::MissingCompiledData)?;
+    match blob.first().copied() {
+        Some(HALO2_BLS_SETUP_BLOB_K_VERSION) => unpack_k_blob(blob),
+        Some(HALO2_BLS_SETUP_BLOB_PARAMS_VERSION) => {
+            use halo2_proofs_pse::poly::commitment::Params as _;
+
+            Ok(load_params_from_blob(blob)?.k())
+        }
+        Some(version) => Err(ZkfError::InvalidArtifact(format!(
+            "unsupported halo2-bls setup blob version {}",
+            version
+        ))),
+        None => Err(ZkfError::InvalidArtifact(
+            "empty halo2-bls setup blob".to_string(),
+        )),
+    }
+}
+
+fn setup_cache_program_digest(compiled: &CompiledProgram) -> ZkfResult<String> {
+    let mut program = compiled.program.clone();
+    // Frontend metadata can include temp paths and other import-local details.
+    // The proving setup depends on the circuit shape, not those frontend paths.
+    program.metadata.clear();
+    program.try_digest_hex()
+}
+
+fn halo2_bls_setup_cache_key(compiled: &CompiledProgram) -> ZkfResult<String> {
+    let setup_program_digest = setup_cache_program_digest(compiled)?;
+    let k = compiled_setup_k(compiled)?;
+    Ok(format!(
+        "{}:k-{k}:params-{}:setup-{}",
+        setup_program_digest, HALO2_BLS_PARAMS_CACHE_VERSION, HALO2_BLS_SETUP_CACHE_VERSION
+    ))
+}
+
+fn halo2_bls_setup_cache_path(compiled: &CompiledProgram) -> ZkfResult<PathBuf> {
+    let setup_program_digest = setup_cache_program_digest(compiled)?;
+    let k = compiled_setup_k(compiled)?;
+    Ok(halo2_bls_setup_cache_root()
+        .join(setup_program_digest)
+        .join(format!("k-{k}.bin")))
+}
+
+fn encode_hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+fn read_setup_cache_manifest<R: Read>(reader: &mut R) -> ZkfResult<Halo2BlsSetupCacheManifest> {
+    let mut magic = vec![0u8; HALO2_BLS_SETUP_CACHE_MAGIC.len()];
+    reader
+        .read_exact(&mut magic)
+        .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
+    if magic.as_slice() != HALO2_BLS_SETUP_CACHE_MAGIC {
+        return Err(ZkfError::InvalidArtifact(
+            "unsupported halo2-bls setup cache header".to_string(),
+        ));
+    }
+
+    let mut len_bytes = [0u8; 8];
+    reader
+        .read_exact(&mut len_bytes)
+        .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
+    let manifest_len = usize::try_from(u64::from_le_bytes(len_bytes))
+        .map_err(|_| ZkfError::InvalidArtifact("halo2-bls setup manifest too large".to_string()))?;
+    let mut manifest_bytes = vec![0u8; manifest_len];
+    reader
+        .read_exact(&mut manifest_bytes)
+        .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
+    serde_json::from_slice(&manifest_bytes).map_err(|err| {
+        ZkfError::InvalidArtifact(format!("invalid halo2-bls setup manifest: {err}"))
+    })
+}
+
+fn setup_cache_manifest_matches(
+    compiled: &CompiledProgram,
+    manifest: &Halo2BlsSetupCacheManifest,
+) -> ZkfResult<bool> {
+    Ok(
+        manifest.bundle_schema == HALO2_BLS_SETUP_CACHE_BUNDLE_SCHEMA
+            && manifest.setup_program_digest == setup_cache_program_digest(compiled)?
+            && manifest.k == compiled_setup_k(compiled)?
+            && manifest.params_cache_version == HALO2_BLS_PARAMS_CACHE_VERSION
+            && manifest.pk_cache_format == HALO2_BLS_SETUP_PK_CACHE_FORMAT,
+    )
+}
+
+fn invalidate_setup_disk_cache(path: &Path) {
+    let _ = fs::remove_file(path);
+}
+
+fn load_setup_from_disk_cache(compiled: &CompiledProgram) -> Option<Arc<Halo2BlsSetupBundle>> {
+    let path = halo2_bls_setup_cache_path(compiled).ok()?;
+    let file = match File::open(&path) {
+        Ok(file) => file,
+        Err(_) => return None,
+    };
+    let mut reader = BufReader::new(file);
+    let manifest = match read_setup_cache_manifest(&mut reader) {
+        Ok(manifest) => manifest,
+        Err(_) => {
+            invalidate_setup_disk_cache(&path);
+            return None;
+        }
+    };
+
+    match setup_cache_manifest_matches(compiled, &manifest) {
+        Ok(true) => {}
+        Ok(false) | Err(_) => {
+            invalidate_setup_disk_cache(&path);
+            return None;
+        }
+    }
+
+    let params = match compiled
+        .compiled_data
+        .as_deref()
+        .ok_or(ZkfError::MissingCompiledData)
+        .and_then(load_params_from_blob)
+    {
+        Ok(params) => params,
+        Err(_) => return None,
+    };
+    let circuit = match Halo2BlsCircuit::without_witness(compiled.program.clone()) {
+        Ok(circuit) => circuit,
+        Err(_) => return None,
+    };
+    let pk = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        halo2_proofs_pse::plonk::pk_read::<G1Affine, _, _>(
+            &mut reader,
+            SerdeFormat::RawBytesUnchecked,
+            manifest.k,
+            &circuit,
+            true,
+        )
+    })) {
+        Ok(Ok(pk)) => pk,
+        Ok(Err(_)) | Err(_) => {
+            invalidate_setup_disk_cache(&path);
+            return None;
+        }
+    };
+
+    if reader
+        .read(&mut [0u8; 1])
+        .ok()
+        .is_some_and(|count| count != 0)
+    {
+        invalidate_setup_disk_cache(&path);
+        return None;
+    }
+
+    let vk = pk.get_vk().clone();
+    let vk_fingerprint = vk_fingerprint(&vk);
+    if encode_hex(&vk_fingerprint) != manifest.vk_fingerprint_hex {
+        invalidate_setup_disk_cache(&path);
+        return None;
+    }
+
+    Some(Arc::new(Halo2BlsSetupBundle {
+        params,
+        pk,
+        vk,
+        vk_fingerprint,
+    }))
+}
+
+fn persist_setup_to_disk_cache(compiled: &CompiledProgram, bundle: &Halo2BlsSetupBundle) {
+    let path = match halo2_bls_setup_cache_path(compiled) {
+        Ok(path) => path,
+        Err(_) => return,
+    };
+    let k = match compiled_setup_k(compiled) {
+        Ok(k) => k,
+        Err(_) => return,
+    };
+    let setup_program_digest = match setup_cache_program_digest(compiled) {
+        Ok(digest) => digest,
+        Err(_) => return,
+    };
+    let manifest = Halo2BlsSetupCacheManifest {
+        bundle_schema: HALO2_BLS_SETUP_CACHE_BUNDLE_SCHEMA.to_string(),
+        setup_program_digest,
+        k,
+        params_cache_version: HALO2_BLS_PARAMS_CACHE_VERSION.to_string(),
+        pk_cache_format: HALO2_BLS_SETUP_PK_CACHE_FORMAT.to_string(),
+        vk_fingerprint_hex: encode_hex(&bundle.vk_fingerprint),
+    };
+    let path_for_err = path.clone();
+    let _ = write_file_atomic(&path, |file| {
+        let manifest_bytes = serde_json::to_vec(&manifest).map_err(|err| {
+            ZkfError::Serialization(format!(
+                "Failed to serialize halo2-bls setup cache manifest: {err}"
+            ))
+        })?;
+        file.write_all(HALO2_BLS_SETUP_CACHE_MAGIC).map_err(|err| {
+            ZkfError::Backend(format!(
+                "Failed to write halo2-bls setup cache header {}: {err}",
+                path_for_err.display()
+            ))
+        })?;
+        file.write_all(&(manifest_bytes.len() as u64).to_le_bytes())
+            .map_err(|err| {
+                ZkfError::Backend(format!(
+                    "Failed to write halo2-bls setup cache manifest length {}: {err}",
+                    path_for_err.display()
+                ))
+            })?;
+        file.write_all(&manifest_bytes).map_err(|err| {
+            ZkfError::Backend(format!(
+                "Failed to write halo2-bls setup cache manifest {}: {err}",
+                path_for_err.display()
+            ))
+        })?;
+        bundle
+            .pk
+            .write(file, SerdeFormat::RawBytesUnchecked)
+            .map_err(|err| {
+                ZkfError::Serialization(format!(
+                    "Failed to serialize halo2-bls setup cache {}: {err}",
+                    path_for_err.display()
+                ))
+            })?;
+        Ok(())
+    });
+}
+
+fn cache_insert(cache_key: String, bundle: Arc<Halo2BlsSetupBundle>) {
     if let Ok(mut cache) = HALO2_BLS_SETUP_CACHE.lock() {
-        cache.insert(program_digest, bundle);
+        cache.insert(cache_key, bundle);
     }
 }
 
@@ -917,9 +1356,15 @@ pub(crate) fn clear_test_setup_cache() {
 }
 
 fn get_or_build_setup(compiled: &CompiledProgram) -> ZkfResult<Arc<Halo2BlsSetupBundle>> {
+    let cache_key = halo2_bls_setup_cache_key(compiled)?;
     if let Ok(mut cache) = HALO2_BLS_SETUP_CACHE.lock()
-        && let Some(bundle) = cache.get_cloned(&compiled.program_digest)
+        && let Some(bundle) = cache.get_cloned(&cache_key)
     {
+        return Ok(bundle);
+    }
+
+    if let Some(bundle) = load_setup_from_disk_cache(compiled) {
+        cache_insert(cache_key, bundle.clone());
         return Ok(bundle);
     }
 
@@ -930,6 +1375,10 @@ fn get_or_build_setup(compiled: &CompiledProgram) -> ZkfResult<Arc<Halo2BlsSetup
     let params = load_params_from_blob(blob)?;
 
     let circuit = Halo2BlsCircuit::without_witness(compiled.program.clone())?;
+    eprintln!(
+        "halo2-bls12-381: generating proving setup for program {}; first run can take minutes",
+        compiled.program_digest
+    );
     let vk = halo2_proofs_pse::plonk::keygen_vk(params.as_ref(), &circuit)
         .map_err(|err| ZkfError::Backend(format!("halo2-bls keygen_vk failed: {err:?}")))?;
     let pk = halo2_proofs_pse::plonk::keygen_pk(params.as_ref(), vk.clone(), &circuit)
@@ -942,7 +1391,8 @@ fn get_or_build_setup(compiled: &CompiledProgram) -> ZkfResult<Arc<Halo2BlsSetup
         vk_fingerprint: vk_fingerprint(&vk),
     });
 
-    cache_insert(compiled.program_digest.clone(), bundle.clone());
+    persist_setup_to_disk_cache(compiled, bundle.as_ref());
+    cache_insert(cache_key, bundle.clone());
     Ok(bundle)
 }
 
@@ -954,9 +1404,20 @@ fn params_for_k(k: u32) -> Arc<ParamsKZG<Bls12381>> {
         return params;
     }
 
+    if let Some(params) = load_params_from_disk_cache(k) {
+        if let Ok(mut cache) = HALO2_BLS_PARAMS_CACHE.lock() {
+            cache.insert(key, params.clone());
+        }
+        return params;
+    }
+
+    eprintln!(
+        "halo2-bls12-381: generating deterministic KZG params for k={k}; first run can take minutes"
+    );
     let seed = derive_setup_seed(k);
     let mut rng = ChaCha20Rng::from_seed(seed);
     let params = Arc::new(ParamsKZG::<Bls12381>::setup(k, &mut rng));
+    persist_params_to_disk_cache(k, params.as_ref());
     if let Ok(mut cache) = HALO2_BLS_PARAMS_CACHE.lock() {
         cache.insert(key, params.clone());
     }
@@ -967,11 +1428,7 @@ fn load_params_from_blob(blob: &[u8]) -> ZkfResult<Arc<ParamsKZG<Bls12381>>> {
     match blob.first().copied() {
         Some(HALO2_BLS_SETUP_BLOB_PARAMS_VERSION) => {
             let params_bytes = unpack_legacy_params_blob(blob)?;
-            let mut cursor = std::io::Cursor::new(params_bytes.as_slice());
-            use halo2_proofs_pse::poly::commitment::Params as _;
-            let params = ParamsKZG::<Bls12381>::read(&mut cursor)
-                .map_err(|err| ZkfError::InvalidArtifact(err.to_string()))?;
-            Ok(Arc::new(params))
+            Ok(Arc::new(deserialize_params(params_bytes.as_slice())?))
         }
         Some(HALO2_BLS_SETUP_BLOB_K_VERSION) => Ok(params_for_k(unpack_k_blob(blob)?)),
         Some(version) => Err(ZkfError::InvalidArtifact(format!(
@@ -1004,12 +1461,7 @@ fn unpack_params_blob(blob: &[u8]) -> ZkfResult<Vec<u8>> {
         Some(HALO2_BLS_SETUP_BLOB_PARAMS_VERSION) => unpack_legacy_params_blob(blob),
         Some(HALO2_BLS_SETUP_BLOB_K_VERSION) => {
             let params = params_for_k(unpack_k_blob(blob)?);
-            let mut params_bytes = Vec::new();
-            use halo2_proofs_pse::poly::commitment::Params as _;
-            params
-                .write(&mut params_bytes)
-                .map_err(|err| ZkfError::Serialization(err.to_string()))?;
-            Ok(params_bytes)
+            serialize_params(params.as_ref())
         }
         Some(version) => Err(ZkfError::InvalidArtifact(format!(
             "unsupported halo2-bls setup blob version {}",
@@ -1095,6 +1547,8 @@ pub struct Halo2Bls12381Fr(Fr);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::ffi::OsString;
+    use std::sync::{Mutex, OnceLock};
 
     #[test]
     fn kind_returns_halo2_bls12381() {
@@ -1200,6 +1654,324 @@ mod tests {
             k < 18,
             "tiny range circuits should not reserve 16-bit tables"
         );
+    }
+
+    fn cache_root_test_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    struct EnvVarGuard {
+        key: &'static str,
+        previous: Option<OsString>,
+    }
+
+    impl EnvVarGuard {
+        fn set(key: &'static str, value: &str) -> Self {
+            let previous = std::env::var_os(key);
+            // Tests serialize env mutation behind a process-wide mutex.
+            unsafe {
+                std::env::set_var(key, value);
+            }
+            Self { key, previous }
+        }
+
+        fn remove(key: &'static str) -> Self {
+            let previous = std::env::var_os(key);
+            // Tests serialize env mutation behind a process-wide mutex.
+            unsafe {
+                std::env::remove_var(key);
+            }
+            Self { key, previous }
+        }
+    }
+
+    impl Drop for EnvVarGuard {
+        fn drop(&mut self) {
+            if let Some(previous) = self.previous.take() {
+                // Tests serialize env mutation behind a process-wide mutex.
+                unsafe {
+                    std::env::set_var(self.key, previous);
+                }
+            } else {
+                // Tests serialize env mutation behind a process-wide mutex.
+                unsafe {
+                    std::env::remove_var(self.key);
+                }
+            }
+        }
+    }
+
+    fn unique_temp_path(prefix: &str) -> PathBuf {
+        std::env::temp_dir().join(format!(
+            "{prefix}-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ))
+    }
+
+    fn serialize_cached_pk_bytes(pk: &halo2_proofs_pse::plonk::ProvingKey<G1Affine>) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        pk.write(&mut bytes, SerdeFormat::RawBytesUnchecked)
+            .expect("serialize proving key");
+        bytes
+    }
+
+    fn test_setup_compiled_program(k: u32) -> CompiledProgram {
+        let program = Program {
+            name: format!("bls_setup_cache_k_{k}"),
+            field: FieldId::Bls12_381,
+            signals: vec![Signal {
+                name: "x".to_string(),
+                visibility: Visibility::Public,
+                constant: None,
+                ty: None,
+            }],
+            constraints: vec![Constraint::Range {
+                signal: "x".to_string(),
+                bits: 1,
+                label: Some("range_1".to_string()),
+            }],
+            witness_plan: Default::default(),
+            ..Default::default()
+        };
+        let mut compiled = CompiledProgram::new(BackendKind::Halo2Bls12381, program);
+        compiled.compiled_data = Some(pack_params_blob(k));
+        compiled.metadata.insert("k".to_string(), k.to_string());
+        compiled
+    }
+
+    #[test]
+    fn setup_cache_program_digest_ignores_frontend_path_metadata() {
+        let mut first = test_setup_compiled_program(4);
+        first.program.metadata.insert(
+            "compact_zkir_path".to_string(),
+            "/tmp/run-a/compact-out/zkir/set.zkir".to_string(),
+        );
+        first.program.metadata.insert(
+            "compact_contract_info_path".to_string(),
+            "/tmp/run-a/compact-out/compiler/contract-info.json".to_string(),
+        );
+
+        let mut second = first.clone();
+        second.program.metadata.insert(
+            "compact_zkir_path".to_string(),
+            "/tmp/run-b/compact-out/zkir/set.zkir".to_string(),
+        );
+        second.program.metadata.insert(
+            "compact_contract_info_path".to_string(),
+            "/tmp/run-b/compact-out/compiler/contract-info.json".to_string(),
+        );
+
+        assert_ne!(
+            first.program.digest_hex(),
+            second.program.digest_hex(),
+            "raw program digest should still reflect differing frontend metadata"
+        );
+        assert_eq!(
+            setup_cache_program_digest(&first).expect("stable setup digest"),
+            setup_cache_program_digest(&second).expect("stable setup digest"),
+            "setup cache digest should ignore frontend path metadata"
+        );
+    }
+
+    #[test]
+    fn params_disk_cache_root_prefers_zkf_cache_dir() {
+        let _guard = cache_root_test_lock()
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let _home = EnvVarGuard::set("HOME", "/tmp/zkf-home-ignored");
+        let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", "/tmp/zkf-cache-root");
+        assert_eq!(
+            halo2_bls_params_cache_root(),
+            PathBuf::from("/tmp/zkf-cache-root")
+                .join("halo2-bls12-381")
+                .join("params")
+                .join(HALO2_BLS_PARAMS_CACHE_VERSION)
+        );
+    }
+
+    #[test]
+    fn params_disk_cache_root_defaults_to_home_cache_root() {
+        let _guard = cache_root_test_lock()
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let home_root = unique_temp_path("zkf-halo2-bls-home-root");
+        let home_root_string = home_root.to_string_lossy().into_owned();
+        let _home = EnvVarGuard::set("HOME", &home_root_string);
+        let _cache = EnvVarGuard::remove("ZKF_CACHE_DIR");
+        assert_eq!(
+            halo2_bls_params_cache_root(),
+            home_root
+                .join(".zkf")
+                .join("cache")
+                .join("halo2-bls12-381")
+                .join("params")
+                .join(HALO2_BLS_PARAMS_CACHE_VERSION)
+        );
+    }
+
+    #[test]
+    fn params_disk_cache_root_falls_back_to_temp_without_home() {
+        let _guard = cache_root_test_lock()
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let _home = EnvVarGuard::remove("HOME");
+        let _cache = EnvVarGuard::remove("ZKF_CACHE_DIR");
+        assert_eq!(
+            halo2_bls_params_cache_root(),
+            std::env::temp_dir()
+                .join("halo2-bls12-381")
+                .join("params")
+                .join(HALO2_BLS_PARAMS_CACHE_VERSION)
+        );
+    }
+
+    #[test]
+    fn params_for_k_persists_and_reloads_disk_cache() {
+        crate::with_serialized_heavy_backend_test(|| {
+            let _guard = cache_root_test_lock()
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let cache_root = unique_temp_path("zkf-halo2-bls-params-cache");
+            let cache_root_string = cache_root.to_string_lossy().into_owned();
+            let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
+            let _home = EnvVarGuard::remove("HOME");
+            clear_test_setup_cache();
+
+            let k = 4;
+            let cache_path = halo2_bls_params_cache_path(k);
+            let first = params_for_k(k);
+            let first_bytes = serialize_params(first.as_ref()).expect("serialize params");
+            assert!(
+                cache_path.exists(),
+                "disk cache should exist after first load"
+            );
+
+            clear_test_setup_cache();
+            let second = params_for_k(k);
+            let second_bytes = serialize_params(second.as_ref()).expect("serialize params");
+
+            assert_eq!(first_bytes, second_bytes, "disk cache should round-trip");
+            let _ = fs::remove_dir_all(cache_root);
+        });
+    }
+
+    #[test]
+    fn params_for_k_regenerates_corrupt_disk_cache() {
+        crate::with_serialized_heavy_backend_test(|| {
+            let _guard = cache_root_test_lock()
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let cache_root = unique_temp_path("zkf-halo2-bls-corrupt-cache");
+            let cache_root_string = cache_root.to_string_lossy().into_owned();
+            let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
+            let _home = EnvVarGuard::remove("HOME");
+            clear_test_setup_cache();
+
+            let k = 4;
+            let cache_path = halo2_bls_params_cache_path(k);
+            fs::create_dir_all(cache_path.parent().expect("cache parent")).expect("cache dir");
+            fs::write(&cache_path, b"not-valid-halo2-params").expect("seed corrupt cache");
+
+            let params = params_for_k(k);
+            let expected_bytes = serialize_params(params.as_ref()).expect("serialize params");
+            let cache_bytes = fs::read(&cache_path).expect("cache bytes");
+
+            assert_eq!(
+                cache_bytes, expected_bytes,
+                "corrupt cache should be replaced with valid params bytes"
+            );
+            let _ = fs::remove_dir_all(cache_root);
+        });
+    }
+
+    #[test]
+    fn setup_disk_cache_root_uses_shared_cache_convention() {
+        let _guard = cache_root_test_lock()
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let _home = EnvVarGuard::set("HOME", "/tmp/zkf-home-ignored");
+        let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", "/tmp/zkf-cache-root");
+        assert_eq!(
+            halo2_bls_setup_cache_root(),
+            PathBuf::from("/tmp/zkf-cache-root")
+                .join("halo2-bls12-381")
+                .join("setup")
+                .join(HALO2_BLS_SETUP_CACHE_VERSION)
+                .join(format!("params-{HALO2_BLS_PARAMS_CACHE_VERSION}"))
+        );
+    }
+
+    #[test]
+    fn get_or_build_setup_persists_and_reloads_disk_cache() {
+        crate::with_serialized_heavy_backend_test(|| {
+            let _guard = cache_root_test_lock()
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let cache_root = unique_temp_path("zkf-halo2-bls-setup-cache");
+            let cache_root_string = cache_root.to_string_lossy().into_owned();
+            let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
+            let _home = EnvVarGuard::remove("HOME");
+            clear_test_setup_cache();
+
+            let compiled = test_setup_compiled_program(4);
+            let cache_path = halo2_bls_setup_cache_path(&compiled).expect("setup cache path");
+            let first = get_or_build_setup(&compiled).expect("first setup");
+            let first_pk_bytes = serialize_cached_pk_bytes(&first.pk);
+            assert!(
+                cache_path.exists(),
+                "setup cache should exist after first build"
+            );
+
+            clear_test_setup_cache();
+            let second = get_or_build_setup(&compiled).expect("second setup");
+            let second_pk_bytes = serialize_cached_pk_bytes(&second.pk);
+
+            assert_eq!(first.vk_fingerprint, second.vk_fingerprint);
+            assert_eq!(
+                first_pk_bytes, second_pk_bytes,
+                "setup cache should round-trip"
+            );
+            let _ = fs::remove_dir_all(cache_root);
+        });
+    }
+
+    #[test]
+    fn get_or_build_setup_regenerates_corrupt_disk_cache() {
+        crate::with_serialized_heavy_backend_test(|| {
+            let _guard = cache_root_test_lock()
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let cache_root = unique_temp_path("zkf-halo2-bls-corrupt-setup-cache");
+            let cache_root_string = cache_root.to_string_lossy().into_owned();
+            let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", &cache_root_string);
+            let _home = EnvVarGuard::remove("HOME");
+            clear_test_setup_cache();
+
+            let compiled = test_setup_compiled_program(4);
+            let cache_path = halo2_bls_setup_cache_path(&compiled).expect("setup cache path");
+            fs::create_dir_all(cache_path.parent().expect("setup cache parent"))
+                .expect("cache dir");
+            fs::write(&cache_path, b"not-valid-halo2-setup").expect("seed corrupt setup cache");
+
+            let setup = get_or_build_setup(&compiled).expect("setup after corrupt cache");
+            let cache_bytes = fs::read(&cache_path).expect("cache bytes");
+
+            assert_eq!(
+                &cache_bytes[..HALO2_BLS_SETUP_CACHE_MAGIC.len()],
+                HALO2_BLS_SETUP_CACHE_MAGIC
+            );
+            assert_eq!(
+                setup.vk_fingerprint,
+                vk_fingerprint(&setup.vk),
+                "regenerated setup should produce a consistent verifying key fingerprint"
+            );
+            let _ = fs::remove_dir_all(cache_root);
+        });
     }
 
     #[test]

@@ -248,7 +248,7 @@
           "constraint_eval_goldilocks"
         ],
         "toolchain": {
-          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+          "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
           "xcode_version": "Xcode 26.3 | Build version 17C529",
           "sdk_version": "26.2"
         },
@@ -256,12 +256,12 @@
           {
             "library_id": "main_library",
             "entrypoint": "constraint_eval_goldilocks",
-            "metallib_sha256": "e2207217b99e754a14bf80179d3994b9505cb626c0b7af1548f51bc7210b7af8",
+            "metallib_sha256": "c653aa312df013d4ede5e82f39daf139930e0deef668184fcaabec1017b7dc84",
             "reflection_sha256": "28144307ccb006d7f23bd1e94e9e962ca10ab54360c53fe7ec50aeecf71b1cc7",
             "public_reflection_sha256": "79b3a0d77f34883cddf49311608bbdb9b95397c3d39de283c0fe264dfb4b8510",
             "pipeline_descriptor_sha256": "c0236e946e8e4ccbbade8248a83520955b5049d17ca081df5db27d4619842e1f",
             "toolchain": {
-              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.lekfAY/Metal.xctoolchain/usr/metal/current/bin",
+              "metal_compiler_version": "Apple metal version 32023.864 (metalfe-32023.864) | Target: air64-apple-darwin25.0.0 | Thread model: posix | InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.4dmsKT/Metal.xctoolchain/usr/metal/current/bin",
               "xcode_version": "Xcode 26.3 | Build version 17C529",
               "sdk_version": "26.2"
             },

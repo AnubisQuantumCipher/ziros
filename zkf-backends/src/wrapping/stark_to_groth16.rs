@@ -1163,6 +1163,7 @@ fn wrap_direct_fri_v2(
     let circuit = FriVerifierCircuit::with_witness(witness, fri_params.clone());
     let proof_seed = deterministic_proof_seed(&source_proof.program_digest, &source_proof.proof);
     let mut rng = StdRng::from_seed(proof_seed);
+    let _msm_fail_closed = ScopedEnvVar::set("ZKF_GROTH16_METAL_NO_CPU_FALLBACK", "1");
 
     let prove_start = Instant::now();
     let (groth16_proof, groth16_dispatch) = if let Some(prove_shape) = setup.prove_shape.as_deref()
@@ -1252,6 +1253,35 @@ fn wrap_direct_fri_v2(
         proof_origin_signature: None,
         proof_origin_public_keys: None,
     })
+}
+
+struct ScopedEnvVar {
+    key: &'static str,
+    previous: Option<std::ffi::OsString>,
+}
+
+impl ScopedEnvVar {
+    fn set(key: &'static str, value: &str) -> Self {
+        let previous = std::env::var_os(key);
+        unsafe {
+            std::env::set_var(key, value);
+        }
+        Self { key, previous }
+    }
+}
+
+impl Drop for ScopedEnvVar {
+    fn drop(&mut self) {
+        if let Some(previous) = self.previous.take() {
+            unsafe {
+                std::env::set_var(self.key, previous);
+            }
+        } else {
+            unsafe {
+                std::env::remove_var(self.key);
+            }
+        }
+    }
 }
 
 #[cfg(feature = "nova-compression")]
@@ -2598,12 +2628,18 @@ fn nova_setup_cache_key(program_digest: &str, compressed: &CompressedStarkProof)
     )
 }
 
+fn default_setup_disk_cache_base_root() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".zkf").join("cache"))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
 fn setup_disk_cache_root() -> PathBuf {
-    if let Some(root) = std::env::var_os("ZKF_CACHE_DIR") {
-        PathBuf::from(root).join("stark-to-groth16")
-    } else {
-        std::env::temp_dir().join("zkf-stark-to-groth16")
-    }
+    std::env::var_os("ZKF_CACHE_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(default_setup_disk_cache_base_root)
+        .join("stark-to-groth16")
 }
 
 fn setup_disk_cache_paths(cache_key: &str) -> (PathBuf, PathBuf, PathBuf) {
@@ -3947,6 +3983,15 @@ mod tests {
             }
             Self { key, previous }
         }
+
+        fn remove(key: &'static str) -> Self {
+            let previous = std::env::var_os(key);
+            // Tests serialize env mutation behind a process-wide mutex.
+            unsafe {
+                std::env::remove_var(key);
+            }
+            Self { key, previous }
+        }
     }
 
     impl Drop for EnvVarGuard {
@@ -3994,6 +4039,51 @@ mod tests {
         let _ = fs::remove_dir_all(base);
     }
 
+    #[test]
+    fn setup_disk_cache_root_prefers_zkf_cache_dir() {
+        let _guard = wrap_mode_lock().lock().unwrap();
+        let _home = EnvVarGuard::set("HOME", "/tmp/zkf-home-ignored");
+        let _cache = EnvVarGuard::set("ZKF_CACHE_DIR", "/tmp/zkf-cache-root");
+        assert_eq!(
+            setup_disk_cache_root(),
+            PathBuf::from("/tmp/zkf-cache-root").join("stark-to-groth16")
+        );
+    }
+
+    #[test]
+    fn setup_disk_cache_root_defaults_to_home_cache_root() {
+        let _guard = wrap_mode_lock().lock().unwrap();
+        let home_root = std::env::temp_dir().join(format!(
+            "zkf-home-cache-root-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        let home_root_string = home_root.to_string_lossy().into_owned();
+        let _home = EnvVarGuard::set("HOME", &home_root_string);
+        let _cache = EnvVarGuard::remove("ZKF_CACHE_DIR");
+        assert_eq!(
+            setup_disk_cache_root(),
+            home_root
+                .join(".zkf")
+                .join("cache")
+                .join("stark-to-groth16")
+        );
+    }
+
+    #[test]
+    fn setup_disk_cache_root_falls_back_to_temp_without_home() {
+        let _guard = wrap_mode_lock().lock().unwrap();
+        let _home = EnvVarGuard::remove("HOME");
+        let _cache = EnvVarGuard::remove("ZKF_CACHE_DIR");
+        assert_eq!(
+            setup_disk_cache_root(),
+            std::env::temp_dir().join("stark-to-groth16")
+        );
+    }
+
     fn make_plonky3_proof_artifact(proof_data: Vec<u8>) -> ProofArtifact {
         let mut metadata = BTreeMap::new();
         // Keep the smoke-test wrapper circuit as small as possible. The real
@@ -4015,7 +4105,7 @@ mod tests {
             vec![],
         )
         .with_metadata(metadata)
-}
+    }
 
     #[derive(Clone)]
     struct TinySetupCircuit;
@@ -4066,7 +4156,7 @@ mod tests {
             ))
             .expect("valid Stark-to-Groth16 wrapped fixture")
         })
-}
+    }
 
     #[test]
     fn wrapper_identifies_backends() {

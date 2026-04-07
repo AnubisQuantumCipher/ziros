@@ -1,4 +1,6 @@
+pub(crate) mod aerospace_qualification;
 pub(crate) mod app;
+pub(crate) mod agent;
 pub(crate) mod audit;
 pub(crate) mod capabilities;
 pub(crate) mod circuit;
@@ -14,23 +16,28 @@ pub(crate) mod estimate_gas;
 pub(crate) mod explore;
 pub(crate) mod import;
 pub(crate) mod ir;
+pub(crate) mod keys;
+pub(crate) mod midnight;
 pub(crate) mod optimize;
 pub(crate) mod package;
 pub(crate) mod prove;
 pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
+pub(crate) mod sovereign_economic_defense;
 pub(crate) mod storage;
+pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
+pub(crate) mod wallet;
 pub(crate) mod witness;
-pub(crate) mod keys;
 
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
-    AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    TelemetryCommands,
+    AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
+    IrCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
+    SubsystemCommands, TelemetryCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -42,8 +49,36 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     let guard = EntrypointGuard::begin(EntrypointSurface::Cli, command_name(&command));
     let result = match command {
         Commands::App { command } => app::handle_app(command),
+        Commands::Subsystem { command } => match command {
+            SubsystemCommands::Scaffold {
+                name,
+                style,
+                out,
+                json,
+            } => subsystem::handle_scaffold(&name, &style, out, json),
+            SubsystemCommands::VerifyCompleteness { root, json } => {
+                subsystem::handle_verify_completeness(root, json)
+            }
+            SubsystemCommands::VerifyReleasePin { pin, binary, json } => {
+                subsystem::handle_verify_release_pin(pin, binary, json)
+            }
+        },
+        Commands::Midnight { command } => midnight::handle_midnight(command),
+        Commands::Wallet {
+            network,
+            persistent_root,
+            cache_root,
+            json,
+            events_jsonl,
+            command,
+        } => wallet::handle_wallet(network, persistent_root, cache_root, json, events_jsonl, command),
+        Commands::Agent {
+            json,
+            events_jsonl,
+            command,
+        } => agent::handle_agent(json, events_jsonl, command),
         Commands::Credential { command } => credential::handle_credential(command),
-        Commands::Capabilities => capabilities::handle_capabilities(),
+        Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
         Commands::Doctor { json } => capabilities::handle_doctor(json),
@@ -165,8 +200,16 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             inputs,
             out,
             continue_on_failure,
+            poseidon_trace,
             solver,
-        } => debug::handle_debug(program, inputs, out, continue_on_failure, solver),
+        } => debug::handle_debug(
+            program,
+            inputs,
+            out,
+            continue_on_failure,
+            poseidon_trace,
+            solver,
+        ),
         Commands::Prove {
             program,
             inputs,
@@ -496,13 +539,109 @@ fn command_name(command: &Commands) -> String {
                 }
                 None => "app:reentry-assurance".to_string(),
             },
+            AppCommands::SovereignEconomicDefense(args) => match &args.command {
+                crate::cli::SovereignEconomicDefenseCommands::Prove { .. } => {
+                    "app:sovereign-economic-defense:prove".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::Verify { .. } => {
+                    "app:sovereign-economic-defense:verify".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::Report { .. } => {
+                    "app:sovereign-economic-defense:report".to_string()
+                }
+                crate::cli::SovereignEconomicDefenseCommands::ExportBundle { .. } => {
+                    "app:sovereign-economic-defense:export-bundle".to_string()
+                }
+            },
+            AppCommands::AerospaceQualification(args) => match &args.command {
+                crate::cli::AerospaceQualificationCommands::Prove { .. } => {
+                    "app:aerospace-qualification:prove".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::Verify { .. } => {
+                    "app:aerospace-qualification:verify".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::Report { .. } => {
+                    "app:aerospace-qualification:report".to_string()
+                }
+                crate::cli::AerospaceQualificationCommands::ExportBundle { .. } => {
+                    "app:aerospace-qualification:export-bundle".to_string()
+                }
+            },
+        },
+        Commands::Subsystem { command } => match command {
+            SubsystemCommands::Scaffold { .. } => "subsystem:scaffold".to_string(),
+            SubsystemCommands::VerifyCompleteness { .. } => {
+                "subsystem:verify-completeness".to_string()
+            }
+            SubsystemCommands::VerifyReleasePin { .. } => {
+                "subsystem:verify-release-pin".to_string()
+            }
+        },
+        Commands::Midnight { command } => match command {
+            MidnightCommands::Status { .. } => "midnight:status".to_string(),
+            MidnightCommands::ProofServer { command } => match command {
+                MidnightProofServerCommands::Serve { .. } => {
+                    "midnight:proof-server:serve".to_string()
+                }
+            },
+            MidnightCommands::Gateway { command } => match command {
+                crate::cli::MidnightGatewayCommands::Serve { .. } => {
+                    "midnight:gateway:serve".to_string()
+                }
+            },
+            MidnightCommands::Templates { .. } => "midnight:templates".to_string(),
+            MidnightCommands::Init { .. } => "midnight:init".to_string(),
+            MidnightCommands::Doctor { .. } => "midnight:doctor".to_string(),
+            MidnightCommands::Disclosure { .. } => "midnight:disclosure".to_string(),
+            MidnightCommands::Resolve { .. } => "midnight:resolve".to_string(),
+            MidnightCommands::Contract { command } => match command {
+                MidnightContractCommands::Compile { .. } => {
+                    "midnight:contract:compile".to_string()
+                }
+                MidnightContractCommands::DeployPrepare { .. } => {
+                    "midnight:contract:deploy-prepare".to_string()
+                }
+                MidnightContractCommands::CallPrepare { .. } => {
+                    "midnight:contract:call-prepare".to_string()
+                }
+            },
+        },
+        Commands::Wallet { command, .. } => match command {
+            WalletCommands::Snapshot => "wallet:snapshot".to_string(),
+            WalletCommands::Unlock { .. } => "wallet:unlock".to_string(),
+            WalletCommands::Lock => "wallet:lock".to_string(),
+            WalletCommands::SyncHealth => "wallet:sync-health".to_string(),
+            WalletCommands::Origin { .. } => "wallet:origin".to_string(),
+            WalletCommands::Session { .. } => "wallet:session".to_string(),
+            WalletCommands::Pending { .. } => "wallet:pending".to_string(),
+            WalletCommands::Grant { .. } => "wallet:grant".to_string(),
+        },
+        Commands::Agent { command, .. } => match command {
+            AgentCommands::Doctor { .. } => "agent:doctor".to_string(),
+            AgentCommands::Status { .. } => "agent:status".to_string(),
+            AgentCommands::Plan { .. } => "agent:plan".to_string(),
+            AgentCommands::Run { .. } => "agent:run".to_string(),
+            AgentCommands::Resume { .. } => "agent:resume".to_string(),
+            AgentCommands::Cancel { .. } => "agent:cancel".to_string(),
+            AgentCommands::Explain { .. } => "agent:explain".to_string(),
+            AgentCommands::Logs { .. } => "agent:logs".to_string(),
+            AgentCommands::Approve { .. } => "agent:approve".to_string(),
+            AgentCommands::Reject { .. } => "agent:reject".to_string(),
+            AgentCommands::Memory { .. } => "agent:memory".to_string(),
+            AgentCommands::Approvals { .. } => "agent:approvals".to_string(),
+            AgentCommands::Project { .. } => "agent:project".to_string(),
+            AgentCommands::Workflow { .. } => "agent:workflow".to_string(),
+            AgentCommands::Worktree { .. } => "agent:worktree".to_string(),
+            AgentCommands::Checkpoint { .. } => "agent:checkpoint".to_string(),
+            AgentCommands::Provider { .. } => "agent:provider".to_string(),
+            AgentCommands::Mcp { .. } => "agent:mcp".to_string(),
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),
             CredentialCommands::Prove { .. } => "credential:prove".to_string(),
             CredentialCommands::Verify { .. } => "credential:verify".to_string(),
         },
-        Commands::Capabilities => "capabilities".to_string(),
+        Commands::Capabilities { .. } => "capabilities".to_string(),
         Commands::Frontends { .. } => "frontends".to_string(),
         Commands::SupportMatrix { .. } => "support-matrix".to_string(),
         Commands::Doctor { .. } => "doctor".to_string(),

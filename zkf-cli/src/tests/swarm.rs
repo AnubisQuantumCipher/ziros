@@ -245,7 +245,7 @@ fn reputation_reports_support_all_scope() {
 #[test]
 fn cli_commands_write_entrypoint_observations() {
     with_temp_home_and_env(&[], || {
-        cmd::handle(Commands::Capabilities, false).unwrap();
+        cmd::handle(Commands::Capabilities { json: false }, false).unwrap();
 
         let entrypoints_dir = SwarmConfig::from_env().swarm_root().join("entrypoints");
         let mut entries = fs::read_dir(&entrypoints_dir)

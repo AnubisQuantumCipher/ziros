@@ -8,13 +8,14 @@ pub mod error;
 pub mod field;
 pub mod ir;
 mod proof_ccs_spec;
-mod proof_constant_time_spec;
+mod proof_constant_time_bridge;
 mod proof_kernel;
 mod proof_kernel_spec;
 mod proof_transform_spec;
 mod proof_witness_adapter_spec;
 mod proof_witness_generation_spec;
 pub mod stack_safe_json;
+#[cfg(feature = "full")]
 pub mod swarm_signer;
 #[cfg(kani)]
 mod verification_kani;
@@ -39,6 +40,8 @@ pub mod benchmark;
 pub mod ccs;
 #[cfg(feature = "full")]
 pub mod debugger;
+#[cfg(feature = "full")]
+pub mod disclosure;
 #[cfg(feature = "full")]
 pub mod diagnostics;
 #[cfg(feature = "full")]
@@ -105,6 +108,7 @@ pub use stack_safe_json::{
     from_reader as json_from_reader, from_slice as json_from_slice, to_vec as json_to_vec,
     to_vec_pretty as json_to_vec_pretty,
 };
+#[cfg(feature = "full")]
 pub use swarm_signer::{ReadOnlySwarmSigner, SwarmIdentityKeyBackend};
 pub use witness::{
     Witness, WitnessInputs, check_constraints, collect_public_inputs, ensure_witness_completeness,
@@ -124,10 +128,16 @@ pub use benchmark::{BenchmarkMetrics, BenchmarkReport, StatsAggregate};
 #[cfg(feature = "full")]
 pub use debugger::{
     ConstraintTrace, ConstraintTraceDetail, DebugOptions, DebugReport, ExprTrace,
-    SymbolicConstraint, SymbolicOrigin, SymbolicSignal, UnderconstrainedAnalysis, WitnessFlowEdge,
-    WitnessFlowGraph, WitnessFlowNode, WitnessFlowStep, analyze_underconstrained,
-    analyze_underconstrained_zir, build_witness_flow, build_witness_flow_zir, debug_program,
-    debug_program_zir,
+    PoseidonTraceEntry, PoseidonTraceSignal, PoseidonTraceValue, SymbolicConstraint,
+    SymbolicOrigin, SymbolicSignal, UnderconstrainedAnalysis, WitnessFlowEdge, WitnessFlowGraph,
+    WitnessFlowNode, WitnessFlowStep, analyze_underconstrained, analyze_underconstrained_zir,
+    build_witness_flow, build_witness_flow_zir, debug_program, debug_program_zir,
+};
+#[cfg(feature = "full")]
+pub use disclosure::{
+    DisclosureClassification, DisclosureFinding, DisclosureReport, DisclosureSeverity,
+    DisclosureSidecarStatus, DisclosureStatus, DisclosureSummary, DisclosureSurface,
+    analyze_midnight_disclosure,
 };
 #[cfg(feature = "full")]
 pub use diagnostics::{

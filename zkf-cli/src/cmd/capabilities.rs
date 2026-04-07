@@ -4,8 +4,6 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 use crate::cmd::runtime::installed_strict_certification_match;
-use zkf_keymanager::{KeyBackend, KeyManager};
-use zkf_storage::StorageStatusReport;
 use zkf_backends::{
     backend_for, capabilities_report, metal_runtime::capability_notes, metal_runtime_report,
     runtime_hardware_profile, strict_bn254_auto_route_ready_with_runtime,
@@ -14,6 +12,8 @@ use zkf_backends::{
 use zkf_core::{BackendCapabilityMatrix, BackendKind, SupportClass, ToolRequirement};
 use zkf_frontends::{FrontendKind, frontend_capabilities_matrix, frontend_for};
 use zkf_gadgets::registry::{AuditStatus, GadgetSpec, all_gadget_specs};
+use zkf_keymanager::{KeyBackend, KeyManager};
+use zkf_storage::StorageStatusReport;
 
 pub(crate) fn handle_capabilities() -> Result<(), String> {
     let matrix = capabilities_report();
@@ -173,7 +173,10 @@ pub(crate) fn handle_doctor(json: bool) -> Result<(), String> {
     );
     println!("persistent root: {}", report.storage.persistent_root);
     println!("cache root: {}", report.storage.cache_root);
-    println!("swarm sqlite live: {}", report.storage.swarm_sqlite_live_path);
+    println!(
+        "swarm sqlite live: {}",
+        report.storage.swarm_sqlite_live_path
+    );
     println!(
         "swarm sqlite snapshot: {}",
         report.storage.swarm_sqlite_snapshot_path
@@ -203,17 +206,27 @@ struct MetalDoctorReport {
     strict_certified_at_unix_ms: Option<u128>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     strict_certification_report: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    binary_support_failures: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    runtime_failures: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    strict_certification_failures: Vec<String>,
     production_ready: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     production_failures: Vec<String>,
 }
 
-pub(crate) fn handle_metal_doctor(_json: bool, strict: bool) -> Result<(), String> {
+pub(crate) fn handle_metal_doctor(json: bool, strict: bool) -> Result<(), String> {
     let report = build_metal_doctor_report();
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
-    );
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!("{}", render_metal_doctor_human(&report));
+    }
     if strict && !report.production_ready {
         return Err(format!(
             "metal-doctor strict gate failed: {}",
@@ -296,9 +309,15 @@ fn build_keychain_doctor_report() -> KeychainDoctorReport {
                 true
             };
             let audit = manager.audit();
-            let key_count = audit.as_ref().map(|report| report.key_count).unwrap_or_else(|_| {
-                manager.list_all().map(|entries| entries.len()).unwrap_or_default()
-            });
+            let key_count = audit
+                .as_ref()
+                .map(|report| report.key_count)
+                .unwrap_or_else(|_| {
+                    manager
+                        .list_all()
+                        .map(|entries| entries.len())
+                        .unwrap_or_default()
+                });
             let healthy = audit.as_ref().map(|report| report.healthy).unwrap_or(false);
             let note = match audit {
                 Ok(_) if enabled => Some(
@@ -489,6 +508,9 @@ fn build_metal_doctor_report() -> MetalDoctorReport {
     let strict_bn254_ready = strict_bn254_auto_route_ready_with_runtime(&runtime);
     let certified_hardware_profile = runtime_hardware_profile(&runtime).to_string();
     let certification = installed_strict_certification_match();
+    let binary_support_failures = collect_metal_support_failures(&runtime);
+    let runtime_failures = collect_metal_runtime_failures(&runtime);
+    let strict_certification_failures = collect_metal_certification_failures(&certification);
     let strict_gpu_busy_ratio_peak = certification
         .strict_gpu_busy_ratio_peak
         .unwrap_or(runtime.metal_gpu_busy_ratio);
@@ -506,20 +528,28 @@ fn build_metal_doctor_report() -> MetalDoctorReport {
         strict_certification_match: certification.matches_current,
         strict_certified_at_unix_ms: certification.certified_at_unix_ms,
         strict_certification_report: certification.report_path,
+        binary_support_failures,
+        runtime_failures,
+        strict_certification_failures,
         production_ready: production_failures.is_empty(),
         production_failures,
     }
 }
 
-fn collect_metal_production_failures(
+fn collect_metal_support_failures(
     runtime: &zkf_backends::metal_runtime::MetalRuntimeReport,
-    certification: &crate::cmd::runtime::StrictCertificationMatch,
 ) -> Vec<String> {
     let mut failures = Vec::new();
-
     if !runtime.metal_compiled {
         failures.push("binary was not built with Metal support".to_string());
     }
+    failures
+}
+
+fn collect_metal_runtime_failures(
+    runtime: &zkf_backends::metal_runtime::MetalRuntimeReport,
+) -> Vec<String> {
+    let mut failures = Vec::new();
     if !runtime.metal_available {
         failures.push("Metal runtime is unavailable on this host".to_string());
     }
@@ -560,19 +590,108 @@ fn collect_metal_production_failures(
             }
         ));
     }
+    failures
+}
+
+fn collect_metal_certification_failures(
+    certification: &crate::cmd::runtime::StrictCertificationMatch,
+) -> Vec<String> {
     if !certification.present {
-        failures.push(
+        vec![
             certification
                 .failures
                 .first()
                 .cloned()
                 .unwrap_or_else(|| "strict certification report is missing".to_string()),
-        );
-    } else if !certification.matches_current {
-        failures.extend(certification.failures.clone());
+        ]
+    } else if certification.matches_current {
+        Vec::new()
+    } else {
+        certification.failures.clone()
     }
+}
 
+fn collect_metal_production_failures(
+    runtime: &zkf_backends::metal_runtime::MetalRuntimeReport,
+    certification: &crate::cmd::runtime::StrictCertificationMatch,
+) -> Vec<String> {
+    let mut failures = collect_metal_support_failures(runtime);
+    failures.extend(collect_metal_runtime_failures(runtime));
+    failures.extend(collect_metal_certification_failures(certification));
     failures
+}
+
+fn render_metal_doctor_human(report: &MetalDoctorReport) -> String {
+    let mut lines = Vec::new();
+    lines.push(format!(
+        "metal production status: {}",
+        if report.production_ready {
+            "ready"
+        } else {
+            "not-ready"
+        }
+    ));
+    lines.push(format!(
+        "certified hardware profile: {}",
+        report.certified_hardware_profile
+    ));
+    lines.push(format!("metal compiled: {}", report.runtime.metal_compiled));
+    lines.push(format!(
+        "metal available: {}",
+        report.runtime.metal_available
+    ));
+    lines.push(format!(
+        "metal device: {}",
+        report
+            .runtime
+            .metal_device
+            .as_deref()
+            .unwrap_or("unavailable")
+    ));
+    lines.push(format!(
+        "metallib mode: {}",
+        report
+            .runtime
+            .metallib_mode
+            .as_deref()
+            .unwrap_or("unavailable")
+    ));
+    lines.push(format!(
+        "strict bn254 auto-route: {}",
+        report.strict_bn254_auto_route
+    ));
+    lines.push(format!(
+        "strict certification report: {}",
+        report
+            .strict_certification_report
+            .as_deref()
+            .unwrap_or("unavailable")
+    ));
+    lines.push(format!(
+        "binary support: {}",
+        if report.binary_support_failures.is_empty() {
+            "ok".to_string()
+        } else {
+            report.binary_support_failures.join("; ")
+        }
+    ));
+    lines.push(format!(
+        "runtime health: {}",
+        if report.runtime_failures.is_empty() {
+            "ok".to_string()
+        } else {
+            report.runtime_failures.join("; ")
+        }
+    ));
+    lines.push(format!(
+        "strict certification: {}",
+        if report.strict_certification_failures.is_empty() {
+            "ok".to_string()
+        } else {
+            report.strict_certification_failures.join("; ")
+        }
+    ));
+    lines.join("\n")
 }
 
 fn collect_doctor_requirements() -> Vec<ToolRequirement> {
@@ -796,8 +915,10 @@ mod tests {
     use std::os::unix::process::ExitStatusExt;
 
     use super::{
-        build_doctor_report, build_metal_doctor_report, build_support_matrix_report,
-        collect_metal_production_failures, support_matrix_backend_notes,
+        MetalDoctorReport, build_doctor_report, build_metal_doctor_report,
+        build_support_matrix_report, collect_metal_certification_failures,
+        collect_metal_production_failures, collect_metal_runtime_failures,
+        collect_metal_support_failures, render_metal_doctor_human, support_matrix_backend_notes,
     };
     use crate::cmd::runtime::StrictCertificationMatch;
     use zkf_backends::metal_runtime::MetalRuntimeReport;
@@ -1039,6 +1160,131 @@ mod tests {
                 .iter()
                 .any(|failure| failure.contains("watchdog timeout"))
         );
+        let runtime_failures = collect_metal_runtime_failures(&unhealthy);
+        assert!(
+            runtime_failures
+                .iter()
+                .any(|failure| failure.contains("watchdog timeout"))
+        );
+    }
+
+    #[test]
+    fn metal_production_gate_surfaces_certification_failures_separately() {
+        let runtime = MetalRuntimeReport {
+            metal_compiled: true,
+            metal_available: true,
+            metal_disabled_by_env: false,
+            metal_device: Some("Apple M4 Max".to_string()),
+            metallib_mode: Some("aot".to_string()),
+            threshold_profile: Some("aggressive".to_string()),
+            threshold_summary: Some("msm=1024".to_string()),
+            recommended_working_set_size_bytes: Some(1),
+            current_allocated_size_bytes: Some(0),
+            working_set_headroom_bytes: Some(1),
+            working_set_utilization_pct: Some(0.0),
+            metal_dispatch_circuit_open: false,
+            metal_dispatch_last_failure: None,
+            prewarmed_pipelines: 0,
+            metal_primary_queue_depth: 24,
+            metal_secondary_queue_depth: 12,
+            metal_pipeline_max_in_flight: 8,
+            metal_scheduler_max_jobs: 16,
+            metal_working_set_headroom_target_pct: 85,
+            metal_gpu_busy_ratio: 0.0,
+            metal_stage_breakdown: "{}".to_string(),
+            metal_inflight_jobs: 0,
+            metal_no_cpu_fallback: false,
+            metal_counter_source: "not-measured".to_string(),
+            active_accelerators: vec![
+                ("ntt".to_string(), "metal-ntt".to_string()),
+                ("msm".to_string(), "metal-msm-bn254".to_string()),
+            ]
+            .into_iter()
+            .collect(),
+            registered_accelerators: Default::default(),
+            cpu_fallback_reasons: Default::default(),
+        };
+        let missing_certification = StrictCertificationMatch {
+            present: false,
+            matches_current: false,
+            failures: vec!["strict certification report missing at /tmp/strict.json".to_string()],
+            report_path: Some("/tmp/strict.json".to_string()),
+            certified_at_unix_ms: None,
+            strict_gpu_busy_ratio_peak: None,
+        };
+
+        assert!(collect_metal_support_failures(&runtime).is_empty());
+        assert!(collect_metal_runtime_failures(&runtime).is_empty());
+        assert_eq!(
+            collect_metal_certification_failures(&missing_certification),
+            vec!["strict certification report missing at /tmp/strict.json".to_string()]
+        );
+    }
+
+    #[test]
+    fn human_metal_doctor_render_surfaces_report_path_and_categories() {
+        let report = MetalDoctorReport {
+            runtime: MetalRuntimeReport {
+                metal_compiled: true,
+                metal_available: true,
+                metal_disabled_by_env: false,
+                metal_device: Some("Apple M4 Max".to_string()),
+                metallib_mode: Some("aot".to_string()),
+                threshold_profile: Some("aggressive".to_string()),
+                threshold_summary: Some("msm=1024".to_string()),
+                recommended_working_set_size_bytes: Some(1),
+                current_allocated_size_bytes: Some(0),
+                working_set_headroom_bytes: Some(1),
+                working_set_utilization_pct: Some(0.0),
+                metal_dispatch_circuit_open: false,
+                metal_dispatch_last_failure: None,
+                prewarmed_pipelines: 0,
+                metal_primary_queue_depth: 24,
+                metal_secondary_queue_depth: 12,
+                metal_pipeline_max_in_flight: 8,
+                metal_scheduler_max_jobs: 16,
+                metal_working_set_headroom_target_pct: 85,
+                metal_gpu_busy_ratio: 0.0,
+                metal_stage_breakdown: "{}".to_string(),
+                metal_inflight_jobs: 0,
+                metal_no_cpu_fallback: false,
+                metal_counter_source: "not-measured".to_string(),
+                active_accelerators: Default::default(),
+                registered_accelerators: Default::default(),
+                cpu_fallback_reasons: Default::default(),
+            },
+            backends: Vec::new(),
+            tools: Vec::new(),
+            certified_hardware_profile: "apple-silicon-m4-max-48gb".to_string(),
+            strict_bn254_ready: true,
+            strict_bn254_auto_route: true,
+            strict_gpu_stage_coverage: zkf_backends::GpuStageCoverage {
+                coverage_ratio: 1.0,
+                required_stages: vec!["fft-ntt".to_string()],
+                metal_stages: vec!["fft-ntt".to_string()],
+                cpu_stages: Vec::new(),
+            },
+            strict_gpu_busy_ratio_peak: 0.75,
+            strict_certification_present: false,
+            strict_certification_match: false,
+            strict_certified_at_unix_ms: None,
+            strict_certification_report: Some("/tmp/strict.json".to_string()),
+            binary_support_failures: Vec::new(),
+            runtime_failures: Vec::new(),
+            strict_certification_failures: vec![
+                "strict certification report missing at /tmp/strict.json".to_string(),
+            ],
+            production_ready: false,
+            production_failures: vec![
+                "strict certification report missing at /tmp/strict.json".to_string(),
+            ],
+        };
+
+        let rendered = render_metal_doctor_human(&report);
+        assert!(rendered.contains("strict certification report: /tmp/strict.json"));
+        assert!(rendered.contains("binary support: ok"));
+        assert!(rendered.contains("runtime health: ok"));
+        assert!(rendered.contains("strict certification: strict certification report missing"));
     }
 }
 

@@ -18,6 +18,7 @@ GENERATED_END = "<!-- END GENERATED VERIFICATION STATUS -->"
 STATUS_ORDER = [
     "mechanized_local",
     "mechanized_generated",
+    "hypothesis_stated",
     "bounded_checked",
     "assumed_external",
     "pending",
@@ -106,7 +107,7 @@ def protocol_rows(entries: list[dict]) -> list[dict]:
             "theorem_id": entry["theorem_id"],
             "status": entry["status"],
             "scope": entry["scope"],
-            "evidence_path": entry["evidence_path"],
+            "evidence_path": entry.get("evidence_path", ""),
         }
         for entry in entries
         if entry["theorem_id"].startswith("protocol.")
@@ -124,6 +125,10 @@ def release_grade_blockers(
     entries: list[dict], counts: dict[str, int], trust_rows: list[str]
 ) -> list[str]:
     blockers: list[str] = []
+    if counts.get("hypothesis_stated", 0):
+        blockers.append(
+            f"{counts['hypothesis_stated']} hypothesis_stated row(s) remain"
+        )
     if counts.get("assumed_external", 0):
         blockers.append(
             f"{counts['assumed_external']} assumed_external row(s) remain"
@@ -256,7 +261,7 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
         "formal-verification-zero-repo-assumption-program",
     )
     current_priority_progress = (
-        "March 25, 2026 release-grade closure complete. "
+        "Release-grade closure status on the current checkout. "
         f"Ledger inventory totals {total_entries} rows with {mechanized_total} machine-checked rows. "
         "Ledger counts: "
         f"{counts_summary}. "
@@ -345,7 +350,7 @@ def security_block(payload: dict) -> str:
         "",
         f"- Total ledger entries: {payload['total_entries']}.",
         f"- Machine-checked rows: {payload['mechanized_total']} total ({counts['mechanized_local']} `mechanized_local`, {counts['mechanized_generated']} `mechanized_generated`).",
-        f"- Remaining bounded/external/pending rows: {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
+        f"- Remaining non-machine-checked rows: {counts['hypothesis_stated']} `hypothesis_stated`, {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
         f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
         f"- Whole-runtime target inventory: {runtime_coverage['total_files']} files / {runtime_coverage['total_functions']} functions, with {runtime_coverage['complete_files']} files / {runtime_coverage['complete_functions']} functions at a completion state.",
         f"- Swarm proof-boundary closure: `{str(swarm_boundary['closed']).lower()}` (`{runtime_swarm['name']}` = {runtime_swarm['complete_files']}/{runtime_swarm['total_files']} files complete, `{distributed_swarm['name']}` = {distributed_swarm['complete_files']}/{distributed_swarm['total_files']} files complete).",
@@ -354,8 +359,9 @@ def security_block(payload: dict) -> str:
     if open_protocol:
         lines.append("- Open protocol rows:")
         for row in open_protocol:
+            evidence_path = row["evidence_path"] or "no-local-proof-artifact"
             lines.append(
-                f"  - `{row['theorem_id']}`: `{row['status']}` via `{row['evidence_path']}`"
+                f"  - `{row['theorem_id']}`: `{row['status']}` via `{evidence_path}`"
             )
     else:
         lines.append("- All protocol rows are `mechanized_local`.")
@@ -375,7 +381,7 @@ def proof_boundary_block(payload: dict) -> str:
         "",
         f"- Total ledger entries: {payload['total_entries']}.",
         f"- Machine-checked rows: {payload['mechanized_total']} total ({counts['mechanized_local']} `mechanized_local`, {counts['mechanized_generated']} `mechanized_generated`).",
-        f"- Remaining bounded/external/pending rows: {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
+        f"- Remaining non-machine-checked rows: {counts['hypothesis_stated']} `hypothesis_stated`, {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
         f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
         f"- Whole-runtime target inventory: {runtime_coverage['total_files']} files / {runtime_coverage['total_functions']} functions, with {runtime_coverage['complete_files']} files / {runtime_coverage['complete_functions']} functions at a completion state.",
         f"- Swarm proof-boundary closure: `{str(swarm_boundary['closed']).lower()}` (`{runtime_swarm['name']}` = {runtime_swarm['complete_files']}/{runtime_swarm['total_files']} files complete, `{distributed_swarm['name']}` = {distributed_swarm['complete_files']}/{distributed_swarm['total_files']} files complete).",

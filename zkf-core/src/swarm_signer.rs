@@ -88,9 +88,10 @@ impl ReadOnlySwarmSigner {
     }
 }
 
-fn load_enclave_seed(_path: &Path, label: &str) -> Result<[u8; 32], String> {
+fn load_enclave_seed(path: &Path, label: &str) -> Result<[u8; 32], String> {
     #[cfg(target_os = "macos")]
     {
+        let _ = path;
         let seed = crate::keystore::retrieve_service_key(SWARM_ED25519_SERVICE, label)
             .map_err(|err| format!("failed to retrieve swarm identity from enclave: {err}"))?;
         to_seed(&seed)
@@ -102,9 +103,10 @@ fn load_enclave_seed(_path: &Path, label: &str) -> Result<[u8; 32], String> {
     }
 }
 
-fn load_enclave_ml_dsa_signing_key(_path: &Path, label: &str) -> Result<MLDSA87SigningKey, String> {
+fn load_enclave_ml_dsa_signing_key(path: &Path, label: &str) -> Result<MLDSA87SigningKey, String> {
     #[cfg(target_os = "macos")]
     {
+        let _ = path;
         let bytes =
             crate::keystore::retrieve_service_key(SWARM_MLDSA87_SERVICE, label).map_err(|err| {
                 format!("failed to retrieve swarm ML-DSA identity from enclave: {err}")

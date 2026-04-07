@@ -15,6 +15,9 @@ theorem bucket_assignment_sound :
 
 theorem bucket_accumulation_sound :
     ProgramRefinesKernelSpec msm_bn254_classic_accumulate bn254ClassicAccumulateSpec
+      ∧ ProgramRefinesKernelSpec
+          msm_bn254_classic_accumulate_segmented
+          bn254ClassicSegmentedAccumulateSpec
       ∧ ProgramRefinesKernelSpec msm_pallas_classic_accumulate pallasClassicAccumulateSpec
       ∧ ProgramRefinesKernelSpec msm_pallas_naf_accumulate pallasNafAccumulateSpec
       ∧ ProgramRefinesKernelSpec msm_vesta_classic_accumulate vestaClassicAccumulateSpec
@@ -23,6 +26,9 @@ theorem bucket_accumulation_sound :
     by
       simp [ProgramRefinesKernelSpec, msm_bn254_classic_accumulate, bn254ClassicAccumulateSpec,
         msmSpec],
+    by
+      simp [ProgramRefinesKernelSpec, msm_bn254_classic_accumulate_segmented,
+        bn254ClassicSegmentedAccumulateSpec, msmSpec],
     by
       simp [ProgramRefinesKernelSpec, msm_pallas_classic_accumulate, pallasClassicAccumulateSpec,
         msmSpec],
@@ -37,6 +43,13 @@ theorem bucket_reduce_sound :
     ProgramRefinesKernelSpec msm_bn254_classic_reduce bn254ClassicReduceSpec := by
   simp [ProgramRefinesKernelSpec, msm_bn254_classic_reduce, bn254ClassicReduceSpec, msmSpec]
 
+theorem segment_reduce_sound :
+    ProgramRefinesKernelSpec
+      msm_bn254_classic_segment_reduce
+      bn254ClassicSegmentReduceSpec := by
+  simp [ProgramRefinesKernelSpec, msm_bn254_classic_segment_reduce,
+    bn254ClassicSegmentReduceSpec, msmSpec]
+
 theorem combine_windows_sound :
     ProgramRefinesKernelSpec msm_bn254_classic_combine bn254ClassicCombineSpec := by
   simp [ProgramRefinesKernelSpec, msm_bn254_classic_combine, bn254ClassicCombineSpec, msmSpec]
@@ -44,11 +57,15 @@ theorem combine_windows_sound :
 theorem bn254_msm_refines_pippenger :
     LoweringMatchesProgram msm_bn254_classic_assign
       ∧ LoweringMatchesProgram msm_bn254_classic_accumulate
+      ∧ LoweringMatchesProgram msm_bn254_classic_accumulate_segmented
+      ∧ LoweringMatchesProgram msm_bn254_classic_segment_reduce
       ∧ LoweringMatchesProgram msm_bn254_classic_reduce
       ∧ LoweringMatchesProgram msm_bn254_classic_combine := by
   exact ⟨
     by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_assign],
     by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_accumulate],
+    by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_accumulate_segmented],
+    by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_segment_reduce],
     by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_reduce],
     by simp [LoweringMatchesProgram, Program.stepCount, msm_bn254_classic_combine]
   ⟩
@@ -81,6 +98,16 @@ theorem msm_family_exact_pippenger_sound :
     (∀ env, MsmAcceptedLaunchSurface msm_bn254_classic_accumulate env ->
       ProgramImplementsMsmPippengerSemantics
         msm_bn254_classic_accumulate bn254ClassicAccumulateSemantics)
+      ∧
+    (∀ env, MsmAcceptedLaunchSurface msm_bn254_classic_accumulate_segmented env ->
+      ProgramImplementsMsmPippengerSemantics
+        msm_bn254_classic_accumulate_segmented
+        bn254ClassicSegmentedAccumulateSemantics)
+      ∧
+    (∀ env, MsmAcceptedLaunchSurface msm_bn254_classic_segment_reduce env ->
+      ProgramImplementsMsmPippengerSemantics
+        msm_bn254_classic_segment_reduce
+        bn254ClassicSegmentReduceSemantics)
       ∧
     (∀ env, MsmAcceptedLaunchSurface msm_bn254_classic_reduce env ->
       ProgramImplementsMsmPippengerSemantics
@@ -116,7 +143,8 @@ theorem msm_family_exact_pippenger_sound :
       ∧
     Bn254ClassicChainSurface
       msm_bn254_classic_assign
-      msm_bn254_classic_accumulate
+      msm_bn254_classic_accumulate_segmented
+      msm_bn254_classic_segment_reduce
       msm_bn254_classic_reduce
       msm_bn254_classic_combine
       ∧
@@ -133,7 +161,7 @@ theorem msm_family_exact_pippenger_sound :
       msm_vesta_naf_accumulate
       CurveFamily.vesta
       "vesta_msm_library" := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro env _accepted
     simp [
       ProgramImplementsMsmPippengerSemantics,
@@ -149,6 +177,22 @@ theorem msm_family_exact_pippenger_sound :
       msmSemantics,
       bn254SourcePaths,
       msm_bn254_classic_accumulate,
+    ]
+  · intro env _accepted
+    simp [
+      ProgramImplementsMsmPippengerSemantics,
+      bn254ClassicSegmentedAccumulateSemantics,
+      msmSemantics,
+      bn254SourcePaths,
+      msm_bn254_classic_accumulate_segmented,
+    ]
+  · intro env _accepted
+    simp [
+      ProgramImplementsMsmPippengerSemantics,
+      bn254ClassicSegmentReduceSemantics,
+      msmSemantics,
+      bn254ReduceSourcePaths,
+      msm_bn254_classic_segment_reduce,
     ]
   · intro env _accepted
     simp [
@@ -217,7 +261,8 @@ theorem msm_family_exact_pippenger_sound :
   · simp [
       Bn254ClassicChainSurface,
       msm_bn254_classic_assign,
-      msm_bn254_classic_accumulate,
+      msm_bn254_classic_accumulate_segmented,
+      msm_bn254_classic_segment_reduce,
       msm_bn254_classic_reduce,
       msm_bn254_classic_combine,
     ]

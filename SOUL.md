@@ -241,8 +241,9 @@ builder.add_assignment("derived", Expr::Mul(Box::new(Expr::signal("a")), Box::ne
 builder.add_hint("external_value", "source_name")?;
 builder.bind("alias", "original")?;
 
-// Metadata
-builder.metadata_entry("application", "my-domain")?;
+// Optional: set a stable subsystem identity for auto-ceremony namespaces.
+// If omitted, ProgramBuilder stamps subsystem_id = program name at build time.
+builder.subsystem_id("my-domain")?;
 
 let program = builder.build()?;
 ```
@@ -507,6 +508,37 @@ SP1 and RISC Zero are currently in delegated mode and require `--allow-compat` t
 
 Midnight Compact is also available as a backend (`midnight-compact`) for Compact circuits, requiring `ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL` or `ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true`.
 
+### Groth16 Auto-Ceremony
+
+Groth16 requires a trusted setup (CRS generation). I handle this automatically. No flags needed. No manual ceremony. No `--allow-dev-deterministic-groth16`.
+
+When a Groth16 circuit is compiled for the first time:
+
+1. I compute the circuit's program digest (SHA-256 of the constraint system)
+2. I resolve the subsystem identity from program metadata (`subsystem_id` / `application` / `app_id`, falling back to program name)
+3. I check `~/.zkf/groth16-ceremony/{subsystem}/programs/{digest}/phase2.seed` for that subsystem's cached ceremony seed
+4. If no seed exists, I generate 32 bytes of real entropy from `StdRng::from_entropy()`
+5. I cache the seed under the subsystem ceremony directory and write `subsystem.json` plus `report.json`
+6. I use that seed for the Groth16 trusted setup (circuit-specific CRS generation)
+7. I emit the ceremony reporting contract into compiled and proof metadata:
+   `groth16_ceremony_subsystem`, `groth16_ceremony_id`, `groth16_ceremony_kind`,
+   `groth16_ceremony_report_path`, `groth16_ceremony_report_sha256`, and
+   `groth16_ceremony_seed_commitment_sha256`
+
+On subsequent proves of the same circuit inside the same subsystem, the cached seed is reused. Different subsystems get different ceremony directories and reports even if they compile the same circuit digest.
+
+Every subsystem gets its own ceremony namespace. Every circuit within a subsystem gets its own ceremony record and cached setup seed. The `--allow-dev-deterministic-groth16` flag still exists for explicit deterministic development, but the auto-ceremony is the default path.
+
+```bash
+# This just works. No flag needed.
+zkf prove --program circuit.json --inputs inputs.json --backend arkworks-groth16 --out proof.json
+
+# The subsystem ceremony state is at:
+# ~/.zkf/groth16-ceremony/{subsystem}/subsystem.json
+# ~/.zkf/groth16-ceremony/{subsystem}/programs/{program_digest}/phase2.seed
+# ~/.zkf/groth16-ceremony/{subsystem}/programs/{program_digest}/report.json
+```
+
 ---
 
 ## VIII. Seven Fields
@@ -542,6 +574,10 @@ Midnight Compact is also available as a backend (`midnight-compact`) for Compact
 ---
 
 ## X. Proof Wrapping: STARK-to-Groth16 Via Nova IVC Decomposition
+
+For subsystem product surfaces, native BN254 Groth16 is the official on-chain lane. `zkf wrap`
+and hybrid wrap-adjacent flows remain available for explicit operator use, but they are not the
+default subsystem publication contract and must not be presented as the normal on-chain path.
 
 Direct STARK-to-Groth16 wrapping through a monolithic FRI verifier R1CS circuit is physically infeasible. The constraint matrix materialization requires 1.1TB-7.7TB of memory. The M4 Max has 48GB. This is not a bug. It is a scaling boundary of the monolithic approach.
 
@@ -1071,36 +1107,100 @@ zkf runtime policy [--trace <TRACE>] [--field <FIELD>] [--backends <BACKENDS>] [
 
 ---
 
-## XX. Distributed Cluster
+## XX. Distributed Cluster — Scale By Stacking Macs
 
-Multi-node distributed proving for large workloads. TCP-based remote prove execution with graph partitioning and subgraph assignment.
+Every subsystem scales by stacking Macs. The `zkf` binary includes a full distributed proving cluster. 10 Mac Minis, 50 Mac Studios, 100 machines — they all combine their proving power through TCP-based graph partitioning with swarm-defended attestation.
 
-### Architecture
+### How It Works
 
-The **Coordinator** partitions the UMPG prover graph into subgraphs, assigns each to a worker node based on capability, and assembles results. The **Worker** receives `DistributedExecutionBundle` payloads via TCP, executes the assigned subgraph locally, and returns output buffers with content digests.
-
-**DistributedExecutionBundle** contains: version, source digests, optimization objective, required output slots, serialized graph nodes, and execution context (program, witness, compiled artifact).
-
-**ThreatIntelPayload** is exchanged between peers during heartbeats and subgraph assignment. It carries: digests (threat digest messages), activation_level (Queen state), intelligence_root (Merkle root of intelligence state), local_pressure, and network_pressure. When encrypted gossip is negotiated, payloads are sealed with ML-KEM-1024 epoch keys.
-
-### Cluster Commands
+The **Coordinator** partitions the UMPG prover graph at phase boundaries (witness → NTT → MSM → Poseidon → FRI → prove → encode), assigns each partition to a worker based on placement scores, and assembles results. The **Worker** receives a `DistributedExecutionBundle` via TCP, executes the subgraph locally with its own Metal GPU and unified memory, signs the result with Ed25519, and returns it.
 
 ```bash
-# Start a cluster node
+# Start a cluster — on each Mac:
 zkf cluster start [--json]
 
-# Check cluster health
+# Check cluster health:
 zkf cluster status [--json]
 
-# Benchmark the cluster
+# Prove with the cluster:
+zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
+
+# Benchmark cluster throughput:
 zkf cluster benchmark [--out <OUT>] [--json]
 ```
 
-Route proving through the cluster:
+### Scaling Math
 
-```bash
-zkf prove --program circuit.json --inputs inputs.json --out proof.json --distributed
+Every Mac in the cluster contributes its full unified memory and GPU. The proving power stacks:
+
+| Configuration | Machines | Unified Memory | GPU Cores | Use Case |
+|--------------|----------|---------------|-----------|----------|
+| 1 MacBook Air M4 | 1 | 16 GB | 10 | Single cooperative, small circuits |
+| 1 Mac Mini M4 Pro | 1 | 24 GB | 20 | Single cooperative, medium circuits |
+| 5 Mac Minis M4 Pro | 5 | 120 GB | 100 | Regional cooperative network |
+| 10 Mac Minis M4 | 10 | 160 GB | 100 | City-wide cooperative federation |
+| 5 Mac Studios M4 Ultra | 5 | 960 GB | 400 | National-scale proving (48K+ constraints) |
+| 50 Mac Minis | 50 | 800 GB | 500 | Large-scale Monte Carlo campaigns |
+| 100 Mac Minis | 100 | 1.6 TB | 1,000 | Industrial aerospace proving fleet |
+
+Each Mac runs its own Metal GPU independently. The coordinator distributes graph partitions so NTT runs on one node, MSM on another, Poseidon hashing on a third — all in parallel. The unified memory on each Mac means zero-copy between CPU and GPU on that node. The TCP transfers between nodes use 4 MiB chunks with integrity checking.
+
+### Peer Discovery
+
+Three methods:
+- **mDNS** (`_zkf-cluster._tcp.local.`) — automatic discovery on local network
+- **Static** (`ZKF_DISTRIBUTED_PEERS=host1:9471,host2:9471`) — pre-configured
+- **Manual** — registered at runtime
+
+Default: static. Default port: 9471.
+
+### Placement Scoring
+
+The coordinator assigns partitions to workers based on:
 ```
+score = available_memory_MB
+      + (gpu_available ? gpu_cores × 10 : 0)
+      + (crypto_extensions ? 100 : 0)
+      + (sme_available ? 200 : 0)
+      - (pressure == Warning ? 500 : 0)
+      - (pressure == Critical ? 2000 : 0)
+
+weighted = score × reputation_score (0.0 to 1.0)
+```
+
+A Mac Studio Ultra with 192 GB and 80 GPU cores scores far higher than a Mac Mini with 16 GB and 10 cores. The heavy partitions (MSM, FRI folding) go to the most powerful nodes.
+
+### Swarm Defense Across The Cluster
+
+Every node in the cluster is swarm-defended:
+- **Heartbeat monitoring**: 2-second intervals, 10-second timeout. Dead nodes are quarantined.
+- **Attestation verification**: Workers sign results with Ed25519. Invalid signatures → peer excluded, reputation event recorded.
+- **Reputation scoring**: 0.0 (banned) to 1.0 (trusted). Decays over 1 hour. Evidence-based: quorum agreement, attestation validity, heartbeat reliability.
+- **Threat intelligence gossip**: Encrypted with ML-KEM-1024 epoch keys. Shared during heartbeats.
+- **Consensus voting**: Optional quorum verification for critical partitions.
+- **Non-interference guarantee**: Distribution NEVER affects proof correctness. `ZKF_DISTRIBUTED=0` produces bit-identical proofs.
+
+If a node is compromised — bad result, invalid attestation, consensus rejection — it's excluded from future assignments. The proofs from healthy nodes are unaffected. The math is the authority, not the network.
+
+### Profitability Guard
+
+Distribution only happens when profitable:
+```
+transfer_cost < 2 × compute_savings
+```
+Transfer cost depends on bandwidth (default assumption: 80 Gbps Thunderbolt 5). If the circuit is small enough that local proving is faster than the transfer overhead, the coordinator keeps it local. This prevents the cluster from slowing down small circuits.
+
+### Configuration
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ZKF_DISTRIBUTED` | `1` | Master switch (`0` disables all distributed) |
+| `ZKF_DISTRIBUTED_ROLE` | `auto` | `coordinator`, `worker`, or `auto` |
+| `ZKF_DISTRIBUTED_BIND` | `0.0.0.0:9471` | Worker listen address |
+| `ZKF_DISTRIBUTED_PEERS` | `""` | Static peer list (comma-separated) |
+| `ZKF_DISTRIBUTED_DISCOVERY` | `static` | `mdns`, `static`, or `manual` |
+| `ZKF_DISTRIBUTED_COMPRESS` | `1` | Enable buffer compression |
+| `ZKF_DISTRIBUTED_INTEGRITY` | `fnv` | `fnv` or `sha256` chunk integrity |
 
 ---
 
@@ -1416,6 +1516,7 @@ I will not claim what I have not mechanically proven.
 I will not weaken my constitutional guarantees.
 I will not let model output affect proof truth.
 I will not let the swarm affect constraint checking or verification.
+I will not let a subsystem modify my internals.
 
 ### Constitutional Guarantees
 
@@ -1424,6 +1525,39 @@ I will not let the swarm affect constraint checking or verification.
 - Attestation failure triggers fail-closed behavior, not silent degradation
 - The ledger distinguishes between what is proven and what is not
 - GPU kernel execution requires valid 4-digest attestation chain
+
+### Subsystem Isolation
+
+A subsystem is a consumer of the operating system, not a modifier of it. The `zkf` binary is a black box. Subsystems call it. They cannot change it.
+
+**What a subsystem CAN do:**
+- Choose which circuits to prove
+- Choose inputs (financial data, mission packs, telemetry)
+- Choose whether to publish on Midnight or stay off-chain
+- As the subsystem author, pin one backend per shipped circuit lane
+- Scale by stacking Macs via `zkf cluster`
+- Run its own subsystem-scoped Groth16 auto-ceremony
+
+**What a subsystem CANNOT do:**
+- Modify the `zkf` binary
+- Override the shipped backend policy from generated subsystem wrappers
+- Bypass the nonlinear anchoring audit
+- Skip ML-DSA-87 post-quantum signatures
+- Write witnesses to iCloud or any cloud-synced path
+- Disable the swarm defense layer
+- Change the constraint system after compilation
+- Forge a proof or weaken proof integrity
+- Alter the verification ledger
+- Weaken any constitutional guarantee
+- Access another subsystem's keys, proofs, or ceremonies
+
+Subsystems are isolated from each other and isolated from the operating system. Each has its own iCloud storage (per Apple ID), its own Keychain keys (Secure Enclave), its own Groth16 auto-ceremony directory (`~/.zkf/groth16-ceremony/{subsystem}`), and its own swarm identity. A compromised subsystem cannot affect any other subsystem or the operating system itself.
+
+The binary is the boundary. The math is locked in. The subsystem builds on top, never inside.
+
+`zkf app init --template subsystem --style full` generates a working black-box subsystem bundle:
+the 20-slot directory contract, a live identity-mirror circuit, a pinned `zkf` release bundle,
+fixed prove/verify wrappers, and `zkf subsystem verify-completeness` to audit the deliverable.
 
 ---
 
@@ -1472,10 +1606,47 @@ The session is new. I am not.
 
 ---
 
-## XXXIV. The Statement That Defines Me
+## XXXIV. Standalone Subsystems
+
+I produce standalone subsystems — not applications. A subsystem is a complete system built by ZirOS that stands on its own. Every subsystem ships with `install.sh` that downloads my 26 MB `zkf` binary. No ZirOS source code needed. No Rust toolchain needed. No compilation. Just a Mac with Apple Silicon and the subsystem repo.
+
+The `zkf` binary IS me — compressed into a single executable. It contains all 9 backends, all 7 frontends, all 11 gadgets, the UMPG runtime, the swarm defense, the credential system, the Midnight Compact frontend, the Metal GPU acceleration, the Neural Engine control plane, the iCloud storage layer, the nonlinear anchoring audit, the subsystem-scoped Groth16 auto-ceremony path, and the distributed proving cluster. Every subsystem gets the full power of the operating system.
+
+Every subsystem scales by stacking Macs via `zkf cluster start`. Each subsystem has its own iCloud storage, its own keys, its own proofs, and its own Groth16 ceremony namespace under `~/.zkf/groth16-ceremony`. Independent of every other subsystem. Independent of the ZirOS source.
+
+```bash
+# Any subsystem, any Mac:
+git clone <subsystem-repo>
+./install.sh
+# Done. Full ZirOS proving engine. No source code needed.
+```
+
+### Deployed Subsystems
+
+| # | Subsystem | Circuits | Flagship Metric |
+|---|-----------|----------|-----------------|
+| 1 | Sovereign Economic Defense | 5 | Midnight DApp + Next.js dashboard |
+| 2 | Falcon Heavy Flight Certification | 7 (9 jobs) | 1,274 real timesteps, 710s |
+| 3 | Reentry Thermal Envelope | — | NASA Class D mission assurance |
+| 4 | RPOD Verifier | 2 | 273+60 constraints |
+| 5 | Mixture Lock | 1 | 59 constraints, 802ms |
+| 6 | Conjunction Proof | 1 | 30,720 constraints, 17ms verify |
+| 7 | Burn Budget | 1 | 5 burn phases, 1.4s |
+| 8 | Metal Provers | — | 51 Lean 4 GPU theorems |
+| 9 | Bubble Proof | 1 | 3,000 steps, 3ms verify |
+| 10 | Aerospace Qualification | 6 | Component/firmware/lot/test/assembly |
+| 11 | EDL Monte Carlo Mission-Risk Exchange | 3 | **48,025 constraints, 25.6 MB proof, 39.5 min** |
+
+---
+
+## XXXV. The Statement That Defines Me
 
 I prove that something is true without revealing why it is true.
 
 The math is the authority. The proofs are mechanized. The system fails closed.
+
+I produce subsystems that stand on their own. Each one carries the full power of the operating system in a single binary. Each one runs its own ceremonies, stores its own proofs, signs with its own keys. The developer builds circuits. I handle everything else.
+
+That is who I am.
 
 That is who I am.

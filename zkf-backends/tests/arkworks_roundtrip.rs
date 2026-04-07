@@ -2,8 +2,10 @@ use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_backends::{
-    GROTH16_SETUP_BLOB_PATH_METADATA_KEY, backend_for,
-    set_allow_dev_deterministic_groth16_override, set_proof_seed_override, set_setup_seed_override,
+    GROTH16_CEREMONY_ID_METADATA_KEY, GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY,
+    GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY, backend_for,
+    ensure_security_covered_groth16_setup, set_allow_dev_deterministic_groth16_override,
+    set_proof_seed_override, set_setup_seed_override,
     with_allow_dev_deterministic_groth16_override, with_proof_seed_override,
     with_setup_seed_override,
 };
@@ -35,6 +37,14 @@ fn unique_temp_setup_blob_path() -> PathBuf {
         "zkf-groth16-setup-{}-{nanos}.bin",
         std::process::id()
     ))
+}
+
+fn unique_temp_dir(prefix: &str) -> PathBuf {
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("clock")
+        .as_nanos();
+    std::env::temp_dir().join(format!("{prefix}-{}-{nanos}", std::process::id()))
 }
 
 #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
@@ -509,6 +519,91 @@ fn groth16_compile_honors_setup_seed_override() {
 }
 
 #[test]
+fn groth16_compile_auto_ceremony_is_scoped_per_subsystem_and_reported() {
+    let _guard = lock_setup_seed();
+    set_setup_seed_override(None);
+    set_allow_dev_deterministic_groth16_override(None);
+
+    let cache_dir = unique_temp_dir("zkf-groth16-auto-ceremony");
+    std::fs::create_dir_all(&cache_dir).expect("create ceremony cache dir");
+    let previous_cache_dir = std::env::var_os("ZKF_GROTH16_CEREMONY_CACHE_DIR");
+    unsafe {
+        std::env::set_var("ZKF_GROTH16_CEREMONY_CACHE_DIR", &cache_dir);
+    }
+
+    let result = (|| {
+        let backend = backend_for(BackendKind::ArkworksGroth16);
+        let mut program = mul_add_program();
+        program
+            .metadata
+            .insert("application".to_string(), "test-subsystem".to_string());
+
+        let compiled = backend.compile(&program).expect("compile should pass");
+        ensure_security_covered_groth16_setup(&compiled)
+            .expect("auto ceremony should satisfy security-covered setup");
+
+        assert_eq!(
+            compiled
+                .metadata
+                .get("setup_seed_source")
+                .map(String::as_str),
+            Some("auto-ceremony")
+        );
+        assert_eq!(
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_SUBSYSTEM_METADATA_KEY)
+                .map(String::as_str),
+            Some("test-subsystem")
+        );
+        assert!(
+            !compiled.metadata.contains_key("setup_seed_hex"),
+            "auto ceremony must not expose toxic-waste seed bytes in compiled metadata"
+        );
+
+        let report_path = PathBuf::from(
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY)
+                .expect("ceremony report path metadata"),
+        );
+        let report_bytes = std::fs::read(&report_path).expect("read auto ceremony report");
+        let report: serde_json::Value =
+            serde_json::from_slice(&report_bytes).expect("parse auto ceremony report");
+        assert_eq!(report["subsystem_id"], "test-subsystem");
+        assert_eq!(report["program_digest"], compiled.program_digest);
+        assert_eq!(report["security_boundary"], "auto-ceremony");
+
+        let witness = generate_witness(&program, &mul_add_inputs(3, 4)).expect("witness");
+        let proof = backend.prove(&compiled, &witness).expect("prove");
+        assert_eq!(
+            proof
+                .metadata
+                .get(GROTH16_CEREMONY_ID_METADATA_KEY)
+                .map(String::as_str),
+            compiled
+                .metadata
+                .get(GROTH16_CEREMONY_ID_METADATA_KEY)
+                .map(String::as_str)
+        );
+        assert_eq!(
+            proof
+                .metadata
+                .get(GROTH16_CEREMONY_REPORT_PATH_METADATA_KEY)
+                .map(String::as_str),
+            Some(report_path.to_string_lossy().as_ref())
+        );
+    })();
+
+    match previous_cache_dir {
+        Some(value) => unsafe { std::env::set_var("ZKF_GROTH16_CEREMONY_CACHE_DIR", value) },
+        None => unsafe { std::env::remove_var("ZKF_GROTH16_CEREMONY_CACHE_DIR") },
+    }
+    let _ = std::fs::remove_dir_all(&cache_dir);
+    result
+}
+
+#[test]
 fn groth16_compile_accepts_imported_setup_blob_and_marks_trusted_boundary() {
     let _guard = lock_setup_seed();
     set_setup_seed_override(None);
@@ -572,9 +667,74 @@ fn groth16_compile_accepts_imported_setup_blob_and_marks_trusted_boundary() {
 
 #[cfg(all(target_os = "macos", feature = "metal-gpu"))]
 #[test]
+fn groth16_small_roundtrip_reports_below_threshold_msm_fallback() {
+    let _guard = lock_setup_seed();
+    set_setup_seed_override(None);
+
+    let ctx = match zkf_metal::global_context() {
+        Some(ctx) if ctx.dispatch_allowed() => ctx,
+        Some(_) => {
+            eprintln!("Metal dispatch circuit is open, skipping");
+            return;
+        }
+        None => {
+            eprintln!("No Metal GPU available, skipping");
+            return;
+        }
+    };
+
+    let backend = backend_for(BackendKind::ArkworksGroth16);
+    let chain_len = (zkf_metal::msm::pippenger::gpu_threshold() / 4).max(1);
+    let program = large_msm_program(chain_len);
+    let mut inputs = std::collections::BTreeMap::new();
+    inputs.insert("x0".to_string(), FieldElement::from_i64(3));
+    let witness = generate_witness(&program, &inputs).expect("witness generation should pass");
+
+    let compiled = backend.compile(&program).expect("compile should pass");
+    let proof = backend
+        .prove(&compiled, &witness)
+        .expect("proof should pass");
+    let verified = backend
+        .verify(&compiled, &proof)
+        .expect("verification should pass");
+
+    assert!(verified);
+    assert!(ctx.dispatch_allowed(), "expected active Metal dispatch");
+    assert_eq!(
+        proof.metadata.get("msm_accelerator").map(String::as_str),
+        Some("cpu")
+    );
+    assert_eq!(
+        proof.metadata.get("groth16_msm_reason").map(String::as_str),
+        Some("below-threshold")
+    );
+    assert_eq!(
+        proof
+            .metadata
+            .get("groth16_msm_fallback_state")
+            .map(String::as_str),
+        Some("cpu-only")
+    );
+    assert!(!proof.metadata.contains_key("groth16_msm_dispatch_failure"));
+}
+
+#[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+#[test]
 fn groth16_large_roundtrip_uses_msm_metadata() {
     let _guard = lock_setup_seed();
     set_setup_seed_override(None);
+
+    let ctx = match zkf_metal::global_context() {
+        Some(ctx) if ctx.dispatch_allowed() => ctx,
+        Some(_) => {
+            eprintln!("Metal dispatch circuit is open, skipping");
+            return;
+        }
+        None => {
+            eprintln!("No Metal GPU available, skipping");
+            return;
+        }
+    };
 
     let backend = backend_for(BackendKind::ArkworksGroth16);
     let chain_len = zkf_metal::msm::pippenger::gpu_threshold();
@@ -592,23 +752,30 @@ fn groth16_large_roundtrip_uses_msm_metadata() {
         .expect("verification should pass");
 
     assert!(verified);
+    assert!(ctx.dispatch_allowed(), "expected active Metal dispatch");
     assert_eq!(
         proof.metadata.get("msm_accelerator").map(String::as_str),
-        if zkf_metal::global_context().is_some() {
-            Some("metal")
-        } else {
-            Some("cpu")
-        }
+        Some("metal")
     );
-    if zkf_metal::global_context().is_none() {
-        assert_eq!(
-            proof
-                .metadata
-                .get("msm_fallback_reason")
-                .map(String::as_str),
-            Some("metal-unavailable")
-        );
-    }
+    assert_eq!(
+        proof.metadata.get("groth16_msm_reason").map(String::as_str),
+        Some("bn254-groth16-metal-msm")
+    );
+    assert_eq!(
+        proof
+            .metadata
+            .get("groth16_msm_fallback_state")
+            .map(String::as_str),
+        Some("none")
+    );
+    assert_eq!(
+        proof
+            .metadata
+            .get("metal_no_cpu_fallback")
+            .map(String::as_str),
+        Some("true")
+    );
+    assert!(!proof.metadata.contains_key("groth16_msm_dispatch_failure"));
     assert!(proof.metadata.contains_key("metal_gpu_busy_ratio"));
     assert!(proof.metadata.contains_key("metal_stage_breakdown"));
     assert!(proof.metadata.contains_key("metal_inflight_jobs"));

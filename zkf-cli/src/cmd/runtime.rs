@@ -1958,6 +1958,13 @@ fn handle_certify(
     let report_path = json_out.unwrap_or_else(|| out_dir.join("strict-certification.json"));
     let proof_bytes = fs::read(&proof).map_err(|e| format!("{}: {e}", proof.display()))?;
     let compiled_bytes = fs::read(&compiled).map_err(|e| format!("{}: {e}", compiled.display()))?;
+    let source_compiled: CompiledProgram =
+        serde_json::from_slice(&compiled_bytes).map_err(|e| {
+            format!(
+                "invalid compiled program JSON at {}: {e}",
+                compiled.display()
+            )
+        })?;
     let build = current_certification_build_info()?;
     let soak_progress_path =
         matches!(mode, CertificationMode::Soak).then(|| out_dir.join("soak-progress.json"));
@@ -2059,42 +2066,39 @@ fn handle_certify(
     };
     let prepare_json: Value = if let Some(path) = existing_prepare_path {
         let existing: Value = read_json_path(&path)?;
-        validate_prepare_report(&existing)?;
-        if path != prepare_path {
-            crate::util::write_json(&prepare_path, &existing)?;
+        if existing_prepare_report_reusable(
+            &existing,
+            &proof,
+            &compiled,
+            zkf_runtime::HardwareProfile::M4,
+        )? {
+            if path != prepare_path {
+                crate::util::write_json(&prepare_path, &existing)?;
+            }
+            eprintln!(
+                "strict certification: reusing existing prepare report {}",
+                path.display()
+            );
+            existing
+        } else {
+            eprintln!(
+                "strict certification: existing prepare report {} is stale; regenerating",
+                path.display()
+            );
+            run_strict_certification_prepare(&proof, &compiled, &prepare_path)?
         }
-        eprintln!(
-            "strict certification: reusing existing prepare report {}",
-            path.display()
-        );
-        existing
     } else {
-        let prepare_capture = run_self_cli_json(
-            &[
-                "runtime".to_string(),
-                "prepare".to_string(),
-                "--proof".to_string(),
-                proof.display().to_string(),
-                "--compiled".to_string(),
-                compiled.display().to_string(),
-                "--output".to_string(),
-                prepare_path.display().to_string(),
-            ],
-            &[],
-            None,
-            false,
-        )?;
-        if !prepare_capture.status_ok {
-            return Err(format!(
-                "strict certification prepare failed: {}",
-                stderr_summary(&prepare_capture.stderr)
-            ));
-        }
-        let generated: Value = read_json_path(&prepare_path)?;
-        validate_prepare_report(&generated)?;
-        generated
+        run_strict_certification_prepare(&proof, &compiled, &prepare_path)?
     };
     validate_prepare_report(&prepare_json)?;
+    let prepare_preview = parse_prepare_report_preview(&prepare_json)?;
+    if let Some(reason) = strict_certification_wrap_admission_failure(
+        &preflight_json,
+        &prepare_preview,
+        source_compiled.program.constraints.len(),
+    ) {
+        return Err(format!("strict certification admission failed: {reason}"));
+    }
     let prepare_report_sha256 = crate::util::sha256_hex(
         &fs::read(&prepare_path).map_err(|e| format!("{}: {e}", prepare_path.display()))?,
     );
@@ -2687,14 +2691,21 @@ fn create_runtime_certification_temp_dir() -> PathBuf {
     std::env::temp_dir().join(format!("zkf-strict-certification-{pid}-{nanos}"))
 }
 
+fn default_zkf_cache_root() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|home| home.join(".zkf").join("cache"))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
 fn strict_certification_cache_dir() -> PathBuf {
     if let Some(root) = std::env::var_os("ZKF_CACHE_DIR") {
         PathBuf::from(root)
             .join("stark-to-groth16")
             .join("certification")
     } else {
-        std::env::temp_dir()
-            .join("zkf-stark-to-groth16")
+        default_zkf_cache_root()
+            .join("stark-to-groth16")
             .join("certification")
     }
 }
@@ -2924,6 +2935,113 @@ fn runtime_only_metal_doctor_failures(value: &Value) -> Vec<String> {
     failures
 }
 
+fn parse_prepare_report_preview(value: &Value) -> Result<WrapperPreview, String> {
+    let preview = value.get("wrapper_preview").cloned().ok_or_else(|| {
+        "strict certification prepare report is missing wrapper_preview".to_string()
+    })?;
+    serde_json::from_value(preview)
+        .map_err(|e| format!("invalid wrapper_preview in strict certification prepare report: {e}"))
+}
+
+fn strict_certification_runtime_metal_probe(
+    preflight_doctor: &Value,
+) -> zkf_runtime::RuntimeMemoryProbe {
+    let runtime = preflight_doctor.get("runtime").unwrap_or(&Value::Null);
+    zkf_runtime::RuntimeMemoryProbe {
+        recommended_working_set_size_bytes: runtime
+            .get("recommended_working_set_size_bytes")
+            .and_then(value_to_u64),
+        current_allocated_size_bytes: runtime
+            .get("current_allocated_size_bytes")
+            .and_then(value_to_u64),
+    }
+}
+
+fn strict_certification_wrap_memory_plan_with_host(
+    host: &zkf_runtime::RuntimeHostSnapshot,
+    preflight_doctor: &Value,
+    preview: &WrapperPreview,
+    fallback_constraint_count: usize,
+) -> zkf_runtime::RuntimeMemoryPlan {
+    use zkf_runtime::{
+        RuntimeMemoryPlanInput, compute_runtime_memory_plan,
+        estimate_job_bytes_from_constraint_count,
+    };
+
+    let compiled_constraint_count = preview
+        .estimated_constraints
+        .and_then(|value| usize::try_from(value).ok())
+        .unwrap_or(fallback_constraint_count);
+    let graph_required_bytes = preview.estimated_memory_bytes.filter(|value| *value > 0);
+    let baseline_job_estimate_bytes =
+        estimate_job_bytes_from_constraint_count(compiled_constraint_count);
+    let job_estimate_bytes = graph_required_bytes
+        .unwrap_or(baseline_job_estimate_bytes)
+        .max(baseline_job_estimate_bytes);
+
+    compute_runtime_memory_plan(
+        host,
+        RuntimeMemoryPlanInput {
+            compiled_constraint_count,
+            job_estimate_bytes,
+            graph_required_bytes,
+            metal: strict_certification_runtime_metal_probe(preflight_doctor),
+        },
+    )
+}
+
+fn gib_string(bytes: u64) -> String {
+    format!("{:.1} GiB", bytes as f64 / (1024.0 * 1024.0 * 1024.0))
+}
+
+fn gib_option_string(bytes: Option<u64>) -> String {
+    bytes
+        .map(gib_string)
+        .unwrap_or_else(|| "unknown".to_string())
+}
+
+fn strict_certification_wrap_admission_failure_with_host(
+    host: &zkf_runtime::RuntimeHostSnapshot,
+    preflight_doctor: &Value,
+    preview: &WrapperPreview,
+    fallback_constraint_count: usize,
+) -> Option<String> {
+    let plan = strict_certification_wrap_memory_plan_with_host(
+        host,
+        preflight_doctor,
+        preview,
+        fallback_constraint_count,
+    );
+    if plan.gpu_allowed && !plan.cpu_override_active {
+        return None;
+    }
+
+    Some(format!(
+        "current strict-wrap memory admission predicts degraded Metal execution (pressure={}, available_ram={}, execution_budget={}, projected_peak={}, wrap_estimate={}, metal_headroom={}, metal_residency_budget={}); refusing to enter a cold wrap that would likely fall back to CPU or hit the MSM watchdog",
+        plan.pressure_level,
+        gib_string(plan.available_ram_bytes),
+        gib_string(plan.execution_budget_bytes),
+        gib_string(plan.projected_peak_bytes),
+        gib_option_string(preview.estimated_memory_bytes),
+        gib_option_string(plan.metal_working_set_headroom_bytes),
+        gib_string(plan.metal_residency_budget_bytes),
+    ))
+}
+
+fn strict_certification_wrap_admission_failure(
+    preflight_doctor: &Value,
+    preview: &WrapperPreview,
+    fallback_constraint_count: usize,
+) -> Option<String> {
+    let host = zkf_runtime::RuntimeHostSnapshot::detect();
+    strict_certification_wrap_admission_failure_with_host(
+        &host,
+        preflight_doctor,
+        preview,
+        fallback_constraint_count,
+    )
+}
+
 fn validate_prepare_report(value: &Value) -> Result<(), String> {
     if value.get("requested_trust_lane").and_then(Value::as_str) != Some("strict-cryptographic") {
         return Err("strict certification prepare report used a non-strict trust lane".to_string());
@@ -2942,6 +3060,111 @@ fn validate_prepare_report(value: &Value) -> Result<(), String> {
         ));
     }
     Ok(())
+}
+
+fn strict_certification_prepare_args(
+    proof: &Path,
+    compiled: &Path,
+    prepare_path: &Path,
+) -> Vec<String> {
+    vec![
+        "runtime".to_string(),
+        "prepare".to_string(),
+        "--proof".to_string(),
+        proof.display().to_string(),
+        "--compiled".to_string(),
+        compiled.display().to_string(),
+        "--allow-large-direct-materialization".to_string(),
+        "--output".to_string(),
+        prepare_path.display().to_string(),
+    ]
+}
+
+fn run_strict_certification_prepare(
+    proof: &Path,
+    compiled: &Path,
+    prepare_path: &Path,
+) -> Result<Value, String> {
+    let prepare_capture = run_self_cli_json(
+        &strict_certification_prepare_args(proof, compiled, prepare_path),
+        &[],
+        None,
+        false,
+    )?;
+    if !prepare_capture.status_ok {
+        return Err(format!(
+            "strict certification prepare failed: {}",
+            stderr_summary(&prepare_capture.stderr)
+        ));
+    }
+    let generated: Value = read_json_path(prepare_path)?;
+    validate_prepare_report(&generated)?;
+    Ok(generated)
+}
+
+fn prepare_report_reusable_with_live_preview(
+    report: &Value,
+    proof_path: &Path,
+    compiled_path: &Path,
+    hardware_profile: zkf_runtime::HardwareProfile,
+    live_preview: &WrapperPreview,
+) -> bool {
+    if validate_prepare_report(report).is_err() {
+        return false;
+    }
+    if report.get("proof").and_then(Value::as_str) != Some(proof_path.to_string_lossy().as_ref()) {
+        return false;
+    }
+    if report.get("compiled").and_then(Value::as_str)
+        != Some(compiled_path.to_string_lossy().as_ref())
+    {
+        return false;
+    }
+    if report.get("hardware_profile").and_then(Value::as_str) != Some(hardware_profile.as_str()) {
+        return false;
+    }
+    if enforce_preview_trust_lane(
+        live_preview,
+        zkf_runtime::RequiredTrustLane::StrictCryptographic,
+    )
+    .is_err()
+    {
+        return false;
+    }
+    if enforce_prepare_ready_preview(live_preview).is_err() {
+        return false;
+    }
+    let Some(expected_value) = report.get("wrapper_preview") else {
+        return false;
+    };
+    let Ok(expected_preview) = serde_json::from_value::<WrapperPreview>(expected_value.clone())
+    else {
+        return false;
+    };
+    wrapper_preview_matches_plan(&expected_preview, live_preview)
+}
+
+fn existing_prepare_report_reusable(
+    report: &Value,
+    proof_path: &Path,
+    compiled_path: &Path,
+    hardware_profile: zkf_runtime::HardwareProfile,
+) -> Result<bool, String> {
+    let source_proof: ProofArtifact = read_json_path(proof_path)?;
+    let source_compiled: CompiledProgram = read_json_path(compiled_path)?;
+    let live_preview = preview_wrapper_inputs(
+        &source_proof,
+        &source_compiled,
+        zkf_runtime::RequiredTrustLane::StrictCryptographic,
+        None,
+    )?;
+    Ok(prepare_report_reusable_with_live_preview(
+        report,
+        proof_path,
+        compiled_path,
+        hardware_profile,
+        &live_preview,
+    ))
 }
 
 fn resolve_certification_parallel_jobs(value: &str, compiled_path: &Path) -> Result<usize, String> {
@@ -6544,6 +6767,195 @@ mod tests {
     }
 
     #[test]
+    fn strict_certification_prepare_args_request_large_materialization() {
+        let args = strict_certification_prepare_args(
+            Path::new("/tmp/source-proof.json"),
+            Path::new("/tmp/source-compiled.json"),
+            Path::new("/tmp/prepare.json"),
+        );
+
+        assert!(
+            args.iter()
+                .any(|arg| arg == "--allow-large-direct-materialization")
+        );
+    }
+
+    #[test]
+    fn prepare_report_reuse_accepts_matching_live_ready_preview() {
+        let live_preview = WrapperPreview {
+            wrapper: "stark-to-groth16".to_string(),
+            source_backend: BackendKind::Plonky3,
+            target_backend: BackendKind::ArkworksGroth16,
+            planned_status: "wrapped-v2".to_string(),
+            strategy: "direct-fri-v2".to_string(),
+            trust_model: "cryptographic".to_string(),
+            trust_model_description: Some("strict".to_string()),
+            estimated_constraints: Some(30_000_000),
+            estimated_memory_bytes: Some(26_880_000_000),
+            memory_budget_bytes: Some(36_977_885_184),
+            low_memory_mode: Some(false),
+            prepare_required: Some(false),
+            setup_cache_state: Some("ready".to_string()),
+            reason: Some("fits".to_string()),
+        };
+        let report = json!({
+            "requested_trust_lane": "strict-cryptographic",
+            "proof": "/tmp/source-proof.json",
+            "compiled": "/tmp/source-compiled.json",
+            "hardware_profile": "apple-silicon-m4-max-48gb",
+            "cache_report": {
+                "blocked": false
+            },
+            "wrapper_preview": serde_json::to_value(&live_preview).unwrap(),
+        });
+
+        assert!(prepare_report_reusable_with_live_preview(
+            &report,
+            Path::new("/tmp/source-proof.json"),
+            Path::new("/tmp/source-compiled.json"),
+            zkf_runtime::HardwareProfile::M4,
+            &live_preview,
+        ));
+    }
+
+    #[test]
+    fn prepare_report_reuse_rejects_stale_missing_cache_preview() {
+        let report_preview = WrapperPreview {
+            wrapper: "stark-to-groth16".to_string(),
+            source_backend: BackendKind::Plonky3,
+            target_backend: BackendKind::ArkworksGroth16,
+            planned_status: "wrapped-v2".to_string(),
+            strategy: "direct-fri-v2".to_string(),
+            trust_model: "cryptographic".to_string(),
+            trust_model_description: Some("strict".to_string()),
+            estimated_constraints: Some(30_000_000),
+            estimated_memory_bytes: Some(26_880_000_000),
+            memory_budget_bytes: Some(36_977_885_184),
+            low_memory_mode: Some(false),
+            prepare_required: Some(false),
+            setup_cache_state: Some("ready".to_string()),
+            reason: Some("fits".to_string()),
+        };
+        let live_preview = WrapperPreview {
+            prepare_required: Some(true),
+            setup_cache_state: Some("missing".to_string()),
+            reason: Some("run `zkf runtime prepare` first".to_string()),
+            ..report_preview.clone()
+        };
+        let report = json!({
+            "requested_trust_lane": "strict-cryptographic",
+            "proof": "/tmp/source-proof.json",
+            "compiled": "/tmp/source-compiled.json",
+            "hardware_profile": "apple-silicon-m4-max-48gb",
+            "cache_report": {
+                "blocked": false
+            },
+            "wrapper_preview": serde_json::to_value(&report_preview).unwrap(),
+        });
+
+        assert!(!prepare_report_reusable_with_live_preview(
+            &report,
+            Path::new("/tmp/source-proof.json"),
+            Path::new("/tmp/source-compiled.json"),
+            zkf_runtime::HardwareProfile::M4,
+            &live_preview,
+        ));
+    }
+
+    fn strict_wrap_runtime_host(
+        total_gib: u64,
+        available_gib: u64,
+        pressure_level: zkf_core::PressureLevel,
+    ) -> zkf_runtime::RuntimeHostSnapshot {
+        let resources = zkf_core::SystemResources {
+            total_ram_bytes: total_gib * 1024 * 1024 * 1024,
+            available_ram_bytes: available_gib * 1024 * 1024 * 1024,
+            cpu_cores_logical: 16,
+            cpu_cores_physical: 12,
+            unified_memory: true,
+            gpu_memory_bytes: Some(total_gib * 1024 * 1024 * 1024),
+            pressure: zkf_core::MemoryPressure {
+                level: pressure_level,
+                utilization_pct: 0.0,
+                compressed_bytes: 0,
+                swap_used_bytes: 0,
+                raw_available_i64: (available_gib * 1024 * 1024 * 1024) as i64,
+                compressor_overflow: false,
+                free_bytes: 0,
+                inactive_bytes: 0,
+                purgeable_bytes: 0,
+                wired_bytes: 0,
+            },
+        };
+        let recommendation = resources.recommend();
+        zkf_runtime::RuntimeHostSnapshot {
+            resources,
+            recommendation,
+        }
+    }
+
+    fn strict_wrap_preview(
+        estimated_constraints: u64,
+        estimated_memory_gib: u64,
+    ) -> WrapperPreview {
+        WrapperPreview {
+            wrapper: "stark-to-groth16".to_string(),
+            source_backend: BackendKind::Plonky3,
+            target_backend: BackendKind::ArkworksGroth16,
+            planned_status: "wrapped-v2".to_string(),
+            strategy: "direct-fri-v2".to_string(),
+            trust_model: "cryptographic".to_string(),
+            trust_model_description: Some("strict".to_string()),
+            estimated_constraints: Some(estimated_constraints),
+            estimated_memory_bytes: Some(estimated_memory_gib * 1024 * 1024 * 1024),
+            memory_budget_bytes: Some(36 * 1024 * 1024 * 1024),
+            low_memory_mode: Some(false),
+            prepare_required: Some(false),
+            setup_cache_state: Some("ready".to_string()),
+            reason: Some("fits".to_string()),
+        }
+    }
+
+    fn strict_wrap_doctor(recommended_working_set_gib: u64, current_allocated_gib: u64) -> Value {
+        json!({
+            "runtime": {
+                "recommended_working_set_size_bytes": recommended_working_set_gib * 1024_u64 * 1024 * 1024,
+                "current_allocated_size_bytes": current_allocated_gib * 1024_u64 * 1024 * 1024,
+            }
+        })
+    }
+
+    #[test]
+    fn strict_certification_admission_rejects_high_pressure_direct_wrap() {
+        let host = strict_wrap_runtime_host(48, 12, zkf_core::PressureLevel::High);
+        let preview = strict_wrap_preview(30_000_000, 27);
+        let doctor = strict_wrap_doctor(40, 2);
+
+        let failure =
+            strict_certification_wrap_admission_failure_with_host(&host, &doctor, &preview, 1_024)
+                .unwrap();
+
+        assert!(failure.contains("pressure=HIGH"));
+        assert!(failure.contains("projected_peak="));
+        assert!(failure.contains("metal_headroom="));
+    }
+
+    #[test]
+    fn strict_certification_admission_accepts_healthy_headroom() {
+        let host = strict_wrap_runtime_host(48, 44, zkf_core::PressureLevel::Normal);
+        let preview = strict_wrap_preview(30_000_000, 27);
+        let doctor = strict_wrap_doctor(40, 2);
+
+        let failure =
+            strict_certification_wrap_admission_failure_with_host(&host, &doctor, &preview, 1_024);
+
+        assert!(failure.is_none());
+        let plan = strict_certification_wrap_memory_plan_with_host(&host, &doctor, &preview, 1_024);
+        assert!(plan.gpu_allowed);
+        assert!(!plan.cpu_override_active);
+    }
+
+    #[test]
     fn generic_plan_document_round_trips_into_graph() {
         let graph = RuntimeCompiler::build_plan(
             1024,
@@ -7960,6 +8372,44 @@ mod tests {
 
         unsafe {
             std::env::remove_var("ZKF_CACHE_DIR");
+        }
+    }
+
+    #[test]
+    fn strict_certification_report_defaults_to_home_cache_root() {
+        let _guard = ENV_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let temp_root =
+            std::env::temp_dir().join(format!("zkf-runtime-cert-home-{}", std::process::id()));
+        let fake_home = temp_root.join("home");
+        fs::create_dir_all(&fake_home).unwrap();
+
+        let previous_home = std::env::var_os("HOME");
+        let previous_cache_dir = std::env::var_os("ZKF_CACHE_DIR");
+        unsafe {
+            std::env::set_var("HOME", &fake_home);
+            std::env::remove_var("ZKF_CACHE_DIR");
+        }
+
+        let path = strict_certification_report_path();
+        assert_eq!(
+            path,
+            fake_home
+                .join(".zkf")
+                .join("cache")
+                .join("stark-to-groth16")
+                .join("certification")
+                .join("strict-m4-max.json")
+        );
+
+        match previous_home {
+            Some(value) => unsafe { std::env::set_var("HOME", value) },
+            None => unsafe { std::env::remove_var("HOME") },
+        }
+        match previous_cache_dir {
+            Some(value) => unsafe { std::env::set_var("ZKF_CACHE_DIR", value) },
+            None => unsafe { std::env::remove_var("ZKF_CACHE_DIR") },
         }
     }
 

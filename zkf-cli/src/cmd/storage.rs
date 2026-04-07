@@ -31,15 +31,15 @@ fn handle_status(json: bool) -> Result<(), String> {
 fn render_status(report: &StorageStatusReport) {
     println!(
         "storage status: mode={} sync={} cache={} bytes keys={}",
-        report.mode,
-        report.sync_state,
-        report.local_cache_usage_bytes,
-        report.key_count
+        report.mode, report.sync_state, report.local_cache_usage_bytes, report.key_count
     );
     println!("persistent root: {}", report.persistent_root);
     println!("cache root: {}", report.cache_root);
     println!("swarm sqlite live: {}", report.swarm_sqlite_live_path);
-    println!("swarm sqlite snapshot: {}", report.swarm_sqlite_snapshot_path);
+    println!(
+        "swarm sqlite snapshot: {}",
+        report.swarm_sqlite_snapshot_path
+    );
 }
 
 fn handle_migrate_to_icloud() -> Result<(), String> {
