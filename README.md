@@ -15,7 +15,7 @@ Most ZK frameworks give you a library and a backend. ZirOS is the system layer t
 | First-party Rust | 288,785 lines across 30 workspace crates |
 | Mechanized theorems | 165 total, 165 proven against shipped production code (includes 22 gateway verification theorems + end-to-end composition) |
 | Model-only claims | **0** -- every claim is mechanized against real code |
-| Hypothesis-carried theorems | 12 (9 protocol cryptographic assumptions + 3 attestation-honesty) |
+| Hypothesis-carried theorems | 9 protocol cryptographic assumptions |
 | Pending verifications | 0 |
 | Metal GPU shaders | 63 shaders, 50 kernel entrypoints, 51 Lean 4 arithmetic proofs |
 | Proving backends | 9 across 7 finite fields |
@@ -299,12 +299,12 @@ This is ZirOS's primary differentiator. No other shipping ZK framework has a com
 |----------|-------|
 | Total mechanized theorems | 165 |
 | `mechanized_local` (proven against shipped code) | 165 |
-| `mechanized_implementation_claim` | 157 |
-| `hypothesis_carried_theorem` | 12 |
+| `mechanized_implementation_claim` | 156 |
+| `hypothesis_carried_theorem` | 9 |
 | `model_only_claim` | **0** |
 | `attestation_backed_lane` | **0** |
 | Pending | **0** |
-| Trusted assumptions | **0** |
+| Trusted assumptions | **9** |
 | `release_grade_ready` | `true` |
 
 ### Proof Languages
@@ -569,7 +569,7 @@ Honesty matters more than impression.
 - **Midnight Compact is integrated but the `support-matrix.json` backend row still carries configuration caveats.** The proof server, Compact frontend, 12 contracts, and live DApp all work. The backend row reflects that the default compile/prove path requires the proof server to be running — it does not mean Midnight integration is broken.
 - **Groth16 is not post-quantum.** Neither is Halo2, Nova, or HyperNova. Only Plonky3 STARK (without wrapping) and the ML-DSA-87/ML-KEM-1024 cryptographic surface are post-quantum. Wrapping a STARK through Nova + Groth16 makes the overall proof classical.
 - **The constant-time bridge proves shell structure, not microarchitectural timing.** The F* proof covers control flow and branching patterns. It does not cover BigInt cache-line behavior or branch prediction.
-- **The 12 hypothesis-carried theorems are real assumptions.** They are standard cryptographic assumptions (discrete log hardness, knowledge-of-exponent, random oracle) and attestation-honesty assumptions. Every ZK system relies on these. ZirOS names them explicitly instead of hiding them.
+- **The 9 hypothesis-carried theorems are real assumptions.** They are standard cryptographic assumptions at the protocol boundary. Every ZK system relies on assumptions of this class. ZirOS names them explicitly instead of hiding them.
 - **The cluster scaling target (1,540 proofs/hour) is a projection.** It is based on measured single-node performance extrapolated to a 20-node configuration.
 
 ---
