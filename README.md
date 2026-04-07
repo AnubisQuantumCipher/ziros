@@ -506,14 +506,13 @@ Source of truth: `~/Library/Mobile Documents/com~apple~CloudDocs/ZirOS/`
 ### Install
 
 ```bash
-# Download the prebuilt binary (v0.4.0, Apple Silicon)
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.4.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
-sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
-tar xzf zkf-darwin-arm64.tar.gz
-sudo mv zkf /usr/local/bin/
+# Published release cut: v0.4.2
+# Verify any downloaded release artifact against:
+# https://github.com/AnubisQuantumCipher/ziros-attestation/blob/main/binary-manifest/v0.4.2/manifest.json
 
 # Or build from source
 cargo build --release -p zkf-cli
+sudo install -m 0755 target/release/zkf /usr/local/bin/zkf
 ```
 
 ### Verify Your System
