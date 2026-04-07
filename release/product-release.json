@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T05:02:08.701860Z",
+  "generated_at": "2026-04-07T05:33:04.454225Z",
   "release_boundary": {
     "allowlist_path": "release/public_release_allowlist.json",
     "boundary_report_path": "release/public_release_boundary_report.json",
@@ -7,10 +7,10 @@
     "public_repo": "/Users/sicarii/Projects/ziros-attestation",
     "scanner_script": "scripts/check_public_release_boundary.py"
   },
-  "release_tag": "v0.4.1",
-  "release_version": "0.4.1",
+  "release_tag": "v0.5.0",
+  "release_version": "0.5.0",
   "schema": "ziros-product-release-v1",
-  "source_commit": "e831e1d32119891a30d83ce918b0f62c3a00c6e0",
+  "source_commit": "61dabc68a7df11cc041fe1535020775dbcea122e",
   "truth_surfaces": {
     "agent_forensics": "forensics/",
     "canonical_truth": "docs/CANONICAL_TRUTH.md",
@@ -36,8 +36,8 @@
     },
     "total_entries": 169
   },
-  "version": "0.4.1",
-  "working_tree_dirty": true,
+  "version": "0.5.0",
+  "working_tree_dirty": false,
   "workspace_members": {
     "count": 22,
     "names": [

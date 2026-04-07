@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T05:02:08.730772Z",
+  "generated_at": "2026-04-07T05:33:04.458214Z",
   "headline_counts": {
     "hypothesis_carried_theorem": 9,
     "hypothesis_stated": 9,
@@ -13,16 +13,16 @@
     "product_release": "release/product-release.json",
     "public_release_allowlist": "release/public_release_allowlist.json"
   },
-  "release_tag": "v0.4.1",
-  "release_version": "0.4.1",
+  "release_tag": "v0.5.0",
+  "release_version": "0.5.0",
   "schema": "ziros-public-attestation-export-v1",
-  "source_commit": "e831e1d32119891a30d83ce918b0f62c3a00c6e0",
+  "source_commit": "61dabc68a7df11cc041fe1535020775dbcea122e",
   "support_matrix_summary": {
     "backend_count": 9,
     "frontend_count": 7,
     "gadget_count": 11,
-    "generated_for": "0.4.1"
+    "generated_for": "0.5.0"
   },
-  "version": "0.4.1",
-  "working_tree_dirty": true
+  "version": "0.5.0",
+  "working_tree_dirty": false
 }

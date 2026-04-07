@@ -1,6 +1,6 @@
 # ZirOS Agent Closure Spec
 
-Generated: `2026-04-07T04:57:30.283853Z`
+Generated: `2026-04-07T05:33:10.164268Z`
 
 This document enumerates what is already closed by source and what remains to reach the full ZirOS Agent blueprint end-state without changing the architectural direction.
 

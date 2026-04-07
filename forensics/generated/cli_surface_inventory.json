@@ -33,7 +33,7 @@
     "Show"
   ],
   "events_jsonl_supported": true,
-  "generated_at": "2026-04-07T04:57:30.229513Z",
+  "generated_at": "2026-04-07T05:33:10.107120Z",
   "midnight_commands": [
     "Status",
     "ProofServer",

@@ -21,7 +21,7 @@
     "wallet.submission-grant.issue"
   ],
   "executor_path": "zkf-agent/src/executor.rs",
-  "generated_at": "2026-04-07T04:57:30.229080Z",
+  "generated_at": "2026-04-07T05:33:10.106637Z",
   "planner_path": "zkf-agent/src/planner.rs",
   "schema": "ziros-agent-action-inventory-v1",
   "workflow_kinds": [

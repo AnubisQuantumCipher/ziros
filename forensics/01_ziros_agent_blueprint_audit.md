@@ -1,6 +1,6 @@
 # ZirOS Agent Blueprint Audit
 
-Generated: `2026-04-07T04:57:30.283738Z`
+Generated: `2026-04-07T05:33:10.164144Z`
 
 This audit is source-first. It covers the in-tree ZirOS Agent foundation, the new command substrate, the CLI closure surfaces, and the macOS host shell as they exist in this checkout.
 

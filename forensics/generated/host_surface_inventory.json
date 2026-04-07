@@ -53,7 +53,7 @@
       "path": "setup/launchd/ziros-agentd-launch.sh"
     }
   ],
-  "generated_at": "2026-04-07T04:57:30.281735Z",
+  "generated_at": "2026-04-07T05:33:10.162191Z",
   "launchd_plist": true,
   "launchd_script": true,
   "schema": "ziros-agent-host-surface-inventory-v1",
