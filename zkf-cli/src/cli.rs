@@ -1206,6 +1206,8 @@ pub(crate) enum AgentCommands {
         no_worktree: bool,
         #[arg(long)]
         provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
     },
     Status {
         #[arg(long, default_value_t = 10)]
@@ -1226,6 +1228,8 @@ pub(crate) enum AgentCommands {
         no_worktree: bool,
         #[arg(long)]
         provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
     },
     Run {
         #[arg(long)]
@@ -1242,6 +1246,8 @@ pub(crate) enum AgentCommands {
         no_worktree: bool,
         #[arg(long)]
         provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
     },
     Resume {
         #[arg(long)]
@@ -1431,12 +1437,16 @@ pub(crate) enum AgentProviderCommands {
         session_id: Option<String>,
         #[arg(long)]
         provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
     },
     Test {
         #[arg(long)]
         session_id: Option<String>,
         #[arg(long)]
         provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
     },
 }
 

@@ -75,9 +75,34 @@ The repo discovers those endpoints through these env vars:
 - `OPENAI_API_BASE`
 - `OPENAI_PROJECT`
 - `OPENAI_ORG_ID`
+- `ZIROS_AGENT_MODEL_NAME`
+- `ZIROS_AGENT_MLX_MODEL`
+- `OLLAMA_MODEL`
 
 If you want ZirOS to talk to OpenAI directly without a local gateway, set
 `OPENAI_API_KEY` and optionally `ZIROS_AGENT_OPENAI_MODEL`.
+
+## Picking The Model
+
+You can choose the model either by env default or per command.
+
+OpenAI direct:
+
+```bash
+ziros agent --json provider route --provider openai-api --model gpt-5.2-codex
+ziros agent --json run --provider openai-api --model gpt-5.2-codex --goal "Inspect this ZirOS checkout"
+```
+
+On OpenAI-compatible assistant routes, ZirOS uses the selected model for
+goal-intent compilation and falls back to the embedded planner if the model
+call is unavailable.
+
+Local OpenAI-compatible endpoint:
+
+```bash
+export ZIROS_AGENT_MODEL_NAME="gpt-5.2-codex"
+ziros agent --json provider route --provider openai-compatible-local --model gpt-5.2-codex
+```
 
 The guide-standard env file is:
 

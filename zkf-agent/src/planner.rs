@@ -723,7 +723,7 @@ fn workflow(
     }
 }
 
-fn workflow_from_kind(workflow_kind: &str, goal: &str) -> GoalIntentV1 {
+pub(crate) fn workflow_from_kind(workflow_kind: &str, goal: &str) -> GoalIntentV1 {
     let mut intent = workflow_catalog()
         .into_iter()
         .find(|candidate| candidate.workflow_kind == workflow_kind)

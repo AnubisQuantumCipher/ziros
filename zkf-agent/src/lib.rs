@@ -2,6 +2,7 @@ mod brain;
 mod checkpoint;
 mod daemon;
 mod executor;
+mod llm;
 mod mcp;
 mod planner;
 mod provider;
@@ -36,6 +37,7 @@ pub use types::{
 use brain::BrainStore;
 use checkpoint::{create_checkpoint_record, rollback_to_checkpoint_record};
 use executor::execute_workgraph;
+use llm::try_compile_goal_intent;
 use planner::{build_workgraph, compile_goal_intent, workflow_catalog};
 use provider::{probe_provider_routes, select_provider_routes};
 use trust_gate::resolve_trust_gate;
@@ -175,6 +177,7 @@ where
         Some(&session.session_id),
         &workflow_kind,
         options.provider_override.as_deref(),
+        options.model_override.as_deref(),
     );
     for route in &provider_routes {
         let _ = brain.store_provider_route(route)?;
@@ -543,12 +546,12 @@ pub fn provider_status(session_id: Option<&str>) -> Result<AgentProviderStatusRe
             let brain = BrainStore::open_default()?;
             let stored = brain.list_provider_routes(Some(session_id))?;
             if stored.is_empty() {
-                select_provider_routes(Some(session_id), "ad-hoc", None)
+                select_provider_routes(Some(session_id), "ad-hoc", None, None)
             } else {
                 stored
             }
         }
-        None => select_provider_routes(None, "ad-hoc", None),
+        None => select_provider_routes(None, "ad-hoc", None, None),
     };
     Ok(AgentProviderStatusReportV1 {
         schema: "ziros-agent-providers-v1".to_string(),
@@ -573,6 +576,7 @@ pub fn provider_route(
                     Some(session_id),
                     "ad-hoc",
                     request.provider_override.as_deref(),
+                    request.model_override.as_deref(),
                 );
                 for route in &routes {
                     let _ = brain.store_provider_route(route)?;
@@ -580,7 +584,12 @@ pub fn provider_route(
                 routes
             }
         }
-        None => select_provider_routes(None, "ad-hoc", request.provider_override.as_deref()),
+        None => select_provider_routes(
+            None,
+            "ad-hoc",
+            request.provider_override.as_deref(),
+            request.model_override.as_deref(),
+        ),
     };
     Ok(AgentProviderStatusReportV1 {
         schema: "ziros-agent-provider-routes-v1".to_string(),
@@ -596,6 +605,7 @@ pub fn provider_test(
     let route_report = provider_route(AgentProviderRouteRequestV1 {
         session_id: request.session_id.clone(),
         provider_override: request.provider_override,
+        model_override: request.model_override,
     })?;
     Ok(AgentProviderTestReportV1 {
         schema: "ziros-agent-provider-tests-v1".to_string(),
@@ -819,6 +829,7 @@ fn resume_options(session: &AgentSessionViewV1, trust_gate: &TrustGateReportV1) 
         workflow_override: Some(trust_gate.workflow_kind.clone()),
         intent: None,
         provider_override: None,
+        model_override: None,
     }
 }
 
@@ -870,6 +881,7 @@ fn resolve_goal_intent(goal: &str, options: &AgentRunOptionsV1) -> GoalIntentV1 
     options
         .intent
         .clone()
+        .or_else(|| try_compile_goal_intent(goal, options))
         .unwrap_or_else(|| compile_goal_intent(goal, options.workflow_override.as_deref()))
 }
 
@@ -1125,6 +1137,7 @@ esac
                 workflow_override: None,
                 intent: None,
                 provider_override: None,
+                model_override: None,
             },
             &mut |_| {},
         )

@@ -51,6 +51,21 @@
       "openai-api"
     ]
   },
+  "model_selection": {
+    "runtime_flags": [
+      "ziros agent --json run --provider openai-api --model gpt-5.2-codex --goal \"...\"",
+      "ziros agent --json doctor --provider openai-api --model gpt-5.2-codex",
+      "ziros agent --json provider route --provider openai-api --model gpt-5.2-codex",
+      "ziros agent --json provider test --provider openai-api --model gpt-5.2-codex"
+    ],
+    "default_env": [
+      "ZIROS_AGENT_OPENAI_MODEL",
+      "OPENAI_MODEL",
+      "ZIROS_AGENT_MODEL_NAME",
+      "ZIROS_AGENT_MLX_MODEL",
+      "OLLAMA_MODEL"
+    ]
+  },
   "truth_artifacts": [
     "docs/CANONICAL_TRUTH.md",
     "release/product-release.json",

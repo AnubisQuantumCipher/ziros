@@ -239,12 +239,14 @@ fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
             request: AgentProviderRouteRequestV1 {
                 session_id: read_optional_string(&arguments, "session_id"),
                 provider_override: read_optional_string(&arguments, "provider_override"),
+                model_override: read_optional_string(&arguments, "model_override"),
             },
         },
         "agent_provider_test" => AgentRpcRequestV1::ProviderTest {
             request: AgentProviderTestRequestV1 {
                 session_id: read_optional_string(&arguments, "session_id"),
                 provider_override: read_optional_string(&arguments, "provider_override"),
+                model_override: read_optional_string(&arguments, "model_override"),
             },
         },
         "agent_approve" => AgentRpcRequestV1::Approve {
@@ -535,7 +537,8 @@ fn tool_definitions() -> Vec<Value> {
                 "type": "object",
                 "properties": {
                     "session_id": { "type": "string" },
-                    "provider_override": { "type": "string" }
+                    "provider_override": { "type": "string" },
+                    "model_override": { "type": "string" }
                 },
                 "additionalProperties": false
             }
@@ -547,7 +550,8 @@ fn tool_definitions() -> Vec<Value> {
                 "type": "object",
                 "properties": {
                     "session_id": { "type": "string" },
-                    "provider_override": { "type": "string" }
+                    "provider_override": { "type": "string" },
+                    "model_override": { "type": "string" }
                 },
                 "additionalProperties": false
             }
@@ -615,7 +619,8 @@ fn goal_schema() -> Value {
                 "required": ["summary", "workflow_kind", "scope"],
                 "additionalProperties": false
             },
-            "provider_override": { "type": "string" }
+            "provider_override": { "type": "string" },
+            "model_override": { "type": "string" }
         },
         "required": ["goal"],
         "additionalProperties": false
@@ -738,6 +743,7 @@ fn read_run_options(arguments: &Value) -> Result<AgentRunOptionsV1, String> {
         workflow_override: read_optional_string(arguments, "workflow_override"),
         intent: read_optional_intent(arguments)?,
         provider_override: read_optional_string(arguments, "provider_override"),
+        model_override: read_optional_string(arguments, "model_override"),
     })
 }
 

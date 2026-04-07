@@ -44,6 +44,9 @@ This is the short reference for the setup-relevant surfaces only.
 | `OPENAI_API_BASE` | alternate base URL override for the official OpenAI route |
 | `OPENAI_PROJECT` | optional OpenAI project header for direct API calls |
 | `OPENAI_ORG_ID` | optional OpenAI organization header for direct API calls |
+| `ZIROS_AGENT_MODEL_NAME` | preferred model for a local OpenAI-compatible endpoint |
+| `ZIROS_AGENT_MLX_MODEL` | preferred model name for the MLX local route |
+| `OLLAMA_MODEL` | preferred model name for the Ollama route |
 | `MIDNIGHT_WALLET_SEED` | headless Midnight wallet diagnostics |
 | `MIDNIGHT_WALLET_MNEMONIC` | headless Midnight wallet diagnostics |
 
@@ -66,5 +69,9 @@ This is the short reference for the setup-relevant surfaces only.
 ```bash
 ziros agent --json doctor
 ziros agent --json provider status
+ziros agent --json provider route --provider openai-api --model gpt-5.2-codex
 ziros agent --json run --goal "Inspect this checkout"
 ```
+
+`--model` applies to the OpenAI-compatible assistant lane used for goal-intent
+compilation. ZirOS falls back to the embedded planner on failure.

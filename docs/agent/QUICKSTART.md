@@ -82,6 +82,19 @@ ziros agent --json run \
   --goal "Inspect this ZirOS checkout, summarize the current operator state, and tell me what you can do next."
 ```
 
+If you want a specific OpenAI model instead of the env default:
+
+```bash
+ziros agent --json run \
+  --provider openai-api \
+  --model gpt-5.2-codex \
+  --goal "Inspect this ZirOS checkout and summarize the current operator state."
+```
+
+On OpenAI-compatible assistant routes, the selected model is used during
+goal-intent compilation. If that call fails, ZirOS falls back to the embedded
+planner.
+
 Subsystem creation:
 
 ```bash

@@ -43,6 +43,7 @@ pub(crate) fn handle_agent(
             project,
             no_worktree,
             provider,
+            model,
         } => {
             let explain = plan_goal(
                 goal.as_deref().unwrap_or("inspect current ZirOS host state"),
@@ -53,6 +54,7 @@ pub(crate) fn handle_agent(
                     use_worktree: !no_worktree,
                     workflow_override: workflow,
                     provider_override: provider,
+                    model_override: model,
                     ..AgentRunOptionsV1::default()
                 },
             )?;
@@ -67,6 +69,7 @@ pub(crate) fn handle_agent(
             project,
             no_worktree,
             provider,
+            model,
         } => print_output(
             json_output,
             &plan_goal(
@@ -78,6 +81,7 @@ pub(crate) fn handle_agent(
                     use_worktree: !no_worktree,
                     workflow_override: workflow,
                     provider_override: provider,
+                    model_override: model,
                     ..AgentRunOptionsV1::default()
                 },
             )?,
@@ -90,6 +94,7 @@ pub(crate) fn handle_agent(
             project,
             no_worktree,
             provider,
+            model,
         } => print_output(
             json_output,
             &run_goal_with_receipts(
@@ -101,6 +106,7 @@ pub(crate) fn handle_agent(
                     use_worktree: !no_worktree,
                     workflow_override: workflow,
                     provider_override: provider,
+                    model_override: model,
                     ..AgentRunOptionsV1::default()
                 },
                 |receipt| {
@@ -248,18 +254,28 @@ pub(crate) fn handle_agent(
             AgentProviderCommands::Status { session_id } => {
                 print_output(json_output, &provider_status(session_id.as_deref())?)?
             }
-            AgentProviderCommands::Route { session_id, provider } => print_output(
+            AgentProviderCommands::Route {
+                session_id,
+                provider,
+                model,
+            } => print_output(
                 json_output,
                 &provider_route(AgentProviderRouteRequestV1 {
                     session_id,
                     provider_override: provider,
+                    model_override: model,
                 })?,
             )?,
-            AgentProviderCommands::Test { session_id, provider } => print_output(
+            AgentProviderCommands::Test {
+                session_id,
+                provider,
+                model,
+            } => print_output(
                 json_output,
                 &provider_test(AgentProviderTestRequestV1 {
                     session_id,
                     provider_override: provider,
+                    model_override: model,
                 })?,
             )?,
         },

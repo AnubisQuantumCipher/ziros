@@ -42,6 +42,8 @@ pub struct AgentRunOptionsV1 {
     pub intent: Option<GoalIntentV1>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub provider_override: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_override: Option<String>,
 }
 
 impl Default for AgentRunOptionsV1 {
@@ -55,6 +57,7 @@ impl Default for AgentRunOptionsV1 {
             workflow_override: None,
             intent: None,
             provider_override: None,
+            model_override: None,
         }
     }
 }
@@ -694,6 +697,8 @@ pub struct AgentProviderRouteRequestV1 {
     pub session_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub provider_override: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_override: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -702,6 +707,8 @@ pub struct AgentProviderTestRequestV1 {
     pub session_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub provider_override: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_override: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
