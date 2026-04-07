@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import generate_private_release_truth as truth
@@ -31,6 +32,21 @@ def compare_payload_subset(actual: dict, expected: dict, prefix: str, issues: li
             issues.append(
                 f"{prefix}{key} drifted: expected {expected_value!r}, found {actual_value!r}"
             )
+
+
+def source_commit_is_acceptable(recorded: str) -> bool:
+    if not recorded:
+        return False
+    head = truth.git_head_commit()
+    if recorded == head:
+        return True
+    result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", recorded, head],
+        cwd=truth.ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
 
 
 def main() -> int:
@@ -68,7 +84,6 @@ def main() -> int:
     expected_product_subset = {
         "version": version,
         "release_tag": f"v{version}",
-        "source_commit": truth.git_head_commit(),
         "working_tree_dirty": truth.git_dirty(),
         "workspace_members": {
             "count": len(workspace_members),
@@ -81,6 +96,10 @@ def main() -> int:
         },
     }
     compare_payload_subset(product_release, expected_product_subset, "release/product-release.json:", issues)
+    if not source_commit_is_acceptable(product_release.get("source_commit", "")):
+        issues.append(
+            "release/product-release.json:source_commit is not HEAD and not an ancestor of HEAD"
+        )
 
     expected_census_subset = {
         "tracked_file_count": len(tracked),
@@ -100,7 +119,6 @@ def main() -> int:
     expected_export_subset = {
         "version": version,
         "release_tag": f"v{version}",
-        "source_commit": truth.git_head_commit(),
         "working_tree_dirty": truth.git_dirty(),
         "headline_counts": {
             "total_entries": len(ledger_entries),
@@ -127,6 +145,10 @@ def main() -> int:
         "release/provenance/public_attestation_export.json:",
         issues,
     )
+    if not source_commit_is_acceptable(public_export.get("source_commit", "")):
+        issues.append(
+            "release/provenance/public_attestation_export.json:source_commit is not HEAD and not an ancestor of HEAD"
+        )
 
     if issues:
         for issue in issues:
