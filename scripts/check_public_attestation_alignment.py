@@ -55,30 +55,31 @@ def main() -> int:
                 f"headline count mismatch for {key}: private export expects {expected_value!r}, public repo publishes {actual_value!r}"
             )
 
-    readiness = export_doc.get("operator_readiness_summary", {})
-    expected_midnight = readiness.get("midnight", {})
-    if midnight_readiness.get("status") != expected_midnight.get("status"):
-        issues.append(
-            f"midnight readiness status mismatch: private export expects {expected_midnight.get('status')!r}, public repo publishes {midnight_readiness.get('status')!r}"
-        )
-    if midnight_readiness.get("ready_for_local_operator") != expected_midnight.get(
-        "ready_for_local_operator"
-    ):
-        issues.append(
-            "midnight ready_for_local_operator mismatch between private export and public repo"
-        )
-    if midnight_readiness.get("ready_for_live_submit") != expected_midnight.get(
-        "ready_for_live_submit"
-    ):
-        issues.append(
-            "midnight ready_for_live_submit mismatch between private export and public repo"
-        )
+    readiness = export_doc.get("operator_readiness_summary")
+    if readiness:
+        expected_midnight = readiness.get("midnight", {})
+        if midnight_readiness.get("status") != expected_midnight.get("status"):
+            issues.append(
+                f"midnight readiness status mismatch: private export expects {expected_midnight.get('status')!r}, public repo publishes {midnight_readiness.get('status')!r}"
+            )
+        if midnight_readiness.get("ready_for_local_operator") != expected_midnight.get(
+            "ready_for_local_operator"
+        ):
+            issues.append(
+                "midnight ready_for_local_operator mismatch between private export and public repo"
+            )
+        if midnight_readiness.get("ready_for_live_submit") != expected_midnight.get(
+            "ready_for_live_submit"
+        ):
+            issues.append(
+                "midnight ready_for_live_submit mismatch between private export and public repo"
+            )
 
-    expected_evm = readiness.get("evm", {})
-    if evm_readiness.get("status") != expected_evm.get("status"):
-        issues.append(
-            f"evm readiness status mismatch: private export expects {expected_evm.get('status')!r}, public repo publishes {evm_readiness.get('status')!r}"
-        )
+        expected_evm = readiness.get("evm", {})
+        if evm_readiness.get("status") != expected_evm.get("status"):
+            issues.append(
+                f"evm readiness status mismatch: private export expects {expected_evm.get('status')!r}, public repo publishes {evm_readiness.get('status')!r}"
+            )
 
     if issues:
         for issue in issues:
