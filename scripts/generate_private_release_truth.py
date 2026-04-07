@@ -166,6 +166,8 @@ def build_readme_summary(
 
 def main() -> None:
     version = workspace_version()
+    source_commit = git_head_commit()
+    working_tree_dirty = git_dirty()
     metadata = cargo_metadata()
     workspace_members = sorted({package["name"] for package in metadata["packages"]})
     tracked = tracked_files()
@@ -183,8 +185,8 @@ def main() -> None:
         "version": version,
         "release_version": version,
         "release_tag": f"v{version}",
-        "source_commit": git_head_commit(),
-        "working_tree_dirty": git_dirty(),
+        "source_commit": source_commit,
+        "working_tree_dirty": working_tree_dirty,
         "workspace_members": {
             "count": len(workspace_members),
             "names": workspace_members,
@@ -214,7 +216,7 @@ def main() -> None:
     private_census = {
         "schema": "ziros-private-source-census-v1",
         "generated_at": now_rfc3339(),
-        "source_commit": git_head_commit(),
+        "source_commit": source_commit,
         "tracked_file_count": len(tracked),
         "counts_by_extension": count_by_extension(tracked),
         "counts_by_family": count_by_family(tracked),
@@ -279,8 +281,8 @@ def main() -> None:
         "version": version,
         "release_version": version,
         "release_tag": f"v{version}",
-        "source_commit": git_head_commit(),
-        "working_tree_dirty": git_dirty(),
+        "source_commit": source_commit,
+        "working_tree_dirty": working_tree_dirty,
         "headline_counts": {
             "total_entries": len(ledger_entries),
             "mechanized_local": completion["counts"]["mechanized_local"],
