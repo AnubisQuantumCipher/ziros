@@ -1,9 +1,11 @@
 use crate::daemon::{AgentRpcRequestV1, handle_rpc_request};
 use crate::types::{
-    AgentApproveRequestV1, AgentCheckpointCreateRequestV1, AgentCheckpointRollbackRequestV1,
-    AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1, AgentProviderTestRequestV1,
-    AgentRejectRequestV1, AgentRunOptionsV1, GoalIntentV1, AgentWorktreeCleanupRequestV1,
-    AgentWorktreeCreateRequestV1, EventSubscriptionRequestV1,
+    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
+    AgentBridgeHandoffPrepareRequestV1, AgentCheckpointCreateRequestV1,
+    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
+    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
+    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
+    EventSubscriptionRequestV1, GoalIntentV1,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -12,6 +14,13 @@ use std::path::PathBuf;
 use zkf_wallet::WalletNetwork;
 
 const MCP_PROTOCOL_VERSION: &str = "2024-11-05";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum McpExposureV1 {
+    LocalStdio,
+    RemoteBridgeReadOnly,
+    RemoteBridgeWrite,
+}
 
 #[derive(Debug, Deserialize)]
 struct JsonRpcRequest {
@@ -49,7 +58,7 @@ pub fn serve_mcp_stdio() -> Result<(), String> {
         let Some(request) = read_message(&mut reader)? else {
             break;
         };
-        let response = match handle_mcp_request(request) {
+        let response = match handle_mcp_request(request, McpExposureV1::LocalStdio) {
             Ok(response) => response,
             Err(error) => JsonRpcResponse {
                 jsonrpc: "2.0",
@@ -69,7 +78,55 @@ pub fn serve_mcp_stdio() -> Result<(), String> {
     Ok(())
 }
 
-fn handle_mcp_request(request: JsonRpcRequest) -> Result<JsonRpcResponse, String> {
+pub fn handle_mcp_jsonrpc_bytes(
+    body: &[u8],
+    exposure: McpExposureV1,
+) -> Result<Vec<u8>, String> {
+    let request: JsonRpcRequest =
+        serde_json::from_slice(body).map_err(|error| error.to_string())?;
+    let response = match handle_mcp_request(request, exposure) {
+        Ok(response) => response,
+        Err(error) => JsonRpcResponse {
+            jsonrpc: "2.0",
+            id: None,
+            result: None,
+            error: Some(JsonRpcError {
+                code: -32603,
+                message: error,
+            }),
+        },
+    };
+    serde_json::to_vec(&response).map_err(|error| error.to_string())
+}
+
+pub fn mcp_server_manifest(exposure: McpExposureV1) -> Value {
+    json!({
+        "schema": "ziros-mcp-server-v1",
+        "protocolVersion": MCP_PROTOCOL_VERSION,
+        "serverInfo": {
+            "name": "ziros-agent",
+            "version": env!("CARGO_PKG_VERSION")
+        },
+        "transport": "jsonrpc-http-post",
+        "exposure": exposure_label(exposure),
+        "localExecutionBoundary": "ziros-agentd",
+        "instructions": "Use the existing ZirOS MCP tool surface remotely for planning and inspection, then accept mutating execution locally through ZirOS.",
+        "tools": tool_definitions(exposure),
+    })
+}
+
+fn exposure_label(exposure: McpExposureV1) -> &'static str {
+    match exposure {
+        McpExposureV1::LocalStdio => "local-stdio",
+        McpExposureV1::RemoteBridgeReadOnly => "remote-bridge-read-only",
+        McpExposureV1::RemoteBridgeWrite => "remote-bridge-write",
+    }
+}
+
+fn handle_mcp_request(
+    request: JsonRpcRequest,
+    exposure: McpExposureV1,
+) -> Result<JsonRpcResponse, String> {
     if request.jsonrpc != "2.0" {
         return Ok(error_response(
             request.id,
@@ -96,7 +153,8 @@ fn handle_mcp_request(request: JsonRpcRequest) -> Result<JsonRpcResponse, String
                         "name": "ziros-agent",
                         "version": env!("CARGO_PKG_VERSION")
                     },
-                    "instructions": "Use the ZirOS agent tools to inspect status, plan workgraphs, run goals, fetch receipts, register projects, and route wallet approvals through the same agent core."
+                    "instructions": "Use the ZirOS agent tools to inspect status, plan workgraphs, fetch receipts, and route approved local execution through the same ZirOS daemon core.",
+                    "zirosExposure": exposure_label(exposure)
                 })),
                 error: None,
             })
@@ -111,7 +169,7 @@ fn handle_mcp_request(request: JsonRpcRequest) -> Result<JsonRpcResponse, String
         "tools/list" => Ok(JsonRpcResponse {
             jsonrpc: "2.0",
             id: request.id,
-            result: Some(json!({ "tools": tool_definitions() })),
+            result: Some(json!({ "tools": tool_definitions(exposure) })),
             error: None,
         }),
         "tools/call" => {
@@ -125,7 +183,7 @@ fn handle_mcp_request(request: JsonRpcRequest) -> Result<JsonRpcResponse, String
                 .get("arguments")
                 .cloned()
                 .unwrap_or_else(|| json!({}));
-            let result = call_tool(name, arguments)?;
+            let result = call_tool(name, arguments, exposure)?;
             Ok(JsonRpcResponse {
                 jsonrpc: "2.0",
                 id: request.id,
@@ -142,7 +200,14 @@ fn handle_mcp_request(request: JsonRpcRequest) -> Result<JsonRpcResponse, String
     }
 }
 
-fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
+fn call_tool(name: &str, arguments: Value, exposure: McpExposureV1) -> Result<Value, String> {
+    if !is_tool_allowed(name, exposure) {
+        return Ok(tool_error(format!(
+            "tool '{}' is not exposed for {}",
+            name,
+            exposure_label(exposure)
+        )));
+    }
     let request = match name {
         "agent_status" => AgentRpcRequestV1::Status {
             limit: read_usize(&arguments, "limit", 10)?,
@@ -199,6 +264,20 @@ fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
             request: AgentProjectRegisterRequestV1 {
                 name: read_string(&arguments, "name")?,
                 root_path: read_string(&arguments, "root_path")?,
+            },
+        },
+        "agent_bridge_prepare" => AgentRpcRequestV1::BridgeHandoffPrepare {
+            request: AgentBridgeHandoffPrepareRequestV1 {
+                origin: read_optional_string(&arguments, "origin")
+                    .unwrap_or_else(|| "remote-mcp".to_string()),
+                goal: read_string(&arguments, "goal")?,
+                options: read_run_options(&arguments)?,
+            },
+        },
+        "agent_bridge_handoffs" => AgentRpcRequestV1::BridgeHandoffList,
+        "agent_bridge_accept" => AgentRpcRequestV1::BridgeHandoffAccept {
+            request: AgentBridgeHandoffAcceptRequestV1 {
+                handoff_id: read_string(&arguments, "handoff_id")?,
             },
         },
         "agent_worktrees_list" => AgentRpcRequestV1::WorktreeList {
@@ -279,8 +358,8 @@ fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
     }
 }
 
-fn tool_definitions() -> Vec<Value> {
-    vec![
+fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
+    let mut tools = vec![
         json!({
             "name": "agent_status",
             "description": "Inspect the live ZirOS agent daemon status, socket path, recent sessions, and registered projects.",
@@ -297,23 +376,29 @@ fn tool_definitions() -> Vec<Value> {
             "description": "Resolve trust gates and compile a product-level ZirOS workgraph without creating a new run session.",
             "inputSchema": goal_schema()
         }),
-        json!({
-            "name": "agent_run",
-            "description": "Create a ZirOS agent session, persist the trust gate snapshot, execute eligible workgraph nodes, and stop honestly at completion or a real block boundary.",
-            "inputSchema": goal_schema()
-        }),
-        json!({
-            "name": "agent_resume",
-            "description": "Resume execution for a stored ZirOS agent session when pending nodes remain runnable.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" }
-                },
-                "required": ["session_id"],
-                "additionalProperties": false
-            }
-        }),
+    ];
+    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+        tools.extend(vec![
+            json!({
+                "name": "agent_run",
+                "description": "Create a ZirOS agent session, persist the trust gate snapshot, execute eligible workgraph nodes, and stop honestly at completion or a real block boundary.",
+                "inputSchema": goal_schema()
+            }),
+            json!({
+                "name": "agent_resume",
+                "description": "Resume execution for a stored ZirOS agent session when pending nodes remain runnable.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "session_id": { "type": "string" }
+                    },
+                    "required": ["session_id"],
+                    "additionalProperties": false
+                }
+            }),
+        ]);
+    }
+    tools.extend(vec![
         json!({
             "name": "agent_logs",
             "description": "Fetch append-only action receipts for a ZirOS agent session.",
@@ -434,18 +519,66 @@ fn tool_definitions() -> Vec<Value> {
             }
         }),
         json!({
-            "name": "agent_projects_register",
-            "description": "Register a project root so the ZirOS agent can reuse it across sessions.",
+            "name": "agent_bridge_prepare",
+            "description": "Prepare a local ZirOS bridge handoff so ChatGPT can plan remotely and the operator can accept execution locally.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "name": { "type": "string" },
-                    "root_path": { "type": "string" }
+                    "origin": { "type": "string", "default": "remote-mcp" },
+                    "goal": { "type": "string" },
+                    "workflow_override": { "type": "string" },
+                    "strict": { "type": "boolean", "default": true },
+                    "compat_allowed": { "type": "boolean", "default": false },
+                    "use_worktree": { "type": "boolean", "default": true },
+                    "wallet_network": { "type": "string", "default": "preprod" },
+                    "project_root": { "type": "string" },
+                    "provider_override": { "type": "string" },
+                    "model_override": { "type": "string" }
                 },
-                "required": ["name", "root_path"],
+                "required": ["goal"],
                 "additionalProperties": false
             }
         }),
+        json!({
+            "name": "agent_bridge_handoffs",
+            "description": "List prepared and accepted ZirOS bridge handoffs.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+    ]);
+    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+        tools.extend(vec![
+            json!({
+                "name": "agent_projects_register",
+                "description": "Register a project root so the ZirOS agent can reuse it across sessions.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "root_path": { "type": "string" }
+                    },
+                    "required": ["name", "root_path"],
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_bridge_accept",
+                "description": "Accept a prepared bridge handoff and execute it locally through ZirOS.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "handoff_id": { "type": "string" }
+                    },
+                    "required": ["handoff_id"],
+                    "additionalProperties": false
+                }
+            }),
+        ]);
+    }
+    tools.extend(vec![
         json!({
             "name": "agent_worktrees_list",
             "description": "List daemon-managed worktrees for a session or for the whole local Brain.",
@@ -457,31 +590,37 @@ fn tool_definitions() -> Vec<Value> {
                 "additionalProperties": false
             }
         }),
-        json!({
-            "name": "agent_worktrees_create",
-            "description": "Create a managed worktree for a stored ZirOS agent session.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" }
-                },
-                "required": ["session_id"],
-                "additionalProperties": false
-            }
-        }),
-        json!({
-            "name": "agent_worktrees_cleanup",
-            "description": "Remove a daemon-managed worktree by id.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "worktree_id": { "type": "string" },
-                    "remove_files": { "type": "boolean", "default": false }
-                },
-                "required": ["worktree_id"],
-                "additionalProperties": false
-            }
-        }),
+    ]);
+    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+        tools.extend(vec![
+            json!({
+                "name": "agent_worktrees_create",
+                "description": "Create a managed worktree for a stored ZirOS agent session.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "session_id": { "type": "string" }
+                    },
+                    "required": ["session_id"],
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_worktrees_cleanup",
+                "description": "Remove a daemon-managed worktree by id.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "worktree_id": { "type": "string" },
+                        "remove_files": { "type": "boolean", "default": false }
+                    },
+                    "required": ["worktree_id"],
+                    "additionalProperties": false
+                }
+            }),
+        ]);
+    }
+    tools.extend(vec![
         json!({
             "name": "agent_checkpoints_list",
             "description": "List persisted checkpoints for a ZirOS agent session.",
@@ -494,31 +633,37 @@ fn tool_definitions() -> Vec<Value> {
                 "additionalProperties": false
             }
         }),
-        json!({
-            "name": "agent_checkpoints_create",
-            "description": "Create a checkpoint for a stored ZirOS agent session.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" },
-                    "label": { "type": "string" }
-                },
-                "required": ["session_id", "label"],
-                "additionalProperties": false
-            }
-        }),
-        json!({
-            "name": "agent_checkpoints_rollback",
-            "description": "Rollback a stored ZirOS agent session to a checkpoint.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "checkpoint_id": { "type": "string" }
-                },
-                "required": ["checkpoint_id"],
-                "additionalProperties": false
-            }
-        }),
+    ]);
+    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+        tools.extend(vec![
+            json!({
+                "name": "agent_checkpoints_create",
+                "description": "Create a checkpoint for a stored ZirOS agent session.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "session_id": { "type": "string" },
+                        "label": { "type": "string" }
+                    },
+                    "required": ["session_id", "label"],
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_checkpoints_rollback",
+                "description": "Rollback a stored ZirOS agent session to a checkpoint.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "checkpoint_id": { "type": "string" }
+                    },
+                    "required": ["checkpoint_id"],
+                    "additionalProperties": false
+                }
+            }),
+        ]);
+    }
+    tools.extend(vec![
         json!({
             "name": "agent_provider_status",
             "description": "Inspect local-first provider routing and any detected local model endpoints.",
@@ -556,29 +701,63 @@ fn tool_definitions() -> Vec<Value> {
                 "additionalProperties": false
             }
         }),
-        json!({
-            "name": "agent_approve",
-            "description": "Approve a pending wallet request through the ZirOS wallet policy core and optionally attach the receipt to an agent session.",
-            "inputSchema": approval_schema("primary_prompt")
-        }),
-        json!({
-            "name": "agent_reject",
-            "description": "Reject a pending wallet request through the ZirOS wallet policy core and optionally attach the receipt to an agent session.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" },
-                    "wallet_network": { "type": "string", "default": "preprod" },
-                    "pending_id": { "type": "string" },
-                    "reason": { "type": "string" },
-                    "persistent_root": { "type": "string" },
-                    "cache_root": { "type": "string" }
-                },
-                "required": ["pending_id", "reason"],
-                "additionalProperties": false
-            }
-        }),
-    ]
+    ]);
+    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+        tools.extend(vec![
+            json!({
+                "name": "agent_approve",
+                "description": "Approve a pending wallet request through the ZirOS wallet policy core and optionally attach the receipt to an agent session.",
+                "inputSchema": approval_schema("primary_prompt")
+            }),
+            json!({
+                "name": "agent_reject",
+                "description": "Reject a pending wallet request through the ZirOS wallet policy core and optionally attach the receipt to an agent session.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "session_id": { "type": "string" },
+                        "wallet_network": { "type": "string", "default": "preprod" },
+                        "pending_id": { "type": "string" },
+                        "reason": { "type": "string" },
+                        "persistent_root": { "type": "string" },
+                        "cache_root": { "type": "string" }
+                    },
+                    "required": ["pending_id", "reason"],
+                    "additionalProperties": false
+                }
+            }),
+        ]);
+    }
+    tools
+}
+
+fn is_tool_allowed(name: &str, exposure: McpExposureV1) -> bool {
+    match exposure {
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite => true,
+        McpExposureV1::RemoteBridgeReadOnly => matches!(
+            name,
+            "agent_status"
+                | "agent_plan"
+                | "agent_logs"
+                | "agent_artifacts"
+                | "agent_approvals"
+                | "agent_deployments"
+                | "agent_environments"
+                | "agent_procedures"
+                | "agent_incidents"
+                | "agent_event_subscribe"
+                | "agent_workflow_list"
+                | "agent_workflow_show"
+                | "agent_projects_list"
+                | "agent_bridge_prepare"
+                | "agent_bridge_handoffs"
+                | "agent_worktrees_list"
+                | "agent_checkpoints_list"
+                | "agent_provider_status"
+                | "agent_provider_route"
+                | "agent_provider_test"
+        ),
+    }
 }
 
 fn goal_schema() -> Value {
@@ -806,7 +985,7 @@ mod tests {
             params: json!({
                 "protocolVersion": "2024-11-05"
             }),
-        })
+        }, McpExposureV1::LocalStdio)
         .expect("initialize");
         let result = response.result.expect("result");
         assert_eq!(result["capabilities"]["tools"], json!({}));
@@ -822,9 +1001,29 @@ mod tests {
                 "name": "nope",
                 "arguments": {}
             }),
-        })
+        }, McpExposureV1::LocalStdio)
         .expect("tool call");
         let result = response.result.expect("result");
         assert_eq!(result["isError"], json!(true));
+    }
+
+    #[test]
+    fn remote_bridge_exposure_hides_mutating_tools() {
+        let response = handle_mcp_request(JsonRpcRequest {
+            jsonrpc: "2.0".to_string(),
+            id: Some(json!(3)),
+            method: "tools/list".to_string(),
+            params: json!({}),
+        }, McpExposureV1::RemoteBridgeReadOnly)
+        .expect("tools/list");
+        let result = response.result.expect("result");
+        let tools = result["tools"].as_array().expect("tools array");
+        let names = tools
+            .iter()
+            .filter_map(|tool| tool.get("name").and_then(Value::as_str))
+            .collect::<Vec<_>>();
+        assert!(names.contains(&"agent_bridge_prepare"));
+        assert!(!names.contains(&"agent_run"));
+        assert!(!names.contains(&"agent_approve"));
     }
 }

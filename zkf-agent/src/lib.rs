@@ -16,7 +16,7 @@ pub use daemon::{
     AgentRpcRequestV1, AgentRpcResponseV1, call_daemon, default_socket_path, handle_rpc_request,
     serve_daemon,
 };
-pub use mcp::serve_mcp_stdio;
+pub use mcp::{McpExposureV1, handle_mcp_jsonrpc_bytes, mcp_server_manifest, serve_mcp_stdio};
 pub use provider_profiles::{
     ProviderCredentialRefV1, ProviderKindV1, ProviderProfileStoreV1, ProviderProfileV1,
     ProviderRoleBindingV1, load_provider_profile_store, load_api_key,
@@ -36,8 +36,10 @@ pub use state::{
 };
 pub use types::{
     ActionReceiptV1, AgentApproveRequestV1, AgentCancelRequestV1, AgentExplainReportV1,
-    AgentApprovalLineageReportV1,
-    AgentArtifactsReportV1, AgentCheckpointCreateRequestV1, AgentCheckpointListReportV1,
+    AgentApprovalLineageReportV1, AgentArtifactsReportV1,
+    AgentBridgeHandoffAcceptRequestV1, AgentBridgeHandoffListReportV1,
+    AgentBridgeHandoffPrepareReportV1, AgentBridgeHandoffPrepareRequestV1,
+    AgentCheckpointCreateRequestV1, AgentCheckpointListReportV1,
     AgentCheckpointRollbackRequestV1, AgentDeploymentsReportV1, AgentEnvironmentReportV1,
     AgentIncidentsReportV1, AgentListProjectsReportV1, AgentLogsReportV1,
     AgentMemorySessionsReportV1, AgentProceduresReportV1, AgentProjectRegisterRequestV1,
@@ -46,11 +48,12 @@ pub use types::{
     AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1, AgentWorktreeListReportV1,
     AgentRejectRequestV1, AgentStatusReportV1, AgentWorkflowListReportV1,
     AgentWorkflowShowReportV1, ApprovalRequestRecordV1, ApprovalRequestV1, ApprovalResponseV1,
-    ApprovalTokenRecordV1, ArtifactRecordV1, CheckpointRecordV1, DeploymentRecordV1,
-    EventSubscriptionRequestV1, EventSubscriptionResponseV1, GoalIntentV1, ProcedureRecordV1,
-    ProjectRecordV1, ProviderProbeResultV1, ProviderRouteRecordV1, ResumeSessionRequestV1,
-    ResumeSessionResponseV1, RunSessionRequestV1, RunSessionResponseV1,
-    SubmissionGrantRecordV1, TrustGateReportV1, WorkgraphV1, WorktreeRecordV1,
+    ApprovalTokenRecordV1, ArtifactRecordV1, BridgeHandoffRecordV1, CheckpointRecordV1,
+    DeploymentRecordV1, EventSubscriptionRequestV1, EventSubscriptionResponseV1, GoalIntentV1,
+    ProcedureRecordV1, ProjectRecordV1, ProviderProbeResultV1, ProviderRouteRecordV1,
+    ResumeSessionRequestV1, ResumeSessionResponseV1, RunSessionRequestV1,
+    RunSessionResponseV1, SubmissionGrantRecordV1, TrustGateReportV1, WorkgraphV1,
+    WorktreeRecordV1,
 };
 
 use brain::BrainStore;
@@ -670,6 +673,79 @@ pub fn list_projects() -> Result<AgentListProjectsReportV1, String> {
     })
 }
 
+pub fn prepare_bridge_handoff(
+    request: AgentBridgeHandoffPrepareRequestV1,
+) -> Result<AgentBridgeHandoffPrepareReportV1, String> {
+    let brain = BrainStore::open_default()?;
+    let handoff_id = new_operation_id("bridge-handoff");
+    let now = zkf_command_surface::now_rfc3339();
+    let record = BridgeHandoffRecordV1 {
+        schema: "ziros-agent-bridge-handoff-v1".to_string(),
+        handoff_id: handoff_id.clone(),
+        bridge_session_id: handoff_id.clone(),
+        created_at: now.clone(),
+        updated_at: now,
+        origin: request.origin,
+        status: "prepared".to_string(),
+        goal: request.goal,
+        options: request.options,
+        local_command: format!(
+            "ziros agent bridge accept --handoff-id {}",
+            shell_escape_arg(&handoff_id)
+        ),
+        session_id: None,
+        session_status: None,
+        last_error: None,
+    };
+    let handoff = brain.store_bridge_handoff(&record)?;
+    Ok(AgentBridgeHandoffPrepareReportV1 {
+        schema: "ziros-agent-bridge-handoff-prepare-v1".to_string(),
+        generated_at: zkf_command_surface::now_rfc3339(),
+        handoff,
+    })
+}
+
+pub fn list_bridge_handoffs() -> Result<AgentBridgeHandoffListReportV1, String> {
+    let brain = BrainStore::open_default()?;
+    Ok(AgentBridgeHandoffListReportV1 {
+        schema: "ziros-agent-bridge-handoffs-v1".to_string(),
+        generated_at: zkf_command_surface::now_rfc3339(),
+        handoffs: brain.list_bridge_handoffs()?,
+    })
+}
+
+pub fn accept_bridge_handoff(
+    request: AgentBridgeHandoffAcceptRequestV1,
+) -> Result<AgentRunReportV1, String> {
+    let brain = BrainStore::open_default()?;
+    let mut handoff = brain
+        .get_bridge_handoff(&request.handoff_id)?
+        .ok_or_else(|| format!("unknown bridge handoff '{}'", request.handoff_id))?;
+    handoff.status = "accepted".to_string();
+    handoff.updated_at = zkf_command_surface::now_rfc3339();
+    handoff.last_error = None;
+    let _ = brain.store_bridge_handoff(&handoff)?;
+
+    match run_goal_with_store(&brain, &handoff.goal, handoff.options.clone(), &mut |_| {}) {
+        Ok(report) => {
+            handoff.status = report.session.status.as_str().to_string();
+            handoff.updated_at = zkf_command_surface::now_rfc3339();
+            handoff.session_id = Some(report.session.session_id.clone());
+            handoff.session_status = Some(report.session.status);
+            handoff.last_error = None;
+            let _ = brain.store_bridge_handoff(&handoff)?;
+            Ok(report)
+        }
+        Err(error) => {
+            handoff.status = "failed".to_string();
+            handoff.updated_at = zkf_command_surface::now_rfc3339();
+            handoff.last_error = Some(error.clone());
+            let _ = brain.store_bridge_handoff(&handoff)?;
+            Err(error)
+        }
+    }
+}
+
 pub fn approve_request(request: AgentApproveRequestV1) -> Result<WalletApprovalOutcomeV1, String> {
     let mut wallet = WalletContextV1 {
         network: Some(request.wallet_network),
@@ -1016,6 +1092,17 @@ fn reject_approval_request(
         )?)?;
     }
     Ok(())
+}
+
+fn shell_escape_arg(value: &str) -> String {
+    if value
+        .chars()
+        .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.' | '/'))
+    {
+        value.to_string()
+    } else {
+        format!("'{}'", value.replace('\'', "'\"'\"'"))
+    }
 }
 
 #[cfg(test)]

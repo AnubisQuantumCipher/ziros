@@ -1,9 +1,9 @@
 use crate::types::{
     ActionReceiptV1, AgentSessionViewV1, ApprovalRequestRecordV1, ApprovalTokenRecordV1,
-    ArtifactRecordV1, CheckpointRecordV1, DeploymentRecordV1, EnvironmentSnapshotV1,
-    IncidentRecordV1, ProcedureRecordV1, ProjectRecordV1, ProviderRouteRecordV1,
-    SessionStatusV1, SubmissionGrantRecordV1, TrustGateReportV1, WorkgraphNodeV1, WorkgraphV1,
-    WorktreeRecordV1,
+    ArtifactRecordV1, BridgeHandoffRecordV1, CheckpointRecordV1, DeploymentRecordV1,
+    EnvironmentSnapshotV1, IncidentRecordV1, ProcedureRecordV1, ProjectRecordV1,
+    ProviderRouteRecordV1, SessionStatusV1, SubmissionGrantRecordV1, TrustGateReportV1,
+    WorkgraphNodeV1, WorkgraphV1, WorktreeRecordV1,
 };
 use crate::state::{brain_path, ensure_ziros_layout};
 use chacha20poly1305::aead::{Aead, KeyInit};
@@ -439,6 +439,48 @@ impl BrainStore {
         Ok(projects)
     }
 
+    pub fn store_bridge_handoff(
+        &self,
+        record: &BridgeHandoffRecordV1,
+    ) -> Result<BridgeHandoffRecordV1, String> {
+        self.conn
+            .execute(
+                "INSERT OR REPLACE INTO bridge_handoffs (handoff_id, session_id, created_at, updated_at, payload_ciphertext)
+                 VALUES (?1, ?2, ?3, ?4, ?5)",
+                params![
+                    record.handoff_id,
+                    record.session_id,
+                    record.created_at,
+                    record.updated_at,
+                    self.encrypt_json(record)?,
+                ],
+            )
+            .map_err(|error| error.to_string())?;
+        Ok(record.clone())
+    }
+
+    pub fn get_bridge_handoff(
+        &self,
+        handoff_id: &str,
+    ) -> Result<Option<BridgeHandoffRecordV1>, String> {
+        let payload = self
+            .conn
+            .query_row(
+                "SELECT payload_ciphertext FROM bridge_handoffs WHERE handoff_id = ?1",
+                params![handoff_id],
+                |row| row.get::<_, Vec<u8>>(0),
+            )
+            .optional()
+            .map_err(|error| error.to_string())?;
+        payload
+            .map(|payload| self.decrypt_json::<BridgeHandoffRecordV1>(&payload))
+            .transpose()
+    }
+
+    pub fn list_bridge_handoffs(&self) -> Result<Vec<BridgeHandoffRecordV1>, String> {
+        self.list_payloads("bridge_handoffs", "handoff_id", None, "session_id")
+    }
+
     pub fn list_environment_snapshots(
         &self,
         session_id: Option<&str>,
@@ -828,6 +870,13 @@ impl BrainStore {
                     created_at TEXT NOT NULL,
                     metadata_ciphertext BLOB NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS bridge_handoffs (
+                    handoff_id TEXT PRIMARY KEY,
+                    session_id TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    payload_ciphertext BLOB NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS worktrees (
                     worktree_id TEXT PRIMARY KEY,
                     session_id TEXT,
@@ -848,7 +897,33 @@ impl BrainStore {
                 );
                 ",
             )
-            .map_err(|error| error.to_string())
+            .map_err(|error| error.to_string())?;
+        self.ensure_column("bridge_handoffs", "session_id", "TEXT")?;
+        Ok(())
+    }
+
+    fn ensure_column(&self, table: &str, column: &str, definition: &str) -> Result<(), String> {
+        let mut statement = self
+            .conn
+            .prepare(&format!("PRAGMA table_info({table})"))
+            .map_err(|error| error.to_string())?;
+        let present = statement
+            .query_map([], |row| row.get::<_, String>(1))
+            .map_err(|error| error.to_string())?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| error.to_string())?
+            .into_iter()
+            .any(|name| name == column);
+        if present {
+            return Ok(());
+        }
+        self.conn
+            .execute(
+                &format!("ALTER TABLE {table} ADD COLUMN {column} {definition}"),
+                [],
+            )
+            .map_err(|error| error.to_string())?;
+        Ok(())
     }
 
     fn store_node(&self, workgraph_id: &str, node: &WorkgraphNodeV1) -> Result<(), String> {

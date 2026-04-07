@@ -218,6 +218,67 @@ fn agent_cli_parses_provider_status_surface() {
 }
 
 #[test]
+fn agent_cli_parses_bridge_prepare_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "agent",
+        "--json",
+        "bridge",
+        "prepare",
+        "--goal",
+        "Prepare a Midnight-first subsystem plan",
+        "--provider",
+        "openai-api",
+        "--model",
+        "gpt-5.3-codex",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Agent { json, command, .. } => {
+            assert!(json);
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Bridge {
+                    command: crate::cli::AgentBridgeCommands::Prepare {
+                        goal,
+                        provider: Some(ref provider),
+                        model: Some(ref model),
+                        ..
+                    }
+                } if goal == "Prepare a Midnight-first subsystem plan"
+                    && provider == "openai-api"
+                    && model == "gpt-5.3-codex"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_allow_remote_writes_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "gateway",
+        "serve",
+        "--bind",
+        "127.0.0.1:8788",
+        "--allow-remote-writes",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Serve {
+                    bind,
+                    allow_remote_writes: true,
+                    ..
+                } if bind == "127.0.0.1:8788"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
 fn setup_cli_parses_public_setup_surface() {
     let cli = crate::cli::Cli::parse_from([
         "ziros",

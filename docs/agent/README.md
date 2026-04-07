@@ -25,8 +25,9 @@ Start here if you want the agent to:
 4. [First Prompts](FIRST_PROMPTS.md)
 5. [Midnight Operations](MIDNIGHT_OPERATIONS.md)
 6. [EVM Operations](EVM_OPERATIONS.md)
-7. [Troubleshooting](TROUBLESHOOTING.md)
-8. [Reference](REFERENCE.md)
+7. [ChatGPT Bridge](CHATGPT_BRIDGE.md)
+8. [Troubleshooting](TROUBLESHOOTING.md)
+9. [Reference](REFERENCE.md)
 
 ## Canonical Bootstrap
 

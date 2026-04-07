@@ -1,22 +1,23 @@
 use crate::cli::{
-    AgentApprovalCommands, AgentCheckpointCommands, AgentCommands, AgentMcpCommands,
-    AgentMemoryCommands, AgentProjectCommands, AgentProviderCommands, AgentWorkflowCommands,
-    AgentWorktreeCommands,
+    AgentApprovalCommands, AgentBridgeCommands, AgentCheckpointCommands, AgentCommands,
+    AgentMcpCommands, AgentMemoryCommands, AgentProjectCommands, AgentProviderCommands,
+    AgentWorkflowCommands, AgentWorktreeCommands,
 };
 use serde::Serialize;
 use std::path::PathBuf;
 use zkf_agent::{
-    ActionReceiptV1, AgentApproveRequestV1, AgentCancelRequestV1, AgentProjectRegisterRequestV1,
-    AgentRejectRequestV1, AgentRunOptionsV1, AgentCheckpointCreateRequestV1,
-    AgentCheckpointRollbackRequestV1, AgentWorktreeCleanupRequestV1,
-    AgentWorktreeCreateRequestV1, AgentProviderRouteRequestV1, AgentProviderTestRequestV1,
-    agent_status, approval_lineage, approve_request, cancel_session,
-    create_checkpoint, create_worktree, explain_session, list_checkpoints, list_incidents,
-    list_procedures, list_projects, list_worktrees, memory_sessions, plan_goal, provider_route,
-    provider_status, provider_test, register_project, reject_request,
-    resume_session_with_receipts, rollback_checkpoint, run_goal_with_receipts, serve_mcp_stdio,
-    session_artifacts, session_deployments, session_environments, session_logs, workflow_list,
-    workflow_show, cleanup_worktree,
+    ActionReceiptV1, AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
+    AgentBridgeHandoffPrepareRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
+    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
+    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
+    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
+    accept_bridge_handoff, agent_status, approval_lineage, approve_request, cancel_session,
+    cleanup_worktree, create_checkpoint, create_worktree, explain_session, list_bridge_handoffs,
+    list_checkpoints, list_incidents, list_procedures, list_projects, list_worktrees,
+    memory_sessions, plan_goal, prepare_bridge_handoff, provider_route, provider_status,
+    provider_test, register_project, reject_request, resume_session_with_receipts,
+    rollback_checkpoint, run_goal_with_receipts, serve_mcp_stdio, session_artifacts,
+    session_deployments, session_environments, session_logs, workflow_list, workflow_show,
 };
 use zkf_command_surface::{CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id};
 use zkf_wallet::WalletNetwork;
@@ -211,6 +212,40 @@ pub(crate) fn handle_agent(
                 })?,
             )?,
             AgentProjectCommands::List => print_output(json_output, &list_projects()?)?,
+        },
+        AgentCommands::Bridge { command } => match command {
+            AgentBridgeCommands::Prepare {
+                goal,
+                origin,
+                workflow,
+                strict,
+                allow_compat,
+                project,
+                no_worktree,
+                provider,
+                model,
+            } => print_output(
+                json_output,
+                &prepare_bridge_handoff(AgentBridgeHandoffPrepareRequestV1 {
+                    origin,
+                    goal,
+                    options: AgentRunOptionsV1 {
+                        strict,
+                        compat_allowed: allow_compat,
+                        project_root: project,
+                        use_worktree: !no_worktree,
+                        workflow_override: workflow,
+                        provider_override: provider,
+                        model_override: model,
+                        ..AgentRunOptionsV1::default()
+                    },
+                })?,
+            )?,
+            AgentBridgeCommands::List => print_output(json_output, &list_bridge_handoffs()?)?,
+            AgentBridgeCommands::Accept { handoff_id } => print_output(
+                json_output,
+                &accept_bridge_handoff(AgentBridgeHandoffAcceptRequestV1 { handoff_id })?,
+            )?,
         },
         AgentCommands::Workflow { command } => match command {
             AgentWorkflowCommands::List => print_output(json_output, &workflow_list()?)?,

@@ -1,17 +1,19 @@
 use crate::{
-    agent_status, approval_lineage, cancel_session, create_checkpoint, create_worktree,
-    event_subscription, list_checkpoints, list_incidents, list_procedures, list_projects,
-    list_worktrees, memory_sessions, plan_goal, provider_route, provider_status, provider_test,
-    register_project, resume_session, rollback_checkpoint, run_goal, session_artifacts,
-    session_deployments, session_environments, session_logs, workflow_list, workflow_show,
-    cleanup_worktree,
+    accept_bridge_handoff, agent_status, approval_lineage, cancel_session, cleanup_worktree,
+    create_checkpoint, create_worktree, event_subscription, list_bridge_handoffs,
+    list_checkpoints, list_incidents, list_procedures, list_projects, list_worktrees,
+    memory_sessions, plan_goal, prepare_bridge_handoff, provider_route, provider_status,
+    provider_test, register_project, resume_session, rollback_checkpoint, run_goal,
+    session_artifacts, session_deployments, session_environments, session_logs, workflow_list,
+    workflow_show,
 };
 use crate::{approve_request, reject_request};
 use crate::types::{
-    AgentApproveRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
-    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1,
-    AgentProviderTestRequestV1, AgentRejectRequestV1, AgentRunOptionsV1,
-    AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
+    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
+    AgentBridgeHandoffPrepareRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
+    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
+    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
+    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
     EventSubscriptionRequestV1,
 };
 use serde::{Deserialize, Serialize};
@@ -42,6 +44,9 @@ pub enum AgentRpcRequestV1 {
     WorkflowShow { workgraph_id: String },
     ProjectRegister { request: AgentProjectRegisterRequestV1 },
     ProjectList,
+    BridgeHandoffPrepare { request: AgentBridgeHandoffPrepareRequestV1 },
+    BridgeHandoffList,
+    BridgeHandoffAccept { request: AgentBridgeHandoffAcceptRequestV1 },
     WorktreeList { session_id: Option<String> },
     WorktreeCreate { request: AgentWorktreeCreateRequestV1 },
     WorktreeCleanup { request: AgentWorktreeCleanupRequestV1 },
@@ -190,6 +195,17 @@ pub fn handle_rpc_request(request: AgentRpcRequestV1) -> Result<Value, String> {
         }
         AgentRpcRequestV1::ProjectList => {
             serde_json::to_value(list_projects()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BridgeHandoffPrepare { request } => {
+            serde_json::to_value(prepare_bridge_handoff(request)?)
+                .map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BridgeHandoffList => {
+            serde_json::to_value(list_bridge_handoffs()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BridgeHandoffAccept { request } => {
+            serde_json::to_value(accept_bridge_handoff(request)?)
+                .map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::WorktreeList { session_id } => {
             serde_json::to_value(list_worktrees(session_id.as_deref())?)

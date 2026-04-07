@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
-use zkf_agent::{AgentRunOptionsV1, load_provider_profile_store, run_goal};
+use zkf_agent::{
+    AgentRunOptionsV1, McpExposureV1, handle_mcp_jsonrpc_bytes, load_provider_profile_store,
+    mcp_server_manifest, run_goal,
+};
 
 use crate::cli::GatewayCommands;
 
@@ -14,6 +17,7 @@ struct GatewayState {
     project_root: Option<PathBuf>,
     provider: Option<String>,
     model: Option<String>,
+    remote_mcp_exposure: McpExposureV1,
 }
 
 #[derive(Debug, Deserialize)]
@@ -55,7 +59,8 @@ pub(crate) fn handle_gateway(command: GatewayCommands) -> Result<(), String> {
             project,
             provider,
             model,
-        } => serve_gateway(bind, project, provider, model),
+            allow_remote_writes,
+        } => serve_gateway(bind, project, provider, model, allow_remote_writes),
     }
 }
 
@@ -64,11 +69,17 @@ fn serve_gateway(
     project_root: Option<PathBuf>,
     provider: Option<String>,
     model: Option<String>,
+    allow_remote_writes: bool,
 ) -> Result<(), String> {
     let state = web::Data::new(GatewayState {
         project_root,
         provider,
         model,
+        remote_mcp_exposure: if allow_remote_writes {
+            McpExposureV1::RemoteBridgeWrite
+        } else {
+            McpExposureV1::RemoteBridgeReadOnly
+        },
     });
     println!("ZirOS gateway listening on http://{bind}");
     actix_web::rt::System::new().block_on(async move {
@@ -76,6 +87,9 @@ fn serve_gateway(
             App::new()
                 .app_data(state.clone())
                 .route("/health", web::get().to(gateway_health))
+                .route("/mcp/health", web::get().to(gateway_health))
+                .route("/mcp/manifest.json", web::get().to(gateway_mcp_manifest))
+                .route("/mcp", web::post().to(gateway_mcp_jsonrpc))
                 .route("/v1/models", web::get().to(gateway_models))
                 .route("/v1/chat/completions", web::post().to(gateway_chat_completions))
                 .route("/v1/responses", web::post().to(gateway_responses))
@@ -94,6 +108,27 @@ async fn gateway_health() -> impl Responder {
         "service": "ziros-gateway",
         "version": env!("CARGO_PKG_VERSION"),
     }))
+}
+
+async fn gateway_mcp_manifest(state: web::Data<GatewayState>) -> impl Responder {
+    HttpResponse::Ok().json(mcp_server_manifest(state.remote_mcp_exposure))
+}
+
+async fn gateway_mcp_jsonrpc(
+    state: web::Data<GatewayState>,
+    body: web::Bytes,
+) -> impl Responder {
+    match handle_mcp_jsonrpc_bytes(body.as_ref(), state.remote_mcp_exposure) {
+        Ok(response) => HttpResponse::Ok()
+            .insert_header((CONTENT_TYPE, "application/json"))
+            .body(response),
+        Err(error) => HttpResponse::BadRequest().json(json!({
+            "error": {
+                "type": "ziros_mcp_bridge_error",
+                "message": error,
+            }
+        })),
+    }
 }
 
 async fn gateway_models() -> impl Responder {

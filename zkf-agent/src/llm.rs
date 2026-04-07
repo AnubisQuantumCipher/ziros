@@ -66,6 +66,15 @@ fn compile_goal_intent_via_chat_completions(
             }
         ]
     });
+    let mut body = body;
+    if let Some(reasoning_effort) = route
+        .summary
+        .get("reasoning_effort")
+        .and_then(serde_json::Value::as_str)
+        .filter(|value| !value.trim().is_empty())
+    {
+        body["reasoning_effort"] = serde_json::Value::String(reasoning_effort.to_string());
+    }
     let payload = serde_json::to_string(&body).ok()?;
 
     let mut request = ureq::post(&endpoint)

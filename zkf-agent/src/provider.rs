@@ -63,6 +63,7 @@ pub fn select_provider_routes(
                         }),
                         "model": selected_model,
                         "role_models": profile.role_models,
+                        "reasoning_effort": profile.reasoning_effort,
                         "selected_model_role": selected_role,
                         "project": profile.project,
                         "organization": profile.organization,

@@ -13,7 +13,8 @@ This is the short reference for the setup-relevant surfaces only.
 | Agent approvals | `ziros agent approvals list`, `approve`, `reject` |
 | Agent continuity | `ziros agent worktree list`, `create`, `cleanup`; `ziros agent checkpoint list`, `create`, `rollback` |
 | Agent provider | `ziros agent provider status`, `route`, `test` |
-| MCP | `ziros agent mcp serve` |
+| Agent bridge | `ziros agent bridge prepare`, `list`, `accept` |
+| MCP | `ziros agent mcp serve`, `ziros gateway serve`, `ziros gateway serve --allow-remote-writes` |
 | Midnight | `ziros midnight status`, `doctor`, `resolve`, `contract ...` |
 | EVM | `ziros evm verifier export`, `estimate-gas`, `foundry init`, `deploy`, `call`, `test`, `diagnose` |
 
@@ -72,6 +73,8 @@ ziros agent --json doctor
 ziros agent --json provider status
 ziros agent --json provider route --provider openai-api --model gpt-5.2-codex
 ziros agent --json run --goal "Inspect this checkout"
+ziros agent --json bridge prepare --goal "Prepare a Midnight-first subsystem plan"
+ziros agent --json bridge accept --handoff-id bridge-handoff-...
 ```
 
 `--model` applies to the OpenAI-compatible assistant lane used for goal-intent

@@ -26,6 +26,8 @@ pub(crate) enum Commands {
         #[arg(long)]
         model: Option<String>,
         #[arg(long)]
+        reasoning_effort: Option<String>,
+        #[arg(long)]
         base_url: Option<String>,
         #[arg(long)]
         project: Option<String>,
@@ -1371,6 +1373,10 @@ pub(crate) enum AgentCommands {
         #[command(subcommand)]
         command: AgentProjectCommands,
     },
+    Bridge {
+        #[command(subcommand)]
+        command: AgentBridgeCommands,
+    },
     Workflow {
         #[command(subcommand)]
         command: AgentWorkflowCommands,
@@ -1419,6 +1425,35 @@ pub(crate) enum AgentMemoryCommands {
     Incidents {
         #[arg(long)]
         session_id: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentBridgeCommands {
+    Prepare {
+        #[arg(long)]
+        goal: String,
+        #[arg(long, default_value = "remote-mcp")]
+        origin: String,
+        #[arg(long)]
+        workflow: Option<String>,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        allow_compat: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        no_worktree: bool,
+        #[arg(long)]
+        provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+    },
+    List,
+    Accept {
+        #[arg(long)]
+        handoff_id: String,
     },
 }
 
@@ -1549,6 +1584,8 @@ pub(crate) enum ModelAddCommands {
         #[arg(long)]
         retrieval_model: Option<String>,
         #[arg(long)]
+        reasoning_effort: Option<String>,
+        #[arg(long)]
         base_url: Option<String>,
         #[arg(long)]
         project: Option<String>,
@@ -1603,6 +1640,8 @@ pub(crate) enum GatewayCommands {
         provider: Option<String>,
         #[arg(long)]
         model: Option<String>,
+        #[arg(long)]
+        allow_remote_writes: bool,
     },
 }
 

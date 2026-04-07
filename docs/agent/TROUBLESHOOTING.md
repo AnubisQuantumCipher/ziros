@@ -17,6 +17,8 @@
 | Agent only uses planner | `ziros agent --json provider status` | `embedded-zkf-planner` plus optional assistant routes | add one local assistant endpoint or `OPENAI_API_KEY` to the env file and re-source it |
 | OpenAI route missing | `ziros agent --json provider status` | `openai-api` appears with `locality=remote-api` | set `OPENAI_API_KEY`, then re-source `~/.ziros/agent.env` |
 | OpenAI route present but probe fails | `ziros agent --json provider test` | `openai-api` returns `ready=true` | verify `OPENAI_API_KEY`, network reachability, and optional `OPENAI_PROJECT` / `OPENAI_ORG_ID` values |
+| ChatGPT-facing MCP tools look too powerful | `curl -sf http://127.0.0.1:8788/mcp/manifest.json` | `exposure` is `remote-bridge-read-only` | restart with plain `ziros gateway serve`; only use `--allow-remote-writes` deliberately |
+| Remote client cannot create a local execution handoff | `ziros agent --json bridge list` | prepared handoff rows appear | verify the client is calling `agent_bridge_prepare` on `/mcp`, then accept locally with `ziros agent --json bridge accept --handoff-id ...` |
 
 ## Apple Silicon And Metal
 

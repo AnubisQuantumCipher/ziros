@@ -669,6 +669,52 @@ pub struct AgentListProjectsReportV1 {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgeHandoffRecordV1 {
+    pub schema: String,
+    pub handoff_id: String,
+    pub bridge_session_id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub origin: String,
+    pub status: String,
+    pub goal: String,
+    pub options: AgentRunOptionsV1,
+    pub local_command: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_status: Option<SessionStatusV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_error: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBridgeHandoffPrepareRequestV1 {
+    pub origin: String,
+    pub goal: String,
+    pub options: AgentRunOptionsV1,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBridgeHandoffPrepareReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub handoff: BridgeHandoffRecordV1,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBridgeHandoffListReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub handoffs: Vec<BridgeHandoffRecordV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBridgeHandoffAcceptRequestV1 {
+    pub handoff_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentWorktreeCreateRequestV1 {
     pub session_id: String,
 }

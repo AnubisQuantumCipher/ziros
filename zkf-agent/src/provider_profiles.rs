@@ -103,6 +103,8 @@ pub struct ProviderProfileV1 {
     #[serde(default)]
     pub role_models: ProviderRoleBindingV1,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_effort: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub organization: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project: Option<String>,
@@ -282,4 +284,3 @@ fn profile_rank(
         2
     }
 }
-
