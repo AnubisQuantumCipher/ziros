@@ -44,7 +44,7 @@ function resolveManifestUrl() {
   return DEFAULT_MANIFEST_URL;
 }
 
-function fetchBytes(url) {
+function fetchBytes(url, redirectBudget = 5) {
   if (url.startsWith("file://")) {
     return Promise.resolve(fs.readFileSync(url.slice("file://".length)));
   }
@@ -52,6 +52,20 @@ function fetchBytes(url) {
   return new Promise((resolve, reject) => {
     client
       .get(url, (response) => {
+        if (
+          response.statusCode &&
+          [301, 302, 303, 307, 308].includes(response.statusCode) &&
+          response.headers.location
+        ) {
+          if (redirectBudget <= 0) {
+            reject(new Error(`redirect limit exceeded for ${url}`));
+            return;
+          }
+          const redirectedUrl = new URL(response.headers.location, url).toString();
+          response.resume();
+          fetchBytes(redirectedUrl, redirectBudget - 1).then(resolve, reject);
+          return;
+        }
         if (response.statusCode && response.statusCode >= 400) {
           reject(new Error(`HTTP ${response.statusCode} for ${url}`));
           return;
