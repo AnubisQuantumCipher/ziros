@@ -57,6 +57,43 @@ pub fn select_provider_routes(
         }
     }
 
+    let openai_api_key = env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty());
+    let openai_base = env::var("ZIROS_AGENT_OPENAI_BASE_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .or_else(|| env::var("OPENAI_API_BASE").ok().filter(|value| !value.trim().is_empty()))
+        .unwrap_or_else(|| "https://api.openai.com".to_string());
+    let openai_model = env::var("ZIROS_AGENT_OPENAI_MODEL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .or_else(|| env::var("OPENAI_MODEL").ok().filter(|value| !value.trim().is_empty()));
+    let openai_project = env::var("OPENAI_PROJECT")
+        .ok()
+        .filter(|value| !value.trim().is_empty());
+    let openai_org = env::var("OPENAI_ORG_ID")
+        .ok()
+        .filter(|value| !value.trim().is_empty());
+    let openai_ready = openai_api_key.is_some() || provider_override == Some("openai-api");
+    if openai_ready {
+        routes.push(route(
+            session_id,
+            "assistant",
+            "openai-api",
+            "remote-api",
+            openai_api_key.is_some(),
+            json!({
+                "workflow_kind": workflow_kind,
+                "configured_from": openai_api_key.as_ref().map(|_| "OPENAI_API_KEY"),
+                "base_url": openai_base,
+                "model": openai_model,
+                "project": openai_project,
+                "organization": openai_org,
+                "auth_mode": if openai_api_key.is_some() { "bearer-api-key" } else { "missing-api-key" },
+                "mode": "detected-not-probed",
+            }),
+        ));
+    }
+
     if let Some(provider_override) = provider_override
         && routes.iter().all(|route| route.provider != provider_override)
     {
@@ -128,9 +165,29 @@ fn probe_route(route: &ProviderRouteRecordV1) -> ProviderProbeResultV1 {
         probe_path.trim_start_matches('/')
     );
     let started = Instant::now();
-    let response = ureq::get(&endpoint)
-        .timeout(std::time::Duration::from_secs(2))
-        .call();
+    let response = {
+        let mut request = ureq::get(&endpoint).timeout(std::time::Duration::from_secs(2));
+        if let Some(api_key) = auth_bearer_for_route(route) {
+            request = request.set("Authorization", &format!("Bearer {api_key}"));
+        }
+        if let Some(project) = route
+            .summary
+            .get("project")
+            .and_then(serde_json::Value::as_str)
+            .filter(|value| !value.trim().is_empty())
+        {
+            request = request.set("OpenAI-Project", project);
+        }
+        if let Some(organization) = route
+            .summary
+            .get("organization")
+            .and_then(serde_json::Value::as_str)
+            .filter(|value| !value.trim().is_empty())
+        {
+            request = request.set("OpenAI-Organization", organization);
+        }
+        request.call()
+    };
     let latency_ms = started.elapsed().as_millis();
 
     match response {
@@ -194,6 +251,13 @@ fn probe_path_for_provider(provider: &str) -> &'static str {
     }
 }
 
+fn auth_bearer_for_route(route: &ProviderRouteRecordV1) -> Option<String> {
+    match route.provider.as_str() {
+        "openai-api" => env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty()),
+        _ => None,
+    }
+}
+
 fn model_count_for_provider(provider: &str, payload: Option<&serde_json::Value>) -> Option<usize> {
     let payload = payload?;
     match provider {
@@ -232,8 +296,8 @@ fn route(
 #[cfg(test)]
 mod tests {
     use super::{
-        model_count_for_provider, normalize_base_url, probe_path_for_provider, probe_provider_routes,
-        route,
+        auth_bearer_for_route, model_count_for_provider, normalize_base_url,
+        probe_path_for_provider, probe_provider_routes, route,
     };
     use serde_json::json;
 
@@ -308,5 +372,28 @@ mod tests {
             probe.error.as_deref(),
             Some("provider route has no base_url to probe")
         );
+    }
+
+    #[allow(unsafe_code)]
+    #[test]
+    fn openai_api_route_uses_bearer_auth_from_environment() {
+        unsafe {
+            std::env::set_var("OPENAI_API_KEY", "test-openai-key");
+        }
+        let route = route(
+            None,
+            "assistant",
+            "openai-api",
+            "remote-api",
+            true,
+            json!({
+                "base_url": "https://api.openai.com",
+                "auth_mode": "bearer-api-key",
+            }),
+        );
+        assert_eq!(auth_bearer_for_route(&route).as_deref(), Some("test-openai-key"));
+        unsafe {
+            std::env::remove_var("OPENAI_API_KEY");
+        }
     }
 }

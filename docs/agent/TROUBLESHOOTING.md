@@ -12,9 +12,11 @@
 
 | Symptom | Check | Expected signal | Fix |
 | --- | --- | --- | --- |
-| No local model route detected | `ziros agent --json provider status` | `mlx-local`, local OpenAI-compatible, or Ollama route appears when configured | set `ZIROS_AGENT_MLX_BASE_URL`, `ZIROS_AGENT_MODEL_BASE_URL`, or `OLLAMA_HOST` |
+| No model route detected | `ziros agent --json provider status` | `mlx-local`, local OpenAI-compatible, Ollama, or `openai-api` appears when configured | set `ZIROS_AGENT_MLX_BASE_URL`, `ZIROS_AGENT_MODEL_BASE_URL`, `OLLAMA_HOST`, or `OPENAI_API_KEY` |
 | Provider detected but unhealthy | `ziros agent --json provider test` | route probe returns `ready=true` | fix the local endpoint and retry |
-| Agent only uses planner | `ziros agent --json provider status` | `embedded-zkf-planner` plus optional assistant routes | add one local assistant endpoint to the env file and re-source it |
+| Agent only uses planner | `ziros agent --json provider status` | `embedded-zkf-planner` plus optional assistant routes | add one local assistant endpoint or `OPENAI_API_KEY` to the env file and re-source it |
+| OpenAI route missing | `ziros agent --json provider status` | `openai-api` appears with `locality=remote-api` | set `OPENAI_API_KEY`, then re-source `~/.ziros/agent.env` |
+| OpenAI route present but probe fails | `ziros agent --json provider test` | `openai-api` returns `ready=true` | verify `OPENAI_API_KEY`, network reachability, and optional `OPENAI_PROJECT` / `OPENAI_ORG_ID` values |
 
 ## Apple Silicon And Metal
 

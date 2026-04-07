@@ -37,6 +37,13 @@ This is the short reference for the setup-relevant surfaces only.
 | `ZIROS_AGENT_MODEL_BASE_URL` | local OpenAI-compatible assistant endpoint |
 | `OPENAI_BASE_URL` | alternate local OpenAI-compatible endpoint name |
 | `OLLAMA_HOST` | Ollama local endpoint |
+| `OPENAI_API_KEY` | direct official OpenAI API access for the agent |
+| `ZIROS_AGENT_OPENAI_MODEL` | preferred model name for the official OpenAI route |
+| `OPENAI_MODEL` | alternate official OpenAI model name |
+| `ZIROS_AGENT_OPENAI_BASE_URL` | override base URL for the official OpenAI route |
+| `OPENAI_API_BASE` | alternate base URL override for the official OpenAI route |
+| `OPENAI_PROJECT` | optional OpenAI project header for direct API calls |
+| `OPENAI_ORG_ID` | optional OpenAI organization header for direct API calls |
 | `MIDNIGHT_WALLET_SEED` | headless Midnight wallet diagnostics |
 | `MIDNIGHT_WALLET_MNEMONIC` | headless Midnight wallet diagnostics |
 

@@ -58,6 +58,8 @@ The agent currently uses:
   - `mlx-local`
   - `openai-compatible-local`
   - `ollama-local`
+- remote optional assistant:
+  - `openai-api`
 
 The repo discovers those endpoints through these env vars:
 
@@ -66,6 +68,16 @@ The repo discovers those endpoints through these env vars:
 - `ZIROS_AGENT_MODEL_BASE_URL`
 - `OPENAI_BASE_URL`
 - `OLLAMA_HOST`
+- `OPENAI_API_KEY`
+- `ZIROS_AGENT_OPENAI_MODEL`
+- `OPENAI_MODEL`
+- `ZIROS_AGENT_OPENAI_BASE_URL`
+- `OPENAI_API_BASE`
+- `OPENAI_PROJECT`
+- `OPENAI_ORG_ID`
+
+If you want ZirOS to talk to OpenAI directly without a local gateway, set
+`OPENAI_API_KEY` and optionally `ZIROS_AGENT_OPENAI_MODEL`.
 
 The guide-standard env file is:
 

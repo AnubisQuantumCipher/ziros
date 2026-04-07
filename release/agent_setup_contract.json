@@ -47,7 +47,8 @@
     "assistant": [
       "mlx-local",
       "openai-compatible-local",
-      "ollama-local"
+      "ollama-local",
+      "openai-api"
     ]
   },
   "truth_artifacts": [
