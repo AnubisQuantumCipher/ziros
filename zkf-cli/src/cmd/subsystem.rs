@@ -10,6 +10,7 @@ use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use zkf_command_surface::subsystem::SubsystemScaffoldReportV1;
 use zkf_core::{
     BackendKind, FieldElement, Program, PublicKeyBundle, SignatureBundle, SignatureScheme,
     WitnessInputs, verify_bundle,
@@ -333,6 +334,50 @@ pub(crate) fn scaffold_subsystem(
     write_text(&root.join("04_tests/cargo_test.txt"), &cargo_test_output)?;
 
     Ok(root)
+}
+
+pub(crate) fn handle_scaffold(
+    name: &str,
+    style: &str,
+    out: Option<PathBuf>,
+    json: bool,
+) -> Result<(), String> {
+    let style = SubsystemScaffoldStyle::parse(style)?.as_str().to_string();
+    let root = scaffold_subsystem(name, &style, out)?;
+    let report = SubsystemScaffoldReportV1 {
+        schema: "zkf-subsystem-scaffold-v1".to_string(),
+        generated_at: Utc::now().to_rfc3339(),
+        name: name.to_string(),
+        style,
+        out_dir: root.display().to_string(),
+        manifest_path: root
+            .join("02_manifest/subsystem_manifest.json")
+            .display()
+            .to_string(),
+        completeness_path: root
+            .join("17_report/report.md")
+            .display()
+            .to_string(),
+        release_pin_path: root
+            .join("20_release/zkf-release-pin.json")
+            .display()
+            .to_string(),
+    };
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!(
+            "subsystem scaffold created: style={} -> {}\nnext:\n  cargo test --manifest-path {}/01_source/Cargo.toml\n  zkf subsystem verify-completeness --root {}",
+            report.style,
+            report.out_dir,
+            report.out_dir,
+            report.out_dir
+        );
+    }
+    Ok(())
 }
 
 pub(crate) fn handle_verify_completeness(root: PathBuf, json: bool) -> Result<(), String> {

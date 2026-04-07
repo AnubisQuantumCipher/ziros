@@ -2,10 +2,12 @@
   "name": "zkf-wallet-helper",
   "version": "0.4.1",
   "private": true,
+  "files": [],
   "type": "module",
   "description": "Official Midnight SDK helper for the ZirOS native wallet",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "pack:audit": "npm pack --json --dry-run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test --import tsx test/**/*.test.ts"
   },

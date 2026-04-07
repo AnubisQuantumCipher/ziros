@@ -110,6 +110,7 @@
 		2132F463195A1887B198839E /* WalletHelperProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHelperProcess.swift; sourceTree = "<group>"; };
 		3481789F62119929F379DA3D /* ZKFWalletWebViewHost.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZKFWalletWebViewHost.m; sourceTree = "<group>"; };
 		3E8C05FE3A9C0EAFF4143A04 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		3EE4C92E23D9084CBB456AE3 /* ZirOSWalletExtensionDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWalletExtensionDebug.entitlements; sourceTree = "<group>"; };
 		432A98D86CF3678E6C9A0EB6 /* BridgeRequestModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeRequestModels.swift; sourceTree = "<group>"; };
 		46E2BBAFD1BD8D1910857716 /* ZirOSWallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWallet.entitlements; sourceTree = "<group>"; };
 		47D58FAD22342219A4C409B8 /* WalletHelperRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHelperRuntime.swift; sourceTree = "<group>"; };
@@ -126,6 +127,7 @@
 		A29B8589AC1F0C0EFECB79F9 /* WalletBrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBrandAssets.swift; sourceTree = "<group>"; };
 		A78FB39D850E61570329D784 /* BrandViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandViewModifiers.swift; sourceTree = "<group>"; };
 		A8499400D8F08B28045C663C /* ZirOSWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZirOSWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9E1912CD96D8067A5FB3A6A /* ZirOSWalletDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZirOSWalletDebug.entitlements; sourceTree = "<group>"; };
 		ACF792A399E126E3647AA8F5 /* Outfit-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Outfit-SemiBold.ttf"; sourceTree = "<group>"; };
 		B5D8DF6A843937DC16429077 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
 		B76E6832759606C00A9E456A /* WalletCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCoordinator.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 			children = (
 				FEB5113ADAEC547046FFA6C4 /* SafariWebExtensionHandler.swift */,
 				F7CF00CA5AEAEA09532FCDA8 /* ZirOSWalletExtension.entitlements */,
+				3EE4C92E23D9084CBB456AE3 /* ZirOSWalletExtensionDebug.entitlements */,
 				A699F5F92EDB0D2797E16585 /* Resources */,
 			);
 			name = Extension;
@@ -276,6 +279,7 @@
 			children = (
 				46E2BBAFD1BD8D1910857716 /* ZirOSWallet.entitlements */,
 				97246B2C0DBDC9FEEAF852A2 /* ZirOSWalletApp.swift */,
+				A9E1912CD96D8067A5FB3A6A /* ZirOSWalletDebug.entitlements */,
 				0D0107236ECEFC1ED603C851 /* Models */,
 				54309D9A0AC3F039F88BADCD /* Views */,
 				BA5EB5A54139B92127371C6D /* WalletCore */,
@@ -805,7 +809,7 @@
 		4D2C90D32575E02C6C091242 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/Extension/ZirOSWalletExtensionDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = E9VB3VKZKH;
@@ -854,7 +858,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWallet.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/App/ZirOSWalletDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = E9VB3VKZKH;

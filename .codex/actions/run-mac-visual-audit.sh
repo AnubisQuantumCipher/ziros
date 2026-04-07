@@ -4,11 +4,14 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APP_ROOT="${REPO_ROOT}/zkf-wallet-app"
 DERIVED_DATA="${APP_ROOT}/build-codex-visual-audit"
+APP_PROCESS_PATH="${HOME}/Library/Developer/Xcode/ZirOSWalletmacOS/Debug/ZirOSWallet.app/Contents/MacOS/ZirOSWallet"
 
 AUDIT_STATE="${AUDIT_STATE:-unlocked}"
 AUDIT_SECTION="${AUDIT_SECTION:-overview}"
 AUDIT_TRANSACT_MODE="${AUDIT_TRANSACT_MODE:-send}"
 AUDIT_APPROVAL="${AUDIT_APPROVAL:-}"
+
+pkill -f "${APP_PROCESS_PATH}" >/dev/null 2>&1 || true
 
 xcodegen generate --spec "${APP_ROOT}/project.yml"
 xcodebuild \

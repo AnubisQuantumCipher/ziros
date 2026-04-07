@@ -28,6 +28,30 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: MidnightCommands,
     },
+    /// Operate the ZirOS Midnight wallet policy core through stable CLI commands.
+    Wallet {
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        persistent_root: Option<PathBuf>,
+        #[arg(long)]
+        cache_root: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+        #[command(subcommand)]
+        command: WalletCommands,
+    },
+    /// Run the ZirOS agent operator surface.
+    Agent {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+        #[command(subcommand)]
+        command: AgentCommands,
+    },
     /// Issue and prove private-identity credentials.
     Credential {
         #[command(subcommand)]
@@ -558,6 +582,18 @@ pub(crate) enum AppCommands {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum SubsystemCommands {
+    /// Scaffold a full ZirOS subsystem bundle with proof, release, and Midnight slots.
+    #[command(name = "scaffold")]
+    Scaffold {
+        #[arg(long)]
+        name: String,
+        #[arg(long, default_value = "full")]
+        style: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+    },
     /// Verify that a subsystem bundle is complete against the canonical 20-slot contract.
     #[command(name = "verify-completeness")]
     VerifyCompleteness {
@@ -580,6 +616,22 @@ pub(crate) enum SubsystemCommands {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum MidnightCommands {
+    /// Summarize current Midnight readiness for agent and operator workflows.
+    #[command(name = "status")]
+    Status {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        proof_server_url: Option<String>,
+        #[arg(long)]
+        gateway_url: Option<String>,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
     /// Run the Midnight proof-server compatibility surface on port 6300.
     #[command(name = "proof-server")]
     ProofServer {
@@ -660,6 +712,12 @@ pub(crate) enum MidnightCommands {
         #[arg(long)]
         verbose: bool,
     },
+    /// Compile and prepare Compact contracts through stable JSON surfaces.
+    #[command(name = "contract")]
+    Contract {
+        #[command(subcommand)]
+        command: MidnightContractCommands,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -705,6 +763,455 @@ pub(crate) enum MidnightGatewayCommands {
         #[arg(long)]
         json: bool,
     },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum MidnightContractCommands {
+    /// Compile one Compact contract and emit the generated `.zkir` path.
+    Compile {
+        #[arg(long)]
+        source: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Prepare a deploy manifest without submitting it.
+    #[command(name = "deploy-prepare")]
+    DeployPrepare {
+        #[arg(long)]
+        source: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        proof_server_url: Option<String>,
+        #[arg(long)]
+        gateway_url: Option<String>,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Prepare a call manifest without submitting it.
+    #[command(name = "call-prepare")]
+    CallPrepare {
+        #[arg(long)]
+        source: PathBuf,
+        #[arg(long)]
+        call: String,
+        #[arg(long)]
+        inputs: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        proof_server_url: Option<String>,
+        #[arg(long)]
+        gateway_url: Option<String>,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum WalletCommands {
+    Snapshot,
+    Unlock {
+        #[arg(long)]
+        prompt: String,
+    },
+    Lock,
+    #[command(name = "sync-health")]
+    SyncHealth,
+    Origin {
+        #[command(subcommand)]
+        command: WalletOriginCommands,
+    },
+    Session {
+        #[command(subcommand)]
+        command: WalletSessionCommands,
+    },
+    Pending {
+        #[command(subcommand)]
+        command: WalletPendingCommands,
+    },
+    Grant {
+        #[command(subcommand)]
+        command: WalletGrantCommands,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum WalletOriginCommands {
+    Grant {
+        #[arg(long)]
+        origin: String,
+        #[arg(long = "scope")]
+        scopes: Vec<String>,
+        #[arg(long)]
+        note: Option<String>,
+    },
+    Revoke {
+        #[arg(long)]
+        origin: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum WalletSessionCommands {
+    Open {
+        #[arg(long)]
+        origin: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum WalletPendingCommands {
+    #[command(name = "begin-native")]
+    BeginNative {
+        #[arg(long)]
+        review: PathBuf,
+    },
+    #[command(name = "begin-bridge")]
+    BeginBridge {
+        #[arg(long)]
+        session_id: String,
+        #[arg(long, default_value = "transfer")]
+        kind: String,
+        #[arg(long)]
+        review: PathBuf,
+    },
+    Review {
+        #[arg(long)]
+        pending_id: String,
+    },
+    Approve {
+        #[arg(long)]
+        pending_id: String,
+        #[arg(long)]
+        primary_prompt: String,
+        #[arg(long)]
+        secondary_prompt: Option<String>,
+    },
+    Reject {
+        #[arg(long)]
+        pending_id: String,
+        #[arg(long)]
+        reason: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum WalletGrantCommands {
+    #[command(name = "issue-native")]
+    IssueNative {
+        #[arg(long)]
+        method: String,
+        #[arg(long)]
+        tx_digest: String,
+        #[arg(long)]
+        token: PathBuf,
+    },
+    #[command(name = "issue-bridge")]
+    IssueBridge {
+        #[arg(long)]
+        session_id: String,
+        #[arg(long)]
+        method: String,
+        #[arg(long)]
+        tx_digest: String,
+        #[arg(long)]
+        token: PathBuf,
+    },
+    #[command(name = "consume-native")]
+    ConsumeNative {
+        #[arg(long)]
+        method: String,
+        #[arg(long)]
+        tx_digest: String,
+        #[arg(long)]
+        grant: PathBuf,
+    },
+    #[command(name = "consume-bridge")]
+    ConsumeBridge {
+        #[arg(long)]
+        session_id: String,
+        #[arg(long)]
+        method: String,
+        #[arg(long)]
+        tx_digest: String,
+        #[arg(long)]
+        grant: PathBuf,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentCommands {
+    Doctor {
+        #[arg(long)]
+        goal: Option<String>,
+        #[arg(long)]
+        workflow: Option<String>,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        allow_compat: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        no_worktree: bool,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+    Status {
+        #[arg(long, default_value_t = 10)]
+        limit: usize,
+    },
+    Plan {
+        #[arg(long)]
+        goal: String,
+        #[arg(long)]
+        workflow: Option<String>,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        allow_compat: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        no_worktree: bool,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+    Run {
+        #[arg(long)]
+        goal: String,
+        #[arg(long)]
+        workflow: Option<String>,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        allow_compat: bool,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        no_worktree: bool,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+    Resume {
+        #[arg(long)]
+        session_id: String,
+    },
+    Cancel {
+        #[arg(long)]
+        session_id: String,
+        #[arg(long)]
+        reason: Option<String>,
+    },
+    Explain {
+        #[arg(long)]
+        session_id: String,
+    },
+    Logs {
+        #[arg(long)]
+        session_id: String,
+    },
+    Approve {
+        #[arg(long)]
+        session_id: Option<String>,
+        #[arg(long, default_value = "preprod")]
+        wallet_network: String,
+        #[arg(long)]
+        pending_id: String,
+        #[arg(long)]
+        primary_prompt: String,
+        #[arg(long)]
+        secondary_prompt: Option<String>,
+        #[arg(long)]
+        bridge_session_id: Option<String>,
+        #[arg(long)]
+        persistent_root: Option<PathBuf>,
+        #[arg(long)]
+        cache_root: Option<PathBuf>,
+    },
+    Reject {
+        #[arg(long)]
+        session_id: Option<String>,
+        #[arg(long, default_value = "preprod")]
+        wallet_network: String,
+        #[arg(long)]
+        pending_id: String,
+        #[arg(long)]
+        reason: String,
+        #[arg(long)]
+        persistent_root: Option<PathBuf>,
+        #[arg(long)]
+        cache_root: Option<PathBuf>,
+    },
+    Memory {
+        #[command(subcommand)]
+        command: AgentMemoryCommands,
+    },
+    Approvals {
+        #[command(subcommand)]
+        command: AgentApprovalCommands,
+    },
+    Project {
+        #[command(subcommand)]
+        command: AgentProjectCommands,
+    },
+    Workflow {
+        #[command(subcommand)]
+        command: AgentWorkflowCommands,
+    },
+    Worktree {
+        #[command(subcommand)]
+        command: AgentWorktreeCommands,
+    },
+    Checkpoint {
+        #[command(subcommand)]
+        command: AgentCheckpointCommands,
+    },
+    Provider {
+        #[command(subcommand)]
+        command: AgentProviderCommands,
+    },
+    Mcp {
+        #[command(subcommand)]
+        command: AgentMcpCommands,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentMemoryCommands {
+    Sessions {
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+    },
+    Receipts {
+        #[arg(long)]
+        session_id: String,
+    },
+    Artifacts {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+    Deployments {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+    Environments {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+    Procedures,
+    Incidents {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentApprovalCommands {
+    List {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentProjectCommands {
+    Register {
+        #[arg(long)]
+        name: String,
+        #[arg(long)]
+        root: String,
+    },
+    List,
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentWorkflowCommands {
+    List,
+    Show {
+        #[arg(long)]
+        workgraph_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentWorktreeCommands {
+    List {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+    Create {
+        #[arg(long)]
+        session_id: String,
+    },
+    Cleanup {
+        #[arg(long)]
+        worktree_id: String,
+        #[arg(long)]
+        remove_files: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentCheckpointCommands {
+    List {
+        #[arg(long)]
+        session_id: String,
+    },
+    Create {
+        #[arg(long)]
+        session_id: String,
+        #[arg(long)]
+        label: String,
+    },
+    Rollback {
+        #[arg(long)]
+        checkpoint_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentProviderCommands {
+    Status {
+        #[arg(long)]
+        session_id: Option<String>,
+    },
+    Route {
+        #[arg(long)]
+        session_id: Option<String>,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+    Test {
+        #[arg(long)]
+        session_id: Option<String>,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentMcpCommands {
+    Serve,
 }
 
 #[derive(Debug, Args)]

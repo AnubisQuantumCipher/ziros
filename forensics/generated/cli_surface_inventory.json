@@ -1,0 +1,65 @@
+{
+  "agent_commands": [
+    "Doctor",
+    "Status",
+    "Plan",
+    "Run",
+    "Resume",
+    "Cancel",
+    "Explain",
+    "Logs",
+    "Approve",
+    "Reject",
+    "Memory",
+    "Approvals",
+    "Project",
+    "Workflow",
+    "Worktree",
+    "Checkpoint",
+    "Provider",
+    "Mcp"
+  ],
+  "agent_memory_commands": [
+    "Sessions",
+    "Receipts",
+    "Artifacts",
+    "Deployments",
+    "Environments",
+    "Procedures",
+    "Incidents"
+  ],
+  "agent_workflow_commands": [
+    "List",
+    "Show"
+  ],
+  "events_jsonl_supported": true,
+  "generated_at": "2026-04-07T04:57:30.229513Z",
+  "midnight_commands": [
+    "Status",
+    "ProofServer",
+    "Gateway",
+    "Templates",
+    "Init",
+    "Doctor",
+    "Disclosure",
+    "Resolve",
+    "Contract"
+  ],
+  "midnight_contract_commands": [
+    "Compile",
+    "DeployPrepare",
+    "CallPrepare"
+  ],
+  "path": "zkf-cli/src/cli.rs",
+  "schema": "ziros-agent-cli-surface-inventory-v1",
+  "wallet_commands": [
+    "Snapshot",
+    "Unlock",
+    "Lock",
+    "SyncHealth",
+    "Origin",
+    "Session",
+    "Pending",
+    "Grant"
+  ]
+}

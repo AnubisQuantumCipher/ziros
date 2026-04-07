@@ -29,10 +29,13 @@ actix-cors = "^0.7.1"
 actix-web = { version = "4.11.0", default-features = false }
 base_crypto = { package = "midnight-base-crypto", git = "https://github.com/midnightntwrk/midnight-ledger.git", tag = "ledger-8.0.3" }
 zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-command-surface = { path = "../zkf-command-surface" }
+zkf-agent = { path = "../zkf-agent" }
 zkf-keymanager = { path = "../zkf-keymanager" }
 zkf-storage = { path = "../zkf-storage" }
 zkf-runtime = { path = "../zkf-runtime" }
 zkf-distributed = { path = "../zkf-distributed" }
+zkf-wallet = { path = "../zkf-wallet" }
 ed25519-dalek.workspace = true
 base64.workspace = true
 clap.workspace = true

@@ -1,0 +1,146 @@
+{
+  "action_count": 19,
+  "agent_command_count": 18,
+  "brain_table_count": 18,
+  "generated_at": "2026-04-07T04:57:30.282892Z",
+  "schema": "ziros-agent-blueprint-gap-matrix-v1",
+  "topics": [
+    {
+      "evidence": [
+        "Cargo.toml",
+        "zkf-agent",
+        "zkf-command-surface",
+        "zkf-cli/src/cli.rs"
+      ],
+      "status": "matched",
+      "topic": "in_tree_workspace_integration"
+    },
+    {
+      "evidence": [
+        "zkf-command-surface/src/lib.rs"
+      ],
+      "status": "matched",
+      "topic": "command_surface_substrate"
+    },
+    {
+      "evidence": [
+        "zkf-command-surface/src/types.rs",
+        "zkf-agent/src/executor.rs"
+      ],
+      "status": "matched",
+      "topic": "typed_action_envelopes"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/daemon.rs"
+      ],
+      "status": "matched",
+      "topic": "daemon_socket_rpc"
+    },
+    {
+      "evidence": [
+        "zkf-cli/src/cmd/wallet.rs"
+      ],
+      "status": "matched",
+      "topic": "wallet_cli_closure"
+    },
+    {
+      "evidence": [
+        "zkf-cli/src/cmd/midnight.rs"
+      ],
+      "status": "matched",
+      "topic": "midnight_status_and_contract_prepare"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/lib.rs",
+        "zkf-agent/src/daemon.rs",
+        "zkf-cli/src/cmd/agent.rs"
+      ],
+      "status": "matched",
+      "topic": "workflow_list_and_artifact_surfaces"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/mcp.rs"
+      ],
+      "status": "matched",
+      "topic": "mcp_parity_for_core_operator_surfaces"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/planner.rs",
+        "zkf-agent/src/types.rs",
+        "zkf-agent/src/lib.rs"
+      ],
+      "note": "Explicit typed intent and hints now drive workflow compilation and executor choices; keyword inference remains only as backward-compatible fallback.",
+      "status": "matched",
+      "topic": "planner_as_full_intent_compiler"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/brain.rs",
+        "zkf-agent/src/lib.rs",
+        "zkf-agent/src/executor.rs"
+      ],
+      "note": "Artifacts, procedures, incidents, approvals, approval tokens, submission grants, deployments, environment snapshots, worktrees, checkpoints, and provider routes are now both persisted and reportable.",
+      "status": "matched",
+      "topic": "brain_tables_operationally_populated"
+    },
+    {
+      "evidence": [
+        "ZirOSAgentHost/project.yml",
+        "ZirOSAgentHost/ZirOSAgentHost.xcodeproj/project.pbxproj"
+      ],
+      "status": "matched",
+      "topic": "host_as_real_macos_app_target"
+    },
+    {
+      "evidence": [
+        "setup/launchd/com.ziros.agentd.plist",
+        "setup/launchd/ziros-agentd-launch.sh"
+      ],
+      "status": "matched",
+      "topic": "launchd_managed_daemon_shell"
+    },
+    {
+      "evidence": [
+        "ZirOSAgentHost/README.md"
+      ],
+      "note": "The architecture intentionally preserves the Unix-socket daemon as the single control plane.",
+      "status": "intentional_absence",
+      "topic": "xpc_service_boundary"
+    },
+    {
+      "evidence": [
+        "zkf-agent/src/executor.rs",
+        "zkf-agent/src/lib.rs",
+        "zkf-agent/src/daemon.rs",
+        "zkf-cli/src/tests/agent_wallet.rs"
+      ],
+      "note": "The current action inventory now covers subsystem scaffold/proof/benchmark/release flows plus Midnight prepare, approval, automatic resume, and submission-grant issuance on the daemon-backed safety boundary.",
+      "status": "matched",
+      "topic": "end_to_end_operator_depth"
+    },
+    {
+      "evidence": [
+        "scripts/generate_private_release_truth.py",
+        "scripts/check_private_truth_drift.py",
+        "scripts/check_public_release_boundary.py",
+        "release/product-release.json",
+        "release/public_release_boundary_report.json"
+      ],
+      "note": "Private truth generation, drift detection, and public-boundary scanning are now explicit repo-local surfaces instead of narrative-only release promises.",
+      "status": "matched",
+      "topic": "sealed_release_boundary"
+    },
+    {
+      "evidence": [
+        "zkf-cli/src/benchmark.rs"
+      ],
+      "status": "matched",
+      "topic": "benchmark_suite_isolation"
+    }
+  ],
+  "workflow_count": 12
+}

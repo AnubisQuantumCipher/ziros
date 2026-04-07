@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-04-07T05:02:08.730772Z",
+  "headline_counts": {
+    "hypothesis_carried_theorem": 9,
+    "hypothesis_stated": 9,
+    "mechanized_implementation_claim": 160,
+    "mechanized_local": 160,
+    "pending": 0,
+    "total_entries": 169
+  },
+  "private_release_paths": {
+    "private_source_census": "release/private_source_census.json",
+    "product_release": "release/product-release.json",
+    "public_release_allowlist": "release/public_release_allowlist.json"
+  },
+  "release_tag": "v0.4.1",
+  "release_version": "0.4.1",
+  "schema": "ziros-public-attestation-export-v1",
+  "source_commit": "e831e1d32119891a30d83ce918b0f62c3a00c6e0",
+  "support_matrix_summary": {
+    "backend_count": 9,
+    "frontend_count": 7,
+    "gadget_count": 11,
+    "generated_for": "0.4.1"
+  },
+  "version": "0.4.1",
+  "working_tree_dirty": true
+}

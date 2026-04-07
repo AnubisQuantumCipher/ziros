@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-04-07T05:02:08.701860Z",
+  "release_boundary": {
+    "allowlist_path": "release/public_release_allowlist.json",
+    "boundary_report_path": "release/public_release_boundary_report.json",
+    "public_export_script": "scripts/export_public_attestation_bundle.py",
+    "public_repo": "/Users/sicarii/Projects/ziros-attestation",
+    "scanner_script": "scripts/check_public_release_boundary.py"
+  },
+  "release_tag": "v0.4.1",
+  "release_version": "0.4.1",
+  "schema": "ziros-product-release-v1",
+  "source_commit": "e831e1d32119891a30d83ce918b0f62c3a00c6e0",
+  "truth_surfaces": {
+    "agent_forensics": "forensics/",
+    "canonical_truth": "docs/CANONICAL_TRUTH.md",
+    "completion_status": ".zkf-completion-status.json",
+    "support_matrix": "support-matrix.json",
+    "verification_ledger": "zkf-ir-spec/verification-ledger.json"
+  },
+  "verification_summary": {
+    "assurance_class_counts": {
+      "attestation_backed_lane": 0,
+      "bounded_check": 0,
+      "hypothesis_carried_theorem": 9,
+      "mechanized_implementation_claim": 160,
+      "model_only_claim": 0
+    },
+    "status_counts": {
+      "assumed_external": 0,
+      "bounded_checked": 0,
+      "hypothesis_stated": 9,
+      "mechanized_generated": 0,
+      "mechanized_local": 160,
+      "pending": 0
+    },
+    "total_entries": 169
+  },
+  "version": "0.4.1",
+  "working_tree_dirty": true,
+  "workspace_members": {
+    "count": 22,
+    "names": [
+      "zkf-agent",
+      "zkf-backends",
+      "zkf-cli",
+      "zkf-cloudfs",
+      "zkf-command-surface",
+      "zkf-conformance",
+      "zkf-core",
+      "zkf-distributed",
+      "zkf-examples",
+      "zkf-ffi",
+      "zkf-frontends",
+      "zkf-gadgets",
+      "zkf-ir-spec",
+      "zkf-keymanager",
+      "zkf-lib",
+      "zkf-metal",
+      "zkf-registry",
+      "zkf-runtime",
+      "zkf-sdk",
+      "zkf-storage",
+      "zkf-ui",
+      "zkf-wallet"
+    ]
+  }
+}

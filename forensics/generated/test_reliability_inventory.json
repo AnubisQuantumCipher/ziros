@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-04-07T04:57:30.282478Z",
+  "ignored_benchmark_tests": [
+    "parallel_benchmark_report_includes_scheduler_and_scope"
+  ],
+  "schema": "ziros-agent-test-reliability-inventory-v1",
+  "test_files": [
+    {
+      "path": "zkf-command-surface/src/wallet.rs",
+      "tests": 2
+    },
+    {
+      "path": "zkf-agent/src/lib.rs",
+      "tests": 9
+    },
+    {
+      "path": "zkf-agent/src/mcp.rs",
+      "tests": 2
+    },
+    {
+      "path": "zkf-cli/src/tests/agent_wallet.rs",
+      "tests": 15
+    }
+  ],
+  "validated_commands": [
+    "cargo check -p zkf-command-surface -p zkf-agent -p zkf-cli",
+    "cargo test -p zkf-command-surface --lib",
+    "cargo test -p zkf-agent --lib",
+    "cargo test -p zkf-cli agent_wallet -- --nocapture",
+    "python3 scripts/generate_private_release_truth.py",
+    "python3 scripts/check_private_truth_drift.py",
+    "python3 scripts/check_public_release_boundary.py",
+    "swift build --package-path /Users/sicarii/Desktop/ZirOS/ZirOSAgentHost",
+    "xcodegen generate --spec /Users/sicarii/Desktop/ZirOS/ZirOSAgentHost/project.yml",
+    "xcodebuild -project /Users/sicarii/Desktop/ZirOS/ZirOSAgentHost/ZirOSAgentHost.xcodeproj -scheme ZirOSAgentHost -configuration Debug -destination 'platform=macOS' build"
+  ]
+}

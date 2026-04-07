@@ -1,0 +1,26 @@
+[package]
+name = "zkf-command-surface"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+chrono.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ureq.workspace = true
+zkf-backends = { path = "../zkf-backends", default-features = false }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-keymanager = { path = "../zkf-keymanager" }
+zkf-lib = { path = "../zkf-lib" }
+zkf-storage = { path = "../zkf-storage" }
+zkf-wallet = { path = "../zkf-wallet" }
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

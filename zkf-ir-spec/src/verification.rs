@@ -60,14 +60,7 @@ impl VerificationLedgerEntry {
             return VerificationAssuranceClass::HypothesisCarriedTheorem;
         }
 
-        if self.theorem_id.starts_with("protocol.")
-            || matches!(
-                self.theorem_id.as_str(),
-                "swarm.coordinator_acceptance_soundness"
-                    | "swarm.memory_snapshot_identity"
-                    | "distributed.acceptance_soundness"
-            )
-        {
+        if self.theorem_id.starts_with("protocol.") {
             VerificationAssuranceClass::HypothesisCarriedTheorem
         } else {
             VerificationAssuranceClass::MechanizedImplementationClaim
@@ -2609,10 +2602,18 @@ mod tests {
         );
         assert_eq!(
             classify("distributed.acceptance_soundness"),
-            VerificationAssuranceClass::HypothesisCarriedTheorem
+            VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(
             classify("swarm.memory_append_only_convergence"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("swarm.coordinator_acceptance_soundness"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("swarm.memory_snapshot_identity"),
             VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(

@@ -1,12 +1,14 @@
 {
-  "name": "ziros-attestation",
+  "name": "ziros-attestation-ops",
   "version": "0.4.1",
   "description": "Midnight attestation package for ZirOS code-correctness proofs",
   "private": true,
+  "files": [],
   "type": "module",
   "scripts": {
     "fetch-compactc": "COMPACTC_VERSION=0.30.0 fetch-compactc",
     "compile-contracts": "bash scripts/compile-contracts.sh",
+    "pack:audit": "npm pack --json --dry-run",
     "typecheck": "tsc --noEmit",
     "witness-builder": "tsx src/witness-builder.ts",
     "prove-attestation": "tsx src/prove-attestation.ts",

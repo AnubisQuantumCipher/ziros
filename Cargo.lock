@@ -12329,6 +12329,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "zkf-agent"
+version = "0.4.1"
+dependencies = [
+ "chacha20poly1305",
+ "chrono",
+ "rand 0.8.5",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "ureq",
+ "zkf-cloudfs",
+ "zkf-command-surface",
+ "zkf-keymanager",
+ "zkf-wallet",
+]
+
+[[package]]
 name = "zkf-backends"
 version = "0.4.1"
 dependencies = [
@@ -12432,8 +12450,10 @@ dependencies = [
  "tempfile",
  "tokio",
  "ureq",
+ "zkf-agent",
  "zkf-backends",
  "zkf-cloudfs",
+ "zkf-command-surface",
  "zkf-conformance",
  "zkf-core",
  "zkf-distributed",
@@ -12446,6 +12466,7 @@ dependencies = [
  "zkf-runtime",
  "zkf-storage",
  "zkf-ui",
+ "zkf-wallet",
 ]
 
 [[package]]
@@ -12460,6 +12481,25 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "tempfile",
+]
+
+[[package]]
+name = "zkf-command-surface"
+version = "0.4.1"
+dependencies = [
+ "chrono",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.18",
+ "ureq",
+ "zkf-backends",
+ "zkf-cloudfs",
+ "zkf-keymanager",
+ "zkf-lib",
+ "zkf-storage",
+ "zkf-wallet",
 ]
 
 [[package]]

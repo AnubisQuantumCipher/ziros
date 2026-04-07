@@ -1,0 +1,137 @@
+{
+  "generated_at": "2026-04-07T04:57:30.229016Z",
+  "modules": [
+    {
+      "line_count": 51,
+      "module": "app",
+      "path": "zkf-command-surface/src/app.rs",
+      "public_functions": [
+        "scaffold",
+        "scaffold_summary"
+      ]
+    },
+    {
+      "line_count": 57,
+      "module": "cluster",
+      "path": "zkf-command-surface/src/cluster.rs",
+      "public_functions": [
+        "benchmark",
+        "status"
+      ]
+    },
+    {
+      "line_count": 553,
+      "module": "midnight",
+      "path": "zkf-command-surface/src/midnight.rs",
+      "public_functions": [
+        "as_str",
+        "call_prepare",
+        "compile_contract",
+        "deploy_prepare",
+        "locate_midnight_project_root",
+        "parse",
+        "status"
+      ]
+    },
+    {
+      "line_count": 89,
+      "module": "proof",
+      "path": "zkf-command-surface/src/proof.rs",
+      "public_functions": [
+        "proof_event_to_command_event"
+      ]
+    },
+    {
+      "line_count": 25,
+      "module": "release",
+      "path": "zkf-command-surface/src/release.rs",
+      "public_functions": [
+        "evidence_bundle"
+      ]
+    },
+    {
+      "line_count": 43,
+      "module": "runtime",
+      "path": "zkf-command-surface/src/runtime.rs",
+      "public_functions": [
+        "benchmark"
+      ]
+    },
+    {
+      "line_count": 97,
+      "module": "shell",
+      "path": "zkf-command-surface/src/shell.rs",
+      "public_functions": [
+        "read_json_file",
+        "resolve_zkf_cli_binary",
+        "run_zkf_cli",
+        "search_path",
+        "workspace_root"
+      ]
+    },
+    {
+      "line_count": 80,
+      "module": "subsystem",
+      "path": "zkf-command-surface/src/subsystem.rs",
+      "public_functions": [
+        "scaffold",
+        "verify_completeness",
+        "verify_release_pin"
+      ]
+    },
+    {
+      "line_count": 25,
+      "module": "swarm",
+      "path": "zkf-command-surface/src/swarm.rs",
+      "public_functions": [
+        "status"
+      ]
+    },
+    {
+      "line_count": 138,
+      "module": "truth",
+      "path": "zkf-command-surface/src/truth.rs",
+      "public_functions": [
+        "collect_truth_snapshot"
+      ]
+    },
+    {
+      "line_count": 250,
+      "module": "types",
+      "path": "zkf-command-surface/src/types.rs",
+      "public_functions": [
+        "emit",
+        "new",
+        "new_operation_id",
+        "now_rfc3339",
+        "open",
+        "success"
+      ]
+    },
+    {
+      "line_count": 381,
+      "module": "wallet",
+      "path": "zkf-command-surface/src/wallet.rs",
+      "public_functions": [
+        "approve_pending",
+        "begin_bridge",
+        "begin_native",
+        "consume_bridge_grant",
+        "consume_native_grant",
+        "grant_origin",
+        "issue_bridge_grant",
+        "issue_native_grant",
+        "lock",
+        "open_handle",
+        "open_session",
+        "pending_review",
+        "reject_pending",
+        "revoke_origin",
+        "snapshot",
+        "sync_health",
+        "unlock"
+      ]
+    }
+  ],
+  "schema": "ziros-agent-command-surface-inventory-v1"
+}

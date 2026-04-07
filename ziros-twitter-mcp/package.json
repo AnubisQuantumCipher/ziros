@@ -2,9 +2,11 @@
   "name": "ziros-twitter-mcp",
   "version": "1.0.0",
   "private": true,
+  "files": [],
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "pack:audit": "npm pack --json --dry-run",
     "test": "npm run build && node --test build/test/*.test.js"
   },
   "dependencies": {

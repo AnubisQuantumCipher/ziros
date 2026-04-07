@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Midnight Compact mailbox contract scaffold for ZirOS wallet messaging",
   "private": true,
+  "files": [],
   "type": "module",
   "scripts": {
     "fetch-compactc": "COMPACTC_VERSION=0.30.0 fetch-compactc",
@@ -10,6 +11,7 @@
     "compile-contracts": "bash scripts/compile-contracts.sh",
     "deploy-mailbox": "npm run build --silent && node dist/deploy-mailbox.js",
     "operator-status": "npm run build --silent && node dist/operator-status.js",
+    "pack:audit": "npm pack --json --dry-run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

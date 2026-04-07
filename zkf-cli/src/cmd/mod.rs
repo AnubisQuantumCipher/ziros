@@ -1,5 +1,6 @@
 pub(crate) mod aerospace_qualification;
 pub(crate) mod app;
+pub(crate) mod agent;
 pub(crate) mod audit;
 pub(crate) mod capabilities;
 pub(crate) mod circuit;
@@ -29,12 +30,14 @@ pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
+pub(crate) mod wallet;
 pub(crate) mod witness;
 
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
-    AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands, IrCommands,
-    MidnightCommands, MidnightProofServerCommands, SubsystemCommands, TelemetryCommands,
+    AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
+    IrCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
+    SubsystemCommands, TelemetryCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -47,6 +50,12 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     let result = match command {
         Commands::App { command } => app::handle_app(command),
         Commands::Subsystem { command } => match command {
+            SubsystemCommands::Scaffold {
+                name,
+                style,
+                out,
+                json,
+            } => subsystem::handle_scaffold(&name, &style, out, json),
             SubsystemCommands::VerifyCompleteness { root, json } => {
                 subsystem::handle_verify_completeness(root, json)
             }
@@ -55,6 +64,19 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             }
         },
         Commands::Midnight { command } => midnight::handle_midnight(command),
+        Commands::Wallet {
+            network,
+            persistent_root,
+            cache_root,
+            json,
+            events_jsonl,
+            command,
+        } => wallet::handle_wallet(network, persistent_root, cache_root, json, events_jsonl, command),
+        Commands::Agent {
+            json,
+            events_jsonl,
+            command,
+        } => agent::handle_agent(json, events_jsonl, command),
         Commands::Credential { command } => credential::handle_credential(command),
         Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
@@ -547,6 +569,7 @@ fn command_name(command: &Commands) -> String {
             },
         },
         Commands::Subsystem { command } => match command {
+            SubsystemCommands::Scaffold { .. } => "subsystem:scaffold".to_string(),
             SubsystemCommands::VerifyCompleteness { .. } => {
                 "subsystem:verify-completeness".to_string()
             }
@@ -555,6 +578,7 @@ fn command_name(command: &Commands) -> String {
             }
         },
         Commands::Midnight { command } => match command {
+            MidnightCommands::Status { .. } => "midnight:status".to_string(),
             MidnightCommands::ProofServer { command } => match command {
                 MidnightProofServerCommands::Serve { .. } => {
                     "midnight:proof-server:serve".to_string()
@@ -570,6 +594,47 @@ fn command_name(command: &Commands) -> String {
             MidnightCommands::Doctor { .. } => "midnight:doctor".to_string(),
             MidnightCommands::Disclosure { .. } => "midnight:disclosure".to_string(),
             MidnightCommands::Resolve { .. } => "midnight:resolve".to_string(),
+            MidnightCommands::Contract { command } => match command {
+                MidnightContractCommands::Compile { .. } => {
+                    "midnight:contract:compile".to_string()
+                }
+                MidnightContractCommands::DeployPrepare { .. } => {
+                    "midnight:contract:deploy-prepare".to_string()
+                }
+                MidnightContractCommands::CallPrepare { .. } => {
+                    "midnight:contract:call-prepare".to_string()
+                }
+            },
+        },
+        Commands::Wallet { command, .. } => match command {
+            WalletCommands::Snapshot => "wallet:snapshot".to_string(),
+            WalletCommands::Unlock { .. } => "wallet:unlock".to_string(),
+            WalletCommands::Lock => "wallet:lock".to_string(),
+            WalletCommands::SyncHealth => "wallet:sync-health".to_string(),
+            WalletCommands::Origin { .. } => "wallet:origin".to_string(),
+            WalletCommands::Session { .. } => "wallet:session".to_string(),
+            WalletCommands::Pending { .. } => "wallet:pending".to_string(),
+            WalletCommands::Grant { .. } => "wallet:grant".to_string(),
+        },
+        Commands::Agent { command, .. } => match command {
+            AgentCommands::Doctor { .. } => "agent:doctor".to_string(),
+            AgentCommands::Status { .. } => "agent:status".to_string(),
+            AgentCommands::Plan { .. } => "agent:plan".to_string(),
+            AgentCommands::Run { .. } => "agent:run".to_string(),
+            AgentCommands::Resume { .. } => "agent:resume".to_string(),
+            AgentCommands::Cancel { .. } => "agent:cancel".to_string(),
+            AgentCommands::Explain { .. } => "agent:explain".to_string(),
+            AgentCommands::Logs { .. } => "agent:logs".to_string(),
+            AgentCommands::Approve { .. } => "agent:approve".to_string(),
+            AgentCommands::Reject { .. } => "agent:reject".to_string(),
+            AgentCommands::Memory { .. } => "agent:memory".to_string(),
+            AgentCommands::Approvals { .. } => "agent:approvals".to_string(),
+            AgentCommands::Project { .. } => "agent:project".to_string(),
+            AgentCommands::Workflow { .. } => "agent:workflow".to_string(),
+            AgentCommands::Worktree { .. } => "agent:worktree".to_string(),
+            AgentCommands::Checkpoint { .. } => "agent:checkpoint".to_string(),
+            AgentCommands::Provider { .. } => "agent:provider".to_string(),
+            AgentCommands::Mcp { .. } => "agent:mcp".to_string(),
         },
         Commands::Credential { command } => match command {
             CredentialCommands::Issue { .. } => "credential:issue".to_string(),

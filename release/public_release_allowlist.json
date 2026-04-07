@@ -1,0 +1,51 @@
+{
+  "allowed_public_extensions": [
+    ".json",
+    ".md",
+    ".txt",
+    ".yml",
+    ".yaml"
+  ],
+  "forbidden_path_fragments": [
+    "/Users/",
+    "/private/var/",
+    "node_modules/",
+    ".tmp/",
+    "logs/",
+    "__pycache__/",
+    "target-local/",
+    "target-public/",
+    "ZirOSAgentHost/build/",
+    "ZirOSAgentHost/.build/"
+  ],
+  "forbidden_suffixes": [
+    ".map",
+    ".rs",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".py",
+    ".sh",
+    ".swift",
+    ".metal",
+    ".metallib",
+    ".lean",
+    ".v",
+    ".fst",
+    ".fsti",
+    ".zip"
+  ],
+  "generated_at": "2026-04-07T05:02:08.730622Z",
+  "package_roots": [
+    "attestation",
+    "zkf-wallet-helper",
+    "zkf-wallet-mailbox",
+    "ziros-twitter-mcp"
+  ],
+  "public_repo_root": "/Users/sicarii/Projects/ziros-attestation",
+  "schema": "ziros-public-release-allowlist-v1",
+  "version": "0.4.1"
+}

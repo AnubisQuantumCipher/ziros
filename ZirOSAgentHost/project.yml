@@ -1,0 +1,39 @@
+name: ZirOSAgentHost
+options:
+  minimumXcodeGenVersion: 2.45.3
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    MACOSX_DEPLOYMENT_TARGET: 14.0
+    ARCHS: arm64
+targets:
+  ZirOSAgentHost:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: Sources/ZirOSAgentHost
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ziros.agent.host
+        PRODUCT_NAME: ZirOSAgentHost
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Config/Info.plist
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        ENABLE_HARDENED_RUNTIME: NO
+        SWIFT_EMIT_LOC_STRINGS: NO
+        SYMROOT: "$(HOME)/Library/Developer/Xcode/ZirOSAgentHost"
+        OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSAgentHost/Intermediates"
+    postCompileScripts:
+      - name: Sanitize Agent Host Bundle
+        script: |
+          if [ -d "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" ]; then
+            xattr -cr "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}" || true
+          fi
+schemes:
+  ZirOSAgentHost:
+    build:
+      targets:
+        ZirOSAgentHost: all

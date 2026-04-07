@@ -1,0 +1,135 @@
+{
+  "generated_at": "2026-04-07T04:56:48.147649Z",
+  "issues": [],
+  "ok": true,
+  "package_reports": [
+    {
+      "issues": [],
+      "package_root": "attestation",
+      "packed_files": [
+        "package.json"
+      ],
+      "raw": [
+        {
+          "bundled": [],
+          "entryCount": 1,
+          "filename": "ziros-attestation-ops-0.4.1.tgz",
+          "files": [
+            {
+              "mode": 420,
+              "path": "package.json",
+              "size": 2523
+            }
+          ],
+          "id": "ziros-attestation-ops@0.4.1",
+          "integrity": "sha512-psEt24+lkl3qvHRlQ0C547twpMiEKjndlX3jPGBZ/ur9iTvTvPQNPgaH4zx/pydcSX+KUxccF2Aw+YTNa/oXxQ==",
+          "name": "ziros-attestation-ops",
+          "shasum": "668ef0a7f08be246165874363686699ee8654324",
+          "size": 869,
+          "unpackedSize": 2523,
+          "version": "0.4.1"
+        }
+      ]
+    },
+    {
+      "issues": [],
+      "package_root": "zkf-wallet-helper",
+      "packed_files": [
+        "package.json"
+      ],
+      "raw": [
+        {
+          "bundled": [],
+          "entryCount": 1,
+          "filename": "zkf-wallet-helper-0.4.1.tgz",
+          "files": [
+            {
+              "mode": 420,
+              "path": "package.json",
+              "size": 1325
+            }
+          ],
+          "id": "zkf-wallet-helper@0.4.1",
+          "integrity": "sha512-gDibsXSMay8fvlrIfulCEc1GrIgugHMEUIbboY23OFgaIl7wQKUunniYMBM/hDxRqdO3vFgCmdWYt1mZV5Df+A==",
+          "name": "zkf-wallet-helper",
+          "shasum": "ddae88cd62488bb9288132bb53a61fdaac599f3f",
+          "size": 626,
+          "unpackedSize": 1325,
+          "version": "0.4.1"
+        }
+      ]
+    },
+    {
+      "issues": [],
+      "package_root": "zkf-wallet-mailbox",
+      "packed_files": [
+        "README.md",
+        "package.json"
+      ],
+      "raw": [
+        {
+          "bundled": [],
+          "entryCount": 2,
+          "filename": "zkf-wallet-mailbox-0.1.0.tgz",
+          "files": [
+            {
+              "mode": 420,
+              "path": "README.md",
+              "size": 1391
+            },
+            {
+              "mode": 420,
+              "path": "package.json",
+              "size": 2166
+            }
+          ],
+          "id": "zkf-wallet-mailbox@0.1.0",
+          "integrity": "sha512-7AymnVK/VawUuhrqgFTUIxSZzKPMkwadunSQSWJlNCYka5oIWsfK4eU/j0v7JT0U53+baswgEu9ffdAn6OeiSw==",
+          "name": "zkf-wallet-mailbox",
+          "shasum": "44285dfe579483246767b9dfd88205722126198d",
+          "size": 1467,
+          "unpackedSize": 3557,
+          "version": "0.1.0"
+        }
+      ]
+    },
+    {
+      "issues": [],
+      "package_root": "ziros-twitter-mcp",
+      "packed_files": [
+        "README.md",
+        "package.json"
+      ],
+      "raw": [
+        {
+          "bundled": [],
+          "entryCount": 2,
+          "filename": "ziros-twitter-mcp-1.0.0.tgz",
+          "files": [
+            {
+              "mode": 420,
+              "path": "README.md",
+              "size": 1649
+            },
+            {
+              "mode": 420,
+              "path": "package.json",
+              "size": 431
+            }
+          ],
+          "id": "ziros-twitter-mcp@1.0.0",
+          "integrity": "sha512-WzmSaVF2ONlS0BsSNi1hoF1lh4ixXXsMX4F4felw4PUiZXCtsq8OI0G8/akIoS6XP/fqav/ZEiGPwu1rT0iIog==",
+          "name": "ziros-twitter-mcp",
+          "shasum": "cb12058a7ec20c0c6cd80e069344c97353d47007",
+          "size": 1145,
+          "unpackedSize": 2080,
+          "version": "1.0.0"
+        }
+      ]
+    }
+  ],
+  "require_clean": false,
+  "schema": "ziros-public-release-boundary-report-v1",
+  "staging_report": null,
+  "working_tree_dirty": true
+}

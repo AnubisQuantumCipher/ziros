@@ -1,0 +1,29 @@
+[package]
+name = "zkf-agent"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "ziros-agentd"
+path = "src/bin/ziros-agentd.rs"
+
+[dependencies]
+chacha20poly1305 = "0.10"
+chrono.workspace = true
+rand.workspace = true
+rusqlite = { version = "0.33", features = ["bundled"] }
+serde.workspace = true
+serde_json.workspace = true
+ureq.workspace = true
+zkf-command-surface = { path = "../zkf-command-surface" }
+zkf-cloudfs = { path = "../zkf-cloudfs" }
+zkf-keymanager = { path = "../zkf-keymanager" }
+zkf-wallet = { path = "../zkf-wallet" }
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

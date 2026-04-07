@@ -1,0 +1,41 @@
+{
+  "action_names": [
+    "agent.plan",
+    "app.scaffold",
+    "cluster.status",
+    "midnight.contract.compile",
+    "midnight.contract.deploy-prepare",
+    "midnight.project.scaffold",
+    "midnight.status",
+    "proof.compile-prove-verify",
+    "release.evidence-bundle",
+    "runtime.benchmark",
+    "subsystem.scaffold",
+    "subsystem.verify-completeness",
+    "subsystem.verify-release-pin",
+    "swarm.status",
+    "truth.capabilities",
+    "truth.inspect",
+    "truth.metal",
+    "wallet.snapshot",
+    "wallet.submission-grant.issue"
+  ],
+  "executor_path": "zkf-agent/src/executor.rs",
+  "generated_at": "2026-04-07T04:57:30.229080Z",
+  "planner_path": "zkf-agent/src/planner.rs",
+  "schema": "ziros-agent-action-inventory-v1",
+  "workflow_kinds": [
+    "benchmark-report",
+    "evidence-bundle",
+    "generic-investigation",
+    "host-readiness",
+    "midnight-contract-ops",
+    "midnight-proof-server-ops",
+    "proof-app-build",
+    "subsystem-benchmark",
+    "subsystem-evidence-release",
+    "subsystem-midnight-ops",
+    "subsystem-proof",
+    "subsystem-scaffold"
+  ]
+}

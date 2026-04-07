@@ -964,7 +964,7 @@
       "scope": "zkf-distributed::swarm_coordinator_core",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "hypothesis_carried_theorem",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/verus/distributed_coordinator_swarm_verus.rs",
       "notes": "Local Verus theorem `swarm_coordinator_acceptance_soundness` proves that, under the explicit attestation-honesty premise for the shipped output/trace agreement surface, the shipped coordinator acceptance helpers preserve digest-prefix equality and reduce attestation agreement to the conjunction of output and trace matches.",
       "trusted_assumptions": []
@@ -1030,7 +1030,7 @@
       "scope": "zkf-distributed::swarm_memory_core",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "hypothesis_carried_theorem",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/verus/swarm_memory_verus.rs",
       "notes": "Local Verus theorem `swarm_memory_append_only_identity` proves that, under the explicit attestation-honesty premise for the shipped snapshot signature surface, the shipped memory snapshot signing-byte layout dominates the job identifier length and imported chain heads remain stable exactly when they match the exported head.",
       "trusted_assumptions": []
@@ -1514,7 +1514,7 @@
       "scope": "zkf-distributed::coordinator",
       "checker": "rocq",
       "status": "mechanized_local",
-      "assurance_class": "hypothesis_carried_theorem",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/rocq/SwarmReputationProofs.v",
       "notes": "Local Rocq theorem `distributed_acceptance_surface_requires_all_preconditions_ok` proves that, under the explicit attestation-honesty premise for the shipped coordinator acceptance surface, distributed acceptance is exactly `attestation_matches && coordinator_requires_quorum_spec(...) && digests_agree`.",
       "trusted_assumptions": []

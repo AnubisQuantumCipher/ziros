@@ -37,6 +37,7 @@ targets:
         OBJROOT: "$(HOME)/Library/Developer/Xcode/ZirOSWalletmacOS/Intermediates"
       configs:
         Debug:
+          CODE_SIGN_ENTITLEMENTS: Sources/App/ZirOSWalletDebug.entitlements
           OTHER_LDFLAGS:
             - "$(SRCROOT)/../target-public/debug/libzkf_ffi.a"
         Release:
@@ -128,6 +129,9 @@ targets:
         INFOPLIST_KEY_NSExtension:
           NSExtensionPointIdentifier: com.apple.Safari.web-extension
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).SafariWebExtensionHandler
+      configs:
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: Sources/Extension/ZirOSWalletExtensionDebug.entitlements
     postCompileScripts:
       - name: Sanitize Extension Bundle
         script: |

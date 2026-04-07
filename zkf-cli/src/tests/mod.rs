@@ -100,6 +100,7 @@ fn verify_package_manifest(manifest_path: &Path) -> Result<PackageVerifyReport, 
     cmd::package::verify::verify_package_manifest(manifest_path)
 }
 
+mod agent_wallet;
 mod app;
 mod audit;
 mod circuit;

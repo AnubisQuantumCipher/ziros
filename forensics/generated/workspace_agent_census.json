@@ -1,0 +1,300 @@
+{
+  "files": [
+    {
+      "lines": 78,
+      "path": "AGENTS.md"
+    },
+    {
+      "lines": 197,
+      "path": "Cargo.toml"
+    },
+    {
+      "lines": 32,
+      "path": "ZirOSAgentHost/Config/Info.plist"
+    },
+    {
+      "lines": 21,
+      "path": "ZirOSAgentHost/Package.swift"
+    },
+    {
+      "lines": 70,
+      "path": "ZirOSAgentHost/README.md"
+    },
+    {
+      "lines": 224,
+      "path": "ZirOSAgentHost/Sources/ZirOSAgentHost/AgentDaemonClient.swift"
+    },
+    {
+      "lines": 164,
+      "path": "ZirOSAgentHost/Sources/ZirOSAgentHost/AgentHostViewModel.swift"
+    },
+    {
+      "lines": 170,
+      "path": "ZirOSAgentHost/Sources/ZirOSAgentHost/Models.swift"
+    },
+    {
+      "lines": 374,
+      "path": "ZirOSAgentHost/Sources/ZirOSAgentHost/ZirOSAgentHostApp.swift"
+    },
+    {
+      "lines": 338,
+      "path": "ZirOSAgentHost/ZirOSAgentHost.xcodeproj/project.pbxproj"
+    },
+    {
+      "lines": 7,
+      "path": "ZirOSAgentHost/ZirOSAgentHost.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+    },
+    {
+      "lines": 89,
+      "path": "ZirOSAgentHost/ZirOSAgentHost.xcodeproj/xcshareddata/xcschemes/ZirOSAgentHost.xcscheme"
+    },
+    {
+      "lines": 39,
+      "path": "ZirOSAgentHost/project.yml"
+    },
+    {
+      "lines": 96,
+      "path": "docs/CANONICAL_TRUTH.md"
+    },
+    {
+      "lines": 24,
+      "path": "setup/launchd/com.ziros.agentd.plist"
+    },
+    {
+      "lines": 11,
+      "path": "setup/launchd/ziros-agentd-launch.sh"
+    },
+    {
+      "lines": 357,
+      "path": "support-matrix.json"
+    },
+    {
+      "lines": 29,
+      "path": "zkf-agent/Cargo.toml"
+    },
+    {
+      "lines": 6,
+      "path": "zkf-agent/src/bin/ziros-agentd.rs"
+    },
+    {
+      "lines": 1227,
+      "path": "zkf-agent/src/brain.rs"
+    },
+    {
+      "lines": 92,
+      "path": "zkf-agent/src/checkpoint.rs"
+    },
+    {
+      "lines": 235,
+      "path": "zkf-agent/src/daemon.rs"
+    },
+    {
+      "lines": 1006,
+      "path": "zkf-agent/src/executor.rs"
+    },
+    {
+      "lines": 1445,
+      "path": "zkf-agent/src/lib.rs"
+    },
+    {
+      "lines": 824,
+      "path": "zkf-agent/src/mcp.rs"
+    },
+    {
+      "lines": 712,
+      "path": "zkf-agent/src/planner.rs"
+    },
+    {
+      "lines": 312,
+      "path": "zkf-agent/src/provider.rs"
+    },
+    {
+      "lines": 130,
+      "path": "zkf-agent/src/trust_gate.rs"
+    },
+    {
+      "lines": 770,
+      "path": "zkf-agent/src/types.rs"
+    },
+    {
+      "lines": 186,
+      "path": "zkf-agent/src/worktree.rs"
+    },
+    {
+      "lines": 1169,
+      "path": "zkf-cli/src/benchmark.rs"
+    },
+    {
+      "lines": 2180,
+      "path": "zkf-cli/src/cli.rs"
+    },
+    {
+      "lines": 404,
+      "path": "zkf-cli/src/cmd/agent.rs"
+    },
+    {
+      "lines": 1317,
+      "path": "zkf-cli/src/cmd/midnight.rs"
+    },
+    {
+      "lines": 211,
+      "path": "zkf-cli/src/cmd/wallet.rs"
+    },
+    {
+      "lines": 354,
+      "path": "zkf-cli/src/tests/agent_wallet.rs"
+    },
+    {
+      "lines": 20,
+      "path": "zkf-cloudfs/Cargo.toml"
+    },
+    {
+      "lines": 521,
+      "path": "zkf-cloudfs/src/cloudfs.rs"
+    },
+    {
+      "lines": 97,
+      "path": "zkf-cloudfs/src/config.rs"
+    },
+    {
+      "lines": 10,
+      "path": "zkf-cloudfs/src/lib.rs"
+    },
+    {
+      "lines": 229,
+      "path": "zkf-cloudfs/src/migrate.rs"
+    },
+    {
+      "lines": 26,
+      "path": "zkf-command-surface/Cargo.toml"
+    },
+    {
+      "lines": 51,
+      "path": "zkf-command-surface/src/app.rs"
+    },
+    {
+      "lines": 57,
+      "path": "zkf-command-surface/src/cluster.rs"
+    },
+    {
+      "lines": 18,
+      "path": "zkf-command-surface/src/lib.rs"
+    },
+    {
+      "lines": 553,
+      "path": "zkf-command-surface/src/midnight.rs"
+    },
+    {
+      "lines": 89,
+      "path": "zkf-command-surface/src/proof.rs"
+    },
+    {
+      "lines": 25,
+      "path": "zkf-command-surface/src/release.rs"
+    },
+    {
+      "lines": 43,
+      "path": "zkf-command-surface/src/runtime.rs"
+    },
+    {
+      "lines": 97,
+      "path": "zkf-command-surface/src/shell.rs"
+    },
+    {
+      "lines": 80,
+      "path": "zkf-command-surface/src/subsystem.rs"
+    },
+    {
+      "lines": 25,
+      "path": "zkf-command-surface/src/swarm.rs"
+    },
+    {
+      "lines": 138,
+      "path": "zkf-command-surface/src/truth.rs"
+    },
+    {
+      "lines": 250,
+      "path": "zkf-command-surface/src/types.rs"
+    },
+    {
+      "lines": 381,
+      "path": "zkf-command-surface/src/wallet.rs"
+    },
+    {
+      "lines": 28,
+      "path": "zkf-keymanager/Cargo.toml"
+    },
+    {
+      "lines": 7,
+      "path": "zkf-keymanager/src/lib.rs"
+    },
+    {
+      "lines": 756,
+      "path": "zkf-keymanager/src/manager.rs"
+    },
+    {
+      "lines": 31,
+      "path": "zkf-keymanager/src/zeroize_types.rs"
+    },
+    {
+      "lines": 37,
+      "path": "zkf-wallet/Cargo.toml"
+    },
+    {
+      "lines": 2878,
+      "path": "zkf-wallet/src/lib.rs"
+    },
+    {
+      "lines": 2073,
+      "path": "zkf-wallet/src/messaging.rs"
+    }
+  ],
+  "generated_at": "2026-04-07T04:57:30.228053Z",
+  "schema": "ziros-agent-workspace-census-v1",
+  "scope_file_count": 62,
+  "scope_line_count": 23420,
+  "workspace_members": [
+    {
+      "manifest_path": "zkf-cli/Cargo.toml",
+      "name": "zkf-cli",
+      "targets": [
+        {
+          "kind": [
+            "bin"
+          ],
+          "name": "zkf-cli"
+        }
+      ]
+    },
+    {
+      "manifest_path": "zkf-agent/Cargo.toml",
+      "name": "zkf-agent",
+      "targets": [
+        {
+          "kind": [
+            "lib"
+          ],
+          "name": "zkf_agent"
+        },
+        {
+          "kind": [
+            "bin"
+          ],
+          "name": "ziros-agentd"
+        }
+      ]
+    },
+    {
+      "manifest_path": "zkf-command-surface/Cargo.toml",
+      "name": "zkf-command-surface",
+      "targets": [
+        {
+          "kind": [
+            "lib"
+          ],
+          "name": "zkf_command_surface"
+        }
+      ]
+    }
+  ]
+}

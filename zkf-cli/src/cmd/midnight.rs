@@ -45,7 +45,12 @@ mod resolve;
 pub(crate) mod shared;
 mod templates;
 
-use crate::cli::{MidnightCommands, MidnightGatewayCommands, MidnightProofServerCommands};
+use crate::cli::{
+    MidnightCommands, MidnightContractCommands, MidnightGatewayCommands,
+    MidnightProofServerCommands,
+};
+use zkf_command_surface::midnight as surface_midnight;
+use zkf_command_surface::{CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id};
 
 const DEFAULT_KEY_LOCATIONS: [&str; 4] = [
     "midnight/zswap/spend",
@@ -233,6 +238,21 @@ type TransactionProvePayload<S> = (
 
 pub(crate) fn handle_midnight(command: MidnightCommands) -> Result<(), String> {
     match command {
+        MidnightCommands::Status {
+            json,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            events_jsonl,
+        } => handle_midnight_status(
+            json,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            events_jsonl,
+        ),
         MidnightCommands::ProofServer { command } => match command {
             MidnightProofServerCommands::Serve {
                 port,
@@ -305,7 +325,166 @@ pub(crate) fn handle_midnight(command: MidnightCommands) -> Result<(), String> {
             json,
             verbose,
         }),
+        MidnightCommands::Contract { command } => handle_midnight_contract(command),
     }
+}
+
+fn handle_midnight_status(
+    json_output: bool,
+    project: Option<std::path::PathBuf>,
+    network: String,
+    proof_server_url: Option<String>,
+    gateway_url: Option<String>,
+    events_jsonl: Option<std::path::PathBuf>,
+) -> Result<(), String> {
+    let action_id = new_operation_id("midnight-status");
+    let mut sink = JsonlEventSink::open(events_jsonl)?;
+    emit_surface_event(
+        &mut sink,
+        CommandEventKindV1::Started,
+        &action_id,
+        "midnight status started",
+    )?;
+    let network = surface_midnight::MidnightNetworkV1::parse(&network)?;
+    let report = surface_midnight::status(
+        network,
+        project.as_deref(),
+        proof_server_url.as_deref(),
+        gateway_url.as_deref(),
+    )?;
+    print_surface_output(json_output, &report)?;
+    emit_surface_event(
+        &mut sink,
+        CommandEventKindV1::Completed,
+        &action_id,
+        "midnight status completed",
+    )
+}
+
+fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), String> {
+    match command {
+        MidnightContractCommands::Compile {
+            source,
+            out,
+            network,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-compile");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract compile started",
+            )?;
+            let network = surface_midnight::MidnightNetworkV1::parse(&network)?;
+            let report = surface_midnight::compile_contract(network, &source, &out)?;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Completed,
+                &action_id,
+                "midnight contract compile completed",
+            )
+        }
+        MidnightContractCommands::DeployPrepare {
+            source,
+            out,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-deploy-prepare");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight deploy-prepare started",
+            )?;
+            let network = surface_midnight::MidnightNetworkV1::parse(&network)?;
+            let report = surface_midnight::deploy_prepare(
+                network,
+                &source,
+                &out,
+                proof_server_url.as_deref(),
+                gateway_url.as_deref(),
+                project.as_deref(),
+            )?;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Completed,
+                &action_id,
+                "midnight deploy-prepare completed",
+            )
+        }
+        MidnightContractCommands::CallPrepare {
+            source,
+            call,
+            inputs,
+            out,
+            project,
+            network,
+            proof_server_url,
+            gateway_url,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-call-prepare");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight call-prepare started",
+            )?;
+            let network = surface_midnight::MidnightNetworkV1::parse(&network)?;
+            let report = surface_midnight::call_prepare(
+                network,
+                &source,
+                &call,
+                &inputs,
+                &out,
+                proof_server_url.as_deref(),
+                gateway_url.as_deref(),
+                project.as_deref(),
+            )?;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Completed,
+                &action_id,
+                "midnight call-prepare completed",
+            )
+        }
+    }
+}
+
+fn emit_surface_event(
+    sink: &mut Option<JsonlEventSink>,
+    kind: CommandEventKindV1,
+    action_id: &str,
+    message: &str,
+) -> Result<(), String> {
+    if let Some(sink) = sink.as_mut() {
+        sink.emit(&CommandEventV1::new(action_id, kind, message))?;
+    }
+    Ok(())
+}
+
+fn print_surface_output<T: serde::Serialize>(json_output: bool, value: &T) -> Result<(), String> {
+    let body = serde_json::to_string_pretty(value).map_err(|error| error.to_string())?;
+    if json_output {
+        println!("{body}");
+    } else {
+        println!("{body}");
+    }
+    Ok(())
 }
 
 fn serve_midnight_proof_server(
