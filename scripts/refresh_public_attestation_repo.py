@@ -19,6 +19,7 @@ PRIVATE_CENSUS = ROOT / "release" / "private_source_census.json"
 PRIVATE_PRODUCT_RELEASE = ROOT / "release" / "product-release.json"
 PRIVATE_MIDNIGHT_READINESS = ROOT / "release" / "midnight_operator_readiness.json"
 PRIVATE_EVM_READINESS = ROOT / "release" / "evm_operator_readiness.json"
+PRIVATE_INSTALLER_MANIFEST = ROOT / "release" / "npm" / "installer-manifest.json"
 PRIVATE_EXPORT = Path("/tmp/ziros-public-attestation-export-bundle/public_attestation_export.json")
 
 HEADLINE_CONFORMANCE_BACKENDS = ["plonky3", "halo2", "nova", "hypernova"]
@@ -303,16 +304,26 @@ def build_proof_inventory(private_census: dict) -> dict:
 
 
 def build_binary_manifest(version: str, binary_path: Path) -> dict:
-    digest = hashlib.sha256(binary_path.read_bytes()).hexdigest()
+    cli_digest = hashlib.sha256(binary_path.read_bytes()).hexdigest()
+    agentd_path = binary_path.parent / "ziros-agentd"
+    agentd_digest = hashlib.sha256(agentd_path.read_bytes()).hexdigest()
     return {
         "version": version,
         "build_date": now_rfc3339(),
         "target_triple": "aarch64-apple-darwin",
         "binaries": {
+            "ziros": {
+                "path": "ziros",
+                "sha256": cli_digest,
+            },
             "zkf": {
                 "path": "zkf",
-                "sha256": digest,
-            }
+                "sha256": cli_digest,
+            },
+            "ziros-agentd": {
+                "path": "ziros-agentd",
+                "sha256": agentd_digest,
+            },
         },
     }
 
@@ -803,6 +814,8 @@ def main() -> int:
     proof_inventory = build_proof_inventory(private_census)
     binary_manifest = build_binary_manifest(version, args.binary_path.resolve())
     binary_manifest_path = f"binary-manifest/{release_tag}/manifest.json"
+    installer_manifest = load_json(PRIVATE_INSTALLER_MANIFEST)
+    installer_manifest_path = f"binary-manifest/{release_tag}/installer-manifest.json"
     public_midnight_readiness = build_midnight_readiness_doc(
         private_midnight_readiness, release_tag, source_commit
     )
@@ -811,6 +824,7 @@ def main() -> int:
     )
 
     write_json(public_root / binary_manifest_path, binary_manifest)
+    write_json(public_root / installer_manifest_path, installer_manifest)
     write_json(public_root / "ledger" / "verification-ledger.json", public_ledger)
     write_json(public_root / "ledger" / "ledger-summary.json", ledger_summary)
 
