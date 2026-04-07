@@ -1,14 +1,14 @@
 {
   "name": "@ziros/agent",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Thin npm installer and launcher for ZirOS on Apple Silicon macOS",
   "license": "UNLICENSED",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/anubisquantumcipher/ziros.git"
+    "url": "https://github.com/AnubisQuantumCipher/ziros-attestation.git"
   },
-  "homepage": "https://github.com/anubisquantumcipher/ziros",
+  "homepage": "https://github.com/AnubisQuantumCipher/ziros-attestation",
   "os": [
     "darwin"
   ],

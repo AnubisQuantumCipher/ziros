@@ -61,9 +61,9 @@
     "swift": 25,
     "typescript_or_js": 65
   },
-  "generated_at": "2026-04-07T14:50:44.330783Z",
+  "generated_at": "2026-04-07T15:53:00.316211Z",
   "schema": "ziros-private-source-census-v1",
-  "source_commit": "3d07bd462d46a65841b7c20d661b64f7185384d2",
+  "source_commit": "a2c74a3d638bedf00e04d28dde2023d41c964ee9",
   "tracked_file_count": 1581,
   "tracked_rust_line_count": 346895,
   "tracked_rust_lines": 346895,
