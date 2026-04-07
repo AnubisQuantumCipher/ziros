@@ -1,0 +1,17 @@
+{
+  "schema": "ziros-public-attestation-export-v1",
+  "generated_at": "2026-04-07T01:18:46.669172+00:00",
+  "release_tag": "v0.4.2",
+  "version": "0.4.2",
+  "source_commit": "d6fd472f4cefdf4be70c04b12de88974d65e30a7",
+  "working_tree_dirty": true,
+  "implementation_bound_rows": 156,
+  "hypothesis_carried_rows": 9,
+  "mechanized_local_rows": 165,
+  "pending_rows": 0,
+  "protocol_registry_sha256": "41576ed33f98e6c617084d0f07e7ec786529568b480cec0e2643db1d35fb2e98",
+  "proof_inventory_sha256": "fbda2cb71e4af876fdb9d03bebf988afa47cb995977c7c5ef1d3e6a3c4beeece",
+  "conformance_summary_sha256": "21057480b55e559ff7e8498e5d40fb83c3e6c7f9e7dd354f5262b29bb022cef7",
+  "capability_summary_sha256": "7cf3b6bf197bc8d87fcdc570cbf6866fca84b404150c5e57c432e996d7570f94",
+  "workspace_census_root": "c6798e8b9e72101e64cf13865bbed55ac17c61bc1ba5ff3c31e0b30e5a5d76f4"
+}

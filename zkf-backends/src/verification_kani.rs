@@ -3,12 +3,17 @@
 use crate::arkworks::should_debug_check_constraint_system_mode;
 use crate::audited_backend::build_audited_compiled_program;
 use crate::blackbox_gadgets::lookup_lowering::{self, LookupLoweringShape};
+use crate::proof_groth16_boundary_spec::{
+    ConstraintMatricesModel, Groth16OutlinedLcModel, Groth16SynthesisModeModel, MatrixRowModel,
+    MatrixTermModel, groth16_matrix_surfaces_equivalent, matrix_free_satisfaction_check_rejected,
+};
 use crate::wrapping::halo2_ipa_accumulator::{Halo2IpaBindingModel, halo2_ipa_binding_accepts};
 use ark_bn254::Fr;
 use ark_relations::r1cs::{
     ConstraintMatrices, ConstraintSystem, ConstraintSystemRef, LinearCombination, OptimizationGoal,
     SynthesisError, SynthesisMode, Variable, satisfaction_check_error_for_mode,
 };
+use ark_serialize::CanonicalSerialize;
 use zkf_core::ir::LookupTable;
 use zkf_core::{BackendKind, FieldElement, FieldId, Program};
 
@@ -84,6 +89,39 @@ fn groth16_matrix_equivalence_fixture(mode: SynthesisMode) -> ConstraintSystemRe
     cs
 }
 
+fn summarize_matrix_row(row: &[(Fr, usize)]) -> Vec<MatrixTermModel> {
+    row.iter()
+        .map(|(coeff, variable)| {
+            let mut coeff_bytes = Vec::new();
+            coeff
+                .serialize_compressed(&mut coeff_bytes)
+                .expect("fixture coefficient serialization should succeed");
+            MatrixTermModel {
+                variable: *variable,
+                coeff_bytes,
+            }
+        })
+        .collect()
+}
+
+fn summarize_constraint_matrices(matrices: &ConstraintMatrices<Fr>) -> ConstraintMatricesModel {
+    ConstraintMatricesModel {
+        num_instance_variables: matrices.num_instance_variables,
+        num_witness_variables: matrices.num_witness_variables,
+        rows: matrices
+            .a
+            .iter()
+            .zip(matrices.b.iter())
+            .zip(matrices.c.iter())
+            .map(|((a_row, b_row), c_row)| MatrixRowModel {
+                a: summarize_matrix_row(a_row),
+                b: summarize_matrix_row(b_row),
+                c: summarize_matrix_row(c_row),
+            })
+            .collect(),
+    }
+}
+
 fn collect_constraint_matrices_from_draining_rows(
     cs: &ConstraintSystemRef<Fr>,
 ) -> ConstraintMatrices<Fr> {
@@ -126,6 +164,21 @@ fn assert_groth16_matrix_paths_match(mode: SynthesisMode) {
     assert_eq!(materialized, streaming);
     assert_eq!(materialized, draining);
     assert_eq!(streaming, draining);
+
+    let outlined = Groth16OutlinedLcModel {
+        num_instance_variables: materialized.num_instance_variables,
+        num_witness_variables: materialized.num_witness_variables,
+        expanded_rows: summarize_constraint_matrices(&materialized).rows,
+    };
+    assert!(groth16_matrix_surfaces_equivalent(&outlined));
+    assert_eq!(
+        summarize_constraint_matrices(&materialized),
+        summarize_constraint_matrices(&streaming)
+    );
+    assert_eq!(
+        summarize_constraint_matrices(&materialized),
+        summarize_constraint_matrices(&draining)
+    );
 }
 
 #[kani::proof]
@@ -184,6 +237,19 @@ fn matrix_free_satisfaction_check_is_rejected() {
             construct_matrices: true,
         }),
         None
+    ));
+    assert!(matrix_free_satisfaction_check_rejected(
+        Groth16SynthesisModeModel::Setup
+    ));
+    assert!(matrix_free_satisfaction_check_rejected(
+        Groth16SynthesisModeModel::Prove {
+            construct_matrices: false
+        }
+    ));
+    assert!(!matrix_free_satisfaction_check_rejected(
+        Groth16SynthesisModeModel::Prove {
+            construct_matrices: true
+        }
     ));
 }
 

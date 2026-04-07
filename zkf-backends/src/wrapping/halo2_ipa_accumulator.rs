@@ -105,22 +105,9 @@ use halo2_proofs::plonk::Error;
 /// caught immediately (unlike the attestation wrapper which only hashes bytes).
 pub struct Halo2IpaAccumulator;
 
-/// Proof-facing summary of the metadata binding shape required before the
-/// deferred IPA/Groth16 recomputation can proceed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Halo2IpaBindingModel {
-    pub proof_count: usize,
-    pub proof_hash_count: usize,
-    pub bound_g_point_count: usize,
-    pub malformed_g_point_count: usize,
-}
-
-pub(crate) fn halo2_ipa_binding_accepts(model: Halo2IpaBindingModel) -> bool {
-    model.proof_count > 0
-        && model.proof_hash_count == model.proof_count
-        && model.bound_g_point_count == model.proof_count
-        && model.malformed_g_point_count == 0
-}
+pub(crate) use crate::proof_halo2_ipa_accumulator_spec::{
+    Halo2IpaBindingModel, halo2_ipa_binding_accepts,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Halo2IpaBindingSummary {

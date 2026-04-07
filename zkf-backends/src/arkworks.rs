@@ -5,13 +5,13 @@ use crate::audited_backend::{
 use crate::blackbox_native::supported_blackbox_ops;
 use crate::blackbox_native::validate_blackbox_constraints;
 use crate::metal_runtime::append_backend_runtime_metadata;
+use crate::proof_groth16_boundary_spec::should_debug_check_constraint_system_mode_model;
 use crate::r1cs_lowering::lower_program_for_backend;
 use crate::{
     BackendEngine, GROTH16_DETERMINISTIC_DEV_PROVENANCE,
     GROTH16_DETERMINISTIC_DEV_SECURITY_BOUNDARY, GROTH16_IMPORTED_SETUP_PROVENANCE,
-    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
-    GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
-    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY,
+    GROTH16_IMPORTED_SETUP_SECURITY_BOUNDARY, GROTH16_LOCAL_CEREMONY_STREAMED_PROVENANCE,
+    GROTH16_LOCAL_CEREMONY_STREAMED_SECURITY_BOUNDARY, GROTH16_SETUP_BLOB_PATH_METADATA_KEY,
     GROTH16_SETUP_PROVENANCE_METADATA_KEY, GROTH16_SETUP_SECURITY_BOUNDARY_METADATA_KEY,
     GROTH16_STREAMED_PK_PATH_METADATA_KEY, GROTH16_STREAMED_SETUP_STORAGE_METADATA_KEY,
     GROTH16_STREAMED_SETUP_STORAGE_VALUE, GROTH16_STREAMED_SHAPE_PATH_METADATA_KEY,
@@ -3545,7 +3545,12 @@ pub(crate) fn should_debug_check_constraint_system_mode(
     env_forced: bool,
     num_constraints: usize,
 ) -> bool {
-    debug_build && construct_matrices && (env_forced || num_constraints <= 50_000)
+    should_debug_check_constraint_system_mode_model(
+        debug_build,
+        construct_matrices,
+        env_forced,
+        num_constraints,
+    )
 }
 
 fn should_debug_check_constraint_system(cs: &ConstraintSystemRef<Fr>) -> bool {
@@ -4926,7 +4931,11 @@ mod tests {
         let stale_path = base.join(".shape.bin.tmp-999999-1-0");
         fs::write(&stale_path, b"stale").expect("stale temp");
         std::process::Command::new("touch")
-            .args(["-t", "200001010000", stale_path.to_str().expect("utf8 path")])
+            .args([
+                "-t",
+                "200001010000",
+                stale_path.to_str().expect("utf8 path"),
+            ])
             .status()
             .expect("touch stale temp");
 

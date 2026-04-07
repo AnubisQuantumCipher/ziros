@@ -27,7 +27,7 @@ Most ZK frameworks give you a library and a backend. ZirOS is the system layer t
 | Rust tests | 1,047 across 6 crates |
 | Proof runner scripts | 6 (Rocq, 3 Verus workspaces, F* with Z3 4.13.3) |
 
-165 mechanized theorems — including 22 gateway verification theorems and an end-to-end composition proof — backed by the source-grounded verification ledger. Every formal claim is proven against the same code that runs in production. The ledger distinguishes between mechanized implementation claims (137), hypothesis-carried theorems (9), model-only claims (16), and attestation-backed lanes (3). There are no pending items. The gateway composition theorem chains 18 lemmas across 3 proof files proving that if the gateway returns a passing attestation, then the contract is safe.
+165 mechanized theorems — including 22 gateway verification theorems and an end-to-end composition proof — backed by the source-grounded verification ledger. Every formal claim is proven against the same code that runs in production. The ledger distinguishes between mechanized implementation claims (156), hypothesis-carried theorems (9), model-only claims (0), and attestation-backed lanes (0). There are no pending items. The gateway composition theorem chains 18 lemmas across 3 proof files proving that if the gateway returns a passing attestation, then the contract is safe.
 
 ---
 

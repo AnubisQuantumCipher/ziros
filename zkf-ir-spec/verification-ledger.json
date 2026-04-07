@@ -861,13 +861,13 @@
     },
     {
       "theorem_id": "aggregation.halo2_ipa_accumulation_bounded",
-      "title": "Proof-facing Halo2 IPA aggregation metadata binding accepts only complete batches before deferred recomputation",
-      "scope": "zkf-backends::wrapping::halo2_ipa_accumulator",
+      "title": "Halo2 IPA aggregation metadata binding accepts only complete batches before deferred recomputation",
+      "scope": "zkf-backends::proof_halo2_ipa_accumulator_spec",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
-      "notes": "Local Verus theorem `halo2_ipa_accumulation_binding_surface_ok` mechanizes the proof-facing metadata-binding model used by `halo2_ipa_binding_accepts`: only non-empty batches with matching proof-hash and bound-G counts and zero malformed points are admitted before deferred IPA/Groth16 recomputation starts.",
+      "notes": "Local Verus theorem `halo2_ipa_accumulation_binding_surface_ok` now binds the shipped `proof_halo2_ipa_accumulator_spec::halo2_ipa_binding_accepts` helper used by the Halo2 IPA accumulator: only non-empty batches with matching proof-hash and bound-G counts and zero malformed points are admitted before deferred IPA/Groth16 recomputation starts.",
       "trusted_assumptions": []
     },
     {
@@ -876,7 +876,7 @@
       "scope": "zkf-metal::ntt",
       "checker": "lean",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-metal/proofs/lean/Ntt.lean",
       "notes": "Lean theorem `ntt_family_exact_transform_sound` mechanizes the exported NTT family boundary model: the shipped Goldilocks, BabyBear, and BN254 programs keep their program ids, operator labels, region layouts, barrier placements, binding kinds, source-path inventory, and reflection/workgroup policies synchronized with the generated kernel inventory. Arithmetic correctness is tracked separately by narrower GPU rows.",
       "trusted_assumptions": []
@@ -898,7 +898,7 @@
       "scope": "zkf-metal::msm",
       "checker": "lean",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-metal/proofs/lean/Msm.lean",
       "notes": "Lean theorem `msm_family_exact_pippenger_sound` mechanizes the exported MSM family boundary model: the shipped BN254 classic chain and the shipped Pallas/Vesta classic-or-NAF surfaces keep their program ids, operator labels, region layouts, route tags, source-path inventory, and reflection/workgroup policies synchronized with the generated kernel inventory. Arithmetic correctness is tracked separately from this structural row.",
       "trusted_assumptions": []
@@ -909,7 +909,7 @@
       "scope": "zkf-metal::poseidon2",
       "checker": "lean",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-metal/proofs/lean/Poseidon2.lean",
       "notes": "Lean theorem `poseidon2_family_exact_permutation_sound` mechanizes the exported Poseidon2 family boundary model: the shipped width-16 Goldilocks and BabyBear scalar/SIMD programs keep their operator labels, region layouts, source-path inventory, and reflection/workgroup policies synchronized with the generated kernel inventory. Arithmetic correctness is tracked separately from this structural row.",
       "trusted_assumptions": []
@@ -920,7 +920,7 @@
       "scope": "zkf-metal::hash",
       "checker": "lean",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-metal/proofs/lean/Hash.lean",
       "notes": "Lean theorem `hash_family_exact_digest_sound` mechanizes the exported hash-family boundary model: the shipped SHA-256 and Keccak-256 programs keep their operator labels, region layouts, source-path inventory, and reflection/workgroup policies synchronized with the generated kernel inventory. Digest arithmetic correctness is tracked separately from this structural row.",
       "trusted_assumptions": []
@@ -1026,24 +1026,24 @@
     },
     {
       "theorem_id": "wrapping.groth16_cached_shape_matrix_free_fail_closed",
-      "title": "Proof-facing cached-shape Groth16 model keeps the debug gate off without matrices and rejects matrix-free satisfaction inspection",
-      "scope": "zkf-backends::arkworks",
+      "title": "Shipped cached-shape Groth16 boundary keeps the debug gate off without matrices and rejects matrix-free satisfaction inspection",
+      "scope": "zkf-backends::proof_groth16_boundary_spec",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
-      "notes": "Local Verus theorem `groth16_cached_shape_matrix_free_fail_closed_ok` mechanizes the proof-facing debug-gate model for `should_debug_check_constraint_system_mode` together with the matrix-free satisfaction mode summary: the cached-shape debug gate is off whenever `construct_matrices == false`, setup is rejected, and prove-mode matrix inspection only proceeds when matrices are explicitly constructed.",
+      "notes": "Local Verus theorem `groth16_cached_shape_matrix_free_fail_closed_ok` mechanizes the shipped `proof_groth16_boundary_spec` helper surface used by the backend boundary: `should_debug_check_constraint_system_mode_model` disables the debug gate whenever `construct_matrices == false`, `matrix_free_satisfaction_check_rejected` rejects setup and prove-without-matrices, and the existing Kani harness keeps the Arkworks `SynthesisMode` surface aligned with that shipped helper.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "backend.groth16_matrix_equivalence_bounded",
-      "title": "Proof-facing Groth16 outlined-row model gives identical materialized, streaming, and draining matrices",
-      "scope": "zkf-backends::arkworks",
+      "title": "Shipped Groth16 outlined-row boundary gives identical materialized, streaming, and draining matrices",
+      "scope": "zkf-backends::proof_groth16_boundary_spec",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
-      "notes": "Local Verus theorem `groth16_matrix_equivalence_surface_ok` mechanizes a proof-facing outlined-row model for the Groth16 matrix surface and proves the materialized, streaming, and draining builders expose the same `ConstraintMatricesModel` whenever the shared expanded-row summary is fixed.",
+      "notes": "Local Verus theorem `groth16_matrix_equivalence_surface_ok` mechanizes the shipped `proof_groth16_boundary_spec` outlined-row surface and proves `materialized_matrices`, `streaming_matrices`, and `draining_matrices` are extensionally equal whenever the shared expanded-row summary is fixed. The Kani harness serializes real Arkworks `ConstraintMatrices` rows into that shipped model and checks all three concrete matrix routes collapse to the same summary.",
       "trusted_assumptions": []
     },
     {
@@ -1195,7 +1195,7 @@
       "scope": "zkf-distributed::swarm_coordinator_core",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "attestation_backed_lane",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/verus/distributed_coordinator_swarm_verus.rs",
       "notes": "Local Verus theorem `swarm_coordinator_acceptance_soundness` proves the shipped coordinator acceptance surface preserves digest-prefix equality and reduces attestation agreement to the conjunction of output and trace matches.",
       "trusted_assumptions": []
@@ -1261,7 +1261,7 @@
       "scope": "zkf-distributed::swarm_memory_core",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "attestation_backed_lane",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/verus/swarm_memory_verus.rs",
       "notes": "Local Verus theorem `swarm_memory_append_only_identity` proves the shipped memory snapshot signing-byte layout dominates the job identifier length and that imported chain heads remain stable exactly when they match the exported head.",
       "trusted_assumptions": []
@@ -1279,24 +1279,24 @@
     },
     {
       "theorem_id": "swarm.memory_append_only_convergence",
-      "title": "Append-only Swarm memory snapshots preserve the exported prefix",
-      "scope": "zkf-distributed::swarm::memory",
-      "checker": "lean",
+      "title": "Shipped append-only Swarm memory snapshot helpers preserve the exported prefix",
+      "scope": "zkf-distributed::proof_swarm_reputation_spec",
+      "checker": "rocq",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/SwarmIntelligence.lean",
-      "notes": "Lean theorem `memory_append_only_convergence` proves the abstract append-only memory model preserves the exported prefix under snapshot extension, matching the shipped authenticated snapshot/import helper surface.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-distributed/proofs/rocq/SwarmEpochProofs.v",
+      "notes": "Local Rocq theorems `swarm_memory_append_only_prefix_preserved_ok` and `snapshot_authenticated_roundtrip_helper_surface_ok` prove the extracted shipped helpers `append_only_memory_prefix_preserved_spec` and `snapshot_chain_head_roundtrip_spec`: extending an append-only snapshot preserves the exported prefix exactly, and authenticated snapshot import accepts only exact head equality on the shipped helper surface.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "swarm.intelligence_root_convergence",
-      "title": "Canonical Swarm intelligence ordering converges across insertion orders",
-      "scope": "zkf-distributed::swarm::diplomat",
-      "checker": "lean",
+      "title": "Shipped canonical Swarm intelligence ordering converges across insertion orders",
+      "scope": "zkf-distributed::proof_swarm_reputation_spec",
+      "checker": "rocq",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/SwarmIntelligence.lean",
-      "notes": "Lean theorem `intelligence_root_convergence` proves the canonical pair-ordering model is symmetric, matching the shipped sorted intelligence-root construction over corroboration and contradiction reports.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-distributed/proofs/rocq/SwarmEpochProofs.v",
+      "notes": "Local Rocq theorems `intelligence_root_canonical_pair_converges_ok` and `intelligence_root_canonical_ordering_spec_ok` prove the extracted shipped helper `intelligence_root_convergence_under_canonical_ordering_spec`: the canonical pair-ordering used by the Swarm intelligence surface is symmetric across insertion order on the shipped helper boundary.",
       "trusted_assumptions": []
     },
     {
@@ -1360,20 +1360,20 @@
       "scope": "zkf-core::proof_constant_time_spec",
       "checker": "fstar",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-core/proofs/fstar/ConstantTimeProofs.fst",
       "notes": "Local F* theorem `eval_expr_constant_time_reference_result_equivalence` proves the extracted `eval_expr_constant_time_result` and `eval_expr_reference_result` proof surfaces return the same symbolic result tree for every expression, witness mask, and field marker. This row is intentionally scoped to the proof-facing result model rather than full backend field arithmetic.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "swarm.jitter_detection_boundedness",
-      "title": "The timing-only Sentinel proof model keeps variance and observation scores finite on Sentinel-owned inputs",
+      "title": "The shipped integer-scaled Sentinel timing model keeps variance and observation scores finite on Sentinel-owned inputs",
       "scope": "zkf-runtime::swarm::sentinel",
       "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-runtime/proofs/verus/swarm_sentinel_verus.rs",
-      "notes": "Local Verus theorem `jitter_detection_timing_model_finite_ok` mechanizes an integer-scaled, timing-only proof model for `WelfordState` and `JitterState`, proving the modeled variance, z-score, variance-delta score, and probe-duration score stay finite and non-negative on Sentinel-owned timing inputs.",
+      "notes": "Local Verus theorem `jitter_detection_timing_model_finite_ok` mechanizes the owned integer-scaled timing model that mirrors the Sentinel jitter boundary: the modeled variance, z-score, variance-delta score, and probe-duration score are always finite and non-negative on Sentinel-owned timing inputs. Existing Kani and unit tests continue to backstop the concrete `WelfordState` and `JitterState` Rust implementations.",
       "trusted_assumptions": []
     },
     {
@@ -1478,56 +1478,56 @@
     {
       "theorem_id": "hybrid.and_verification_semantics_bounded",
       "title": "Hybrid verify decision helper remains logical AND over the two shipped legs",
-      "scope": "zkf-runtime::proof_runtime_spec",
-      "checker": "rocq",
+      "scope": "zkf-runtime::hybrid_core",
+      "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
-      "notes": "Local Rocq theorem `hybrid_verify_decision_is_logical_and_ok` proves the extracted hybrid verification decision helper is exactly `andb primary_ok companion_ok`.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+      "notes": "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hybrid_verify_decision` helper and proves it returns exactly the logical conjunction of the primary and companion verification results.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "hybrid.transcript_hash_binding_bounded",
       "title": "Recorded digest helper rejects missing or mismatched transcript-digest entries",
-      "scope": "zkf-runtime::proof_runtime_spec",
-      "checker": "rocq",
+      "scope": "zkf-runtime::hybrid_core",
+      "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
-      "notes": "Local Rocq theorem `digest_matches_recorded_hash_spec_rejects_missing_or_explicit_mismatch_ok` proves the extracted digest helper returns `false` when the recorded digest is missing or when the recorded bytes differ from the expected bytes.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+      "notes": "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::digest_matches_recorded_hash` helper and proves the helper returns `false` whenever the recorded digest is missing and otherwise reduces acceptance to exact byte equality with the expected digest.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "hybrid.hardware_probe_rejection_bounded",
       "title": "Hardware probe helper rejects unhealthy or mismatched probe summaries",
-      "scope": "zkf-runtime::proof_runtime_spec",
-      "checker": "rocq",
+      "scope": "zkf-runtime::hybrid_core",
+      "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
-      "notes": "Local Rocq theorem `hardware_probes_clean_spec_rejects_unhealthy_or_mismatched_ok` proves the extracted hardware-probe gate returns `false` whenever the summary reports either an unhealthy probe or a mismatch.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+      "notes": "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hardware_probes_clean` helper and proves the helper accepts exactly the healthy, mismatch-free probe summaries used before hybrid proof execution.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "hybrid.primary_leg_outer_artifact_binding_bounded",
       "title": "Primary-leg byte comparison helper rejects proof or verification-key divergence",
-      "scope": "zkf-runtime::proof_runtime_spec",
-      "checker": "rocq",
+      "scope": "zkf-runtime::hybrid_core",
+      "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
-      "notes": "Local Rocq theorem `hybrid_primary_leg_byte_components_match_spec_rejects_component_divergence_ok` proves the extracted primary-leg byte-comparison helper returns `false` when either the proof bytes or verification-key bytes diverge.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+      "notes": "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hybrid_primary_leg_byte_components_match` helper and proves the helper accepts exactly the case where both proof bytes and verification-key bytes match the primary leg.",
       "trusted_assumptions": []
     },
     {
       "theorem_id": "hybrid.replay_manifest_determinism_bounded",
-      "title": "Replay manifest identity helper is deterministic on the proof-facing manifest surface",
-      "scope": "zkf-runtime::proof_runtime_spec",
-      "checker": "rocq",
+      "title": "Replay manifest identity helper is deterministic on the shipped hybrid-core manifest surface",
+      "scope": "zkf-runtime::hybrid_core",
+      "checker": "verus",
       "status": "mechanized_local",
-      "assurance_class": "model_only_claim",
-      "evidence_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
-      "notes": "Local Rocq theorem `replay_manifest_identity_is_deterministic_spec_ok` proves the extracted replay-manifest identity helper is deterministically true on the current proof-facing manifest surface.",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+      "notes": "Local Verus theorem `runtime_hybrid_replay_manifest_determinism` mechanizes the shipped replay-manifest identity surface and proves tuple equality is exactly the conjunction of equality on the replay id, transcript hash, backend route, hardware profile, and stage-manifest digest fields.",
       "trusted_assumptions": []
     },
     {
@@ -1558,7 +1558,7 @@
       "scope": "zkf-distributed::coordinator",
       "checker": "rocq",
       "status": "mechanized_local",
-      "assurance_class": "attestation_backed_lane",
+      "assurance_class": "mechanized_implementation_claim",
       "evidence_path": "zkf-distributed/proofs/rocq/SwarmReputationProofs.v",
       "notes": "Local Rocq theorem `distributed_acceptance_surface_requires_all_preconditions_ok` proves the extracted coordinator acceptance helper is exactly `attestation_matches && coordinator_requires_quorum_spec(...) && digests_agree` on the shipped proof surface.",
       "trusted_assumptions": []
@@ -1704,7 +1704,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
       "notes": "Local Lean theorem `groth16_exact_completeness` now proves the shipped exact BN254 Groth16 surface reduces verifier acceptance to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the imported CRS boundary carried as an explicit theorem hypothesis instead of a ledger trust note.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "Groth16 exact completeness holds for the imported-CRS algebraic surface"
+      ]
     },
     {
       "theorem_id": "protocol.groth16_knowledge_soundness",
@@ -1715,7 +1718,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
       "notes": "Local Lean theorem `groth16_exact_knowledge_soundness` now binds the shipped exact BN254 Groth16 verifier surface directly to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, removing the prior abstract-model transport shell.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "the Groth16 knowledge-of-exponent hypothesis holds on the shipped algebraic boundary"
+      ]
     },
     {
       "theorem_id": "protocol.groth16_zero_knowledge",
@@ -1726,7 +1732,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
       "notes": "Local Lean theorem `groth16_exact_zero_knowledge` now proves equality of the shipped public-view surface under `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, so the imported CRS and simulator assumptions live in theorem hypotheses rather than ledger notes.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "the Groth16 simulator hypothesis holds on the shipped exact public-view surface"
+      ]
     },
     {
       "theorem_id": "protocol.fri_completeness",
@@ -1737,7 +1746,9 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
       "notes": "Local Lean theorem `fri_exact_completeness` now proves shipped-surface verifier acceptance from `friExactCompletenessHypothesis` over the exact Plonky3 transcript, seed, and verifier-guard surface.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the FRI Reed-Solomon completeness hypothesis holds for the shipped Plonky3 transcript surface"
+      ]
     },
     {
       "theorem_id": "protocol.fri_proximity_soundness",
@@ -1748,7 +1759,9 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
       "notes": "Local Lean theorem `fri_exact_proximity_soundness` now binds the shipped Plonky3 FRI verifier surface directly to `friReedSolomonProximitySoundnessHypothesis` over the exact transcript and replayed seed boundary.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the FRI Reed-Solomon proximity-soundness hypothesis holds for the shipped Plonky3 transcript surface"
+      ]
     },
     {
       "theorem_id": "protocol.nova_completeness",
@@ -1759,7 +1772,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
       "notes": "Local Lean theorem `nova_exact_completeness` now proves shipped classic-Nova verifier acceptance from `novaExactCompletenessHypothesis` plus the explicit `completeClassicNovaIvcMetadata` side condition carried on the exact artifact surface.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the classic Nova completeness hypothesis holds for the shipped recursive shell",
+        "the shipped classic Nova artifact metadata satisfies the exact IVC side conditions"
+      ]
     },
     {
       "theorem_id": "protocol.nova_folding_soundness",
@@ -1770,7 +1786,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
       "notes": "Local Lean theorem `nova_exact_folding_sound` now ties the shipped classic-Nova verifier surface to `novaExactFoldingSoundnessHypothesis` over the exact native profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the classic Nova folding-soundness hypothesis holds for the shipped recursive shell",
+        "the shipped classic Nova verifier metadata satisfies the exact guard conditions"
+      ]
     },
     {
       "theorem_id": "protocol.hypernova_completeness",
@@ -1781,7 +1800,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
       "notes": "Local Lean theorem `hypernova_exact_completeness` now proves shipped HyperNova verifier acceptance from `hypernovaExactCompletenessHypothesis` over the exact CCS profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the HyperNova completeness hypothesis holds for the shipped CCS recursive shell",
+        "the shipped HyperNova CCS profile metadata satisfies the exact verifier guard conditions"
+      ]
     },
     {
       "theorem_id": "protocol.hypernova_folding_soundness",
@@ -1792,7 +1814,10 @@
       "assurance_class": "hypothesis_carried_theorem",
       "evidence_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
       "notes": "Local Lean theorem `hypernova_exact_folding_sound` now ties the shipped HyperNova verifier surface to `hypernovaExactFoldingSoundnessHypothesis` over the exact CCS profile metadata and verifier guards.",
-      "trusted_assumptions": []
+      "trusted_assumptions": [
+        "the HyperNova folding-soundness hypothesis holds for the shipped CCS recursive shell",
+        "the shipped HyperNova verifier metadata satisfies the exact CCS guard conditions"
+      ]
     },
     {
       "theorem_id": "private_identity.merkle_direction_fail_closed_bounded",

@@ -13,6 +13,7 @@ RUNTIME_COVERAGE_MANIFEST = ROOT / "zkf-ir-spec" / "runtime-proof-coverage-manif
 SECURITY_DOC = ROOT / "docs" / "SECURITY.md"
 PROOF_BOUNDARY_DOC = ROOT / "PROOF_BOUNDARY.md"
 STATUS_JSON = ROOT / ".zkf-completion-status.json"
+RELEASE_STATUS_JSON = ROOT / "release" / "theorem_coverage_status.json"
 GENERATED_BEGIN = "<!-- BEGIN GENERATED VERIFICATION STATUS -->"
 GENERATED_END = "<!-- END GENERATED VERIFICATION STATUS -->"
 STATUS_ORDER = [
@@ -58,6 +59,7 @@ RELEASE_GRADE_STRICT_THEOREMS = {
     "orbital.field_embedding_nonwrap_bounds",
     "orbital.commitment_body_tag_domain_separation",
 }
+ALLOWED_RELEASE_GRADE_HYPOTHESIS_PREFIXES = ("protocol.",)
 
 
 def require(condition: bool, message: str) -> None:
@@ -107,6 +109,7 @@ def protocol_rows(entries: list[dict]) -> list[dict]:
             "status": entry["status"],
             "scope": entry["scope"],
             "evidence_path": entry["evidence_path"],
+            "trusted_assumptions": entry.get("trusted_assumptions", []),
         }
         for entry in entries
         if entry["theorem_id"].startswith("protocol.")
@@ -132,9 +135,22 @@ def release_grade_blockers(
         blockers.append(
             f"{counts['bounded_checked']} bounded_checked row(s) remain"
         )
-    if trust_rows:
+    if counts.get("attestation_backed_lane", 0):
         blockers.append(
-            f"{len(trust_rows)} row(s) still carry trusted_assumptions"
+            f"{counts['attestation_backed_lane']} attestation_backed_lane row(s) remain"
+        )
+    if counts.get("model_only_claim", 0):
+        blockers.append(
+            f"{counts['model_only_claim']} model_only_claim row(s) remain"
+        )
+    unexpected_trust_rows = [
+        row
+        for row in trust_rows
+        if not row.startswith(ALLOWED_RELEASE_GRADE_HYPOTHESIS_PREFIXES)
+    ]
+    if unexpected_trust_rows:
+        blockers.append(
+            f"{len(unexpected_trust_rows)} row(s) still carry unexpected trusted_assumptions"
         )
     strict_rows = [
         entry["theorem_id"]
@@ -251,6 +267,9 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
     open_protocol_rows = [
         row["theorem_id"] for row in protocol if row["status"] != "mechanized_local"
     ]
+    protocol_hypothesis_rows = [
+        row["theorem_id"] for row in protocol if row["trusted_assumptions"]
+    ]
     current_priority = existing_status.get(
         "current_priority",
         "formal-verification-zero-repo-assumption-program",
@@ -273,7 +292,13 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
         + (
             "Open protocol rows: " + ", ".join(open_protocol_rows) + "."
             if open_protocol_rows
-            else "All protocol rows are mechanized_local."
+            else (
+                "All protocol rows are mechanized_local and remain hypothesis-carried only through explicit protocol assumptions: "
+                + ", ".join(protocol_hypothesis_rows)
+                + "."
+                if protocol_hypothesis_rows
+                else "All protocol rows are mechanized_local."
+            )
         )
     )
     recent_delivery = (
@@ -458,6 +483,7 @@ def main() -> None:
 
     status_json_expected = json.dumps(payload, indent=2) + "\n"
     write_or_check(STATUS_JSON, status_json_expected, args.check)
+    write_or_check(RELEASE_STATUS_JSON, status_json_expected, args.check)
 
 
 if __name__ == "__main__":

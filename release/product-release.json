@@ -1,0 +1,35 @@
+{
+  "schema": "ziros-product-release-v1",
+  "generated_at": "2026-04-07T00:31:22.391379+00:00",
+  "version": "0.4.2",
+  "release_tag": "v0.4.2",
+  "source_commit": "d6fd472f4cefdf4be70c04b12de88974d65e30a7",
+  "working_tree_dirty": true,
+  "binary_target": "aarch64-apple-darwin",
+  "binary": {
+    "path": "target-public/release/zkf-cli",
+    "sha256": "bcefb3ffb8d9c2a183077e0e7f759e93ec72e31733eea6550768a3870f68d80d"
+  },
+  "source_truth_surfaces": [
+    "zkf-ir-spec/verification-ledger.json",
+    ".zkf-completion-status.json",
+    "support-matrix.json",
+    "release/product-release.json",
+    "release/private_source_census.json"
+  ],
+  "headline_counts": {
+    "implementation_bound_rows": 156,
+    "hypothesis_carried_rows": 9,
+    "mechanized_local_rows": 165,
+    "pending_rows": 0
+  },
+  "digests": {
+    "verification_ledger_sha256": "ae23bc695c43adda62d01b9c6c806ad98d9c971fdb7b7d85a520bba34a0e74c2",
+    "support_matrix_sha256": "2b6adb2d873dd966bfa8d98aa2166bf9f601f23b36964ad16970488ba668f749"
+  },
+  "proof_runners": [
+    "scripts/run_rocq_proofs.sh",
+    "scripts/run_protocol_lean_proofs.sh",
+    "scripts/run_verus_workspace.sh"
+  ]
+}

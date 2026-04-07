@@ -93,9 +93,9 @@ This block is generated from `zkf-ir-spec/verification-ledger.json`.
 - Total ledger entries: 165.
 - Machine-checked rows: 165 total (165 `mechanized_local`, 0 `mechanized_generated`).
 - Remaining bounded/external/pending rows: 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
-- Assurance classes: 137 `mechanized_implementation_claim`, 0 `bounded_check`, 3 `attestation_backed_lane`, 16 `model_only_claim`, 9 `hypothesis_carried_theorem`.
+- Assurance classes: 156 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 0 `model_only_claim`, 9 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
-- Rows with non-empty `trusted_assumptions`: 0.
+- Rows with non-empty `trusted_assumptions`: 9.
 - All protocol rows are `mechanized_local`.
 <!-- END GENERATED VERIFICATION STATUS -->

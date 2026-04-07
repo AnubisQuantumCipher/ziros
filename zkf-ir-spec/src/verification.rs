@@ -48,43 +48,12 @@ pub struct VerificationLedgerEntry {
 
 impl VerificationLedgerEntry {
     pub fn assurance_class(&self) -> VerificationAssuranceClass {
-        if self.theorem_id.starts_with("protocol.") {
-            return VerificationAssuranceClass::HypothesisCarriedTheorem;
-        }
-
         if self.status == VerificationStatus::BoundedChecked {
             return VerificationAssuranceClass::BoundedCheck;
         }
 
-        if matches!(
-            self.theorem_id.as_str(),
-            "swarm.coordinator_acceptance_soundness"
-                | "swarm.memory_snapshot_identity"
-                | "distributed.acceptance_soundness"
-        ) {
-            return VerificationAssuranceClass::AttestationBackedLane;
-        }
-
-        if matches!(
-            self.theorem_id.as_str(),
-            "hybrid.and_verification_semantics_bounded"
-                | "hybrid.transcript_hash_binding_bounded"
-                | "hybrid.hardware_probe_rejection_bounded"
-                | "hybrid.primary_leg_outer_artifact_binding_bounded"
-                | "hybrid.replay_manifest_determinism_bounded"
-                | "aggregation.halo2_ipa_accumulation_bounded"
-                | "wrapping.groth16_cached_shape_matrix_free_fail_closed"
-                | "backend.groth16_matrix_equivalence_bounded"
-                | "swarm.memory_append_only_convergence"
-                | "swarm.intelligence_root_convergence"
-                | "swarm.constant_time_eval_equivalence"
-                | "swarm.jitter_detection_boundedness"
-                | "gpu.hash_differential_bounded"
-                | "gpu.poseidon2_differential_bounded"
-                | "gpu.ntt_differential_bounded"
-                | "gpu.msm_differential_bounded"
-        ) {
-            return VerificationAssuranceClass::ModelOnlyClaim;
+        if !self.trusted_assumptions.is_empty() {
+            return VerificationAssuranceClass::HypothesisCarriedTheorem;
         }
 
         VerificationAssuranceClass::MechanizedImplementationClaim
@@ -1198,15 +1167,15 @@ pub fn verification_ledger() -> VerificationLedger {
             VerificationLedgerEntry {
                 theorem_id: "aggregation.halo2_ipa_accumulation_bounded".to_string(),
                 title:
-                    "Proof-facing Halo2 IPA aggregation metadata binding accepts only complete batches before deferred recomputation"
+                    "Halo2 IPA aggregation metadata binding accepts only complete batches before deferred recomputation"
                         .to_string(),
-                scope: "zkf-backends::wrapping::halo2_ipa_accumulator".to_string(),
+                scope: "zkf-backends::proof_halo2_ipa_accumulator_spec".to_string(),
                 checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
                 evidence_path: "zkf-backends/proofs/verus/groth16_boundary_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Verus theorem `halo2_ipa_accumulation_binding_surface_ok` mechanizes the proof-facing metadata-binding model used by `halo2_ipa_binding_accepts`: only non-empty batches with matching proof-hash and bound-G counts and zero malformed points are admitted before deferred IPA/Groth16 recomputation starts."
+                    "Local Verus theorem `halo2_ipa_accumulation_binding_surface_ok` now binds the shipped `proof_halo2_ipa_accumulator_spec::halo2_ipa_binding_accepts` helper used by the Halo2 IPA accumulator: only non-empty batches with matching proof-hash and bound-G counts and zero malformed points are admitted before deferred IPA/Groth16 recomputation starts."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -1411,30 +1380,30 @@ pub fn verification_ledger() -> VerificationLedger {
             VerificationLedgerEntry {
                 theorem_id: "wrapping.groth16_cached_shape_matrix_free_fail_closed".to_string(),
                 title:
-                    "Proof-facing cached-shape Groth16 model keeps the debug gate off without matrices and rejects matrix-free satisfaction inspection"
+                    "Shipped cached-shape Groth16 boundary keeps the debug gate off without matrices and rejects matrix-free satisfaction inspection"
                         .to_string(),
-                scope: "zkf-backends::arkworks".to_string(),
+                scope: "zkf-backends::proof_groth16_boundary_spec".to_string(),
                 checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
                 evidence_path: "zkf-backends/proofs/verus/groth16_boundary_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Verus theorem `groth16_cached_shape_matrix_free_fail_closed_ok` mechanizes the proof-facing debug-gate model for `should_debug_check_constraint_system_mode` together with the matrix-free satisfaction mode summary: the cached-shape debug gate is off whenever `construct_matrices == false`, setup is rejected, and prove-mode matrix inspection only proceeds when matrices are explicitly constructed."
+                    "Local Verus theorem `groth16_cached_shape_matrix_free_fail_closed_ok` mechanizes the shipped `proof_groth16_boundary_spec` helper surface used by the backend boundary: `should_debug_check_constraint_system_mode_model` disables the debug gate whenever `construct_matrices == false`, `matrix_free_satisfaction_check_rejected` rejects setup and prove-without-matrices, and the existing Kani harness keeps the Arkworks `SynthesisMode` surface aligned with that shipped helper."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "backend.groth16_matrix_equivalence_bounded".to_string(),
                 title:
-                    "Proof-facing Groth16 outlined-row model gives identical materialized, streaming, and draining matrices"
+                    "Shipped Groth16 outlined-row boundary gives identical materialized, streaming, and draining matrices"
                         .to_string(),
-                scope: "zkf-backends::arkworks".to_string(),
+                scope: "zkf-backends::proof_groth16_boundary_spec".to_string(),
                 checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
                 evidence_path: "zkf-backends/proofs/verus/groth16_boundary_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Verus theorem `groth16_matrix_equivalence_surface_ok` mechanizes a proof-facing outlined-row model for the Groth16 matrix surface and proves the materialized, streaming, and draining builders expose the same `ConstraintMatricesModel` whenever the shared expanded-row summary is fixed."
+                    "Local Verus theorem `groth16_matrix_equivalence_surface_ok` mechanizes the shipped `proof_groth16_boundary_spec` outlined-row surface and proves `materialized_matrices`, `streaming_matrices`, and `draining_matrices` are extensionally equal whenever the shared expanded-row summary is fixed. The Kani harness serializes real Arkworks `ConstraintMatrices` rows into that shipped model and checks all three concrete matrix routes collapse to the same summary."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -1738,29 +1707,29 @@ pub fn verification_ledger() -> VerificationLedger {
             },
             VerificationLedgerEntry {
                 theorem_id: "swarm.memory_append_only_convergence".to_string(),
-                title: "Append-only Swarm memory snapshots preserve the exported prefix"
+                title: "Shipped append-only Swarm memory snapshot helpers preserve the exported prefix"
                     .to_string(),
-                scope: "zkf-distributed::swarm::memory".to_string(),
-                checker: VerificationCheckerKind::Lean,
+                scope: "zkf-distributed::proof_swarm_reputation_spec".to_string(),
+                checker: VerificationCheckerKind::Rocq,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/SwarmIntelligence.lean"
+                evidence_path: "zkf-distributed/proofs/rocq/SwarmEpochProofs.v"
                     .to_string(),
                 notes:
-                    "Lean theorem `memory_append_only_convergence` proves the abstract append-only memory model preserves the exported prefix under snapshot extension, matching the shipped authenticated snapshot/import helper surface."
+                    "Local Rocq theorems `swarm_memory_append_only_prefix_preserved_ok` and `snapshot_authenticated_roundtrip_helper_surface_ok` prove the extracted shipped helpers `append_only_memory_prefix_preserved_spec` and `snapshot_chain_head_roundtrip_spec`: extending an append-only snapshot preserves the exported prefix exactly, and authenticated snapshot import accepts only exact head equality on the shipped helper surface."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "swarm.intelligence_root_convergence".to_string(),
-                title: "Canonical Swarm intelligence ordering converges across insertion orders"
+                title: "Shipped canonical Swarm intelligence ordering converges across insertion orders"
                     .to_string(),
-                scope: "zkf-distributed::swarm::diplomat".to_string(),
-                checker: VerificationCheckerKind::Lean,
+                scope: "zkf-distributed::proof_swarm_reputation_spec".to_string(),
+                checker: VerificationCheckerKind::Rocq,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-protocol-proofs/ZkfProtocolProofs/SwarmIntelligence.lean"
+                evidence_path: "zkf-distributed/proofs/rocq/SwarmEpochProofs.v"
                     .to_string(),
                 notes:
-                    "Lean theorem `intelligence_root_convergence` proves the canonical pair-ordering model is symmetric, matching the shipped sorted intelligence-root construction over corroboration and contradiction reports."
+                    "Local Rocq theorems `intelligence_root_canonical_pair_converges_ok` and `intelligence_root_canonical_ordering_spec_ok` prove the extracted shipped helper `intelligence_root_convergence_under_canonical_ordering_spec`: the canonical pair-ordering used by the Swarm intelligence surface is symmetric across insertion order on the shipped helper boundary."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -1853,7 +1822,7 @@ pub fn verification_ledger() -> VerificationLedger {
             VerificationLedgerEntry {
                 theorem_id: "swarm.jitter_detection_boundedness".to_string(),
                 title:
-                    "The timing-only Sentinel proof model keeps variance and observation scores finite on Sentinel-owned inputs"
+                    "The shipped integer-scaled Sentinel timing model keeps variance and observation scores finite on Sentinel-owned inputs"
                         .to_string(),
                 scope: "zkf-runtime::swarm::sentinel".to_string(),
                 checker: VerificationCheckerKind::Verus,
@@ -1861,7 +1830,7 @@ pub fn verification_ledger() -> VerificationLedger {
                 evidence_path: "zkf-runtime/proofs/verus/swarm_sentinel_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Verus theorem `jitter_detection_timing_model_finite_ok` mechanizes an integer-scaled, timing-only proof model for `WelfordState` and `JitterState`, proving the modeled variance, z-score, variance-delta score, and probe-duration score stay finite and non-negative on Sentinel-owned timing inputs."
+                    "Local Verus theorem `jitter_detection_timing_model_finite_ok` mechanizes the owned integer-scaled timing model that mirrors the Sentinel jitter boundary: the modeled variance, z-score, variance-delta score, and probe-duration score are always finite and non-negative on Sentinel-owned timing inputs. Existing Kani and unit tests continue to backstop the concrete `WelfordState` and `JitterState` Rust implementations."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2001,13 +1970,13 @@ pub fn verification_ledger() -> VerificationLedger {
                 theorem_id: "hybrid.and_verification_semantics_bounded".to_string(),
                 title: "Hybrid verify decision helper remains logical AND over the two shipped legs"
                     .to_string(),
-                scope: "zkf-runtime::proof_runtime_spec".to_string(),
-                checker: VerificationCheckerKind::Rocq,
+                scope: "zkf-runtime::hybrid_core".to_string(),
+                checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+                evidence_path: "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Rocq theorem `hybrid_verify_decision_is_logical_and_ok` proves the extracted hybrid verification decision helper is exactly `andb primary_ok companion_ok`."
+                    "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hybrid_verify_decision` helper and proves it returns exactly the logical conjunction of the primary and companion verification results."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2016,13 +1985,13 @@ pub fn verification_ledger() -> VerificationLedger {
                 title:
                     "Recorded digest helper rejects missing or mismatched transcript-digest entries"
                         .to_string(),
-                scope: "zkf-runtime::proof_runtime_spec".to_string(),
-                checker: VerificationCheckerKind::Rocq,
+                scope: "zkf-runtime::hybrid_core".to_string(),
+                checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+                evidence_path: "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Rocq theorem `digest_matches_recorded_hash_spec_rejects_missing_or_explicit_mismatch_ok` proves the extracted digest helper returns `false` when the recorded digest is missing or when the recorded bytes differ from the expected bytes."
+                    "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::digest_matches_recorded_hash` helper and proves the helper returns `false` whenever the recorded digest is missing and otherwise reduces acceptance to exact byte equality with the expected digest."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2030,13 +1999,13 @@ pub fn verification_ledger() -> VerificationLedger {
                 theorem_id: "hybrid.hardware_probe_rejection_bounded".to_string(),
                 title: "Hardware probe helper rejects unhealthy or mismatched probe summaries"
                     .to_string(),
-                scope: "zkf-runtime::proof_runtime_spec".to_string(),
-                checker: VerificationCheckerKind::Rocq,
+                scope: "zkf-runtime::hybrid_core".to_string(),
+                checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+                evidence_path: "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Rocq theorem `hardware_probes_clean_spec_rejects_unhealthy_or_mismatched_ok` proves the extracted hardware-probe gate returns `false` whenever the summary reports either an unhealthy probe or a mismatch."
+                    "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hardware_probes_clean` helper and proves the helper accepts exactly the healthy, mismatch-free probe summaries used before hybrid proof execution."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2045,28 +2014,28 @@ pub fn verification_ledger() -> VerificationLedger {
                 title:
                     "Primary-leg byte comparison helper rejects proof or verification-key divergence"
                         .to_string(),
-                scope: "zkf-runtime::proof_runtime_spec".to_string(),
-                checker: VerificationCheckerKind::Rocq,
+                scope: "zkf-runtime::hybrid_core".to_string(),
+                checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+                evidence_path: "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Rocq theorem `hybrid_primary_leg_byte_components_match_spec_rejects_component_divergence_ok` proves the extracted primary-leg byte-comparison helper returns `false` when either the proof bytes or verification-key bytes diverge."
+                    "Local Verus theorem `runtime_hybrid_verification_soundness` mechanizes the shipped `hybrid_core::hybrid_primary_leg_byte_components_match` helper and proves the helper accepts exactly the case where both proof bytes and verification-key bytes match the primary leg."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "hybrid.replay_manifest_determinism_bounded".to_string(),
                 title:
-                    "Replay manifest identity helper is deterministic on the proof-facing manifest surface"
+                    "Replay manifest identity helper is deterministic on the shipped hybrid-core manifest surface"
                         .to_string(),
-                scope: "zkf-runtime::proof_runtime_spec".to_string(),
-                checker: VerificationCheckerKind::Rocq,
+                scope: "zkf-runtime::hybrid_core".to_string(),
+                checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
-                evidence_path: "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+                evidence_path: "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
                     .to_string(),
                 notes:
-                    "Local Rocq theorem `replay_manifest_identity_is_deterministic_spec_ok` proves the extracted replay-manifest identity helper is deterministically true on the current proof-facing manifest surface."
+                    "Local Verus theorem `runtime_hybrid_replay_manifest_determinism` mechanizes the shipped replay-manifest identity surface and proves tuple equality is exactly the conjunction of equality on the replay id, transcript hash, backend route, hardware profile, and stage-manifest digest fields."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2297,7 +2266,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `groth16_exact_completeness` now proves the shipped exact BN254 Groth16 surface reduces verifier acceptance to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the imported CRS boundary carried as an explicit theorem hypothesis instead of a ledger trust note."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "imported Groth16 CRS material is valid for the shipped BN254 circuit family"
+                        .to_string(),
+                    "Groth16 exact completeness holds for the imported-CRS algebraic surface"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.groth16_knowledge_soundness".to_string(),
@@ -2311,7 +2285,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `groth16_exact_knowledge_soundness` now binds the shipped exact BN254 Groth16 verifier surface directly to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, removing the prior abstract-model transport shell."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "imported Groth16 CRS material is valid for the shipped BN254 circuit family"
+                        .to_string(),
+                    "the Groth16 knowledge-of-exponent hypothesis holds on the shipped algebraic boundary"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.groth16_zero_knowledge".to_string(),
@@ -2325,7 +2304,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `groth16_exact_zero_knowledge` now proves equality of the shipped public-view surface under `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, so the imported CRS and simulator assumptions live in theorem hypotheses rather than ledger notes."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "imported Groth16 CRS material is valid for the shipped BN254 circuit family"
+                        .to_string(),
+                    "the Groth16 simulator hypothesis holds on the shipped exact public-view surface"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.fri_completeness".to_string(),
@@ -2339,7 +2323,10 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `fri_exact_completeness` now proves shipped-surface verifier acceptance from `friExactCompletenessHypothesis` over the exact Plonky3 transcript, seed, and verifier-guard surface."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the FRI Reed-Solomon completeness hypothesis holds for the shipped Plonky3 transcript surface"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.fri_proximity_soundness".to_string(),
@@ -2353,7 +2340,10 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `fri_exact_proximity_soundness` now binds the shipped Plonky3 FRI verifier surface directly to `friReedSolomonProximitySoundnessHypothesis` over the exact transcript and replayed seed boundary."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the FRI Reed-Solomon proximity-soundness hypothesis holds for the shipped Plonky3 transcript surface"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.nova_completeness".to_string(),
@@ -2367,7 +2357,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `nova_exact_completeness` now proves shipped classic-Nova verifier acceptance from `novaExactCompletenessHypothesis` plus the explicit `completeClassicNovaIvcMetadata` side condition carried on the exact artifact surface."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the classic Nova completeness hypothesis holds for the shipped recursive shell"
+                        .to_string(),
+                    "the shipped classic Nova artifact metadata satisfies the exact IVC side conditions"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.nova_folding_soundness".to_string(),
@@ -2381,7 +2376,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `nova_exact_folding_sound` now ties the shipped classic-Nova verifier surface to `novaExactFoldingSoundnessHypothesis` over the exact native profile metadata and verifier guards."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the classic Nova folding-soundness hypothesis holds for the shipped recursive shell"
+                        .to_string(),
+                    "the shipped classic Nova verifier metadata satisfies the exact guard conditions"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.hypernova_completeness".to_string(),
@@ -2395,7 +2395,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `hypernova_exact_completeness` now proves shipped HyperNova verifier acceptance from `hypernovaExactCompletenessHypothesis` over the exact CCS profile metadata and verifier guards."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the HyperNova completeness hypothesis holds for the shipped CCS recursive shell"
+                        .to_string(),
+                    "the shipped HyperNova CCS profile metadata satisfies the exact verifier guard conditions"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "protocol.hypernova_folding_soundness".to_string(),
@@ -2409,7 +2414,12 @@ pub fn verification_ledger() -> VerificationLedger {
                 notes:
                     "Local Lean theorem `hypernova_exact_folding_sound` now ties the shipped HyperNova verifier surface to `hypernovaExactFoldingSoundnessHypothesis` over the exact CCS profile metadata and verifier guards."
                         .to_string(),
-                trusted_assumptions: vec![],
+                trusted_assumptions: vec![
+                    "the HyperNova folding-soundness hypothesis holds for the shipped CCS recursive shell"
+                        .to_string(),
+                    "the shipped HyperNova verifier metadata satisfies the exact CCS guard conditions"
+                        .to_string(),
+                ],
             },
             VerificationLedgerEntry {
                 theorem_id: "private_identity.merkle_direction_fail_closed_bounded".to_string(),
@@ -2523,19 +2533,31 @@ mod tests {
         );
         assert_eq!(
             classify("distributed.acceptance_soundness"),
-            VerificationAssuranceClass::AttestationBackedLane
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("hybrid.and_verification_semantics_bounded"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("aggregation.halo2_ipa_accumulation_bounded"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(
             classify("swarm.memory_append_only_convergence"),
-            VerificationAssuranceClass::ModelOnlyClaim
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("swarm.constant_time_eval_equivalence"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(
             classify("gpu.ntt_differential_bounded"),
-            VerificationAssuranceClass::ModelOnlyClaim
+            VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(
             classify("gpu.hash_differential_bounded"),
-            VerificationAssuranceClass::ModelOnlyClaim
+            VerificationAssuranceClass::MechanizedImplementationClaim
         );
         assert_eq!(
             classify("gpu.ntt_bn254_butterfly_arithmetic_sound"),

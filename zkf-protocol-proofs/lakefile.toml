@@ -1,0 +1,5 @@
+name = "ZkfProtocolProofs"
+defaultTargets = ["ZkfProtocolProofs"]
+
+[[lean_lib]]
+name = "ZkfProtocolProofs"
