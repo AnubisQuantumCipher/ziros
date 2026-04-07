@@ -50,7 +50,7 @@ swift run --package-path /Users/sicarii/Desktop/ZirOS/ZirOSAgentHost
 The default socket path is:
 
 ```text
-~/.zkf/cache/agent/ziros-agentd.sock
+~/.ziros/agent/ziros-agentd.sock
 ```
 
 ## launchd

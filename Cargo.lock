@@ -12339,6 +12339,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+ "toml",
  "ureq",
  "zkf-cloudfs",
  "zkf-command-surface",
@@ -12449,6 +12450,7 @@ dependencies = [
  "sha2 0.10.9",
  "tempfile",
  "tokio",
+ "toml",
  "ureq",
  "zkf-agent",
  "zkf-backends",
@@ -12819,6 +12821,7 @@ dependencies = [
  "chrono",
  "serde",
  "serde_json",
+ "tempfile",
  "zkf-cloudfs",
  "zkf-keymanager",
 ]

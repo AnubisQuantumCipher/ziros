@@ -1,3 +1,6 @@
+use crate::provider_profiles::{
+    load_api_key, load_provider_profile_store, ordered_profiles_for_selection,
+};
 use crate::types::{ProviderProbeResultV1, ProviderRouteRecordV1};
 use serde_json::json;
 use std::env;
@@ -23,6 +26,56 @@ pub fn select_provider_routes(
             "capabilities": ["intent-compilation", "workgraph-planning", "command-routing"],
         }),
     ));
+
+    let configured_profiles = load_provider_profile_store().ok();
+    if let Some(store) = configured_profiles.as_ref() {
+        let selected_profiles = ordered_profiles_for_selection(store, provider_override);
+        if !selected_profiles.is_empty() {
+            for profile in selected_profiles {
+                let selected_role = if workflow_kind == "intent-compilation" {
+                    "planner"
+                } else {
+                    "chat"
+                };
+                let selected_model = profile.selected_model(selected_role, model_override);
+                let credential = profile.credential.clone();
+                let api_key = load_api_key(credential.as_ref());
+                let ready = match profile.provider_kind.as_str() {
+                    "openai-api" => api_key.is_some(),
+                    _ => profile.base_url.as_ref().is_some_and(|value| !value.trim().is_empty()),
+                };
+                routes.push(route(
+                    session_id,
+                    "assistant",
+                    profile.provider_kind.as_str(),
+                    match profile.provider_kind.as_str() {
+                        "openai-api" => "remote-api",
+                        "mlx-local" => "apple-silicon-local",
+                        _ => "local-endpoint",
+                    },
+                    ready,
+                    json!({
+                        "workflow_kind": workflow_kind,
+                        "profile_id": profile.profile_id,
+                        "configured_from": "providers.toml",
+                        "base_url": profile.base_url.or_else(|| {
+                            default_base_url_for_provider(profile.provider_kind.as_str()).map(str::to_string)
+                        }),
+                        "model": selected_model,
+                        "role_models": profile.role_models,
+                        "selected_model_role": selected_role,
+                        "project": profile.project,
+                        "organization": profile.organization,
+                        "auth_mode": auth_mode_for_route(credential.as_ref(), api_key.is_some()),
+                        "auth_env": credential.as_ref().and_then(|value| value.env_var.clone()),
+                        "keychain_service": credential.as_ref().and_then(|value| value.keychain_service.clone()),
+                        "keychain_account": credential.as_ref().and_then(|value| value.keychain_account.clone()),
+                    }),
+                ));
+            }
+            return routes;
+        }
+    }
 
     for (provider, locality, vars) in [
         (
@@ -268,6 +321,16 @@ fn default_model_for_provider(provider: &str) -> Option<String> {
     }
 }
 
+fn default_base_url_for_provider(provider: &str) -> Option<&'static str> {
+    match provider {
+        "openai-api" => Some("https://api.openai.com"),
+        "mlx-local" => Some("http://127.0.0.1:8080"),
+        "openai-compatible-local" => Some("http://127.0.0.1:11434"),
+        "ollama-local" => Some("http://127.0.0.1:11434"),
+        _ => None,
+    }
+}
+
 fn probe_path_for_provider(provider: &str) -> &'static str {
     match provider {
         "ollama-local" => "/api/tags",
@@ -275,10 +338,61 @@ fn probe_path_for_provider(provider: &str) -> &'static str {
     }
 }
 
-fn auth_bearer_for_route(route: &ProviderRouteRecordV1) -> Option<String> {
-    match route.provider.as_str() {
-        "openai-api" => env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty()),
-        _ => None,
+pub(crate) fn auth_bearer_for_route(route: &ProviderRouteRecordV1) -> Option<String> {
+    if route.provider != "openai-api" {
+        return None;
+    }
+
+    if let Some(env_var) = route
+        .summary
+        .get("auth_env")
+        .and_then(serde_json::Value::as_str)
+        && let Ok(value) = env::var(env_var)
+        && !value.trim().is_empty()
+    {
+        return Some(value);
+    }
+
+    if let Some(value) = env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty()) {
+        return Some(value);
+    }
+
+    let credential = crate::provider_profiles::ProviderCredentialRefV1 {
+        source: if route.summary.get("keychain_account").is_some() {
+            "keychain".to_string()
+        } else {
+            "env".to_string()
+        },
+        env_var: route
+            .summary
+            .get("auth_env")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_string),
+        keychain_service: route
+            .summary
+            .get("keychain_service")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_string),
+        keychain_account: route
+            .summary
+            .get("keychain_account")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_string),
+    };
+    load_api_key(Some(&credential))
+}
+
+fn auth_mode_for_route(
+    credential: Option<&crate::provider_profiles::ProviderCredentialRefV1>,
+    auth_ready: bool,
+) -> &'static str {
+    if auth_ready {
+        match credential.and_then(|value| value.keychain_account.as_deref()) {
+            Some(_) => "keychain-or-env",
+            None => "env",
+        }
+    } else {
+        "missing-api-key"
     }
 }
 

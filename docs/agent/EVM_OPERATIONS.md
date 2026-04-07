@@ -1,6 +1,6 @@
 # ZirOS EVM Operations
 
-EVM is the secondary contract lane in `0.6.0`.
+EVM is the secondary contract lane in the current release line.
 
 Use it for verifier export, Foundry/Anvil local testing, gas estimation, and
 supported deploy/call workflows. Do not treat it as semantic parity with the

@@ -20,7 +20,7 @@ use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::PathBuf;
-use zkf_cloudfs::CloudFS;
+use crate::state::{ensure_ziros_layout, socket_path as managed_socket_path};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "method", rename_all = "kebab-case")]
@@ -66,8 +66,8 @@ pub struct AgentRpcResponseV1 {
 }
 
 pub fn default_socket_path() -> Result<PathBuf, String> {
-    let cloudfs = CloudFS::new().map_err(|error| error.to_string())?;
-    Ok(cloudfs.cache_root().join("agent").join("ziros-agentd.sock"))
+    let _ = ensure_ziros_layout()?;
+    Ok(managed_socket_path())
 }
 
 pub fn serve_daemon(socket_path: Option<PathBuf>) -> Result<(), String> {

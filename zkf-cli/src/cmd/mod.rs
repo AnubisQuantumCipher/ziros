@@ -15,9 +15,11 @@ pub(crate) mod equivalence;
 pub(crate) mod evm;
 pub(crate) mod estimate_gas;
 pub(crate) mod explore;
+pub(crate) mod gateway;
 pub(crate) mod import;
 pub(crate) mod ir;
 pub(crate) mod keys;
+pub(crate) mod model;
 pub(crate) mod midnight;
 pub(crate) mod optimize;
 pub(crate) mod package;
@@ -25,21 +27,24 @@ pub(crate) mod prove;
 pub(crate) mod registry;
 pub(crate) mod retrain;
 pub(crate) mod runtime;
+pub(crate) mod setup;
 pub(crate) mod sovereign_economic_defense;
 pub(crate) mod storage;
 pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
+pub(crate) mod chat;
+pub(crate) mod update;
 pub(crate) mod wallet;
 pub(crate) mod witness;
 
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
-    EvmCommands, EvmFoundryCommands, EvmVerifierCommands, IrCommands, MidnightCommands,
-    MidnightContractCommands, MidnightProofServerCommands, SubsystemCommands, TelemetryCommands,
-    WalletCommands,
+    EvmCommands, EvmFoundryCommands, EvmVerifierCommands, GatewayCommands, IrCommands,
+    MidnightCommands, MidnightContractCommands, MidnightProofServerCommands, ModelAddCommands,
+    ModelCommands, SubsystemCommands, TelemetryCommands, UpdateCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -50,6 +55,48 @@ use zkf_runtime::{EntrypointGuard, EntrypointSurface, RuntimeSecurityContext};
 pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String> {
     let guard = EntrypointGuard::begin(EntrypointSurface::Cli, command_name(&command));
     let result = match command {
+        Commands::Setup {
+            json,
+            non_interactive,
+            provider,
+            profile,
+            model,
+            base_url,
+            project,
+            organization,
+            api_key_stdin,
+            set_default,
+            start_daemon,
+        } => setup::handle_setup(setup::SetupCommand {
+            json,
+            non_interactive,
+            provider,
+            profile,
+            model,
+            base_url,
+            project,
+            organization,
+            api_key_stdin,
+            set_default,
+            start_daemon,
+        }),
+        Commands::Chat {
+            project,
+            provider,
+            model,
+            strict,
+            allow_compat,
+        } => chat::handle_chat(chat::ChatCommand {
+            project_root: project,
+            provider,
+            model,
+            strict,
+            compat_allowed: allow_compat,
+        }),
+        Commands::Model { json, command } => model::handle_model(json, command),
+        Commands::Gateway { command } => gateway::handle_gateway(command),
+        Commands::Update { command } => update::handle_update(command),
+        Commands::Version { json } => update::handle_version(json),
         Commands::App { command } => app::handle_app(command),
         Commands::Subsystem { command } => match command {
             SubsystemCommands::Scaffold {
@@ -508,8 +555,41 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
     result
 }
 
+pub(crate) fn handle_default_ziros() -> Result<(), String> {
+    if setup::setup_is_complete() {
+        chat::handle_chat(chat::ChatCommand::default())
+    } else {
+        setup::handle_setup(setup::SetupCommand::default())
+    }
+}
+
 fn command_name(command: &Commands) -> String {
     match command {
+        Commands::Setup { .. } => "setup".to_string(),
+        Commands::Chat { .. } => "chat".to_string(),
+        Commands::Model { command, .. } => match command {
+            ModelCommands::List => "model:list".to_string(),
+            ModelCommands::Add { command } => match command {
+                ModelAddCommands::Openai { .. } => "model:add-openai".to_string(),
+                ModelAddCommands::Mlx { .. } => "model:add-mlx".to_string(),
+                ModelAddCommands::OpenaiCompatible { .. } => {
+                    "model:add-openai-compatible".to_string()
+                }
+                ModelAddCommands::Ollama { .. } => "model:add-ollama".to_string(),
+            },
+            ModelCommands::Use { .. } => "model:use".to_string(),
+            ModelCommands::Test { .. } => "model:test".to_string(),
+            ModelCommands::Remove { .. } => "model:remove".to_string(),
+        },
+        Commands::Gateway { command } => match command {
+            GatewayCommands::Serve { .. } => "gateway:serve".to_string(),
+        },
+        Commands::Update { command } => match command {
+            None => "update".to_string(),
+            Some(UpdateCommands::Status { .. }) => "update:status".to_string(),
+            Some(UpdateCommands::Apply { .. }) => "update:apply".to_string(),
+        },
+        Commands::Version { .. } => "version".to_string(),
         Commands::App { command } => match command {
             AppCommands::Init { .. } => "app:init".to_string(),
             AppCommands::Gallery => "app:gallery".to_string(),

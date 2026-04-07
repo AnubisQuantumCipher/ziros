@@ -2,10 +2,12 @@ mod brain;
 mod checkpoint;
 mod daemon;
 mod executor;
+mod provider_profiles;
 mod llm;
 mod mcp;
 mod planner;
 mod provider;
+mod state;
 mod trust_gate;
 mod types;
 mod worktree;
@@ -15,6 +17,23 @@ pub use daemon::{
     serve_daemon,
 };
 pub use mcp::serve_mcp_stdio;
+pub use provider_profiles::{
+    ProviderCredentialRefV1, ProviderKindV1, ProviderProfileStoreV1, ProviderProfileV1,
+    ProviderRoleBindingV1, load_provider_profile_store, load_api_key,
+    openai_credential_ref, ordered_profiles_for_selection, remove_provider_profile,
+    save_provider_profile_store, set_default_provider_profile, store_openai_api_key,
+    upsert_provider_profile,
+};
+pub use state::{
+    AgentStateLayoutReportV1, AgentStateMigrationRecordV1, agent_root as ziros_agent_root,
+    brain_path as ziros_agent_brain_path, config_path as ziros_config_path,
+    ensure_ziros_layout, first_run_marker_path as ziros_first_run_marker_path,
+    install_root as ziros_install_root, legacy_agent_root as ziros_legacy_agent_root,
+    logs_root as ziros_logs_root, managed_bin_root as ziros_managed_bin_root,
+    provider_profiles_path as ziros_provider_profiles_path,
+    socket_path as ziros_agent_socket_path, state_root as ziros_state_root,
+    ziros_home_root,
+};
 pub use types::{
     ActionReceiptV1, AgentApproveRequestV1, AgentCancelRequestV1, AgentExplainReportV1,
     AgentApprovalLineageReportV1,

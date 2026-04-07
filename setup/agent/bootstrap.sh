@@ -49,15 +49,18 @@ if [[ -f "${repo_root}/.cargo/config.toml" ]]; then
   )"
 fi
 if [[ -n "${configured_target_dir}" ]]; then
-  target_dir="${repo_root}/${configured_target_dir}/release"
+  target_root="${repo_root}/${configured_target_dir}"
 else
-  target_dir="${repo_root}/target/release"
+  target_root="${repo_root}/target"
 fi
+release_target_dir="${target_root}/release"
+debug_target_dir="${target_root}/debug"
 local_bin="${HOME}/.local/bin"
-cache_root="${HOME}/.zkf/cache"
-state_root="${HOME}/.zkf/state"
-socket_path="${cache_root}/agent/ziros-agentd.sock"
-brain_path="${cache_root}/agent/brain.sqlite3"
+managed_bin="${HOME}/.ziros/bin"
+state_root="${HOME}/.ziros/state"
+agent_root="${HOME}/.ziros/agent"
+socket_path="${agent_root}/ziros-agentd.sock"
+brain_path="${agent_root}/brain.sqlite3"
 cli_artifact=""
 
 declare -a missing=()
@@ -222,37 +225,54 @@ if (( ${#missing[@]} > 0 )); then
   exit 1
 fi
 
-mkdir -p "$local_bin" "$cache_root" "$state_root"
+mkdir -p "$local_bin" "$managed_bin" "$agent_root" "$state_root"
 
 if (( ! check_only )); then
   cargo build -p zkf-cli --release
   cargo build -p zkf-agent --release --bin ziros-agentd
 fi
 
-if [[ -x "${target_dir}/zkf-cli" ]]; then
-  cli_artifact="${target_dir}/zkf-cli"
-elif [[ -x "${target_dir}/zkf" ]]; then
-  cli_artifact="${target_dir}/zkf"
+if (( check_only )); then
+  if [[ -x "${debug_target_dir}/zkf-cli" ]]; then
+    cli_artifact="${debug_target_dir}/zkf-cli"
+  elif [[ -x "${debug_target_dir}/zkf" ]]; then
+    cli_artifact="${debug_target_dir}/zkf"
+  fi
+fi
+
+if [[ -z "${cli_artifact}" ]]; then
+  if [[ -x "${release_target_dir}/zkf-cli" ]]; then
+    cli_artifact="${release_target_dir}/zkf-cli"
+  elif [[ -x "${release_target_dir}/zkf" ]]; then
+    cli_artifact="${release_target_dir}/zkf"
+  fi
 fi
 
 if (( ! check_only )); then
   if [[ -z "${cli_artifact}" ]]; then
-    echo "Could not find a built ZirOS CLI artifact under ${target_dir}." >&2
+    echo "Could not find a built ZirOS CLI artifact under ${release_target_dir}." >&2
     exit 1
   fi
-  ln -sfn "${cli_artifact}" "${local_bin}/ziros"
-  ln -sfn "${cli_artifact}" "${local_bin}/zkf"
-  ln -sfn "${target_dir}/ziros-agentd" "${local_bin}/ziros-agentd"
+  install -m 0755 "${cli_artifact}" "${managed_bin}/ziros"
+  install -m 0755 "${cli_artifact}" "${managed_bin}/zkf"
+  install -m 0755 "${release_target_dir}/ziros-agentd" "${managed_bin}/ziros-agentd"
+  ln -sfn "${managed_bin}/ziros" "${local_bin}/ziros"
+  ln -sfn "${managed_bin}/zkf" "${local_bin}/zkf"
+  ln -sfn "${managed_bin}/ziros-agentd" "${local_bin}/ziros-agentd"
 fi
 
-ziros_cmd="${local_bin}/ziros"
+ziros_cmd="${managed_bin}/ziros"
 if [[ ! -x "$ziros_cmd" ]]; then
   ziros_cmd="${cli_artifact}"
 fi
 
 if [[ ! -x "$ziros_cmd" ]]; then
-  echo "Could not find a built ZirOS CLI at ${local_bin}/ziros or ${target_dir}/zkf-cli." >&2
+  echo "Could not find a built ZirOS CLI at ${managed_bin}/ziros, ${debug_target_dir}/zkf-cli, or ${release_target_dir}/zkf-cli." >&2
   exit 1
+fi
+
+if (( ! check_only )); then
+  "$ziros_cmd" setup --non-interactive --json >/dev/null || true
 fi
 
 if ! run_check "ziros-doctor" "$ziros_cmd" doctor --json; then
@@ -290,7 +310,8 @@ if (( json_output )); then
   printf '  "check_only": %s,\n' "$([[ $check_only -eq 1 ]] && echo true || echo false)"
   printf '  "repo_root": "%s",\n' "$repo_root"
   printf '  "ziros_command": "%s",\n' "$ziros_cmd"
-  printf '  "daemon_binary": "%s",\n' "${local_bin}/ziros-agentd"
+  printf '  "daemon_binary": "%s",\n' "${managed_bin}/ziros-agentd"
+  printf '  "managed_bin_root": "%s",\n' "$managed_bin"
   printf '  "socket_path": "%s",\n' "$socket_path"
   printf '  "brain_path": "%s",\n' "$brain_path"
   printf '  "path_ready": %s,\n' "$path_ready"
@@ -318,7 +339,8 @@ else
   fi
   echo "Repo root: ${repo_root}"
   echo "CLI: ${ziros_cmd}"
-  echo "Daemon: ${local_bin}/ziros-agentd"
+  echo "Daemon: ${managed_bin}/ziros-agentd"
+  echo "Managed bin root: ${managed_bin}"
   echo "Socket: ${socket_path}"
   echo "Brain: ${brain_path}"
   if [[ -n "${compactc_path}" ]]; then

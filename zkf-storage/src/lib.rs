@@ -154,8 +154,19 @@ fn directory_size(path: &Path) -> io::Result<u64> {
     if !path.exists() {
         return Ok(0);
     }
-    if path.is_file() {
-        return Ok(fs::metadata(path)?.len());
+    let metadata = fs::symlink_metadata(path)?;
+    if metadata.file_type().is_symlink() {
+        let target = fs::metadata(path)?;
+        if target.is_file() {
+            return Ok(target.len());
+        }
+        if !target.is_dir() {
+            return Ok(0);
+        }
+    } else if metadata.is_file() {
+        return Ok(metadata.len());
+    } else if !metadata.is_dir() {
+        return Ok(0);
     }
     let mut total = 0u64;
     for entry in fs::read_dir(path)? {
@@ -249,4 +260,26 @@ fn delete_secure(path: &Path) -> io::Result<()> {
 
 fn same_bytes(left: &Path, right: &Path) -> io::Result<bool> {
     Ok(fs::read(left)? == fs::read(right)?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::directory_size;
+    use std::fs;
+    use tempfile::tempdir;
+
+    #[cfg(target_family = "unix")]
+    #[test]
+    fn directory_size_ignores_unix_socket_entries() {
+        use std::os::unix::net::UnixListener;
+
+        let temp = tempdir().expect("tempdir");
+        let root = temp.path();
+        fs::write(root.join("payload.bin"), b"1234").expect("payload");
+        let socket_path = root.join("agent.sock");
+        let _listener = UnixListener::bind(&socket_path).expect("socket");
+
+        let size = directory_size(root).expect("directory size");
+        assert_eq!(size, 4);
+    }
 }

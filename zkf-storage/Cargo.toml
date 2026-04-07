@@ -12,3 +12,5 @@ chrono.workspace = true
 zkf-cloudfs = { path = "../zkf-cloudfs" }
 zkf-keymanager = { path = "../zkf-keymanager" }
 
+[dev-dependencies]
+tempfile = "3"

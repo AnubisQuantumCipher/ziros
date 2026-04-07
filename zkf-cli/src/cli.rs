@@ -2,7 +2,7 @@ use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
-#[command(name = "zkf")]
+#[command(name = "ziros")]
 #[command(about = "ZirOS CLI (formerly ZKF): proving, wrapping, certification, and monitoring")]
 pub(crate) struct Cli {
     #[arg(long, global = true)]
@@ -13,6 +13,66 @@ pub(crate) struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
+    /// Run the public ZirOS setup wizard and state migration flow.
+    Setup {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        non_interactive: bool,
+        #[arg(long)]
+        provider: Option<String>,
+        #[arg(long)]
+        profile: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        project: Option<String>,
+        #[arg(long)]
+        organization: Option<String>,
+        #[arg(long)]
+        api_key_stdin: bool,
+        #[arg(long)]
+        set_default: bool,
+        #[arg(long)]
+        start_daemon: bool,
+    },
+    /// Open the interactive ZirOS operator shell.
+    Chat {
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        strict: bool,
+        #[arg(long)]
+        allow_compat: bool,
+    },
+    /// Manage provider profiles and model routing.
+    Model {
+        #[arg(long)]
+        json: bool,
+        #[command(subcommand)]
+        command: ModelCommands,
+    },
+    /// Serve the local ZirOS OpenAI-compatible gateway.
+    Gateway {
+        #[command(subcommand)]
+        command: GatewayCommands,
+    },
+    /// Check for or apply managed ZirOS binary updates.
+    Update {
+        #[command(subcommand)]
+        command: Option<UpdateCommands>,
+    },
+    /// Show version/build metadata.
+    Version {
+        #[arg(long)]
+        json: bool,
+    },
     /// Scaffold a standalone application that embeds `zkf-lib`.
     App {
         #[command(subcommand)]
@@ -1453,6 +1513,113 @@ pub(crate) enum AgentProviderCommands {
 #[derive(Debug, Subcommand)]
 pub(crate) enum AgentMcpCommands {
     Serve,
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum ModelCommands {
+    List,
+    Add {
+        #[command(subcommand)]
+        command: ModelAddCommands,
+    },
+    Use {
+        profile_id: String,
+    },
+    Test {
+        profile_id: Option<String>,
+    },
+    Remove {
+        profile_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum ModelAddCommands {
+    Openai {
+        #[arg(long)]
+        profile: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        planner_model: Option<String>,
+        #[arg(long)]
+        chat_model: Option<String>,
+        #[arg(long)]
+        summarizer_model: Option<String>,
+        #[arg(long)]
+        retrieval_model: Option<String>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        project: Option<String>,
+        #[arg(long)]
+        organization: Option<String>,
+        #[arg(long)]
+        api_key_stdin: bool,
+        #[arg(long)]
+        set_default: bool,
+    },
+    Mlx {
+        #[arg(long)]
+        profile: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        set_default: bool,
+    },
+    #[command(name = "openai-compatible")]
+    OpenaiCompatible {
+        #[arg(long)]
+        profile: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        set_default: bool,
+    },
+    Ollama {
+        #[arg(long)]
+        profile: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        set_default: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum GatewayCommands {
+    Serve {
+        #[arg(long, default_value = "127.0.0.1:8787")]
+        bind: String,
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        provider: Option<String>,
+        #[arg(long)]
+        model: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum UpdateCommands {
+    Status {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        manifest_url: Option<String>,
+    },
+    Apply {
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        manifest_url: Option<String>,
+    },
 }
 
 #[derive(Debug, Args)]

@@ -343,8 +343,8 @@ Several of these surfaces also emit evidence-oriented bundles through `zkf-lib::
 ### For Autonomous Agent Operators
 
 - Start with [`docs/agent/README.md`](docs/agent/README.md).
-- Use `bash setup/agent/bootstrap.sh` to install the public `ziros` command
-  over the existing `zkf` binary.
+- Public install target: `npm install -g @ziros/agent` then `ziros setup`.
+- Source contributor path: `bash setup/agent/bootstrap.sh` then `ziros setup`.
 - Run `ziros-agentd` first, then operate through `ziros agent ...` or the thin
   `ZirOSAgentHost` shell.
 - Inspect persistent local learning through `ziros agent memory ...` instead of
@@ -494,19 +494,22 @@ If you want the autonomous ZirOS operator, start with the dedicated guide set:
 
 1. [`docs/agent/README.md`](docs/agent/README.md)
 2. [`docs/agent/QUICKSTART.md`](docs/agent/QUICKSTART.md)
-3. `bash setup/agent/bootstrap.sh`
+3. `ziros setup`
 
-The bootstrap installs the public `ziros` command alias, the legacy `zkf`
-compatibility alias, and `ziros-agentd`.
+Source contributors can still use `bash setup/agent/bootstrap.sh`, which now
+installs managed binaries under `~/.ziros/bin/` and compatibility symlinks in
+`~/.local/bin/`.
 
-### Prebuilt Binary (any Mac, recommended)
+### npm Install (Apple Silicon macOS, recommended)
 
 ```bash
-curl -fsSL https://github.com/AnubisQuantumCipher/ziros/releases/download/v0.3.0/zkf-aarch64-apple-darwin.tar.gz | tar xz
-sudo mv zkf-aarch64-apple-darwin /usr/local/bin/zkf
-zkf doctor --json
-zkf storage install
+npm install -g @ziros/agent
+ziros setup
+ziros
 ```
+
+This public path is npm-first and does not require a Rust toolchain unless you
+want to build ZirOS from source.
 
 ### Source Build
 

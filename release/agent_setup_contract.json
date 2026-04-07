@@ -1,6 +1,6 @@
 {
   "schema": "ziros-agent-setup-contract-v1",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "canonical_command_name": "ziros",
   "legacy_aliases": [
     "zkf"
@@ -9,12 +9,19 @@
     "os": "macos",
     "arch": "arm64"
   },
-  "required_binaries": [
-    "cargo",
-    "rustc",
-    "git",
-    "xcrun"
-  ],
+  "required_binaries": {
+    "public_install": [
+      "node",
+      "npm",
+      "xcrun"
+    ],
+    "source_build": [
+      "cargo",
+      "rustc",
+      "git",
+      "xcrun"
+    ]
+  },
   "optional_binaries": {
     "midnight": [
       "node",
@@ -36,9 +43,12 @@
   "env_example": "examples/agent/ziros-agent.env.example",
   "daemon_binary": "ziros-agentd",
   "paths": {
-    "socket": "~/.zkf/cache/agent/ziros-agentd.sock",
-    "brain": "~/.zkf/cache/agent/brain.sqlite3",
-    "user_local_bin": "~/.local/bin"
+    "socket": "~/.ziros/agent/ziros-agentd.sock",
+    "brain": "~/.ziros/agent/brain.sqlite3",
+    "managed_bin_root": "~/.ziros/bin",
+    "user_local_bin": "~/.local/bin",
+    "providers": "~/.ziros/providers.toml",
+    "config": "~/.ziros/config.toml"
   },
   "provider_order": {
     "planner": [
@@ -75,6 +85,11 @@
     ".zkf-completion-status.json"
   ],
   "readiness_commands": [
+    "ziros setup",
+    "ziros chat",
+    "ziros model list",
+    "ziros gateway serve",
+    "ziros update status",
     "ziros doctor --json",
     "ziros metal-doctor --json --strict",
     "ziros agent --json doctor",

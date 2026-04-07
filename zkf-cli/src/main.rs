@@ -13,6 +13,7 @@ use clap::Parser;
 use cli::Cli;
 use std::ffi::OsStr;
 use std::fs;
+use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::thread;
@@ -20,7 +21,6 @@ use types::*;
 use zkf_runtime::{EntrypointGuard, EntrypointSurface, RuntimeSecurityContext};
 
 const ZIROS_FIRST_RUN_BANNER: &str = "Welcome to ZirOS. Prove thou wilt.";
-const ZIROS_FIRST_RUN_MARKER_FILE: &str = "ziros-first-run-v1";
 const ZIROS_INVOKED_AS_ENV: &str = "ZIROS_INVOKED_AS";
 const DEFAULT_CLI_STACK_BYTES: usize = 1024 * 1024 * 1024;
 
@@ -32,6 +32,15 @@ fn main() -> ExitCode {
     }
 
     maybe_emit_ziros_first_run_banner();
+    if should_handle_default_ziros_entrypoint() {
+        return match run_on_cli_stack_default_ziros() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(err) => {
+                eprintln!("error: {err}");
+                ExitCode::from(1)
+            }
+        };
+    }
     let cli = match Cli::try_parse() {
         Ok(cli) => cli,
         Err(err) => {
@@ -90,6 +99,10 @@ fn run(cli: Cli) -> Result<(), String> {
     cmd::handle(cli.command, cli.allow_compat)
 }
 
+fn run_default_ziros() -> Result<(), String> {
+    cmd::handle_default_ziros()
+}
+
 fn cli_stack_bytes() -> usize {
     std::env::var("ZKF_CLI_STACK_BYTES")
         .ok()
@@ -104,6 +117,31 @@ fn run_on_cli_stack(cli: Cli) -> Result<(), String> {
         .name("ziros-cli".to_string())
         .stack_size(stack_bytes)
         .spawn(move || run(cli))
+        .map_err(|err| format!("failed to spawn CLI worker thread: {err}"))?;
+
+    match handle.join() {
+        Ok(result) => result,
+        Err(payload) => {
+            let reason = if let Some(message) = payload.downcast_ref::<&'static str>() {
+                (*message).to_string()
+            } else if let Some(message) = payload.downcast_ref::<String>() {
+                message.clone()
+            } else {
+                "unknown panic payload".to_string()
+            };
+            Err(format!(
+                "CLI worker thread panicked on a {stack_bytes}-byte stack: {reason}"
+            ))
+        }
+    }
+}
+
+fn run_on_cli_stack_default_ziros() -> Result<(), String> {
+    let stack_bytes = cli_stack_bytes();
+    let handle = thread::Builder::new()
+        .name("ziros-cli".to_string())
+        .stack_size(stack_bytes)
+        .spawn(run_default_ziros)
         .map_err(|err| format!("failed to spawn CLI worker thread: {err}"))?;
 
     match handle.join() {
@@ -166,12 +204,7 @@ pub(crate) fn ziros_invocation_requested(argv0: Option<&OsStr>, env_flag: Option
 }
 
 pub(crate) fn ziros_first_run_marker_path() -> Option<PathBuf> {
-    std::env::var_os("HOME").map(|home| {
-        PathBuf::from(home)
-            .join(".zkf")
-            .join("state")
-            .join(ZIROS_FIRST_RUN_MARKER_FILE)
-    })
+    Some(zkf_agent::ziros_first_run_marker_path())
 }
 
 pub(crate) fn persist_ziros_first_run_marker(path: Option<&Path>) {
@@ -182,6 +215,14 @@ pub(crate) fn persist_ziros_first_run_marker(path: Option<&Path>) {
         let _ = fs::create_dir_all(parent);
     }
     let _ = fs::write(path, b"seen\n");
+}
+
+fn should_handle_default_ziros_entrypoint() -> bool {
+    let argv0 = std::env::args_os().next();
+    invoked_as_ziros(argv0.as_deref())
+        && std::env::args_os().nth(1).is_none()
+        && std::io::stdin().is_terminal()
+        && std::io::stdout().is_terminal()
 }
 
 #[cfg(test)]

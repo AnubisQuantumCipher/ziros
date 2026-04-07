@@ -1,4 +1,5 @@
 use crate::planner::{workflow_catalog, workflow_from_kind};
+use crate::provider::auth_bearer_for_route;
 use crate::provider::select_provider_routes;
 use crate::types::{AgentRunOptionsV1, GoalIntentV1};
 use serde::Deserialize;
@@ -132,15 +133,6 @@ fn normalize_base_url(base_url: &str) -> String {
         base_url.to_string()
     } else {
         format!("http://{base_url}")
-    }
-}
-
-fn auth_bearer_for_route(route: &crate::types::ProviderRouteRecordV1) -> Option<String> {
-    match route.provider.as_str() {
-        "openai-api" => std::env::var("OPENAI_API_KEY")
-            .ok()
-            .filter(|value| !value.trim().is_empty()),
-        _ => None,
     }
 }
 

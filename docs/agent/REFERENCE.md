@@ -7,6 +7,7 @@ This is the short reference for the setup-relevant surfaces only.
 | Surface | Commands |
 | --- | --- |
 | Base health | `ziros doctor`, `ziros metal-doctor` |
+| Public UX | `ziros setup`, `ziros chat`, `ziros model ...`, `ziros gateway serve`, `ziros update`, `ziros version --json` |
 | Agent | `ziros agent doctor`, `status`, `plan`, `run`, `resume`, `logs` |
 | Agent memory | `ziros agent memory sessions`, `receipts`, `artifacts`, `deployments`, `environments`, `procedures`, `incidents` |
 | Agent approvals | `ziros agent approvals list`, `approve`, `reject` |
@@ -20,13 +21,13 @@ This is the short reference for the setup-relevant surfaces only.
 
 | Path | Meaning |
 | --- | --- |
-| `~/.local/bin/ziros` | public-facing CLI alias |
-| `~/.local/bin/zkf` | legacy compatibility alias |
-| `~/.local/bin/ziros-agentd` | daemon binary |
-| `~/.zkf/cache/agent/ziros-agentd.sock` | agent socket |
-| `~/.zkf/cache/agent/brain.sqlite3` | encrypted Brain |
-| `~/.zkf/state/ziros-first-run-v1` | first-run banner marker |
-| `~/.zkf/models/` | operator-installed Core ML bundles |
+| `~/.ziros/bin/ziros` | managed ZirOS CLI |
+| `~/.ziros/bin/zkf` | managed compatibility alias |
+| `~/.ziros/bin/ziros-agentd` | managed daemon binary |
+| `~/.ziros/agent/ziros-agentd.sock` | agent socket |
+| `~/.ziros/agent/brain.sqlite3` | encrypted Brain |
+| `~/.ziros/state/ziros-first-run-v1` | first-run banner marker |
+| `~/.zkf/models/` | legacy Core ML bundle discovery path still honored by the runtime |
 
 ## Env Vars
 

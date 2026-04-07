@@ -3,9 +3,16 @@
 This is the shortest supported path from checkout to first autonomous prompt on
 an Apple Silicon Mac.
 
-## 1. Build The Public Command Alias
+## 1. Install Or Build The Public Command Alias
 
-From the repo root:
+Public install:
+
+```bash
+npm install -g @ziros/agent
+ziros setup
+```
+
+From the repo root, if you are working from source:
 
 ```bash
 mkdir -p "$HOME/.ziros"
@@ -13,13 +20,15 @@ cp examples/agent/ziros-agent.env.example "$HOME/.ziros/agent.env"
 $EDITOR "$HOME/.ziros/agent.env"
 source "$HOME/.ziros/agent.env"
 bash setup/agent/bootstrap.sh
+ziros setup --non-interactive
 ```
 
 What the bootstrap does:
 
 - verifies macOS on Apple Silicon
 - builds `zkf` and `ziros-agentd` in release mode
-- installs `ziros` and `zkf` symlinks into `~/.local/bin`
+- installs managed binaries into `~/.ziros/bin/`
+- installs `ziros` and `zkf` compatibility symlinks into `~/.local/bin`
 - runs the doctor chain for the agent, Metal, Midnight, and EVM lanes
 
 If you only want validation:
@@ -61,7 +70,7 @@ ziros-agentd
 The default socket is:
 
 ```text
-~/.zkf/cache/agent/ziros-agentd.sock
+~/.ziros/agent/ziros-agentd.sock
 ```
 
 If you want the optional macOS shell, build it separately after the daemon is

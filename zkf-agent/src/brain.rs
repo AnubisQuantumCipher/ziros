@@ -5,6 +5,7 @@ use crate::types::{
     SessionStatusV1, SubmissionGrantRecordV1, TrustGateReportV1, WorkgraphNodeV1, WorkgraphV1,
     WorktreeRecordV1,
 };
+use crate::state::{brain_path, ensure_ziros_layout};
 use chacha20poly1305::aead::{Aead, KeyInit};
 use chacha20poly1305::{ChaCha20Poly1305, Nonce};
 use rand::RngCore;
@@ -34,7 +35,8 @@ impl BrainStore {
     }
 
     pub fn open_with_cloudfs(cloudfs: CloudFS) -> Result<Self, String> {
-        let db_path = cloudfs.cache_root().join("agent").join("brain.sqlite3");
+        let _ = ensure_ziros_layout()?;
+        let db_path = brain_path();
         if let Some(parent) = db_path.parent() {
             fs::create_dir_all(parent)
                 .map_err(|error| format!("failed to create {}: {error}", parent.display()))?;

@@ -5,8 +5,8 @@ supported for compatibility, and internal crate/package names stay `zkf-*` for n
 
 For the operator-first Apple Silicon onboarding path, start with
 `docs/agent/README.md`.
-If you used `setup/agent/bootstrap.sh`, substitute `ziros` for `zkf`
-throughout this reference.
+If you used `ziros setup` or `setup/agent/bootstrap.sh`, substitute `ziros` for
+`zkf` throughout this reference.
 
 ## Global Flags
 

@@ -218,6 +218,92 @@ fn agent_cli_parses_provider_status_surface() {
 }
 
 #[test]
+fn setup_cli_parses_public_setup_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "setup",
+        "--non-interactive",
+        "--provider",
+        "openai",
+        "--model",
+        "gpt-5.2-codex",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Setup {
+            non_interactive,
+            provider,
+            model,
+            ..
+        } => {
+            assert!(non_interactive);
+            assert_eq!(provider.as_deref(), Some("openai"));
+            assert_eq!(model.as_deref(), Some("gpt-5.2-codex"));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn model_cli_parses_openai_profile_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "model",
+        "add",
+        "openai",
+        "--profile",
+        "dev-openai",
+        "--model",
+        "gpt-5.2-codex",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Model { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::ModelCommands::Add {
+                    command: crate::cli::ModelAddCommands::Openai {
+                        profile: Some(ref profile),
+                        model: Some(ref model),
+                        ..
+                    }
+                } if profile == "dev-openai" && model == "gpt-5.2-codex"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_serve_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "gateway",
+        "serve",
+        "--bind",
+        "127.0.0.1:8787",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Serve { ref bind, .. } if bind == "127.0.0.1:8787"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn update_cli_defaults_to_apply_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "update"]);
+    match cli.command {
+        crate::cli::Commands::Update { command } => {
+            assert!(command.is_none());
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
 fn agent_cli_parses_provider_route_surface() {
     let cli = crate::cli::Cli::parse_from([
         "zkf",
@@ -237,6 +323,7 @@ fn agent_cli_parses_provider_route_surface() {
                     command: crate::cli::AgentProviderCommands::Route {
                         session_id: Some(ref session_id),
                         provider: Some(ref provider),
+                        ..
                     }
                 } if session_id == "session-123" && provider == "mlx-local"
             ));
@@ -263,6 +350,7 @@ fn agent_cli_parses_provider_test_surface() {
                     command: crate::cli::AgentProviderCommands::Test {
                         session_id: None,
                         provider: Some(ref provider),
+                        ..
                     }
                 } if provider == "ollama-local"
             ));

@@ -8,7 +8,7 @@ more effective over time without hiding how that happens.
 The Brain is an encrypted local SQLite database:
 
 ```text
-~/.zkf/cache/agent/brain.sqlite3
+~/.ziros/agent/brain.sqlite3
 ```
 
 The key is managed through ZirOS key-management layers, not by a plaintext

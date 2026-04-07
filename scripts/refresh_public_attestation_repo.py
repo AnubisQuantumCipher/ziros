@@ -318,14 +318,15 @@ def build_binary_manifest(version: str, binary_path: Path) -> dict:
 
 
 def build_midnight_readiness_doc(private_midnight: dict, release_tag: str, source_commit: str) -> dict:
+    version = private_midnight["version"]
     return {
         "schema": "ziros-public-midnight-readiness-v1",
         "generated_at": now_rfc3339(),
-        "version": private_midnight["version"],
+        "version": version,
         "release_tag": release_tag,
         "source_commit": source_commit,
         "domain": "midnight",
-        "claim_scope": "full-universal-path-for-0.6.0",
+        "claim_scope": f"full-universal-path-for-{version}",
         "status": private_midnight["status"],
         "ready_for_local_operator": private_midnight["ready_for_local_operator"],
         "ready_for_live_submit": private_midnight["ready_for_live_submit"],
@@ -340,14 +341,15 @@ def build_midnight_readiness_doc(private_midnight: dict, release_tag: str, sourc
 
 
 def build_evm_readiness_doc(private_evm: dict, release_tag: str, source_commit: str) -> dict:
+    version = private_evm["version"]
     return {
         "schema": "ziros-public-evm-readiness-v1",
         "generated_at": now_rfc3339(),
-        "version": private_evm["version"],
+        "version": version,
         "release_tag": release_tag,
         "source_commit": source_commit,
         "domain": "evm",
-        "claim_scope": "secondary-deploy-capable-verifier-export-lane-for-0.6.0",
+        "claim_scope": f"secondary-deploy-capable-verifier-export-lane-for-{version}",
         "status": private_evm["status"],
         "supported_targets": private_evm["supported_targets"],
         "supported_surfaces": private_evm["supported_surfaces"],
@@ -364,6 +366,8 @@ def build_claim_graph(
     midnight_readiness: dict,
     evm_readiness: dict,
 ) -> dict:
+    midnight_version = midnight_readiness["version"]
+    evm_version = evm_readiness["version"]
     claims = [
         {
             "claim_id": "publication.release_tag",
@@ -504,7 +508,7 @@ def build_claim_graph(
         {
             "claim_id": "operator.midnight_status",
             "category": "mathematically_established",
-            "claim_text": "Published Midnight readiness status for the 0.6.0 full operator path.",
+            "claim_text": f"Published Midnight readiness status for the {midnight_version} full operator path.",
             "expected_value": midnight_readiness["status"],
             "sources": [
                 {"path": "midnight/readiness.json", "json_pointer": "/status"},
@@ -514,7 +518,7 @@ def build_claim_graph(
         {
             "claim_id": "operator.evm_status",
             "category": "mathematically_established",
-            "claim_text": "Published EVM readiness status for the 0.6.0 secondary operator lane.",
+            "claim_text": f"Published EVM readiness status for the {evm_version} secondary operator lane.",
             "expected_value": evm_readiness["status"],
             "sources": [
                 {"path": "evm/readiness.json", "json_pointer": "/status"},
@@ -719,6 +723,8 @@ def build_public_summary_block(
     midnight_readiness: dict,
     evm_readiness: dict,
 ) -> str:
+    midnight_version = midnight_readiness["version"]
+    evm_version = evm_readiness["version"]
     return "\n".join(
         [
             "This repository is evidence-only. It publishes no implementation source, headers, examples, or public SDK surface.",
@@ -730,8 +736,8 @@ def build_public_summary_block(
             f"| Disclosed hypotheses | {attestation['headline_counts']['hypothesis_carried_rows']} hypothesis-carried rows, published separately in [attestation/latest.json](attestation/latest.json) and [evidence/protocol-proof-registry.json](evidence/protocol-proof-registry.json) |",
             f"| Public conformance | {conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed across `plonky3`, `halo2`, `nova`, and `hypernova` |",
             f"| Sealed-source census | {workspace_census_summary['total_tracked_files']} tracked files classified; zero unclassified = `{workspace_census_summary['zero_unclassified_files']}` |",
-            f"| Midnight readiness | full universal path for `0.6.0`: status=`{midnight_readiness['status']}`, local_operator=`{midnight_readiness['ready_for_local_operator']}`, live_submit=`{midnight_readiness['ready_for_live_submit']}` via [midnight/readiness.json](midnight/readiness.json) |",
-            f"| EVM readiness | secondary deploy-capable lane for `0.6.0`: status=`{evm_readiness['status']}` via [evm/readiness.json](evm/readiness.json) |",
+            f"| Midnight readiness | full universal path for `{midnight_version}`: status=`{midnight_readiness['status']}`, local_operator=`{midnight_readiness['ready_for_local_operator']}`, live_submit=`{midnight_readiness['ready_for_live_submit']}` via [midnight/readiness.json](midnight/readiness.json) |",
+            f"| EVM readiness | secondary deploy-capable lane for `{evm_version}`: status=`{evm_readiness['status']}` via [evm/readiness.json](evm/readiness.json) |",
             "| Midnight evidence | 5 published Midnight preprod deployment manifests; explorer verification 0/5 on 2026-04-05 |",
             "| Hostile-audit verdict | [hostile-audit-verdict.json](hostile-audit-verdict.json) and [claim-source-graph.json](claim-source-graph.json) |",
         ]
@@ -746,6 +752,8 @@ def build_weekly_status_block(
     midnight_readiness: dict,
     evm_readiness: dict,
 ) -> str:
+    midnight_version = midnight_readiness["version"]
+    evm_version = evm_readiness["version"]
     return "\n".join(
         [
             "| What It Publishes | How | Current Status |",
@@ -755,8 +763,8 @@ def build_weekly_status_block(
             f"| Public backend conformance | Compile -> prove -> verify across 4 published backends | **{conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed** |",
             f"| Sealed-source census | Opaque private-file census summarized publicly | **{workspace_census_summary['total_tracked_files']} files; zero unclassified = {workspace_census_summary['zero_unclassified_files']}** |",
             f"| Binary integrity | Published release manifest `{publication['binary_manifest_path']}` | **SHA-256 verified for `{publication['binary_target']}`** |",
-            f"| Midnight operator path | Full universal path for `0.6.0` | **status={midnight_readiness['status']} local_operator={midnight_readiness['ready_for_local_operator']} live_submit={midnight_readiness['ready_for_live_submit']}** |",
-            f"| EVM operator path | Secondary deploy-capable lane for `0.6.0` | **status={evm_readiness['status']}** |",
+            f"| Midnight operator path | Full universal path for `{midnight_version}` | **status={midnight_readiness['status']} local_operator={midnight_readiness['ready_for_local_operator']} live_submit={midnight_readiness['ready_for_live_submit']}** |",
+            f"| EVM operator path | Secondary deploy-capable lane for `{evm_version}` | **status={evm_readiness['status']}** |",
             "| Midnight deployment evidence | Published deployment manifest plus live explorer recheck | **0/5 explorer-verified on 2026-04-05** |",
         ]
     )

@@ -30,7 +30,7 @@ exclude = [
 resolver = "2"
 
 [workspace.package]
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 license = "LicenseRef-ZirOS-Proprietary"
 authors = ["AnubisQuantumCipher"]
@@ -78,6 +78,7 @@ getrandom02 = { package = "getrandom", version = "0.2", features = ["js"] }
 semver = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+toml = "0.8"
 serde_stacker = "0.1"
 stacker = "0.1"
 sha2 = "0.10"

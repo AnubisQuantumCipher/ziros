@@ -13,7 +13,20 @@ Apple Silicon.
 | Encrypted Brain | Stores the agent's persistent local memory | It is not cloud memory and it is not a hidden remote service | `ziros agent memory ...` |
 | Keychain / Secure Enclave | Protects local secrets and agent Brain encryption keys through ZirOS key-management layers | It does not replace explicit approvals or receipts | `ziros doctor --json` |
 
-## Required Tools
+## Public Install Tools
+
+If you install ZirOS through `npm install -g @ziros/agent`, the public path
+does not require a Rust toolchain.
+
+| Tool | Why ZirOS needs it |
+| --- | --- |
+| `node` and `npm` | install the thin `@ziros/agent` wrapper package |
+| `xcrun` | Apple toolchain presence check for the macOS runtime |
+
+## Source Build Tools
+
+If you are working from the repo and want to build ZirOS yourself, these are
+the contributor prerequisites:
 
 | Tool | Why ZirOS needs it |
 | --- | --- |
@@ -139,12 +152,12 @@ ziros evm diagnose --json
 
 | Path | Meaning |
 | --- | --- |
-| `~/.local/bin/ziros` | Public-facing CLI alias installed by the bootstrap |
-| `~/.local/bin/zkf` | Legacy compatibility alias |
-| `~/.local/bin/ziros-agentd` | Installed daemon binary |
-| `~/.zkf/cache/agent/ziros-agentd.sock` | Local daemon socket |
-| `~/.zkf/cache/agent/brain.sqlite3` | Encrypted local Brain |
-| `~/.zkf/models/` | Operator-installed Core ML model bundles |
+| `~/.ziros/bin/ziros` | Managed public-facing CLI |
+| `~/.ziros/bin/zkf` | Managed legacy compatibility alias |
+| `~/.ziros/bin/ziros-agentd` | Managed daemon binary |
+| `~/.ziros/agent/ziros-agentd.sock` | Local daemon socket |
+| `~/.ziros/agent/brain.sqlite3` | Encrypted local Brain |
+| `~/.zkf/models/` | Legacy Core ML bundle discovery path still honored by the runtime |
 
 ## Honest Limits
 
@@ -152,4 +165,4 @@ ziros evm diagnose --json
 - Proof validity does not depend on any model output.
 - Midnight local operator readiness and Midnight live-submit readiness are not
   the same thing. Always inspect `ready_for_live_submit`.
-- EVM remains the secondary lane in `0.6.0`.
+- EVM remains the secondary lane in the current release line.

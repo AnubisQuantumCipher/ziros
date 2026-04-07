@@ -30,18 +30,29 @@ Start here if you want the agent to:
 
 ## Canonical Bootstrap
 
-The one supported bootstrap entrypoint is:
+Public install path:
+
+```bash
+npm install -g @ziros/agent
+ziros setup
+```
+
+That path is intended for developers and operators who want ZirOS without
+installing a Rust toolchain first.
+
+Source contributor path:
 
 ```bash
 bash setup/agent/bootstrap.sh
 ```
 
-The script builds and installs the public-facing command aliases expected by
+The source bootstrap builds and installs the managed command surface expected by
 this guide:
 
-- `~/.local/bin/ziros`
-- `~/.local/bin/zkf`
-- `~/.local/bin/ziros-agentd`
+- `~/.ziros/bin/ziros`
+- `~/.ziros/bin/zkf`
+- `~/.ziros/bin/ziros-agentd`
+- compatibility symlinks under `~/.local/bin/`
 
 The current release artifact built by Cargo is `zkf-cli`. This guide
 standardizes on the installed `ziros` command, while keeping `zkf` as a
@@ -51,8 +62,10 @@ compatibility alias.
 
 The most important local paths are:
 
-- agent socket: `~/.zkf/cache/agent/ziros-agentd.sock`
-- encrypted Brain: `~/.zkf/cache/agent/brain.sqlite3`
+- agent socket: `~/.ziros/agent/ziros-agentd.sock`
+- encrypted Brain: `~/.ziros/agent/brain.sqlite3`
+- provider profiles: `~/.ziros/providers.toml`
+- managed binaries: `~/.ziros/bin/`
 - local env example: `examples/agent/ziros-agent.env.example`
 - bootstrap: `setup/agent/bootstrap.sh`
 - optional host shell: `ZirOSAgentHost/README.md`

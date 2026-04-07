@@ -4,9 +4,9 @@
 
 | Symptom | Check | Expected signal | Fix |
 | --- | --- | --- | --- |
-| `ziros agent ...` cannot connect | `ls ~/.zkf/cache/agent/ziros-agentd.sock` | socket exists | start `ziros-agentd` |
+| `ziros agent ...` cannot connect | `ls ~/.ziros/agent/ziros-agentd.sock` | socket exists | start `ziros-agentd` |
 | Host opens but shows nothing | `ziros agent status --limit 10` | JSON or human session list | start daemon first, then reopen `ZirOSAgentHost` |
-| Session vanished after restart | `ziros agent memory sessions --limit 20` | prior sessions still listed | inspect the Brain at `~/.zkf/cache/agent/brain.sqlite3` and restart the daemon |
+| Session vanished after restart | `ziros agent memory sessions --limit 20` | prior sessions still listed | inspect the Brain at `~/.ziros/agent/brain.sqlite3` and restart the daemon |
 
 ## Provider Routing
 
