@@ -1,4 +1,5 @@
 /target-public/
+/target-public-debug/
 /target/
 /target-local/
 /dist/
