@@ -38,7 +38,7 @@
     ".fsti",
     ".zip"
   ],
-  "generated_at": "2026-04-07T10:37:32.352903Z",
+  "generated_at": "2026-04-07T10:43:16.058324Z",
   "package_roots": [
     "attestation",
     "zkf-wallet-helper",

@@ -119,7 +119,7 @@
         "status": "not_checkable_from_cli"
       }
     ],
-    "generated_at": "1775558252Z",
+    "generated_at": "1775558596Z",
     "network": "preprod",
     "recommended_fixes": [
       "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
@@ -142,7 +142,7 @@
     "total": 13,
     "warned": 1
   },
-  "generated_at": "2026-04-07T10:37:32.341765Z",
+  "generated_at": "2026-04-07T10:43:16.053100Z",
   "live_submit_blockers": [
     "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
     "wallet: No browser wallet session or headless operator wallet credentials were available.",

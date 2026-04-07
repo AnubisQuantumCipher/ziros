@@ -1,7 +1,7 @@
 {
   "contract_operator_summary": {
     "evm": {
-      "generated_at": "2026-04-07T10:37:32.342820Z",
+      "generated_at": "2026-04-07T10:43:16.053505Z",
       "primary_domain": "evm",
       "schema": "ziros-evm-operator-readiness-v1",
       "status": "secondary-ready",
@@ -142,7 +142,7 @@
             "status": "not_checkable_from_cli"
           }
         ],
-        "generated_at": "1775558252Z",
+        "generated_at": "1775558596Z",
         "network": "preprod",
         "recommended_fixes": [
           "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
@@ -165,7 +165,7 @@
         "total": 13,
         "warned": 1
       },
-      "generated_at": "2026-04-07T10:37:32.341765Z",
+      "generated_at": "2026-04-07T10:43:16.053100Z",
       "live_submit_blockers": [
         "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
         "wallet: No browser wallet session or headless operator wallet credentials were available.",
@@ -191,7 +191,7 @@
       "version": "0.6.0"
     }
   },
-  "generated_at": "2026-04-07T10:37:32.344187Z",
+  "generated_at": "2026-04-07T10:43:16.054270Z",
   "product_release_ready": true,
   "release_boundary": {
     "allowlist_path": "release/public_release_allowlist.json",
@@ -203,7 +203,7 @@
   "release_tag": "v0.6.0",
   "release_version": "0.6.0",
   "schema": "ziros-product-release-v1",
-  "source_commit": "631449e3a2059c507ae768ae3923ecc722ee1fb0",
+  "source_commit": "63c5eeba3c7267fe83b9c057043ade1ae5157274",
   "theorem_release_grade_ready": false,
   "truth_surfaces": {
     "agent_forensics": "forensics/",
