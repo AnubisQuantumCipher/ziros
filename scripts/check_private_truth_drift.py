@@ -142,7 +142,6 @@ def main() -> int:
         "working_tree_dirty": truth.git_dirty(),
         "headline_counts": {
             "total_entries": len(ledger_entries),
-            "mechanized_total": completion["mechanized_total"],
             "hypothesis_stated": completion["counts"]["hypothesis_stated"],
             "mechanized_implementation_claim": completion["assurance_class_counts"][
                 "mechanized_implementation_claim"
@@ -159,6 +158,14 @@ def main() -> int:
             "gadget_count": len(support["gadgets"]),
         },
     }
+    if "mechanized_total" in public_export.get("headline_counts", {}):
+        expected_export_subset["headline_counts"]["mechanized_total"] = completion[
+            "mechanized_total"
+        ]
+    else:
+        expected_export_subset["headline_counts"]["mechanized_local"] = completion["counts"][
+            "mechanized_local"
+        ]
     compare_payload_subset(
         public_export,
         expected_export_subset,
