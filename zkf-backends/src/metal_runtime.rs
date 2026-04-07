@@ -185,8 +185,6 @@ struct BackendReadiness {
 }
 
 const ARKWORKS_PRODUCTION_DISCLAIMER_REASON: &str = "upstream-ark-groth16-production-disclaimer";
-const STRICT_CERTIFICATION_SCHEMA_V1: &str = "zkf-strict-certification-v1";
-const CERTIFIED_STRICT_LANE_ID: &str = "apple-silicon-m4-max-48gb:bn254-strict-v1";
 
 const STANDARD_METAL_METADATA_KEYS: [&str; 7] = [
     "metal_gpu_busy_ratio",

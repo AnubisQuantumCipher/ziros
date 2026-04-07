@@ -303,7 +303,8 @@
           "coverage_state": "shell_contract_mechanized",
           "evidence_rows": [
             "swarm.sentinel_rate_limit_soundness",
-            "swarm.sentinel_baseline_soundness"
+            "swarm.sentinel_baseline_soundness",
+            "swarm.jitter_detection_boundedness"
           ]
         },
         {
@@ -458,7 +459,8 @@
           "coverage_state": "shell_contract_mechanized",
           "evidence_rows": [
             "swarm.sentinel_rate_limit_soundness",
-            "swarm.sentinel_baseline_soundness"
+            "swarm.sentinel_baseline_soundness",
+            "swarm.jitter_detection_boundedness"
           ]
         },
         {
@@ -594,7 +596,8 @@
           "coverage_state": "implementation_mechanized",
           "evidence_rows": [
             "swarm.gossip_boundedness",
-            "swarm.diplomat_intelligence_root_determinism"
+            "swarm.diplomat_intelligence_root_determinism",
+            "swarm.intelligence_root_convergence"
           ]
         },
         {
@@ -618,7 +621,8 @@
           "fn_count": 6,
           "coverage_state": "implementation_mechanized",
           "evidence_rows": [
-            "swarm.memory_snapshot_identity"
+            "swarm.memory_snapshot_identity",
+            "swarm.memory_append_only_convergence"
           ]
         },
         {
@@ -660,7 +664,8 @@
           "coverage_state": "shell_contract_mechanized",
           "evidence_rows": [
             "swarm.gossip_boundedness",
-            "swarm.diplomat_intelligence_root_determinism"
+            "swarm.diplomat_intelligence_root_determinism",
+            "swarm.intelligence_root_convergence"
           ]
         },
         {
@@ -684,7 +689,8 @@
           "fn_count": 38,
           "coverage_state": "shell_contract_mechanized",
           "evidence_rows": [
-            "swarm.memory_snapshot_identity"
+            "swarm.memory_snapshot_identity",
+            "swarm.memory_append_only_convergence"
           ]
         },
         {

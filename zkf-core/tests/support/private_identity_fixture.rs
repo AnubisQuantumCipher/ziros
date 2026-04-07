@@ -5,24 +5,36 @@ pub fn private_identity_artifact_path(manifest_dir: &str) -> PathBuf {
     Path::new(manifest_dir).join("../private_identity/target/private_identity.json")
 }
 
-pub fn ensure_private_identity_artifact(manifest_dir: &str) -> PathBuf {
+pub fn ensure_private_identity_artifact(manifest_dir: &str) -> Option<PathBuf> {
     let artifact_path = private_identity_artifact_path(manifest_dir);
     if artifact_path.is_file() {
-        return artifact_path;
+        return Some(artifact_path);
     }
 
     let project_dir = Path::new(manifest_dir).join("../private_identity");
-    let output = Command::new("nargo")
+    if !project_dir.is_dir() {
+        eprintln!(
+            "skipping private_identity beta.19 import test because project directory is missing: {}",
+            project_dir.display()
+        );
+        return None;
+    }
+    let output = match Command::new("nargo")
         .arg("compile")
         .current_dir(&project_dir)
         .output()
-        .unwrap_or_else(|err| {
-            panic!(
-                "failed to run `nargo compile` in {} while generating {}. Ensure nargo 1.0.0-beta.19 is installed and on PATH: {err}",
+    {
+        Ok(output) => output,
+        Err(err) => {
+            eprintln!(
+                "skipping private_identity beta.19 import test because `nargo compile` could not start in {} while generating {}: {}",
                 project_dir.display(),
                 artifact_path.display(),
-            )
-        });
+                err,
+            );
+            return None;
+        }
+    };
 
     if !output.status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
@@ -42,5 +54,5 @@ pub fn ensure_private_identity_artifact(manifest_dir: &str) -> PathBuf {
         artifact_path.display(),
     );
 
-    artifact_path
+    Some(artifact_path)
 }

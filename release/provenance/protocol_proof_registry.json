@@ -1,0 +1,226 @@
+{
+  "schema": "ziros-protocol-proof-registry-v1",
+  "generated_at": "2026-04-07T01:18:45.594251+00:00",
+  "rows": [
+    {
+      "theorem_id": "protocol.groth16_completeness",
+      "proof_family": "groth16_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.Groth16Exact",
+      "lean_theorem": "groth16_exact_completeness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
+      "private_artifact_digest": "0eb483f8ab99ba5c470844fdaf66c2f9cdd92dc0141a538c3986df5dfe15fd9c",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::arkworks",
+      "exact_surface": "BN254 Groth16 imported-CRS verifier boundary",
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "Groth16 exact completeness holds for the imported-CRS algebraic surface"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.groth16_knowledge_soundness",
+      "proof_family": "groth16_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.Groth16Exact",
+      "lean_theorem": "groth16_exact_knowledge_soundness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
+      "private_artifact_digest": "0eb483f8ab99ba5c470844fdaf66c2f9cdd92dc0141a538c3986df5dfe15fd9c",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::arkworks",
+      "exact_surface": "BN254 Groth16 imported-CRS verifier boundary",
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "the Groth16 knowledge-of-exponent hypothesis holds on the shipped algebraic boundary"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.groth16_zero_knowledge",
+      "proof_family": "groth16_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.Groth16Exact",
+      "lean_theorem": "groth16_exact_zero_knowledge",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/Groth16Exact.lean",
+      "private_artifact_digest": "0eb483f8ab99ba5c470844fdaf66c2f9cdd92dc0141a538c3986df5dfe15fd9c",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::arkworks",
+      "exact_surface": "BN254 Groth16 imported-CRS verifier boundary",
+      "trusted_assumptions": [
+        "imported Groth16 CRS material is valid for the shipped BN254 circuit family",
+        "the Groth16 simulator hypothesis holds on the shipped exact public-view surface"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.fri_completeness",
+      "proof_family": "fri_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.FriExact",
+      "lean_theorem": "fri_exact_completeness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
+      "private_artifact_digest": "4b802348946b973d9efe09981c645a6dd099bc55f5bee6174024d68d6d57b2d4",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::plonky3",
+      "exact_surface": "Plonky3 FRI transcript and verifier-guard boundary",
+      "trusted_assumptions": [
+        "the FRI Reed-Solomon completeness hypothesis holds for the shipped Plonky3 transcript surface"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.fri_proximity_soundness",
+      "proof_family": "fri_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.FriExact",
+      "lean_theorem": "fri_exact_proximity_soundness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/FriExact.lean",
+      "private_artifact_digest": "4b802348946b973d9efe09981c645a6dd099bc55f5bee6174024d68d6d57b2d4",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::plonky3",
+      "exact_surface": "Plonky3 FRI transcript and verifier-guard boundary",
+      "trusted_assumptions": [
+        "the FRI Reed-Solomon proximity-soundness hypothesis holds for the shipped Plonky3 transcript surface"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.nova_completeness",
+      "proof_family": "nova_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.NovaExact",
+      "lean_theorem": "nova_exact_completeness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
+      "private_artifact_digest": "1462c58f587edad04ae31671bda923631cafee5b15e29ac775d00d33def3807e",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::nova_native",
+      "exact_surface": "classic Nova recursive shell and verifier metadata boundary",
+      "trusted_assumptions": [
+        "the classic Nova completeness hypothesis holds for the shipped recursive shell",
+        "the shipped classic Nova artifact metadata satisfies the exact IVC side conditions"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.nova_folding_soundness",
+      "proof_family": "nova_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.NovaExact",
+      "lean_theorem": "nova_exact_folding_sound",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/NovaExact.lean",
+      "private_artifact_digest": "1462c58f587edad04ae31671bda923631cafee5b15e29ac775d00d33def3807e",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::nova_native",
+      "exact_surface": "classic Nova recursive shell and verifier metadata boundary",
+      "trusted_assumptions": [
+        "the classic Nova folding-soundness hypothesis holds for the shipped recursive shell",
+        "the shipped classic Nova verifier metadata satisfies the exact guard conditions"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.hypernova_completeness",
+      "proof_family": "hypernova_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.HyperNovaExact",
+      "lean_theorem": "hypernova_exact_completeness",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
+      "private_artifact_digest": "a91b2340900f7237c842539ebf66b6b24509dce02d7e810ab32664609dcf510f",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::nova_native",
+      "exact_surface": "HyperNova CCS profile and verifier metadata boundary",
+      "trusted_assumptions": [
+        "the HyperNova completeness hypothesis holds for the shipped CCS recursive shell",
+        "the shipped HyperNova CCS profile metadata satisfies the exact verifier guard conditions"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    },
+    {
+      "theorem_id": "protocol.hypernova_folding_soundness",
+      "proof_family": "hypernova_exact",
+      "checker": "lean",
+      "lean_module": "zkf-protocol-proofs.ZkfProtocolProofs.HyperNovaExact",
+      "lean_theorem": "hypernova_exact_folding_sound",
+      "private_artifact_path": "zkf-protocol-proofs/ZkfProtocolProofs/HyperNovaExact.lean",
+      "private_artifact_digest": "a91b2340900f7237c842539ebf66b6b24509dce02d7e810ab32664609dcf510f",
+      "runner_script": "scripts/run_protocol_lean_proofs.sh",
+      "runner_digest": "9eb34659c90026164eb2b0bb0d7b94285de73dc9383b23ee1abfd7962537ccd8",
+      "toolchain": "leanprover/lean4:v4.28.0",
+      "scope": "zkf-backends::nova_native",
+      "exact_surface": "HyperNova CCS profile and verifier metadata boundary",
+      "trusted_assumptions": [
+        "the HyperNova folding-soundness hypothesis holds for the shipped CCS recursive shell",
+        "the shipped HyperNova verifier metadata satisfies the exact CCS guard conditions"
+      ],
+      "assumption_class": "cryptographic_protocol_hypothesis"
+    }
+  ],
+  "families": {
+    "groth16_exact": {
+      "label": "Groth16 exact protocol hypotheses",
+      "checker": "lean",
+      "proof_status": "mechanized_local_with_pinned_private_lean_artifact",
+      "hypothesis_class": "cryptographic_protocol_hypothesis",
+      "exact_surface": "BN254 Groth16 imported-CRS verifier boundary",
+      "row_count": 3,
+      "theorem_ids": [
+        "protocol.groth16_completeness",
+        "protocol.groth16_knowledge_soundness",
+        "protocol.groth16_zero_knowledge"
+      ]
+    },
+    "fri_exact": {
+      "label": "FRI exact protocol hypotheses",
+      "checker": "lean",
+      "proof_status": "mechanized_local_with_pinned_private_lean_artifact",
+      "hypothesis_class": "cryptographic_protocol_hypothesis",
+      "exact_surface": "Plonky3 FRI transcript and verifier-guard boundary",
+      "row_count": 2,
+      "theorem_ids": [
+        "protocol.fri_completeness",
+        "protocol.fri_proximity_soundness"
+      ]
+    },
+    "nova_exact": {
+      "label": "Classic Nova exact protocol hypotheses",
+      "checker": "lean",
+      "proof_status": "mechanized_local_with_pinned_private_lean_artifact",
+      "hypothesis_class": "cryptographic_protocol_hypothesis",
+      "exact_surface": "classic Nova recursive shell and verifier metadata boundary",
+      "row_count": 2,
+      "theorem_ids": [
+        "protocol.nova_completeness",
+        "protocol.nova_folding_soundness"
+      ]
+    },
+    "hypernova_exact": {
+      "label": "HyperNova exact protocol hypotheses",
+      "checker": "lean",
+      "proof_status": "mechanized_local_with_pinned_private_lean_artifact",
+      "hypothesis_class": "cryptographic_protocol_hypothesis",
+      "exact_surface": "HyperNova CCS profile and verifier metadata boundary",
+      "row_count": 2,
+      "theorem_ids": [
+        "protocol.hypernova_completeness",
+        "protocol.hypernova_folding_soundness"
+      ]
+    }
+  }
+}

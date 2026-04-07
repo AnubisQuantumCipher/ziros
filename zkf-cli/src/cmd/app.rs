@@ -297,7 +297,7 @@ impl AppStyle {
                 "Generates a styled `main.rs` that uses `zkf-ui` rendering plus progress reporting."
             }
             Self::Tui => {
-                "Generates `main.rs` + `dashboard.rs` wired through `zkf-tui` and the local proof worker."
+                "Generates `main.rs` + `dashboard.rs` with a self-contained ratatui dashboard and local proof worker."
             }
         }
     }
@@ -381,7 +381,8 @@ fn render_gallery() -> String {
         render_gallery_card(AppStyle::Minimal, &theme),
         render_gallery_card(AppStyle::Colored, &theme),
         render_gallery_card(AppStyle::Tui, &theme),
-        "Flagship example: cargo run -p zkf-tui --example aegisvault".to_string(),
+        "Flagship pattern: use `--style tui` for operator consoles like aegisvault."
+            .to_string(),
     ]
     .join("\n\n")
 }
@@ -498,10 +499,6 @@ fn cargo_toml_content(package_name: &str, style: AppStyle) -> String {
         ));
     }
     if style == AppStyle::Tui {
-        dependencies.push(format!(
-            "zkf-tui = {{ path = \"{}\" }}",
-            root.join("zkf-tui").display()
-        ));
         dependencies.push("crossterm = \"0.28\"".to_string());
         dependencies.push("ratatui = { version = \"0.29\", default-features = false, features = [\"crossterm\"] }".to_string());
     }
@@ -792,21 +789,338 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn tui_dashboard_rs_content() -> &'static str {
-    r#"use std::time::Duration;
+    r##"use std::sync::mpsc::{self, Receiver};
+use std::thread;
+use std::time::Duration;
 
 use crossterm::{
-    event::{self, Event},
+    event::{self, Event, KeyCode, KeyEvent},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
-use zkf_tui::{DashboardAction, DashboardState, ProofJobUpdate, VaultEntry, ZkDashboard};
+use ratatui::{
+    backend::CrosstermBackend,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    widgets::{Block, Borders, Clear, Gauge, List, ListItem, Paragraph, Wrap},
+    Frame, Terminal,
+};
+use zkf_lib::{Program, Visibility, WitnessInputs};
+use zkf_ui::{ProofProgressReporter, ZkTheme};
+
+#[derive(Clone)]
+pub struct VaultEntry {
+    id: String,
+    site: String,
+    username: String,
+    category: String,
+    strength: u16,
+    proof_status: String,
+}
+
+#[derive(Clone, Default)]
+pub struct ProofModalState {
+    open: bool,
+    title: String,
+    body: Vec<String>,
+}
+
+#[derive(Clone)]
+pub struct DashboardState {
+    entries: Vec<VaultEntry>,
+    selected: usize,
+    health_score: u16,
+    proof_percent: u16,
+    proof_stage_label: String,
+    proof_activity_samples: Vec<String>,
+    proof_running: bool,
+    audit_lines: Vec<String>,
+    status_line: String,
+    proof_modal: ProofModalState,
+}
+
+impl DashboardState {
+    fn begin_proof(&mut self) {
+        self.proof_running = true;
+        self.proof_percent = 5;
+        self.proof_stage_label = "Compile".to_string();
+        self.proof_activity_samples.clear();
+        self.status_line = "Proof job running...".to_string();
+    }
+
+    fn apply_proof_event(&mut self, event: &ProofProgressEvent) {
+        self.proof_percent = event.percent.min(100);
+        self.proof_stage_label = event.stage_label.clone();
+        self.proof_activity_samples.push(event.detail.clone());
+        if self.proof_activity_samples.len() > 6 {
+            let excess = self.proof_activity_samples.len() - 6;
+            self.proof_activity_samples.drain(0..excess);
+        }
+    }
+
+    fn finish_proof(&mut self, verified: bool) {
+        self.proof_running = false;
+        self.proof_percent = 100;
+        self.proof_stage_label = if verified {
+            "Verified".to_string()
+        } else {
+            "Invalid".to_string()
+        };
+    }
+
+    fn fail_proof(&mut self, message: &str) {
+        self.proof_running = false;
+        self.proof_percent = 0;
+        self.proof_stage_label = "Failed".to_string();
+        self.status_line = message.to_string();
+    }
+
+    fn open_modal(&mut self, title: impl Into<String>, body: Vec<String>) {
+        self.proof_modal = ProofModalState {
+            open: true,
+            title: title.into(),
+            body,
+        };
+    }
+
+    fn close_modal(&mut self) {
+        self.proof_modal = ProofModalState::default();
+    }
+
+    fn next_entry(&mut self) {
+        if self.entries.is_empty() {
+            return;
+        }
+        self.selected = (self.selected + 1) % self.entries.len();
+    }
+
+    fn previous_entry(&mut self) {
+        if self.entries.is_empty() {
+            return;
+        }
+        self.selected = if self.selected == 0 {
+            self.entries.len() - 1
+        } else {
+            self.selected - 1
+        };
+    }
+}
+
+pub enum DashboardAction {
+    None,
+    Quit,
+    TriggerProof,
+}
+
+#[derive(Clone)]
+pub struct ProofProgressEvent {
+    pub stage_label: String,
+    pub detail: String,
+    pub percent: u16,
+}
+
+#[derive(Debug)]
+pub struct ProofDemoResult {
+    pub verified: bool,
+    pub progress_lines: Vec<String>,
+    pub proof_summary: String,
+    pub credential: String,
+}
+
+pub enum ProofJobUpdate {
+    Event(ProofProgressEvent),
+    Finished(ProofDemoResult),
+    Failed(String),
+}
+
+pub struct ZkDashboard;
+
+impl ZkDashboard {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn draw(&self, frame: &mut Frame<'_>, state: &DashboardState) {
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Min(14),
+                Constraint::Length(3),
+            ])
+            .split(frame.area());
+
+        let header = Paragraph::new(format!(
+            "ZirOS Proof Console | health {} | backend worker local",
+            state.health_score
+        ))
+        .block(Block::default().title("Gateway Console").borders(Borders::ALL))
+        .wrap(Wrap { trim: true });
+        frame.render_widget(header, layout[0]);
+
+        let body = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(34), Constraint::Percentage(66)])
+            .split(layout[1]);
+
+        let entries = state
+            .entries
+            .iter()
+            .enumerate()
+            .map(|(index, entry)| {
+                let prefix = if index == state.selected { "> " } else { "  " };
+                ListItem::new(format!(
+                    "{prefix}{} [{}] {}",
+                    entry.site, entry.category, entry.proof_status
+                ))
+            })
+            .collect::<Vec<_>>();
+        let list = List::new(entries).block(
+            Block::default()
+                .title("Credentials")
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Cyan)),
+        );
+        frame.render_widget(list, body[0]);
+
+        let right = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(6),
+                Constraint::Length(4),
+                Constraint::Min(6),
+            ])
+            .split(body[1]);
+
+        let detail_text = if let Some(entry) = state.entries.get(state.selected) {
+            format!(
+                "Selected: {}\nUser: {}\nID: {}\nStrength: {}\nProof status: {}",
+                entry.site, entry.username, entry.id, entry.strength, entry.proof_status
+            )
+        } else {
+            "No credentials loaded.".to_string()
+        };
+        let details = Paragraph::new(detail_text)
+            .block(Block::default().title("Details").borders(Borders::ALL))
+            .wrap(Wrap { trim: false });
+        frame.render_widget(details, right[0]);
+
+        let gauge = Gauge::default()
+            .block(
+                Block::default()
+                    .title(format!("Proof Progress | {}", state.proof_stage_label))
+                    .borders(Borders::ALL),
+            )
+            .percent(state.proof_percent.min(100))
+            .gauge_style(
+                Style::default()
+                    .fg(if state.proof_running {
+                        Color::Cyan
+                    } else {
+                        Color::Green
+                    })
+                    .add_modifier(Modifier::BOLD),
+            );
+        frame.render_widget(gauge, right[1]);
+
+        let audit_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(55), Constraint::Percentage(45)])
+            .split(right[2]);
+
+        let activity = if state.proof_activity_samples.is_empty() {
+            vec![ListItem::new("Waiting for proof activity.")]
+        } else {
+            state
+                .proof_activity_samples
+                .iter()
+                .map(|line| ListItem::new(line.clone()))
+                .collect::<Vec<_>>()
+        };
+        let activity_list = List::new(activity).block(
+            Block::default()
+                .title("Proof Activity")
+                .borders(Borders::ALL),
+        );
+        frame.render_widget(activity_list, audit_chunks[0]);
+
+        let audit = Paragraph::new(state.audit_lines.join("\n"))
+            .block(Block::default().title("Audit Surface").borders(Borders::ALL))
+            .wrap(Wrap { trim: false });
+        frame.render_widget(audit, audit_chunks[1]);
+
+        let footer = Paragraph::new(state.status_line.clone())
+            .block(Block::default().title("Status").borders(Borders::ALL))
+            .wrap(Wrap { trim: true });
+        frame.render_widget(footer, layout[2]);
+
+        if state.proof_modal.open {
+            let modal_area = centered_rect(68, 68, frame.area());
+            frame.render_widget(Clear, modal_area);
+            let modal = Paragraph::new(state.proof_modal.body.join("\n"))
+                .block(
+                    Block::default()
+                        .title(state.proof_modal.title.clone())
+                        .borders(Borders::ALL)
+                        .border_style(Style::default().fg(Color::Yellow)),
+                )
+                .wrap(Wrap { trim: false });
+            frame.render_widget(modal, modal_area);
+        }
+    }
+
+    pub fn handle_key(&self, state: &mut DashboardState, key: KeyEvent) -> DashboardAction {
+        if state.proof_modal.open {
+            match key.code {
+                KeyCode::Esc | KeyCode::Enter | KeyCode::Char(' ') => {
+                    state.close_modal();
+                }
+                _ => {}
+            }
+            return DashboardAction::None;
+        }
+
+        match key.code {
+            KeyCode::Char('q') | KeyCode::Esc => DashboardAction::Quit,
+            KeyCode::Up | KeyCode::Char('k') => {
+                state.previous_entry();
+                DashboardAction::None
+            }
+            KeyCode::Down | KeyCode::Char('j') => {
+                state.next_entry();
+                DashboardAction::None
+            }
+            KeyCode::Char('p') | KeyCode::Char('P') => DashboardAction::TriggerProof,
+            _ => DashboardAction::None,
+        }
+    }
+}
+
+fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(area);
+
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(popup_layout[1])[1]
+}
 
 fn sample_state() -> DashboardState {
     DashboardState {
         entries: vec![
             VaultEntry {
-                id: "1".to_string(),
+                id: "cred-1".to_string(),
                 site: "mail.zir".to_string(),
                 username: "alice".to_string(),
                 category: "email".to_string(),
@@ -814,7 +1128,7 @@ fn sample_state() -> DashboardState {
                 proof_status: "Ready".to_string(),
             },
             VaultEntry {
-                id: "2".to_string(),
+                id: "cred-2".to_string(),
                 site: "bank.zir".to_string(),
                 username: "alice.reserve".to_string(),
                 category: "finance".to_string(),
@@ -831,16 +1145,16 @@ fn sample_state() -> DashboardState {
         audit_lines: vec![
             "Audit pipeline: PASS".to_string(),
             "Constraint surface: tight".to_string(),
-            "Swarm defense: active".to_string(),
+            "Witness checks: explicit".to_string(),
         ],
-        status_line: "Press P to prove the selected credential.".to_string(),
-        proof_modal: Default::default(),
+        status_line: "Press P to prove the selected credential. Use J/K or arrows to navigate. Press Q to quit.".to_string(),
+        proof_modal: ProofModalState::default(),
     }
 }
 
 pub fn run(
-    program: zkf_lib::Program,
-    sample_inputs: zkf_lib::WitnessInputs,
+    program: Program,
+    sample_inputs: WitnessInputs,
     backend: &'static str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
@@ -850,7 +1164,7 @@ pub fn run(
     let mut terminal = Terminal::new(terminal_backend)?;
     let dashboard = ZkDashboard::new();
     let mut state = sample_state();
-    let mut receiver: Option<std::sync::mpsc::Receiver<ProofJobUpdate>> = None;
+    let mut receiver: Option<Receiver<ProofJobUpdate>> = None;
 
     let result = loop {
         terminal.draw(|frame| dashboard.draw(frame, &state))?;
@@ -863,8 +1177,13 @@ pub fn run(
                         state.apply_proof_event(&event);
                     }
                     ProofJobUpdate::Finished(result) => {
-                        state.entries[state.selected].proof_status =
-                            if result.verified { "Verified" } else { "Invalid" }.to_string();
+                        if let Some(entry) = state.entries.get_mut(state.selected) {
+                            entry.proof_status = if result.verified {
+                                "Verified".to_string()
+                            } else {
+                                "Invalid".to_string()
+                            };
+                        }
                         state.finish_proof(result.verified);
                         state.open_modal(
                             "Proof Result",
@@ -884,7 +1203,7 @@ pub fn run(
                     }
                     ProofJobUpdate::Failed(message) => {
                         state.fail_proof(&message);
-                        state.open_modal("Proof Failed", vec![message.clone()]);
+                        state.open_modal("Proof Failed", vec![message]);
                         clear_receiver = true;
                     }
                 }
@@ -902,7 +1221,7 @@ pub fn run(
                     DashboardAction::TriggerProof => {
                         if receiver.is_none() {
                             state.begin_proof();
-                            receiver = Some(zkf_tui::spawn_local_proof_job_with_backend(
+                            receiver = Some(spawn_local_proof_job_with_backend(
                                 program.clone(),
                                 sample_inputs.clone(),
                                 backend.to_string(),
@@ -919,7 +1238,71 @@ pub fn run(
     terminal.show_cursor()?;
     result
 }
-"#
+
+pub fn spawn_local_proof_job_with_backend(
+    program: Program,
+    inputs: WitnessInputs,
+    backend: String,
+) -> Receiver<ProofJobUpdate> {
+    let (sender, receiver) = mpsc::channel();
+    thread::spawn(move || {
+        match run_local_proof_demo_with_backend(&program, &inputs, &backend) {
+            Ok(result) => {
+                let _ = sender.send(ProofJobUpdate::Finished(result));
+            }
+            Err(error) => {
+                let _ = sender.send(ProofJobUpdate::Failed(error.to_string()));
+            }
+        }
+    });
+    receiver
+}
+
+pub fn run_local_proof_demo_with_backend(
+    program: &Program,
+    inputs: &WitnessInputs,
+    backend: &str,
+) -> Result<ProofDemoResult, Box<dyn std::error::Error>> {
+    let mut reporter = ProofProgressReporter::new(true);
+    let embedded = zkf_lib::compile_and_prove_with_progress_backend(
+        program,
+        inputs,
+        backend,
+        None,
+        None,
+        |event| reporter.observe(event),
+    )?;
+    let verified = zkf_lib::verify(&embedded.compiled, &embedded.artifact)?;
+    if !verified {
+        return Err("verification failed".into());
+    }
+
+    let labels = embedded
+        .compiled
+        .program
+        .signals
+        .iter()
+        .filter(|signal| signal.visibility == Visibility::Public)
+        .map(|signal| signal.name.as_str())
+        .collect::<Vec<_>>();
+    let theme = ZkTheme::default();
+    let credential = zkf_ui::render_credential(&embedded.artifact.public_inputs, &labels, &theme);
+    let proof_summary = format!(
+        "Backend: {} | proof bytes: {} | verification key bytes: {} | public inputs: {}",
+        embedded.compiled.backend,
+        embedded.artifact.proof.len(),
+        embedded.artifact.verification_key.len(),
+        embedded.artifact.public_inputs.len(),
+    );
+
+    Ok(ProofDemoResult {
+        verified,
+        progress_lines: reporter.lines(),
+        proof_summary,
+        credential,
+    })
+}
+"##
 }
 
 fn smoke_test_content(style: AppStyle, backend: &str) -> String {
@@ -1021,6 +1404,8 @@ fn template_proves_and_verifies_with_progress_and_rejects_violation() {{
         AppStyle::Tui => format!(
             r#"#[path = "../src/spec.rs"]
 mod spec;
+#[path = "../src/dashboard.rs"]
+mod dashboard;
 
 #[test]
 fn template_proves_and_verifies_through_tui_worker_and_rejects_violation() {{
@@ -1036,7 +1421,7 @@ fn template_proves_and_verifies_through_tui_worker_and_rejects_violation() {{
                 compliant_path.to_str().expect("manifest path must be utf-8"),
             )
             .expect("compliant inputs should load");
-            let result = zkf_tui::run_local_proof_demo_with_backend(
+            let result = dashboard::run_local_proof_demo_with_backend(
                 &program,
                 &compliant_inputs,
                 backend,
@@ -1050,7 +1435,7 @@ fn template_proves_and_verifies_through_tui_worker_and_rejects_violation() {{
                 violation_path.to_str().expect("manifest path must be utf-8"),
             )
             .expect("violation inputs should load");
-            zkf_tui::run_local_proof_demo_with_backend(&program, &violation_inputs, backend)
+            dashboard::run_local_proof_demo_with_backend(&program, &violation_inputs, backend)
                 .expect_err("violation inputs must fail closed");
         }})
         .expect("spawn scaffold smoke thread");
@@ -1086,7 +1471,7 @@ fn readme_content(
             "- `src/main.rs`: uses `zkf-ui` plus explicit-backend progress proving to render a styled proof banner, audit surface, proof summary, and credential output."
         }
         AppStyle::Tui => {
-            "- `src/dashboard.rs`: wires a ratatui-style dashboard shell through `zkf-tui` and the explicit-backend local proof worker surface."
+            "- `src/dashboard.rs`: provides a self-contained ratatui dashboard shell plus an explicit-backend local proof worker surface."
         }
     };
 
@@ -3135,7 +3520,9 @@ mod tests {
                 }
                 AppStyle::Tui => {
                     assert!(cargo_toml.contains("zkf-ui"));
-                    assert!(cargo_toml.contains("zkf-tui"));
+                    assert!(!cargo_toml.contains("zkf-tui"));
+                    assert!(cargo_toml.contains("ratatui"));
+                    assert!(cargo_toml.contains("crossterm"));
                 }
             }
         }

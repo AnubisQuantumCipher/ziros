@@ -173,16 +173,15 @@ impl CloudFS {
         }
         #[cfg(target_os = "macos")]
         {
-            if self.icloud_native {
-                if let Ok(output) = Command::new("xattr")
+            if self.icloud_native
+                && let Ok(output) = Command::new("xattr")
                     .args(["-p", "com.apple.ubiquity.isDownloaded"])
                     .arg(&path)
                     .output()
-                    && output.status.success()
-                {
-                    let stdout = String::from_utf8_lossy(&output.stdout);
-                    return stdout.trim() == "1";
-                }
+                && output.status.success()
+            {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                return stdout.trim() == "1";
             }
         }
         true
@@ -218,7 +217,7 @@ impl CloudFS {
             file_name
         );
         self.write(&relative, data)?;
-        Ok(self.resolve_persistent(&relative)?)
+        self.resolve_persistent(&relative)
     }
 
     pub fn read_json<T>(&self, relative_path: &str) -> io::Result<Option<T>>
@@ -257,7 +256,9 @@ impl CloudFS {
     }
 
     fn resolve_cache(&self, relative_path: &str) -> io::Result<PathBuf> {
-        Ok(self.cache_root.join(safe_cache_relative_path(relative_path)?))
+        Ok(self
+            .cache_root
+            .join(safe_cache_relative_path(relative_path)?))
     }
 }
 
@@ -514,7 +515,8 @@ mod tests {
     #[test]
     fn reject_parent_directory_traversal() {
         let temp = tempfile::tempdir().expect("tempdir");
-        let cloudfs = CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
+        let cloudfs =
+            CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
         let error = cloudfs.write("../escape", b"x").expect_err("must reject");
         assert_eq!(error.kind(), io::ErrorKind::InvalidInput);
     }

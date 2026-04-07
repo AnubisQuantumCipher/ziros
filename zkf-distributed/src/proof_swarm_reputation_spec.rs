@@ -378,3 +378,59 @@ pub(crate) fn intelligence_root_convergence_under_canonical_ordering_spec(
         canonical_intelligence_leaf_pair(second, first),
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        ProofBytes4, append_only_memory_prefix_preserved_spec,
+        intelligence_root_convergence_under_canonical_ordering_spec,
+        snapshot_chain_head_roundtrip_spec,
+    };
+
+    #[test]
+    fn append_only_memory_prefix_is_preserved() {
+        let prefix = ProofBytes4 {
+            quad0: 1,
+            quad1: 2,
+            quad2: 3,
+            quad3: 4,
+        };
+        let suffix = ProofBytes4 {
+            quad0: 9,
+            quad1: 8,
+            quad2: 7,
+            quad3: 6,
+        };
+        assert!(append_only_memory_prefix_preserved_spec(prefix, suffix));
+    }
+
+    #[test]
+    fn snapshot_roundtrip_accepts_only_matching_heads() {
+        let head = ProofBytes4 {
+            quad0: 7,
+            quad1: 1,
+            quad2: 4,
+            quad3: 9,
+        };
+        assert!(snapshot_chain_head_roundtrip_spec(head, head));
+        assert!(!snapshot_chain_head_roundtrip_spec(
+            head,
+            ProofBytes4 {
+                quad0: 0,
+                quad1: 1,
+                quad2: 4,
+                quad3: 9,
+            }
+        ));
+    }
+
+    #[test]
+    fn canonical_intelligence_order_is_symmetric() {
+        assert!(intelligence_root_convergence_under_canonical_ordering_spec(
+            2, 9
+        ));
+        assert!(intelligence_root_convergence_under_canonical_ordering_spec(
+            9, 2
+        ));
+    }
+}

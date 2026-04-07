@@ -144,7 +144,7 @@ impl KeyManager {
     pub fn keychain_probe(&self) -> io::Result<bool> {
         #[cfg(target_os = "macos")]
         {
-            return keychain_probe();
+            keychain_probe()
         }
 
         #[cfg(not(target_os = "macos"))]
@@ -333,9 +333,9 @@ impl KeyManager {
 
     fn upsert_index_entry(&self, entry: KeyEntry) -> io::Result<()> {
         let mut index = self.read_index()?;
-        index.entries.retain(|candidate| {
-            !(candidate.id == entry.id && candidate.service == entry.service)
-        });
+        index
+            .entries
+            .retain(|candidate| !(candidate.id == entry.id && candidate.service == entry.service));
         index.entries.push(entry);
         index.entries.sort_by(|left, right| {
             left.service
@@ -347,7 +347,8 @@ impl KeyManager {
 
     fn remove_index_entry(&self, id: &str, service: &str) -> io::Result<()> {
         let mut index = self.read_index()?;
-        index.entries
+        index
+            .entries
             .retain(|entry| !(entry.id == id && entry.service == service));
         self.cloudfs.write_json("keys/index.json", &index)
     }
@@ -371,17 +372,18 @@ fn generate_key_material(key_type: KeyType) -> io::Result<Vec<u8>> {
         KeyType::ApiKey | KeyType::CredentialIssuerKey | KeyType::Symmetric => {
             Ok(SymmetricKey(random_array::<32>()?).0.to_vec())
         }
-        KeyType::Groth16ProvingKey | KeyType::X25519Secret | KeyType::Unknown => Err(io::Error::new(
-            io::ErrorKind::Unsupported,
-            "automatic rotation is unsupported for this key type",
-        )),
+        KeyType::Groth16ProvingKey | KeyType::X25519Secret | KeyType::Unknown => {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "automatic rotation is unsupported for this key type",
+            ))
+        }
     }
 }
 
 fn random_array<const N: usize>() -> io::Result<[u8; N]> {
     let mut bytes = [0u8; N];
-    zkf_core::secure_random::secure_random_bytes(&mut bytes)
-        .map_err(io::Error::other)?;
+    zkf_core::secure_random::secure_random_bytes(&mut bytes).map_err(io::Error::other)?;
     Ok(bytes)
 }
 
@@ -424,7 +426,10 @@ fn retrieve_encrypted_file(path: &Path) -> io::Result<Vec<u8>> {
     let key = derive_file_key(&payload.salt)?;
     let cipher = ChaCha20Poly1305::new(Key::from_slice(&key));
     cipher
-        .decrypt(Nonce::from_slice(&payload.nonce), payload.ciphertext.as_ref())
+        .decrypt(
+            Nonce::from_slice(&payload.nonce),
+            payload.ciphertext.as_ref(),
+        )
         .map_err(|err| io::Error::other(err.to_string()))
 }
 
@@ -505,7 +510,10 @@ fn store_keychain_item(service: &str, account: &str, bytes: &[u8]) -> io::Result
         let selector = CFDictionary::from_CFType_pairs(&query[..4]);
         let updates = CFDictionary::from_CFType_pairs(&query[4..]);
         cvt_status(unsafe {
-            SecItemUpdate(selector.as_concrete_TypeRef(), updates.as_concrete_TypeRef())
+            SecItemUpdate(
+                selector.as_concrete_TypeRef(),
+                updates.as_concrete_TypeRef(),
+            )
         })
     } else {
         cvt_status(status)
@@ -514,8 +522,8 @@ fn store_keychain_item(service: &str, account: &str, bytes: &[u8]) -> io::Result
 
 #[cfg(target_os = "macos")]
 fn retrieve_keychain_item(service: &str, account: &str) -> io::Result<Vec<u8>> {
-    use core_foundation::base::TCFType;
     use core_foundation::base::CFTypeRef;
+    use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::data::CFData;
     use core_foundation::dictionary::CFDictionary;
@@ -605,8 +613,8 @@ fn delete_keychain_item(service: &str, account: &str) -> io::Result<()> {
 
 #[cfg(target_os = "macos")]
 fn keychain_probe() -> io::Result<bool> {
-    use core_foundation::base::TCFType;
     use core_foundation::base::CFTypeRef;
+    use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::dictionary::CFDictionary;
     use core_foundation::string::CFString;
@@ -693,12 +701,7 @@ mod tests {
     use super::*;
     use tempfile::tempdir;
 
-    fn store_or_skip(
-        manager: &KeyManager,
-        id: &str,
-        service: &str,
-        bytes: &[u8],
-    ) -> Option<()> {
+    fn store_or_skip(manager: &KeyManager, id: &str, service: &str, bytes: &[u8]) -> Option<()> {
         match manager.store_key(id, service, bytes) {
             Ok(()) => Some(()),
             Err(error)
@@ -714,7 +717,8 @@ mod tests {
     #[test]
     fn list_reads_index_from_cloudfs() {
         let temp = tempdir().expect("tempdir");
-        let cloudfs = CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
+        let cloudfs =
+            CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
         let manager = KeyManager::with_cloudfs(cloudfs.clone());
         if store_or_skip(&manager, "peer-a", "com.ziros.swarm.ed25519", &[7u8; 32]).is_none() {
             return;
@@ -727,7 +731,8 @@ mod tests {
     #[test]
     fn rotate_rewrites_supported_key_material() {
         let temp = tempdir().expect("tempdir");
-        let cloudfs = CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
+        let cloudfs =
+            CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
         let manager = KeyManager::with_cloudfs(cloudfs);
         if store_or_skip(&manager, "peer-a", "com.ziros.swarm.ed25519", &[9u8; 32]).is_none() {
             return;
@@ -745,7 +750,8 @@ mod tests {
     #[test]
     fn revoke_removes_entry() {
         let temp = tempdir().expect("tempdir");
-        let cloudfs = CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
+        let cloudfs =
+            CloudFS::from_roots(temp.path().join("icloud"), temp.path().join("cache"), false);
         let manager = KeyManager::with_cloudfs(cloudfs);
         if store_or_skip(&manager, "peer-a", "com.ziros.swarm.ed25519", &[5u8; 32]).is_none() {
             return;

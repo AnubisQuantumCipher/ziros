@@ -1149,8 +1149,11 @@ fn execute_beta19_bytecode_uses_normalized_parse_fallback() {
 
 #[test]
 fn imports_beta19_private_identity_pipeline_structure() {
-    let artifact_path =
-        private_identity_fixture::ensure_private_identity_artifact(env!("CARGO_MANIFEST_DIR"));
+    let Some(artifact_path) =
+        private_identity_fixture::ensure_private_identity_artifact(env!("CARGO_MANIFEST_DIR"))
+    else {
+        return;
+    };
     let artifact_json = std::fs::read_to_string(&artifact_path)
         .expect("private_identity beta.19 artifact should exist");
     let artifact: serde_json::Value =
