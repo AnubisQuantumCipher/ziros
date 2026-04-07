@@ -1,7 +1,7 @@
 {
   "contract_operator_summary": {
     "evm": {
-      "generated_at": "2026-04-07T10:50:57.198591Z",
+      "generated_at": "2026-04-07T14:50:44.327634Z",
       "primary_domain": "evm",
       "schema": "ziros-evm-operator-readiness-v1",
       "status": "secondary-ready",
@@ -19,7 +19,7 @@
         "optimism-arbitrum-l2",
         "generic-evm"
       ],
-      "version": "0.6.0"
+      "version": "0.7.0"
     },
     "midnight": {
       "advisories": [
@@ -142,7 +142,7 @@
             "status": "not_checkable_from_cli"
           }
         ],
-        "generated_at": "1775559057Z",
+        "generated_at": "1775573444Z",
         "network": "preprod",
         "recommended_fixes": [
           "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
@@ -165,7 +165,7 @@
         "total": 13,
         "warned": 1
       },
-      "generated_at": "2026-04-07T10:50:57.197405Z",
+      "generated_at": "2026-04-07T14:50:44.326912Z",
       "live_submit_blockers": [
         "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
         "wallet: No browser wallet session or headless operator wallet credentials were available.",
@@ -188,10 +188,10 @@
       "schema": "ziros-midnight-operator-readiness-v1",
       "status": "ready",
       "validation_template": "token-transfer",
-      "version": "0.6.0"
+      "version": "0.7.0"
     }
   },
-  "generated_at": "2026-04-07T10:50:57.201148Z",
+  "generated_at": "2026-04-07T14:50:44.330399Z",
   "product_release_ready": true,
   "release_boundary": {
     "allowlist_path": "release/public_release_allowlist.json",
@@ -200,10 +200,10 @@
     "public_repo": "/Users/sicarii/Projects/ziros-attestation",
     "scanner_script": "scripts/check_public_release_boundary.py"
   },
-  "release_tag": "v0.6.0",
-  "release_version": "0.6.0",
+  "release_tag": "v0.7.0",
+  "release_version": "0.7.0",
   "schema": "ziros-product-release-v1",
-  "source_commit": "50eb34764c5b75269dedcec54744547230afd646",
+  "source_commit": "3d07bd462d46a65841b7c20d661b64f7185384d2",
   "theorem_release_grade_ready": false,
   "truth_surfaces": {
     "agent_forensics": "forensics/",
@@ -234,7 +234,7 @@
     },
     "total_entries": 169
   },
-  "version": "0.6.0",
+  "version": "0.7.0",
   "working_tree_dirty": false,
   "workspace_members": {
     "count": 22,
