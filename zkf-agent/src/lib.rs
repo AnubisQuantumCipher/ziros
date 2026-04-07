@@ -538,16 +538,17 @@ pub fn rollback_checkpoint(
 }
 
 pub fn provider_status(session_id: Option<&str>) -> Result<AgentProviderStatusReportV1, String> {
-    let brain = BrainStore::open_default()?;
-    let routes = if let Some(session_id) = session_id {
-        let stored = brain.list_provider_routes(Some(session_id))?;
-        if stored.is_empty() {
-            select_provider_routes(Some(session_id), "ad-hoc", None)
-        } else {
-            stored
+    let routes = match session_id {
+        Some(session_id) => {
+            let brain = BrainStore::open_default()?;
+            let stored = brain.list_provider_routes(Some(session_id))?;
+            if stored.is_empty() {
+                select_provider_routes(Some(session_id), "ad-hoc", None)
+            } else {
+                stored
+            }
         }
-    } else {
-        select_provider_routes(None, "ad-hoc", None)
+        None => select_provider_routes(None, "ad-hoc", None),
     };
     Ok(AgentProviderStatusReportV1 {
         schema: "ziros-agent-providers-v1".to_string(),
@@ -560,25 +561,26 @@ pub fn provider_status(session_id: Option<&str>) -> Result<AgentProviderStatusRe
 pub fn provider_route(
     request: AgentProviderRouteRequestV1,
 ) -> Result<AgentProviderStatusReportV1, String> {
-    let brain = BrainStore::open_default()?;
     let session_id = request.session_id.as_deref();
-    let routes = if let Some(session_id) = session_id {
-        let stored = brain.list_provider_routes(Some(session_id))?;
-        if request.provider_override.is_none() && !stored.is_empty() {
-            stored
-        } else {
-            let routes = select_provider_routes(
-                Some(session_id),
-                "ad-hoc",
-                request.provider_override.as_deref(),
-            );
-            for route in &routes {
-                let _ = brain.store_provider_route(route)?;
+    let routes = match session_id {
+        Some(session_id) => {
+            let brain = BrainStore::open_default()?;
+            let stored = brain.list_provider_routes(Some(session_id))?;
+            if request.provider_override.is_none() && !stored.is_empty() {
+                stored
+            } else {
+                let routes = select_provider_routes(
+                    Some(session_id),
+                    "ad-hoc",
+                    request.provider_override.as_deref(),
+                );
+                for route in &routes {
+                    let _ = brain.store_provider_route(route)?;
+                }
+                routes
             }
-            routes
         }
-    } else {
-        select_provider_routes(None, "ad-hoc", request.provider_override.as_deref())
+        None => select_provider_routes(None, "ad-hoc", request.provider_override.as_deref()),
     };
     Ok(AgentProviderStatusReportV1 {
         schema: "ziros-agent-provider-routes-v1".to_string(),

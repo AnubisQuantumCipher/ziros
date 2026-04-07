@@ -1,0 +1,87 @@
+{
+  "schema": "ziros-agent-setup-contract-v1",
+  "version": "0.6.0",
+  "canonical_command_name": "ziros",
+  "legacy_aliases": [
+    "zkf"
+  ],
+  "platform": {
+    "os": "macos",
+    "arch": "arm64"
+  },
+  "required_binaries": [
+    "cargo",
+    "rustc",
+    "git",
+    "xcrun"
+  ],
+  "optional_binaries": {
+    "midnight": [
+      "node",
+      "npm",
+      "compactc",
+      "compact"
+    ],
+    "evm": [
+      "forge",
+      "anvil",
+      "cast"
+    ],
+    "host_shell": [
+      "swift",
+      "xcodegen"
+    ]
+  },
+  "bootstrap_script": "setup/agent/bootstrap.sh",
+  "env_example": "examples/agent/ziros-agent.env.example",
+  "daemon_binary": "ziros-agentd",
+  "paths": {
+    "socket": "~/.zkf/cache/agent/ziros-agentd.sock",
+    "brain": "~/.zkf/cache/agent/brain.sqlite3",
+    "user_local_bin": "~/.local/bin"
+  },
+  "provider_order": {
+    "planner": [
+      "embedded-zkf-planner"
+    ],
+    "assistant": [
+      "mlx-local",
+      "openai-compatible-local",
+      "ollama-local"
+    ]
+  },
+  "truth_artifacts": [
+    "docs/CANONICAL_TRUTH.md",
+    "release/product-release.json",
+    "release/midnight_operator_readiness.json",
+    "release/evm_operator_readiness.json",
+    "support-matrix.json",
+    ".zkf-completion-status.json"
+  ],
+  "readiness_commands": [
+    "ziros doctor --json",
+    "ziros metal-doctor --json --strict",
+    "ziros agent --json doctor",
+    "ziros agent --json provider status",
+    "ziros midnight doctor --json --network preprod",
+    "ziros evm diagnose --json"
+  ],
+  "first_prompt_profiles": [
+    {
+      "id": "repo-analysis",
+      "goal": "Inspect this ZirOS checkout, summarize the current operator state, and tell me what you can do next."
+    },
+    {
+      "id": "subsystem-scaffold",
+      "goal": "Create a new subsystem named mission-policy-ledger with a Midnight-first contract surface and a public evidence bundle."
+    },
+    {
+      "id": "midnight-private-voting",
+      "goal": "Scaffold a private-voting subsystem, prove it, and prepare the Midnight deployment artifacts."
+    },
+    {
+      "id": "evm-verifier-bundle",
+      "goal": "Export the current subsystem proof as an EVM verifier bundle, initialize a Foundry project, and run the local Anvil test flow."
+    }
+  ]
+}

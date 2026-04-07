@@ -3,6 +3,11 @@
 `ziros` is the preferred public command name. The legacy `zkf` command remains
 supported for compatibility, and internal crate/package names stay `zkf-*` for now.
 
+For the operator-first Apple Silicon onboarding path, start with
+`docs/agent/README.md`.
+If you used `setup/agent/bootstrap.sh`, substitute `ziros` for `zkf`
+throughout this reference.
+
 ## Global Flags
 
 | Flag | Description |
@@ -416,25 +421,9 @@ or countdown guarantee. The Neural Engine security detector is advisory only; de
 is the enforcement boundary.
 
 ```bash
-python3 -m pip install -r scripts/neural_engine_requirements.txt
-python3 scripts/build_fixture_neural_models.py
-python3 scripts/build_fixture_neural_models.py --check
-python3 scripts/install_fixture_neural_models.py --dest target/coreml
 zkf runtime policy --objective smallest-proof --trace /tmp/zkf-wrapper.trace.json --json
 zkf prove --program program.json --inputs inputs.json --backend auto --objective no-trusted-setup --out proof.json
 zkf fold --manifest package.json --inputs inputs.json --steps 8 --objective fastest-prove --json
-```
-
-Production/operator model training uses the same lane names but a larger telemetry corpus:
-
-```bash
-python3 scripts/build_control_plane_corpus.py --out ~/.zkf/models/control_plane_corpus.jsonl
-python3 scripts/train_scheduler_model.py --out ~/.zkf/models/scheduler_v1.mlpackage
-python3 scripts/train_backend_recommender.py --out ~/.zkf/models/backend_recommender_v1.mlpackage
-python3 scripts/train_duration_estimator.py --out ~/.zkf/models/duration_estimator_v1.mlpackage
-python3 scripts/train_anomaly_detector.py --out ~/.zkf/models/anomaly_detector_v1.mlpackage
-python3 scripts/train_security_detector.py --out ~/.zkf/models/security_detector_v1.mlpackage
-zkf runtime policy --trace /tmp/zkf-wrapper.trace.json --json
 ```
 
 Model discovery order:
@@ -450,8 +439,8 @@ and `target/coreml/` must carry a sidecar with the expected schema, input shape,
 a passing `quality_gate`. Explicit `ZKF_*_MODEL` paths may omit the sidecar for local development,
 but a present sidecar marked failed is still rejected.
 
-See docs/NEURAL_ENGINE_OPERATIONS.md
-for training, validation, and rollback.
+See `docs/NEURAL_ENGINE_OPERATIONS.md` and `docs/agent/SETUP_APPLE_SILICON.md`
+for the supported Apple Silicon control-plane posture.
 
 The soak report is the source of truth for strict readiness. `zkf metal-doctor --strict --json`
 is only `production_ready=true` when the runtime is healthy and the current binary has a matching

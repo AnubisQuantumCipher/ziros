@@ -87,7 +87,7 @@ Additional trust semantics guidance lives in
 
 Operational guidance lives in
 `NEURAL_ENGINE_OPERATIONS.md`
-and `DEPLOYMENT.md`.
+and `agent/SETUP_APPLE_SILICON.md`.
 
 ## Historical Documents
 

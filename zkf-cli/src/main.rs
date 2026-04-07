@@ -62,12 +62,10 @@ fn observe_cli_parse_failure(detail: &str) {
     let _ = guard.finish(
         RuntimeSecurityContext {
             caller_class: Some("cli".to_string()),
-            malformed_request_count: 1,
-            rejection_reason: Some(detail.to_string()),
             ..RuntimeSecurityContext::default()
         },
         false,
-        None,
+        Some(2),
         Some(detail.to_string()),
     );
 }

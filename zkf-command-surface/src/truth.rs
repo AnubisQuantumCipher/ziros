@@ -1,8 +1,11 @@
 use crate::types::now_rfc3339;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 use zkf_backends::{
     capabilities_report, metal_runtime_report, runtime_hardware_profile,
     strict_bn254_auto_route_ready_with_runtime, strict_bn254_gpu_stage_coverage,
@@ -35,6 +38,8 @@ pub struct TruthSnapshotV1 {
     pub support_matrix_midnight_compact: Option<SupportMatrixRowV1>,
     #[serde(default)]
     pub truth_surfaces: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
 }
 
 pub fn collect_truth_snapshot() -> Result<TruthSnapshotV1, String> {
@@ -46,12 +51,36 @@ pub fn collect_truth_snapshot() -> Result<TruthSnapshotV1, String> {
     let capabilities =
         serde_json::to_value(capabilities_report()).map_err(|error| error.to_string())?;
     let metal = serde_json::to_value(&metal_report).map_err(|error| error.to_string())?;
-    let storage =
-        serde_json::to_value(zkf_storage::status().map_err(|error| error.to_string())?)
-            .map_err(|error| error.to_string())?;
-    let key_manager = KeyManager::new().map_err(|error| error.to_string())?;
-    let keychain = serde_json::to_value(key_manager.audit().map_err(|error| error.to_string())?)
-        .map_err(|error| error.to_string())?;
+    let mut warnings = Vec::new();
+    let storage = match collect_with_timeout("storage status", || {
+        let status = zkf_storage::status().map_err(|error| error.to_string())?;
+        serde_json::to_value(status).map_err(|error| error.to_string())
+    }) {
+        Ok(status) => status,
+        Err(error) => {
+            warnings.push(format!("storage diagnostics degraded: {error}"));
+            json!({
+                "status": "degraded",
+                "ready": false,
+                "error": error,
+            })
+        }
+    };
+    let keychain = match collect_with_timeout("keychain audit", || {
+        let key_manager = KeyManager::new().map_err(|error| error.to_string())?;
+        let audit = key_manager.audit().map_err(|error| error.to_string())?;
+        serde_json::to_value(audit).map_err(|error| error.to_string())
+    }) {
+        Ok(audit) => audit,
+        Err(error) => {
+            warnings.push(format!("keychain diagnostics degraded: {error}"));
+            json!({
+                "status": "degraded",
+                "healthy": false,
+                "error": error,
+            })
+        }
+    };
     let truth_root = locate_truth_root(std::env::current_dir().ok().as_deref());
     let support_matrix_midnight_compact = truth_root
         .as_ref()
@@ -88,7 +117,35 @@ pub fn collect_truth_snapshot() -> Result<TruthSnapshotV1, String> {
         keychain,
         support_matrix_midnight_compact,
         truth_surfaces,
+        warnings,
     })
+}
+
+fn collect_with_timeout<T, F>(label: &str, operation: F) -> Result<T, String>
+where
+    T: Send + 'static,
+    F: FnOnce() -> Result<T, String> + Send + 'static,
+{
+    let (sender, receiver) = mpsc::channel();
+    let timeout = diagnostic_timeout();
+    thread::spawn(move || {
+        let _ = sender.send(operation());
+    });
+    receiver.recv_timeout(timeout).map_err(|_| {
+        format!(
+            "{label} timed out after {}s",
+            timeout.as_secs()
+        )
+    })?
+}
+
+fn diagnostic_timeout() -> Duration {
+    let seconds = std::env::var("ZIROS_TRUTH_DIAGNOSTIC_TIMEOUT_SECONDS")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or(3);
+    Duration::from_secs(seconds)
 }
 
 fn locate_truth_root(start: Option<&Path>) -> Option<PathBuf> {

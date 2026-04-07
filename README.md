@@ -340,17 +340,28 @@ Several of these surfaces also emit evidence-oriented bundles through `zkf-lib::
 
 ## Operator Entry Paths
 
+### For Autonomous Agent Operators
+
+- Start with [`docs/agent/README.md`](docs/agent/README.md).
+- Use `bash setup/agent/bootstrap.sh` to install the public `ziros` command
+  over the existing `zkf` binary.
+- Run `ziros-agentd` first, then operate through `ziros agent ...` or the thin
+  `ZirOSAgentHost` shell.
+- Inspect persistent local learning through `ziros agent memory ...` instead of
+  assuming the agent is stateless.
+
 ### For Cryptographers
 
 - Start with `support-matrix.json`, `zkf-ir-spec/verification-ledger.json`, `.zkf-completion-status.json`, and [`docs/CANONICAL_TRUTH.md`](docs/CANONICAL_TRUTH.md).
 - Read `zkf-backends`, `zkf-backends-pro`, and `zkf-verify` for backend and verifier surfaces.
-- Read [`docs/VERIFIED_METAL_BOUNDARY.md`](docs/VERIFIED_METAL_BOUNDARY.md) and `zkf-metal/proofs/*` for the GPU lane.
+- Read [`docs/agent/SETUP_APPLE_SILICON.md`](docs/agent/SETUP_APPLE_SILICON.md) and `zkf-metal/proofs/*` for the Apple Silicon GPU lane.
 
 ### For Engineers And Programmers
 
 - Start with `zkf-lib`, `ProgramBuilder`, `AppSpecV1`, and `zkf-cli`.
 - Use `zkf-api`, `zkf-python`, or `zkf-ffi` if you need embedding instead of shell workflows.
 - Use `zkf-examples`, `zkf-conformance`, and `zkf-integration-tests` to see complete end-to-end flows.
+- If you want the daemon-backed operator path, start with [`docs/agent/README.md`](docs/agent/README.md).
 
 ### For Scientists, Physicists, Chemists, And Mathematicians
 
@@ -382,6 +393,7 @@ The repo ships a Neural Engine control-plane story through runtime and documenta
 
 - retraining and telemetry commands in `zkf-cli`
 - model-operations docs in [`docs/NEURAL_ENGINE_OPERATIONS.md`](docs/NEURAL_ENGINE_OPERATIONS.md)
+- Apple-Silicon agent setup docs in [`docs/agent/SETUP_APPLE_SILICON.md`](docs/agent/SETUP_APPLE_SILICON.md)
 - explicit canonical-truth language that model output is advisory, not proof-validity truth
 
 ### Post-Quantum Cryptographic Surfaces
@@ -476,6 +488,17 @@ On non-macOS platforms, the iCloud layer falls back to local file storage at `~/
 
 ## Quick Start
 
+### Agent-First Apple Silicon Setup
+
+If you want the autonomous ZirOS operator, start with the dedicated guide set:
+
+1. [`docs/agent/README.md`](docs/agent/README.md)
+2. [`docs/agent/QUICKSTART.md`](docs/agent/QUICKSTART.md)
+3. `bash setup/agent/bootstrap.sh`
+
+The bootstrap installs the public `ziros` command alias, the legacy `zkf`
+compatibility alias, and `ziros-agentd`.
+
 ### Prebuilt Binary (any Mac, recommended)
 
 ```bash
@@ -568,19 +591,19 @@ cargo run -p zkf-verify -- --help
 
 | Document | Role |
 | --- | --- |
-| [`CONSTITUTION.md`](CONSTITUTION.md) | Binding philosophy and claim discipline |
-| [`PROOF_BOUNDARY.md`](PROOF_BOUNDARY.md) | Proof-boundary baseline |
 | [`docs/CANONICAL_TRUTH.md`](docs/CANONICAL_TRUTH.md) | How to interpret truth, trust lanes, and live support |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Higher-level system architecture |
-| [`docs/BACKENDS.md`](docs/BACKENDS.md) | Backend comparison and operator guidance |
-| [`docs/NONLINEAR_ANCHORING.md`](docs/NONLINEAR_ANCHORING.md) | Fail-closed audit model |
-| [`docs/VERIFIED_METAL_BOUNDARY.md`](docs/VERIFIED_METAL_BOUNDARY.md) | Public description of the attested Metal proof lane |
-| [`docs/WRAPPING_SECURITY.md`](docs/WRAPPING_SECURITY.md) | Wrapping trust model and security posture |
+| [`docs/agent/README.md`](docs/agent/README.md) | Canonical ZirOS autonomous-agent onboarding path |
+| [`docs/agent/QUICKSTART.md`](docs/agent/QUICKSTART.md) | Fastest path from checkout to first prompt |
+| [`docs/agent/SETUP_APPLE_SILICON.md`](docs/agent/SETUP_APPLE_SILICON.md) | Apple Silicon runtime, provider, and control-plane setup |
+| [`docs/agent/MEMORY_AND_LEARNING.md`](docs/agent/MEMORY_AND_LEARNING.md) | Brain persistence and how the agent improves continuity over time |
+| [`docs/agent/MIDNIGHT_OPERATIONS.md`](docs/agent/MIDNIGHT_OPERATIONS.md) | Midnight-first contract operator workflow |
+| [`docs/agent/EVM_OPERATIONS.md`](docs/agent/EVM_OPERATIONS.md) | EVM secondary-lane operator workflow |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Security model and TCB discussion |
-| [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | End-to-end starter flow |
-| [`docs/APP_DEVELOPER_GUIDE.md`](docs/APP_DEVELOPER_GUIDE.md) | App-builder guidance |
-| [`docs/CLI.md`](docs/CLI.md) and [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md) | CLI surfaces and command reference |
+| [`docs/CLI.md`](docs/CLI.md) | CLI surfaces and command reference |
 | [`docs/NEURAL_ENGINE_OPERATIONS.md`](docs/NEURAL_ENGINE_OPERATIONS.md) | Model/telemetry/control-plane operations |
+| [`ZirOSAgentHost/README.md`](ZirOSAgentHost/README.md) | Thin macOS supervisory host over `ziros-agentd` |
+| [`forensics/01_ziros_agent_blueprint_audit.md`](forensics/01_ziros_agent_blueprint_audit.md) | Source-backed audit of the current agent foundation |
+| [`forensics/03_ziros_agent_operator_verdict.md`](forensics/03_ziros_agent_operator_verdict.md) | Current agent verdict and residual boundaries |
 
 ## Workspace And Technology Catalog
 

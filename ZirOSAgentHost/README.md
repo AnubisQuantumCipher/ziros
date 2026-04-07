@@ -2,6 +2,10 @@
 
 Thin macOS supervisory host for `ziros-agentd`.
 
+For the full Apple-Silicon agent setup path, start with
+[`docs/agent/README.md`](../docs/agent/README.md).
+This file covers the host shell only.
+
 ## What it does
 
 - connects directly to the local ZirOS agent Unix socket
@@ -34,7 +38,7 @@ xcodebuild \
 Start the daemon first:
 
 ```bash
-cargo run -p zkf-agent --bin ziros-agentd
+ziros-agentd
 ```
 
 Then launch the host:
