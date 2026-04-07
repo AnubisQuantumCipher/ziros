@@ -1,0 +1,70 @@
+{
+  "evm_export_compatibility": {
+    "arkworks-groth16": true,
+    "midnight-compact": true,
+    "sp1": true
+  },
+  "generated_at": "2026-04-07T10:37:27.699987Z",
+  "primitive_families": [
+    "arithmetic",
+    "boolean",
+    "equality",
+    "comparison",
+    "range-proofs",
+    "poseidon",
+    "merkle-inclusion",
+    "sha-256-ready-lanes",
+    "selective-disclosure",
+    "credential-admission",
+    "state-transition",
+    "provenance"
+  ],
+  "schema": "ziros-guaranteed-circuit-primitive-set-v1",
+  "template_dependency_map": {
+    "cooperative-treasury": [
+      "arithmetic",
+      "range-proofs",
+      "state-transition"
+    ],
+    "credential-verification": [
+      "poseidon",
+      "credential-admission",
+      "selective-disclosure"
+    ],
+    "custom-subsystem-contract": [
+      "arithmetic",
+      "boolean",
+      "equality",
+      "comparison",
+      "range-proofs",
+      "poseidon",
+      "merkle-inclusion",
+      "sha-256-ready-lanes",
+      "selective-disclosure",
+      "credential-admission",
+      "state-transition",
+      "provenance"
+    ],
+    "private-auction": [
+      "poseidon",
+      "range-proofs",
+      "comparison"
+    ],
+    "private-voting": [
+      "poseidon",
+      "merkle-inclusion",
+      "selective-disclosure"
+    ],
+    "supply-chain-provenance": [
+      "poseidon",
+      "provenance",
+      "state-transition"
+    ],
+    "token-transfer": [
+      "arithmetic",
+      "equality",
+      "state-transition"
+    ]
+  },
+  "version": "0.6.0"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "zkf-midnight-package-manifest-v1",
-  "compact": "0.5.1",
+  "compact": "0.2.0",
   "compactc": "0.30.0",
   "compact_runtime": "0.15.0",
   "compact_js": "2.5.0",

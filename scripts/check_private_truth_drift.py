@@ -34,6 +34,18 @@ def compare_payload_subset(actual: dict, expected: dict, prefix: str, issues: li
             )
 
 
+def strip_generated_at(value):
+    if isinstance(value, dict):
+        return {
+            key: strip_generated_at(inner)
+            for key, inner in value.items()
+            if key != "generated_at"
+        }
+    if isinstance(value, list):
+        return [strip_generated_at(item) for item in value]
+    return value
+
+
 def source_commit_is_acceptable(recorded: str) -> bool:
     if not recorded:
         return False
@@ -62,6 +74,12 @@ def main() -> int:
     product_release = truth.load_json(truth.RELEASE_DIR / "product-release.json")
     private_census = truth.load_json(truth.RELEASE_DIR / "private_source_census.json")
     public_export = truth.load_json(truth.PROVENANCE_DIR / "public_attestation_export.json")
+    midnight_taxonomy = truth.load_json(truth.RELEASE_DIR / "midnight_universal_contract_taxonomy.json")
+    evm_taxonomy = truth.load_json(truth.RELEASE_DIR / "evm_secondary_contract_taxonomy.json")
+    primitive_set = truth.load_json(truth.RELEASE_DIR / "guaranteed_circuit_primitive_set.json")
+    midnight_readiness = truth.load_json(truth.RELEASE_DIR / "midnight_operator_readiness.json")
+    evm_readiness = truth.load_json(truth.RELEASE_DIR / "evm_operator_readiness.json")
+    alignment_report = truth.load_json(truth.RELEASE_DIR / "vision_alignment_report.json")
 
     issues: list[str] = []
 
@@ -71,6 +89,8 @@ def main() -> int:
         support,
         ledger_entries,
         completion,
+        midnight_readiness,
+        evm_readiness,
     )
     current_summary = extract_block(truth.README, BEGIN, END)
     if current_summary != expected_summary:
@@ -149,6 +169,58 @@ def main() -> int:
         issues.append(
             "release/provenance/public_attestation_export.json:source_commit is not HEAD and not an ancestor of HEAD"
         )
+
+    expected_midnight_taxonomy = truth.midnight_contract_taxonomy(version)
+    expected_midnight_taxonomy.pop("generated_at", None)
+    compare_payload_subset(
+        midnight_taxonomy,
+        expected_midnight_taxonomy,
+        "release/midnight_universal_contract_taxonomy.json:",
+        issues,
+    )
+    expected_evm_taxonomy = truth.evm_secondary_contract_taxonomy(version)
+    expected_evm_taxonomy.pop("generated_at", None)
+    compare_payload_subset(
+        evm_taxonomy,
+        expected_evm_taxonomy,
+        "release/evm_secondary_contract_taxonomy.json:",
+        issues,
+    )
+    expected_primitive_set = truth.guaranteed_circuit_primitive_set(version)
+    expected_primitive_set.pop("generated_at", None)
+    compare_payload_subset(
+        primitive_set,
+        expected_primitive_set,
+        "release/guaranteed_circuit_primitive_set.json:",
+        issues,
+    )
+    expected_midnight_readiness = strip_generated_at(
+        truth.midnight_operator_readiness(version, support)
+    )
+    compare_payload_subset(
+        strip_generated_at(midnight_readiness),
+        expected_midnight_readiness,
+        "release/midnight_operator_readiness.json:",
+        issues,
+    )
+    expected_evm_readiness = strip_generated_at(truth.evm_operator_readiness(version))
+    compare_payload_subset(
+        strip_generated_at(evm_readiness),
+        expected_evm_readiness,
+        "release/evm_operator_readiness.json:",
+        issues,
+    )
+    expected_alignment = strip_generated_at(
+        truth.vision_alignment_report(
+            version, completion, support, expected_midnight_readiness
+        )
+    )
+    compare_payload_subset(
+        strip_generated_at(alignment_report),
+        expected_alignment,
+        "release/vision_alignment_report.json:",
+        issues,
+    )
 
     if issues:
         for issue in issues:

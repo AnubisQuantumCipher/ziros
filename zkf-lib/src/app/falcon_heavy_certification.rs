@@ -195,10 +195,6 @@ fn one() -> BigInt {
     BigInt::from(1u8)
 }
 
-fn two() -> BigInt {
-    BigInt::from(2u8)
-}
-
 fn fixed_scale(decimals: u32) -> BigInt {
     BigInt::from(10u8).pow(decimals)
 }

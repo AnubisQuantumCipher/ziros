@@ -206,6 +206,20 @@ pub(crate) struct GasEstimateReport {
 }
 
 #[derive(Debug, Serialize)]
+pub(crate) struct DeployReport {
+    pub(crate) backend: String,
+    pub(crate) evm_target: String,
+    pub(crate) artifact_path: String,
+    pub(crate) solidity_path: String,
+    pub(crate) contract_name: String,
+    pub(crate) solidity_bytes: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) algebraic_binding: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) trust_boundary_note: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
 pub(crate) struct CompileResult {
     pub(crate) manifest: String,
     pub(crate) backend: String,

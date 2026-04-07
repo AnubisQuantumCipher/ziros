@@ -16,6 +16,36 @@ pub(crate) fn handle_deploy(
     evm_target: String,
     json: bool,
 ) -> Result<(), String> {
+    let report = export_verifier_to_path(
+        artifact_path,
+        backend,
+        out,
+        contract_name,
+        evm_target,
+    )?;
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!(
+            "deploy: backend={} evm_target={} contract={} -> {}",
+            report.backend, report.evm_target, report.contract_name, report.solidity_path
+        );
+    }
+
+    Ok(())
+}
+
+pub(crate) fn export_verifier_to_path(
+    artifact_path: PathBuf,
+    backend: String,
+    out: PathBuf,
+    contract_name: Option<String>,
+    evm_target: String,
+) -> Result<crate::DeployReport, String> {
     let backend_kind = crate::util::parse_backend(&backend)?;
     let evm_target = parse_evm_target(Some(&evm_target))?;
 
@@ -28,35 +58,19 @@ pub(crate) fn handle_deploy(
 
     write_solidity_output(&out, &source)?;
 
-    if json {
-        let report = DeployReport {
-            backend: backend_kind.as_str().to_string(),
-            evm_target: evm_target.as_str().to_string(),
-            artifact_path: artifact_path.display().to_string(),
-            solidity_path: out.display().to_string(),
-            contract_name: name,
-            solidity_bytes: source.len(),
-            algebraic_binding: artifact.metadata.get("algebraic_binding").cloned(),
-            trust_boundary_note: trust_boundary_note(&artifact),
-        };
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
-        );
-    } else {
-        println!(
-            "deploy: backend={} evm_target={} contract={} -> {}",
-            backend_kind,
-            evm_target.as_str(),
-            name,
-            out.display()
-        );
-    }
-
-    Ok(())
+    Ok(crate::DeployReport {
+        backend: backend_kind.as_str().to_string(),
+        evm_target: evm_target.as_str().to_string(),
+        artifact_path: artifact_path.display().to_string(),
+        solidity_path: out.display().to_string(),
+        contract_name: name,
+        solidity_bytes: source.len(),
+        algebraic_binding: artifact.metadata.get("algebraic_binding").cloned(),
+        trust_boundary_note: trust_boundary_note(&artifact),
+    })
 }
 
-fn render_solidity_verifier(
+pub(crate) fn render_solidity_verifier(
     backend: BackendKind,
     artifact: &ProofArtifact,
     contract_name: &str,
@@ -76,7 +90,7 @@ fn render_solidity_verifier(
     }
 }
 
-fn default_contract_name(backend: BackendKind) -> String {
+pub(crate) fn default_contract_name(backend: BackendKind) -> String {
     match backend {
         BackendKind::Sp1 => "ZkfSp1BoundVerifier".to_string(),
         BackendKind::ArkworksGroth16 => "ZkfGroth16Verifier".to_string(),
@@ -84,7 +98,7 @@ fn default_contract_name(backend: BackendKind) -> String {
     }
 }
 
-fn write_solidity_output(path: &Path, source: &str) -> Result<(), String> {
+pub(crate) fn write_solidity_output(path: &Path, source: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| {
             format!(
@@ -101,21 +115,7 @@ fn write_solidity_output(path: &Path, source: &str) -> Result<(), String> {
     })
 }
 
-#[derive(Debug, serde::Serialize)]
-struct DeployReport {
-    backend: String,
-    evm_target: String,
-    artifact_path: String,
-    solidity_path: String,
-    contract_name: String,
-    solidity_bytes: usize,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    algebraic_binding: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    trust_boundary_note: Option<String>,
-}
-
-fn trust_boundary_note(artifact: &ProofArtifact) -> Option<String> {
+pub(crate) fn trust_boundary_note(artifact: &ProofArtifact) -> Option<String> {
     artifact
         .metadata
         .get("algebraic_binding")

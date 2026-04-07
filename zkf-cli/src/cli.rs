@@ -28,6 +28,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: MidnightCommands,
     },
+    /// Operate the secondary EVM verifier/export/deploy/test lane.
+    Evm {
+        #[command(subcommand)]
+        command: EvmCommands,
+    },
     /// Operate the ZirOS Midnight wallet policy core through stable CLI commands.
     Wallet {
         #[arg(long, default_value = "preprod")]
@@ -612,6 +617,74 @@ pub(crate) enum SubsystemCommands {
         #[arg(long)]
         json: bool,
     },
+    /// Validate a subsystem manifest and its current proof/deployment closure.
+    #[command(name = "validate")]
+    Validate {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Re-prove the primary subsystem circuit and refresh the stored proof artifact.
+    #[command(name = "prove")]
+    Prove {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Re-verify the primary subsystem proof artifact.
+    #[command(name = "verify")]
+    Verify {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Emit the public evidence bundle expected by release consumers.
+    #[command(name = "bundle-public")]
+    BundlePublic {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Prepare a Midnight deployment manifest for the subsystem Compact contract.
+    #[command(name = "deploy-prepare")]
+    DeployPrepare {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Prepare a Midnight call manifest for the subsystem Compact contract.
+    #[command(name = "call-prepare")]
+    CallPrepare {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        call: String,
+        #[arg(long)]
+        inputs: PathBuf,
+        #[arg(long, default_value = "preprod")]
+        network: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Export an EVM compatibility verifier bundle from the primary subsystem proof.
+    #[command(name = "evm-export")]
+    EvmExport {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long, default_value = "ethereum")]
+        evm_target: String,
+        #[arg(long)]
+        contract_name: Option<String>,
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -823,6 +896,164 @@ pub(crate) enum MidnightContractCommands {
         json: bool,
         #[arg(long)]
         events_jsonl: Option<PathBuf>,
+    },
+    /// Validate the live contract workflow without mutating the chain.
+    Test {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Submit the generated Midnight deploy flow for a project.
+    Deploy {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Submit a generated Midnight contract call flow for a project.
+    Call {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Report current explorer visibility for deployment manifest entries.
+    #[command(name = "verify-explorer")]
+    VerifyExplorer {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+    /// Diagnose contract-scoped Midnight readiness and required scripts.
+    Diagnose {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        events_jsonl: Option<PathBuf>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum EvmCommands {
+    /// Export verifier contracts for supported proof artifacts.
+    Verifier {
+        #[command(subcommand)]
+        command: EvmVerifierCommands,
+    },
+    /// Estimate verifier gas on supported EVM targets.
+    #[command(name = "estimate-gas")]
+    EstimateGas {
+        #[arg(long)]
+        backend: String,
+        #[arg(long)]
+        artifact: Option<PathBuf>,
+        #[arg(long)]
+        proof_size: Option<usize>,
+        #[arg(long, default_value = "ethereum")]
+        evm_target: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Scaffold a Foundry project around a verifier bundle.
+    Foundry {
+        #[command(subcommand)]
+        command: EvmFoundryCommands,
+    },
+    /// Deploy a verifier contract through Foundry.
+    Deploy {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        contract: String,
+        #[arg(long)]
+        rpc_url: Option<String>,
+        #[arg(long)]
+        private_key: Option<String>,
+        #[arg(long = "constructor-arg")]
+        constructor_arg: Vec<String>,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Call or send against an EVM contract through cast.
+    Call {
+        #[arg(long, default_value = "http://127.0.0.1:8545")]
+        rpc_url: String,
+        #[arg(long)]
+        to: String,
+        #[arg(long)]
+        signature: String,
+        #[arg(long = "arg")]
+        arg: Vec<String>,
+        #[arg(long)]
+        private_key: Option<String>,
+        #[arg(long)]
+        send: bool,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Run Foundry tests for a verifier bundle.
+    Test {
+        #[arg(long)]
+        project: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Diagnose EVM lane toolchain and project readiness.
+    Diagnose {
+        #[arg(long)]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum EvmVerifierCommands {
+    /// Export a supported Solidity verifier contract from a proof artifact.
+    Export {
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        backend: String,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        contract_name: Option<String>,
+        #[arg(long, default_value = "ethereum")]
+        evm_target: String,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum EvmFoundryCommands {
+    /// Create a Foundry verifier project from Solidity output and optional proof artifacts.
+    Init {
+        #[arg(long)]
+        solidity: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        contract_name: Option<String>,
+        #[arg(long)]
+        artifact: Option<PathBuf>,
+        #[arg(long)]
+        backend: Option<String>,
+        #[arg(long)]
+        json: bool,
     },
 }
 

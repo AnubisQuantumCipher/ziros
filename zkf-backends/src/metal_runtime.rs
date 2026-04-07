@@ -88,6 +88,9 @@ pub struct CapabilityReport {
     pub export_scheme: Option<String>,
 }
 
+const DEFAULT_LOCAL_MIDNIGHT_PROVE_URL: &str = "http://127.0.0.1:6300/prove";
+const DEFAULT_LOCAL_MIDNIGHT_VERIFY_URL: &str = "http://127.0.0.1:6300/verify";
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StrictCertificationMatch {
     pub present: bool,
@@ -1038,13 +1041,17 @@ fn backend_runtime_status(kind: BackendKind) -> Option<(String, String)> {
 }
 
 fn midnight_runtime_status() -> Option<(String, String)> {
-    let prove_url = std::env::var("ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL").ok();
-    let verify_url = std::env::var("ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL").ok();
+    let prove_url = std::env::var("ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL")
+        .ok()
+        .or_else(|| Some(DEFAULT_LOCAL_MIDNIGHT_PROVE_URL.to_string()));
+    let verify_url = std::env::var("ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL")
+        .ok()
+        .or_else(|| Some(DEFAULT_LOCAL_MIDNIGHT_VERIFY_URL.to_string()));
     let allow_delegate = std::env::var("ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE")
         .map(|value| value.eq_ignore_ascii_case("true") || value == "1")
         .unwrap_or(false);
     let action =
-        "configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds".to_string();
+        "start the local ZirOS proof server on http://127.0.0.1:6300 or configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds".to_string();
 
     let Some(prove_url) = prove_url else {
         return Some((

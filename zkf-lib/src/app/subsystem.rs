@@ -5,6 +5,48 @@ pub const SUBSYSTEM_MANIFEST_SCHEMA_V1: &str = "zkf-subsystem-manifest-v1";
 pub const SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED: &str = "author_fixed";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum MidnightContractClassV1 {
+    TokenTransfer,
+    CooperativeTreasury,
+    PrivateVoting,
+    CredentialVerification,
+    PrivateAuction,
+    SupplyChainProvenance,
+    Custom,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum EvmCompatibilityContractClassV1 {
+    VerifierExport,
+    RegistryAdapter,
+    CompatibilityBundle,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct DisclosurePolicyV1 {
+    pub policy_id: String,
+    pub summary: String,
+    pub witness_local_only: bool,
+    pub public_inputs_documented: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub notes: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct DeploymentProfileV1 {
+    pub primary_chain: String,
+    pub primary_network: String,
+    pub supports_live_deploy: bool,
+    pub explorer_expected: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub secondary_targets: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct SubsystemCircuitManifestV1 {
     pub backend: String,
@@ -18,6 +60,50 @@ pub struct SubsystemCircuitManifestV1 {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct SubsystemCircuitModuleV1 {
+    pub module_id: String,
+    pub backend: String,
+    pub program_path: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compiled_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audit_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub guaranteed_primitives: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct SubsystemContractSpecV1 {
+    pub contract_id: String,
+    pub primary_target: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_circuit: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compact_source: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solidity_output: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verifier_contract_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub midnight_class: Option<MidnightContractClassV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evm_class: Option<EvmCompatibilityContractClassV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct SubsystemReleaseContractV1 {
+    pub public_bundle_dir: String,
+    pub evidence_bundle_path: String,
+    pub release_pin_path: String,
+    pub disclosure_policy_path: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct SubsystemManifestEnvelopeV1 {
     pub schema: String,
     pub subsystem_id: String,
@@ -26,6 +112,16 @@ pub struct SubsystemManifestEnvelopeV1 {
     pub backend_policy: String,
     pub publication_target: String,
     pub circuits: BTreeMap<String, SubsystemCircuitManifestV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub circuit_modules: Vec<SubsystemCircuitModuleV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub contracts: Vec<SubsystemContractSpecV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub disclosure_policy: Option<DisclosurePolicyV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deployment_profile: Option<DeploymentProfileV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_contract: Option<SubsystemReleaseContractV1>,
 }
 
 impl SubsystemManifestEnvelopeV1 {
@@ -44,6 +140,11 @@ impl SubsystemManifestEnvelopeV1 {
             backend_policy: SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED.to_string(),
             publication_target: publication_target.into(),
             circuits,
+            circuit_modules: Vec::new(),
+            contracts: Vec::new(),
+            disclosure_policy: None,
+            deployment_profile: None,
+            release_contract: None,
         }
     }
 }

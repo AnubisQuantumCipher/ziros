@@ -462,6 +462,181 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
                 "midnight call-prepare completed",
             )
         }
+        MidnightContractCommands::Test {
+            project,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-test");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract test started",
+            )?;
+            let report = surface_midnight::test_contract(
+                &project,
+                surface_midnight::MidnightNetworkV1::Preprod,
+            )?;
+            let ok = report.ok;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                if ok {
+                    CommandEventKindV1::Completed
+                } else {
+                    CommandEventKindV1::Failed
+                },
+                &action_id,
+                if ok {
+                    "midnight contract test completed"
+                } else {
+                    "midnight contract test failed"
+                },
+            )?;
+            if ok {
+                Ok(())
+            } else {
+                Err(format!("midnight contract test failed: {}", report.stderr))
+            }
+        }
+        MidnightContractCommands::Deploy {
+            project,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-deploy");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract deploy started",
+            )?;
+            let report = surface_midnight::deploy_contract(&project)?;
+            let ok = report.ok;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                if ok {
+                    CommandEventKindV1::Completed
+                } else {
+                    CommandEventKindV1::Failed
+                },
+                &action_id,
+                if ok {
+                    "midnight contract deploy completed"
+                } else {
+                    "midnight contract deploy failed"
+                },
+            )?;
+            if ok {
+                Ok(())
+            } else {
+                Err(format!("midnight contract deploy failed: {}", report.stderr))
+            }
+        }
+        MidnightContractCommands::Call {
+            project,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-call");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract call started",
+            )?;
+            let report = surface_midnight::call_contract(&project)?;
+            let ok = report.ok;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                if ok {
+                    CommandEventKindV1::Completed
+                } else {
+                    CommandEventKindV1::Failed
+                },
+                &action_id,
+                if ok {
+                    "midnight contract call completed"
+                } else {
+                    "midnight contract call failed"
+                },
+            )?;
+            if ok {
+                Ok(())
+            } else {
+                Err(format!("midnight contract call failed: {}", report.stderr))
+            }
+        }
+        MidnightContractCommands::VerifyExplorer {
+            project,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-verify-explorer");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract verify-explorer started",
+            )?;
+            let report = surface_midnight::verify_explorer(&project)?;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Completed,
+                &action_id,
+                "midnight contract verify-explorer completed",
+            )
+        }
+        MidnightContractCommands::Diagnose {
+            project,
+            json,
+            events_jsonl,
+        } => {
+            let action_id = new_operation_id("midnight-contract-diagnose");
+            let mut sink = JsonlEventSink::open(events_jsonl)?;
+            emit_surface_event(
+                &mut sink,
+                CommandEventKindV1::Started,
+                &action_id,
+                "midnight contract diagnose started",
+            )?;
+            let report = surface_midnight::diagnose_contract(
+                &project,
+                surface_midnight::MidnightNetworkV1::Preprod,
+            )?;
+            let ready = report.ready;
+            print_surface_output(json, &report)?;
+            emit_surface_event(
+                &mut sink,
+                if ready {
+                    CommandEventKindV1::Completed
+                } else {
+                    CommandEventKindV1::Failed
+                },
+                &action_id,
+                if ready {
+                    "midnight contract diagnose completed"
+                } else {
+                    "midnight contract diagnose found blockers"
+                },
+            )?;
+            if ready {
+                Ok(())
+            } else {
+                Err(format!(
+                    "midnight contract diagnose blocked: {}",
+                    report.blockers.join("; ")
+                ))
+            }
+        }
     }
 }
 

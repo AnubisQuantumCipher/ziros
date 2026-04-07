@@ -15,11 +15,21 @@ use zkf_core::{
     BackendKind, FieldElement, Program, PublicKeyBundle, SignatureBundle, SignatureScheme,
     WitnessInputs, verify_bundle,
 };
+use zkf_command_surface::midnight::{
+    MidnightNetworkV1, call_prepare as midnight_call_prepare,
+    deploy_prepare as midnight_deploy_prepare,
+};
 use zkf_lib::{
     Expr, ProgramBuilder, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, SubsystemCircuitManifestV1,
     SubsystemManifestEnvelopeV1, audit_program_default, compile_and_prove, verify,
 };
+use zkf_lib::app::subsystem::{
+    DeploymentProfileV1, DisclosurePolicyV1, EvmCompatibilityContractClassV1,
+    MidnightContractClassV1, SubsystemCircuitModuleV1, SubsystemContractSpecV1,
+    SubsystemReleaseContractV1,
+};
 
+use crate::cmd::deploy;
 use crate::util::{read_json, write_json, write_text};
 
 const SUBSYSTEM_SCHEMA_VERSION: &str = "1.0.0";
@@ -138,6 +148,30 @@ struct SubsystemCompletenessReportV1 {
     report_word_count: usize,
     checks: Vec<CompletenessCheckV1>,
     missing_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SubsystemProofLifecycleReportV1 {
+    schema: String,
+    root: String,
+    subsystem_id: String,
+    circuit_id: String,
+    backend: String,
+    compiled_path: String,
+    proof_path: String,
+    verification_path: String,
+    verified: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SubsystemPublicBundleReportV1 {
+    schema: String,
+    generated_at: String,
+    root: String,
+    subsystem_id: String,
+    manifest_path: String,
+    public_bundle_manifest_path: String,
+    release_pin_path: String,
 }
 
 pub(crate) fn scaffold_subsystem(
@@ -453,6 +487,141 @@ pub(crate) fn handle_verify_release_pin(
     }
 }
 
+pub(crate) fn handle_validate(root: PathBuf, json: bool) -> Result<(), String> {
+    handle_verify_completeness(root, json)
+}
+
+pub(crate) fn handle_prove(root: PathBuf, json: bool) -> Result<(), String> {
+    let report = reproving_report(&root)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!(
+            "subsystem prove: {} {} -> {}",
+            report.subsystem_id, report.backend, report.proof_path
+        );
+    }
+    Ok(())
+}
+
+pub(crate) fn handle_verify(root: PathBuf, json: bool) -> Result<(), String> {
+    let report = verification_report(&root)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!(
+            "subsystem verify: {} ({})",
+            if report.verified { "PASS" } else { "FAIL" },
+            report.root
+        );
+    }
+    if report.verified {
+        Ok(())
+    } else {
+        Err("subsystem verification failed".to_string())
+    }
+}
+
+pub(crate) fn handle_bundle_public(root: PathBuf, json: bool) -> Result<(), String> {
+    let report = bundle_public_report(&root)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!(
+            "subsystem public bundle refreshed: {} -> {}",
+            report.subsystem_id, report.public_bundle_manifest_path
+        );
+    }
+    Ok(())
+}
+
+pub(crate) fn handle_deploy_prepare(root: PathBuf, network: String, json: bool) -> Result<(), String> {
+    let network = MidnightNetworkV1::parse(&network)?;
+    let source = root.join("16_compact/Subsystem.compact");
+    let out_path = root.join("16_compact/deploy-prepare.json");
+    let report = midnight_deploy_prepare(network, &source, &out_path, None, None, Some(&root))?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!("subsystem deploy-prepare -> {}", report.out_path);
+    }
+    Ok(())
+}
+
+pub(crate) fn handle_call_prepare(
+    root: PathBuf,
+    call: String,
+    inputs: PathBuf,
+    network: String,
+    json: bool,
+) -> Result<(), String> {
+    let network = MidnightNetworkV1::parse(&network)?;
+    let source = root.join("16_compact/Subsystem.compact");
+    let out_path = root.join("16_compact/call-prepare.json");
+    let report = midnight_call_prepare(
+        network,
+        &source,
+        &call,
+        &inputs,
+        &out_path,
+        None,
+        None,
+        Some(&root),
+    )?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!("subsystem call-prepare -> {}", report.out_path);
+    }
+    Ok(())
+}
+
+pub(crate) fn handle_evm_export(
+    root: PathBuf,
+    evm_target: String,
+    contract_name: Option<String>,
+    json: bool,
+) -> Result<(), String> {
+    let manifest = load_subsystem_manifest(&root)?;
+    let (_, circuit) = primary_circuit_entry(&manifest)?;
+    let artifact_path = root.join(&circuit.proof_path);
+    let out_path = root.join("15_solidity/SubsystemVerifier.sol");
+    let report = deploy::export_verifier_to_path(
+        artifact_path,
+        circuit.backend.clone(),
+        out_path,
+        contract_name,
+        evm_target,
+    )?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        );
+    } else {
+        println!(
+            "subsystem evm export: {} -> {}",
+            manifest.subsystem_id, report.solidity_path
+        );
+    }
+    Ok(())
+}
+
 fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReportV1, String> {
     let mut checks = Vec::new();
     let mut missing_paths = Vec::new();
@@ -663,6 +832,123 @@ fn verify_release_pin_report(
     })
 }
 
+fn load_subsystem_manifest(root: &Path) -> Result<SubsystemManifestEnvelopeV1, String> {
+    read_json(&root.join("02_manifest/subsystem_manifest.json"))
+}
+
+fn primary_circuit_entry(
+    manifest: &SubsystemManifestEnvelopeV1,
+) -> Result<(&str, &SubsystemCircuitManifestV1), String> {
+    manifest
+        .circuits
+        .iter()
+        .next()
+        .map(|(circuit_id, circuit)| (circuit_id.as_str(), circuit))
+        .ok_or_else(|| "subsystem manifest contains no circuits".to_string())
+}
+
+fn reproving_report(root: &Path) -> Result<SubsystemProofLifecycleReportV1, String> {
+    let manifest = load_subsystem_manifest(root)?;
+    let subsystem_id = manifest.subsystem_id.clone();
+    let (circuit_id, circuit) = primary_circuit_entry(&manifest)?;
+    let program: Program = read_json(&root.join(&circuit.program_path))?;
+    let inputs: WitnessInputs = read_json(&root.join(&circuit.inputs_path))?;
+    let embedded =
+        compile_and_prove(&program, &inputs, &circuit.backend, None, None).map_err(|error| error.to_string())?;
+    let verified = verify(&embedded.compiled, &embedded.artifact).map_err(|error| error.to_string())?;
+
+    write_json(&root.join(&circuit.compiled_path), &embedded.compiled)?;
+    write_json(&root.join(&circuit.proof_path), &embedded.artifact)?;
+    write_json(
+        &root.join(&circuit.verification_path),
+        &serde_json::json!({
+            "schema": "zkf-subsystem-verification-v1",
+            "subsystem_id": manifest.subsystem_id.clone(),
+            "circuit_id": circuit_id,
+            "backend": circuit.backend.clone(),
+            "verified": verified,
+        }),
+    )?;
+
+    Ok(SubsystemProofLifecycleReportV1 {
+        schema: "zkf-subsystem-proof-lifecycle-v1".to_string(),
+        root: root.display().to_string(),
+        subsystem_id,
+        circuit_id: circuit_id.to_string(),
+        backend: circuit.backend.clone(),
+        compiled_path: root.join(&circuit.compiled_path).display().to_string(),
+        proof_path: root.join(&circuit.proof_path).display().to_string(),
+        verification_path: root.join(&circuit.verification_path).display().to_string(),
+        verified,
+    })
+}
+
+fn verification_report(root: &Path) -> Result<SubsystemProofLifecycleReportV1, String> {
+    let manifest = load_subsystem_manifest(root)?;
+    let subsystem_id = manifest.subsystem_id.clone();
+    let (circuit_id, circuit) = primary_circuit_entry(&manifest)?;
+    let compiled: zkf_core::CompiledProgram = read_json(&root.join(&circuit.compiled_path))?;
+    let artifact: zkf_core::ProofArtifact = read_json(&root.join(&circuit.proof_path))?;
+    let verified = verify(&compiled, &artifact).map_err(|error| error.to_string())?;
+    write_json(
+        &root.join(&circuit.verification_path),
+        &serde_json::json!({
+            "schema": "zkf-subsystem-verification-v1",
+            "subsystem_id": manifest.subsystem_id.clone(),
+            "circuit_id": circuit_id,
+            "backend": circuit.backend.clone(),
+            "verified": verified,
+        }),
+    )?;
+    Ok(SubsystemProofLifecycleReportV1 {
+        schema: "zkf-subsystem-proof-lifecycle-v1".to_string(),
+        root: root.display().to_string(),
+        subsystem_id,
+        circuit_id: circuit_id.to_string(),
+        backend: circuit.backend.clone(),
+        compiled_path: root.join(&circuit.compiled_path).display().to_string(),
+        proof_path: root.join(&circuit.proof_path).display().to_string(),
+        verification_path: root.join(&circuit.verification_path).display().to_string(),
+        verified,
+    })
+}
+
+fn bundle_public_report(root: &Path) -> Result<SubsystemPublicBundleReportV1, String> {
+    let manifest = load_subsystem_manifest(root)?;
+    let report = SubsystemPublicBundleReportV1 {
+        schema: "zkf-subsystem-public-bundle-v1".to_string(),
+        generated_at: Utc::now().to_rfc3339(),
+        root: root.display().to_string(),
+        subsystem_id: manifest.subsystem_id.clone(),
+        manifest_path: root
+            .join("02_manifest/subsystem_manifest.json")
+            .display()
+            .to_string(),
+        public_bundle_manifest_path: root
+            .join("13_public_bundle/subsystem_bundle.json")
+            .display()
+            .to_string(),
+        release_pin_path: root
+            .join("20_release/zkf-release-pin.json")
+            .display()
+            .to_string(),
+    };
+    write_json(
+        Path::new(&report.public_bundle_manifest_path),
+        &serde_json::json!({
+            "schema": report.schema,
+            "generated_at": report.generated_at,
+            "subsystem_id": report.subsystem_id,
+            "manifest_path": "02_manifest/subsystem_manifest.json",
+            "release_pin_path": "20_release/zkf-release-pin.json",
+            "report_path": "17_report/report.md",
+            "disclosure_policy_path": "06_docs/disclosure_policy.md",
+            "public_readme_path": "13_public_bundle/README.md",
+        }),
+    )?;
+    Ok(report)
+}
+
 fn subsystem_manifest(subsystem_id: &str) -> SubsystemManifestEnvelopeV1 {
     let circuits = BTreeMap::from([(
         SUBSYSTEM_CIRCUIT_ID.to_string(),
@@ -676,13 +962,72 @@ fn subsystem_manifest(subsystem_id: &str) -> SubsystemManifestEnvelopeV1 {
             audit_path: "10_audit/audit.json".to_string(),
         },
     )]);
-    SubsystemManifestEnvelopeV1::author_fixed(
+    let mut manifest = SubsystemManifestEnvelopeV1::author_fixed(
         subsystem_id,
         SUBSYSTEM_SCHEMA_VERSION,
         Utc::now().to_rfc3339(),
         SUBSYSTEM_PUBLICATION_TARGET,
         circuits,
-    )
+    );
+    manifest.circuit_modules = vec![SubsystemCircuitModuleV1 {
+        module_id: SUBSYSTEM_CIRCUIT_ID.to_string(),
+        backend: SUBSYSTEM_BACKEND.to_string(),
+        program_path: "07_compiled/program.json".to_string(),
+        compiled_path: Some("07_compiled/compiled.json".to_string()),
+        proof_path: Some("08_proofs/proof.json".to_string()),
+        audit_path: Some("10_audit/audit.json".to_string()),
+        guaranteed_primitives: vec![
+            "arithmetic".to_string(),
+            "equality".to_string(),
+            "public-output-binding".to_string(),
+        ],
+    }];
+    manifest.contracts = vec![
+        SubsystemContractSpecV1 {
+            contract_id: "subsystem-compact".to_string(),
+            primary_target: "midnight".to_string(),
+            primary_circuit: Some(SUBSYSTEM_CIRCUIT_ID.to_string()),
+            compact_source: Some("16_compact/Subsystem.compact".to_string()),
+            solidity_output: None,
+            verifier_contract_name: None,
+            midnight_class: Some(MidnightContractClassV1::Custom),
+            evm_class: None,
+        },
+        SubsystemContractSpecV1 {
+            contract_id: "subsystem-verifier".to_string(),
+            primary_target: "evm".to_string(),
+            primary_circuit: Some(SUBSYSTEM_CIRCUIT_ID.to_string()),
+            compact_source: None,
+            solidity_output: Some("15_solidity/SubsystemVerifierRegistry.sol".to_string()),
+            verifier_contract_name: Some("SubsystemVerifierRegistry".to_string()),
+            midnight_class: None,
+            evm_class: Some(EvmCompatibilityContractClassV1::VerifierExport),
+        },
+    ];
+    manifest.disclosure_policy = Some(DisclosurePolicyV1 {
+        policy_id: format!("{subsystem_id}-default-disclosure"),
+        summary: "Witness data stays local; only documented public outputs and signed release artifacts leave the bundle.".to_string(),
+        witness_local_only: true,
+        public_inputs_documented: true,
+        notes: vec![
+            "Use the generated disclosure_policy.md as the operator-facing contract.".to_string(),
+            "Do not publish cache-local witnesses or debug traces.".to_string(),
+        ],
+    });
+    manifest.deployment_profile = Some(DeploymentProfileV1 {
+        primary_chain: "midnight".to_string(),
+        primary_network: "preprod".to_string(),
+        supports_live_deploy: false,
+        explorer_expected: true,
+        secondary_targets: vec!["ethereum".to_string(), "generic-evm".to_string()],
+    });
+    manifest.release_contract = Some(SubsystemReleaseContractV1 {
+        public_bundle_dir: "13_public_bundle".to_string(),
+        evidence_bundle_path: "13_public_bundle/subsystem_bundle.json".to_string(),
+        release_pin_path: "20_release/zkf-release-pin.json".to_string(),
+        disclosure_policy_path: "06_docs/disclosure_policy.md".to_string(),
+    });
+    manifest
 }
 
 fn build_identity_mirror_program(subsystem_id: &str) -> Result<Program, String> {

@@ -445,6 +445,7 @@ fn scaffold_project(
     write_text(&root.join("src/midnight/artifacts.ts"), &artifacts_ts())?;
     write_text(&root.join("src/midnight/runtime.ts"), &runtime_ts())?;
     write_text(&root.join("src/deploy/deploy-all.ts"), &deploy_all_ts())?;
+    write_text(&root.join("src/deploy/call-all.ts"), &call_all_ts())?;
     write_text(&root.join("src/deploy/config.ts"), &deploy_config_ts())?;
     write_text(
         &root.join("src/onboarding/e2e-smoke.ts"),
@@ -559,6 +560,10 @@ fn generated_package_json(name: &str, source: &Value) -> Value {
             (
                 "deploy".to_string(),
                 Value::String("tsx src/deploy/deploy-all.ts".to_string()),
+            ),
+            (
+                "call".to_string(),
+                Value::String("tsx src/deploy/call-all.ts".to_string()),
             ),
             (
                 "test:e2e".to_string(),
@@ -1368,6 +1373,125 @@ if (isDirectExecution) {
 }
 "#
         .to_string()
+}
+
+fn call_all_ts() -> String {
+    r#"import { pathToFileURL } from 'node:url';
+
+import { createUnprovenCallTx } from '@midnight-ntwrk/midnight-js-contracts';
+
+import { loadCompiledContract } from '../midnight/artifacts';
+import { CONTRACTS, type ContractKey } from '../midnight/contracts';
+import { getRuntimeConfig, type MidnightNetwork, type MidnightProvingMode } from '../midnight/config';
+import { readDeploymentManifest, upsertDeploymentManifestEntry } from '../midnight/manifest';
+import {
+  type MidnightWalletProvider,
+  buildHeadlessWallet,
+  createDeployProviders,
+  waitForSpendableDust,
+} from '../midnight/providers';
+
+export interface CallAllOptions {
+  network?: string;
+  provingMode?: MidnightProvingMode;
+  manifestPath?: string;
+}
+
+async function callSingleContract(
+  contractKey: ContractKey,
+  options: {
+    walletProvider: MidnightWalletProvider;
+    network?: string;
+    provingMode?: MidnightProvingMode;
+    manifestPath?: string;
+  },
+): Promise<void> {
+  const config = getRuntimeConfig({
+    network: options.network as MidnightNetwork | undefined,
+    provingMode: options.provingMode,
+  });
+  const manifest = await readDeploymentManifest(options.manifestPath);
+  const entry = manifest?.contracts.find((value) => value.name === contractKey);
+  if (!entry?.address) {
+    throw new Error(`Contract ${contractKey} is not deployed. Run "npm run deploy" first.`);
+  }
+
+  const loaded = await loadCompiledContract(contractKey, { config });
+  const providers = createDeployProviders(
+    config,
+    loaded.artifactDir,
+    options.walletProvider,
+    contractKey,
+    config.provingMode,
+  );
+  const callTxData = await createUnprovenCallTx(providers as never, {
+    compiledContract: loaded.compiledContract as never,
+    contractAddress: entry.address as never,
+    circuitId: loaded.contract.circuitId as never,
+    args: [],
+  } as never);
+  const provenTx = await (providers.proofProvider as any).proveTx(callTxData.private.unprovenTx);
+  const balancedTx = await (options.walletProvider as any).balanceTx(provenTx);
+  const txId = await (options.walletProvider as any).submitTx(balancedTx);
+  const txData = await (providers.publicDataProvider as any).watchForTxData(txId as never);
+  const onChainState = await (providers.publicDataProvider as any).queryContractState(entry.address as never);
+  const snapshot = onChainState ? loaded.decodeLedgerState(onChainState) : entry.publicStateSnapshot ?? null;
+
+  await upsertDeploymentManifestEntry(
+    {
+      ...entry,
+      publicStateSnapshot: snapshot,
+      lastCallTxHash: txData.txHash,
+      lastCallAt: new Date().toISOString(),
+    },
+    {
+      network: config.network,
+      networkName: config.network,
+      manifestPath: options.manifestPath,
+    },
+  );
+
+  console.log(`${loaded.contract.displayName}`);
+  console.log(`  Address:      ${entry.address}`);
+  console.log(`  Last call tx: ${txData.txHash}`);
+}
+
+export async function callAll(options: CallAllOptions = {}): Promise<void> {
+  const config = getRuntimeConfig({
+    network: options.network as MidnightNetwork | undefined,
+    provingMode: options.provingMode,
+  });
+  const walletProvider = await buildHeadlessWallet(config);
+
+  try {
+    await waitForSpendableDust(walletProvider);
+    for (const contract of CONTRACTS) {
+      console.log(`--- Calling ${contract.displayName} ---`);
+      await callSingleContract(contract.key, { ...options, walletProvider });
+    }
+  } finally {
+    await walletProvider.stop();
+  }
+}
+
+const isDirectExecution =
+  process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectExecution) {
+  callAll({
+    network: process.env.MIDNIGHT_NETWORK,
+    provingMode:
+      process.env.MIDNIGHT_PROVING_MODE === 'wallet-proving-provider'
+        ? 'wallet-proving-provider'
+        : 'local-zkf-proof-server',
+  }).catch((error: unknown) => {
+    const message = error instanceof Error ? error.stack ?? error.message : String(error);
+    console.error(message);
+    process.exitCode = 1;
+  });
+}
+"#
+    .to_string()
 }
 
 fn deploy_config_ts() -> String {

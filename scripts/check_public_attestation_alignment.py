@@ -25,6 +25,8 @@ def main() -> int:
     export_doc = load_json(args.private_export.resolve())
     latest = load_json(public_root / "attestation" / "latest.json")
     manifest = load_json(public_root / "publication" / "manifest.json")
+    midnight_readiness = load_json(public_root / "midnight" / "readiness.json")
+    evm_readiness = load_json(public_root / "evm" / "readiness.json")
 
     issues: list[str] = []
 
@@ -52,6 +54,31 @@ def main() -> int:
             issues.append(
                 f"headline count mismatch for {key}: private export expects {expected_value!r}, public repo publishes {actual_value!r}"
             )
+
+    readiness = export_doc.get("operator_readiness_summary", {})
+    expected_midnight = readiness.get("midnight", {})
+    if midnight_readiness.get("status") != expected_midnight.get("status"):
+        issues.append(
+            f"midnight readiness status mismatch: private export expects {expected_midnight.get('status')!r}, public repo publishes {midnight_readiness.get('status')!r}"
+        )
+    if midnight_readiness.get("ready_for_local_operator") != expected_midnight.get(
+        "ready_for_local_operator"
+    ):
+        issues.append(
+            "midnight ready_for_local_operator mismatch between private export and public repo"
+        )
+    if midnight_readiness.get("ready_for_live_submit") != expected_midnight.get(
+        "ready_for_live_submit"
+    ):
+        issues.append(
+            "midnight ready_for_live_submit mismatch between private export and public repo"
+        )
+
+    expected_evm = readiness.get("evm", {})
+    if evm_readiness.get("status") != expected_evm.get("status"):
+        issues.append(
+            f"evm readiness status mismatch: private export expects {expected_evm.get('status')!r}, public repo publishes {evm_readiness.get('status')!r}"
+        )
 
     if issues:
         for issue in issues:

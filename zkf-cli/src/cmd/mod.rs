@@ -12,6 +12,7 @@ pub(crate) mod demo;
 pub(crate) mod deploy;
 pub(crate) mod distributed;
 pub(crate) mod equivalence;
+pub(crate) mod evm;
 pub(crate) mod estimate_gas;
 pub(crate) mod explore;
 pub(crate) mod import;
@@ -36,8 +37,9 @@ pub(crate) mod witness;
 use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
-    IrCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
-    SubsystemCommands, TelemetryCommands, WalletCommands,
+    EvmCommands, EvmFoundryCommands, EvmVerifierCommands, IrCommands, MidnightCommands,
+    MidnightContractCommands, MidnightProofServerCommands, SubsystemCommands, TelemetryCommands,
+    WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -62,8 +64,33 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             SubsystemCommands::VerifyReleasePin { pin, binary, json } => {
                 subsystem::handle_verify_release_pin(pin, binary, json)
             }
+            SubsystemCommands::Validate { root, json } => subsystem::handle_validate(root, json),
+            SubsystemCommands::Prove { root, json } => subsystem::handle_prove(root, json),
+            SubsystemCommands::Verify { root, json } => subsystem::handle_verify(root, json),
+            SubsystemCommands::BundlePublic { root, json } => {
+                subsystem::handle_bundle_public(root, json)
+            }
+            SubsystemCommands::DeployPrepare {
+                root,
+                network,
+                json,
+            } => subsystem::handle_deploy_prepare(root, network, json),
+            SubsystemCommands::CallPrepare {
+                root,
+                call,
+                inputs,
+                network,
+                json,
+            } => subsystem::handle_call_prepare(root, call, inputs, network, json),
+            SubsystemCommands::EvmExport {
+                root,
+                evm_target,
+                contract_name,
+                json,
+            } => subsystem::handle_evm_export(root, evm_target, contract_name, json),
         },
         Commands::Midnight { command } => midnight::handle_midnight(command),
+        Commands::Evm { command } => evm::handle_evm(command),
         Commands::Wallet {
             network,
             persistent_root,
@@ -576,6 +603,13 @@ fn command_name(command: &Commands) -> String {
             SubsystemCommands::VerifyReleasePin { .. } => {
                 "subsystem:verify-release-pin".to_string()
             }
+            SubsystemCommands::Validate { .. } => "subsystem:validate".to_string(),
+            SubsystemCommands::Prove { .. } => "subsystem:prove".to_string(),
+            SubsystemCommands::Verify { .. } => "subsystem:verify".to_string(),
+            SubsystemCommands::BundlePublic { .. } => "subsystem:bundle-public".to_string(),
+            SubsystemCommands::DeployPrepare { .. } => "subsystem:deploy-prepare".to_string(),
+            SubsystemCommands::CallPrepare { .. } => "subsystem:call-prepare".to_string(),
+            SubsystemCommands::EvmExport { .. } => "subsystem:evm-export".to_string(),
         },
         Commands::Midnight { command } => match command {
             MidnightCommands::Status { .. } => "midnight:status".to_string(),
@@ -604,7 +638,35 @@ fn command_name(command: &Commands) -> String {
                 MidnightContractCommands::CallPrepare { .. } => {
                     "midnight:contract:call-prepare".to_string()
                 }
+                MidnightContractCommands::Test { .. } => {
+                    "midnight:contract:test".to_string()
+                }
+                MidnightContractCommands::Deploy { .. } => {
+                    "midnight:contract:deploy".to_string()
+                }
+                MidnightContractCommands::Call { .. } => {
+                    "midnight:contract:call".to_string()
+                }
+                MidnightContractCommands::VerifyExplorer { .. } => {
+                    "midnight:contract:verify-explorer".to_string()
+                }
+                MidnightContractCommands::Diagnose { .. } => {
+                    "midnight:contract:diagnose".to_string()
+                }
             },
+        },
+        Commands::Evm { command } => match command {
+            EvmCommands::Verifier { command } => match command {
+                EvmVerifierCommands::Export { .. } => "evm:verifier:export".to_string(),
+            },
+            EvmCommands::EstimateGas { .. } => "evm:estimate-gas".to_string(),
+            EvmCommands::Foundry { command } => match command {
+                EvmFoundryCommands::Init { .. } => "evm:foundry:init".to_string(),
+            },
+            EvmCommands::Deploy { .. } => "evm:deploy".to_string(),
+            EvmCommands::Call { .. } => "evm:call".to_string(),
+            EvmCommands::Test { .. } => "evm:test".to_string(),
+            EvmCommands::Diagnose { .. } => "evm:diagnose".to_string(),
         },
         Commands::Wallet { command, .. } => match command {
             WalletCommands::Snapshot => "wallet:snapshot".to_string(),

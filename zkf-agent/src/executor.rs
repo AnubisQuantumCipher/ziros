@@ -10,6 +10,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use zkf_command_surface::app::scaffold as scaffold_app;
 use zkf_command_surface::cluster::status as cluster_status;
+use zkf_command_surface::evm::diagnose as evm_diagnose;
 use zkf_command_surface::midnight::{
     MidnightNetworkV1, compile_contract, deploy_prepare, status as midnight_status,
 };
@@ -17,7 +18,10 @@ use zkf_command_surface::release::evidence_bundle;
 use zkf_command_surface::runtime::benchmark as runtime_benchmark;
 use zkf_command_surface::shell::{read_json_file, run_zkf_cli, workspace_root};
 use zkf_command_surface::subsystem::{
-    scaffold as scaffold_subsystem_bundle, verify_completeness as verify_subsystem_completeness,
+    bundle_public as bundle_subsystem_public, evm_export as export_subsystem_evm,
+    prove as prove_subsystem_bundle, scaffold as scaffold_subsystem_bundle,
+    validate as validate_subsystem_bundle, verify as verify_subsystem_bundle,
+    verify_completeness as verify_subsystem_completeness,
     verify_release_pin as verify_subsystem_release_pin,
 };
 use zkf_command_surface::swarm::status as swarm_status;
@@ -315,6 +319,11 @@ fn execute_node_action(
         "wallet.snapshot" => execute_wallet_snapshot(options)?,
         "wallet.submission-grant.issue" => execute_wallet_submission_grant(brain, session)?,
         "subsystem.scaffold" => execute_subsystem_scaffold(session, workgraph)?,
+        "subsystem.prove" => execute_subsystem_prove(session)?,
+        "subsystem.verify" => execute_subsystem_verify(session)?,
+        "subsystem.bundle-public" => execute_subsystem_bundle_public(session)?,
+        "subsystem.validate" => execute_subsystem_validate(session)?,
+        "subsystem.evm-export" => execute_subsystem_evm_export(session)?,
         "subsystem.verify-completeness" => execute_subsystem_verify_completeness(session)?,
         "subsystem.verify-release-pin" => execute_subsystem_verify_release_pin(session)?,
         "midnight.status" => serde_json::to_value(midnight_status(
@@ -333,6 +342,11 @@ fn execute_node_action(
         "app.scaffold" => execute_app_scaffold(session, workgraph)?,
         "proof.compile-prove-verify" => execute_proof_workflow(brain, session)?,
         "release.evidence-bundle" => execute_evidence_bundle(brain, session)?,
+        "evm.diagnose" => serde_json::to_value(evm_diagnose(
+            session.project_root.as_deref().map(Path::new),
+            workspace_root(),
+        )?)
+        .map_err(|error| error.to_string())?,
         "swarm.status" => serde_json::to_value(swarm_status()?).map_err(|error| error.to_string())?,
         "cluster.status" => serde_json::to_value(cluster_status()?).map_err(|error| error.to_string())?,
         "agent.plan" => json!({
@@ -447,6 +461,31 @@ fn execute_subsystem_scaffold(
 fn execute_subsystem_verify_completeness(session: &AgentSessionViewV1) -> Result<Value, String> {
     let project_root = required_project_root(session)?;
     verify_subsystem_completeness(&project_root, workspace_root())
+}
+
+fn execute_subsystem_validate(session: &AgentSessionViewV1) -> Result<Value, String> {
+    let project_root = required_project_root(session)?;
+    validate_subsystem_bundle(&project_root, workspace_root())
+}
+
+fn execute_subsystem_prove(session: &AgentSessionViewV1) -> Result<Value, String> {
+    let project_root = required_project_root(session)?;
+    prove_subsystem_bundle(&project_root, workspace_root())
+}
+
+fn execute_subsystem_verify(session: &AgentSessionViewV1) -> Result<Value, String> {
+    let project_root = required_project_root(session)?;
+    verify_subsystem_bundle(&project_root, workspace_root())
+}
+
+fn execute_subsystem_bundle_public(session: &AgentSessionViewV1) -> Result<Value, String> {
+    let project_root = required_project_root(session)?;
+    bundle_subsystem_public(&project_root, workspace_root())
+}
+
+fn execute_subsystem_evm_export(session: &AgentSessionViewV1) -> Result<Value, String> {
+    let project_root = required_project_root(session)?;
+    export_subsystem_evm(&project_root, "ethereum", None, workspace_root())
 }
 
 fn execute_subsystem_verify_release_pin(session: &AgentSessionViewV1) -> Result<Value, String> {

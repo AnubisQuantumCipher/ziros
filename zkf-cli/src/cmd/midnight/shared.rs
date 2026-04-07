@@ -15,7 +15,7 @@ use zkf_frontends::{FrontendImportOptions, FrontendKind, frontend_for};
 
 use crate::util::{read_json, sha256_hex};
 
-pub(crate) const REQUIRED_COMPACT_MANAGER_VERSION: &str = "0.5.1";
+pub(crate) const REQUIRED_COMPACT_MANAGER_VERSION: &str = "0.2.0";
 pub(crate) const REQUIRED_COMPACTC_VERSION: &str = "0.30.0";
 pub(crate) const REQUIRED_COMPACT_RUNTIME_VERSION: &str = "0.15.0";
 pub(crate) const REQUIRED_COMPACT_JS_VERSION: &str = "2.5.0";
@@ -666,7 +666,7 @@ pub(crate) fn compactc_version(path: &Path) -> Result<String, String> {
 }
 
 pub(crate) fn compact_manager_version(path: &Path) -> Result<String, String> {
-    binary_version(path, ["compile", "--version"])
+    binary_version(path, ["--version"])
 }
 
 pub(crate) fn binary_version<I, S>(binary: &Path, args: I) -> Result<String, String>

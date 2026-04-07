@@ -708,10 +708,8 @@ pub fn build_edl_trajectory_program_with_steps(
         )));
     }
     let scale = edl_goldilocks_scale();
-    let amount_bits = bits_for_bound(&edl_goldilocks_amount_bound());
     let alt_bits = bits_for_bound(&edl_altitude_bound());
     let vel_bits = bits_for_bound(&edl_velocity_bound());
-    let gamma_bits = bits_for_bound(&edl_gamma_bound());
     let mass_bits = bits_for_bound(&edl_mass_bound());
     let area_bits = bits_for_bound(&edl_area_bound());
     let coeff_bits = bits_for_bound(&edl_coeff_bound());
@@ -720,17 +718,7 @@ pub fn build_edl_trajectory_program_with_steps(
     let q_bits = bits_for_bound(&edl_q_max_bound());
     let heat_bits = bits_for_bound(&edl_heating_bound());
     let grav_bits = bits_for_bound(&edl_gravity_bound());
-    let bank_bits = bits_for_bound(&edl_bank_cos_bound());
     let v_sq_bits = bits_for_bound(&edl_v_sq_bound());
-    let rho_v_sq_bits = bits_for_bound(&edl_rho_v_sq_bound());
-    let dyn_q_bits = bits_for_bound(&edl_dynamic_pressure_bound());
-    let drag_force_bits = bits_for_bound(&edl_drag_force_bound());
-    let lift_cos_bits = bits_for_bound(&edl_lift_cos_bound());
-    let lift_force_bits = bits_for_bound(&edl_lift_force_bound());
-    let accel_bits = bits_for_bound(&edl_acceleration_bound());
-    let vdelta_bits = bits_for_bound(&edl_velocity_delta_bound());
-    let hdelta_bits = bits_for_bound(&edl_altitude_delta_bound());
-    let gdelta_bits = bits_for_bound(&edl_gamma_delta_bound());
 
     let mut builder = ProgramBuilder::new(
         format!("edl_monte_carlo_trajectory_{steps}"),
@@ -840,7 +828,6 @@ pub fn build_edl_trajectory_program_with_steps(
         builder.constrain_range(&v_sq_name, v_sq_bits)?;
 
         // rho * V^2
-        let rho_v_sq_name = format!("edl_step_{i}_rho_v_sq");
         let rho_v_sq_q = format!("edl_step_{i}_rho_v_sq_q");
         let rho_v_sq_r = format!("edl_step_{i}_rho_v_sq_r");
         let rho_v_sq_s = format!("edl_step_{i}_rho_v_sq_s");
@@ -1308,7 +1295,7 @@ pub fn edl_trajectory_witness_from_request_with_steps(
     let mut v = v0;
     let mut gamma = gamma0;
     let mut peak_q = zero();
-    let mut peak_qdot = zero();
+    let peak_qdot = zero();
     let mut previous_digest = zero();
 
     for i in 0..steps {
@@ -1698,7 +1685,6 @@ pub fn build_edl_risk_summary_program(request: &EdlRiskSummaryRequestV1) -> ZkfR
     }
 
     let scale = edl_bn254_scale();
-    let amount_bits = bits_for_bound(&edl_bn254_amount_bound());
     let ratio_bits = bits_for_bound(&edl_bn254_scale());
     let vel_bits = bits_for_bound(&edl_bn254_velocity_bound());
     let alt_bits = bits_for_bound(&edl_bn254_altitude_bound());

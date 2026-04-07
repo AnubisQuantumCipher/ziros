@@ -9,7 +9,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-pub const REQUIRED_COMPACT_MANAGER_VERSION: &str = "0.5.1";
+pub const REQUIRED_COMPACT_MANAGER_VERSION: &str = "0.2.0";
 pub const REQUIRED_COMPACTC_VERSION: &str = "0.30.0";
 pub const DEFAULT_PROOF_SERVER_URL: &str = "http://127.0.0.1:6300";
 pub const DEFAULT_GATEWAY_URL: &str = "http://127.0.0.1:6311";
@@ -114,6 +114,70 @@ pub struct MidnightContractPrepareReportV1 {
     pub inputs_path: Option<String>,
     pub proof_server_url: String,
     pub gateway_url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExplorerVerificationStatusV1 {
+    pub contract_name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tx_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub explorer_url: Option<String>,
+    pub visible: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MidnightContractTestReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub project_root: String,
+    pub status: MidnightStatusReportV1,
+    pub ok: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MidnightContractDeployReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub project_root: String,
+    pub manifest_path: String,
+    pub ok: bool,
+    pub stdout: String,
+    pub stderr: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub explorer_statuses: Vec<ExplorerVerificationStatusV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MidnightContractCallReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub project_root: String,
+    pub manifest_path: String,
+    pub ok: bool,
+    pub stdout: String,
+    pub stderr: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub explorer_statuses: Vec<ExplorerVerificationStatusV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MidnightContractDiagnoseReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub project_root: String,
+    pub status: MidnightStatusReportV1,
+    pub ready: bool,
+    pub has_deploy_script: bool,
+    pub has_call_script: bool,
+    pub has_test_script: bool,
+    pub manifest_path: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub blockers: Vec<String>,
 }
 
 pub fn status(
@@ -336,6 +400,99 @@ pub fn call_prepare(
     Ok(report)
 }
 
+pub fn test_contract(project_root: &Path, network: MidnightNetworkV1) -> Result<MidnightContractTestReportV1, String> {
+    let status = status(network, Some(project_root), None, None)?;
+    let output = run_package_script(project_root, "test:e2e")?;
+    Ok(MidnightContractTestReportV1 {
+        schema: "zkf-midnight-contract-test-v1".to_string(),
+        generated_at: now_rfc3339(),
+        project_root: project_root.display().to_string(),
+        status,
+        ok: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
+    })
+}
+
+pub fn deploy_contract(project_root: &Path) -> Result<MidnightContractDeployReportV1, String> {
+    let output = run_package_script(project_root, "deploy")?;
+    let manifest_path = deployment_manifest_path(project_root);
+    Ok(MidnightContractDeployReportV1 {
+        schema: "zkf-midnight-contract-deploy-v1".to_string(),
+        generated_at: now_rfc3339(),
+        project_root: project_root.display().to_string(),
+        manifest_path: manifest_path.display().to_string(),
+        ok: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
+        explorer_statuses: explorer_statuses(project_root)?,
+    })
+}
+
+pub fn call_contract(project_root: &Path) -> Result<MidnightContractCallReportV1, String> {
+    let output = run_package_script(project_root, "call")?;
+    let manifest_path = deployment_manifest_path(project_root);
+    Ok(MidnightContractCallReportV1 {
+        schema: "zkf-midnight-contract-call-v1".to_string(),
+        generated_at: now_rfc3339(),
+        project_root: project_root.display().to_string(),
+        manifest_path: manifest_path.display().to_string(),
+        ok: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
+        explorer_statuses: explorer_statuses(project_root)?,
+    })
+}
+
+pub fn verify_explorer(project_root: &Path) -> Result<Vec<ExplorerVerificationStatusV1>, String> {
+    explorer_statuses(project_root)
+}
+
+pub fn diagnose_contract(
+    project_root: &Path,
+    network: MidnightNetworkV1,
+) -> Result<MidnightContractDiagnoseReportV1, String> {
+    let status = status(network, Some(project_root), None, None)?;
+    let package_json = read_json(&project_root.join("package.json"))?;
+    let scripts = package_json
+        .get("scripts")
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    let has_deploy_script = scripts.contains_key("deploy");
+    let has_call_script = scripts.contains_key("call");
+    let has_test_script = scripts.contains_key("test:e2e");
+    let mut blockers = status.blocked_reasons.clone();
+    if !has_deploy_script {
+        blockers.push("package.json is missing a deploy script".to_string());
+    }
+    if !has_call_script {
+        blockers.push("package.json is missing a call script".to_string());
+    }
+    if !has_test_script {
+        blockers.push("package.json is missing a test:e2e script".to_string());
+    }
+    let manifest_path = deployment_manifest_path(project_root);
+    if !manifest_path.exists() {
+        blockers.push(format!(
+            "deployment manifest is missing at {}",
+            manifest_path.display()
+        ));
+    }
+    Ok(MidnightContractDiagnoseReportV1 {
+        schema: "zkf-midnight-contract-diagnose-v1".to_string(),
+        generated_at: now_rfc3339(),
+        project_root: project_root.display().to_string(),
+        status,
+        ready: blockers.is_empty(),
+        has_deploy_script,
+        has_call_script,
+        has_test_script,
+        manifest_path: manifest_path.display().to_string(),
+        blockers,
+    })
+}
+
 pub fn locate_midnight_project_root(provided: Option<&Path>) -> Option<PathBuf> {
     if let Some(path) = provided {
         let normalized = if path.is_file() {
@@ -359,6 +516,55 @@ fn find_ancestor_with_file(start: &Path, file_name: &str) -> Option<PathBuf> {
         current = path.parent();
     }
     None
+}
+
+fn deployment_manifest_path(project_root: &Path) -> PathBuf {
+    project_root.join("data").join("deployment-manifest.json")
+}
+
+fn explorer_statuses(project_root: &Path) -> Result<Vec<ExplorerVerificationStatusV1>, String> {
+    let manifest_path = deployment_manifest_path(project_root);
+    if !manifest_path.exists() {
+        return Ok(Vec::new());
+    }
+    let manifest = read_json(&manifest_path)?;
+    let Some(contracts) = manifest.get("contracts").and_then(Value::as_array) else {
+        return Ok(Vec::new());
+    };
+    Ok(contracts
+        .iter()
+        .map(|entry| ExplorerVerificationStatusV1 {
+            contract_name: entry
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or("unknown-contract")
+                .to_string(),
+            address: entry.get("address").and_then(Value::as_str).map(str::to_string),
+            tx_hash: entry
+                .get("txHash")
+                .or_else(|| entry.get("lastCallTxHash"))
+                .and_then(Value::as_str)
+                .map(str::to_string),
+            explorer_url: entry.get("explorerUrl").and_then(Value::as_str).map(str::to_string),
+            visible: entry
+                .get("explorerUrl")
+                .and_then(Value::as_str)
+                .is_some_and(|value| !value.trim().is_empty()),
+        })
+        .collect())
+}
+
+fn run_package_script(project_root: &Path, script: &str) -> Result<std::process::Output, String> {
+    let package_json = project_root.join("package.json");
+    if !package_json.exists() {
+        return Err(format!("missing package.json under {}", project_root.display()));
+    }
+    Command::new("npm")
+        .arg("run")
+        .arg(script)
+        .current_dir(project_root)
+        .output()
+        .map_err(|error| format!("failed to run npm run {script}: {error}"))
 }
 
 fn compare_project_package_pins(project_root: &Path) -> Result<Value, String> {
@@ -463,7 +669,7 @@ fn binary_status(
 
 fn version_args(binary: &str) -> [&str; 2] {
     match binary {
-        "compact" => ["compile", "--version"],
+        "compact" => ["--version", ""],
         _ => ["--version", ""],
     }
 }

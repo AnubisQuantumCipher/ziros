@@ -1,0 +1,38 @@
+{
+  "claims": [
+    {
+      "backing_artifact": "release/midnight_operator_readiness.json",
+      "claim": "midnight-first universal contract operator",
+      "status": "backed"
+    },
+    {
+      "backing_artifact": "release/evm_operator_readiness.json",
+      "claim": "evm secondary deploy-capable lane",
+      "status": "backed"
+    },
+    {
+      "backing_artifact": "release/guaranteed_circuit_primitive_set.json",
+      "claim": "subsystem-first contract authoring",
+      "status": "backed"
+    }
+  ],
+  "generated_at": "2026-04-07T10:37:32.342846Z",
+  "midnight_release_ready": true,
+  "midnight_support_row": {
+    "assurance_lane": "delegated-or-external-lane",
+    "fields": [
+      "pasta-fp",
+      "pasta-fq"
+    ],
+    "gpu_coverage": "0/0 GPU stages active on current host",
+    "id": "midnight-compact",
+    "mode": "native",
+    "notes": "Midnight-first operator lane derived from typed readiness and doctor evidence. ready_for_live_submit=false blockers=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}; wallet: No browser wallet session or headless operator wallet credentials were available.; dust: DUST balance is not checkable from a bare CLI process. advisories=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+    "proof_semantics": "external-or-delegated",
+    "status": "ready"
+  },
+  "product_release_ready": true,
+  "release_grade_ready": false,
+  "schema": "ziros-vision-alignment-report-v1",
+  "version": "0.6.0"
+}

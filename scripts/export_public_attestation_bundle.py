@@ -63,6 +63,8 @@ def main() -> int:
     census = load_json(RELEASE_DIR / "private_source_census.json")
     completion = load_json(ROOT / ".zkf-completion-status.json")
     support = load_json(ROOT / "support-matrix.json")
+    midnight_readiness = load_json(RELEASE_DIR / "midnight_operator_readiness.json")
+    evm_readiness = load_json(RELEASE_DIR / "evm_operator_readiness.json")
     export_doc = {
         "schema": "ziros-public-attestation-export-bundle-v1",
         "generated_at": now_rfc3339(),
@@ -83,6 +85,21 @@ def main() -> int:
             "backend_count": len(support["backends"]),
             "frontend_count": len(support["frontends"]),
             "gadget_count": len(support["gadgets"]),
+        },
+        "operator_readiness_summary": {
+            "product_release_ready": product_release["product_release_ready"],
+            "theorem_release_grade_ready": product_release["theorem_release_grade_ready"],
+            "midnight": {
+                "status": midnight_readiness["status"],
+                "ready_for_local_operator": midnight_readiness["ready_for_local_operator"],
+                "ready_for_live_submit": midnight_readiness["ready_for_live_submit"],
+                "contract_universe_count": midnight_readiness["contract_universe_count"],
+            },
+            "evm": {
+                "status": evm_readiness["status"],
+                "supported_target_count": len(evm_readiness["supported_targets"]),
+                "supported_surface_count": len(evm_readiness["supported_surfaces"]),
+            },
         },
         "private_release_inputs": {
             "product_release": product_release,

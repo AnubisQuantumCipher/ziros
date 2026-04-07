@@ -12,7 +12,7 @@
 //! 5. Test Campaign Compliance (Goldilocks/Plonky3)
 //! 6. Flight-Readiness Assembly (Goldilocks/Plonky3, integration circuit)
 
-use num_bigint::{BigInt, Sign};
+use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zkf_backends::blackbox_gadgets::poseidon2_permutation_native;
@@ -142,10 +142,6 @@ fn one() -> BigInt {
     BigInt::from(1u8)
 }
 
-fn two() -> BigInt {
-    BigInt::from(2u8)
-}
-
 fn fixed_scale(decimals: u32) -> BigInt {
     BigInt::from(10u8).pow(decimals)
 }
@@ -154,24 +150,8 @@ fn aq_goldilocks_scale() -> BigInt {
     fixed_scale(AEROSPACE_QUALIFICATION_GOLDILOCKS_SCALE_DECIMALS)
 }
 
-fn aq_bn254_scale() -> BigInt {
-    fixed_scale(AEROSPACE_QUALIFICATION_BN254_SCALE_DECIMALS)
-}
-
 fn aq_goldilocks_amount_bound() -> BigInt {
     BigInt::from(1_000_000_000u64)
-}
-
-fn aq_bn254_amount_bound() -> BigInt {
-    fixed_scale(AEROSPACE_QUALIFICATION_BN254_SCALE_DECIMALS) * BigInt::from(1_000_000u64)
-}
-
-fn abs_bigint(value: &BigInt) -> BigInt {
-    if value.sign() == Sign::Minus {
-        -value.clone()
-    } else {
-        value.clone()
-    }
 }
 
 fn bits_for_bound(bound: &BigInt) -> u32 {
@@ -264,10 +244,6 @@ fn nonnegative_bound_anchor_name(prefix: &str) -> String {
     format!("{prefix}_nonnegative_bound_anchor")
 }
 
-fn exact_division_slack_anchor_name(prefix: &str) -> String {
-    format!("{prefix}_exact_division_slack_anchor")
-}
-
 fn write_value(
     values: &mut BTreeMap<String, FieldElement>,
     name: impl Into<String>,
@@ -319,26 +295,6 @@ fn write_nonnegative_bound_support(
         field_ref(&(&slack * &slack)),
     );
     Ok(())
-}
-
-fn write_exact_division_support(
-    values: &mut BTreeMap<String, FieldElement>,
-    quotient_name: &str,
-    quotient: &BigInt,
-    remainder_name: &str,
-    remainder: &BigInt,
-    slack_name: &str,
-    slack: &BigInt,
-    prefix: &str,
-) {
-    write_value(values, quotient_name, quotient.clone());
-    write_value(values, remainder_name, remainder.clone());
-    write_value(values, slack_name, slack.clone());
-    write_value(
-        values,
-        exact_division_slack_anchor_name(prefix),
-        slack * slack,
-    );
 }
 
 fn write_hash_lanes(
@@ -482,12 +438,6 @@ fn parse_goldilocks_amount(value: &str, label: &str) -> ZkfResult<BigInt> {
     Ok(parsed)
 }
 
-fn parse_bn254_amount(value: &str, label: &str) -> ZkfResult<BigInt> {
-    let parsed = decimal_scaled(value, AEROSPACE_QUALIFICATION_BN254_SCALE_DECIMALS);
-    ensure_nonnegative_le(label, &parsed, &aq_bn254_amount_bound())?;
-    Ok(parsed)
-}
-
 fn parse_nonnegative_integer(value: &str, label: &str) -> ZkfResult<BigInt> {
     let parsed = BigInt::parse_bytes(value.as_bytes(), 10)
         .ok_or_else(|| ZkfError::InvalidArtifact(format!("{label} must be a base-10 integer")))?;
@@ -497,10 +447,6 @@ fn parse_nonnegative_integer(value: &str, label: &str) -> ZkfResult<BigInt> {
         )));
     }
     Ok(parsed)
-}
-
-fn sum_bigints(values: &[BigInt]) -> BigInt {
-    values.iter().fold(zero(), |acc, value| acc + value)
 }
 
 fn sum_exprs(names: &[String]) -> Expr {

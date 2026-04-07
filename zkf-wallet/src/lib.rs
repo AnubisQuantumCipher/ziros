@@ -2143,6 +2143,7 @@ fn random_token() -> String {
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 fn create_biometric_gate_item(network: WalletNetwork) -> Result<(), WalletError> {
+    use crate::apple_security_bridge as security_bridge;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::data::CFData;
@@ -2151,11 +2152,6 @@ fn create_biometric_gate_item(network: WalletNetwork) -> Result<(), WalletError>
     use security_framework::access_control::{ProtectionMode, SecAccessControl};
     use security_framework_sys::access_control::kSecAccessControlBiometryCurrentSet;
     use security_framework_sys::base::errSecDuplicateItem;
-    use security_framework_sys::item::{
-        kSecAttrAccessControl, kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable,
-        kSecClass, kSecClassGenericPassword, kSecValueData,
-    };
-    use security_framework_sys::keychain_item::SecItemAdd;
 
     let access_control = SecAccessControl::create_with_protection(
         Some(ProtectionMode::AccessibleWhenPasscodeSetThisDeviceOnly),
@@ -2167,32 +2163,32 @@ fn create_biometric_gate_item(network: WalletNetwork) -> Result<(), WalletError>
     let payload = random_gate_payload();
     let query = vec![
         (
-            unsafe { CFString::wrap_under_get_rule(kSecClass) },
-            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+            security_bridge::sec_class_key(),
+            security_bridge::sec_class_generic_password_value(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            security_bridge::service_key(),
             CFString::from(service.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            security_bridge::account_key(),
             CFString::from(account.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            security_bridge::synchronizable_key(),
             CFBoolean::from(false).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccessControl) },
+            security_bridge::access_control_key(),
             access_control.into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecValueData) },
+            security_bridge::value_data_key(),
             CFData::from_buffer(payload.as_slice()).into_CFType(),
         ),
     ];
     let dict = CFDictionary::from_CFType_pairs(&query);
-    let status = unsafe { SecItemAdd(dict.as_concrete_TypeRef(), std::ptr::null_mut()) };
+    let status = security_bridge::sec_item_add(&dict);
     if status == errSecDuplicateItem {
         Ok(())
     } else {
@@ -2219,54 +2215,45 @@ fn authenticate_biometric_gate_item(
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 fn copy_biometric_gate_payload(network: WalletNetwork, prompt: &str) -> io::Result<Vec<u8>> {
+    use crate::apple_security_bridge as security_bridge;
     use core_foundation::base::CFTypeRef;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
-    use core_foundation::data::CFData;
     use core_foundation::dictionary::CFDictionary;
     use core_foundation::string::CFString;
     use security_framework_sys::base::errSecItemNotFound;
-    use security_framework_sys::item::{
-        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
-        kSecClassGenericPassword, kSecReturnData,
-    };
-    use security_framework_sys::keychain_item::SecItemCopyMatching;
-
-    unsafe extern "C" {
-        static kSecUseOperationPrompt: *const core_foundation::string::__CFString;
-    }
 
     let service = biometric_gate_service(network);
     let account = biometric_gate_account(network);
     let query = vec![
         (
-            unsafe { CFString::wrap_under_get_rule(kSecClass) },
-            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+            security_bridge::sec_class_key(),
+            security_bridge::sec_class_generic_password_value(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            security_bridge::service_key(),
             CFString::from(service.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            security_bridge::account_key(),
             CFString::from(account.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            security_bridge::synchronizable_key(),
             CFBoolean::from(false).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecReturnData) },
+            security_bridge::return_data_key(),
             CFBoolean::from(true).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecUseOperationPrompt) },
+            security_bridge::operation_prompt_key(),
             CFString::from(prompt).into_CFType(),
         ),
     ];
     let dict = CFDictionary::from_CFType_pairs(&query);
     let mut value: CFTypeRef = std::ptr::null();
-    let status = unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) };
+    let status = security_bridge::sec_item_copy_matching(&dict, &mut value);
     if status == errSecItemNotFound {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
@@ -2280,7 +2267,7 @@ fn copy_biometric_gate_payload(network: WalletNetwork, prompt: &str) -> io::Resu
             format!("missing biometric gate item {service}/{account}"),
         ));
     }
-    let data = unsafe { CFData::wrap_under_create_rule(value as _) };
+    let data = security_bridge::cf_data_from_type_ref(value);
     Ok(data.bytes().to_vec())
 }
 
@@ -2302,7 +2289,86 @@ fn random_gate_payload() -> Vec<u8> {
 }
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
+mod apple_security_bridge {
+    #![allow(unsafe_code)]
+
+    use core_foundation::base::{CFType, CFTypeRef, TCFType};
+    use core_foundation::data::CFData;
+    use core_foundation::dictionary::CFDictionary;
+    use core_foundation::string::{__CFString, CFString};
+    use security_framework_sys::item::{
+        kSecAttrAccessControl, kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable,
+        kSecClass, kSecClassGenericPassword, kSecReturnData, kSecValueData,
+    };
+    use security_framework_sys::keychain_item::{SecItemAdd, SecItemCopyMatching, SecItemDelete};
+
+    unsafe extern "C" {
+        static kSecUseOperationPrompt: *const __CFString;
+    }
+
+    fn cf_key(value: *const __CFString) -> CFString {
+        unsafe { CFString::wrap_under_get_rule(value) }
+    }
+
+    pub(super) fn sec_class_key() -> CFString {
+        unsafe { cf_key(kSecClass) }
+    }
+
+    pub(super) fn sec_class_generic_password_value() -> CFType {
+        unsafe { cf_key(kSecClassGenericPassword).into_CFType() }
+    }
+
+    pub(super) fn service_key() -> CFString {
+        unsafe { cf_key(kSecAttrService) }
+    }
+
+    pub(super) fn account_key() -> CFString {
+        unsafe { cf_key(kSecAttrAccount) }
+    }
+
+    pub(super) fn synchronizable_key() -> CFString {
+        unsafe { cf_key(kSecAttrSynchronizable) }
+    }
+
+    pub(super) fn access_control_key() -> CFString {
+        unsafe { cf_key(kSecAttrAccessControl) }
+    }
+
+    pub(super) fn value_data_key() -> CFString {
+        unsafe { cf_key(kSecValueData) }
+    }
+
+    pub(super) fn return_data_key() -> CFString {
+        unsafe { cf_key(kSecReturnData) }
+    }
+
+    pub(super) fn operation_prompt_key() -> CFString {
+        unsafe { cf_key(kSecUseOperationPrompt) }
+    }
+
+    pub(super) fn sec_item_add(dict: &CFDictionary<CFString, CFType>) -> i32 {
+        unsafe { SecItemAdd(dict.as_concrete_TypeRef(), std::ptr::null_mut()) }
+    }
+
+    pub(super) fn sec_item_delete(dict: &CFDictionary<CFString, CFType>) -> i32 {
+        unsafe { SecItemDelete(dict.as_concrete_TypeRef()) }
+    }
+
+    pub(super) fn sec_item_copy_matching(
+        dict: &CFDictionary<CFString, CFType>,
+        value: &mut CFTypeRef,
+    ) -> i32 {
+        unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), value) }
+    }
+
+    pub(super) fn cf_data_from_type_ref(value: CFTypeRef) -> CFData {
+        unsafe { CFData::wrap_under_create_rule(value as _) }
+    }
+}
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
 fn store_secure_seed_item(network: WalletNetwork, bytes: &[u8]) -> io::Result<()> {
+    use crate::apple_security_bridge as security_bridge;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::data::CFData;
@@ -2311,11 +2377,6 @@ fn store_secure_seed_item(network: WalletNetwork, bytes: &[u8]) -> io::Result<()
     use security_framework::access_control::{ProtectionMode, SecAccessControl};
     use security_framework_sys::access_control::kSecAccessControlBiometryCurrentSet;
     use security_framework_sys::base::errSecItemNotFound;
-    use security_framework_sys::item::{
-        kSecAttrAccessControl, kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable,
-        kSecClass, kSecClassGenericPassword, kSecValueData,
-    };
-    use security_framework_sys::keychain_item::{SecItemAdd, SecItemDelete};
 
     let access_control = SecAccessControl::create_with_protection(
         Some(ProtectionMode::AccessibleWhenPasscodeSetThisDeviceOnly),
@@ -2326,56 +2387,56 @@ fn store_secure_seed_item(network: WalletNetwork, bytes: &[u8]) -> io::Result<()
     let account = secure_seed_account(network);
     let selector = vec![
         (
-            unsafe { CFString::wrap_under_get_rule(kSecClass) },
-            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+            security_bridge::sec_class_key(),
+            security_bridge::sec_class_generic_password_value(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            security_bridge::service_key(),
             CFString::from(service.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            security_bridge::account_key(),
             CFString::from(account.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            security_bridge::synchronizable_key(),
             CFBoolean::from(false).into_CFType(),
         ),
     ];
     let selector_dict = CFDictionary::from_CFType_pairs(&selector);
-    let delete_status = unsafe { SecItemDelete(selector_dict.as_concrete_TypeRef()) };
+    let delete_status = security_bridge::sec_item_delete(&selector_dict);
     if delete_status != 0 && delete_status != errSecItemNotFound {
         cvt_status(delete_status).map_err(io::Error::other)?;
     }
 
     let query = vec![
         (
-            unsafe { CFString::wrap_under_get_rule(kSecClass) },
-            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+            security_bridge::sec_class_key(),
+            security_bridge::sec_class_generic_password_value(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            security_bridge::service_key(),
             CFString::from(service.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            security_bridge::account_key(),
             CFString::from(account.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            security_bridge::synchronizable_key(),
             CFBoolean::from(false).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccessControl) },
+            security_bridge::access_control_key(),
             access_control.into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecValueData) },
+            security_bridge::value_data_key(),
             CFData::from_buffer(bytes).into_CFType(),
         ),
     ];
     let dict = CFDictionary::from_CFType_pairs(&query);
-    let status = unsafe { SecItemAdd(dict.as_concrete_TypeRef(), std::ptr::null_mut()) };
+    let status = security_bridge::sec_item_add(&dict);
     cvt_status(status).map_err(io::Error::other)
 }
 
@@ -2384,56 +2445,47 @@ fn retrieve_secure_seed_item(
     network: WalletNetwork,
     prompt: Option<&str>,
 ) -> io::Result<Vec<u8>> {
+    use crate::apple_security_bridge as security_bridge;
     use core_foundation::base::CFTypeRef;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
-    use core_foundation::data::CFData;
     use core_foundation::dictionary::CFDictionary;
     use core_foundation::string::CFString;
     use security_framework_sys::base::errSecItemNotFound;
-    use security_framework_sys::item::{
-        kSecAttrAccount, kSecAttrService, kSecAttrSynchronizable, kSecClass,
-        kSecClassGenericPassword, kSecReturnData,
-    };
-    use security_framework_sys::keychain_item::SecItemCopyMatching;
-
-    unsafe extern "C" {
-        static kSecUseOperationPrompt: *const core_foundation::string::__CFString;
-    }
 
     let service = secure_seed_service(network);
     let account = secure_seed_account(network);
     let mut query = vec![
         (
-            unsafe { CFString::wrap_under_get_rule(kSecClass) },
-            unsafe { CFString::wrap_under_get_rule(kSecClassGenericPassword) }.into_CFType(),
+            security_bridge::sec_class_key(),
+            security_bridge::sec_class_generic_password_value(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrService) },
+            security_bridge::service_key(),
             CFString::from(service.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrAccount) },
+            security_bridge::account_key(),
             CFString::from(account.as_str()).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecAttrSynchronizable) },
+            security_bridge::synchronizable_key(),
             CFBoolean::from(false).into_CFType(),
         ),
         (
-            unsafe { CFString::wrap_under_get_rule(kSecReturnData) },
+            security_bridge::return_data_key(),
             CFBoolean::from(true).into_CFType(),
         ),
     ];
     if let Some(prompt) = prompt {
         query.push((
-            unsafe { CFString::wrap_under_get_rule(kSecUseOperationPrompt) },
+            security_bridge::operation_prompt_key(),
             CFString::from(prompt).into_CFType(),
         ));
     }
     let dict = CFDictionary::from_CFType_pairs(&query);
     let mut value: CFTypeRef = std::ptr::null();
-    let status = unsafe { SecItemCopyMatching(dict.as_concrete_TypeRef(), &mut value) };
+    let status = security_bridge::sec_item_copy_matching(&dict, &mut value);
     if status == errSecItemNotFound {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
@@ -2447,7 +2499,7 @@ fn retrieve_secure_seed_item(
             format!("missing secure seed item {service}/{account}"),
         ));
     }
-    let data = unsafe { CFData::wrap_under_create_rule(value as _) };
+    let data = security_bridge::cf_data_from_type_ref(value);
     Ok(data.bytes().to_vec())
 }
 

@@ -1,151 +1,212 @@
 {
-  "schema": "zkf-completion-status-v2",
-  "generated_from": "zkf-ir-spec/verification-ledger.json",
-  "current_priority": "formal-verification-zero-repo-assumption-program",
-  "current_priority_progress": "Release-grade closure status on the current checkout. Ledger inventory totals 169 rows with 160 machine-checked rows. Ledger counts: 160 mechanized_local, 0 mechanized_generated, 9 hypothesis_stated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 157 mechanized_implementation_claim, 0 bounded_check, 0 attestation_backed_lane, 0 model_only_claim, 12 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. Open protocol rows: protocol.fri_completeness, protocol.fri_proximity_soundness, protocol.groth16_completeness, protocol.groth16_knowledge_soundness, protocol.groth16_zero_knowledge, protocol.hypernova_completeness, protocol.hypernova_folding_soundness, protocol.nova_completeness, protocol.nova_folding_soundness.",
-  "build_status": "March 30, 2026: the formal-closure repair tranche builds cleanly on the current tree. Passed checks this tranche: `cargo build -p zkf-ir-spec`, `cargo build --workspace`. The workspace still emits existing warnings in `zkf-backends/src/metal_runtime.rs`, `zkf-runtime/src/metal_dispatch_macos.rs`, and `zkf-lib/src/app/edl_monte_carlo.rs`, but the repaired verification-ledger source export, the restored reentry rows, the SED proof runners, and the `zkf-core` isolated-build gate all compile together.",
-  "test_status": "March 30, 2026: the formal-closure repair tranche passes the directly affected proof and crate gates on the current tree: `bash ./scripts/run_rocq_proofs.sh`; `bash ./scripts/run_verus_sovereign_economic_defense_proofs.sh`; `bash ./scripts/run_verus_reentry_assurance_proofs.sh`; `cargo test -p zkf-core --lib`; `cargo test -p zkf-ir-spec --lib`; and `python3 scripts/generate_verification_status_artifacts.py --check`. `cargo test -p zkf-core --lib` passed with 198 tests green; `cargo test -p zkf-ir-spec --lib` passed with 38 tests green, including `verification::tests::json_export_stays_in_sync` after the source-truth repair.",
-  "recent_delivery": "Promoted the eight Sovereign Economic Defense theorem rows into `zkf-ir-spec/src/verification.rs` as real mechanized claims, restored seventeen JSON-only reentry rows back into the Rust ledger source so the exported ledger again reflects the full 168-row mechanized inventory, fixed the SED Rocq proof file until `coqc` accepted it, gated `zkf-core::swarm_signer` behind the `full` feature so `zkf-ir-spec` builds in isolation again, and added pinned Verus/Rocq runner scripts so the SED and reentry proof surfaces are executable from this checkout instead of depending on out-of-band tooling.",
+  "assurance_class_counts": {
+    "attestation_backed_lane": 0,
+    "bounded_check": 0,
+    "hypothesis_carried_theorem": 9,
+    "mechanized_implementation_claim": 160,
+    "model_only_claim": 0
+  },
   "authoritative_status_source": "zkf-ir-spec/verification-ledger.json",
-  "total_entries": 169,
-  "mechanized_total": 160,
+  "build_status": "March 30, 2026: the formal-closure repair tranche builds cleanly on the current tree. Passed checks this tranche: `cargo build -p zkf-ir-spec`, `cargo build --workspace`. The workspace still emits existing warnings in `zkf-backends/src/metal_runtime.rs`, `zkf-runtime/src/metal_dispatch_macos.rs`, and `zkf-lib/src/app/edl_monte_carlo.rs`, but the repaired verification-ledger source export, the restored reentry rows, the SED proof runners, and the `zkf-core` isolated-build gate all compile together.",
   "counts": {
-    "mechanized_local": 160,
-    "mechanized_generated": 0,
-    "hypothesis_stated": 9,
-    "bounded_checked": 0,
     "assumed_external": 0,
+    "bounded_checked": 0,
+    "hypothesis_stated": 9,
+    "mechanized_generated": 0,
+    "mechanized_local": 160,
     "pending": 0
   },
-  "assurance_class_counts": {
-    "mechanized_implementation_claim": 157,
-    "bounded_check": 0,
-    "attestation_backed_lane": 0,
-    "model_only_claim": 0,
-    "hypothesis_carried_theorem": 12
-  },
+  "current_priority": "formal-verification-zero-repo-assumption-program",
+  "current_priority_progress": "Release-grade closure status on the current checkout. Ledger inventory totals 169 rows with 160 machine-checked rows. Ledger counts: 160 mechanized_local, 0 mechanized_generated, 9 hypothesis_stated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 160 mechanized_implementation_claim, 0 bounded_check, 0 attestation_backed_lane, 0 model_only_claim, 9 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. Open protocol rows: protocol.fri_completeness, protocol.fri_proximity_soundness, protocol.groth16_completeness, protocol.groth16_knowledge_soundness, protocol.groth16_zero_knowledge, protocol.hypernova_completeness, protocol.hypernova_folding_soundness, protocol.nova_completeness, protocol.nova_folding_soundness.",
+  "generated_from": "zkf-ir-spec/verification-ledger.json",
+  "mechanized_total": 160,
+  "protocol_rows": [
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::plonky3",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.fri_completeness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::plonky3",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.fri_proximity_soundness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::arkworks",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.groth16_completeness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::arkworks",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.groth16_knowledge_soundness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::arkworks",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.groth16_zero_knowledge"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::nova_native",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.hypernova_completeness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::nova_native",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.hypernova_folding_soundness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::nova_native",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.nova_completeness"
+    },
+    {
+      "evidence_path": "",
+      "scope": "zkf-backends::nova_native",
+      "status": "hypothesis_stated",
+      "theorem_id": "protocol.nova_folding_soundness"
+    }
+  ],
+  "recent_delivery": "Promoted the eight Sovereign Economic Defense theorem rows into `zkf-ir-spec/src/verification.rs` as real mechanized claims, restored seventeen JSON-only reentry rows back into the Rust ledger source so the exported ledger again reflects the full 168-row mechanized inventory, fixed the SED Rocq proof file until `coqc` accepted it, gated `zkf-core::swarm_signer` behind the `full` feature so `zkf-ir-spec` builds in isolation again, and added pinned Verus/Rocq runner scripts so the SED and reentry proof surfaces are executable from this checkout instead of depending on out-of-band tooling.",
+  "release_grade_blockers": [
+    "9 hypothesis_stated row(s) remain",
+    "9 row(s) still carry trusted_assumptions"
+  ],
+  "release_grade_ready": false,
   "runtime_proof_coverage": {
-    "schema": "zkf-runtime-proof-coverage-v1",
-    "total_files": 89,
-    "total_functions": 1788,
-    "file_counts": {
-      "implementation_mechanized": 27,
-      "shell_contract_mechanized": 32,
-      "explicit_tcb_adapter": 30
-    },
-    "function_counts": {
-      "implementation_mechanized": 199,
-      "shell_contract_mechanized": 1037,
-      "explicit_tcb_adapter": 552
-    },
     "complete_files": 89,
     "complete_functions": 1788,
+    "file_counts": {
+      "explicit_tcb_adapter": 30,
+      "implementation_mechanized": 27,
+      "shell_contract_mechanized": 32
+    },
+    "function_counts": {
+      "explicit_tcb_adapter": 552,
+      "implementation_mechanized": 199,
+      "shell_contract_mechanized": 1037
+    },
+    "schema": "zkf-runtime-proof-coverage-v1",
     "targets": [
       {
-        "name": "zkf-runtime-full",
-        "total_files": 39,
-        "total_functions": 950,
+        "closed": true,
         "complete_files": 39,
         "complete_functions": 950,
-        "closed": true,
         "file_counts": {
+          "explicit_tcb_adapter": 12,
           "implementation_mechanized": 12,
-          "shell_contract_mechanized": 15,
-          "explicit_tcb_adapter": 12
+          "shell_contract_mechanized": 15
         },
         "function_counts": {
+          "explicit_tcb_adapter": 348,
           "implementation_mechanized": 88,
-          "shell_contract_mechanized": 514,
-          "explicit_tcb_adapter": 348
-        }
+          "shell_contract_mechanized": 514
+        },
+        "name": "zkf-runtime-full",
+        "total_files": 39,
+        "total_functions": 950
       },
       {
-        "name": "zkf-runtime-swarm-path",
-        "total_files": 13,
-        "total_functions": 284,
+        "closed": true,
         "complete_files": 13,
         "complete_functions": 284,
-        "closed": true,
         "file_counts": {
+          "explicit_tcb_adapter": 1,
           "implementation_mechanized": 6,
-          "shell_contract_mechanized": 6,
-          "explicit_tcb_adapter": 1
+          "shell_contract_mechanized": 6
         },
         "function_counts": {
+          "explicit_tcb_adapter": 7,
           "implementation_mechanized": 42,
-          "shell_contract_mechanized": 235,
-          "explicit_tcb_adapter": 7
-        }
+          "shell_contract_mechanized": 235
+        },
+        "name": "zkf-runtime-swarm-path",
+        "total_files": 13,
+        "total_functions": 284
       },
       {
-        "name": "zkf-distributed-swarm-path",
-        "total_files": 37,
-        "total_functions": 554,
+        "closed": true,
         "complete_files": 37,
         "complete_functions": 554,
-        "closed": true,
         "file_counts": {
+          "explicit_tcb_adapter": 17,
           "implementation_mechanized": 9,
-          "shell_contract_mechanized": 11,
-          "explicit_tcb_adapter": 17
+          "shell_contract_mechanized": 11
         },
         "function_counts": {
+          "explicit_tcb_adapter": 197,
           "implementation_mechanized": 69,
-          "shell_contract_mechanized": 288,
-          "explicit_tcb_adapter": 197
-        }
+          "shell_contract_mechanized": 288
+        },
+        "name": "zkf-distributed-swarm-path",
+        "total_files": 37,
+        "total_functions": 554
       },
       {
-        "name": "zkf-runtime-app-proof-surfaces",
-        "total_files": 0,
-        "total_functions": 0,
+        "closed": true,
         "complete_files": 0,
         "complete_functions": 0,
-        "closed": true,
         "file_counts": {},
-        "function_counts": {}
+        "function_counts": {},
+        "name": "zkf-runtime-app-proof-surfaces",
+        "total_files": 0,
+        "total_functions": 0
       }
-    ]
+    ],
+    "total_files": 89,
+    "total_functions": 1788
   },
+  "schema": "zkf-completion-status-v2",
   "swarm_proof_boundary": {
-    "runtime_target": {
-      "name": "zkf-runtime-swarm-path",
-      "total_files": 13,
-      "total_functions": 284,
-      "complete_files": 13,
-      "complete_functions": 284,
-      "closed": true,
-      "file_counts": {
-        "implementation_mechanized": 6,
-        "shell_contract_mechanized": 6,
-        "explicit_tcb_adapter": 1
-      },
-      "function_counts": {
-        "implementation_mechanized": 42,
-        "shell_contract_mechanized": 235,
-        "explicit_tcb_adapter": 7
-      }
-    },
+    "closed": true,
     "distributed_target": {
-      "name": "zkf-distributed-swarm-path",
-      "total_files": 37,
-      "total_functions": 554,
+      "closed": true,
       "complete_files": 37,
       "complete_functions": 554,
-      "closed": true,
       "file_counts": {
+        "explicit_tcb_adapter": 17,
         "implementation_mechanized": 9,
-        "shell_contract_mechanized": 11,
-        "explicit_tcb_adapter": 17
+        "shell_contract_mechanized": 11
       },
       "function_counts": {
+        "explicit_tcb_adapter": 197,
         "implementation_mechanized": 69,
-        "shell_contract_mechanized": 288,
-        "explicit_tcb_adapter": 197
-      }
+        "shell_contract_mechanized": 288
+      },
+      "name": "zkf-distributed-swarm-path",
+      "total_files": 37,
+      "total_functions": 554
     },
-    "closed": true
+    "runtime_target": {
+      "closed": true,
+      "complete_files": 13,
+      "complete_functions": 284,
+      "file_counts": {
+        "explicit_tcb_adapter": 1,
+        "implementation_mechanized": 6,
+        "shell_contract_mechanized": 6
+      },
+      "function_counts": {
+        "explicit_tcb_adapter": 7,
+        "implementation_mechanized": 42,
+        "shell_contract_mechanized": 235
+      },
+      "name": "zkf-runtime-swarm-path",
+      "total_files": 13,
+      "total_functions": 284
+    }
   },
+  "test_status": "March 30, 2026: the formal-closure repair tranche passes the directly affected proof and crate gates on the current tree: `bash ./scripts/run_rocq_proofs.sh`; `bash ./scripts/run_verus_sovereign_economic_defense_proofs.sh`; `bash ./scripts/run_verus_reentry_assurance_proofs.sh`; `cargo test -p zkf-core --lib`; `cargo test -p zkf-ir-spec --lib`; and `python3 scripts/generate_verification_status_artifacts.py --check`. `cargo test -p zkf-core --lib` passed with 198 tests green; `cargo test -p zkf-ir-spec --lib` passed with 38 tests green, including `verification::tests::json_export_stays_in_sync` after the source-truth repair.",
+  "total_entries": 169,
   "trusted_assumption_rows": [
     "protocol.fri_completeness",
     "protocol.fri_proximity_soundness",
@@ -156,66 +217,5 @@
     "protocol.hypernova_folding_soundness",
     "protocol.nova_completeness",
     "protocol.nova_folding_soundness"
-  ],
-  "release_grade_ready": false,
-  "release_grade_blockers": [
-    "9 hypothesis_stated row(s) remain",
-    "9 row(s) still carry trusted_assumptions"
-  ],
-  "protocol_rows": [
-    {
-      "theorem_id": "protocol.fri_completeness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::plonky3",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.fri_proximity_soundness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::plonky3",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.groth16_completeness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::arkworks",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.groth16_knowledge_soundness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::arkworks",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.groth16_zero_knowledge",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::arkworks",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.hypernova_completeness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::nova_native",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.hypernova_folding_soundness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::nova_native",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.nova_completeness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::nova_native",
-      "evidence_path": ""
-    },
-    {
-      "theorem_id": "protocol.nova_folding_soundness",
-      "status": "hypothesis_stated",
-      "scope": "zkf-backends::nova_native",
-      "evidence_path": ""
-    }
   ]
 }

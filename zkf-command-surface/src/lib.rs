@@ -1,5 +1,6 @@
 pub mod app;
 pub mod cluster;
+pub mod evm;
 pub mod midnight;
 pub mod proof;
 pub mod release;

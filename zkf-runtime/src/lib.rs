@@ -53,7 +53,7 @@ pub(crate) mod hybrid_core;
 pub mod memory;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod memory_plan;
-#[cfg(all(feature = "full", target_os = "macos", not(hax)))]
+#[cfg(all(feature = "full", target_os = "macos", feature = "metal-gpu", not(hax)))]
 mod metal_dispatch_macos;
 #[cfg(all(feature = "full", not(hax)))]
 pub mod metal_driver;

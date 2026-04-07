@@ -1,6 +1,6 @@
 use crate::types::{
-    CapabilityRequirementV1, ExecutionPolicyV1, GoalIntentV1, IntentScopeV1,
-    SuccessPredicateV1, TrustGateReportV1, WorkgraphNodeV1, WorkgraphV1,
+    CapabilityRequirementV1, ExecutionPolicyV1, GoalIntentV1, IntentHintsV1, IntentScopeV1,
+    SuccessPredicateV1, TargetChainProfileV1, TrustGateReportV1, WorkgraphNodeV1, WorkgraphV1,
     WorkflowRequirementsV1,
 };
 use zkf_command_surface::{RiskClassV1, new_operation_id};
@@ -35,6 +35,16 @@ pub fn workflow_catalog() -> Vec<GoalIntentV1> {
                 "16_compact/contract.compact",
                 "deploy-prepare.json",
                 "20_release/zkf-release-pin.json",
+            ],
+        ),
+        workflow(
+            "subsystem-evm-ops",
+            IntentScopeV1::Project,
+            "Scaffold or reuse a subsystem bundle, refresh proof artifacts, and export an EVM compatibility bundle.",
+            &[
+                "08_proofs/proof.json",
+                "15_solidity/SubsystemVerifier.sol",
+                "13_public_bundle/subsystem_bundle.json",
             ],
         ),
         workflow(
@@ -104,6 +114,14 @@ pub fn compile_goal_intent(goal: &str, workflow_override: Option<&str>) -> GoalI
         return workflow_from_kind("midnight-proof-server-ops", goal);
     }
     if lower.contains("subsystem") || lower.contains("component") || lower.contains("module") {
+        if lower.contains("evm")
+            || lower.contains("solidity")
+            || lower.contains("foundry")
+            || lower.contains("anvil")
+            || lower.contains("verifier")
+        {
+            return workflow_from_kind("subsystem-evm-ops", goal);
+        }
         if lower.contains("benchmark") || lower.contains("metal") || lower.contains("gpu") {
             return workflow_from_kind("subsystem-benchmark", goal);
         }
@@ -342,6 +360,80 @@ pub fn build_workgraph(
                     )],
                 ));
             }
+        }
+        "subsystem-evm-ops" => {
+            let scaffold = node(
+                "subsystem-scaffold",
+                "Scaffold subsystem bundle",
+                "subsystem.scaffold",
+                RiskClassV1::WorkspaceMutation,
+                false,
+                vec![inspect_id.clone()],
+                vec![
+                    "02_manifest/subsystem_manifest.json",
+                    "08_proofs/proof.json",
+                    "15_solidity/SubsystemVerifier.sol",
+                ],
+                vec![success("subsystem-scaffolded", "A subsystem bundle exists")],
+            );
+            let scaffold_id = scaffold.node_id.clone();
+            nodes.push(scaffold);
+            let prove = node(
+                "subsystem-prove",
+                "Refresh subsystem proof artifacts",
+                "subsystem.prove",
+                RiskClassV1::LocalBuildTest,
+                false,
+                vec![scaffold_id.clone()],
+                vec!["08_proofs/proof.json", "09_verification/verification.json"],
+                vec![success("subsystem-proved", "Subsystem proof artifacts are refreshed")],
+            );
+            let prove_id = prove.node_id.clone();
+            nodes.push(prove);
+            let verify = node(
+                "subsystem-verify",
+                "Verify subsystem proof artifacts",
+                "subsystem.verify",
+                RiskClassV1::ReadOnly,
+                false,
+                vec![prove_id.clone()],
+                vec!["09_verification/verification.json"],
+                vec![success("subsystem-verified", "Subsystem proof artifacts verify")],
+            );
+            let verify_id = verify.node_id.clone();
+            nodes.push(verify);
+            let export = node(
+                "subsystem-evm-export",
+                "Export subsystem EVM compatibility bundle",
+                "subsystem.evm-export",
+                RiskClassV1::WorkspaceMutation,
+                false,
+                vec![verify_id.clone()],
+                vec!["15_solidity/SubsystemVerifier.sol"],
+                vec![success("evm-exported", "A Solidity verifier bundle is materialized")],
+            );
+            let export_id = export.node_id.clone();
+            nodes.push(export);
+            nodes.push(node(
+                "subsystem-public-bundle",
+                "Refresh subsystem public evidence bundle",
+                "subsystem.bundle-public",
+                RiskClassV1::WorkspaceMutation,
+                false,
+                vec![export_id.clone()],
+                vec!["13_public_bundle/subsystem_bundle.json"],
+                vec![success("public-bundle", "The public subsystem bundle is refreshed")],
+            ));
+            nodes.push(node(
+                "evm-diagnose",
+                "Diagnose EVM operator readiness",
+                "evm.diagnose",
+                RiskClassV1::ReadOnly,
+                false,
+                vec![export_id],
+                vec!["evm-readiness.json"],
+                vec![success("evm-ready", "The EVM toolchain surface is inspectable")],
+            ));
         }
         "subsystem-benchmark" => {
             let scaffold = node(
@@ -644,6 +736,14 @@ fn workflow_from_kind(workflow_kind: &str, goal: &str) -> GoalIntentV1 {
             )
         });
     intent.summary = goal.to_string();
+    intent.hints = Some(IntentHintsV1 {
+        target_chain: Some(match workflow_kind {
+            "subsystem-midnight-ops" | "midnight-contract-ops" => TargetChainProfileV1::Midnight,
+            "subsystem-evm-ops" => TargetChainProfileV1::Evm,
+            _ => TargetChainProfileV1::Hybrid,
+        }),
+        ..IntentHintsV1::default()
+    });
     intent
 }
 
@@ -662,6 +762,13 @@ fn capability_requirements(
             required: true,
             description: "Midnight proof-server, gateway, and Compact toolchain must be ready."
                 .to_string(),
+        });
+    }
+    if requirements.require_evm {
+        values.push(CapabilityRequirementV1 {
+            id: "evm".to_string(),
+            required: true,
+            description: "Foundry, cast, and verifier export surfaces must be ready.".to_string(),
         });
     }
     if requirements.require_wallet {

@@ -389,10 +389,6 @@ fn positive_comparison_offset(bound: &BigInt) -> BigInt {
     bound + one()
 }
 
-fn signed_comparison_offset(bound: &BigInt) -> BigInt {
-    (bound * two()) + one()
-}
-
 fn comparator_slack(lhs: &BigInt, rhs: &BigInt, offset: &BigInt) -> BigInt {
     if lhs >= rhs {
         lhs - rhs
@@ -435,21 +431,6 @@ fn append_boolean_not(builder: &mut ProgramBuilder, target: &str, source: &str) 
     builder.constrain_equal(
         signal_expr(target),
         sub_expr(const_expr(&one()), signal_expr(source)),
-    )?;
-    Ok(())
-}
-
-fn append_boolean_and(
-    builder: &mut ProgramBuilder,
-    target: &str,
-    left: &str,
-    right: &str,
-) -> ZkfResult<()> {
-    builder.private_signal(target)?;
-    builder.constrain_boolean(target)?;
-    builder.constrain_equal(
-        signal_expr(target),
-        mul_expr(signal_expr(left), signal_expr(right)),
     )?;
     Ok(())
 }

@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-04-07T10:37:32.342820Z",
+  "primary_domain": "evm",
+  "schema": "ziros-evm-operator-readiness-v1",
+  "status": "secondary-ready",
+  "supported_surfaces": [
+    "zkf evm verifier export",
+    "zkf evm estimate-gas",
+    "zkf evm foundry init",
+    "zkf evm deploy",
+    "zkf evm call",
+    "zkf evm test",
+    "zkf evm diagnose"
+  ],
+  "supported_targets": [
+    "ethereum",
+    "optimism-arbitrum-l2",
+    "generic-evm"
+  ],
+  "version": "0.6.0"
+}

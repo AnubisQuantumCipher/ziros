@@ -17,6 +17,8 @@ PRIVATE_COMPLETION = ROOT / ".zkf-completion-status.json"
 PRIVATE_SUPPORT = ROOT / "support-matrix.json"
 PRIVATE_CENSUS = ROOT / "release" / "private_source_census.json"
 PRIVATE_PRODUCT_RELEASE = ROOT / "release" / "product-release.json"
+PRIVATE_MIDNIGHT_READINESS = ROOT / "release" / "midnight_operator_readiness.json"
+PRIVATE_EVM_READINESS = ROOT / "release" / "evm_operator_readiness.json"
 PRIVATE_EXPORT = Path("/tmp/ziros-public-attestation-export-bundle/public_attestation_export.json")
 
 HEADLINE_CONFORMANCE_BACKENDS = ["plonky3", "halo2", "nova", "hypernova"]
@@ -315,6 +317,43 @@ def build_binary_manifest(version: str, binary_path: Path) -> dict:
     }
 
 
+def build_midnight_readiness_doc(private_midnight: dict, release_tag: str, source_commit: str) -> dict:
+    return {
+        "schema": "ziros-public-midnight-readiness-v1",
+        "generated_at": now_rfc3339(),
+        "version": private_midnight["version"],
+        "release_tag": release_tag,
+        "source_commit": source_commit,
+        "domain": "midnight",
+        "claim_scope": "full-universal-path-for-0.6.0",
+        "status": private_midnight["status"],
+        "ready_for_local_operator": private_midnight["ready_for_local_operator"],
+        "ready_for_live_submit": private_midnight["ready_for_live_submit"],
+        "contract_universe_count": private_midnight["contract_universe_count"],
+        "validation_template": private_midnight.get("validation_template"),
+        "required_cli_surfaces": private_midnight.get("required_cli_surfaces", []),
+        "doctor_summary": private_midnight.get("doctor_summary"),
+        "blockers": private_midnight.get("blockers", []),
+        "advisories": private_midnight.get("advisories", []),
+        "live_submit_blockers": private_midnight.get("live_submit_blockers", []),
+    }
+
+
+def build_evm_readiness_doc(private_evm: dict, release_tag: str, source_commit: str) -> dict:
+    return {
+        "schema": "ziros-public-evm-readiness-v1",
+        "generated_at": now_rfc3339(),
+        "version": private_evm["version"],
+        "release_tag": release_tag,
+        "source_commit": source_commit,
+        "domain": "evm",
+        "claim_scope": "secondary-deploy-capable-verifier-export-lane-for-0.6.0",
+        "status": private_evm["status"],
+        "supported_targets": private_evm["supported_targets"],
+        "supported_surfaces": private_evm["supported_surfaces"],
+    }
+
+
 def build_claim_graph(
     publication: dict,
     attestation: dict,
@@ -322,6 +361,8 @@ def build_claim_graph(
     conformance_summary: dict,
     capability_summary: dict,
     workspace_census_summary: dict,
+    midnight_readiness: dict,
+    evm_readiness: dict,
 ) -> dict:
     claims = [
         {
@@ -460,6 +501,26 @@ def build_claim_graph(
                 {"path": "attestation/latest.json", "json_pointer": "/claims_verified/capability_surface/gadget_count"},
             ],
         },
+        {
+            "claim_id": "operator.midnight_status",
+            "category": "mathematically_established",
+            "claim_text": "Published Midnight readiness status for the 0.6.0 full operator path.",
+            "expected_value": midnight_readiness["status"],
+            "sources": [
+                {"path": "midnight/readiness.json", "json_pointer": "/status"},
+                {"path": "attestation/latest.json", "json_pointer": "/claims_verified/operator_readiness/midnight/status"},
+            ],
+        },
+        {
+            "claim_id": "operator.evm_status",
+            "category": "mathematically_established",
+            "claim_text": "Published EVM readiness status for the 0.6.0 secondary operator lane.",
+            "expected_value": evm_readiness["status"],
+            "sources": [
+                {"path": "evm/readiness.json", "json_pointer": "/status"},
+                {"path": "attestation/latest.json", "json_pointer": "/claims_verified/operator_readiness/evm/status"},
+            ],
+        },
     ]
     graph = {
         "schema": "ziros-claim-source-graph-v1",
@@ -508,6 +569,8 @@ def build_attestation(
     capability_summary: dict,
     hypothesis_registry: dict,
     ledger_file_sha: str,
+    midnight_readiness: dict,
+    evm_readiness: dict,
 ) -> dict:
     return {
         "schema": "ziros-attestation-v2",
@@ -554,6 +617,19 @@ def build_attestation(
                 "backend_count": capability_summary["backend_count"],
                 "frontend_count": capability_summary["frontend_count"],
                 "gadget_count": capability_summary["gadget_count"],
+            },
+            "operator_readiness": {
+                "midnight": {
+                    "summary_path": "midnight/readiness.json",
+                    "status": midnight_readiness["status"],
+                    "ready_for_local_operator": midnight_readiness["ready_for_local_operator"],
+                    "ready_for_live_submit": midnight_readiness["ready_for_live_submit"],
+                },
+                "evm": {
+                    "summary_path": "evm/readiness.json",
+                    "status": evm_readiness["status"],
+                    "supported_target_count": len(evm_readiness["supported_targets"]),
+                },
             },
         },
         "attestation_hash": "",
@@ -608,6 +684,8 @@ def build_evidence_package(
         "capability_summary": "evidence/capability-summary.json",
         "proof_file_inventory": "evidence/proof-file-inventory.json",
         "protocol_proof_registry": "evidence/protocol-proof-registry.json",
+        "midnight_readiness": "midnight/readiness.json",
+        "evm_readiness": "evm/readiness.json",
         "binary_manifest": publication["binary_manifest_path"],
     }
     verdict_digest = canonical_sha256(hostile_verdict)
@@ -624,6 +702,8 @@ def build_evidence_package(
             "conformance_summary": "evidence/conformance-summary.json",
             "capability_summary": "evidence/capability-summary.json",
             "protocol_proof_registry": "evidence/protocol-proof-registry.json",
+            "midnight_readiness": "midnight/readiness.json",
+            "evm_readiness": "evm/readiness.json",
         },
         "workspace_census_summary": workspace_census_summary,
         "claim_source_graph_digest": claim_graph["graph_digest"],
@@ -631,7 +711,14 @@ def build_evidence_package(
     }
 
 
-def build_public_summary_block(publication: dict, attestation: dict, conformance_summary: dict, workspace_census_summary: dict) -> str:
+def build_public_summary_block(
+    publication: dict,
+    attestation: dict,
+    conformance_summary: dict,
+    workspace_census_summary: dict,
+    midnight_readiness: dict,
+    evm_readiness: dict,
+) -> str:
     return "\n".join(
         [
             "This repository is evidence-only. It publishes no implementation source, headers, examples, or public SDK surface.",
@@ -643,13 +730,22 @@ def build_public_summary_block(publication: dict, attestation: dict, conformance
             f"| Disclosed hypotheses | {attestation['headline_counts']['hypothesis_carried_rows']} hypothesis-carried rows, published separately in [attestation/latest.json](attestation/latest.json) and [evidence/protocol-proof-registry.json](evidence/protocol-proof-registry.json) |",
             f"| Public conformance | {conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed across `plonky3`, `halo2`, `nova`, and `hypernova` |",
             f"| Sealed-source census | {workspace_census_summary['total_tracked_files']} tracked files classified; zero unclassified = `{workspace_census_summary['zero_unclassified_files']}` |",
+            f"| Midnight readiness | full universal path for `0.6.0`: status=`{midnight_readiness['status']}`, local_operator=`{midnight_readiness['ready_for_local_operator']}`, live_submit=`{midnight_readiness['ready_for_live_submit']}` via [midnight/readiness.json](midnight/readiness.json) |",
+            f"| EVM readiness | secondary deploy-capable lane for `0.6.0`: status=`{evm_readiness['status']}` via [evm/readiness.json](evm/readiness.json) |",
             "| Midnight evidence | 5 published Midnight preprod deployment manifests; explorer verification 0/5 on 2026-04-05 |",
             "| Hostile-audit verdict | [hostile-audit-verdict.json](hostile-audit-verdict.json) and [claim-source-graph.json](claim-source-graph.json) |",
         ]
     )
 
 
-def build_weekly_status_block(publication: dict, attestation: dict, conformance_summary: dict, workspace_census_summary: dict) -> str:
+def build_weekly_status_block(
+    publication: dict,
+    attestation: dict,
+    conformance_summary: dict,
+    workspace_census_summary: dict,
+    midnight_readiness: dict,
+    evm_readiness: dict,
+) -> str:
     return "\n".join(
         [
             "| What It Publishes | How | Current Status |",
@@ -659,6 +755,8 @@ def build_weekly_status_block(publication: dict, attestation: dict, conformance_
             f"| Public backend conformance | Compile -> prove -> verify across 4 published backends | **{conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed** |",
             f"| Sealed-source census | Opaque private-file census summarized publicly | **{workspace_census_summary['total_tracked_files']} files; zero unclassified = {workspace_census_summary['zero_unclassified_files']}** |",
             f"| Binary integrity | Published release manifest `{publication['binary_manifest_path']}` | **SHA-256 verified for `{publication['binary_target']}`** |",
+            f"| Midnight operator path | Full universal path for `0.6.0` | **status={midnight_readiness['status']} local_operator={midnight_readiness['ready_for_local_operator']} live_submit={midnight_readiness['ready_for_live_submit']}** |",
+            f"| EVM operator path | Secondary deploy-capable lane for `0.6.0` | **status={evm_readiness['status']}** |",
             "| Midnight deployment evidence | Published deployment manifest plus live explorer recheck | **0/5 explorer-verified on 2026-04-05** |",
         ]
     )
@@ -678,6 +776,8 @@ def main() -> int:
     private_support = load_json(PRIVATE_SUPPORT)
     private_ledger = load_json(PRIVATE_LEDGER)
     private_completion = load_json(PRIVATE_COMPLETION)
+    private_midnight_readiness = load_json(PRIVATE_MIDNIGHT_READINESS)
+    private_evm_readiness = load_json(PRIVATE_EVM_READINESS)
 
     version = private_product_release["version"]
     release_tag = private_product_release["release_tag"]
@@ -695,6 +795,12 @@ def main() -> int:
     proof_inventory = build_proof_inventory(private_census)
     binary_manifest = build_binary_manifest(version, args.binary_path.resolve())
     binary_manifest_path = f"binary-manifest/{release_tag}/manifest.json"
+    public_midnight_readiness = build_midnight_readiness_doc(
+        private_midnight_readiness, release_tag, source_commit
+    )
+    public_evm_readiness = build_evm_readiness_doc(
+        private_evm_readiness, release_tag, source_commit
+    )
 
     write_json(public_root / binary_manifest_path, binary_manifest)
     write_json(public_root / "ledger" / "verification-ledger.json", public_ledger)
@@ -716,6 +822,8 @@ def main() -> int:
         capability_summary,
         hypothesis_registry,
         ledger_file_sha,
+        public_midnight_readiness,
+        public_evm_readiness,
     )
     publication = build_publication_manifest(
         version,
@@ -732,6 +840,8 @@ def main() -> int:
         conformance_summary,
         capability_summary,
         workspace_census_summary,
+        public_midnight_readiness,
+        public_evm_readiness,
     )
     hostile_verdict = build_hostile_verdict(claim_graph, workspace_census_summary)
     attestation["claim_source_graph_digest"] = claim_graph["graph_digest"]
@@ -753,6 +863,8 @@ def main() -> int:
     write_json(public_root / "evidence" / "capability-summary.json", capability_summary)
     write_json(public_root / "evidence" / "proof-file-inventory.json", proof_inventory)
     write_json(public_root / "evidence" / "protocol-proof-registry.json", protocol_registry)
+    write_json(public_root / "midnight" / "readiness.json", public_midnight_readiness)
+    write_json(public_root / "evm" / "readiness.json", public_evm_readiness)
     write_json(public_root / "claim-source-graph.json", claim_graph)
     write_json(public_root / "hostile-audit-verdict.json", hostile_verdict)
     write_json(public_root / "attestation" / "latest.json", attestation)
@@ -765,13 +877,27 @@ def main() -> int:
         public_root / "README.md",
         PUBLIC_SUMMARY_BEGIN,
         PUBLIC_SUMMARY_END,
-        build_public_summary_block(publication, attestation, conformance_summary, workspace_census_summary),
+        build_public_summary_block(
+            publication,
+            attestation,
+            conformance_summary,
+            workspace_census_summary,
+            public_midnight_readiness,
+            public_evm_readiness,
+        ),
     )
     replace_generated_block(
         public_root / "README.md",
         WEEKLY_STATUS_BEGIN,
         WEEKLY_STATUS_END,
-        build_weekly_status_block(publication, attestation, conformance_summary, workspace_census_summary),
+        build_weekly_status_block(
+            publication,
+            attestation,
+            conformance_summary,
+            workspace_census_summary,
+            public_midnight_readiness,
+            public_evm_readiness,
+        ),
     )
     return 0
 

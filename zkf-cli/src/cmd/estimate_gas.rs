@@ -99,6 +99,29 @@ pub(crate) fn handle_estimate_gas(
     evm_target: String,
     json: bool,
 ) -> Result<(), String> {
+    let report = estimate_gas_report(backend, artifact, proof_size, evm_target)?;
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+        );
+    } else {
+        println!(
+            "gas estimate: backend={} evm_target={} proof_size={} estimated_verify_gas={}",
+            report.backend, report.evm_target, report.proof_size_bytes, report.estimated_verify_gas
+        );
+    }
+
+    Ok(())
+}
+
+pub(crate) fn estimate_gas_report(
+    backend: String,
+    artifact: Option<PathBuf>,
+    proof_size: Option<usize>,
+    evm_target: String,
+) -> Result<crate::GasEstimateReport, String> {
     let backend = parse_backend(&backend)?;
     let evm_target = parse_evm_target(Some(&evm_target))?;
     let (proof_size_bytes, source) = if let Some(path) = artifact.as_ref() {
@@ -122,18 +145,5 @@ pub(crate) fn handle_estimate_gas(
         model_source: source,
         model_note: gas_model_note(backend, evm_target),
     };
-
-    if json {
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
-        );
-    } else {
-        println!(
-            "gas estimate: backend={} evm_target={} proof_size={} estimated_verify_gas={}",
-            report.backend, report.evm_target, report.proof_size_bytes, report.estimated_verify_gas
-        );
-    }
-
-    Ok(())
+    Ok(report)
 }

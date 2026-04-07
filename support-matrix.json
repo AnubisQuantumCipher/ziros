@@ -113,9 +113,9 @@
       "gpu_coverage": "0/0 GPU stages active on current host",
       "id": "midnight-compact",
       "mode": "native",
-      "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true. Shipped developer-platform commands include `zkf midnight gateway serve`, `zkf midnight templates`, `zkf midnight init`, `zkf midnight doctor`, `zkf midnight disclosure`, and `zkf midnight resolve`, pinned to compactc 0.30.0, but they do not promote this backend row to production-ready. implementation_type=native compiled_in=true production_ready=false assurance_lane=delegated-or-external-lane proof_semantics=external-or-delegated aggregation_semantics=single-proof-only readiness_reason=midnight-proof-server-unconfigured operator_action=configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds",
+      "notes": "Midnight-first operator lane derived from typed readiness and doctor evidence. ready_for_live_submit=false blockers=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}; wallet: No browser wallet session or headless operator wallet credentials were available.; dust: DUST balance is not checkable from a bare CLI process. advisories=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
       "proof_semantics": "external-or-delegated",
-      "status": "broken"
+      "status": "ready"
     }
   ],
   "frontends": [
@@ -333,7 +333,7 @@
       ]
     }
   ],
-  "generated_for": "0.5.0",
+  "generated_for": "0.6.0",
   "registry": {
     "local": "ready",
     "notes": "Local + remote registries with CombinedRegistry fallback, SemVer resolution, and SHA-256 manifest/content integrity checks.",

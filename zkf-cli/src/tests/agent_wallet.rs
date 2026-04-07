@@ -305,6 +305,144 @@ fn agent_cli_parses_approve_bridge_surface() {
 }
 
 #[test]
+fn evm_cli_parses_verifier_export_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "evm",
+        "verifier",
+        "export",
+        "--artifact",
+        "proof.json",
+        "--backend",
+        "arkworks-groth16",
+        "--out",
+        "Verifier.sol",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Evm { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::EvmCommands::Verifier {
+                    command: crate::cli::EvmVerifierCommands::Export {
+                        backend,
+                        json: true,
+                        ..
+                    }
+                } if backend == "arkworks-groth16"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn evm_cli_parses_foundry_init_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "evm",
+        "foundry",
+        "init",
+        "--solidity",
+        "Verifier.sol",
+        "--out",
+        "bundle",
+        "--artifact",
+        "proof.json",
+        "--backend",
+        "arkworks-groth16",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Evm { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::EvmCommands::Foundry {
+                    command: crate::cli::EvmFoundryCommands::Init {
+                        backend: Some(ref backend),
+                        json: true,
+                        ..
+                    }
+                } if backend == "arkworks-groth16"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn subsystem_cli_parses_bundle_public_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "subsystem",
+        "bundle-public",
+        "--root",
+        "/tmp/subsystem",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Subsystem { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::SubsystemCommands::BundlePublic { json: true, .. }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn subsystem_cli_parses_evm_export_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "subsystem",
+        "evm-export",
+        "--root",
+        "/tmp/subsystem",
+        "--evm-target",
+        "generic-evm",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Subsystem { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::SubsystemCommands::EvmExport {
+                    evm_target,
+                    json: true,
+                    ..
+                } if evm_target == "generic-evm"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn midnight_cli_parses_contract_diagnose_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "zkf",
+        "midnight",
+        "contract",
+        "diagnose",
+        "--project",
+        "/tmp/midnight-project",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Midnight { command } => {
+            assert!(matches!(
+                command,
+                crate::cli::MidnightCommands::Contract {
+                    command: crate::cli::MidnightContractCommands::Diagnose { json: true, .. }
+                }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
 fn subsystem_cli_parses_scaffold_surface() {
     let cli = crate::cli::Cli::parse_from([
         "zkf",

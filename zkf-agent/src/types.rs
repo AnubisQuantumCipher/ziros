@@ -67,6 +67,14 @@ pub enum IntentScopeV1 {
     Release,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum TargetChainProfileV1 {
+    Midnight,
+    Evm,
+    Hybrid,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct IntentHintsV1 {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -83,6 +91,8 @@ pub struct IntentHintsV1 {
     pub benchmark_parallel: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub benchmark_distributed: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target_chain: Option<TargetChainProfileV1>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -122,6 +132,7 @@ pub struct WorkflowRequirementsV1 {
     pub strict: bool,
     pub compat_allowed: bool,
     pub require_midnight: bool,
+    pub require_evm: bool,
     pub require_wallet: bool,
     pub require_metal: bool,
     pub wallet_network: WalletNetwork,
@@ -156,6 +167,7 @@ impl WorkflowRequirementsV1 {
             compat_allowed: options.compat_allowed,
             require_midnight: intent.workflow_kind.starts_with("midnight-")
                 || intent.workflow_kind == "subsystem-midnight-ops",
+            require_evm: intent.workflow_kind == "subsystem-evm-ops",
             require_wallet,
             require_metal,
             wallet_network: options.wallet_network,
