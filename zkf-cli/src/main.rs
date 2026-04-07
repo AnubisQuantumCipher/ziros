@@ -165,10 +165,13 @@ pub(crate) fn maybe_emit_ziros_first_run_banner() {
     let argv0 = std::env::args_os().next();
     let env_flag = std::env::var_os(ZIROS_INVOKED_AS_ENV);
     let marker_path = ziros_first_run_marker_path();
+    let argv = std::env::args_os().skip(1).collect::<Vec<_>>();
     if !should_emit_ziros_first_run_banner(
         argv0.as_deref(),
         env_flag.as_deref(),
         marker_path.as_deref(),
+        &argv,
+        std::io::stdout().is_terminal(),
     ) {
         return;
     }
@@ -180,7 +183,12 @@ pub(crate) fn should_emit_ziros_first_run_banner(
     argv0: Option<&OsStr>,
     env_flag: Option<&OsStr>,
     marker_path: Option<&Path>,
+    argv: &[std::ffi::OsString],
+    stdout_is_terminal: bool,
 ) -> bool {
+    if !stdout_is_terminal || argv.iter().any(|arg| arg == "--json") {
+        return false;
+    }
     if !ziros_invocation_requested(argv0, env_flag) {
         return false;
     }

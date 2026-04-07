@@ -1,6 +1,6 @@
 {
   "name": "@ziros/agent",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Thin npm installer and launcher for ZirOS on Apple Silicon macOS",
   "license": "UNLICENSED",
   "private": false,

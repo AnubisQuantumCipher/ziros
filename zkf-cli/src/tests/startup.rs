@@ -35,16 +35,22 @@ fn should_emit_ziros_banner_only_for_first_ziros_run() {
         Some(OsStr::new("ziros")),
         None,
         Some(marker_path.as_path()),
+        &[],
+        true,
     ));
     assert!(!crate::should_emit_ziros_first_run_banner(
         Some(OsStr::new("zkf")),
         None,
         Some(marker_path.as_path()),
+        &[],
+        true,
     ));
     assert!(crate::should_emit_ziros_first_run_banner(
         Some(OsStr::new("zkf-cli")),
         Some(OsStr::new("1")),
         Some(marker_path.as_path()),
+        &[],
+        true,
     ));
 
     crate::persist_ziros_first_run_marker(Some(marker_path.as_path()));
@@ -53,11 +59,15 @@ fn should_emit_ziros_banner_only_for_first_ziros_run() {
         Some(OsStr::new("ziros")),
         None,
         Some(marker_path.as_path()),
+        &[],
+        true,
     ));
     assert!(!crate::should_emit_ziros_first_run_banner(
         Some(OsStr::new("zkf-cli")),
         Some(OsStr::new("1")),
         Some(marker_path.as_path()),
+        &[],
+        true,
     ));
 
     let _ = fs::remove_dir_all(&temp_root);
@@ -69,10 +79,32 @@ fn should_emit_ziros_banner_without_marker_path() {
         Some(OsStr::new("ziros")),
         None,
         None,
+        &[],
+        true,
     ));
     assert!(crate::should_emit_ziros_first_run_banner(
         Some(OsStr::new("zkf-cli")),
         Some(OsStr::new("1")),
         None,
+        &[],
+        true,
+    ));
+}
+
+#[test]
+fn should_suppress_ziros_banner_for_machine_surfaces() {
+    assert!(!crate::should_emit_ziros_first_run_banner(
+        Some(OsStr::new("ziros")),
+        None,
+        None,
+        &[],
+        false,
+    ));
+    assert!(!crate::should_emit_ziros_first_run_banner(
+        Some(OsStr::new("ziros")),
+        None,
+        None,
+        &[std::ffi::OsString::from("--json")],
+        true,
     ));
 }

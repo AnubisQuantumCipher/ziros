@@ -1,6 +1,6 @@
 {
   "schema": "ziros-agent-setup-contract-v1",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "canonical_command_name": "ziros",
   "legacy_aliases": [
     "zkf"

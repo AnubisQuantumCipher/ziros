@@ -16,7 +16,7 @@
       "status": "backed"
     }
   ],
-  "generated_at": "2026-04-07T16:07:21.039238Z",
+  "generated_at": "2026-04-07T16:19:28.957208Z",
   "midnight_release_ready": true,
   "midnight_support_row": {
     "assurance_lane": "delegated-or-external-lane",
@@ -34,5 +34,5 @@
   "product_release_ready": true,
   "release_grade_ready": false,
   "schema": "ziros-vision-alignment-report-v1",
-  "version": "0.7.2"
+  "version": "0.7.3"
 }

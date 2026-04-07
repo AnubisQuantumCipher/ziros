@@ -61,12 +61,12 @@
     "swift": 25,
     "typescript_or_js": 65
   },
-  "generated_at": "2026-04-07T16:07:21.042084Z",
+  "generated_at": "2026-04-07T16:19:28.959784Z",
   "schema": "ziros-private-source-census-v1",
-  "source_commit": "dacd7b9adea14290dd94f6496972cc0a0360146a",
+  "source_commit": "ffe6f5eaf7b2c724706a48d9f643fb485befe661",
   "tracked_file_count": 1581,
-  "tracked_rust_line_count": 346895,
-  "tracked_rust_lines": 346895,
+  "tracked_rust_line_count": 346935,
+  "tracked_rust_lines": 346935,
   "workspace_crate_count": 22,
   "workspace_member_count": 22,
   "zero_unclassified_assertion": true
