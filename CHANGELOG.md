@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.7.4
+
+- Added the `private_claims_truth_and_settlement_subsystem` flagship lane as a
+  production-style property and casualty claims adjudication, settlement, and
+  selective-disclosure subsystem with strict HyperNova-backed packaging and
+  operator evidence bundles.
+- Closed the flagship claims release path with packaged subsystem completeness,
+  Midnight contract validation outputs, claim decision artifacts, and a
+  flagship report that truthfully states the proof boundary, attestation chain,
+  and host hardware participation.
+- Extended the HyperNova/Nova truth surface to cover the Pasta field path used
+  by the claims subsystem and corrected the public capability and support-matrix
+  surfaces to match the live proof lane.
+- Raised the runtime proof-encode buffer budget so flagship HyperNova runs no
+  longer fail when large proof artifacts are emitted through the execution
+  adapter.
+- Preserved the existing task-scoped claims flagship release artifacts while
+  folding their deliverables into the repo-wide `v0.7.4` semver cut.
+
 ## v0.1.0
 
 - Repositioned the repository as ZirOS: a zero-knowledge operating system for
