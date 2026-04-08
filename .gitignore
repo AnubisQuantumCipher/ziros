@@ -36,6 +36,8 @@
 system-health-alert-*.txt
 system-health-*.md
 morning-briefing-*.md
+/.hermes/
+/zkf-protocol-proofs/.lake/
 
 # Proof build artifacts
 .lia.cache

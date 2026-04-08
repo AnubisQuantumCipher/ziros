@@ -1,7 +1,7 @@
 #![cfg_attr(not(test), allow(dead_code))]
 #![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
 
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -13,7 +13,7 @@ use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 use zkf_cloudfs::CloudFS;
-use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
+use zkf_core::{json_from_slice, json_to_vec_pretty, ZkfError, ZkfResult};
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -102,6 +102,7 @@ const MULTI_SATELLITE_APP_ID: &str = "private_multi_satellite_conjunction_showca
 const SATELLITE_APP_ID: &str = "private_satellite_conjunction_showcase";
 const TURBINE_APP_ID: &str = "private_turbine_blade_life_showcase";
 const CLAIMS_APP_ID: &str = "private_claims_truth_and_settlement_showcase";
+const TRADE_FINANCE_APP_ID: &str = "private_trade_finance_settlement_showcase";
 const VOTING_APP_ID: &str = "private_voting_commitment_pipeline";
 
 const MULTI_SATELLITE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 2] = [
@@ -150,6 +151,24 @@ const CLAIMS_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 3] = [
         name: "verus_claims_truth",
         script_relative_path: "scripts/run_verus_claims_truth_proofs.sh",
         log_file_name: "verus_claims_truth.log",
+    },
+];
+
+const TRADE_FINANCE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 3] = [
+    FormalScriptSpec {
+        name: "rocq_trade_finance",
+        script_relative_path: "scripts/run_rocq_trade_finance_proofs.sh",
+        log_file_name: "rocq_trade_finance.log",
+    },
+    FormalScriptSpec {
+        name: "lean_trade_finance",
+        script_relative_path: "scripts/run_lean_trade_finance_proofs.sh",
+        log_file_name: "lean_trade_finance.log",
+    },
+    FormalScriptSpec {
+        name: "verus_trade_finance",
+        script_relative_path: "scripts/run_verus_trade_finance_proofs.sh",
+        log_file_name: "verus_trade_finance.log",
     },
 ];
 
@@ -341,6 +360,7 @@ fn generated_app_formal_script_specs_internal(
         SATELLITE_APP_ID => Ok(&SATELLITE_FORMAL_SCRIPT_SPECS),
         TURBINE_APP_ID => Ok(&TURBINE_FORMAL_SCRIPT_SPECS),
         CLAIMS_APP_ID => Ok(&CLAIMS_FORMAL_SCRIPT_SPECS),
+        TRADE_FINANCE_APP_ID => Ok(&TRADE_FINANCE_FORMAL_SCRIPT_SPECS),
         _ => Err(ZkfError::InvalidArtifact(format!(
             "unknown finished-app closure id `{app_id}`"
         ))),
@@ -798,6 +818,53 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                     "action_class_code",
                     "human_review_required",
                     "eligible_for_midnight_settlement",
+                ],
+            }),
+            surface_ids: &[
+                "truth.canonical_truth_active_boundaries",
+                "truth.backend.hypernova",
+                "truth.backend.arkworks_groth16",
+                "truth.runtime_proof_coverage",
+                "core.proof_witness_generation_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
+                "runtime.proof_runtime_spec",
+                "lib.proof_embedded_app_spec",
+                "backend.audited_backend_boundary",
+                "backend.groth16_boundary_model",
+                "protocol.hypernova_exact",
+                "protocol.groth16_exact",
+            ],
+        },
+        AppClosureSpec {
+            app_id: TRADE_FINANCE_APP_ID,
+            application: json!({
+                "name": TRADE_FINANCE_APP_ID,
+                "backend": {
+                    "primary": "hypernova",
+                    "compatibility_export": "not-emitted-for-pasta-fq-primary",
+                },
+                "execution_surface": "zkf-runtime strict-cryptographic lane",
+                "parameterization": {
+                    "business_lane": "private trade finance settlement",
+                    "line_item_count": 4,
+                    "rule_flag_count": 4,
+                    "disclosure_roles": ["supplier", "financier", "buyer", "auditor", "regulator"],
+                    "fixed_point_scale": "10^4",
+                },
+                "public_outputs": [
+                    "invoice_packet_commitment",
+                    "eligibility_commitment",
+                    "consistency_score_commitment",
+                    "duplicate_financing_risk_commitment",
+                    "approved_advance_commitment",
+                    "fee_amount_commitment",
+                    "reserve_amount_commitment",
+                    "maturity_schedule_commitment",
+                    "action_class",
+                    "human_review_required",
+                    "eligible_for_midnight_settlement",
+                    "proof_verification_result",
                 ],
             }),
             surface_ids: &[
@@ -1628,7 +1695,10 @@ pub fn run_foundry_report(project_dir: &Path, report_path: &Path) -> ZkfResult<s
         .arg("--gas-report")
         .output()
         .map_err(|error| {
-            ZkfError::Io(format!("run forge test in {}: {error}", project_dir.display()))
+            ZkfError::Io(format!(
+                "run forge test in {}: {error}",
+                project_dir.display()
+            ))
         })?;
     let mut text = String::new();
     text.push_str(&String::from_utf8_lossy(&output.stdout));

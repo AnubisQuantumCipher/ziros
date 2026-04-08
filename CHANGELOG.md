@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-04-08 — Private source release tranche
+
+- Added a release-facing documentation index under `docs/releases/` together with a private source release note and a 5,000-word operator experience report.
+- Added the Hermes operator blueprint, constitution, bootstrap prompt, and machine-readable operator contract so the agent layer is now documented as a first-class ZirOS operating surface.
+- Added the `private_trade_finance_settlement` subsystem to `zkf-lib`, including core decision, settlement binding, disclosure projection, duplicate-registry handoff, exporter, showcase example, and TDD coverage.
+- Hardened the trade-finance export surface so renamed business-facing fields now map to dedicated in-circuit commitment surfaces instead of legacy semantic aliases.
+- Added trade-finance packaging, Midnight validation, and formal-surface runner scripts for subsystem materialization and proof-side checks.
+- Refreshed generated forensics and release staging artifacts to capture the new subsystem and operator-facing release posture.
+- Added release-hygiene ignores for local `.hermes/` planning material and `zkf-protocol-proofs/.lake/` build outputs so future commits stay closer to source and evidence rather than host-local scratch state.
+
 ## v0.1.0
 
 - Repositioned the repository as ZirOS: a zero-knowledge operating system for

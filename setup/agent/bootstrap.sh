@@ -42,17 +42,25 @@ while [[ $# -gt 0 ]]; do
 done
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "${repo_root}"
 configured_target_dir=""
 if [[ -f "${repo_root}/.cargo/config.toml" ]]; then
   configured_target_dir="$(
     sed -n 's/^target-dir = "\(.*\)"/\1/p' "${repo_root}/.cargo/config.toml" | head -n 1
   )"
 fi
-if [[ -n "${configured_target_dir}" ]]; then
+if [[ -n "${CARGO_TARGET_DIR:-}" ]]; then
+  if [[ "${CARGO_TARGET_DIR}" = /* ]]; then
+    target_root="${CARGO_TARGET_DIR}"
+  else
+    target_root="${repo_root}/${CARGO_TARGET_DIR}"
+  fi
+elif [[ -n "${configured_target_dir}" ]]; then
   target_root="${repo_root}/${configured_target_dir}"
 else
-  target_root="${repo_root}/target"
+  target_root="${repo_root}/target-public"
 fi
+export CARGO_TARGET_DIR="${target_root}"
 release_target_dir="${target_root}/release"
 debug_target_dir="${target_root}/debug"
 local_bin="${HOME}/.local/bin"
@@ -228,7 +236,7 @@ fi
 mkdir -p "$local_bin" "$managed_bin" "$agent_root" "$state_root"
 
 if (( ! check_only )); then
-  cargo build -p zkf-cli --release
+  "${repo_root}/zkf-build.sh" --release -p zkf-cli --features neural-engine
   cargo build -p zkf-agent --release --bin ziros-agentd
 fi
 

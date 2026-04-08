@@ -262,6 +262,33 @@ pub use app::private_claims_truth::{
     run_private_claims_truth_hypernova_diagnostics,
 };
 #[cfg(not(hax))]
+pub use app::private_trade_finance_settlement::{
+    PRIVATE_TRADE_FINANCE_MAX_DIGESTS, PRIVATE_TRADE_FINANCE_MAX_LINE_ITEMS,
+    PRIVATE_TRADE_FINANCE_MAX_PERILS, PRIVATE_TRADE_FINANCE_PUBLIC_OUTPUTS,
+    TRADE_FINANCE_FIXED_POINT_SCALE, TradeFinanceActionClassV1,
+    TradeFinanceClaimEventDataV1, TradeFinanceConsistencyFraudInputsV1,
+    TradeFinanceEstimateLineItemV1, TradeFinanceEvidenceDataV1, TradeFinanceInvoiceLineItemV1,
+    TradeFinancePolicyDataV1, TradeFinancePrivateInputsV1, TradeFinancePublicOutputsV1,
+    TradeFinanceSettlementGovernanceInputsV1, build_trade_finance_decision_core_program,
+    build_trade_finance_disclosure_projection_program,
+    build_trade_finance_duplicate_registry_handoff_program,
+    build_trade_finance_settlement_binding_program, private_trade_finance_approve_inputs,
+    private_trade_finance_settlement_approve_inputs,
+    private_trade_finance_settlement_approve_with_manual_review_inputs,
+    private_trade_finance_settlement_inconsistency_rejection_inputs,
+    private_trade_finance_settlement_reject_for_rule_failure_inputs,
+    private_trade_finance_settlement_risk_review_inputs,
+    private_trade_finance_settlement_showcase, private_trade_finance_settlement_violation_inputs,
+    trade_finance_decision_witness_from_inputs, trade_finance_private_input_names_v1,
+};
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use app::private_trade_finance_settlement::{
+    PrivateTradeFinanceSettlementExportConfig, PrivateTradeFinanceSettlementExportProfile,
+    PrivateTradeFinanceSettlementHypernovaDiagnosticReport,
+    run_private_trade_finance_settlement_export,
+    run_private_trade_finance_settlement_hypernova_diagnostics,
+};
+#[cfg(not(hax))]
 pub use app::progress::{ProofEvent, ProofStage};
 #[cfg(not(hax))]
 pub use app::real_gas::{

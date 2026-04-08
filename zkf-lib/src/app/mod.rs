@@ -17,6 +17,7 @@ pub mod navier_stokes;
 pub mod orbital;
 pub mod private_identity;
 pub mod private_claims_truth;
+pub mod private_trade_finance_settlement;
 pub mod progress;
 pub mod real_gas;
 pub mod reentry;

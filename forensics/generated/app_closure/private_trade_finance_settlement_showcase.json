@@ -1,0 +1,837 @@
+{
+  "app_id": "private_trade_finance_settlement_showcase",
+  "application": {
+    "backend": {
+      "compatibility_export": "not-emitted-for-pasta-fq-primary",
+      "primary": "hypernova"
+    },
+    "execution_surface": "zkf-runtime strict-cryptographic lane",
+    "name": "private_trade_finance_settlement_showcase",
+    "parameterization": {
+      "business_lane": "private trade finance settlement",
+      "disclosure_roles": [
+        "supplier",
+        "financier",
+        "buyer",
+        "auditor",
+        "regulator"
+      ],
+      "fixed_point_scale": "10^4",
+      "line_item_count": 4,
+      "rule_flag_count": 4
+    },
+    "public_outputs": [
+      "invoice_packet_commitment",
+      "eligibility_commitment",
+      "consistency_score_commitment",
+      "duplicate_financing_risk_commitment",
+      "approved_advance_commitment",
+      "fee_amount_commitment",
+      "reserve_amount_commitment",
+      "maturity_schedule_commitment",
+      "action_class",
+      "human_review_required",
+      "eligible_for_midnight_settlement",
+      "proof_verification_result"
+    ]
+  },
+  "assurance_counts": {
+    "bounded": 0,
+    "compatibility alias": 0,
+    "explicit_tcb_adapter": 1,
+    "hypothesis-carried": 5,
+    "mechanized": 20,
+    "metadata-only": 4,
+    "model-only": 0
+  },
+  "assurance_vocabulary": [
+    "mechanized",
+    "bounded",
+    "model-only",
+    "hypothesis-carried",
+    "compatibility alias",
+    "metadata-only",
+    "explicit_tcb_adapter"
+  ],
+  "bundle_files": {
+    "exercised_surfaces": "formal/exercised_surfaces.json",
+    "logs": [
+      "formal/rocq_trade_finance.log",
+      "formal/lean_trade_finance.log",
+      "formal/verus_trade_finance.log"
+    ],
+    "status": "formal/STATUS.md"
+  },
+  "classifications": [
+    "mechanized",
+    "hypothesis-carried",
+    "metadata-only",
+    "explicit_tcb_adapter"
+  ],
+  "formal_scripts": [
+    {
+      "log_file_name": "rocq_trade_finance.log",
+      "name": "rocq_trade_finance",
+      "script_relative_path": "scripts/run_rocq_trade_finance_proofs.sh"
+    },
+    {
+      "log_file_name": "lean_trade_finance.log",
+      "name": "lean_trade_finance",
+      "script_relative_path": "scripts/run_lean_trade_finance_proofs.sh"
+    },
+    {
+      "log_file_name": "verus_trade_finance.log",
+      "name": "verus_trade_finance",
+      "script_relative_path": "scripts/run_verus_trade_finance_proofs.sh"
+    }
+  ],
+  "generated_closure_path": "forensics/generated/app_closure/private_trade_finance_settlement_showcase.json",
+  "generated_from": {
+    "canonical_truth": "docs/CANONICAL_TRUTH.md",
+    "completion_status": ".zkf-completion-status.json",
+    "support_matrix": "support-matrix.json",
+    "verification_ledger": "zkf-ir-spec/verification-ledger.json"
+  },
+  "implementation_closure_summary_path": "forensics/generated/implementation_closure_summary.json",
+  "schema": "zkf-generated-app-closure-v1",
+  "selected_surface_ids": [
+    "truth.canonical_truth_active_boundaries",
+    "truth.backend.hypernova",
+    "truth.backend.arkworks_groth16",
+    "truth.runtime_proof_coverage",
+    "core.proof_witness_generation_spec",
+    "core.proof_constant_time_bridge",
+    "runtime.hybrid_core",
+    "runtime.proof_runtime_spec",
+    "lib.proof_embedded_app_spec",
+    "backend.audited_backend_boundary",
+    "backend.groth16_boundary_model",
+    "protocol.hypernova_exact",
+    "protocol.groth16_exact"
+  ],
+  "selected_surfaces": [
+    {
+      "claims": [
+        {
+          "boundary": "strict-cryptographic default",
+          "claim_id": "canonical_truth.strict_cryptographic_default",
+          "classification": "metadata-only",
+          "path": "docs/CANONICAL_TRUTH.md",
+          "source": "canonical-truth"
+        },
+        {
+          "boundary": "metadata-only and compatibility-alias guidance",
+          "claim_id": "canonical_truth.metadata_only_and_alias_guidance",
+          "classification": "metadata-only",
+          "path": "docs/CANONICAL_TRUTH.md",
+          "source": "canonical-truth"
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 0,
+        "metadata-only": 2,
+        "model-only": 0
+      },
+      "classifications": [
+        "metadata-only"
+      ],
+      "label": "Canonical trust and compatibility boundaries",
+      "markers": {
+        "compatibility_alias_marker": true,
+        "metadata_only_marker": true,
+        "strict_cryptographic_marker": true
+      },
+      "path": "docs/CANONICAL_TRUTH.md",
+      "source": "canonical-truth",
+      "surface_id": "truth.canonical_truth_active_boundaries"
+    },
+    {
+      "claims": [
+        {
+          "assurance_lane": "native-cryptographic-proof",
+          "backend_id": "hypernova",
+          "claim_id": "support_matrix.backend.hypernova",
+          "classification": "metadata-only",
+          "path": "support-matrix.json",
+          "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+          "source": "support-matrix",
+          "status": "ready"
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 0,
+        "metadata-only": 1,
+        "model-only": 0
+      },
+      "classifications": [
+        "metadata-only"
+      ],
+      "label": "HyperNova backend readiness and trust metadata",
+      "path": "support-matrix.json",
+      "source": "support-matrix",
+      "surface_id": "truth.backend.hypernova"
+    },
+    {
+      "claims": [
+        {
+          "assurance_lane": "native-cryptographic-proof",
+          "backend_id": "arkworks-groth16",
+          "claim_id": "support_matrix.backend.arkworks_groth16",
+          "classification": "metadata-only",
+          "path": "support-matrix.json",
+          "proof_semantics": "proof-enforced-basic-ir",
+          "source": "support-matrix",
+          "status": "limited"
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 0,
+        "metadata-only": 1,
+        "model-only": 0
+      },
+      "classifications": [
+        "metadata-only"
+      ],
+      "label": "Arkworks Groth16 backend readiness and trust metadata",
+      "path": "support-matrix.json",
+      "source": "support-matrix",
+      "surface_id": "truth.backend.arkworks_groth16"
+    },
+    {
+      "claims": [
+        {
+          "claim_id": "completion_status.runtime_proof_coverage.explicit_tcb_adapter",
+          "classification": "explicit_tcb_adapter",
+          "complete_files": 89,
+          "complete_functions": 1788,
+          "explicit_tcb_files": 30,
+          "explicit_tcb_functions": 552,
+          "path": ".zkf-completion-status.json",
+          "source": "completion-status",
+          "total_files": 89,
+          "total_functions": 1788
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 1,
+        "hypothesis-carried": 0,
+        "mechanized": 0,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "explicit_tcb_adapter"
+      ],
+      "label": "Runtime proof-coverage explicit TCB inventory",
+      "path": ".zkf-completion-status.json",
+      "source": "completion-status",
+      "surface_id": "truth.runtime_proof_coverage"
+    },
+    {
+      "claims": [
+        {
+          "checker": "rocq",
+          "claim_id": "witness.generate_witness_non_blackbox_soundness",
+          "classification": "mechanized",
+          "proof_path": "zkf-core/proofs/rocq/WitnessGenerationProofs.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-core/src/proof_witness_generation_spec.rs",
+          "source_scope": "zkf-core::proof_witness_generation_spec",
+          "status": "mechanized_local",
+          "title": "Extraction-safe non-blackbox witness generation returns witnesses accepted by the proof kernel",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 1,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Witness generation proof-facing core",
+      "path": "zkf-core/src/proof_witness_generation_spec.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-core/proofs/rocq/WitnessGenerationProofs.v",
+          "zkf-core/proofs/rocq/extraction/Zkf_core_Proof_witness_generation_spec.v",
+          "zkf-core/proofs/fstar/extraction/Zkf_core.Proof_witness_generation_spec.fst"
+        ],
+        "proof_paths": [
+          "zkf-core/proofs/rocq/WitnessGenerationProofs.v"
+        ],
+        "source_path": "zkf-core/src/proof_witness_generation_spec.rs"
+      },
+      "surface_id": "core.proof_witness_generation_spec"
+    },
+    {
+      "claims": [
+        {
+          "checker": "fstar",
+          "claim_id": "swarm.constant_time_eval_equivalence",
+          "classification": "mechanized",
+          "proof_path": "zkf-core/proofs/fstar/ConstantTimeProofs.fst",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-core/src/proof_constant_time_bridge.rs",
+          "source_scope": "zkf-core::proof_constant_time_bridge",
+          "status": "mechanized_local",
+          "title": "The shipped constant-time evaluator shell matches the production-called reference result-shape bridge",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "fstar",
+          "claim_id": "security.constant_time_secret_independence",
+          "classification": "mechanized",
+          "proof_path": "zkf-core/proofs/fstar/ConstantTimeProofs.fst",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-core/src/proof_constant_time_bridge.rs",
+          "source_scope": "zkf-core::proof_constant_time_bridge",
+          "status": "mechanized_local",
+          "title": "Constant-time evaluator visit schedule is independent of secret witness data on the shipped proof surface",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 2,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Constant-time proof-facing evaluator bridge surface",
+      "path": "zkf-core/src/proof_constant_time_bridge.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-core/proofs/fstar/ConstantTimeProofs.fst"
+        ],
+        "proof_paths": [
+          "zkf-core/proofs/fstar/ConstantTimeProofs.fst"
+        ],
+        "source_path": "zkf-core/src/proof_constant_time_bridge.rs"
+      },
+      "surface_id": "core.proof_constant_time_bridge"
+    },
+    {
+      "claims": [
+        {
+          "checker": "verus",
+          "claim_id": "hybrid.and_verification_semantics_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/hybrid_core.rs",
+          "source_scope": "zkf-runtime::hybrid_core",
+          "status": "mechanized_local",
+          "title": "Hybrid verify decision helper remains logical AND over the two shipped legs",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "hybrid.transcript_hash_binding_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/hybrid_core.rs",
+          "source_scope": "zkf-runtime::hybrid_core",
+          "status": "mechanized_local",
+          "title": "Recorded digest helper rejects missing or mismatched transcript-digest entries",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "hybrid.hardware_probe_rejection_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/hybrid_core.rs",
+          "source_scope": "zkf-runtime::hybrid_core",
+          "status": "mechanized_local",
+          "title": "Hardware probe helper rejects unhealthy or mismatched probe summaries",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "hybrid.primary_leg_outer_artifact_binding_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/hybrid_core.rs",
+          "source_scope": "zkf-runtime::hybrid_core",
+          "status": "mechanized_local",
+          "title": "Primary-leg byte comparison helper rejects proof or verification-key divergence",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "hybrid.replay_manifest_determinism_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/hybrid_core.rs",
+          "source_scope": "zkf-runtime::hybrid_core",
+          "status": "mechanized_local",
+          "title": "Replay manifest identity helper is deterministic on the shipped replay-manifest surface",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 5,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Hybrid runtime decision helpers",
+      "path": "zkf-runtime/src/hybrid_core.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
+        ],
+        "proof_paths": [
+          "zkf-runtime/proofs/verus/runtime_execution_hybrid_verus.rs"
+        ],
+        "source_path": "zkf-runtime/src/hybrid_core.rs"
+      },
+      "surface_id": "runtime.hybrid_core"
+    },
+    {
+      "claims": [
+        {
+          "checker": "rocq",
+          "claim_id": "pipeline.cli_runtime_path_composition",
+          "classification": "mechanized",
+          "proof_path": "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-runtime/src/proof_runtime_spec.rs",
+          "source_scope": "zkf-runtime::proof_runtime_spec",
+          "status": "mechanized_local",
+          "title": "CLI/runtime transform pipeline preserves kernel acceptance on the supported arithmetic surface",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 1,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Runtime CLI/pipeline proof helpers",
+      "path": "zkf-runtime/src/proof_runtime_spec.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+        ],
+        "proof_paths": [
+          "zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"
+        ],
+        "source_path": "zkf-runtime/src/proof_runtime_spec.rs"
+      },
+      "surface_id": "runtime.proof_runtime_spec"
+    },
+    {
+      "claims": [
+        {
+          "checker": "rocq",
+          "claim_id": "app.alias_resolution_correctness_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Canonical input-key helper resolves an alias target or preserves the requested key",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "app.digest_mismatch_rejection_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Program digest guard rejects mismatched digests on the embedded app proof surface",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "app.error_propagation_completeness_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Program mismatch field helper preserves the expected and found digests",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "app.default_backend_validity_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Default embedded backend helper is total over the shipped proof field enum",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "pipeline.embedded_default_path_composition",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Embedded default transform pipeline preserves kernel acceptance on the supported arithmetic surface",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "private_identity.merkle_direction_fail_closed_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Private-identity Merkle direction helper accepts only binary direction values",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "rocq",
+          "claim_id": "private_identity.public_input_arity_fail_closed_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-lib/src/proof_embedded_app_spec.rs",
+          "source_scope": "zkf-lib::proof_embedded_app_spec",
+          "status": "mechanized_local",
+          "title": "Private-identity public-input arity helper accepts only the shipped expected arity",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 7,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Embedded application helper surface",
+      "path": "zkf-lib/src/proof_embedded_app_spec.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v",
+          "zkf-lib/proofs/rocq/extraction/Zkf_lib_Proof_embedded_app_spec.v"
+        ],
+        "proof_paths": [
+          "zkf-lib/proofs/rocq/EmbeddedPipelineComposition.v"
+        ],
+        "source_path": "zkf-lib/src/proof_embedded_app_spec.rs"
+      },
+      "surface_id": "lib.proof_embedded_app_spec"
+    },
+    {
+      "claims": [
+        {
+          "checker": "verus",
+          "claim_id": "backend.audit_retains_original_on_digest_mismatch",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/verus/audited_backend_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-backends/proofs/verus/audited_backend_verus.rs",
+          "source_scope": "zkf-backends::audited_backend",
+          "status": "mechanized_local",
+          "title": "Audited compile retains the original program when the source and compiled digests differ",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 1,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Audited backend digest-retention boundary",
+      "path": "zkf-backends/proofs/verus/audited_backend_verus.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [],
+        "proof_paths": [
+          "zkf-backends/proofs/verus/audited_backend_verus.rs"
+        ],
+        "source_path": "zkf-backends/proofs/verus/audited_backend_verus.rs"
+      },
+      "surface_id": "backend.audited_backend_boundary"
+    },
+    {
+      "claims": [
+        {
+          "checker": "verus",
+          "claim_id": "aggregation.halo2_ipa_accumulation_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source_scope": "zkf-backends::wrapping::halo2_ipa_accumulator",
+          "status": "mechanized_local",
+          "title": "Halo2 IPA aggregation binding accepts only complete batches before deferred recomputation",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "wrapping.groth16_cached_shape_matrix_free_fail_closed",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source_scope": "zkf-backends::arkworks",
+          "status": "mechanized_local",
+          "title": "Cached-shape Groth16 keeps the shipped debug gate off without matrices and rejects matrix-free satisfaction inspection",
+          "trusted_assumptions": []
+        },
+        {
+          "checker": "verus",
+          "claim_id": "backend.groth16_matrix_equivalence_bounded",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source": "verification-ledger",
+          "source_assurance_class": "mechanized_implementation_claim",
+          "source_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+          "source_scope": "zkf-backends::arkworks",
+          "status": "mechanized_local",
+          "title": "Groth16 outlined-row expansion gives identical materialized, streaming, and draining matrices on the shipped helper surface",
+          "trusted_assumptions": []
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 3,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "mechanized"
+      ],
+      "label": "Groth16 proof-facing boundary model",
+      "path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [],
+        "proof_paths": [
+          "zkf-backends/proofs/verus/groth16_boundary_verus.rs"
+        ],
+        "source_path": "zkf-backends/proofs/verus/groth16_boundary_verus.rs"
+      },
+      "surface_id": "backend.groth16_boundary_model"
+    },
+    {
+      "claims": [
+        {
+          "checker": "lean",
+          "claim_id": "protocol.hypernova_completeness",
+          "classification": "hypothesis-carried",
+          "proof_path": null,
+          "source": "verification-ledger",
+          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_path": "zkf-backends/src/nova_native.rs",
+          "source_scope": "zkf-backends::nova_native",
+          "status": "hypothesis_stated",
+          "title": "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses",
+          "trusted_assumptions": [
+            "hypernovaExactCompletenessHypothesis"
+          ]
+        },
+        {
+          "checker": "lean",
+          "claim_id": "protocol.hypernova_folding_soundness",
+          "classification": "hypothesis-carried",
+          "proof_path": null,
+          "source": "verification-ledger",
+          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_path": "zkf-backends/src/nova_native.rs",
+          "source_scope": "zkf-backends::nova_native",
+          "status": "hypothesis_stated",
+          "title": "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses",
+          "trusted_assumptions": [
+            "hypernovaExactFoldingSoundnessHypothesis"
+          ]
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 2,
+        "mechanized": 0,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "hypothesis-carried"
+      ],
+      "label": "HyperNova exact shipped protocol surface",
+      "path": "zkf-backends/src/nova_native.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [
+          "zkf-backends/src/proof_hypernova_exact_spec.rs"
+        ],
+        "proof_paths": [],
+        "source_path": "zkf-backends/src/nova_native.rs"
+      },
+      "surface_id": "protocol.hypernova_exact"
+    },
+    {
+      "claims": [
+        {
+          "checker": "lean",
+          "claim_id": "protocol.groth16_completeness",
+          "classification": "hypothesis-carried",
+          "proof_path": null,
+          "source": "verification-ledger",
+          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_path": "zkf-backends/src/arkworks.rs",
+          "source_scope": "zkf-backends::arkworks",
+          "status": "hypothesis_stated",
+          "title": "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses",
+          "trusted_assumptions": [
+            "groth16ImportedCrsValidityHypothesis",
+            "groth16ExactCompletenessHypothesis"
+          ]
+        },
+        {
+          "checker": "lean",
+          "claim_id": "protocol.groth16_knowledge_soundness",
+          "classification": "hypothesis-carried",
+          "proof_path": null,
+          "source": "verification-ledger",
+          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_path": "zkf-backends/src/arkworks.rs",
+          "source_scope": "zkf-backends::arkworks",
+          "status": "hypothesis_stated",
+          "title": "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses",
+          "trusted_assumptions": [
+            "groth16ImportedCrsValidityHypothesis",
+            "groth16KnowledgeOfExponentHypothesis"
+          ]
+        },
+        {
+          "checker": "lean",
+          "claim_id": "protocol.groth16_zero_knowledge",
+          "classification": "hypothesis-carried",
+          "proof_path": null,
+          "source": "verification-ledger",
+          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_path": "zkf-backends/src/arkworks.rs",
+          "source_scope": "zkf-backends::arkworks",
+          "status": "hypothesis_stated",
+          "title": "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses",
+          "trusted_assumptions": [
+            "groth16ImportedCrsValidityHypothesis",
+            "groth16ExactZeroKnowledgeHypothesis"
+          ]
+        }
+      ],
+      "classification_counts": {
+        "bounded": 0,
+        "compatibility alias": 0,
+        "explicit_tcb_adapter": 0,
+        "hypothesis-carried": 3,
+        "mechanized": 0,
+        "metadata-only": 0,
+        "model-only": 0
+      },
+      "classifications": [
+        "hypothesis-carried"
+      ],
+      "label": "Groth16 exact shipped protocol surface",
+      "path": "zkf-backends/src/arkworks.rs",
+      "source": "verification-ledger",
+      "supporting_paths": {
+        "extraction_paths": [],
+        "proof_paths": [],
+        "source_path": "zkf-backends/src/arkworks.rs"
+      },
+      "surface_id": "protocol.groth16_exact"
+    }
+  ]
+}

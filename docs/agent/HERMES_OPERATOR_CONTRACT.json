@@ -1,0 +1,365 @@
+{
+  "schema": "ziros-hermes-operator-contract-v1",
+  "generated_from": {
+    "repo_root": "/Users/sicarii/Desktop/ZirOS",
+    "truth_files": [
+      "/Users/sicarii/Desktop/ZirOS/AGENTS.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md",
+      "/Users/sicarii/Desktop/ZirOS/.zkf-completion-status.json",
+      "/Users/sicarii/Desktop/ZirOS/support-matrix.json",
+      "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json"
+    ],
+    "code_paths": [
+      "/Users/sicarii/Desktop/ZirOS/zkf-runtime/src/lib.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-runtime/src/control_plane.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-runtime/src/trust.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-agent/src/mcp.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-cli/src/cmd/gateway.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-cli/src/cmd/midnight.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-cli/src/cmd/subsystem.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-distributed/src/lib.rs",
+      "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/src/verification.rs"
+    ],
+    "hermes_docs": [
+      "https://hermes-agent.nousresearch.com/docs/guides/tips/",
+      "https://hermes-agent.nousresearch.com/docs/user-guide/features/cron/",
+      "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser/",
+      "https://hermes-agent.nousresearch.com/docs/user-guide/configuration/",
+      "https://hermes-agent.nousresearch.com/docs/user-guide/security/"
+    ]
+  },
+  "truth_hierarchy": [
+    {
+      "rank": 1,
+      "kind": "live-command",
+      "sources": [
+        "~/.ziros/bin/ziros-managed.bin gateway status --json",
+        "cat /Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
+        "TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict",
+        "~/.ziros/bin/ziros-managed.bin capabilities --json",
+        "~/.ziros/bin/ziros-managed.bin agent --json provider status"
+      ]
+    },
+    {
+      "rank": 2,
+      "kind": "machine-readable-repo-truth",
+      "sources": [
+        "/Users/sicarii/Desktop/ZirOS/.zkf-completion-status.json",
+        "/Users/sicarii/Desktop/ZirOS/support-matrix.json",
+        "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json"
+      ]
+    },
+    {
+      "rank": 3,
+      "kind": "canonical-docs",
+      "sources": [
+        "/Users/sicarii/Desktop/ZirOS/AGENTS.md",
+        "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
+        "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
+        "/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md"
+      ]
+    },
+    {
+      "rank": 4,
+      "kind": "source-code",
+      "sources": [
+        "/Users/sicarii/Desktop/ZirOS/zkf-runtime",
+        "/Users/sicarii/Desktop/ZirOS/zkf-agent",
+        "/Users/sicarii/Desktop/ZirOS/zkf-cli",
+        "/Users/sicarii/Desktop/ZirOS/zkf-metal",
+        "/Users/sicarii/Desktop/ZirOS/zkf-distributed",
+        "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec"
+      ]
+    }
+  ],
+  "binary_topology": {
+    "public_wrappers": {
+      "ziros": "/Users/sicarii/.ziros/bin/ziros",
+      "zkf": "/Users/sicarii/.ziros/bin/zkf",
+      "role": "convenience wrappers over operator and certified proof lanes"
+    },
+    "managed_operator_lane": {
+      "binary": "/Users/sicarii/.ziros/bin/ziros-managed.bin",
+      "sha256": "80a95194812d6dfb0de6319a059a23e0988f25fce18ecb08eb77d4780b92d172",
+      "authoritative_for": [
+        "gateway",
+        "mcp",
+        "agent",
+        "provider-routing",
+        "midnight",
+        "wallet",
+        "subsystem",
+        "rich-capability-reporting",
+        "operator-status"
+      ]
+    },
+    "certified_proof_lane": {
+      "binary": "/Users/sicarii/.ziros/bin/ziros-certified.bin",
+      "compat_alias": "/Users/sicarii/.ziros/bin/zkf-certified.bin",
+      "sha256": "185e1bf6806040a3e2dcc1c3cd04eeed14d80b82bab6e04456f418373a035df4",
+      "tmpdir": "/Users/sicarii/.zkf/strict-cert-tmp/",
+      "certification_report": "/Users/sicarii/.zkf/cache/stark-to-groth16/certification/strict-m4-max.json",
+      "authoritative_for": [
+        "metal-doctor --strict",
+        "strict metal production readiness",
+        "strict bn254 wrap readiness"
+      ]
+    },
+    "daemon": "/Users/sicarii/.ziros/bin/ziros-agentd",
+    "brain": "/Users/sicarii/.ziros/agent/brain.sqlite3"
+  },
+  "path_roots": {
+    "repo_root": "/Users/sicarii/Desktop/ZirOS",
+    "operator_specimen_root": "/Users/sicarii/Projects/hibikari",
+    "live_mcp_file": "/Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
+    "agent_socket": "/Users/sicarii/.ziros/agent/ziros-agentd.sock",
+    "strict_cert_tmp_anchor": "/Users/sicarii/.zkf/strict-cert-tmp/zkf-stark-to-groth16/certification/strict-m4-max.json"
+  },
+  "observed_runtime_state": {
+    "mcp_url": {
+      "value": "https://d39501b02c0e87.lhr.life/mcp",
+      "volatile": true,
+      "refresh_with": [
+        "~/.ziros/bin/ziros-managed.bin gateway status --json",
+        "cat /Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt"
+      ]
+    }
+  },
+  "command_surfaces": {
+    "gateway_status": "~/.ziros/bin/ziros-managed.bin gateway status --json",
+    "live_mcp_url": "cat /Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
+    "strict_metal": "TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict",
+    "capabilities": "~/.ziros/bin/ziros-managed.bin capabilities --json",
+    "provider_status": "~/.ziros/bin/ziros-managed.bin agent --json provider status",
+    "agent_status": "~/.ziros/bin/ziros-managed.bin agent --json status",
+    "midnight_status": "~/.ziros/bin/ziros-managed.bin midnight status --json",
+    "midnight_doctor": "~/.ziros/bin/ziros-managed.bin midnight doctor --json --network preview",
+    "subsystem_scaffold": "~/.ziros/bin/ziros-managed.bin subsystem scaffold",
+    "wallet_status": "~/.ziros/bin/ziros-managed.bin wallet status --json"
+  },
+  "execution_modes": {
+    "local_cli": {
+      "priority": "primary",
+      "why": "trusted-host source of truth and full system control"
+    },
+    "mcp_remote_bridge": {
+      "priority": "secondary",
+      "default_exposure": "remote-bridge-read-only",
+      "local_execution_boundary": "ziros-agentd",
+      "notes": [
+        "use for remote planning and inspection",
+        "prepare local handoffs when mutating execution still requires local acceptance"
+      ]
+    },
+    "browser": {
+      "priority": "validation-and-web-flows",
+      "allowed_roles": [
+        "official-doc-verification",
+        "explorer-or-indexer-checks",
+        "release-surface-validation",
+        "web-only-operator-flows"
+      ]
+    },
+    "terminal_backends": [
+      "local",
+      "docker",
+      "ssh",
+      "modal",
+      "daytona",
+      "singularity"
+    ]
+  },
+  "autonomy_policy": {
+    "default_mode": "max-autonomy-local-first",
+    "autonomous_actions": [
+      "inspect",
+      "search",
+      "patch",
+      "build",
+      "test",
+      "prove",
+      "verify",
+      "export",
+      "package",
+      "scaffold",
+      "generate-reports",
+      "validate-on-chain-state",
+      "create-skills",
+      "update-memory",
+      "schedule-checks"
+    ],
+    "must_never_do": [
+      "invent-missing-secrets",
+      "push-source-or-repository-state-by-default",
+      "claim-stricter-trust-than-artifacts-support",
+      "claim-on-chain-state-without-live-confirmation",
+      "hide-delegated-or-compatibility-lanes",
+      "treat-neural-engine-as-proof-truth",
+      "pretend-platform-enforced-handoffs-do-not-exist"
+    ]
+  },
+  "approval_exceptions": [
+    {
+      "case": "platform-enforced-local-bridge-acceptance",
+      "rule": "when the remote bridge produces a local handoff, Hermes must surface the handoff and the local accept command instead of pretending it already executed"
+    },
+    {
+      "case": "missing-wallet-or-key-material",
+      "rule": "Hermes may diagnose and prepare, but it must not fabricate or substitute missing wallet secrets, admin keys, or API credentials"
+    }
+  ],
+  "memory_policy": {
+    "facts_live_in": "~/.hermes/memories/",
+    "procedures_live_in": "~/.hermes/skills/",
+    "persist_facts": [
+      "project-roots",
+      "wallet-and-network-choices",
+      "bridge-and-gateway-realities",
+      "deployment-addresses",
+      "lane-caveats",
+      "failure-patterns"
+    ],
+    "promote_to_skill_when": "workflow takes 5 or more steps and is likely to recur"
+  },
+  "skill_policy": {
+    "priority_workflows": [
+      "bridge-recovery",
+      "strict-metal-checks",
+      "midnight-wallet-readiness",
+      "midnight-deploy-recovery",
+      "subsystem-scaffold-and-package",
+      "verifier-export",
+      "proof-first-public-release"
+    ]
+  },
+  "publication_policy": {
+    "default_mode": "local-only-source-private",
+    "push_source_by_default": false,
+    "preferred_publication_posture": [
+      "artifact-first",
+      "proof-first",
+      "source-private",
+      "mechanized-attestation-preferred",
+      "leak-scan-before-push",
+      "trust-lane-honest"
+    ],
+    "publish_when_explicitly_requested": [
+      "theorem-statements",
+      "proof-artifacts",
+      "verification-keys",
+      "digests",
+      "verifier-assets",
+      "public-inputs",
+      "evidence-reports",
+      "sanitized-release-artifacts"
+    ],
+    "do_not_default_to": [
+      "pushing-implementation-source",
+      "publishing-private-repository-state",
+      "publishing-unsanitized-artifacts"
+    ]
+  },
+  "subagent_policy": {
+    "use_for": [
+      "repo-forensics",
+      "proof-vs-operator-lane-comparison",
+      "formal-surface-review",
+      "deployment-validation",
+      "browser-based-validation"
+    ],
+    "goal": "parallelize without collapsing trust semantics or overloading a single context"
+  },
+  "cron_catalog": [
+    {
+      "name": "ziros-gateway-health",
+      "schedule": "every 15m",
+      "prompt": "Run ~/.ziros/bin/ziros-managed.bin gateway status --json, compare the reported mcp_url to /Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt, and alert if local health, remote health, tunnel state, or URL drift is unhealthy.",
+      "delivery": "home-channel-or-local-file"
+    },
+    {
+      "name": "ziros-strict-metal-lane",
+      "schedule": "every 6h",
+      "prompt": "Run TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict and summarize strict certification and gpu production readiness.",
+      "delivery": "home-channel-or-local-file"
+    },
+    {
+      "name": "ziros-nightly-capabilities",
+      "schedule": "0 2 * * *",
+      "prompt": "Run ~/.ziros/bin/ziros-managed.bin capabilities --json and summarize backend readiness changes and any new regressions.",
+      "delivery": "home-channel-or-local-file"
+    },
+    {
+      "name": "ziros-midnight-readiness",
+      "schedule": "every 12h",
+      "prompt": "Run ~/.ziros/bin/ziros-managed.bin midnight status --json and ~/.ziros/bin/ziros-managed.bin midnight doctor --json --network preview, then summarize proof-server, gateway, wallet, and deploy readiness.",
+      "delivery": "home-channel-or-local-file"
+    },
+    {
+      "name": "hibikari-deployment-watch",
+      "schedule": "0 9 * * *",
+      "prompt": "Inspect /Users/sicarii/Projects/hibikari/deployment-all.json, verify the listed contracts against the live Midnight preview indexer, and summarize invariant drift or missing chain state.",
+      "delivery": "home-channel-or-local-file"
+    }
+  ],
+  "browser_policy": {
+    "use_for": [
+      "official Hermes docs",
+      "official OpenAI docs",
+      "Midnight explorer or indexer",
+      "release pages",
+      "public proof artifacts"
+    ],
+    "do_not_use_for": [
+      "local command truth that already has a deterministic CLI surface"
+    ]
+  },
+  "midnight_policy": {
+    "specimen_repo": "/Users/sicarii/Projects/hibikari",
+    "principles": [
+      "funding is not deploy readiness",
+      "registered NIGHT is not spendable tDUST",
+      "deployment manifests are local truth before narrative",
+      "on-chain claims require live network confirmation",
+      "midnight-compact remains a delegated-or-external lane"
+    ]
+  },
+  "formal_attestation_policy": {
+    "mechanized_rows": 160,
+    "hypothesis_rows": 9,
+    "rules": [
+      "mechanized local proof outranks prose",
+      "hypothesis-carried rows stay labeled",
+      "attestation-backed and metadata-only surfaces are never relabeled as cryptographic recursion",
+      "exported reports must preserve trust-lane honesty"
+    ]
+  },
+  "failure_mode_catalog": [
+    {
+      "name": "gateway-url-rotation",
+      "detect_with": "~/.ziros/bin/ziros-managed.bin gateway status --json",
+      "repair_pattern": "refresh mcp-url.txt and, if needed, restart the gateway"
+    },
+    {
+      "name": "strict-certification-drift",
+      "detect_with": "TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict",
+      "repair_pattern": "rebind the matching certification report or recertify the current build"
+    },
+    {
+      "name": "wallet-funded-but-not-deploy-ready",
+      "detect_with": "wallet setup or readiness diagnostics showing spendableDustRaw == 0",
+      "repair_pattern": "materialize spendable tDUST before deploy"
+    },
+    {
+      "name": "deploy-block-limit",
+      "detect_with": "live deploy failure during multi-contract deployment",
+      "repair_pattern": "fall back to staged verifier-key or staged deploy strategy"
+    },
+    {
+      "name": "mcp-handoff-boundary",
+      "detect_with": "remote tool can plan but local mutation still requires acceptance",
+      "repair_pattern": "prepare bridge handoff and accept locally"
+    }
+  ]
+}

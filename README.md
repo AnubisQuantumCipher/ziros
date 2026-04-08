@@ -596,6 +596,8 @@ cargo run -p zkf-verify -- --help
 | --- | --- |
 | [`docs/CANONICAL_TRUTH.md`](docs/CANONICAL_TRUTH.md) | How to interpret truth, trust lanes, and live support |
 | [`docs/agent/README.md`](docs/agent/README.md) | Canonical ZirOS autonomous-agent onboarding path |
+| [`docs/releases/README.md`](docs/releases/README.md) | Private release notes and operator retrospectives for current source drops |
+| [`docs/releases/2026-04-08-operator-experience-report.md`](docs/releases/2026-04-08-operator-experience-report.md) | 5,000-word operator assessment of the project and system after direct execution |
 | [`docs/agent/QUICKSTART.md`](docs/agent/QUICKSTART.md) | Fastest path from checkout to first prompt |
 | [`docs/agent/SETUP_APPLE_SILICON.md`](docs/agent/SETUP_APPLE_SILICON.md) | Apple Silicon runtime, provider, and control-plane setup |
 | [`docs/agent/MEMORY_AND_LEARNING.md`](docs/agent/MEMORY_AND_LEARNING.md) | Brain persistence and how the agent improves continuity over time |
