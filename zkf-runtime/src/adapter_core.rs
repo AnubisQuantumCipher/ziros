@@ -50,13 +50,17 @@ pub(crate) fn delegated_backend_artifact_bytes(backend: BackendKind, constraints
             512 * 1024
         }
         BackendKind::Plonky3 => 16 * 1024 * 1024,
-        BackendKind::Nova | BackendKind::HyperNova => 4 * 1024 * 1024,
+        BackendKind::Nova => 4 * 1024 * 1024,
+        // Native HyperNova proof artifacts can exceed 40 MiB even for medium-sized
+        // recursive programs once the serialized IVC payload and metadata are encoded.
+        BackendKind::HyperNova => 48 * 1024 * 1024,
         _ => 2 * 1024 * 1024,
     };
     // Plonky3 STARK proofs scale with constraint count — large circuits
     // (e.g. 96-step Euler integration) produce proofs exceeding 8 MB.
     let max_bytes = match backend {
         BackendKind::Plonky3 => 64 * 1024 * 1024,
+        BackendKind::HyperNova => 128 * 1024 * 1024,
         _ => 16 * 1024 * 1024,
     };
     base.max(constraints.saturating_mul(64))

@@ -63,12 +63,18 @@ pub open spec fn delegated_backend_artifact_bytes(
         | BackendKindModel::Halo2
         | BackendKindModel::Halo2Bls12381 => 512 * 1024,
         BackendKindModel::Plonky3 => 8 * 1024 * 1024,
-        BackendKindModel::Nova | BackendKindModel::HyperNova => 4 * 1024 * 1024,
+        BackendKindModel::Nova => 4 * 1024 * 1024,
+        BackendKindModel::HyperNova => 48 * 1024 * 1024,
         BackendKindModel::Sp1
         | BackendKindModel::RiscZero
         | BackendKindModel::MidnightCompact => 2 * 1024 * 1024,
     };
-    clamp_nat(max_nat(base, constraints * 64), 256 * 1024, 16 * 1024 * 1024)
+    let upper = match backend {
+        BackendKindModel::Plonky3 => 64 * 1024 * 1024,
+        BackendKindModel::HyperNova => 128 * 1024 * 1024,
+        _ => 16 * 1024 * 1024,
+    };
+    clamp_nat(max_nat(base, constraints * 64), 256 * 1024, upper)
 }
 
 pub open spec fn backend_witness_bytes(signal_count: nat) -> nat {
@@ -118,7 +124,14 @@ pub proof fn runtime_adapter_backend_graph_emission(
         backend_transcript_bytes() == 32,
         backend_prove_bytes() == 32,
         delegated_backend_artifact_bytes(backend, constraints) >= 256 * 1024,
-        delegated_backend_artifact_bytes(backend, constraints) <= 16 * 1024 * 1024,
+        delegated_backend_artifact_bytes(backend, constraints)
+            <= if backend == BackendKindModel::HyperNova {
+                128 * 1024 * 1024
+            } else if backend == BackendKindModel::Plonky3 {
+                64 * 1024 * 1024
+            } else {
+                16 * 1024 * 1024
+            },
         unique(backend_prove_slot_plan()),
         backend_dependency_order(backend_prove_slot_plan()),
 {

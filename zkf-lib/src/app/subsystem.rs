@@ -6,6 +6,16 @@ pub const SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED: &str = "author_fixed";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
+pub enum ProductionClassificationV1 {
+    PrimaryStrict,
+    CompatibilityOnlySmoke,
+    CompatibilityOnly,
+    ExternalDelegate,
+    PlanningOnly,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
 pub enum MidnightContractClassV1 {
     TokenTransfer,
     CooperativeTreasury,
@@ -56,6 +66,8 @@ pub struct SubsystemCircuitManifestV1 {
     pub proof_path: String,
     pub verification_path: String,
     pub audit_path: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lane_classification: Option<ProductionClassificationV1>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
@@ -104,6 +116,25 @@ pub struct SubsystemReleaseContractV1 {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct SubsystemEvidenceRefsV1 {
+    pub report_path: String,
+    pub summary_path: String,
+    pub telemetry_report_path: String,
+    pub translation_report_path: String,
+    pub witness_summary_path: String,
+    pub public_inputs_path: String,
+    pub public_outputs_path: String,
+    pub evidence_summary_path: String,
+    pub deterministic_manifest_path: String,
+    pub closure_artifacts_path: String,
+    pub midnight_package_manifest_path: String,
+    pub midnight_flow_manifest_path: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub midnight_validation_summary_path: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct SubsystemManifestEnvelopeV1 {
     pub schema: String,
     pub subsystem_id: String,
@@ -112,6 +143,12 @@ pub struct SubsystemManifestEnvelopeV1 {
     pub backend_policy: String,
     pub publication_target: String,
     pub circuits: BTreeMap<String, SubsystemCircuitManifestV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runtime_profile: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub production_classification: Option<ProductionClassificationV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub minimum_report_word_count: Option<usize>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub circuit_modules: Vec<SubsystemCircuitModuleV1>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -122,6 +159,8 @@ pub struct SubsystemManifestEnvelopeV1 {
     pub deployment_profile: Option<DeploymentProfileV1>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub release_contract: Option<SubsystemReleaseContractV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_refs: Option<SubsystemEvidenceRefsV1>,
 }
 
 impl SubsystemManifestEnvelopeV1 {
@@ -140,11 +179,15 @@ impl SubsystemManifestEnvelopeV1 {
             backend_policy: SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED.to_string(),
             publication_target: publication_target.into(),
             circuits,
+            runtime_profile: None,
+            production_classification: None,
+            minimum_report_word_count: None,
             circuit_modules: Vec::new(),
             contracts: Vec::new(),
             disclosure_policy: None,
             deployment_profile: None,
             release_contract: None,
+            evidence_refs: None,
         }
     }
 }

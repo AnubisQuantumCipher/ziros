@@ -1209,8 +1209,13 @@ fn delegated_backend(kind: BackendKind) -> Option<BackendKind> {
 
 fn supported_fields(kind: BackendKind) -> Vec<FieldId> {
     match kind {
-        BackendKind::ArkworksGroth16 | BackendKind::Nova | BackendKind::HyperNova => {
-            vec![FieldId::Bn254]
+        BackendKind::ArkworksGroth16 => vec![FieldId::Bn254],
+        BackendKind::Nova | BackendKind::HyperNova => {
+            if cfg!(feature = "native-nova") {
+                vec![FieldId::Bn254, FieldId::PastaFp, FieldId::PastaFq]
+            } else {
+                vec![FieldId::Bn254]
+            }
         }
         BackendKind::Plonky3 | BackendKind::Sp1 | BackendKind::RiscZero => {
             vec![FieldId::Goldilocks, FieldId::BabyBear, FieldId::Mersenne31]

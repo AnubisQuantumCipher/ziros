@@ -35,7 +35,7 @@ impl BackendEngine for HyperNovaBackend {
                 vec!["hypernova-ccs".to_string(), "pallas-vesta".to_string()],
                 "HyperNova native mode: delegates to Nova native backend with HyperNova \
                  CCS profile for real multifolding over Pallas/Vesta curve cycle. \
-                 Supports BN254 IR programs (mapped to Pallas scalar field)."
+                 Supports BN254, PastaFp, and PastaFq IR programs."
                     .to_string(),
             )
         } else {
@@ -71,10 +71,24 @@ impl BackendEngine for HyperNovaBackend {
 
     fn compile(&self, program: &Program) -> ZkfResult<CompiledProgram> {
         crate::with_serialized_heavy_backend_test(|| {
-            if program.field != FieldId::Bn254 {
+            if nova_native_available() {
+                match program.field {
+                    FieldId::Bn254 | FieldId::PastaFq | FieldId::PastaFp => {}
+                    _ => {
+                        return Err(ZkfError::UnsupportedBackend {
+                            backend: self.kind().to_string(),
+                            message: format!(
+                                "hypernova native mode requires bn254, pasta-fq, or pasta-fp programs; got {}",
+                                program.field.as_str()
+                            ),
+                        });
+                    }
+                }
+            } else if program.field != FieldId::Bn254 {
                 return Err(ZkfError::UnsupportedBackend {
                     backend: self.kind().to_string(),
-                    message: "hypernova currently supports BN254 programs only".to_string(),
+                    message: "hypernova compatibility mode currently supports BN254 programs only"
+                        .to_string(),
                 });
             }
 

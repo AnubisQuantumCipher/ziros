@@ -214,7 +214,7 @@ impl BackendCapabilityMatrix {
                     backend: BackendKind::Nova,
                     support_class: SupportClass::Native,
                     delegates_to: None,
-                    supported_fields: vec![FieldId::Bn254],
+                    supported_fields: vec![FieldId::Bn254, FieldId::PastaFp, FieldId::PastaFq],
                     max_range_bits: None,
                     gpu_acceleration: GpuAcceleration {
                         claimed: true,
@@ -333,7 +333,7 @@ impl BackendCapabilityMatrix {
                     } else {
                         Some(BackendKind::Nova)
                     },
-                    supported_fields: vec![FieldId::Bn254],
+                    supported_fields: vec![FieldId::Bn254, FieldId::PastaFp, FieldId::PastaFq],
                     max_range_bits: None,
                     gpu_acceleration: GpuAcceleration {
                         claimed: true,

@@ -20,6 +20,7 @@ use zkf_core::{Expr, FieldElement, ZkfResult};
 pub enum SupportedCriticalHashOp {
     PoseidonBn254Width4,
     PoseidonBls12381Width4,
+    PoseidonPastaFqWidth4,
     PoseidonGoldilocksWidth4,
     PoseidonBabyBearWidth4,
     PoseidonMersenne31Width4,
@@ -45,6 +46,7 @@ pub enum SpecCriticalHashBlackBoxOp {
 pub enum SpecCriticalHashFieldId {
     Bn254,
     Bls12_381,
+    PastaFq,
     Goldilocks,
     BabyBear,
     Mersenne31,
@@ -74,6 +76,7 @@ fn spec_hash_field(field: FieldId) -> SpecCriticalHashFieldId {
     match field {
         FieldId::Bn254 => SpecCriticalHashFieldId::Bn254,
         FieldId::Bls12_381 => SpecCriticalHashFieldId::Bls12_381,
+        FieldId::PastaFq => SpecCriticalHashFieldId::PastaFq,
         FieldId::Goldilocks => SpecCriticalHashFieldId::Goldilocks,
         FieldId::BabyBear => SpecCriticalHashFieldId::BabyBear,
         FieldId::Mersenne31 => SpecCriticalHashFieldId::Mersenne31,
@@ -95,6 +98,9 @@ pub fn critical_hash_proof_surface(
             }
             SpecCriticalHashFieldId::Bls12_381 if inputs_len == 4 && outputs_len == 4 => {
                 Some(SupportedCriticalHashOp::PoseidonBls12381Width4)
+            }
+            SpecCriticalHashFieldId::PastaFq if inputs_len == 4 && outputs_len == 4 => {
+                Some(SupportedCriticalHashOp::PoseidonPastaFqWidth4)
             }
             SpecCriticalHashFieldId::Goldilocks if inputs_len == 4 && outputs_len == 4 => {
                 Some(SupportedCriticalHashOp::PoseidonGoldilocksWidth4)
@@ -215,6 +221,14 @@ pub fn compute_hash_aux_witness(
                     aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
                 })
             }
+            (SpecCriticalHashBlackBoxOp::Poseidon, SpecCriticalHashFieldId::PastaFq, 4) => {
+                Some(CriticalHashLoweringSemantics {
+                    supported_op: SupportedCriticalHashOp::PoseidonPastaFqWidth4,
+                    supported_inputs_len: 4,
+                    supported_outputs_len: 4,
+                    aux_witness_mode: CriticalHashAuxWitnessMode::ConstraintSolverDerived,
+                })
+            }
             (SpecCriticalHashBlackBoxOp::Poseidon, SpecCriticalHashFieldId::Goldilocks, 4) => {
                 Some(CriticalHashLoweringSemantics {
                     supported_op: SupportedCriticalHashOp::PoseidonGoldilocksWidth4,
@@ -304,6 +318,15 @@ mod tests {
                 4
             ),
             Some(SupportedCriticalHashOp::PoseidonBls12381Width4)
+        );
+        assert_eq!(
+            critical_hash_proof_surface(
+                SpecCriticalHashBlackBoxOp::Poseidon,
+                SpecCriticalHashFieldId::PastaFq,
+                4,
+                4,
+            ),
+            Some(SupportedCriticalHashOp::PoseidonPastaFqWidth4)
         );
         assert_eq!(
             critical_hash_proof_surface(

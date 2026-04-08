@@ -1,0 +1,336 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -L)"
+artifact_root="${1:-$repo_root/dist/showcases/private_claims_truth_and_settlement}"
+subsystem_root="${2:-$repo_root/dist/subsystems/private_claims_truth_and_settlement}"
+profile="${3:-flagship}"
+
+mkdir -p "$(dirname "$artifact_root")" "$(dirname "$subsystem_root")"
+
+echo "[claims-subsystem] exporting finished showcase bundle into $artifact_root" >&2
+env ZKF_PRIVATE_CLAIMS_TRUTH_PROFILE="$profile" \
+  cargo run --release -p zkf-lib --example private_claims_truth_and_settlement_showcase -- "$artifact_root"
+
+echo "[claims-subsystem] validating Midnight contract package into $artifact_root/midnight_validation" >&2
+bash "$repo_root/scripts/validate_private_claims_truth_midnight_contracts.sh" "$artifact_root" preprod
+
+echo "[claims-subsystem] scaffolding subsystem shell into $subsystem_root" >&2
+cargo run -p zkf-cli -- subsystem scaffold \
+  --name private-claims-truth-and-settlement \
+  --style full \
+  --out "$subsystem_root" \
+  --json > /dev/null
+
+mkdir -p \
+  "$subsystem_root/03_inputs" \
+  "$subsystem_root/05_scripts" \
+  "$subsystem_root/06_docs" \
+  "$subsystem_root/07_compiled" \
+  "$subsystem_root/08_proofs" \
+  "$subsystem_root/09_verification" \
+  "$subsystem_root/10_audit" \
+  "$subsystem_root/16_compact" \
+  "$subsystem_root/17_report"
+
+cp -R "$artifact_root/compiled/." "$subsystem_root/07_compiled/"
+cp -R "$artifact_root/proofs/." "$subsystem_root/08_proofs/"
+cp -R "$artifact_root/verification/." "$subsystem_root/09_verification/"
+cp -R "$artifact_root/audit/." "$subsystem_root/10_audit/"
+cp -R "$artifact_root/midnight_package/." "$subsystem_root/16_compact/"
+
+cp "$artifact_root/public_inputs.json" "$subsystem_root/03_inputs/public_inputs.json"
+cp "$artifact_root/public_outputs.json" "$subsystem_root/03_inputs/public_outputs.json"
+cp "$artifact_root/witness_summary.json" "$subsystem_root/17_report/witness_summary.json"
+cp "$artifact_root/private_claims_truth.run_report.json" "$subsystem_root/17_report/run_report.json"
+cp "$artifact_root/private_claims_truth.translation_report.json" "$subsystem_root/17_report/translation_report.json"
+cp "$artifact_root/telemetry/private_claims_truth.telemetry_report.json" "$subsystem_root/17_report/telemetry_report.json"
+cp "$artifact_root/private_claims_truth.evidence_summary.json" "$subsystem_root/17_report/evidence_summary.json"
+cp "$artifact_root/private_claims_truth.summary.json" "$subsystem_root/17_report/summary.json"
+cp "$artifact_root/private_claims_truth.report.md" "$subsystem_root/17_report/report.md"
+cp "$artifact_root/deterministic_manifest.json" "$subsystem_root/17_report/deterministic_manifest.json"
+cp "$artifact_root/closure_artifacts.json" "$subsystem_root/17_report/closure_artifacts.json"
+cp "$artifact_root/operator_notes.md" "$subsystem_root/17_report/operator_notes.md"
+cp "$artifact_root/deployment_notes.md" "$subsystem_root/17_report/deployment_notes.md"
+cp "$artifact_root/summary.md" "$subsystem_root/17_report/summary.md"
+cp "$artifact_root/subsystem_prebundle.json" "$subsystem_root/17_report/subsystem_prebundle.json"
+cp "$artifact_root/audit_bundle.json" "$subsystem_root/10_audit/audit_bundle.json"
+cp -R "$artifact_root/selective_disclosure" "$subsystem_root/10_audit/selective_disclosure"
+if [[ -d "$artifact_root/midnight_validation" ]]; then
+  rm -rf "$subsystem_root/17_report/midnight_validation"
+  cp -R "$artifact_root/midnight_validation" "$subsystem_root/17_report/midnight_validation"
+fi
+
+if [[ -d "$artifact_root/formal" ]]; then
+  rm -rf "$subsystem_root/17_report/formal"
+  cp -R "$artifact_root/formal" "$subsystem_root/17_report/formal"
+fi
+
+cp "$repo_root/scripts/run_rocq_claims_truth_proofs.sh" \
+  "$subsystem_root/05_scripts/run_rocq_claims_truth_proofs.sh"
+cp "$repo_root/scripts/run_lean_claims_truth_proofs.sh" \
+  "$subsystem_root/05_scripts/run_lean_claims_truth_proofs.sh"
+cp "$repo_root/scripts/run_verus_claims_truth_proofs.sh" \
+  "$subsystem_root/05_scripts/run_verus_claims_truth_proofs.sh"
+cp "$repo_root/scripts/validate_private_claims_truth_midnight_contracts.sh" \
+  "$subsystem_root/05_scripts/validate_private_claims_truth_midnight_contracts.sh"
+cp "$repo_root/scripts/materialize_private_claims_truth_and_settlement_subsystem.sh" \
+  "$subsystem_root/05_scripts/materialize_private_claims_truth_and_settlement_subsystem.sh"
+
+cat > "$subsystem_root/06_docs/README.md" <<EOF
+# Private Claims Truth And Settlement Subsystem
+
+This subsystem packages the finished ZirOS private claims truth exporter into the standard 20-slot subsystem layout.
+
+Export profile: $profile
+
+Core circuit modules:
+
+- claim_decision_core.primary
+- settlement_binding.primary
+- disclosure_projection.primary
+- batch_shard_handoff.primary
+
+The bundle also preserves:
+
+- the public output artifact
+- the witness summary
+- the strict runtime telemetry report
+- the selective disclosure bundle
+- the Midnight Compact package
+- the formal evidence logs
+- deterministic manifests and closure artifacts
+EOF
+
+cat > "$subsystem_root/06_docs/disclosure_policy.md" <<'EOF'
+# Disclosure Policy
+
+- Raw claimant-identifying information remains private and is not exported into the subsystem bundle.
+- External OCR, telematics, photo-analysis, vendor, and authority inputs are digest-bound rather than publicly disclosed.
+- Denials and high-risk actions preserve a public `human_review_required` flag.
+- Midnight package sources are emitted for preprod integration, but live deployment still requires separate operator wallet and network readiness checks.
+EOF
+
+verifier_exists="false"
+if [[ -f "$artifact_root/solidity/ClaimsTruthVerifier.sol" ]]; then
+  verifier_exists="true"
+fi
+
+python3 - "$subsystem_root/02_manifest/subsystem_manifest.json" "$artifact_root/private_claims_truth.summary.json" "$profile" "$verifier_exists" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+manifest_path = Path(sys.argv[1])
+summary_path = Path(sys.argv[2])
+manifest = json.loads(manifest_path.read_text())
+summary = json.loads(summary_path.read_text())
+verifier_exists = sys.argv[4].lower() == "true"
+effective_backend = summary.get("effective_core_backend") or summary.get("primary_backend") or "hypernova"
+lane_classification = summary.get("lane_classification") or "planning-only"
+manifest["subsystem_id"] = "private_claims_truth_and_settlement_subsystem"
+manifest["runtime_profile"] = "flagship" if lane_classification == "primary-strict" else sys.argv[3]
+manifest["production_classification"] = lane_classification
+manifest["minimum_report_word_count"] = 10000
+manifest["circuits"] = {
+    "claim_decision_core": {
+        "backend": effective_backend,
+        "program_path": "07_compiled/claim_decision_core.primary.program.json",
+        "compiled_path": "07_compiled/claim_decision_core.primary.compiled.json",
+        "inputs_path": "03_inputs/public_inputs.json",
+        "proof_path": "08_proofs/claim_decision_core.primary.proof.json",
+        "verification_path": "09_verification/claim_decision_core.primary.verification.json",
+        "audit_path": "10_audit/claim_decision_core.primary.audit.json",
+        "lane_classification": lane_classification,
+    },
+    "settlement_binding": {
+        "backend": effective_backend,
+        "program_path": "07_compiled/settlement_binding.primary.program.json",
+        "compiled_path": "07_compiled/settlement_binding.primary.compiled.json",
+        "inputs_path": "03_inputs/public_outputs.json",
+        "proof_path": "08_proofs/settlement_binding.primary.proof.json",
+        "verification_path": "09_verification/settlement_binding.primary.verification.json",
+        "audit_path": "10_audit/settlement_binding.primary.audit.json",
+        "lane_classification": lane_classification,
+    },
+    "disclosure_projection": {
+        "backend": effective_backend,
+        "program_path": "07_compiled/disclosure_projection.primary.program.json",
+        "compiled_path": "07_compiled/disclosure_projection.primary.compiled.json",
+        "inputs_path": "03_inputs/public_outputs.json",
+        "proof_path": "08_proofs/disclosure_projection.primary.proof.json",
+        "verification_path": "09_verification/disclosure_projection.primary.verification.json",
+        "audit_path": "10_audit/disclosure_projection.primary.audit.json",
+        "lane_classification": lane_classification,
+    },
+    "batch_shard_handoff": {
+        "backend": effective_backend,
+        "program_path": "07_compiled/batch_shard_handoff.primary.program.json",
+        "compiled_path": "07_compiled/batch_shard_handoff.primary.compiled.json",
+        "inputs_path": "03_inputs/public_outputs.json",
+        "proof_path": "08_proofs/batch_shard_handoff.primary.proof.json",
+        "verification_path": "09_verification/batch_shard_handoff.primary.verification.json",
+        "audit_path": "10_audit/batch_shard_handoff.primary.audit.json",
+        "lane_classification": lane_classification,
+    },
+}
+manifest["circuit_modules"] = [
+    {
+        "module_id": "claim_decision_core",
+        "backend": effective_backend,
+        "program_path": "07_compiled/claim_decision_core.primary.program.json",
+        "compiled_path": "07_compiled/claim_decision_core.primary.compiled.json",
+        "proof_path": "08_proofs/claim_decision_core.primary.proof.json",
+        "audit_path": "10_audit/claim_decision_core.primary.audit.json",
+        "guaranteed_primitives": [
+            "poseidon-commitment",
+            "range",
+            "comparison",
+            "exact-division",
+            "action-derivation",
+            "settlement-binding",
+        ],
+    },
+    {
+        "module_id": "settlement_binding",
+        "backend": effective_backend,
+        "program_path": "07_compiled/settlement_binding.primary.program.json",
+        "compiled_path": "07_compiled/settlement_binding.primary.compiled.json",
+        "proof_path": "08_proofs/settlement_binding.primary.proof.json",
+        "audit_path": "10_audit/settlement_binding.primary.audit.json",
+        "guaranteed_primitives": [
+            "settlement-binding",
+            "hold-gating",
+            "reinsurer-release",
+        ],
+    },
+    {
+        "module_id": "disclosure_projection",
+        "backend": effective_backend,
+        "program_path": "07_compiled/disclosure_projection.primary.program.json",
+        "compiled_path": "07_compiled/disclosure_projection.primary.compiled.json",
+        "proof_path": "08_proofs/disclosure_projection.primary.proof.json",
+        "audit_path": "10_audit/disclosure_projection.primary.audit.json",
+        "guaranteed_primitives": [
+            "role-selector",
+            "selective-disclosure-binding",
+        ],
+    },
+    {
+        "module_id": "batch_shard_handoff",
+        "backend": effective_backend,
+        "program_path": "07_compiled/batch_shard_handoff.primary.program.json",
+        "compiled_path": "07_compiled/batch_shard_handoff.primary.compiled.json",
+        "proof_path": "08_proofs/batch_shard_handoff.primary.proof.json",
+        "audit_path": "10_audit/batch_shard_handoff.primary.audit.json",
+        "guaranteed_primitives": [
+            "exact-division",
+            "deterministic-shard-assignment",
+            "aggregation-binding",
+        ],
+    },
+]
+manifest["contracts"] = [
+    {
+        "contract_id": "claim_registration",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/claim_registration.compact",
+        "midnight_class": "custom",
+    },
+    {
+        "contract_id": "settlement_authorization",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/settlement_authorization.compact",
+        "midnight_class": "cooperative-treasury",
+    },
+    {
+        "contract_id": "dispute_hold",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/dispute_hold.compact",
+        "midnight_class": "custom",
+    },
+    {
+        "contract_id": "disclosure_access",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/disclosure_access.compact",
+        "midnight_class": "custom",
+    },
+    {
+        "contract_id": "reinsurer_release",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/reinsurer_release.compact",
+        "midnight_class": "custom",
+    },
+    {
+        "contract_id": "claimant_receipt",
+        "primary_target": "midnight",
+        "compact_source": "16_compact/claims-truth-settlement/contracts/compact/claimant_receipt.compact",
+        "midnight_class": "custom",
+    },
+]
+if verifier_exists:
+    manifest["contracts"].insert(0, {
+        "contract_id": "claims_truth_verifier",
+        "primary_target": "evm",
+        "primary_circuit": "claim_decision_core",
+        "solidity_output": "15_solidity/ClaimsTruthVerifier.sol",
+        "verifier_contract_name": "ClaimsTruthVerifier",
+        "evm_class": "verifier-export",
+    })
+manifest["disclosure_policy"] = {
+    "policy_id": "claims-truth-disclosure-policy-v1",
+    "summary": "Raw claimant identity and private evidence remain local while decision commitments, review flags, and selective disclosure bundles are exported.",
+    "witness_local_only": True,
+    "public_inputs_documented": True,
+    "notes": [
+        "Denials and high-risk actions preserve human review.",
+        "Midnight package is emitted for preprod integration and requires separate operator readiness.",
+    ],
+}
+manifest["deployment_profile"] = {
+    "primary_chain": "midnight",
+    "primary_network": "preprod-emitted",
+    "supports_live_deploy": False,
+    "explorer_expected": False,
+    "secondary_targets": ["runtime-hypernova"] + (["evm-verifier-export"] if verifier_exists else []),
+}
+manifest["release_contract"] = {
+    "public_bundle_dir": "13_public_bundle",
+    "evidence_bundle_path": "13_public_bundle/subsystem_bundle.json",
+    "release_pin_path": "20_release/zkf-release-pin.json",
+    "disclosure_policy_path": "06_docs/disclosure_policy.md",
+}
+manifest["evidence_refs"] = {
+    "report_path": "17_report/report.md",
+    "summary_path": "17_report/summary.json",
+    "telemetry_report_path": "17_report/telemetry_report.json",
+    "translation_report_path": "17_report/translation_report.json",
+    "witness_summary_path": "17_report/witness_summary.json",
+    "public_inputs_path": "03_inputs/public_inputs.json",
+    "public_outputs_path": "03_inputs/public_outputs.json",
+    "evidence_summary_path": "17_report/evidence_summary.json",
+    "deterministic_manifest_path": "17_report/deterministic_manifest.json",
+    "closure_artifacts_path": "17_report/closure_artifacts.json",
+    "midnight_package_manifest_path": "16_compact/claims-truth-settlement/package_manifest.json",
+    "midnight_flow_manifest_path": "16_compact/claims-truth-settlement/flow_manifest.json",
+    "midnight_validation_summary_path": "17_report/midnight_validation/summary.json",
+}
+manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+PY
+
+if [[ -f "$artifact_root/solidity/ClaimsTruthVerifier.sol" ]]; then
+  mkdir -p "$subsystem_root/15_solidity"
+  cp "$artifact_root/solidity/ClaimsTruthVerifier.sol" "$subsystem_root/15_solidity/ClaimsTruthVerifier.sol"
+fi
+
+echo "[claims-subsystem] verifying subsystem completeness" >&2
+cargo run -p zkf-cli -- subsystem verify-completeness \
+  --root "$subsystem_root" \
+  --json > "$subsystem_root/17_report/verify-completeness.json"
+
+echo "[claims-subsystem] bundling public subsystem view" >&2
+cargo run -p zkf-cli -- subsystem bundle-public \
+  --root "$subsystem_root" \
+  --json > "$subsystem_root/17_report/bundle-public.json"
+
+echo "$subsystem_root"

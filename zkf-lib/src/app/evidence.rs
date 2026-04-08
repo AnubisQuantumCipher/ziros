@@ -9,7 +9,7 @@ use std::fs;
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 use zkf_cloudfs::CloudFS;
@@ -100,6 +100,8 @@ const ORBITAL_APP_ID: &str = "private_nbody_orbital_showcase";
 const DESCENT_APP_ID: &str = "private_powered_descent_showcase";
 const MULTI_SATELLITE_APP_ID: &str = "private_multi_satellite_conjunction_showcase";
 const SATELLITE_APP_ID: &str = "private_satellite_conjunction_showcase";
+const TURBINE_APP_ID: &str = "private_turbine_blade_life_showcase";
+const CLAIMS_APP_ID: &str = "private_claims_truth_and_settlement_showcase";
 const VOTING_APP_ID: &str = "private_voting_commitment_pipeline";
 
 const MULTI_SATELLITE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 2] = [
@@ -112,6 +114,42 @@ const MULTI_SATELLITE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 2] = [
         name: "protocol_lean",
         script_relative_path: "scripts/run_protocol_lean_proofs.sh",
         log_file_name: "protocol_lean.log",
+    },
+];
+
+const TURBINE_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 3] = [
+    FormalScriptSpec {
+        name: "rocq_turbine_blade",
+        script_relative_path: "scripts/run_rocq_turbine_blade_life_proofs.sh",
+        log_file_name: "rocq_turbine_blade.log",
+    },
+    FormalScriptSpec {
+        name: "protocol_lean",
+        script_relative_path: "scripts/run_protocol_lean_proofs.sh",
+        log_file_name: "protocol_lean.log",
+    },
+    FormalScriptSpec {
+        name: "verus_turbine_blade",
+        script_relative_path: "scripts/run_verus_turbine_blade_life_proofs.sh",
+        log_file_name: "verus_turbine_blade.log",
+    },
+];
+
+const CLAIMS_FORMAL_SCRIPT_SPECS: [FormalScriptSpec; 3] = [
+    FormalScriptSpec {
+        name: "rocq_claims_truth",
+        script_relative_path: "scripts/run_rocq_claims_truth_proofs.sh",
+        log_file_name: "rocq_claims_truth.log",
+    },
+    FormalScriptSpec {
+        name: "lean_claims_truth",
+        script_relative_path: "scripts/run_lean_claims_truth_proofs.sh",
+        log_file_name: "lean_claims_truth.log",
+    },
+    FormalScriptSpec {
+        name: "verus_claims_truth",
+        script_relative_path: "scripts/run_verus_claims_truth_proofs.sh",
+        log_file_name: "verus_claims_truth.log",
     },
 ];
 
@@ -301,6 +339,8 @@ fn generated_app_formal_script_specs_internal(
         DESCENT_APP_ID => Ok(&DESCENT_FORMAL_SCRIPT_SPECS),
         MULTI_SATELLITE_APP_ID => Ok(&MULTI_SATELLITE_FORMAL_SCRIPT_SPECS),
         SATELLITE_APP_ID => Ok(&SATELLITE_FORMAL_SCRIPT_SPECS),
+        TURBINE_APP_ID => Ok(&TURBINE_FORMAL_SCRIPT_SPECS),
+        CLAIMS_APP_ID => Ok(&CLAIMS_FORMAL_SCRIPT_SPECS),
         _ => Err(ZkfError::InvalidArtifact(format!(
             "unknown finished-app closure id `{app_id}`"
         ))),
@@ -392,12 +432,10 @@ fn ledger_surface_specs() -> Vec<LedgerSurfaceSpec> {
             surface_id: "runtime.proof_runtime_spec",
             label: "Runtime CLI/pipeline proof helpers",
             source_path: "zkf-runtime/src/proof_runtime_spec.rs",
-            claims: &[
-                LedgerClaimSpec {
-                    theorem_id: "pipeline.cli_runtime_path_composition",
-                    expected_scope: "zkf-runtime::proof_runtime_spec",
-                },
-            ],
+            claims: &[LedgerClaimSpec {
+                theorem_id: "pipeline.cli_runtime_path_composition",
+                expected_scope: "zkf-runtime::proof_runtime_spec",
+            }],
             extraction_paths: &["zkf-runtime/proofs/rocq/RuntimePipelineComposition.v"],
         },
         LedgerSurfaceSpec {
@@ -516,6 +554,22 @@ fn ledger_surface_specs() -> Vec<LedgerSurfaceSpec> {
                 },
             ],
             extraction_paths: &[],
+        },
+        LedgerSurfaceSpec {
+            surface_id: "protocol.hypernova_exact",
+            label: "HyperNova exact shipped protocol surface",
+            source_path: "zkf-backends/src/nova_native.rs",
+            claims: &[
+                LedgerClaimSpec {
+                    theorem_id: "protocol.hypernova_completeness",
+                    expected_scope: "zkf-backends::nova_native",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "protocol.hypernova_folding_soundness",
+                    expected_scope: "zkf-backends::nova_native",
+                },
+            ],
+            extraction_paths: &["zkf-backends/src/proof_hypernova_exact_spec.rs"],
         },
     ]
 }
@@ -677,6 +731,92 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
             ],
         },
         AppClosureSpec {
+            app_id: TURBINE_APP_ID,
+            application: json!({
+                "name": TURBINE_APP_ID,
+                "backend": {
+                    "primary": "strict-runtime-selected",
+                    "native_recursive_candidate": "hypernova",
+                    "compatibility_export": "arkworks-groth16",
+                },
+                "execution_surface": "zkf-runtime strict-cryptographic lane",
+                "parameterization": {
+                    "geometry_stations": 8,
+                    "control_sections": 3,
+                    "integration_steps": "export-time parameter (default 500)",
+                    "mission_profile_shape": "500 x (rpm, gas_temp, surface_temp, centrifugal_factor, pressure_factor)",
+                    "surrogate_boundary": "normalized integer reduced-order thermal-mechanical model",
+                },
+                "public_outputs": [
+                    "damage_commitment",
+                    "crack_commitment",
+                    "remaining_life_commitment",
+                    "min_margin_commitment",
+                    "safe_to_deploy",
+                ],
+            }),
+            surface_ids: &[
+                "truth.canonical_truth_active_boundaries",
+                "truth.backend.hypernova",
+                "truth.backend.arkworks_groth16",
+                "truth.runtime_proof_coverage",
+                "core.proof_witness_generation_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
+                "runtime.proof_runtime_spec",
+                "lib.proof_embedded_app_spec",
+                "backend.audited_backend_boundary",
+                "backend.groth16_boundary_model",
+                "protocol.hypernova_exact",
+                "protocol.groth16_exact",
+            ],
+        },
+        AppClosureSpec {
+            app_id: CLAIMS_APP_ID,
+            application: json!({
+                "name": CLAIMS_APP_ID,
+                "backend": {
+                    "primary": "hypernova",
+                    "compatibility_export": "arkworks-groth16",
+                },
+                "execution_surface": "zkf-runtime strict-cryptographic lane",
+                "parameterization": {
+                    "business_lane": "property-and-casualty claims",
+                    "line_item_count": 4,
+                    "peril_flag_count": 4,
+                    "disclosure_roles": ["auditor", "regulator", "reinsurer", "claimant", "investigator"],
+                    "fixed_point_scale": "10^4",
+                },
+                "public_outputs": [
+                    "claim_packet_commitment",
+                    "coverage_decision_commitment",
+                    "consistency_score_commitment",
+                    "fraud_evidence_score_commitment",
+                    "payout_amount_commitment",
+                    "reserve_amount_commitment",
+                    "settlement_instruction_commitment",
+                    "action_class_code",
+                    "human_review_required",
+                    "eligible_for_midnight_settlement",
+                ],
+            }),
+            surface_ids: &[
+                "truth.canonical_truth_active_boundaries",
+                "truth.backend.hypernova",
+                "truth.backend.arkworks_groth16",
+                "truth.runtime_proof_coverage",
+                "core.proof_witness_generation_spec",
+                "core.proof_constant_time_bridge",
+                "runtime.hybrid_core",
+                "runtime.proof_runtime_spec",
+                "lib.proof_embedded_app_spec",
+                "backend.audited_backend_boundary",
+                "backend.groth16_boundary_model",
+                "protocol.hypernova_exact",
+                "protocol.groth16_exact",
+            ],
+        },
+        AppClosureSpec {
             app_id: VOTING_APP_ID,
             application: json!({
                 "name": VOTING_APP_ID,
@@ -779,19 +919,22 @@ fn build_ledger_surface(
 
 fn build_backend_metadata_surface(
     support_matrix: &SupportMatrixFile,
+    backend_id: &str,
+    surface_id: &str,
+    label: &str,
 ) -> ZkfResult<serde_json::Value> {
     ensure_repo_relative_path_exists("support-matrix.json")?;
     let backend = support_matrix
         .backends
         .iter()
-        .find(|backend| backend.id == "arkworks-groth16")
+        .find(|backend| backend.id == backend_id)
         .ok_or_else(|| {
-            ZkfError::InvalidArtifact(
-                "support-matrix.json no longer contains arkworks-groth16".to_string(),
-            )
+            ZkfError::InvalidArtifact(format!(
+                "support-matrix.json no longer contains {backend_id}"
+            ))
         })?;
     let claims = vec![json!({
-        "claim_id": "support_matrix.backend.arkworks_groth16",
+        "claim_id": format!("support_matrix.backend.{}", backend.id.replace('-', "_")),
         "classification": "metadata-only",
         "source": "support-matrix",
         "path": "support-matrix.json",
@@ -802,8 +945,8 @@ fn build_backend_metadata_surface(
     })];
     let counts = accumulate_claim_counts(&claims)?;
     Ok(json!({
-        "surface_id": "truth.backend.arkworks_groth16",
-        "label": "Arkworks Groth16 backend readiness and trust metadata",
+        "surface_id": surface_id,
+        "label": label,
         "path": "support-matrix.json",
         "source": "support-matrix",
         "classification_counts": counts,
@@ -947,8 +1090,20 @@ fn build_surface_inventory() -> ZkfResult<BTreeMap<String, serde_json::Value>> {
             build_ledger_surface(&spec, &ledger_by_theorem)?,
         );
     }
-    let backend_surface = build_backend_metadata_surface(&support_matrix)?;
-    surfaces.insert(surface_id_string(&backend_surface)?, backend_surface);
+    let arkworks_surface = build_backend_metadata_surface(
+        &support_matrix,
+        "arkworks-groth16",
+        "truth.backend.arkworks_groth16",
+        "Arkworks Groth16 backend readiness and trust metadata",
+    )?;
+    surfaces.insert(surface_id_string(&arkworks_surface)?, arkworks_surface);
+    let hypernova_surface = build_backend_metadata_surface(
+        &support_matrix,
+        "hypernova",
+        "truth.backend.hypernova",
+        "HyperNova backend readiness and trust metadata",
+    )?;
+    surfaces.insert(surface_id_string(&hypernova_surface)?, hypernova_surface);
     let compatibility_surface = build_compatibility_alias_surface(&support_matrix)?;
     surfaces.insert(
         surface_id_string(&compatibility_surface)?,
@@ -1466,6 +1621,42 @@ pub fn ensure_foundry_layout(project_dir: &Path) -> ZkfResult<()> {
     Ok(())
 }
 
+pub fn run_foundry_report(project_dir: &Path, report_path: &Path) -> ZkfResult<serde_json::Value> {
+    let output = Command::new("forge")
+        .current_dir(project_dir)
+        .arg("test")
+        .arg("--gas-report")
+        .output()
+        .map_err(|error| {
+            ZkfError::Io(format!("run forge test in {}: {error}", project_dir.display()))
+        })?;
+    let mut text = String::new();
+    text.push_str(&String::from_utf8_lossy(&output.stdout));
+    if !output.stderr.is_empty() {
+        if !text.ends_with('\n') {
+            text.push('\n');
+        }
+        text.push_str(&String::from_utf8_lossy(&output.stderr));
+    }
+    write_text(report_path, &text)?;
+    if !output.status.success() {
+        return Err(ZkfError::Backend(format!(
+            "forge test failed for {} with status {}",
+            project_dir.display(),
+            output.status
+        )));
+    }
+    Ok(json!({
+        "generated": true,
+        "passed": true,
+        "gas_used": serde_json::Value::Null,
+        "report_path": report_path
+            .file_name()
+            .and_then(|value| value.to_str())
+            .unwrap_or("foundry_report.txt"),
+    }))
+}
+
 pub fn json_pretty(value: &serde_json::Value) -> String {
     serde_json::to_string_pretty(value).unwrap_or_else(|_| value.to_string())
 }
@@ -1654,6 +1845,19 @@ fn run_formal_script(
     command.process_group(0);
     let child = command.spawn();
 
+    #[cfg(unix)]
+    fn terminate_child_group(child: &mut Child) {
+        let _ = Command::new("kill")
+            .arg("-9")
+            .arg(format!("-{}", child.id()))
+            .status();
+    }
+
+    #[cfg(not(unix))]
+    fn terminate_child_group(child: &mut Child) {
+        let _ = child.kill();
+    }
+
     let (status, exit_code) = match child {
         Ok(mut child) => {
             let start = Instant::now();
@@ -1664,7 +1868,7 @@ fn run_formal_script(
                     Ok(None) => {
                         if start.elapsed() >= timeout {
                             timed_out = true;
-                            let _ = child.kill();
+                            terminate_child_group(&mut child);
                             break;
                         }
                         thread::sleep(Duration::from_millis(100));

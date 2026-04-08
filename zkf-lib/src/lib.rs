@@ -163,7 +163,7 @@ pub use app::evidence::{
     generated_app_closure_bundle_summary, generated_app_closure_relative_path,
     generated_app_formal_script_specs, hash_json_value, json_pretty, load_generated_app_closure,
     load_generated_implementation_closure_summary, read_json as read_bundle_json,
-    read_text as read_bundle_text, repo_root as bundle_repo_root, sha256_hex,
+    read_text as read_bundle_text, repo_root as bundle_repo_root, run_foundry_report, sha256_hex,
     two_tier_audit_record, write_json as write_bundle_json, write_text as write_bundle_text,
 };
 #[cfg(not(hax))]
@@ -241,6 +241,27 @@ pub use app::private_identity::{
     prove_private_identity_with_paths, verify_private_identity_artifact,
 };
 #[cfg(not(hax))]
+pub use app::private_claims_truth::{
+    CLAIMS_FIXED_POINT_SCALE, PRIVATE_CLAIMS_MAX_DIGESTS, PRIVATE_CLAIMS_MAX_LINE_ITEMS,
+    PRIVATE_CLAIMS_MAX_PERILS, PRIVATE_CLAIMS_PUBLIC_OUTPUTS, ClaimsActionClassV1,
+    ClaimsTruthClaimEventDataV1, ClaimsTruthConsistencyFraudInputsV1,
+    ClaimsTruthEstimateLineItemV1, ClaimsTruthEvidenceDataV1, ClaimsTruthInvoiceLineItemV1,
+    ClaimsTruthPolicyDataV1, ClaimsTruthPrivateInputsV1, ClaimsTruthPublicOutputsV1,
+    ClaimsTruthSettlementGovernanceInputsV1, build_batch_shard_handoff_program,
+    build_claim_decision_core_program, build_disclosure_projection_program,
+    build_settlement_binding_program, claims_truth_private_input_names_v1,
+    private_claims_truth_inconsistency_denial_inputs,
+    private_claims_truth_investigation_inputs, private_claims_truth_manual_review_inputs,
+    private_claims_truth_policy_denial_inputs, private_claims_truth_sample_inputs,
+    private_claims_truth_showcase, private_claims_truth_violation_inputs,
+};
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use app::private_claims_truth::{
+    PrivateClaimsTruthExportConfig, PrivateClaimsTruthExportProfile,
+    PrivateClaimsTruthHypernovaDiagnosticReport, run_private_claims_truth_export,
+    run_private_claims_truth_hypernova_diagnostics,
+};
+#[cfg(not(hax))]
 pub use app::progress::{ProofEvent, ProofStage};
 #[cfg(not(hax))]
 pub use app::real_gas::{
@@ -301,8 +322,9 @@ pub use app::spec::{
 };
 #[cfg(not(hax))]
 pub use app::subsystem::{
-    SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, SUBSYSTEM_MANIFEST_SCHEMA_V1,
-    SubsystemCircuitManifestV1, SubsystemManifestEnvelopeV1,
+    ProductionClassificationV1, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED,
+    SUBSYSTEM_MANIFEST_SCHEMA_V1, SubsystemCircuitManifestV1, SubsystemEvidenceRefsV1,
+    SubsystemManifestEnvelopeV1,
 };
 #[cfg(not(hax))]
 pub use app::templates::TemplateProgram;
@@ -311,6 +333,27 @@ pub use app::thermochemical::{
     THERMOCHEMICAL_ELEMENTS, THERMOCHEMICAL_PUBLIC_OUTPUTS, THERMOCHEMICAL_SPECIES,
     ThermochemicalEquilibriumRequestV1, build_thermochemical_equilibrium_program,
     thermochemical_equilibrium_inputs_from_request, thermochemical_equilibrium_showcase,
+};
+#[cfg(not(hax))]
+pub use app::turbine_blade::{
+    PRIVATE_TURBINE_BLADE_CONTROL_SECTIONS, PRIVATE_TURBINE_BLADE_DEFAULT_STEPS,
+    PRIVATE_TURBINE_BLADE_GEOMETRY_STATIONS, PRIVATE_TURBINE_BLADE_PRIVATE_INPUTS,
+    PRIVATE_TURBINE_BLADE_PUBLIC_OUTPUTS, TurbineBladeCommitmentBlindersV1,
+    TurbineBladeGeometryStationV1, TurbineBladeLifeRequestV1, TurbineBladeMaterialPropertiesV1,
+    TurbineBladeMissionStepV1, TurbineBladeThresholdsV1, build_private_turbine_blade_life_program,
+    build_private_turbine_blade_life_program_with_steps, private_turbine_blade_life_sample_inputs,
+    private_turbine_blade_life_sample_inputs_with_steps, private_turbine_blade_life_sample_request,
+    private_turbine_blade_life_sample_request_with_steps, private_turbine_blade_life_showcase,
+    private_turbine_blade_life_showcase_with_steps,
+    private_turbine_blade_life_violation_inputs_with_steps,
+    private_turbine_blade_life_violation_request_with_steps,
+    private_turbine_blade_life_witness_from_request,
+    private_turbine_blade_life_witness_from_request_with_steps,
+};
+#[cfg(all(not(target_arch = "wasm32"), not(hax)))]
+pub use app::turbine_blade::{
+    PrivateTurbineBladeExportConfig, PrivateTurbineBladeExportProfile,
+    run_private_turbine_blade_export,
 };
 #[cfg(all(not(target_arch = "wasm32"), not(hax)))]
 pub use app::verifier::{export_groth16_solidity_verifier, export_verifier};

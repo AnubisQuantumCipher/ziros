@@ -16,6 +16,7 @@ pub mod multi_satellite;
 pub mod navier_stokes;
 pub mod orbital;
 pub mod private_identity;
+pub mod private_claims_truth;
 pub mod progress;
 pub mod real_gas;
 pub mod reentry;
@@ -28,5 +29,6 @@ pub mod subsystem;
 pub mod subsystem_support;
 pub mod templates;
 pub mod thermochemical;
+pub mod turbine_blade;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod verifier;

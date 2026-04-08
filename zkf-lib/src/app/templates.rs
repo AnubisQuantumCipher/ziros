@@ -67,6 +67,20 @@ pub use super::orbital::{
     private_nbody_orbital_witness_with_steps,
 };
 use super::private_identity as private_identity_app;
+pub use super::private_claims_truth::{
+    CLAIMS_FIXED_POINT_SCALE, PRIVATE_CLAIMS_MAX_DIGESTS, PRIVATE_CLAIMS_MAX_LINE_ITEMS,
+    PRIVATE_CLAIMS_MAX_PERILS, PRIVATE_CLAIMS_PUBLIC_OUTPUTS, ClaimsActionClassV1,
+    ClaimsTruthClaimEventDataV1, ClaimsTruthConsistencyFraudInputsV1,
+    ClaimsTruthEstimateLineItemV1, ClaimsTruthEvidenceDataV1, ClaimsTruthInvoiceLineItemV1,
+    ClaimsTruthPolicyDataV1, ClaimsTruthPrivateInputsV1, ClaimsTruthPublicOutputsV1,
+    ClaimsTruthSettlementGovernanceInputsV1, build_batch_shard_handoff_program,
+    build_claim_decision_core_program, build_disclosure_projection_program,
+    build_settlement_binding_program, claims_truth_private_input_names_v1,
+    private_claims_truth_inconsistency_denial_inputs,
+    private_claims_truth_investigation_inputs, private_claims_truth_manual_review_inputs,
+    private_claims_truth_policy_denial_inputs, private_claims_truth_sample_inputs,
+    private_claims_truth_showcase, private_claims_truth_violation_inputs,
+};
 pub use super::real_gas::{
     REAL_GAS_COMPONENTS, REAL_GAS_PUBLIC_OUTPUTS, RealGasModelFamilyV1, RealGasStateRequestV1,
     build_real_gas_state_program, real_gas_state_inputs_from_request, real_gas_state_showcase,
@@ -99,6 +113,21 @@ pub use super::thermochemical::{
     THERMOCHEMICAL_ELEMENTS, THERMOCHEMICAL_PUBLIC_OUTPUTS, THERMOCHEMICAL_SPECIES,
     ThermochemicalEquilibriumRequestV1, build_thermochemical_equilibrium_program,
     thermochemical_equilibrium_inputs_from_request, thermochemical_equilibrium_showcase,
+};
+pub use super::turbine_blade::{
+    PRIVATE_TURBINE_BLADE_CONTROL_SECTIONS, PRIVATE_TURBINE_BLADE_DEFAULT_STEPS,
+    PRIVATE_TURBINE_BLADE_GEOMETRY_STATIONS, PRIVATE_TURBINE_BLADE_PRIVATE_INPUTS,
+    PRIVATE_TURBINE_BLADE_PUBLIC_OUTPUTS, TurbineBladeCommitmentBlindersV1,
+    TurbineBladeGeometryStationV1, TurbineBladeLifeRequestV1, TurbineBladeMaterialPropertiesV1,
+    TurbineBladeMissionStepV1, TurbineBladeThresholdsV1, build_private_turbine_blade_life_program,
+    build_private_turbine_blade_life_program_with_steps, private_turbine_blade_life_sample_inputs,
+    private_turbine_blade_life_sample_inputs_with_steps, private_turbine_blade_life_sample_request,
+    private_turbine_blade_life_sample_request_with_steps, private_turbine_blade_life_showcase,
+    private_turbine_blade_life_showcase_with_steps,
+    private_turbine_blade_life_violation_inputs_with_steps,
+    private_turbine_blade_life_violation_request_with_steps,
+    private_turbine_blade_life_witness_from_request,
+    private_turbine_blade_life_witness_from_request_with_steps,
 };
 
 #[derive(Debug, Clone)]

@@ -900,6 +900,26 @@ pub fn template_registry() -> Vec<TemplateRegistryEntryV1> {
             }],
         },
         TemplateRegistryEntryV1 {
+            id: "private-turbine-blade-life".to_string(),
+            description: "Private turbine blade thermal-mechanical life showcase with committed final damage, crack, life, and margin outputs."
+                .to_string(),
+            release_ready: true,
+            template_args: vec![TemplateArgSpecV1 {
+                name: "steps".to_string(),
+                description: "Number of hard-coded turbine mission steps.".to_string(),
+                default_value: Some(
+                    super::templates::PRIVATE_TURBINE_BLADE_DEFAULT_STEPS.to_string(),
+                ),
+                required: false,
+            }],
+        },
+        TemplateRegistryEntryV1 {
+            id: "private-claims-truth-and-settlement".to_string(),
+            description: "Private insurance claims truth, settlement binding, selective disclosure, and shard handoff showcase.".to_string(),
+            release_ready: true,
+            template_args: Vec::new(),
+        },
+        TemplateRegistryEntryV1 {
             id: "thermochemical-equilibrium".to_string(),
             description:
                 "Gas-phase thermochemical-equilibrium certificate with element balance and KKT complementarity."
@@ -1079,6 +1099,18 @@ pub fn instantiate_template(
                 "steps",
                 8,
             )?)?
+        }
+        "private-turbine-blade-life" => {
+            reject_unknown_args(template_args, &["steps"])?;
+            super::templates::private_turbine_blade_life_showcase_with_steps(parse_usize_arg(
+                template_args,
+                "steps",
+                super::templates::PRIVATE_TURBINE_BLADE_DEFAULT_STEPS,
+            )?)?
+        }
+        "private-claims-truth-and-settlement" => {
+            reject_unknown_args(template_args, &[])?;
+            super::templates::private_claims_truth_showcase()?
         }
         "thermochemical-equilibrium" => {
             reject_unknown_args(template_args, &[])?;

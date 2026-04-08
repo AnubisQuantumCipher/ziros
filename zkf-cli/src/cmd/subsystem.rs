@@ -3,6 +3,7 @@ use ed25519_dalek::{Signer, SigningKey};
 use libcrux_ml_dsa::ml_dsa_87::{generate_key_pair, sign as mldsa_sign};
 use libcrux_ml_dsa::{KEY_GENERATION_RANDOMNESS_SIZE, SIGNING_RANDOMNESS_SIZE};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs;
@@ -20,8 +21,9 @@ use zkf_command_surface::midnight::{
     deploy_prepare as midnight_deploy_prepare,
 };
 use zkf_lib::{
-    Expr, ProgramBuilder, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED, SubsystemCircuitManifestV1,
-    SubsystemManifestEnvelopeV1, audit_program_default, compile_and_prove, verify,
+    Expr, ProductionClassificationV1, ProgramBuilder, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED,
+    SubsystemCircuitManifestV1, SubsystemManifestEnvelopeV1, audit_program_default,
+    compile_and_prove, verify,
 };
 use zkf_lib::app::subsystem::{
     DeploymentProfileV1, DisclosurePolicyV1, EvmCompatibilityContractClassV1,
@@ -646,34 +648,58 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
         None
     };
     let subsystem_id = manifest.as_ref().map(|value| value.subsystem_id.clone());
+    let mut required_report_word_count = MIN_REPORT_WORD_COUNT;
     if let Some(manifest) = manifest.as_ref() {
+        required_report_word_count = manifest
+            .minimum_report_word_count
+            .unwrap_or(MIN_REPORT_WORD_COUNT);
         checks.push(CompletenessCheckV1 {
             name: "manifest:backend_policy".to_string(),
             passed: manifest.backend_policy == SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED,
             detail: manifest.backend_policy.clone(),
         });
+        if let Some(runtime_profile) = manifest.runtime_profile.as_ref() {
+            checks.push(CompletenessCheckV1 {
+                name: "manifest:runtime_profile".to_string(),
+                passed: !runtime_profile.trim().is_empty(),
+                detail: runtime_profile.clone(),
+            });
+        }
+        if let Some(classification) = manifest.production_classification.as_ref() {
+            checks.push(CompletenessCheckV1 {
+                name: "manifest:production_classification".to_string(),
+                passed: true,
+                detail: format!("{classification:?}"),
+            });
+        }
         for (circuit_id, circuit) in &manifest.circuits {
             let compiled_path = root.join(&circuit.compiled_path);
             let artifact_path = root.join(&circuit.proof_path);
+            let verification_path = root.join(&circuit.verification_path);
             let audit_path = root.join(&circuit.audit_path);
             let compiled_exists = compiled_path.is_file();
             let artifact_exists = artifact_path.is_file();
+            let verification_exists = verification_path.is_file();
             let audit_exists = audit_path.is_file();
-            if !(compiled_exists && artifact_exists) {
+            if !(compiled_exists && artifact_exists && verification_exists) {
                 if !compiled_exists {
                     missing_paths.push(circuit.compiled_path.clone());
                 }
                 if !artifact_exists {
                     missing_paths.push(circuit.proof_path.clone());
                 }
+                if !verification_exists {
+                    missing_paths.push(circuit.verification_path.clone());
+                }
             }
             checks.push(CompletenessCheckV1 {
                 name: format!("artifact:{circuit_id}"),
-                passed: compiled_exists && artifact_exists && audit_exists,
+                passed: compiled_exists && artifact_exists && verification_exists && audit_exists,
                 detail: format!(
-                    "compiled={} proof={} audit={}",
+                    "compiled={} proof={} verification={} audit={}",
                     compiled_path.display(),
                     artifact_path.display(),
+                    verification_path.display(),
                     audit_path.display()
                 ),
             });
@@ -702,6 +728,143 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
                     ),
                 });
             }
+            if matches!(
+                manifest.production_classification.as_ref(),
+                Some(ProductionClassificationV1::PrimaryStrict)
+            ) {
+                checks.push(CompletenessCheckV1 {
+                    name: format!("lane:{circuit_id}"),
+                    passed: matches!(
+                        circuit.lane_classification.as_ref(),
+                        Some(ProductionClassificationV1::PrimaryStrict)
+                    ),
+                    detail: format!("{:?}", circuit.lane_classification),
+                });
+            }
+        }
+        if let Some(evidence_refs) = manifest.evidence_refs.as_ref() {
+            let required_refs = [
+                ("evidence:report", evidence_refs.report_path.as_str()),
+                ("evidence:summary", evidence_refs.summary_path.as_str()),
+                (
+                    "evidence:telemetry",
+                    evidence_refs.telemetry_report_path.as_str(),
+                ),
+                (
+                    "evidence:translation",
+                    evidence_refs.translation_report_path.as_str(),
+                ),
+                (
+                    "evidence:witness_summary",
+                    evidence_refs.witness_summary_path.as_str(),
+                ),
+                (
+                    "evidence:public_inputs",
+                    evidence_refs.public_inputs_path.as_str(),
+                ),
+                (
+                    "evidence:public_outputs",
+                    evidence_refs.public_outputs_path.as_str(),
+                ),
+                (
+                    "evidence:evidence_summary",
+                    evidence_refs.evidence_summary_path.as_str(),
+                ),
+                (
+                    "evidence:deterministic_manifest",
+                    evidence_refs.deterministic_manifest_path.as_str(),
+                ),
+                (
+                    "evidence:closure_artifacts",
+                    evidence_refs.closure_artifacts_path.as_str(),
+                ),
+                (
+                    "evidence:midnight_package_manifest",
+                    evidence_refs.midnight_package_manifest_path.as_str(),
+                ),
+                (
+                    "evidence:midnight_flow_manifest",
+                    evidence_refs.midnight_flow_manifest_path.as_str(),
+                ),
+            ];
+            for (name, relative_path) in required_refs {
+                let path = root.join(relative_path);
+                let passed = path.is_file();
+                if !passed {
+                    missing_paths.push(relative_path.to_string());
+                }
+                checks.push(CompletenessCheckV1 {
+                    name: name.to_string(),
+                    passed,
+                    detail: path.display().to_string(),
+                });
+            }
+            if let Some(validation_path) = evidence_refs.midnight_validation_summary_path.as_ref() {
+                let path = root.join(validation_path);
+                let passed = path.is_file();
+                if !passed {
+                    missing_paths.push(validation_path.clone());
+                }
+                checks.push(CompletenessCheckV1 {
+                    name: "evidence:midnight_validation".to_string(),
+                    passed,
+                    detail: path.display().to_string(),
+                });
+            }
+            if matches!(
+                manifest.production_classification.as_ref(),
+                Some(ProductionClassificationV1::PrimaryStrict)
+            ) {
+                let summary_path = root.join(&evidence_refs.summary_path);
+                let telemetry_path = root.join(&evidence_refs.telemetry_report_path);
+                if summary_path.is_file() {
+                    let summary: Value = read_json(&summary_path)?;
+                    let lane_ok = summary
+                        .get("lane_classification")
+                        .and_then(Value::as_str)
+                        == Some("primary-strict");
+                    checks.push(CompletenessCheckV1 {
+                        name: "evidence:summary_lane".to_string(),
+                        passed: lane_ok,
+                        detail: summary_path.display().to_string(),
+                    });
+                    let backend_ok = summary
+                        .get("effective_core_backend")
+                        .and_then(Value::as_str)
+                        == Some("hypernova");
+                    checks.push(CompletenessCheckV1 {
+                        name: "evidence:summary_backend".to_string(),
+                        passed: backend_ok,
+                        detail: summary_path.display().to_string(),
+                    });
+                }
+                if telemetry_path.is_file() {
+                    let telemetry: Value = read_json(&telemetry_path)?;
+                    let backend_ok = telemetry
+                        .get("backend_selected")
+                        .and_then(Value::as_str)
+                        == Some("hypernova");
+                    checks.push(CompletenessCheckV1 {
+                        name: "evidence:telemetry_backend".to_string(),
+                        passed: backend_ok,
+                        detail: telemetry_path.display().to_string(),
+                    });
+                }
+                checks.push(CompletenessCheckV1 {
+                    name: "manifest:runtime_profile_flagship".to_string(),
+                    passed: manifest.runtime_profile.as_deref() == Some("flagship"),
+                    detail: manifest.runtime_profile.clone().unwrap_or_default(),
+                });
+            }
+        } else if matches!(
+            manifest.production_classification.as_ref(),
+            Some(ProductionClassificationV1::PrimaryStrict)
+        ) {
+            checks.push(CompletenessCheckV1 {
+                name: "manifest:evidence_refs".to_string(),
+                passed: false,
+                detail: "primary-strict subsystems must declare evidence_refs".to_string(),
+            });
         }
     }
 
@@ -710,7 +873,7 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
     let report_word_count = report_text.split_whitespace().count();
     checks.push(CompletenessCheckV1 {
         name: "report:word_count".to_string(),
-        passed: report_word_count >= MIN_REPORT_WORD_COUNT,
+        passed: report_word_count >= required_report_word_count,
         detail: format!("{report_word_count} words"),
     });
     if report_word_count == 0 {
@@ -960,6 +1123,7 @@ fn subsystem_manifest(subsystem_id: &str) -> SubsystemManifestEnvelopeV1 {
             proof_path: "08_proofs/proof.json".to_string(),
             verification_path: "09_verification/verification.json".to_string(),
             audit_path: "10_audit/audit.json".to_string(),
+            lane_classification: None,
         },
     )]);
     let mut manifest = SubsystemManifestEnvelopeV1::author_fixed(
@@ -1993,6 +2157,109 @@ mod tests {
         .expect("subsystem scaffold");
         let report = verify_completeness_report(&generated).expect("completeness report");
         assert!(report.overall_passed, "{report:#?}");
+    }
+
+    #[test]
+    fn verify_completeness_respects_manifest_report_word_floor() {
+        let root = tempfile::tempdir().expect("tempdir");
+        let generated = scaffold_subsystem(
+            "Claims Completeness Demo",
+            "full",
+            Some(root.path().join("claims-completeness-demo")),
+        )
+        .expect("subsystem scaffold");
+        let manifest_path = generated.join("02_manifest/subsystem_manifest.json");
+        let mut manifest: SubsystemManifestEnvelopeV1 = read_json(&manifest_path).expect("manifest");
+        manifest.minimum_report_word_count = Some(10_000);
+        write_json(&manifest_path, &manifest).expect("write manifest");
+
+        let report = verify_completeness_report(&generated).expect("completeness report");
+        assert!(!report.overall_passed, "{report:#?}");
+        assert!(report
+            .checks
+            .iter()
+            .any(|check| check.name == "report:word_count" && !check.passed));
+    }
+
+    #[test]
+    fn verify_completeness_rejects_primary_strict_summary_mismatch() {
+        let root = tempfile::tempdir().expect("tempdir");
+        let generated = scaffold_subsystem(
+            "Primary Strict Demo",
+            "full",
+            Some(root.path().join("primary-strict-demo")),
+        )
+        .expect("subsystem scaffold");
+        let manifest_path = generated.join("02_manifest/subsystem_manifest.json");
+        let mut manifest: SubsystemManifestEnvelopeV1 = read_json(&manifest_path).expect("manifest");
+        manifest.runtime_profile = Some("flagship".to_string());
+        manifest.production_classification = Some(ProductionClassificationV1::PrimaryStrict);
+        manifest.evidence_refs = Some(zkf_lib::SubsystemEvidenceRefsV1 {
+            report_path: "17_report/report.md".to_string(),
+            summary_path: "17_report/summary.json".to_string(),
+            telemetry_report_path: "17_report/telemetry_report.json".to_string(),
+            translation_report_path: "17_report/translation_report.json".to_string(),
+            witness_summary_path: "17_report/witness_summary.json".to_string(),
+            public_inputs_path: "03_inputs/sample_input.json".to_string(),
+            public_outputs_path: "03_inputs/sample_input.json".to_string(),
+            evidence_summary_path: "17_report/evidence_summary.json".to_string(),
+            deterministic_manifest_path: "17_report/deterministic_manifest.json".to_string(),
+            closure_artifacts_path: "17_report/closure_artifacts.json".to_string(),
+            midnight_package_manifest_path: "16_compact/README.md".to_string(),
+            midnight_flow_manifest_path: "16_compact/README.md".to_string(),
+            midnight_validation_summary_path: None,
+        });
+        for circuit in manifest.circuits.values_mut() {
+            circuit.lane_classification = Some(ProductionClassificationV1::PrimaryStrict);
+        }
+        write_json(&manifest_path, &manifest).expect("write manifest");
+
+        write_text(
+            &generated.join("17_report/summary.json"),
+            r#"{"lane_classification":"compatibility-only-smoke","effective_core_backend":"arkworks-groth16"}"#,
+        )
+        .expect("summary");
+        write_text(
+            &generated.join("17_report/telemetry_report.json"),
+            r#"{"backend_selected":"arkworks-groth16"}"#,
+        )
+        .expect("telemetry");
+        write_text(
+            &generated.join("17_report/translation_report.json"),
+            "{}",
+        )
+        .expect("translation");
+        write_text(
+            &generated.join("17_report/witness_summary.json"),
+            "{}",
+        )
+        .expect("witness summary");
+        write_text(
+            &generated.join("17_report/evidence_summary.json"),
+            "{}",
+        )
+        .expect("evidence summary");
+        write_text(
+            &generated.join("17_report/deterministic_manifest.json"),
+            "{}",
+        )
+        .expect("deterministic manifest");
+        write_text(
+            &generated.join("17_report/closure_artifacts.json"),
+            "{}",
+        )
+        .expect("closure artifacts");
+
+        let report = verify_completeness_report(&generated).expect("completeness report");
+        assert!(!report.overall_passed, "{report:#?}");
+        assert!(report
+            .checks
+            .iter()
+            .any(|check| check.name == "evidence:summary_lane" && !check.passed));
+        assert!(report
+            .checks
+            .iter()
+            .any(|check| check.name == "evidence:telemetry_backend" && !check.passed));
     }
 
     #[test]
