@@ -38,7 +38,7 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     archive_url = args.archive_url or (
-        f"https://github.com/AnubisQuantumCipher/ziros-attestation/releases/download/v{version}/"
+        f"https://github.com/AnubisQuantumCipher/ziros/releases/download/v{version}/"
         f"ziros-darwin-arm64-v{version}.tar.gz"
     )
     sha256 = "PENDING"

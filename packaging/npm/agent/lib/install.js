@@ -11,7 +11,7 @@ const https = require("node:https");
 const PACKAGE_VERSION = require("../package.json").version;
 const DEFAULT_MANIFEST_URL =
   process.env.ZIROS_INSTALLER_MANIFEST_URL ||
-  "https://github.com/AnubisQuantumCipher/ziros-attestation/releases/latest/download/installer-manifest.json";
+  "https://github.com/AnubisQuantumCipher/ziros/releases/latest/download/installer-manifest.json";
 
 function zirosHome() {
   return process.env.ZIROS_HOME || path.join(os.homedir(), ".ziros");

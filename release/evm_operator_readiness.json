@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T16:19:28.957175Z",
+  "generated_at": "2026-04-08T18:21:31.721813Z",
   "primary_domain": "evm",
   "schema": "ziros-evm-operator-readiness-v1",
   "status": "secondary-ready",
@@ -17,5 +17,5 @@
     "optimism-arbitrum-l2",
     "generic-evm"
   ],
-  "version": "0.7.3"
+  "version": "0.7.4"
 }

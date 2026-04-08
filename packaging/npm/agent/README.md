@@ -5,8 +5,8 @@ Thin npm installer for the ZirOS Apple-Silicon agent runtime.
 This package does not ship ZirOS core source. It downloads a pinned ZirOS
 binary bundle, verifies the bundle SHA-256 against the installer manifest, and
 installs the managed binaries under `~/.ziros/bin/`. Public installer manifests
-and binary bundles are hosted from the artifact-only
-`AnubisQuantumCipher/ziros-attestation` release line.
+and binary bundles are hosted from the
+`AnubisQuantumCipher/ziros` GitHub release line.
 
 Install:
 

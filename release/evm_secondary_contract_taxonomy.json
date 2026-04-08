@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T16:19:24.223840Z",
+  "generated_at": "2026-04-08T18:20:42.201920Z",
   "primary_domain": "evm",
   "schema": "ziros-evm-secondary-contract-taxonomy-v1",
   "scope": "secondary-deploy-capable-lane",
@@ -17,5 +17,5 @@
     "optimism-arbitrum-l2",
     "generic-evm"
   ],
-  "version": "0.7.3"
+  "version": "0.7.4"
 }
