@@ -271,7 +271,7 @@ fn call_tool(name: &str, arguments: Value, exposure: McpExposureV1) -> Result<Va
                 origin: read_optional_string(&arguments, "origin")
                     .unwrap_or_else(|| "remote-mcp".to_string()),
                 goal: read_string(&arguments, "goal")?,
-                options: read_run_options(&arguments)?,
+                options: read_run_options_with_default(&arguments, false)?,
             },
         },
         "agent_bridge_handoffs" => AgentRpcRequestV1::BridgeHandoffList,
@@ -527,7 +527,7 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
                     "origin": { "type": "string", "default": "remote-mcp" },
                     "goal": { "type": "string" },
                     "workflow_override": { "type": "string" },
-                    "strict": { "type": "boolean", "default": true },
+                    "strict": { "type": "boolean", "default": false },
                     "compat_allowed": { "type": "boolean", "default": false },
                     "use_worktree": { "type": "boolean", "default": true },
                     "wallet_network": { "type": "string", "default": "preprod" },
@@ -904,11 +904,18 @@ fn tool_error(message: String) -> Value {
 }
 
 fn read_run_options(arguments: &Value) -> Result<AgentRunOptionsV1, String> {
+    read_run_options_with_default(arguments, true)
+}
+
+fn read_run_options_with_default(
+    arguments: &Value,
+    strict_default: bool,
+) -> Result<AgentRunOptionsV1, String> {
     Ok(AgentRunOptionsV1 {
         strict: arguments
             .get("strict")
             .and_then(Value::as_bool)
-            .unwrap_or(true),
+            .unwrap_or(strict_default),
         compat_allowed: arguments
             .get("compat_allowed")
             .and_then(Value::as_bool)
@@ -1025,5 +1032,25 @@ mod tests {
         assert!(names.contains(&"agent_bridge_prepare"));
         assert!(!names.contains(&"agent_run"));
         assert!(!names.contains(&"agent_approve"));
+    }
+
+    #[test]
+    fn bridge_prepare_schema_defaults_to_non_strict() {
+        let tools = tool_definitions(McpExposureV1::RemoteBridgeReadOnly);
+        let bridge_prepare = tools
+            .into_iter()
+            .find(|tool| tool["name"] == json!("agent_bridge_prepare"))
+            .expect("bridge prepare tool");
+        assert_eq!(
+            bridge_prepare["inputSchema"]["properties"]["strict"]["default"],
+            json!(false)
+        );
+    }
+
+    #[test]
+    fn bridge_prepare_parser_defaults_to_non_strict() {
+        let options = read_run_options_with_default(&json!({ "goal": "inspect host readiness" }), false)
+            .expect("bridge options");
+        assert!(!options.strict);
     }
 }
