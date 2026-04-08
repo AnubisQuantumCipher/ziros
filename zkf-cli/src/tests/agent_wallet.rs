@@ -279,6 +279,112 @@ fn gateway_cli_parses_allow_remote_writes_surface() {
 }
 
 #[test]
+fn gateway_cli_parses_setup_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "gateway",
+        "setup",
+        "--bind",
+        "127.0.0.1:8788",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Setup {
+                    bind,
+                    json: true,
+                    copy_url: true,
+                    open_chatgpt: true,
+                } if bind == "127.0.0.1:8788"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_install_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "gateway",
+        "install",
+        "--bind",
+        "127.0.0.1:8788",
+        "--json",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Install {
+                    bind,
+                    json: true,
+                } if bind == "127.0.0.1:8788"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_start_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "gateway", "start", "--json"]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Start { json: true }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_stop_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "gateway", "stop", "--json"]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Stop { json: true }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_restart_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "gateway", "restart", "--json"]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Restart { json: true }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn gateway_cli_parses_status_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "gateway", "status", "--json"]);
+    match cli.command {
+        crate::cli::Commands::Gateway { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::GatewayCommands::Status { json: true }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
 fn setup_cli_parses_public_setup_surface() {
     let cli = crate::cli::Cli::parse_from([
         "ziros",

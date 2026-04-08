@@ -1631,8 +1631,40 @@ pub(crate) enum ModelAddCommands {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum GatewayCommands {
+    Setup {
+        #[arg(long, default_value = "127.0.0.1:8788")]
+        bind: String,
+        #[arg(long)]
+        json: bool,
+        #[arg(long, default_value_t = true)]
+        copy_url: bool,
+        #[arg(long, default_value_t = true)]
+        open_chatgpt: bool,
+    },
+    Install {
+        #[arg(long, default_value = "127.0.0.1:8788")]
+        bind: String,
+        #[arg(long)]
+        json: bool,
+    },
+    Start {
+        #[arg(long)]
+        json: bool,
+    },
+    Stop {
+        #[arg(long)]
+        json: bool,
+    },
+    Restart {
+        #[arg(long)]
+        json: bool,
+    },
+    Status {
+        #[arg(long)]
+        json: bool,
+    },
     Serve {
-        #[arg(long, default_value = "127.0.0.1:8787")]
+        #[arg(long, default_value = "127.0.0.1:8788")]
         bind: String,
         #[arg(long)]
         project: Option<PathBuf>,

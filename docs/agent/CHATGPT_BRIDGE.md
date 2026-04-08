@@ -14,10 +14,30 @@ clients can plan remotely without bypassing the local ZirOS execution boundary.
 This is not a second control plane. It is the same MCP semantics with a remote
 transport wrapper.
 
-## Start The Bridge
+## Hermes-Style Bridge Flow
+
+```bash
+ziros gateway setup
+ziros gateway status --json
+```
+
+That installs and starts the local gateway plus the public tunnel, copies the
+public MCP URL to your clipboard, and opens ChatGPT by default.
+
+If you want foreground mode instead of the managed service:
 
 ```bash
 ziros gateway serve --bind 127.0.0.1:8788
+```
+
+Managed lifecycle commands:
+
+```bash
+ziros gateway install
+ziros gateway start
+ziros gateway stop
+ziros gateway restart
+ziros gateway status --json
 ```
 
 Key endpoints:

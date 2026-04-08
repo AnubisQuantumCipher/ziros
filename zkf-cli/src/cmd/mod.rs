@@ -584,6 +584,12 @@ fn command_name(command: &Commands) -> String {
             ModelCommands::Remove { .. } => "model:remove".to_string(),
         },
         Commands::Gateway { command } => match command {
+            GatewayCommands::Setup { .. } => "gateway:setup".to_string(),
+            GatewayCommands::Install { .. } => "gateway:install".to_string(),
+            GatewayCommands::Start { .. } => "gateway:start".to_string(),
+            GatewayCommands::Stop { .. } => "gateway:stop".to_string(),
+            GatewayCommands::Restart { .. } => "gateway:restart".to_string(),
+            GatewayCommands::Status { .. } => "gateway:status".to_string(),
             GatewayCommands::Serve { .. } => "gateway:serve".to_string(),
         },
         Commands::Update { command } => match command {

@@ -7,14 +7,14 @@ This is the short reference for the setup-relevant surfaces only.
 | Surface | Commands |
 | --- | --- |
 | Base health | `ziros doctor`, `ziros metal-doctor` |
-| Public UX | `ziros setup`, `ziros chat`, `ziros model ...`, `ziros gateway serve`, `ziros update`, `ziros version --json` |
+| Public UX | `ziros setup`, `ziros chat`, `ziros model ...`, `ziros gateway setup`, `ziros gateway status`, `ziros update`, `ziros version --json` |
 | Agent | `ziros agent doctor`, `status`, `plan`, `run`, `resume`, `logs` |
 | Agent memory | `ziros agent memory sessions`, `receipts`, `artifacts`, `deployments`, `environments`, `procedures`, `incidents` |
 | Agent approvals | `ziros agent approvals list`, `approve`, `reject` |
 | Agent continuity | `ziros agent worktree list`, `create`, `cleanup`; `ziros agent checkpoint list`, `create`, `rollback` |
 | Agent provider | `ziros agent provider status`, `route`, `test` |
 | Agent bridge | `ziros agent bridge prepare`, `list`, `accept` |
-| MCP | `ziros agent mcp serve`, `ziros gateway serve`, `ziros gateway serve --allow-remote-writes` |
+| MCP | `ziros agent mcp serve`, `ziros gateway setup|install|start|stop|restart|status`, `ziros gateway serve`, `ziros gateway serve --allow-remote-writes` |
 | Midnight | `ziros midnight status`, `doctor`, `resolve`, `contract ...` |
 | EVM | `ziros evm verifier export`, `estimate-gas`, `foundry init`, `deploy`, `call`, `test`, `diagnose` |
 
