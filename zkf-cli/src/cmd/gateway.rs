@@ -715,9 +715,9 @@ url_file="{url_file}"
   -R 80:{bind} \
   nokey@localhost.run 2>&1 | while IFS= read -r line; do
   printf '%s\n' "$line"
-  if [[ "$line" =~ https://[^[:space:]]+\\.lhr\\.life ]]; then
-    match="$MATCH"
-    printf '%s/mcp\n' "${{match%/}}" > "$url_file"
+  url=$(printf '%s\n' "$line" | /usr/bin/grep -oE 'https://[^[:space:]]+\\.lhr\\.life' | /usr/bin/tail -n 1 || true)
+  if [[ -n "$url" ]]; then
+    printf '%s/mcp\n' "${{url%/}}" > "$url_file"
   fi
 done
 "#,
@@ -853,10 +853,24 @@ fn wait_for_mcp_url() -> Result<String, String> {
 }
 
 fn read_mcp_url() -> Option<String> {
-    fs::read_to_string(mcp_url_path())
+    read_trimmed_path(&mcp_url_path())
+        .or_else(read_mcp_url_from_log)
+}
+
+fn read_trimmed_path(path: &std::path::Path) -> Option<String> {
+    fs::read_to_string(path)
         .ok()
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty())
+}
+
+fn read_mcp_url_from_log() -> Option<String> {
+    let text = fs::read_to_string(localhostrun_stdout_path()).ok()?;
+    text.lines().rev().find_map(|line| {
+        line.split_whitespace()
+            .find(|part| part.starts_with("https://") && part.ends_with(".lhr.life"))
+            .map(|value| format!("{}/mcp", value.trim_end_matches('/')))
+    })
 }
 
 fn local_health(bind: &str) -> bool {
