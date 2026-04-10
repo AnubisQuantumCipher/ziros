@@ -11,24 +11,24 @@ use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use zkf_command_surface::midnight::{
+    MidnightNetworkV1, call_prepare as midnight_call_prepare,
+    deploy_prepare as midnight_deploy_prepare,
+};
 use zkf_command_surface::subsystem::SubsystemScaffoldReportV1;
 use zkf_core::{
     BackendKind, FieldElement, Program, PublicKeyBundle, SignatureBundle, SignatureScheme,
     WitnessInputs, verify_bundle,
 };
-use zkf_command_surface::midnight::{
-    MidnightNetworkV1, call_prepare as midnight_call_prepare,
-    deploy_prepare as midnight_deploy_prepare,
+use zkf_lib::app::subsystem::{
+    DeploymentProfileV1, DisclosurePolicyV1, EvmCompatibilityContractClassV1,
+    MidnightContractClassV1, SubsystemCircuitModuleV1, SubsystemContractSpecV1,
+    SubsystemReleaseContractV1,
 };
 use zkf_lib::{
     Expr, ProductionClassificationV1, ProgramBuilder, SUBSYSTEM_BACKEND_POLICY_AUTHOR_FIXED,
     SubsystemCircuitManifestV1, SubsystemManifestEnvelopeV1, audit_program_default,
     compile_and_prove, verify,
-};
-use zkf_lib::app::subsystem::{
-    DeploymentProfileV1, DisclosurePolicyV1, EvmCompatibilityContractClassV1,
-    MidnightContractClassV1, SubsystemCircuitModuleV1, SubsystemContractSpecV1,
-    SubsystemReleaseContractV1,
 };
 
 use crate::cmd::deploy;
@@ -390,10 +390,7 @@ pub(crate) fn handle_scaffold(
             .join("02_manifest/subsystem_manifest.json")
             .display()
             .to_string(),
-        completeness_path: root
-            .join("17_report/report.md")
-            .display()
-            .to_string(),
+        completeness_path: root.join("17_report/report.md").display().to_string(),
         release_pin_path: root
             .join("20_release/zkf-release-pin.json")
             .display()
@@ -407,10 +404,7 @@ pub(crate) fn handle_scaffold(
     } else {
         println!(
             "subsystem scaffold created: style={} -> {}\nnext:\n  cargo test --manifest-path {}/01_source/Cargo.toml\n  zkf subsystem verify-completeness --root {}",
-            report.style,
-            report.out_dir,
-            report.out_dir,
-            report.out_dir
+            report.style, report.out_dir, report.out_dir, report.out_dir
         );
     }
     Ok(())
@@ -546,7 +540,11 @@ pub(crate) fn handle_bundle_public(root: PathBuf, json: bool) -> Result<(), Stri
     Ok(())
 }
 
-pub(crate) fn handle_deploy_prepare(root: PathBuf, network: String, json: bool) -> Result<(), String> {
+pub(crate) fn handle_deploy_prepare(
+    root: PathBuf,
+    network: String,
+    json: bool,
+) -> Result<(), String> {
     let network = MidnightNetworkV1::parse(&network)?;
     let source = root.join("16_compact/Subsystem.compact");
     let out_path = root.join("16_compact/deploy-prepare.json");
@@ -819,9 +817,7 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
                 let telemetry_path = root.join(&evidence_refs.telemetry_report_path);
                 if summary_path.is_file() {
                     let summary: Value = read_json(&summary_path)?;
-                    let lane_ok = summary
-                        .get("lane_classification")
-                        .and_then(Value::as_str)
+                    let lane_ok = summary.get("lane_classification").and_then(Value::as_str)
                         == Some("primary-strict");
                     checks.push(CompletenessCheckV1 {
                         name: "evidence:summary_lane".to_string(),
@@ -840,9 +836,7 @@ fn verify_completeness_report(root: &Path) -> Result<SubsystemCompletenessReport
                 }
                 if telemetry_path.is_file() {
                     let telemetry: Value = read_json(&telemetry_path)?;
-                    let backend_ok = telemetry
-                        .get("backend_selected")
-                        .and_then(Value::as_str)
+                    let backend_ok = telemetry.get("backend_selected").and_then(Value::as_str)
                         == Some("hypernova");
                     checks.push(CompletenessCheckV1 {
                         name: "evidence:telemetry_backend".to_string(),
@@ -1016,9 +1010,10 @@ fn reproving_report(root: &Path) -> Result<SubsystemProofLifecycleReportV1, Stri
     let (circuit_id, circuit) = primary_circuit_entry(&manifest)?;
     let program: Program = read_json(&root.join(&circuit.program_path))?;
     let inputs: WitnessInputs = read_json(&root.join(&circuit.inputs_path))?;
-    let embedded =
-        compile_and_prove(&program, &inputs, &circuit.backend, None, None).map_err(|error| error.to_string())?;
-    let verified = verify(&embedded.compiled, &embedded.artifact).map_err(|error| error.to_string())?;
+    let embedded = compile_and_prove(&program, &inputs, &circuit.backend, None, None)
+        .map_err(|error| error.to_string())?;
+    let verified =
+        verify(&embedded.compiled, &embedded.artifact).map_err(|error| error.to_string())?;
 
     write_json(&root.join(&circuit.compiled_path), &embedded.compiled)?;
     write_json(&root.join(&circuit.proof_path), &embedded.artifact)?;
@@ -2169,16 +2164,19 @@ mod tests {
         )
         .expect("subsystem scaffold");
         let manifest_path = generated.join("02_manifest/subsystem_manifest.json");
-        let mut manifest: SubsystemManifestEnvelopeV1 = read_json(&manifest_path).expect("manifest");
+        let mut manifest: SubsystemManifestEnvelopeV1 =
+            read_json(&manifest_path).expect("manifest");
         manifest.minimum_report_word_count = Some(10_000);
         write_json(&manifest_path, &manifest).expect("write manifest");
 
         let report = verify_completeness_report(&generated).expect("completeness report");
         assert!(!report.overall_passed, "{report:#?}");
-        assert!(report
-            .checks
-            .iter()
-            .any(|check| check.name == "report:word_count" && !check.passed));
+        assert!(
+            report
+                .checks
+                .iter()
+                .any(|check| check.name == "report:word_count" && !check.passed)
+        );
     }
 
     #[test]
@@ -2191,7 +2189,8 @@ mod tests {
         )
         .expect("subsystem scaffold");
         let manifest_path = generated.join("02_manifest/subsystem_manifest.json");
-        let mut manifest: SubsystemManifestEnvelopeV1 = read_json(&manifest_path).expect("manifest");
+        let mut manifest: SubsystemManifestEnvelopeV1 =
+            read_json(&manifest_path).expect("manifest");
         manifest.runtime_profile = Some("flagship".to_string());
         manifest.production_classification = Some(ProductionClassificationV1::PrimaryStrict);
         manifest.evidence_refs = Some(zkf_lib::SubsystemEvidenceRefsV1 {
@@ -2224,42 +2223,34 @@ mod tests {
             r#"{"backend_selected":"arkworks-groth16"}"#,
         )
         .expect("telemetry");
-        write_text(
-            &generated.join("17_report/translation_report.json"),
-            "{}",
-        )
-        .expect("translation");
-        write_text(
-            &generated.join("17_report/witness_summary.json"),
-            "{}",
-        )
-        .expect("witness summary");
-        write_text(
-            &generated.join("17_report/evidence_summary.json"),
-            "{}",
-        )
-        .expect("evidence summary");
+        write_text(&generated.join("17_report/translation_report.json"), "{}")
+            .expect("translation");
+        write_text(&generated.join("17_report/witness_summary.json"), "{}")
+            .expect("witness summary");
+        write_text(&generated.join("17_report/evidence_summary.json"), "{}")
+            .expect("evidence summary");
         write_text(
             &generated.join("17_report/deterministic_manifest.json"),
             "{}",
         )
         .expect("deterministic manifest");
-        write_text(
-            &generated.join("17_report/closure_artifacts.json"),
-            "{}",
-        )
-        .expect("closure artifacts");
+        write_text(&generated.join("17_report/closure_artifacts.json"), "{}")
+            .expect("closure artifacts");
 
         let report = verify_completeness_report(&generated).expect("completeness report");
         assert!(!report.overall_passed, "{report:#?}");
-        assert!(report
-            .checks
-            .iter()
-            .any(|check| check.name == "evidence:summary_lane" && !check.passed));
-        assert!(report
-            .checks
-            .iter()
-            .any(|check| check.name == "evidence:telemetry_backend" && !check.passed));
+        assert!(
+            report
+                .checks
+                .iter()
+                .any(|check| check.name == "evidence:summary_lane" && !check.passed)
+        );
+        assert!(
+            report
+                .checks
+                .iter()
+                .any(|check| check.name == "evidence:telemetry_backend" && !check.passed)
+        );
     }
 
     #[test]

@@ -7,8 +7,8 @@ use zkf_backends::foundry_test::generate_foundry_test_from_artifact;
 use zkf_core::{BackendKind, ProofArtifact};
 use zkf_lib::app::evidence::ensure_foundry_layout;
 
-use crate::cmd::{deploy, estimate_gas};
 use crate::cli::{EvmCommands, EvmFoundryCommands, EvmVerifierCommands};
+use crate::cmd::{deploy, estimate_gas};
 use crate::solidity::parse_evm_target;
 use crate::util::{parse_backend, read_json, write_text};
 
@@ -52,7 +52,14 @@ pub(crate) fn handle_evm(command: EvmCommands) -> Result<(), String> {
             private_key,
             constructor_arg,
             json,
-        } => handle_deploy(project, contract, rpc_url, private_key, constructor_arg, json),
+        } => handle_deploy(
+            project,
+            contract,
+            rpc_url,
+            private_key,
+            constructor_arg,
+            json,
+        ),
         EvmCommands::Call {
             rpc_url,
             to,
@@ -160,7 +167,10 @@ fn handle_foundry_init(
     json: bool,
 ) -> Result<(), String> {
     if !solidity.is_file() {
-        return Err(format!("solidity source does not exist: {}", solidity.display()));
+        return Err(format!(
+            "solidity source does not exist: {}",
+            solidity.display()
+        ));
     }
     let project_root = out.join("foundry");
     ensure_foundry_layout(&project_root).map_err(|error| error.to_string())?;
@@ -172,7 +182,9 @@ fn handle_foundry_init(
             .unwrap_or("Verifier")
             .to_string()
     });
-    let verifier_contract_path = project_root.join("src").join(format!("{contract_name}.sol"));
+    let verifier_contract_path = project_root
+        .join("src")
+        .join(format!("{contract_name}.sol"));
     fs::copy(&solidity, &verifier_contract_path).map_err(|error| {
         format!(
             "failed to copy {} -> {}: {error}",
@@ -181,7 +193,9 @@ fn handle_foundry_init(
         )
     })?;
 
-    let test_path = if let (Some(artifact_path), Some(backend_name)) = (artifact.as_ref(), backend.as_deref()) {
+    let test_path = if let (Some(artifact_path), Some(backend_name)) =
+        (artifact.as_ref(), backend.as_deref())
+    {
         let backend_kind = parse_backend(backend_name)?;
         if backend_kind == BackendKind::ArkworksGroth16 {
             let artifact_data: ProofArtifact = read_json(artifact_path)?;
@@ -344,7 +358,11 @@ fn handle_call(
         Command::new("cast")
     };
     command.arg(if send { "send" } else { "call" });
-    command.arg("--rpc-url").arg(&rpc_url).arg(&to).arg(&signature);
+    command
+        .arg("--rpc-url")
+        .arg(&rpc_url)
+        .arg(&to)
+        .arg(&signature);
     for value in &args {
         command.arg(value);
     }
@@ -352,9 +370,12 @@ fn handle_call(
         let (resolved_private_key, _) = resolve_private_key(private_key.as_deref(), &rpc_url)?;
         command.arg("--private-key").arg(resolved_private_key);
     }
-    let output = command
-        .output()
-        .map_err(|error| format!("failed to run cast {}: {error}", if send { "send" } else { "call" }))?;
+    let output = command.output().map_err(|error| {
+        format!(
+            "failed to run cast {}: {error}",
+            if send { "send" } else { "call" }
+        )
+    })?;
     let report = EvmCallReportV1 {
         schema: "zkf-evm-call-v1".to_string(),
         generated_at: now_rfc3339(),
@@ -410,7 +431,11 @@ fn first_line(raw: &[u8]) -> String {
         .to_string()
 }
 
-fn run_forge_command(project: &Path, action: &str, args: &[&str]) -> Result<EvmForgeRunReportV1, String> {
+fn run_forge_command(
+    project: &Path,
+    action: &str,
+    args: &[&str],
+) -> Result<EvmForgeRunReportV1, String> {
     ensure_foundry_project(project)?;
     let output = Command::new("forge")
         .current_dir(project)
@@ -446,7 +471,10 @@ fn ensure_foundry_project(project: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn resolve_private_key(private_key: Option<&str>, rpc_url: &str) -> Result<(String, String), String> {
+fn resolve_private_key(
+    private_key: Option<&str>,
+    rpc_url: &str,
+) -> Result<(String, String), String> {
     if let Some(value) = private_key {
         return Ok((value.to_string(), "explicit".to_string()));
     }

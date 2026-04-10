@@ -44,7 +44,9 @@ fn sign_payload(bytes: &[u8]) -> Result<(PublicKeyBundle, SignatureBundle), Stri
         SUBSYSTEM_CREDENTIAL_CONTEXT,
         secure_random_array::<SIGNING_RANDOMNESS_SIZE>()?,
     )
-    .map_err(|error| format!("failed to sign subsystem credential payload with ML-DSA-87: {error:?}"))?;
+    .map_err(|error| {
+        format!("failed to sign subsystem credential payload with ML-DSA-87: {error:?}")
+    })?;
 
     Ok((
         PublicKeyBundle {
@@ -61,7 +63,11 @@ fn sign_payload(bytes: &[u8]) -> Result<(PublicKeyBundle, SignatureBundle), Stri
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let root = PathBuf::from(env::args().nth(1).ok_or("usage: resign_subsystem_credential <subsystem_root>")?);
+    let root = PathBuf::from(
+        env::args()
+            .nth(1)
+            .ok_or("usage: resign_subsystem_credential <subsystem_root>")?,
+    );
     let credential_path = root.join("11_credentials/subsystem_credential.json");
     let public_keys_path = root.join("12_signatures/subsystem_credential_public_keys.json");
     let signature_path = root.join("12_signatures/subsystem_credential_signature.json");
@@ -70,9 +76,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bytes = serde_json::to_vec(&credential)?;
     let (public_keys, signature_bundle) = sign_payload(&bytes).map_err(std::io::Error::other)?;
 
-    fs::create_dir_all(public_keys_path.parent().ok_or("missing signatures parent")?)?;
+    fs::create_dir_all(
+        public_keys_path
+            .parent()
+            .ok_or("missing signatures parent")?,
+    )?;
     fs::write(&public_keys_path, serde_json::to_vec_pretty(&public_keys)?)?;
-    fs::write(&signature_path, serde_json::to_vec_pretty(&signature_bundle)?)?;
+    fs::write(
+        &signature_path,
+        serde_json::to_vec_pretty(&signature_bundle)?,
+    )?;
     println!("{}", root.display());
     Ok(())
 }

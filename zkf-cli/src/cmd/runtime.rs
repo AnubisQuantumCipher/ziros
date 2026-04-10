@@ -7568,6 +7568,7 @@ mod tests {
                         core_frequency_mhz: Some(4040),
                         requested_backend: None,
                         backend_route: Some("native-auto".to_string()),
+                        program_digest_bucket: None,
                         requested_jobs: 2,
                         total_jobs: 4,
                     },
@@ -7658,6 +7659,7 @@ mod tests {
                         threshold_optimizer: None,
                         failures: BTreeMap::new(),
                     },
+                    model_executions: vec![],
                     notes: vec![],
                 },
                 anomaly_verdict: zkf_runtime::AnomalyVerdict {

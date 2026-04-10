@@ -3,7 +3,7 @@ use std::fs;
 use std::io::{self, IsTerminal, Write};
 use std::path::PathBuf;
 use zkf_agent::{
-    AgentRunOptionsV1, agent_status, approval_lineage, list_projects, list_procedures,
+    AgentRunOptionsV1, agent_status, approval_lineage, list_procedures, list_projects,
     load_provider_profile_store, provider_status, run_goal, session_deployments, workflow_list,
 };
 
@@ -33,10 +33,11 @@ pub(crate) fn handle_chat(command: ChatCommand) -> Result<(), String> {
         return Err("ziros chat requires an interactive terminal".to_string());
     }
 
-    let provider_override = command
-        .provider
-        .clone()
-        .or_else(|| load_provider_profile_store().ok().and_then(|store| store.default_profile));
+    let provider_override = command.provider.clone().or_else(|| {
+        load_provider_profile_store()
+            .ok()
+            .and_then(|store| store.default_profile)
+    });
     print_banner(&command, provider_override.as_deref())?;
 
     loop {
@@ -71,7 +72,9 @@ pub(crate) fn handle_chat(command: ChatCommand) -> Result<(), String> {
         )?;
         println!(
             "session {} [{}] workflow={}",
-            report.session.session_id, report.session.status.as_str(), report.session.workflow_kind
+            report.session.session_id,
+            report.session.status.as_str(),
+            report.session.workflow_kind
         );
         println!("goal: {}", report.session.goal_summary);
         if report.trust_gate.blocked {
@@ -92,9 +95,14 @@ pub(crate) fn handle_chat(command: ChatCommand) -> Result<(), String> {
 }
 
 fn print_banner(command: &ChatCommand, provider_override: Option<&str>) -> Result<(), String> {
-    println!("ZirOS {}  midnight-first operator shell", env!("CARGO_PKG_VERSION"));
+    println!(
+        "ZirOS {}  midnight-first operator shell",
+        env!("CARGO_PKG_VERSION")
+    );
     println!("Toolsets: subsystem  midnight  evm  wallet  release  memory  worktree  checkpoint");
-    println!("Slash: /help  /doctor  /models  /recipes  /projects  /memory  /approvals  /deployments  /update  /exit");
+    println!(
+        "Slash: /help  /doctor  /models  /recipes  /projects  /memory  /approvals  /deployments  /update  /exit"
+    );
 
     let routes = provider_status(None)?;
     if let Some(route) = routes.routes.iter().find(|route| {
@@ -108,7 +116,11 @@ fn print_banner(command: &ChatCommand, provider_override: Option<&str>) -> Resul
                         .is_some_and(|profile| profile == selected)
             })
     }) {
-        let model = route.summary.get("model").and_then(Value::as_str).unwrap_or("embedded");
+        let model = route
+            .summary
+            .get("model")
+            .and_then(Value::as_str)
+            .unwrap_or("embedded");
         let profile = route
             .summary
             .get("profile_id")
@@ -150,7 +162,9 @@ fn handle_slash_command(input: &str, command: &ChatCommand) -> Result<(), String
     match input {
         "/help" => {
             println!("Enter a normal goal to run the agent.");
-            println!("Slash commands: /doctor /models /recipes /projects /memory /approvals /deployments /update /exit");
+            println!(
+                "Slash commands: /doctor /models /recipes /projects /memory /approvals /deployments /update /exit"
+            );
         }
         "/doctor" => {
             print_jsonish(&serde_json::json!({
@@ -196,7 +210,9 @@ fn handle_slash_command(input: &str, command: &ChatCommand) -> Result<(), String
 }
 
 fn read_midnight_readiness(repo_root: &PathBuf) -> Option<Value> {
-    let path = repo_root.join("release").join("midnight_operator_readiness.json");
+    let path = repo_root
+        .join("release")
+        .join("midnight_operator_readiness.json");
     let bytes = fs::read(path).ok()?;
     serde_json::from_slice(&bytes).ok()
 }

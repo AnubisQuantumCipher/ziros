@@ -1,0 +1,4 @@
+-Q ./extraction ZkfLangExtraction
+./ZirLangSemantics.v
+./ZirLangLoweringProofs.v
+./ZirLangPrivacyProofs.v

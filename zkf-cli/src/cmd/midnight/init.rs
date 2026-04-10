@@ -1,17 +1,17 @@
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use super::doctor::{handle_doctor, DoctorArgs};
-use super::gateway::{admit_compact_request, VerifyCompactRequest};
+use super::doctor::{DoctorArgs, handle_doctor};
+use super::gateway::{VerifyCompactRequest, admit_compact_request};
 use super::shared::{
-    compare_project_package_pins, copy_dir_recursive_filtered, copy_file,
-    current_timestamp_rfc3339ish, ensure_sed_dapp_root, midnight_template_catalog, network_config,
-    node_version, npm_version, read_text, resolve_compactc_binary, template_contract_filename,
-    template_contract_source, MidnightNetwork, REQUIRED_COMPACTC_VERSION, REQUIRED_NODE_MAJOR,
+    MidnightNetwork, REQUIRED_COMPACTC_VERSION, REQUIRED_NODE_MAJOR, compare_project_package_pins,
+    copy_dir_recursive_filtered, copy_file, current_timestamp_rfc3339ish, ensure_sed_dapp_root,
+    midnight_template_catalog, network_config, node_version, npm_version, read_text,
+    resolve_compactc_binary, template_contract_filename, template_contract_source,
 };
 use crate::util::write_json;
 

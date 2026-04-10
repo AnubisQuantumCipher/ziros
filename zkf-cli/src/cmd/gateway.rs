@@ -10,9 +10,9 @@ use std::process::Command;
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_agent::{
-    AgentRunOptionsV1, McpExposureV1, handle_mcp_jsonrpc_bytes, load_provider_profile_store,
-    mcp_server_manifest, run_goal, ziros_home_root, ziros_logs_root, ziros_managed_bin_root,
-    ensure_ziros_layout,
+    AgentRunOptionsV1, McpExposureV1, ensure_ziros_layout, handle_mcp_jsonrpc_bytes,
+    load_provider_profile_store, mcp_server_manifest, run_goal, ziros_home_root, ziros_logs_root,
+    ziros_managed_bin_root,
 };
 
 use crate::cli::GatewayCommands;
@@ -224,10 +224,7 @@ fn status_gateway(json_output: bool) -> Result<(), String> {
         bind: bind.clone(),
         configured: gateway_config_path().exists(),
         local_health_ok: local_health(&bind),
-        remote_health_ok: mcp_url
-            .as_deref()
-            .map(remote_health)
-            .unwrap_or(false),
+        remote_health_ok: mcp_url.as_deref().map(remote_health).unwrap_or(false),
         mcp_url,
         gateway_running: launch_agent_running(GATEWAY_LABEL),
         tunnel_running: launch_agent_running(LOCALHOSTRUN_LABEL),
@@ -262,7 +259,10 @@ fn serve_gateway(
                 .route("/mcp/manifest.json", web::get().to(gateway_mcp_manifest))
                 .route("/mcp", web::post().to(gateway_mcp_jsonrpc))
                 .route("/v1/models", web::get().to(gateway_models))
-                .route("/v1/chat/completions", web::post().to(gateway_chat_completions))
+                .route(
+                    "/v1/chat/completions",
+                    web::post().to(gateway_chat_completions),
+                )
                 .route("/v1/responses", web::post().to(gateway_responses))
         })
         .bind(&bind)
@@ -285,10 +285,7 @@ async fn gateway_mcp_manifest(state: web::Data<GatewayState>) -> impl Responder 
     HttpResponse::Ok().json(mcp_server_manifest(state.remote_mcp_exposure))
 }
 
-async fn gateway_mcp_jsonrpc(
-    state: web::Data<GatewayState>,
-    body: web::Bytes,
-) -> impl Responder {
+async fn gateway_mcp_jsonrpc(state: web::Data<GatewayState>, body: web::Bytes) -> impl Responder {
     match handle_mcp_jsonrpc_bytes(body.as_ref(), state.remote_mcp_exposure) {
         Ok(response) => HttpResponse::Ok()
             .insert_header((CONTENT_TYPE, "application/json"))
@@ -337,8 +334,14 @@ async fn gateway_chat_completions(
     state: web::Data<GatewayState>,
     request: web::Json<GatewayChatRequest>,
 ) -> impl Responder {
-    let goal = extract_goal(&request.messages).unwrap_or_else(|| "inspect current operator state".to_string());
-    match run_gateway_goal(&state, request.model.clone(), project_root_from_metadata(&state, request.metadata.as_ref()), &goal) {
+    let goal = extract_goal(&request.messages)
+        .unwrap_or_else(|| "inspect current operator state".to_string());
+    match run_gateway_goal(
+        &state,
+        request.model.clone(),
+        project_root_from_metadata(&state, request.metadata.as_ref()),
+        &goal,
+    ) {
         Ok((content, model)) => {
             if request.stream {
                 let stream_payload = format!(
@@ -393,8 +396,14 @@ async fn gateway_responses(
     state: web::Data<GatewayState>,
     request: web::Json<GatewayChatRequest>,
 ) -> impl Responder {
-    let goal = extract_goal(&request.messages).unwrap_or_else(|| "inspect current operator state".to_string());
-    match run_gateway_goal(&state, request.model.clone(), project_root_from_metadata(&state, request.metadata.as_ref()), &goal) {
+    let goal = extract_goal(&request.messages)
+        .unwrap_or_else(|| "inspect current operator state".to_string());
+    match run_gateway_goal(
+        &state,
+        request.model.clone(),
+        project_root_from_metadata(&state, request.metadata.as_ref()),
+        &goal,
+    ) {
         Ok((content, model)) => HttpResponse::Ok().json(json!({
             "id": format!("resp-{}", now_unix()),
             "object": "response",
@@ -429,10 +438,11 @@ fn run_gateway_goal(
     project_root: Option<PathBuf>,
     goal: &str,
 ) -> Result<(String, String), String> {
-    let provider = state
-        .provider
-        .clone()
-        .or_else(|| load_provider_profile_store().ok().and_then(|store| store.default_profile));
+    let provider = state.provider.clone().or_else(|| {
+        load_provider_profile_store()
+            .ok()
+            .and_then(|store| store.default_profile)
+    });
     let model = requested_model.or_else(|| state.model.clone());
     let report = run_goal(
         goal,
@@ -807,7 +817,10 @@ fn kickstart_launch_agent(plist_path: &std::path::Path, label: &str) -> Result<(
         .status()
         .map_err(|error| error.to_string())?;
     if !bootstrap.success() {
-        return Err(format!("launchctl bootstrap failed for {}", plist_path.display()));
+        return Err(format!(
+            "launchctl bootstrap failed for {}",
+            plist_path.display()
+        ));
     }
     let kickstart = Command::new("launchctl")
         .args(["kickstart", "-k", &format!("{domain}/{label}")])
@@ -853,8 +866,7 @@ fn wait_for_mcp_url() -> Result<String, String> {
 }
 
 fn read_mcp_url() -> Option<String> {
-    read_trimmed_path(&mcp_url_path())
-        .or_else(read_mcp_url_from_log)
+    read_trimmed_path(&mcp_url_path()).or_else(read_mcp_url_from_log)
 }
 
 fn read_trimmed_path(path: &std::path::Path) -> Option<String> {

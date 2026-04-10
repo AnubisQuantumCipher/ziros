@@ -127,8 +127,12 @@ fn handle_update_apply(json_output: bool, manifest_url: Option<String>) -> Resul
         ));
     }
 
-    fs::create_dir_all(ziros_install_root())
-        .map_err(|error| format!("failed to create {}: {error}", ziros_install_root().display()))?;
+    fs::create_dir_all(ziros_install_root()).map_err(|error| {
+        format!(
+            "failed to create {}: {error}",
+            ziros_install_root().display()
+        )
+    })?;
     let archive_path = ziros_install_root().join("ziros-update.tar.gz");
     fs::write(&archive_path, &archive_bytes)
         .map_err(|error| format!("failed to write {}: {error}", archive_path.display()))?;
@@ -149,7 +153,10 @@ fn handle_update_apply(json_output: bool, manifest_url: Option<String>) -> Resul
         .status()
         .map_err(|error| format!("failed to extract {}: {error}", archive_path.display()))?;
     if !status.success() {
-        return Err(format!("tar failed while extracting {}", archive_path.display()));
+        return Err(format!(
+            "tar failed while extracting {}",
+            archive_path.display()
+        ));
     }
 
     fs::create_dir_all(ziros_managed_bin_root()).map_err(|error| {

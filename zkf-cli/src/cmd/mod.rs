@@ -1,8 +1,9 @@
 pub(crate) mod aerospace_qualification;
-pub(crate) mod app;
 pub(crate) mod agent;
+pub(crate) mod app;
 pub(crate) mod audit;
 pub(crate) mod capabilities;
+pub(crate) mod chat;
 pub(crate) mod circuit;
 pub(crate) mod compile;
 pub(crate) mod conformance;
@@ -12,16 +13,16 @@ pub(crate) mod demo;
 pub(crate) mod deploy;
 pub(crate) mod distributed;
 pub(crate) mod equivalence;
-pub(crate) mod evm;
 pub(crate) mod estimate_gas;
+pub(crate) mod evm;
 pub(crate) mod explore;
 pub(crate) mod gateway;
 pub(crate) mod import;
 pub(crate) mod ir;
 pub(crate) mod keys;
 pub(crate) mod lang;
-pub(crate) mod model;
 pub(crate) mod midnight;
+pub(crate) mod model;
 pub(crate) mod neural;
 pub(crate) mod optimize;
 pub(crate) mod package;
@@ -36,7 +37,6 @@ pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
-pub(crate) mod chat;
 pub(crate) mod update;
 pub(crate) mod wallet;
 pub(crate) mod witness;
@@ -45,9 +45,9 @@ use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
     EvmCommands, EvmFoundryCommands, EvmVerifierCommands, GatewayCommands, IrCommands,
-    LangCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
-    ModelAddCommands, ModelCommands, NeuralCommands, SubsystemCommands, TelemetryCommands,
-    UpdateCommands, WalletCommands,
+    LangCommands, LangFlowCommands, LangLspCommands, MidnightCommands, MidnightContractCommands,
+    MidnightProofServerCommands, ModelAddCommands, ModelCommands, NeuralCommands,
+    SubsystemCommands, TelemetryCommands, UpdateCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -151,7 +151,14 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             json,
             events_jsonl,
             command,
-        } => wallet::handle_wallet(network, persistent_root, cache_root, json, events_jsonl, command),
+        } => wallet::handle_wallet(
+            network,
+            persistent_root,
+            cache_root,
+            json,
+            events_jsonl,
+            command,
+        ),
         Commands::Agent {
             json,
             events_jsonl,
@@ -162,12 +169,19 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
         Commands::Lang { command } => match command {
             LangCommands::Check { source, json } => lang::handle_lang_check(source, json),
+            LangCommands::Inspect { source, json } => lang::handle_lang_inspect(source, json),
             LangCommands::Lower {
                 source,
                 out,
                 to,
                 json,
             } => lang::handle_lang_lower(source, out, to, json),
+            LangCommands::Package {
+                source,
+                out,
+                to,
+                json,
+            } => lang::handle_lang_package(source, out, to, json),
             LangCommands::Obligations { source, json } => {
                 lang::handle_lang_obligations(source, json)
             }
@@ -230,6 +244,24 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
                 },
                 allow_compat,
             ),
+            LangCommands::Flow { command } => match command {
+                LangFlowCommands::Check { workflow, json } => {
+                    lang::handle_lang_flow_check(workflow, json)
+                }
+                LangFlowCommands::Plan {
+                    workflow,
+                    out,
+                    json,
+                } => lang::handle_lang_flow_plan(workflow, out, json),
+                LangFlowCommands::Run {
+                    workflow,
+                    approve,
+                    json,
+                } => lang::handle_lang_flow_run(workflow, approve, json, allow_compat),
+            },
+            LangCommands::Lsp { command } => match command {
+                LangLspCommands::Serve => lang::handle_lang_lsp_serve(),
+            },
         },
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
         Commands::Doctor { json } => capabilities::handle_doctor(json),
@@ -797,24 +829,16 @@ fn command_name(command: &Commands) -> String {
             MidnightCommands::Disclosure { .. } => "midnight:disclosure".to_string(),
             MidnightCommands::Resolve { .. } => "midnight:resolve".to_string(),
             MidnightCommands::Contract { command } => match command {
-                MidnightContractCommands::Compile { .. } => {
-                    "midnight:contract:compile".to_string()
-                }
+                MidnightContractCommands::Compile { .. } => "midnight:contract:compile".to_string(),
                 MidnightContractCommands::DeployPrepare { .. } => {
                     "midnight:contract:deploy-prepare".to_string()
                 }
                 MidnightContractCommands::CallPrepare { .. } => {
                     "midnight:contract:call-prepare".to_string()
                 }
-                MidnightContractCommands::Test { .. } => {
-                    "midnight:contract:test".to_string()
-                }
-                MidnightContractCommands::Deploy { .. } => {
-                    "midnight:contract:deploy".to_string()
-                }
-                MidnightContractCommands::Call { .. } => {
-                    "midnight:contract:call".to_string()
-                }
+                MidnightContractCommands::Test { .. } => "midnight:contract:test".to_string(),
+                MidnightContractCommands::Deploy { .. } => "midnight:contract:deploy".to_string(),
+                MidnightContractCommands::Call { .. } => "midnight:contract:call".to_string(),
                 MidnightContractCommands::VerifyExplorer { .. } => {
                     "midnight:contract:verify-explorer".to_string()
                 }
@@ -876,11 +900,21 @@ fn command_name(command: &Commands) -> String {
         Commands::Frontends { .. } => "frontends".to_string(),
         Commands::Lang { command } => match command {
             LangCommands::Check { .. } => "lang:check".to_string(),
+            LangCommands::Inspect { .. } => "lang:inspect".to_string(),
             LangCommands::Lower { .. } => "lang:lower".to_string(),
+            LangCommands::Package { .. } => "lang:package".to_string(),
             LangCommands::Obligations { .. } => "lang:obligations".to_string(),
             LangCommands::Fmt { .. } => "lang:fmt".to_string(),
             LangCommands::Prove { .. } => "lang:prove".to_string(),
             LangCommands::Verify { .. } => "lang:verify".to_string(),
+            LangCommands::Flow { command } => match command {
+                LangFlowCommands::Check { .. } => "lang:flow:check".to_string(),
+                LangFlowCommands::Plan { .. } => "lang:flow:plan".to_string(),
+                LangFlowCommands::Run { .. } => "lang:flow:run".to_string(),
+            },
+            LangCommands::Lsp { command } => match command {
+                LangLspCommands::Serve => "lang:lsp:serve".to_string(),
+            },
         },
         Commands::SupportMatrix { .. } => "support-matrix".to_string(),
         Commands::Doctor { .. } => "doctor".to_string(),

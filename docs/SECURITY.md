@@ -27,6 +27,10 @@ The practical TCB for this checkout includes:
 
 - Rust and the Cargo toolchain
 - Lean, Rocq/Coq, Verus, Kani, and their proof libraries
+- RefinedRust when a Rust surface is explicitly promoted as a counted
+  `mechanized_local` row after generated Rocq proof checking
+- Thrust and its CHC solver only as non-counted support evidence unless the
+  release-grade ledger policy is changed explicitly
 - Apple’s Metal compiler/runtime/driver plus Apple GPU hardware on the Metal lane
 - Upstream backend libraries that are not fully mechanized in the local ledger
 
@@ -90,10 +94,10 @@ When prose and generated evidence disagree, trust the live truth surfaces:
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 189.
-- Machine-checked rows: 180 total (176 `mechanized_local`, 4 `mechanized_generated`).
+- Total ledger entries: 192.
+- Machine-checked rows: 183 total (179 `mechanized_local`, 4 `mechanized_generated`).
 - Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 9 `assumed_external`, 0 `pending`.
-- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 14 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
+- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
 - Rows with non-empty `trusted_assumptions`: 9.

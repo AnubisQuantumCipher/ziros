@@ -20,6 +20,9 @@ order.
 
 ## Program Family Truth
 
+- `zir` source is the native ZirOS proof-language surface. It is tiered: Tier 1 is the bounded
+  total circuit subset, and Tier 2 is the explicit advanced ZIR feature subset. Zir does not claim
+  automatic formal verification of arbitrary programs.
 - `zir-v1` is the canonical lossless interchange family.
 - `ir-v2` is the lowered backend-consumption dialect.
 - `zkf import --ir-family auto` preserves `zir-v1` whenever the frontend exposes semantics that
@@ -60,6 +63,23 @@ order.
 
 Additional trust semantics guidance lives in
 `WRAPPING_SECURITY.md`.
+
+## Formal Tool Evidence Truth
+
+- RefinedRust is admitted as a future counted Rust verification lane only when
+  the target surface has generated Rocq/Radium output and a passing `dune build`
+  over the generated and stable proof files.
+- Thrust is admitted as non-counted support evidence for safe-Rust refinement
+  checks, invariant discovery, and regression screening. Thrust results must not
+  increase `mechanized_total` or replace existing Rocq, Verus, Lean, or F*
+  theorem rows in this checkout.
+- The checked-in tool pins under `formal/tools/` record tool identity and
+  trusted boundaries. They do not by themselves create a proof claim.
+- Fresh RefinedRust and Thrust runner output belongs under `target-local/formal/`
+  unless a proof tranche intentionally promotes a checked evidence surface.
+
+Detailed operator guidance lives in
+`FORMAL_TOOLCHAIN_INTEGRATION.md`.
 
 ## Scientific Certificate Truth
 

@@ -539,7 +539,10 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
             if ok {
                 Ok(())
             } else {
-                Err(format!("midnight contract deploy failed: {}", report.stderr))
+                Err(format!(
+                    "midnight contract deploy failed: {}",
+                    report.stderr
+                ))
             }
         }
         MidnightContractCommands::Call {

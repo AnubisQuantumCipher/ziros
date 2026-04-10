@@ -4,8 +4,8 @@ use std::io::{self, Write};
 use std::process::{Command, Stdio};
 use zkf_agent::{
     AgentStateLayoutReportV1, ProviderKindV1, ProviderProfileV1, ProviderRoleBindingV1,
-    ensure_ziros_layout, load_provider_profile_store, openai_credential_ref,
-    store_openai_api_key, upsert_provider_profile, ziros_config_path,
+    ensure_ziros_layout, load_provider_profile_store, openai_credential_ref, store_openai_api_key,
+    upsert_provider_profile, ziros_config_path,
 };
 
 #[derive(Debug, Clone, Default)]
@@ -74,10 +74,7 @@ pub(crate) fn handle_setup(command: SetupCommand) -> Result<(), String> {
     let provider_kind = if command.non_interactive {
         command.provider.clone()
     } else {
-        command
-            .provider
-            .clone()
-            .or_else(prompt_provider_choice)
+        command.provider.clone().or_else(prompt_provider_choice)
     };
 
     if let Some(provider) = provider_kind {
@@ -140,12 +137,8 @@ pub(crate) fn handle_setup(command: SetupCommand) -> Result<(), String> {
 
 fn save_setup_config(config: &SetupConfigV1) -> Result<(), String> {
     let body = toml::to_string_pretty(config).map_err(|error| error.to_string())?;
-    fs::write(ziros_config_path(), body).map_err(|error| {
-        format!(
-            "failed to write {}: {error}",
-            ziros_config_path().display()
-        )
-    })
+    fs::write(ziros_config_path(), body)
+        .map_err(|error| format!("failed to write {}: {error}", ziros_config_path().display()))
 }
 
 fn configure_provider_profile(command: &SetupCommand, provider: &str) -> Result<String, String> {
@@ -155,16 +148,12 @@ fn configure_provider_profile(command: &SetupCommand, provider: &str) -> Result<
         .clone()
         .unwrap_or_else(|| default_profile_id(&provider_kind));
 
-    let role_models = ProviderRoleBindingV1::filled(
-        command
-            .model
-            .clone()
-            .or(if command.non_interactive {
-                None
-            } else {
-                interactive_optional_value("Default model", None)?
-            }),
-    );
+    let role_models =
+        ProviderRoleBindingV1::filled(command.model.clone().or(if command.non_interactive {
+            None
+        } else {
+            interactive_optional_value("Default model", None)?
+        }));
 
     let base_url = if let Some(base_url) = command.base_url.clone() {
         Some(base_url)

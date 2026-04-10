@@ -1,0 +1,17 @@
+{
+  "schema": "zkf-thrust-evidence-v1",
+  "tool": "thrust",
+  "tool_commit": "9bce62e92f3bea25bd80fb103be956667a2f69da",
+  "solver": "z3",
+  "solver_args": "fp.spacer.global=true fp.validate=true",
+  "target_files": [],
+  "passed": [],
+  "failed": [],
+  "trusted_functions": [],
+  "status": "not_run",
+  "counted_in_verification_ledger": false,
+  "notes": [
+    "Checked-in placeholder for the non-counted Thrust support-evidence lane.",
+    "Use scripts/run_thrust_checks.sh to emit run evidence under target-local/formal/thrust."
+  ]
+}

@@ -8,8 +8,12 @@ pub enum VerificationCheckerKind {
     Proptest,
     Lean,
     Rocq,
+    #[serde(rename = "rocq+verus")]
+    RocqVerus,
     Fstar,
     Verus,
+    RefinedRust,
+    ThrustChc,
     GeneratedProof,
     ExternalAssumption,
 }

@@ -175,12 +175,13 @@ fn migrate_manifest_v2_to_v4_updates_schema_version() {
     let manifest_path = root.join("manifest.json");
     write_json(&manifest_path, &manifest_json).expect("manifest");
 
-    let report = migrate_package_manifest(&manifest_path, "2", "4").expect("migrate");
+    let target_version = zkf_core::PACKAGE_SCHEMA_VERSION.to_string();
+    let report = migrate_package_manifest(&manifest_path, "2", &target_version).expect("migrate");
     assert_eq!(report.from_version, 2);
-    assert_eq!(report.to_version, 4);
+    assert_eq!(report.to_version, zkf_core::PACKAGE_SCHEMA_VERSION);
 
     let migrated: PackageManifest = read_json(&manifest_path).expect("read migrated");
-    assert_eq!(migrated.schema_version, 4);
+    assert_eq!(migrated.schema_version, zkf_core::PACKAGE_SCHEMA_VERSION);
 
     let _ = fs::remove_dir_all(&root);
 }

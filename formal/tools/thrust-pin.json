@@ -1,0 +1,25 @@
+{
+  "schema": "zkf-formal-tool-pin-v1",
+  "tool": "thrust",
+  "role": "safe_rust_refinement_type_chc_support_evidence",
+  "counting_policy": "non_counted_support_evidence_until_ledger_policy_changes",
+  "upstream_repository": "https://github.com/coord-e/thrust.git",
+  "upstream_commit": "9bce62e92f3bea25bd80fb103be956667a2f69da",
+  "observed_at": "2026-04-10",
+  "required_solver": "z3",
+  "default_solver_args": "fp.spacer.global=true fp.validate=true",
+  "default_timeout_seconds": 30,
+  "default_output_root": "target-local/formal/thrust",
+  "repo_evidence_root": "formal/tool-evidence/thrust",
+  "trusted_boundary": [
+    "Thrust compiler plugin",
+    "CHC solver implementation and solver validation mode",
+    "Rust type system guarantee for well-borrowed safe Rust",
+    "functions marked #[thrust::trusted]"
+  ],
+  "notes": [
+    "Thrust evidence is intentionally not counted in release-grade mechanized totals in this checkout.",
+    "Thrust is useful as an automated regression and invariant-discovery lane over safe Rust proof cores.",
+    "Every trusted function discovered by the runner must be recorded in the evidence JSON."
+  ]
+}

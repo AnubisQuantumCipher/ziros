@@ -8,16 +8,16 @@ use std::path::PathBuf;
 use zkf_agent::{
     ActionReceiptV1, AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
     AgentBridgeHandoffPrepareRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
-    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
-    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
-    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
-    accept_bridge_handoff, agent_status, approval_lineage, approve_request, cancel_session,
-    cleanup_worktree, create_checkpoint, create_worktree, explain_session, list_bridge_handoffs,
-    list_checkpoints, list_incidents, list_procedures, list_projects, list_worktrees,
-    memory_sessions, plan_goal, prepare_bridge_handoff, provider_route, provider_status,
-    provider_test, register_project, reject_request, resume_session_with_receipts,
-    rollback_checkpoint, run_goal_with_receipts, serve_mcp_stdio, session_artifacts,
-    session_deployments, session_environments, session_logs, workflow_list, workflow_show,
+    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1,
+    AgentProviderTestRequestV1, AgentRejectRequestV1, AgentRunOptionsV1,
+    AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1, accept_bridge_handoff,
+    agent_status, approval_lineage, approve_request, cancel_session, cleanup_worktree,
+    create_checkpoint, create_worktree, explain_session, list_bridge_handoffs, list_checkpoints,
+    list_incidents, list_procedures, list_projects, list_worktrees, memory_sessions, plan_goal,
+    prepare_bridge_handoff, provider_route, provider_status, provider_test, register_project,
+    reject_request, resume_session_with_receipts, rollback_checkpoint, run_goal_with_receipts,
+    serve_mcp_stdio, session_artifacts, session_deployments, session_environments, session_logs,
+    workflow_list, workflow_show,
 };
 use zkf_command_surface::{CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id};
 use zkf_wallet::WalletNetwork;
@@ -47,7 +47,8 @@ pub(crate) fn handle_agent(
             model,
         } => {
             let explain = plan_goal(
-                goal.as_deref().unwrap_or("inspect current ZirOS host state"),
+                goal.as_deref()
+                    .unwrap_or("inspect current ZirOS host state"),
                 AgentRunOptionsV1 {
                     strict,
                     compat_allowed: allow_compat,
@@ -115,14 +116,12 @@ pub(crate) fn handle_agent(
                 },
             )?,
         )?,
-        AgentCommands::Resume { session_id } => {
-            print_output(
-                json_output,
-                &resume_session_with_receipts(&session_id, |receipt| {
-                    let _ = emit_receipt_event(&mut sink, &action_id, receipt);
-                })?,
-            )?
-        }
+        AgentCommands::Resume { session_id } => print_output(
+            json_output,
+            &resume_session_with_receipts(&session_id, |receipt| {
+                let _ = emit_receipt_event(&mut sink, &action_id, receipt);
+            })?,
+        )?,
         AgentCommands::Explain { session_id } => {
             print_output(json_output, &explain_session(&session_id)?)?
         }
@@ -130,7 +129,9 @@ pub(crate) fn handle_agent(
             json_output,
             &cancel_session(AgentCancelRequestV1 { session_id, reason })?,
         )?,
-        AgentCommands::Logs { session_id } => print_output(json_output, &session_logs(&session_id)?)?,
+        AgentCommands::Logs { session_id } => {
+            print_output(json_output, &session_logs(&session_id)?)?
+        }
         AgentCommands::Approve {
             session_id,
             wallet_network,
@@ -141,7 +142,8 @@ pub(crate) fn handle_agent(
             persistent_root,
             cache_root,
         } => {
-            let wallet_network = WalletNetwork::parse(&wallet_network).map_err(|error| error.to_string())?;
+            let wallet_network =
+                WalletNetwork::parse(&wallet_network).map_err(|error| error.to_string())?;
             print_output(
                 json_output,
                 &approve_request(AgentApproveRequestV1 {
@@ -164,7 +166,8 @@ pub(crate) fn handle_agent(
             persistent_root,
             cache_root,
         } => {
-            let wallet_network = WalletNetwork::parse(&wallet_network).map_err(|error| error.to_string())?;
+            let wallet_network =
+                WalletNetwork::parse(&wallet_network).map_err(|error| error.to_string())?;
             reject_request(AgentRejectRequestV1 {
                 session_id,
                 wallet_network,
@@ -191,9 +194,7 @@ pub(crate) fn handle_agent(
             AgentMemoryCommands::Environments { session_id } => {
                 print_output(json_output, &session_environments(session_id.as_deref())?)?
             }
-            AgentMemoryCommands::Procedures => {
-                print_output(json_output, &list_procedures()?)?
-            }
+            AgentMemoryCommands::Procedures => print_output(json_output, &list_procedures()?)?,
             AgentMemoryCommands::Incidents { session_id } => {
                 print_output(json_output, &list_incidents(session_id.as_deref())?)?
             }

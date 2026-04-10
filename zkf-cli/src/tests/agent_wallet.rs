@@ -441,13 +441,8 @@ fn model_cli_parses_openai_profile_surface() {
 
 #[test]
 fn gateway_cli_parses_serve_surface() {
-    let cli = crate::cli::Cli::parse_from([
-        "ziros",
-        "gateway",
-        "serve",
-        "--bind",
-        "127.0.0.1:8787",
-    ]);
+    let cli =
+        crate::cli::Cli::parse_from(["ziros", "gateway", "serve", "--bind", "127.0.0.1:8787"]);
     match cli.command {
         crate::cli::Commands::Gateway { command } => {
             assert!(matches!(

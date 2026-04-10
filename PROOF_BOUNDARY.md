@@ -14,10 +14,10 @@ swarm defense envelope.
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 189.
-- Machine-checked rows: 180 total (176 `mechanized_local`, 4 `mechanized_generated`).
+- Total ledger entries: 192.
+- Machine-checked rows: 183 total (179 `mechanized_local`, 4 `mechanized_generated`).
 - Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 9 `assumed_external`, 0 `pending`.
-- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 14 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
+- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
 - Release-grade ready: `true`.
@@ -25,6 +25,23 @@ This block is generated from `zkf-ir-spec/verification-ledger.json`.
 <!-- END GENERATED VERIFICATION STATUS -->
 
 When prose and the ledger disagree, the ledger wins.
+
+## Rust Formal Tool Lanes
+
+RefinedRust and Thrust are now recognized as formal-tool lanes, but they do not
+change the freeze counts until evidence is promoted deliberately:
+
+- RefinedRust can become a counted `mechanized_local` implementation claim only
+  after the target surface has generated Rocq/Radium output and a passing
+  `dune build`.
+- Thrust is non-counted support evidence for safe-Rust refinement checks in this
+  checkout. It may fail CI or surface regressions, but it does not replace a
+  Rocq, Verus, Lean, or F* theorem row.
+- Tool pins and support evidence live under `formal/tools/` and
+  `formal/tool-evidence/`. Fresh run output lives under `target-local/formal/`.
+
+The current ledger still has no RefinedRust-counted row and no Thrust-counted
+row.
 
 ## Verified GPU Lane
 

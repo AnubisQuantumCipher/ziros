@@ -1,6 +1,6 @@
 use zkf_core::{
-    Constraint, Expr, FieldId, FrontendProvenance, PackageManifest, Program, Signal, Visibility,
-    WitnessPlan,
+    Constraint, Expr, FieldId, FrontendProvenance, PACKAGE_SCHEMA_VERSION, PackageManifest,
+    Program, Signal, Visibility, WitnessPlan,
 };
 
 #[test]
@@ -47,7 +47,7 @@ fn package_manifest_tracks_program_digest_and_field() {
         "frontends/noir/original.json",
     );
 
-    assert_eq!(manifest.schema_version, 4);
+    assert_eq!(manifest.schema_version, PACKAGE_SCHEMA_VERSION);
     assert_eq!(manifest.package_name, program.name);
     assert_eq!(manifest.program_digest, program.digest_hex());
     assert_eq!(manifest.field, FieldId::Bn254);

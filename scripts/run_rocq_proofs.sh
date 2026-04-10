@@ -21,6 +21,10 @@ for proof_file in "$@"; do
       extraction_root="zkf-frontends/proofs/rocq/extraction"
       namespace="ZkfFrontendsExtraction"
       ;;
+    zkf-lang/proofs/rocq/*)
+      extraction_root="zkf-lang/proofs/rocq/extraction"
+      namespace="ZkfLangExtraction"
+      ;;
     zkf-runtime/proofs/rocq/*)
       extraction_root="zkf-runtime/proofs/rocq/extraction"
       namespace="ZkfRuntimeExtraction"

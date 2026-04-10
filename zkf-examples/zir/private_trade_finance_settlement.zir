@@ -1,0 +1,22 @@
+circuit private_trade_finance_settlement(field: bn254, tier: 1) {
+  private invoice_amount: u64<32>;
+  private settlement_amount: u64<32>;
+  private fee_amount: u64<16>;
+  private maturity_days: u64<16>;
+  private risk_score: u64<8>;
+
+  public net_amount: field;
+  public approved: field;
+
+  net_amount = settlement_amount - fee_amount;
+  approved = 1;
+
+  constrain settlement_amount == invoice_amount;
+  constrain leq(fee_amount, settlement_amount, 32);
+  constrain leq(maturity_days, 180, 16);
+  constrain leq(risk_score, 80, 8);
+  constrain approved == 1;
+
+  expose net_amount;
+  expose approved;
+}
