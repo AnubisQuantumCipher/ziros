@@ -60,6 +60,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         command: ModelCommands,
     },
+    /// Inspect and gate local CoreML/ANE control-plane lanes.
+    Neural {
+        #[command(subcommand)]
+        command: NeuralCommands,
+    },
     /// Serve the local ZirOS OpenAI-compatible gateway.
     Gateway {
         #[command(subcommand)]
@@ -1643,6 +1648,33 @@ pub(crate) enum ModelAddCommands {
         base_url: Option<String>,
         #[arg(long)]
         set_default: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum NeuralCommands {
+    /// Print the runtime-supported neural feature schemas and fingerprints.
+    Schema {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Pin discovered local CoreML packages into a runtime-validated bundle manifest.
+    Pin {
+        #[arg(long)]
+        model_dir: Option<PathBuf>,
+        #[arg(long)]
+        manifest_out: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Discover local CoreML lanes and fail closed when strict requirements are not met.
+    Doctor {
+        #[arg(long)]
+        require_all: bool,
+        #[arg(long)]
+        require_ane: bool,
+        #[arg(long)]
+        json: bool,
     },
 }
 

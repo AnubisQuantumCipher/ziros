@@ -15,11 +15,11 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_backends::metal_runtime::metal_runtime_report;
+use zkf_cloudfs::CloudFS;
 use zkf_core::artifact::{BackendKind, CompiledProgram, ProofArtifact};
 use zkf_core::ccs::program_constraint_degree;
 use zkf_core::ir::{Constraint, Program};
 use zkf_core::{FieldId, PlatformCapability, SystemResources, Witness, WitnessInputs};
-use zkf_cloudfs::CloudFS;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TelemetryRecord {
@@ -379,7 +379,11 @@ fn build_record(
         .unwrap_or_else(|| {
             gpu_capable_stage_keys()
                 .iter()
-                .filter(|stage| effective_gpu_stages.iter().any(|candidate| candidate == **stage))
+                .filter(|stage| {
+                    effective_gpu_stages
+                        .iter()
+                        .any(|candidate| candidate == **stage)
+                })
                 .map(|stage| (*stage).to_string())
                 .collect()
         });
@@ -781,6 +785,7 @@ mod tests {
                     core_frequency_mhz: Some(4040),
                     requested_backend: None,
                     backend_route: Some("native-auto".to_string()),
+                    program_digest_bucket: None,
                     requested_jobs: 2,
                     total_jobs: 4,
                 },
@@ -869,6 +874,7 @@ mod tests {
                     threshold_optimizer: None,
                     failures: BTreeMap::new(),
                 },
+                model_executions: vec![],
                 notes: vec![],
             },
             anomaly_verdict: AnomalyVerdict {
@@ -918,8 +924,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
-        proof_origin_signature: None,
-        proof_origin_public_keys: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let path = emit_prove_telemetry_to_dir(
@@ -983,8 +989,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
-        proof_origin_signature: None,
-        proof_origin_public_keys: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
 
         let path = emit_fold_telemetry_to_dir(
@@ -1022,8 +1028,8 @@ mod tests {
             hybrid_bundle: None,
             credential_bundle: None,
             archive_metadata: None,
-        proof_origin_signature: None,
-        proof_origin_public_keys: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
         };
         let preview = zkf_core::wrapping::WrapperPreview {
             wrapper: "stark-to-groth16".to_string(),

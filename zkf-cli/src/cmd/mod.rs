@@ -22,6 +22,7 @@ pub(crate) mod keys;
 pub(crate) mod lang;
 pub(crate) mod model;
 pub(crate) mod midnight;
+pub(crate) mod neural;
 pub(crate) mod optimize;
 pub(crate) mod package;
 pub(crate) mod prove;
@@ -45,8 +46,8 @@ use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
     EvmCommands, EvmFoundryCommands, EvmVerifierCommands, GatewayCommands, IrCommands,
     LangCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
-    ModelAddCommands, ModelCommands, SubsystemCommands, TelemetryCommands, UpdateCommands,
-    WalletCommands,
+    ModelAddCommands, ModelCommands, NeuralCommands, SubsystemCommands, TelemetryCommands,
+    UpdateCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -98,6 +99,7 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             compat_allowed: allow_compat,
         }),
         Commands::Model { json, command } => model::handle_model(json, command),
+        Commands::Neural { command } => neural::handle_neural(command),
         Commands::Gateway { command } => gateway::handle_gateway(command),
         Commands::Update { command } => update::handle_update(command),
         Commands::Version { json } => update::handle_version(json),
@@ -655,6 +657,11 @@ fn command_name(command: &Commands) -> String {
             ModelCommands::Use { .. } => "model:use".to_string(),
             ModelCommands::Test { .. } => "model:test".to_string(),
             ModelCommands::Remove { .. } => "model:remove".to_string(),
+        },
+        Commands::Neural { command } => match command {
+            NeuralCommands::Schema { .. } => "neural:schema".to_string(),
+            NeuralCommands::Pin { .. } => "neural:pin".to_string(),
+            NeuralCommands::Doctor { .. } => "neural:doctor".to_string(),
         },
         Commands::Gateway { command } => match command {
             GatewayCommands::Setup { .. } => "gateway:setup".to_string(),

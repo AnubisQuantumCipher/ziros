@@ -987,6 +987,7 @@ mod tests {
                     core_frequency_mhz: Some(4050),
                     requested_backend: Some("arkworks-groth16".to_string()),
                     backend_route: Some("native-auto".to_string()),
+                    program_digest_bucket: None,
                     requested_jobs: 1,
                     total_jobs: 1,
                 },
@@ -1037,6 +1038,7 @@ mod tests {
                     proof_size_ratio: None,
                 },
                 model_catalog: ModelCatalog::default(),
+                model_executions: vec![],
                 notes: vec![],
             },
             anomaly_verdict: AnomalyVerdict {

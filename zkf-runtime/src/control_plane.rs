@@ -178,8 +178,8 @@ impl ModelLane {
 
     pub fn supported_input_shapes(self) -> &'static [usize] {
         match self {
-            Self::Scheduler | Self::Backend | Self::Duration | Self::Anomaly => &[57, 47],
-            Self::Security => &[68, 58],
+            Self::Scheduler | Self::Backend | Self::Duration | Self::Anomaly => &[128, 57, 47],
+            Self::Security => &[145, 74, 64],
             Self::ThresholdOptimizer => &[12],
         }
     }
@@ -469,6 +469,8 @@ pub struct ControlPlaneFeatures {
     pub requested_backend: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub backend_route: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub program_digest_bucket: Option<usize>,
     pub requested_jobs: usize,
     pub total_jobs: usize,
 }
@@ -619,6 +621,25 @@ pub struct AnomalyVerdict {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ModelLaneExecution {
+    pub lane: ModelLane,
+    pub source: String,
+    pub executed: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub score: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_shape: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_path: Option<String>,
+    #[serde(default)]
+    pub pinned: bool,
+    #[serde(default)]
+    pub trusted: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ControlPlaneDecision {
     pub job_kind: JobKind,
     pub features: ControlPlaneFeatures,
@@ -628,6 +649,8 @@ pub struct ControlPlaneDecision {
     pub duration_estimate: DurationEstimate,
     pub anomaly_baseline: AnomalyVerdict,
     pub model_catalog: ModelCatalog,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub model_executions: Vec<ModelLaneExecution>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub notes: Vec<String>,
 }
@@ -787,6 +810,13 @@ pub fn evaluate_control_plane(request: &ControlPlaneRequest<'_>) -> ControlPlane
         &duration_estimate,
         &model_catalog,
     );
+    let model_executions = evaluate_model_executions(
+        &features,
+        backend_recommendation.selected,
+        dispatch_plan.candidate,
+        request.objective,
+        &model_catalog,
+    );
 
     if model_catalog.scheduler.is_none() {
         notes.push("scheduler model unavailable; using heuristic candidate scoring".to_string());
@@ -845,6 +875,7 @@ pub fn evaluate_control_plane(request: &ControlPlaneRequest<'_>) -> ControlPlane
         duration_estimate,
         anomaly_baseline,
         model_catalog,
+        model_executions,
         notes,
     }
 }
@@ -1732,24 +1763,84 @@ fn inspect_model_integrity(
 }
 
 fn load_model_bundle_manifest(path: &Path) -> Option<(PathBuf, serde_json::Value)> {
-    let root = if path.is_dir() {
-        Some(path)
-    } else {
-        path.parent()
-    }?;
+    let mut roots = Vec::new();
+    if path.is_dir() {
+        roots.push(path.to_path_buf());
+        if let Some(parent) = path.parent() {
+            roots.push(parent.to_path_buf());
+        }
+    } else if let Some(parent) = path.parent() {
+        roots.push(parent.to_path_buf());
+    }
+    roots.sort();
+    roots.dedup();
     for file_name in [
         "control_plane_models_manifest.json",
         "fixture_manifest.json",
         "zkf-model-bundle-manifest.json",
     ] {
-        let candidate = root.join(file_name);
-        if let Ok(bytes) = fs::read(&candidate)
-            && let Ok(payload) = serde_json::from_slice(&bytes)
-        {
-            return Some((candidate, payload));
+        for root in &roots {
+            let candidate = root.join(file_name);
+            if let Ok(bytes) = fs::read(&candidate)
+                && let Ok(payload) = serde_json::from_slice(&bytes)
+            {
+                return Some((candidate, payload));
+            }
         }
     }
     None
+}
+
+fn manifest_lane_aliases(lane: ModelLane) -> &'static [&'static str] {
+    match lane {
+        ModelLane::Scheduler => &["scheduler"],
+        ModelLane::Backend => &["backend", "backend_recommender"],
+        ModelLane::Duration => &["duration", "duration_estimator"],
+        ModelLane::Anomaly => &["anomaly", "anomaly_detector"],
+        ModelLane::Security => &["security", "security_detector"],
+        ModelLane::ThresholdOptimizer => &["threshold-optimizer", "threshold_optimizer"],
+    }
+}
+
+fn manifest_lane_entry<'a>(
+    manifest: &'a serde_json::Value,
+    manifest_root: &Path,
+    lane: ModelLane,
+    package_path: &Path,
+) -> Option<&'a serde_json::Value> {
+    let aliases = manifest_lane_aliases(lane);
+    if let Some(lanes) = manifest.get("lanes") {
+        for alias in aliases {
+            if let Some(entry) = lanes.get(*alias) {
+                return Some(entry);
+            }
+        }
+    }
+
+    let entries = manifest.get("models").and_then(|value| value.as_array())?;
+    let matching_lane_entries = entries
+        .iter()
+        .filter(|entry| {
+            entry
+                .get("lane")
+                .and_then(|value| value.as_str())
+                .is_some_and(|raw| aliases.contains(&raw))
+        })
+        .collect::<Vec<_>>();
+    let matching_path_entry = matching_lane_entries.iter().copied().find(|entry| {
+        entry
+            .get("package")
+            .or_else(|| entry.get("path"))
+            .and_then(|value| value.as_str())
+            .map(|raw| resolve_manifest_artifact_path(manifest_root, raw) == package_path)
+            .unwrap_or(false)
+    });
+    if matching_path_entry.is_some() {
+        return matching_path_entry;
+    }
+    matching_lane_entries
+        .into_iter()
+        .find(|entry| entry.get("package").is_none() && entry.get("path").is_none())
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1763,20 +1854,19 @@ fn validate_manifest_lane_entry(
     package_tree_sha256: Option<&str>,
     sidecar_sha256: Option<&str>,
 ) -> Result<(), String> {
-    let Some(entry) = manifest
-        .get("lanes")
-        .and_then(|value| value.get(lane.as_str()))
-    else {
+    let manifest_root = manifest_path.parent().unwrap_or_else(|| Path::new("."));
+    let Some(entry) = manifest_lane_entry(manifest, manifest_root, lane, package_path) else {
         return Err(format!(
-            "bundle manifest {} does not contain a '{}' lane entry",
+            "bundle manifest {} does not contain a '{}' lane entry for {}",
             manifest_path.display(),
-            lane.as_str()
+            lane.as_str(),
+            package_path.display()
         ));
     };
 
-    let manifest_root = manifest_path.parent().unwrap_or_else(|| Path::new("."));
     let package_path_in_manifest = entry
         .get("package")
+        .or_else(|| entry.get("path"))
         .and_then(|value| value.as_str())
         .map(|raw| resolve_manifest_artifact_path(manifest_root, raw));
     if let Some(expected_path) = package_path_in_manifest
@@ -2036,7 +2126,7 @@ fn extract_features(request: &ControlPlaneRequest<'_>) -> ControlPlaneFeatures {
         .collect();
 
     ControlPlaneFeatures {
-        feature_schema: "zkf-neural-control-plane-v2".to_string(),
+        feature_schema: "zkf-neural-control-plane-v3".to_string(),
         job_kind: request.job_kind,
         objective: request.objective,
         circuit,
@@ -2072,9 +2162,31 @@ fn extract_features(request: &ControlPlaneRequest<'_>) -> ControlPlaneFeatures {
             .requested_backend
             .map(|backend| backend.as_str().to_string()),
         backend_route: request.backend_route.map(backend_route_label),
+        program_digest_bucket: request_program_digest_bucket(request),
         requested_jobs,
         total_jobs,
     }
+}
+
+fn request_program_digest_bucket(request: &ControlPlaneRequest<'_>) -> Option<usize> {
+    if let Some(compiled) = request.compiled {
+        return Some(digest_bucket_64(&compiled.program_digest));
+    }
+    request
+        .program
+        .map(|program| digest_bucket_64(&program.digest_hex()))
+}
+
+fn digest_bucket_64(digest: &str) -> usize {
+    if digest.len() >= 2
+        && let Ok(byte) = u8::from_str_radix(&digest[..2], 16)
+    {
+        return (byte as usize) % 64;
+    }
+    let mut hasher = Sha256::new();
+    hasher.update(digest.as_bytes());
+    let bytes = hasher.finalize();
+    (bytes[0] as usize) % 64
 }
 
 fn control_plane_base_feature_vector(features: &ControlPlaneFeatures) -> Vec<f32> {
@@ -2156,23 +2268,23 @@ fn rank_dispatch_candidates(
     let mut scores = DispatchCandidate::ALL
         .into_iter()
         .map(|candidate| {
-            let predicted = model_catalog
-                .lane(ModelLane::Scheduler)
-                .and_then(|descriptor| {
-                    predict_numeric(
-                        descriptor,
-                        &build_feature_vector_for_descriptor(
+            let model_prediction =
+                model_catalog
+                    .lane(ModelLane::Scheduler)
+                    .and_then(|descriptor| {
+                        predict_model_score(
                             descriptor,
                             features,
                             Some(candidate),
                             Some(backend),
                             Some(objective),
-                        ),
-                    )
-                    .ok()
-                })
+                        )
+                        .ok()
+                        .map(|prediction| prediction.score)
+                    });
+            let predicted = model_prediction
                 .unwrap_or_else(|| heuristic_scheduler_ms(features, backend, candidate));
-            let source = if model_catalog.lane(ModelLane::Scheduler).is_some() {
+            let source = if model_prediction.is_some() {
                 "model".to_string()
             } else {
                 "heuristic".to_string()
@@ -2212,25 +2324,28 @@ fn recommend_backend(
         request.backend_candidates.clone()
     };
 
+    let mut backend_model_used = false;
     let mut rankings = candidates
         .iter()
         .copied()
         .map(|backend| {
-            let score = model_catalog
+            let model_score = model_catalog
                 .lane(ModelLane::Backend)
                 .and_then(|descriptor| {
-                    predict_numeric(
+                    predict_model_score(
                         descriptor,
-                        &build_feature_vector_for_descriptor(
-                            descriptor,
-                            features,
-                            None,
-                            Some(backend),
-                            Some(request.objective),
-                        ),
+                        features,
+                        None,
+                        Some(backend),
+                        Some(request.objective),
                     )
                     .ok()
-                })
+                    .map(|prediction| prediction.score)
+                });
+            if model_score.is_some() {
+                backend_model_used = true;
+            }
+            let score = model_score
                 .unwrap_or_else(|| heuristic_backend_score(features, backend, request.objective));
             BackendScore { backend, score }
         })
@@ -2374,7 +2489,7 @@ fn recommend_backend(
         .unwrap_or(fallback_backend);
     let source = if valid_requested_backend.is_some() {
         "explicit".to_string()
-    } else if model_catalog.backend.is_some() {
+    } else if backend_model_used {
         "model".to_string()
     } else {
         "heuristic".to_string()
@@ -2402,21 +2517,20 @@ fn estimate_duration(
     } else {
         DispatchCandidate::CpuOnly
     };
-    let estimate_ms = model_catalog
+    let model_estimate_ms = model_catalog
         .lane(ModelLane::Duration)
         .and_then(|descriptor| {
-            predict_numeric(
+            predict_model_score(
                 descriptor,
-                &build_feature_vector_for_descriptor(
-                    descriptor,
-                    features,
-                    Some(advisory_candidate),
-                    Some(backend),
-                    Some(objective),
-                ),
+                features,
+                Some(advisory_candidate),
+                Some(backend),
+                Some(objective),
             )
             .ok()
-        })
+            .map(|prediction| prediction.score)
+        });
+    let estimate_ms = model_estimate_ms
         .or_else(|| {
             candidate_rankings
                 .iter()
@@ -2436,7 +2550,7 @@ fn estimate_duration(
     let countdown_safe = upper_bound_ms.is_some() && features.metal_available;
     let eta_semantics = if !features.metal_available {
         EtaSemantics::NonSlaFallback
-    } else if model_catalog.duration.is_some() {
+    } else if model_estimate_ms.is_some() {
         EtaSemantics::ModelEstimate
     } else if execution_regime == ExecutionRegime::CpuOnly {
         EtaSemantics::HeuristicBound
@@ -2447,7 +2561,7 @@ fn estimate_duration(
         estimate_ms,
         upper_bound_ms,
         predicted_wall_time_ms: estimate_ms,
-        source: if model_catalog.duration.is_some() {
+        source: if model_estimate_ms.is_some() {
             "model".to_string()
         } else {
             "heuristic".to_string()
@@ -2741,18 +2855,86 @@ fn predicted_anomaly_score(
     model_catalog
         .lane(ModelLane::Anomaly)
         .and_then(|descriptor| {
-            predict_numeric(
+            predict_model_score(
                 descriptor,
-                &build_feature_vector_for_descriptor(
-                    descriptor,
-                    features,
-                    Some(candidate),
-                    Some(backend),
-                    Some(objective),
-                ),
+                features,
+                Some(candidate),
+                Some(backend),
+                Some(objective),
             )
             .ok()
+            .map(|prediction| prediction.score)
         })
+}
+
+fn evaluate_model_executions(
+    features: &ControlPlaneFeatures,
+    backend: BackendKind,
+    candidate: DispatchCandidate,
+    objective: OptimizationObjective,
+    model_catalog: &ModelCatalog,
+) -> Vec<ModelLaneExecution> {
+    [
+        ModelLane::Scheduler,
+        ModelLane::Backend,
+        ModelLane::Duration,
+        ModelLane::Anomaly,
+        ModelLane::Security,
+        ModelLane::ThresholdOptimizer,
+    ]
+    .into_iter()
+    .map(|lane| {
+        let Some(descriptor) = model_catalog.lane(lane) else {
+            return ModelLaneExecution {
+                lane,
+                source: "missing".to_string(),
+                executed: false,
+                score: None,
+                error: Some(
+                    model_catalog
+                        .failures
+                        .get(lane.as_str())
+                        .cloned()
+                        .unwrap_or_else(|| "model was not discovered".to_string()),
+                ),
+                input_shape: None,
+                model_path: None,
+                pinned: false,
+                trusted: false,
+            };
+        };
+        match predict_model_score(
+            descriptor,
+            features,
+            Some(candidate),
+            Some(backend),
+            Some(objective),
+        ) {
+            Ok(prediction) => ModelLaneExecution {
+                lane,
+                source: "model".to_string(),
+                executed: true,
+                score: Some(prediction.score),
+                error: None,
+                input_shape: Some(prediction.input_shape),
+                model_path: Some(descriptor.path.clone()),
+                pinned: descriptor.pinned,
+                trusted: descriptor.trusted,
+            },
+            Err(error) => ModelLaneExecution {
+                lane,
+                source: "model-error".to_string(),
+                executed: false,
+                score: None,
+                error: Some(error),
+                input_shape: descriptor.input_shape,
+                model_path: Some(descriptor.path.clone()),
+                pinned: descriptor.pinned,
+                trusted: descriptor.trusted,
+            },
+        }
+    })
+    .collect()
 }
 
 fn heuristic_duration_bound_multiplier(
@@ -3035,7 +3217,62 @@ fn build_feature_vector_for_shape(
     match shape {
         47 => vector,
         57 => extend_platform_features(vector, features),
+        128 => extend_program_identity_features(
+            extend_runtime_prediction_features(
+                extend_platform_features(vector, features),
+                features,
+                candidate,
+                backend,
+                objective,
+            ),
+            features,
+        ),
         _ => extend_platform_features(vector, features),
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct ModelPrediction {
+    score: f64,
+    input_shape: usize,
+}
+
+fn predict_model_score(
+    descriptor: &ModelDescriptor,
+    features: &ControlPlaneFeatures,
+    candidate: Option<DispatchCandidate>,
+    backend: Option<BackendKind>,
+    objective: Option<OptimizationObjective>,
+) -> Result<ModelPrediction, String> {
+    let feature_vector =
+        build_feature_vector_for_descriptor(descriptor, features, candidate, backend, objective);
+    match predict_numeric(descriptor, &feature_vector) {
+        Ok(score) => Ok(ModelPrediction {
+            score,
+            input_shape: feature_vector.len(),
+        }),
+        Err(vector_error) => {
+            #[cfg(all(target_vendor = "apple", feature = "neural-engine"))]
+            {
+                let named_features =
+                    legacy_coreml_scalar_features(descriptor.lane, features, candidate, backend);
+                return predict_numeric_named(descriptor, &named_features)
+                    .map(|score| ModelPrediction {
+                        score,
+                        input_shape: named_features.len(),
+                    })
+                    .map_err(|named_error| {
+                        format!(
+                            "{vector_error}; named-scalar CoreML fallback failed for legacy exported model: {named_error}"
+                        )
+                    });
+            }
+
+            #[cfg(not(all(target_vendor = "apple", feature = "neural-engine")))]
+            {
+                Err(vector_error)
+            }
+        }
     }
 }
 
@@ -3048,9 +3285,25 @@ pub(crate) fn build_security_feature_vector(
     security_inputs: &SecurityFeatureInputs,
 ) -> Vec<f32> {
     let mut vector = match shape {
-        58 => build_feature_vector_for_shape(
+        64 => build_feature_vector_for_shape(
             ModelLane::Scheduler,
             47,
+            features,
+            candidate,
+            backend,
+            objective,
+        ),
+        145 => build_feature_vector_for_shape(
+            ModelLane::Scheduler,
+            128,
+            features,
+            candidate,
+            backend,
+            objective,
+        ),
+        74 => build_feature_vector_for_shape(
+            ModelLane::Scheduler,
+            57,
             features,
             candidate,
             backend,
@@ -3096,6 +3349,82 @@ pub(crate) fn build_security_feature_vector(
             0.0
         },
     ]);
+    vector
+}
+
+fn extend_runtime_prediction_features(
+    mut vector: Vec<f32>,
+    features: &ControlPlaneFeatures,
+    candidate: Option<DispatchCandidate>,
+    backend: Option<BackendKind>,
+    objective: Option<OptimizationObjective>,
+) -> Vec<f32> {
+    let candidate = candidate.unwrap_or(if features.metal_available {
+        DispatchCandidate::Balanced
+    } else {
+        DispatchCandidate::CpuOnly
+    });
+    let backend = backend
+        .or_else(|| {
+            features
+                .requested_backend
+                .as_deref()
+                .and_then(|value| value.parse::<BackendKind>().ok())
+        })
+        .unwrap_or(BackendKind::ArkworksGroth16);
+    let estimate_ms = heuristic_scheduler_ms(features, backend, candidate).max(1.0);
+    let execution_regime = planned_execution_regime(features, candidate);
+    let (upper_bound_ms, _) = duration_upper_bound(features, execution_regime, estimate_ms, None);
+    let upper_bound_ms = upper_bound_ms.unwrap_or(estimate_ms);
+    let upper_bound_ratio = if estimate_ms > 0.0 {
+        upper_bound_ms / estimate_ms
+    } else {
+        1.0
+    };
+    let expected_proof_size =
+        heuristic_expected_proof_size_bytes(features, backend).max(1) as usize;
+    let objective = objective.unwrap_or(features.objective);
+    let objective_bias = match objective {
+        OptimizationObjective::FastestProve => 1.0,
+        OptimizationObjective::SmallestProof => 0.85,
+        OptimizationObjective::NoTrustedSetup => 1.15,
+    };
+
+    vector.extend([
+        normalized_log2((estimate_ms * objective_bias).ceil() as usize, 24.0),
+        normalized_log2(upper_bound_ms.ceil() as usize, 24.0),
+        (upper_bound_ratio / 8.0).clamp(0.0, 1.0) as f32,
+        normalized_log2(expected_proof_size, 28.0),
+        if execution_regime == ExecutionRegime::CpuOnly {
+            1.0
+        } else {
+            0.0
+        },
+        if execution_regime == ExecutionRegime::PartialFallback {
+            1.0
+        } else {
+            0.0
+        },
+        if execution_regime == ExecutionRegime::GpuCapable {
+            1.0
+        } else {
+            0.0
+        },
+    ]);
+    vector
+}
+
+fn extend_program_identity_features(
+    mut vector: Vec<f32>,
+    features: &ControlPlaneFeatures,
+) -> Vec<f32> {
+    for bucket in 0..64 {
+        vector.push(if features.program_digest_bucket == Some(bucket) {
+            1.0
+        } else {
+            0.0
+        });
+    }
     vector
 }
 
@@ -3201,6 +3530,127 @@ fn threshold_optimizer_feature_vector(features: &ControlPlaneFeatures) -> Vec<f3
     ]
 }
 
+#[cfg(all(target_vendor = "apple", feature = "neural-engine"))]
+fn legacy_coreml_scalar_features(
+    lane: ModelLane,
+    features: &ControlPlaneFeatures,
+    candidate: Option<DispatchCandidate>,
+    backend: Option<BackendKind>,
+) -> Vec<(String, f64)> {
+    let backend = backend
+        .or_else(|| {
+            features
+                .requested_backend
+                .as_deref()
+                .and_then(|value| value.parse::<BackendKind>().ok())
+        })
+        .unwrap_or(BackendKind::ArkworksGroth16);
+    let candidate = candidate.unwrap_or(if features.metal_available {
+        DispatchCandidate::Balanced
+    } else {
+        DispatchCandidate::CpuOnly
+    });
+    let estimated_prove_ms = heuristic_scheduler_ms(features, backend, candidate).max(1.0);
+    let gpu_busy_ratio = if features.metal_available {
+        candidate.stages_on_gpu().len() as f64 / gpu_capable_stage_keys().len().max(1) as f64
+    } else {
+        0.0
+    };
+    let peak_memory_bytes =
+        features.memory_pressure_ratio.clamp(0.0, 1.0) * 48.0 * 1024.0_f64.powi(3);
+    let proof_size_bytes = heuristic_expected_proof_size_bytes(features, backend) as f64;
+    if lane == ModelLane::ThresholdOptimizer {
+        let plan = DispatchPlan::from_candidate(candidate);
+        return vec![
+            (
+                "constraint_count".to_string(),
+                features.circuit.constraint_count as f64,
+            ),
+            (
+                "signal_count".to_string(),
+                features.circuit.signal_count as f64,
+            ),
+            ("gpu_busy_ratio".to_string(), gpu_busy_ratio),
+            ("peak_memory_bytes".to_string(), peak_memory_bytes),
+            ("prove_time_ms".to_string(), estimated_prove_ms),
+            ("verify_time_ms".to_string(), estimated_prove_ms * 0.05),
+            ("witness_gen_time_ms".to_string(), estimated_prove_ms * 0.35),
+            ("proof_size_bytes".to_string(), proof_size_bytes),
+            (
+                "max_constraint_degree".to_string(),
+                features.circuit.max_constraint_degree as f64,
+            ),
+            (
+                "witness_size".to_string(),
+                features.circuit.witness_size as f64,
+            ),
+            ("cpu_nodes".to_string(), plan.stages_on_cpu.len() as f64),
+            ("gpu_nodes".to_string(), plan.stages_on_gpu.len() as f64),
+        ];
+    }
+
+    let mut out = vec![
+        (
+            "constraint_count".to_string(),
+            features.circuit.constraint_count as f64,
+        ),
+        (
+            "signal_count".to_string(),
+            features.circuit.signal_count as f64,
+        ),
+        ("prove_time_ms".to_string(), estimated_prove_ms),
+        ("verify_time_ms".to_string(), estimated_prove_ms * 0.05),
+        ("witness_gen_time_ms".to_string(), estimated_prove_ms * 0.35),
+        ("gpu_busy_ratio".to_string(), gpu_busy_ratio),
+        ("peak_memory_bytes".to_string(), peak_memory_bytes),
+        ("proof_size_bytes".to_string(), proof_size_bytes),
+    ];
+    let backend_name = legacy_coreml_backend_name(backend);
+    for name in [
+        "groth16",
+        "halo2",
+        "nova",
+        "plonk",
+        "spartan",
+        "stark",
+        "supernova",
+        "unknown",
+    ] {
+        out.push((
+            format!("backend_{name}"),
+            if name == backend_name { 1.0 } else { 0.0 },
+        ));
+    }
+    for name in [
+        "bn254",
+        "bls12-381",
+        "goldilocks",
+        "pallas",
+        "vesta",
+        "babybear",
+        "mersenne31",
+        "unknown",
+    ] {
+        out.push((
+            format!("field_{name}"),
+            if name == "bn254" { 1.0 } else { 0.0 },
+        ));
+    }
+    out
+}
+
+#[cfg(all(target_vendor = "apple", feature = "neural-engine"))]
+fn legacy_coreml_backend_name(backend: BackendKind) -> &'static str {
+    match backend {
+        BackendKind::ArkworksGroth16 => "groth16",
+        BackendKind::Halo2 | BackendKind::Halo2Bls12381 => "halo2",
+        BackendKind::Nova => "nova",
+        BackendKind::Plonky3 => "plonk",
+        BackendKind::HyperNova => "supernova",
+        BackendKind::Sp1 | BackendKind::RiscZero | BackendKind::MidnightCompact => "unknown",
+    }
+}
+
 pub fn feature_vector_labels_v1() -> Vec<String> {
     let mut labels = vec![
         "constraints_log2_norm",
@@ -3285,6 +3735,25 @@ pub fn feature_vector_labels_v2() -> Vec<String> {
     labels
 }
 
+pub fn feature_vector_labels_v3() -> Vec<String> {
+    let mut labels = feature_vector_labels_v2();
+    labels.extend(
+        [
+            "heuristic_estimate_ms_log2_norm",
+            "heuristic_upper_bound_ms_log2_norm",
+            "heuristic_upper_bound_ratio",
+            "heuristic_expected_proof_size_log2_norm",
+            "execution_regime_cpu_only",
+            "execution_regime_partial_fallback",
+            "execution_regime_gpu_capable",
+        ]
+        .into_iter()
+        .map(str::to_string),
+    );
+    labels.extend((0..64).map(|bucket| format!("program_digest_bucket_{bucket:02}")));
+    labels
+}
+
 pub fn threshold_optimizer_feature_labels() -> Vec<String> {
     [
         "chip_generation_norm",
@@ -3361,8 +3830,36 @@ pub fn security_feature_labels_v2() -> Vec<String> {
     labels
 }
 
+pub fn security_feature_labels_v3() -> Vec<String> {
+    let mut labels = feature_vector_labels_v3();
+    labels.extend(
+        [
+            "watchdog_notice_count_log2_norm",
+            "watchdog_warning_count_log2_norm",
+            "watchdog_critical_count_log2_norm",
+            "timing_alert_count_log2_norm",
+            "thermal_alert_count_log2_norm",
+            "memory_alert_count_log2_norm",
+            "gpu_circuit_breaker_count_log2_norm",
+            "repeated_fallback_count_log2_norm",
+            "anomaly_severity_score_norm",
+            "model_integrity_failure_count_log2_norm",
+            "rate_limit_violation_count_log2_norm",
+            "auth_failure_count_log2_norm",
+            "malformed_request_count_log2_norm",
+            "backend_incompatibility_attempt_count_log2_norm",
+            "telemetry_replay_flag",
+            "integrity_mismatch_flag",
+            "anonymous_burst_flag",
+        ]
+        .into_iter()
+        .map(str::to_string),
+    );
+    labels
+}
+
 pub fn feature_vector_labels() -> Vec<String> {
-    feature_vector_labels_v2()
+    feature_vector_labels_v3()
 }
 
 pub fn dispatch_candidates() -> &'static [DispatchCandidate] {
@@ -3391,11 +3888,12 @@ fn fingerprint_for_labels(labels: &[String]) -> String {
     format!("{:x}", hasher.finalize())
 }
 
-fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<String> {
+pub fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<String> {
     let labels = match (lane, shape) {
         (ModelLane::ThresholdOptimizer, 12) => threshold_optimizer_feature_labels(),
-        (ModelLane::Security, 58) => security_feature_labels_v1(),
-        (ModelLane::Security, 68) => security_feature_labels_v2(),
+        (ModelLane::Security, 64) => security_feature_labels_v1(),
+        (ModelLane::Security, 74) => security_feature_labels_v2(),
+        (ModelLane::Security, 145) => security_feature_labels_v3(),
         (
             ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
             47,
@@ -3404,12 +3902,19 @@ fn schema_fingerprint_for_lane_shape(lane: ModelLane, shape: usize) -> Option<St
             ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
             57,
         ) => feature_vector_labels_v2(),
+        (
+            ModelLane::Scheduler | ModelLane::Backend | ModelLane::Duration | ModelLane::Anomaly,
+            128,
+        ) => feature_vector_labels_v3(),
         _ => return None,
     };
     Some(fingerprint_for_labels(&labels))
 }
 
 fn model_freshness_notice(sidecar: Option<&serde_json::Value>) -> Option<String> {
+    if !model_freshness_scan_enabled() {
+        return None;
+    }
     let sidecar = sidecar?;
     let trained_corpus_hash = sidecar.get("corpus_hash").and_then(|value| value.as_str());
     let trained_record_count = sidecar.get("record_count").and_then(|value| value.as_u64());
@@ -3447,6 +3952,12 @@ fn model_freshness_notice(sidecar: Option<&serde_json::Value>) -> Option<String>
     }
 
     None
+}
+
+fn model_freshness_scan_enabled() -> bool {
+    std::env::var("ZKF_MODEL_FRESHNESS_SCAN")
+        .map(|value| matches!(value.as_str(), "1" | "true" | "TRUE" | "yes" | "YES"))
+        .unwrap_or(false)
 }
 
 fn mobile_dispatch_candidates(
@@ -3825,6 +4336,76 @@ pub(crate) fn predict_numeric(
 }
 
 #[cfg(all(target_vendor = "apple", feature = "neural-engine"))]
+#[allow(deprecated)]
+fn predict_numeric_named(
+    model: &ModelDescriptor,
+    named_features: &[(String, f64)],
+) -> Result<f64, String> {
+    use objc2::AnyThread;
+    use objc2::rc::Retained;
+    use objc2::runtime::{AnyObject, ProtocolObject};
+    use objc2_core_ml::{
+        MLDictionaryFeatureProvider, MLFeatureValue, MLModel, MLModelConfiguration,
+    };
+    use objc2_foundation::{NSDictionary, NSString};
+
+    let model_path = PathBuf::from(&model.path);
+    let model_url = nsurl_for_path(&model_path);
+    let compiled_url = if model_path
+        .extension()
+        .and_then(|value| value.to_str())
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("mlmodelc"))
+    {
+        model_url
+    } else {
+        unsafe { MLModel::compileModelAtURL_error(&model_url) }
+            .map_err(|err| format!("failed to compile CoreML model {}: {err:?}", model.path))?
+    };
+
+    let configuration = unsafe { MLModelConfiguration::new() };
+    unsafe {
+        configuration.setComputeUnits(objc2_core_ml::MLComputeUnits::CPUAndNeuralEngine);
+    }
+    let loaded = unsafe {
+        MLModel::modelWithContentsOfURL_configuration_error(&compiled_url, &configuration)
+    }
+    .map_err(|err| format!("failed to load CoreML model {}: {err:?}", model.path))?;
+
+    let names = named_features
+        .iter()
+        .map(|(name, _)| NSString::from_str(name))
+        .collect::<Vec<_>>();
+    let values = named_features
+        .iter()
+        .map(|(_, value)| unsafe { MLFeatureValue::featureValueWithDouble(*value) })
+        .collect::<Vec<_>>();
+    let name_refs = names.iter().map(|value| &**value).collect::<Vec<_>>();
+    let value_objects = values
+        .into_iter()
+        .map(Retained::<MLFeatureValue>::into)
+        .collect::<Vec<Retained<AnyObject>>>();
+    let dictionary: Retained<NSDictionary<NSString, AnyObject>> =
+        NSDictionary::from_retained_objects(&name_refs, &value_objects);
+    let provider = unsafe {
+        MLDictionaryFeatureProvider::initWithDictionary_error(
+            MLDictionaryFeatureProvider::alloc(),
+            &dictionary,
+        )
+    }
+    .map_err(|err| {
+        format!(
+            "failed to create named CoreML feature provider for {}: {err:?}",
+            model.path
+        )
+    })?;
+
+    let prediction =
+        unsafe { loaded.predictionFromFeatures_error(ProtocolObject::from_ref(&*provider)) }
+            .map_err(|err| format!("CoreML named inference failed for {}: {err:?}", model.path))?;
+    extract_numeric_prediction(ProtocolObject::from_ref(&*prediction))
+}
+
+#[cfg(all(target_vendor = "apple", feature = "neural-engine"))]
 fn extract_numeric_prediction(
     provider: &objc2::runtime::ProtocolObject<dyn objc2_core_ml::MLFeatureProvider>,
 ) -> Result<f64, String> {
@@ -4182,11 +4763,88 @@ mod tests {
 
     #[test]
     fn feature_vector_schema_is_stable() {
-        assert_eq!(feature_vector_labels().len(), 57);
+        assert_eq!(feature_vector_labels_v1().len(), 47);
+        assert_eq!(feature_vector_labels_v2().len(), 57);
+        assert_eq!(feature_vector_labels().len(), 128);
+        assert_eq!(security_feature_labels_v1().len(), 64);
+        assert_eq!(security_feature_labels_v2().len(), 74);
+        assert_eq!(security_feature_labels_v3().len(), 145);
         assert_eq!(stable_feature_schema_fingerprint().len(), 64);
         assert_eq!(
             schema_fingerprint_for_lane_shape(ModelLane::Scheduler, 47),
             Some("3e05b7ee88d044937f9d6fb44d741b530bea8d9295e1adf384d85c059cbde14e".to_string())
+        );
+        assert_eq!(
+            schema_fingerprint_for_lane_shape(ModelLane::Scheduler, 128),
+            Some("ce0d7b22a196dea7fdeff4553bb63eb80c9a9a39e0f601f123fa4ef380750354".to_string())
+        );
+        assert_eq!(
+            schema_fingerprint_for_lane_shape(ModelLane::Security, 145),
+            Some("17160a4df9c9bbec408b093cbea06218213b72cfa6091b62af9acacdb37a6bfb".to_string())
+        );
+    }
+
+    #[test]
+    fn v3_feature_vectors_match_production_model_shapes() {
+        let program = sample_program();
+        let graph = sample_graph();
+        let request = sample_request(&program, &graph);
+        let features = extract_features(&request);
+        let scheduler = build_feature_vector_for_shape(
+            ModelLane::Scheduler,
+            128,
+            &features,
+            Some(DispatchCandidate::Balanced),
+            Some(BackendKind::ArkworksGroth16),
+            Some(OptimizationObjective::FastestProve),
+        );
+        let security = build_security_feature_vector(
+            145,
+            &features,
+            Some(DispatchCandidate::Balanced),
+            Some(BackendKind::ArkworksGroth16),
+            Some(OptimizationObjective::FastestProve),
+            &SecurityFeatureInputs::default(),
+        );
+
+        assert_eq!(scheduler.len(), 128);
+        assert_eq!(security.len(), 145);
+        assert_eq!(
+            scheduler[64..128]
+                .iter()
+                .filter(|value| **value == 1.0)
+                .count(),
+            1,
+            "v3 feature vector should bind exactly one program digest bucket"
+        );
+    }
+
+    #[test]
+    fn model_bundle_manifest_accepts_models_list_entries() {
+        let tempdir = tempfile::tempdir().expect("manifest root");
+        let package = tempdir.path().join("scheduler_v2.mlpackage");
+        fs::create_dir_all(&package).expect("package");
+        let manifest = serde_json::json!({
+            "schema": "zkf-control-plane-manifest-v2",
+            "models": [{
+                "lane": "scheduler",
+                "path": package,
+                "input_shape": 128,
+                "output_name": "predicted_duration_ms",
+                "package_tree_sha256": "abc"
+            }]
+        });
+        let entry = manifest_lane_entry(
+            &manifest,
+            tempdir.path(),
+            ModelLane::Scheduler,
+            &tempdir.path().join("scheduler_v2.mlpackage"),
+        )
+        .expect("scheduler model-list entry");
+
+        assert_eq!(
+            entry.get("input_shape").and_then(serde_json::Value::as_u64),
+            Some(128)
         );
     }
 
@@ -4293,7 +4951,7 @@ mod tests {
 
     #[cfg(all(target_os = "macos", feature = "neural-engine"))]
     #[test]
-    fn model_backed_smallest_proof_keeps_groth16_when_allowed() {
+    fn explicit_smallest_proof_keeps_groth16_when_allowed() {
         with_fixture_model_env(|| {
             let program = sample_program();
             let graph = sample_graph();
@@ -4303,7 +4961,7 @@ mod tests {
             request.objective = OptimizationObjective::SmallestProof;
 
             let recommendation = evaluate_control_plane(&request).backend_recommendation;
-            assert_eq!(recommendation.source, "model");
+            assert_eq!(recommendation.source, "explicit");
             assert_eq!(recommendation.selected, BackendKind::ArkworksGroth16);
         });
     }

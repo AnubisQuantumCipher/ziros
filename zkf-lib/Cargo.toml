@@ -10,7 +10,8 @@ description = "ZKF embeddable library — compile, prove, verify, normalize, and
 default = ["full"]
 full = ["zkf-core/full"]
 frontends = ["dep:zkf-frontends"]
-metal-gpu = ["zkf-backends/metal-gpu"]
+metal-gpu = ["zkf-backends/metal-gpu", "zkf-runtime/metal-gpu"]
+neural-engine = ["zkf-runtime/neural-engine"]
 
 [dependencies]
 acir.workspace = true

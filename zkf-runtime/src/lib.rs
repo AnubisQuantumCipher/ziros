@@ -117,9 +117,12 @@ pub use control_plane::{
     ControlPlaneFeatures, ControlPlaneReplayManifest, ControlPlaneRequest, DispatchCandidate,
     DispatchCandidateScore, DispatchPlan, DurationEstimate, EtaSemantics, ExecutionRegime,
     HardwareProbeSample, HardwareProbeSummary, JobKind, ModelCatalog, ModelDescriptor, ModelLane,
-    ModelQualityGate, ModelSource, OptimizationObjective, enforce_apple_silicon_production_lane,
-    evaluate_control_plane, persist_replay_manifest, recommend_backend_for_program,
-    replay_manifest_digest, run_continuous_hardware_probes,
+    ModelLaneExecution, ModelQualityGate, ModelSource, OptimizationObjective,
+    enforce_apple_silicon_production_lane, evaluate_control_plane, feature_vector_labels_v1,
+    feature_vector_labels_v2, feature_vector_labels_v3, persist_replay_manifest,
+    recommend_backend_for_program, replay_manifest_digest, run_continuous_hardware_probes,
+    schema_fingerprint_for_lane_shape, security_feature_labels_v1, security_feature_labels_v2,
+    security_feature_labels_v3, threshold_optimizer_feature_labels,
 };
 #[cfg(all(feature = "full", not(hax)))]
 pub use cpu_driver::{CpuBackendDriver, CpuNodeTelemetry};

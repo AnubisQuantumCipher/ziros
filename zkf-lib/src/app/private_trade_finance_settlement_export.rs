@@ -786,6 +786,272 @@ fn runtime_report_json(
     }))
 }
 
+fn env_flag_enabled(name: &str) -> bool {
+    matches!(
+        std::env::var(name)
+            .ok()
+            .as_deref()
+            .map(|value| value.trim().to_ascii_lowercase()),
+        Some(value) if matches!(value.as_str(), "1" | "true" | "yes" | "on")
+    )
+}
+
+fn flagship_neural_required() -> bool {
+    env_flag_enabled("ZKF_TRADE_FINANCE_REQUIRE_NEURAL")
+        || env_flag_enabled("ZKF_TRADE_FINANCE_REJECT_HEURISTICS")
+}
+
+fn flagship_metal_required() -> bool {
+    env_flag_enabled("ZKF_TRADE_FINANCE_REQUIRE_METAL")
+        || env_flag_enabled("ZKF_TRADE_FINANCE_REJECT_CPU_FALLBACK")
+}
+
+fn expected_model_catalog_fields() -> &'static [&'static str] {
+    &[
+        "scheduler",
+        "backend",
+        "duration",
+        "anomaly",
+        "security",
+        "threshold_optimizer",
+    ]
+}
+
+fn expected_model_execution_lanes() -> &'static [&'static str] {
+    &[
+        "scheduler",
+        "backend",
+        "duration",
+        "anomaly",
+        "security",
+        "threshold-optimizer",
+    ]
+}
+
+fn model_catalog_summary(telemetry: &Value) -> (bool, bool, bool, bool) {
+    let catalog = telemetry.pointer("/control_plane/decision/model_catalog");
+    let failures_empty = catalog
+        .and_then(|value| value.get("failures"))
+        .and_then(Value::as_object)
+        .map(|failures| failures.is_empty())
+        .unwrap_or(false);
+    let all_available = expected_model_catalog_fields().iter().all(|lane| {
+        catalog
+            .and_then(|value| value.get(*lane))
+            .is_some_and(Value::is_object)
+    });
+    let all_pinned = expected_model_catalog_fields().iter().all(|lane| {
+        catalog
+            .and_then(|value| value.get(*lane))
+            .and_then(|value| value.get("pinned"))
+            .and_then(Value::as_bool)
+            == Some(true)
+    });
+    let all_quality_passed = expected_model_catalog_fields().iter().all(|lane| {
+        catalog
+            .and_then(|value| value.get(*lane))
+            .and_then(|value| value.get("quality_gate"))
+            .and_then(|value| value.get("passed"))
+            .and_then(Value::as_bool)
+            == Some(true)
+    });
+    (
+        all_available,
+        all_pinned,
+        all_quality_passed,
+        failures_empty,
+    )
+}
+
+fn all_neural_lanes_executed(telemetry: &Value) -> bool {
+    let executions = telemetry
+        .pointer("/control_plane/decision/model_executions")
+        .and_then(Value::as_array);
+    expected_model_execution_lanes().iter().all(|lane| {
+        executions.is_some_and(|items| {
+            items.iter().any(|item| {
+                item.get("lane").and_then(Value::as_str) == Some(*lane)
+                    && item.get("source").and_then(Value::as_str) == Some("model")
+                    && item.get("executed").and_then(Value::as_bool) == Some(true)
+            })
+        })
+    })
+}
+
+fn heuristic_fallback_used(telemetry: &Value) -> bool {
+    let decision = telemetry.pointer("/control_plane/decision");
+    let candidate_heuristic = decision
+        .and_then(|value| value.get("candidate_rankings"))
+        .and_then(Value::as_array)
+        .map(|items| {
+            items
+                .iter()
+                .any(|item| item.get("source").and_then(Value::as_str) == Some("heuristic"))
+        })
+        .unwrap_or(true);
+    let duration_heuristic = decision
+        .and_then(|value| value.get("duration_estimate"))
+        .and_then(|value| value.get("source"))
+        .and_then(Value::as_str)
+        == Some("heuristic");
+    let anomaly_heuristic = decision
+        .and_then(|value| value.get("anomaly_baseline"))
+        .and_then(|value| value.get("source"))
+        .and_then(Value::as_str)
+        == Some("heuristic");
+    let backend_heuristic = decision
+        .and_then(|value| value.get("backend_recommendation"))
+        .and_then(|value| value.get("source"))
+        .and_then(Value::as_str)
+        == Some("heuristic");
+    let note_heuristic = decision
+        .and_then(|value| value.get("notes"))
+        .and_then(Value::as_array)
+        .map(|notes| {
+            notes.iter().filter_map(Value::as_str).any(|note| {
+                note.contains("model unavailable")
+                    || note.contains("using heuristic")
+                    || note.contains("heuristic-only")
+            })
+        })
+        .unwrap_or(true);
+
+    candidate_heuristic
+        || duration_heuristic
+        || anomaly_heuristic
+        || backend_heuristic
+        || note_heuristic
+}
+
+fn annotate_flagship_runtime_requirements(telemetry: &mut Value) {
+    let neural_required = flagship_neural_required();
+    let metal_required = flagship_metal_required();
+    let (all_available, all_pinned, all_quality_passed, failures_empty) =
+        model_catalog_summary(telemetry);
+    let all_executed = all_neural_lanes_executed(telemetry);
+    let heuristic_fallback = heuristic_fallback_used(telemetry);
+    let fallback_count = telemetry
+        .get("actual_fallback_count")
+        .and_then(Value::as_u64)
+        .unwrap_or_default();
+    let metal_available = telemetry
+        .get("metal_available")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    let gpu_participation = telemetry
+        .get("runtime_effective_gpu_participation")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    let gpu_stage_coverage = telemetry
+        .get("actual_gpu_stage_coverage")
+        .and_then(Value::as_u64)
+        .unwrap_or_default();
+
+    if let Some(object) = telemetry.as_object_mut() {
+        object.insert("neural_required".to_string(), json!(neural_required));
+        object.insert(
+            "all_neural_lanes_available".to_string(),
+            json!(all_available),
+        );
+        object.insert("all_neural_lanes_pinned".to_string(), json!(all_pinned));
+        object.insert(
+            "all_neural_lanes_quality_passed".to_string(),
+            json!(all_quality_passed),
+        );
+        object.insert("all_neural_lanes_executed".to_string(), json!(all_executed));
+        object.insert(
+            "heuristic_fallback_used".to_string(),
+            json!(heuristic_fallback),
+        );
+        object.insert(
+            "model_catalog_failures_empty".to_string(),
+            json!(failures_empty),
+        );
+        object.insert("metal_required".to_string(), json!(metal_required));
+        object.insert("metal_verified".to_string(), json!(metal_available));
+        object.insert("gpu_selected".to_string(), json!(gpu_participation));
+        object.insert("cpu_fallback_count".to_string(), json!(fallback_count));
+        object.insert(
+            "strict_runtime_requirements".to_string(),
+            json!({
+                "neural_required": neural_required,
+                "all_neural_lanes_available": all_available,
+                "all_neural_lanes_pinned": all_pinned,
+                "all_neural_lanes_quality_passed": all_quality_passed,
+                "all_neural_lanes_executed": all_executed,
+                "heuristic_fallback_used": heuristic_fallback,
+                "model_catalog_failures_empty": failures_empty,
+                "metal_required": metal_required,
+                "metal_available": metal_available,
+                "gpu_selected": gpu_participation,
+                "actual_gpu_stage_coverage": gpu_stage_coverage,
+                "cpu_fallback_count": fallback_count,
+            }),
+        );
+    }
+}
+
+fn validate_flagship_runtime_requirements(telemetry: &Value) -> ZkfResult<()> {
+    if telemetry.get("neural_required").and_then(Value::as_bool) == Some(true) {
+        for (key, message) in [
+            (
+                "all_neural_lanes_available",
+                "all neural control-plane lanes must be discovered",
+            ),
+            (
+                "all_neural_lanes_pinned",
+                "all neural control-plane lanes must be pinned by a bundle manifest",
+            ),
+            (
+                "all_neural_lanes_quality_passed",
+                "all neural control-plane lanes must pass quality gates",
+            ),
+            (
+                "all_neural_lanes_executed",
+                "all neural control-plane lanes must execute in flagship strict mode",
+            ),
+            (
+                "model_catalog_failures_empty",
+                "neural model catalog must not contain discovery or integrity failures",
+            ),
+        ] {
+            if telemetry.get(key).and_then(Value::as_bool) != Some(true) {
+                return Err(ZkfError::InvalidArtifact(format!(
+                    "private trade finance strict neural gate failed: {message}"
+                )));
+            }
+        }
+        if telemetry
+            .get("heuristic_fallback_used")
+            .and_then(Value::as_bool)
+            == Some(true)
+        {
+            return Err(ZkfError::InvalidArtifact(
+                "private trade finance strict neural gate failed: heuristic fallback was used"
+                    .to_string(),
+            ));
+        }
+    }
+
+    if telemetry.get("metal_required").and_then(Value::as_bool) == Some(true) {
+        if telemetry.get("metal_verified").and_then(Value::as_bool) != Some(true)
+            || telemetry.get("gpu_selected").and_then(Value::as_bool) != Some(true)
+            || telemetry
+                .get("cpu_fallback_count")
+                .and_then(Value::as_u64)
+                .unwrap_or(1)
+                != 0
+        {
+            return Err(ZkfError::InvalidArtifact(
+                "private trade finance strict Metal gate failed: verified GPU participation with zero CPU fallback is required"
+                    .to_string(),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 fn smoke_telemetry_report_json(
     requested_primary_backend_name: &str,
     effective_backend_name: &str,
@@ -2310,8 +2576,10 @@ pub fn run_private_trade_finance_settlement_export(
     let (core_compiled, core_artifact, telemetry_report) = match config.profile {
         PrivateTradeFinanceSettlementExportProfile::Flagship => {
             let execution = runtime_prove_core(&config, &core_program, &request, &core_witness)?;
-            let telemetry =
+            let mut telemetry =
                 runtime_report_json(&execution, &config.primary_backend.requested_name)?;
+            annotate_flagship_runtime_requirements(&mut telemetry);
+            validate_flagship_runtime_requirements(&telemetry)?;
             (execution.compiled, execution.artifact, telemetry)
         }
         PrivateTradeFinanceSettlementExportProfile::Smoke => {
@@ -2850,6 +3118,105 @@ mod export_tests {
             .find(|check| check.check_id == check_id)
             .unwrap_or_else(|| panic!("missing certificate check {check_id}"))
             .passed
+    }
+
+    fn strict_model_catalog_fixture() -> Value {
+        json!({
+            "scheduler": model_descriptor_fixture("scheduler"),
+            "backend": model_descriptor_fixture("backend"),
+            "duration": model_descriptor_fixture("duration"),
+            "anomaly": model_descriptor_fixture("anomaly"),
+            "security": model_descriptor_fixture("security"),
+            "threshold_optimizer": model_descriptor_fixture("threshold-optimizer"),
+            "failures": {}
+        })
+    }
+
+    fn model_descriptor_fixture(lane: &str) -> Value {
+        json!({
+            "lane": lane,
+            "path": format!("/tmp/{lane}.mlpackage"),
+            "source": "user-home",
+            "input_shape": if lane == "security" { 145 } else if lane == "threshold-optimizer" { 12 } else { 128 },
+            "output_name": if lane == "backend" { "backend_score" } else if lane == "anomaly" { "anomaly_score" } else if lane == "security" { "risk_score" } else if lane == "threshold-optimizer" { "gpu_lane_score" } else { "predicted_duration_ms" },
+            "quality_gate": {"passed": true},
+            "pinned": true,
+            "trusted": true
+        })
+    }
+
+    fn strict_model_executions_fixture() -> Vec<Value> {
+        expected_model_execution_lanes()
+            .iter()
+            .map(|lane| {
+                json!({
+                    "lane": lane,
+                    "source": "model",
+                    "executed": true,
+                    "score": 1.0,
+                    "input_shape": if *lane == "security" { 145 } else if *lane == "threshold-optimizer" { 12 } else { 128 },
+                    "pinned": true,
+                    "trusted": true
+                })
+            })
+            .collect()
+    }
+
+    fn strict_telemetry_fixture() -> Value {
+        json!({
+            "control_plane": {
+                "decision": {
+                    "model_catalog": strict_model_catalog_fixture(),
+                    "model_executions": strict_model_executions_fixture(),
+                    "candidate_rankings": [
+                        {"candidate": "balanced", "predicted_duration_ms": 10.0, "source": "model"}
+                    ],
+                    "duration_estimate": {"source": "model"},
+                    "anomaly_baseline": {"source": "model"},
+                    "backend_recommendation": {"source": "explicit"},
+                    "notes": []
+                }
+            },
+            "metal_available": true,
+            "runtime_effective_gpu_participation": true,
+            "actual_gpu_stage_coverage": 1,
+            "actual_fallback_count": 0
+        })
+    }
+
+    #[test]
+    fn strict_runtime_requirements_accept_all_pinned_executed_model_lanes() {
+        let mut telemetry = strict_telemetry_fixture();
+        annotate_flagship_runtime_requirements(&mut telemetry);
+        telemetry["neural_required"] = json!(true);
+        telemetry["metal_required"] = json!(true);
+
+        validate_flagship_runtime_requirements(&telemetry).expect("strict telemetry accepted");
+        assert_eq!(
+            telemetry
+                .get("all_neural_lanes_executed")
+                .and_then(Value::as_bool),
+            Some(true)
+        );
+        assert_eq!(
+            telemetry
+                .get("heuristic_fallback_used")
+                .and_then(Value::as_bool),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn strict_runtime_requirements_reject_heuristic_model_sources() {
+        let mut telemetry = strict_telemetry_fixture();
+        telemetry["control_plane"]["decision"]["candidate_rankings"][0]["source"] =
+            json!("heuristic");
+        annotate_flagship_runtime_requirements(&mut telemetry);
+        telemetry["neural_required"] = json!(true);
+
+        let error = validate_flagship_runtime_requirements(&telemetry)
+            .expect_err("heuristic fallback should fail strict neural gate");
+        assert!(error.to_string().contains("heuristic fallback"));
     }
 
     #[test]
