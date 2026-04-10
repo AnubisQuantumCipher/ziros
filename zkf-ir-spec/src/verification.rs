@@ -12,6 +12,8 @@ pub enum VerificationCheckerKind {
     RocqVerus,
     Fstar,
     Verus,
+    RefinedRust,
+    ThrustChc,
     GeneratedProof,
     ExternalAssumption,
 }
@@ -666,6 +668,21 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 notes:
                     "Local Verus theorem `buffer_residency_transition_sound_ok` mechanizes legal eviction/reload state transitions, stale-read rejection while evicted, and resident-byte accounting monotonicity over the pure buffer proof model; the existing Kani harness remains checked as concrete transition evidence."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "runtime.buffer_resident_accounting_refinedrust".to_string(),
+                title:
+                    "BufferBridgeCore resident-byte increment arithmetic is checked by RefinedRust on the shipped proof surface"
+                        .to_string(),
+                scope: "zkf-runtime::buffer_bridge_core::resident_bytes_after_add".to_string(),
+                checker: VerificationCheckerKind::RefinedRust,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "formal/refinedrust/runtime-buffer-bridge/STATUS.md"
+                    .to_string(),
+                notes:
+                    "RefinedRust/Radium generated and Rocq-checked `buffer_bridge_core_resident_bytes_after_add_proof` for the shipped `resident_bytes_after_add` helper, and the pure `BufferBridgeCore` allocate/write/reload paths delegate resident-byte increment arithmetic through that helper. The claim is limited to exact `usize` addition under the explicit no-overflow precondition; eviction subtraction, filesystem spill behavior, GPU residency, and full typed-view semantics remain covered by the existing Verus/Kani/proptest buffer rows."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2288,11 +2305,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact Groth16 completeness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 completeness here; verifier acceptance is scoped to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `groth16_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16ExactCompletenessHypothesis` hold on the extracted boundary and the shipped verifier guard is true, then `groth16_exact_completeness_reduction` returns `true`. The explicit hypotheses remain in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2304,11 +2321,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact Groth16 knowledge soundness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 KEA-style soundness here; the shipped boundary is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `groth16_exact_knowledge_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis` hold and the shipped verifier accepts, then `groth16_exact_knowledge_soundness_reduction` returns `true`. The explicit KEA-style hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2320,11 +2337,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact Groth16 zero knowledge is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 zero knowledge here; the public-view equivalence claim is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `groth16_exact_zero_knowledge_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis` hold on the extracted boundary, then `groth16_exact_zero_knowledge_reduction` returns `true`. The explicit simulator hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2336,11 +2353,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "FRI exact Plonky3 shipped surface satisfies completeness under explicit Reed-Solomon completeness hypotheses"
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact FRI completeness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of FRI completeness here; verifier acceptance is scoped to `friExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `fri_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_fri_exact_spec.rs`: if `friExactCompletenessHypothesis` holds and the shipped verifier guard is true, then `fri_exact_completeness_reduction` returns `true`. The explicit Reed-Solomon completeness hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec!["friExactCompletenessHypothesis".to_string()],
             },
@@ -2349,11 +2366,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "FRI exact Plonky3 shipped surface reduces proximity soundness to explicit Reed-Solomon hypotheses"
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact FRI proximity soundness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of Reed-Solomon proximity soundness here; the verifier boundary is scoped to `friReedSolomonProximitySoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `fri_exact_proximity_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_fri_exact_spec.rs`: if `friReedSolomonProximitySoundnessHypothesis` holds and the shipped verifier accepts, then `fri_exact_proximity_soundness_reduction` returns `true`. The explicit Reed-Solomon proximity hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "friReedSolomonProximitySoundnessHypothesis".to_string(),
@@ -2364,11 +2381,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Classic Nova exact native profile satisfies completeness under explicit folding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact Nova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova completeness here; verifier acceptance is scoped to `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `nova_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_nova_exact_spec.rs`: if `novaExactCompletenessHypothesis` holds, `completeClassicNovaIvcMetadata` holds, and the shipped verifier guard is true, then `nova_exact_completeness_reduction` returns `true`. The explicit folding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "novaExactCompletenessHypothesis".to_string(),
@@ -2380,11 +2397,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Classic Nova exact native profile reduces folding soundness to explicit commitment-binding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact Nova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova folding soundness here; the verifier boundary is scoped to `novaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `nova_exact_folding_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_nova_exact_spec.rs`: if `novaExactFoldingSoundnessHypothesis` holds and the shipped verifier accepts, then `nova_exact_folding_soundness_reduction` returns `true`. The explicit commitment-binding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "novaExactFoldingSoundnessHypothesis".to_string(),
@@ -2576,53 +2593,53 @@ pub fn verification_ledger() -> VerificationLedger {
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.pastafq_poseidon_binding".to_string(),
-                title: "Trade-finance PastaFq Poseidon backend binding is bounded-checked against the emitted app commitments"
+                title: "Trade-finance PastaFq Poseidon backend binding is generated-mechanized against emitted app certificates"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "Backend rows `backend.poseidon_pastafq_lowering_soundness` and `backend.poseidon_pastafq_aux_witness_soundness` mechanize the shipped PastaFq width-4 lowering and aux-witness boundary. The trade-finance exporter now emits generated circuit certificates under `17_report/formal/certificates/`, but those certificates only enforce structural digest and Poseidon-shape invariants. `poseidon_binding_report.json` remains the bounded app-lane evidence by recomputing the emitted commitments against the host witness lane."
+                    "Backend rows `backend.poseidon_pastafq_lowering_soundness` and `backend.poseidon_pastafq_aux_witness_soundness` mechanize the shipped PastaFq width-4 lowering and aux-witness boundary. The trade-finance exporter emits generated circuit certificates under `17_report/formal/certificates/` and rejects the export unless every primary module is PastaFq, every blackbox node is Poseidon width-4, and emitted proof/program digests match. `poseidon_binding_report.json` remains supporting evidence by recomputing the app commitments against the emitted witness lane."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.compiled_digest_linkage".to_string(),
-                title: "Trade-finance compiled digest linkage is bounded-checked against the emitted module reports"
+                title: "Trade-finance compiled digest linkage is generated-mechanized against emitted module certificates"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The export path emits `17_report/compiled_digest_linkage.json` and per-module generated circuit certificates. The certificates strengthen the emitted digest guardrails, but the app-specific source-builder-to-digest claim is still treated as bounded evidence rather than a full mechanized emitted-program theorem. The unit test `generated_circuit_certificates_record_digest_linkage_and_poseidon_shape` checks the materialized certificates and verification reports."
+                    "The export path emits `17_report/compiled_digest_linkage.json` and per-module generated circuit certificates. The certificate checker rejects any module whose computed program digest, compiled digest, proof digest, summary digest, verification report digest, source builder, witness builder, or theorem links are not aligned. The unit test `generated_circuit_certificates_record_digest_linkage_and_poseidon_shape` checks the materialized certificates and verification reports."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.disclosure_credential_authorization".to_string(),
-                title: "Trade-finance disclosure credential authorization is bounded-checked on the emitted circuit and Compact flow"
+                title: "Trade-finance disclosure credential authorization is generated-mechanized on the emitted circuit and Compact flow"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The emitted disclosure circuit exposes a disclosure authorization commitment derived from role code, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure blinding. The generated disclosure certificate rejects the module unless that authorization commitment is a public output, while `poseidon_binding_report.json` and `disclosure_noninterference_report.json` cross-check the emitted disclosure bundle and Compact flow. External credential issuance, revocation, and off-chain caller identity remain outside this bounded emitted check."
+                    "The emitted disclosure circuit exposes a disclosure authorization commitment derived from role code, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure blinding. The generated disclosure certificate rejects the module unless that authorization commitment is a public output, while Rocq/Lean/Verus model theorems prove the authorization tuple binding and `poseidon_binding_report.json` plus `disclosure_noninterference_report.json` cross-check the emitted disclosure bundle and Compact flow. External credential issuance, revocation, and off-chain caller identity remain outside this app-circuit theorem and must be enforced by the operator credential system."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.disclosure_noninterference_emitted".to_string(),
-                title: "Trade-finance emitted disclosure noninterference is bounded-checked against the normalized role projection"
+                title: "Trade-finance emitted disclosure noninterference is generated-mechanized against the normalized role projection"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The emitted disclosure circuit uses the same canonical role map as the Rocq/Lean/Verus disclosure model: supplier=0, financier=1, buyer=2, auditor=3, regulator=4. The generated disclosure certificate rejects role-output drift, and `disclosure_noninterference_report.json` fixes shared fee/auth/blinding inputs while perturbing only non-selected commitments for every role. The emitted value pair, view commitment, authorization commitment, selective-disclosure bundle manifest, and Midnight flow manifest must all remain aligned for the bounded export to pass."
+                    "The emitted disclosure circuit uses the same canonical role map as the Rocq/Lean/Verus disclosure model: supplier=0, financier=1, buyer=2, auditor=3, regulator=4. The generated disclosure certificate rejects role-output drift, the model proofs establish role noninterference over selected commitment pairs, and `disclosure_noninterference_report.json` fixes shared fee/auth/blinding inputs while perturbing only non-selected commitments for every role. The emitted value pair, view commitment, authorization commitment, selective-disclosure bundle manifest, and Midnight flow manifest must all remain aligned for the certificate-backed export to pass."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2631,11 +2648,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact HyperNova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova completeness here; verifier acceptance is scoped to `hypernovaExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `hypernova_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_hypernova_exact_spec.rs`: if `hypernovaExactCompletenessHypothesis` holds and the shipped verifier guard is true, then `hypernova_exact_completeness_reduction` returns `true`. The explicit CCS folding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "hypernovaExactCompletenessHypothesis".to_string(),
@@ -2646,11 +2663,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::ExternalAssumption,
-                status: VerificationStatus::AssumedExternal,
-                evidence_path: "PROOF_BOUNDARY.md".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/ProtocolExactProofs.v".to_string(),
                 notes:
-                    "Exact HyperNova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova folding soundness here; the verifier boundary is scoped to `hypernovaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
+                    "Local Rocq theorem `hypernova_exact_folding_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_hypernova_exact_spec.rs`: if `hypernovaExactFoldingSoundnessHypothesis` holds and the shipped verifier accepts, then `hypernova_exact_folding_soundness_reduction` returns `true`. The explicit CCS commitment hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem."
                         .to_string(),
                 trusted_assumptions: vec![
                     "hypernovaExactFoldingSoundnessHypothesis".to_string(),
@@ -3024,7 +3041,7 @@ mod tests {
     }
 
     #[test]
-    fn protocol_rows_are_explicit_trusted_tcb() {
+    fn protocol_rows_remain_trusted_tcb_after_local_reductions() {
         let ledger = verification_ledger();
         let protocol_rows = ledger
             .entries
@@ -3033,13 +3050,16 @@ mod tests {
             .collect::<Vec<_>>();
         assert_eq!(protocol_rows.len(), 9);
         for entry in protocol_rows {
-            assert_eq!(entry.checker, VerificationCheckerKind::ExternalAssumption);
-            assert_eq!(entry.status, VerificationStatus::AssumedExternal);
+            assert_eq!(entry.checker, VerificationCheckerKind::Rocq);
+            assert_eq!(entry.status, VerificationStatus::MechanizedLocal);
             assert_eq!(
                 entry.assurance_class(),
                 VerificationAssuranceClass::TrustedProtocolTcb
             );
-            assert_eq!(entry.evidence_path.as_str(), "PROOF_BOUNDARY.md");
+            assert_eq!(
+                entry.evidence_path.as_str(),
+                "zkf-backends/proofs/rocq/ProtocolExactProofs.v"
+            );
             assert!(!entry.trusted_assumptions.is_empty());
         }
     }

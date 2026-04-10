@@ -1,0 +1,7 @@
+{
+  "schema": "zkf-formal-tool-pin-ref-v1",
+  "tool": "refinedrust",
+  "inherits": "formal/tools/refinedrust-pin.json",
+  "surface": "runtime-buffer-bridge",
+  "target": "zkf-runtime --lib --no-default-features --features kani-minimal,refinedrust"
+}

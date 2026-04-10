@@ -1,8 +1,9 @@
 pub(crate) mod aerospace_qualification;
-pub(crate) mod app;
 pub(crate) mod agent;
+pub(crate) mod app;
 pub(crate) mod audit;
 pub(crate) mod capabilities;
+pub(crate) mod chat;
 pub(crate) mod circuit;
 pub(crate) mod compile;
 pub(crate) mod conformance;
@@ -12,16 +13,16 @@ pub(crate) mod demo;
 pub(crate) mod deploy;
 pub(crate) mod distributed;
 pub(crate) mod equivalence;
-pub(crate) mod evm;
 pub(crate) mod estimate_gas;
+pub(crate) mod evm;
 pub(crate) mod explore;
 pub(crate) mod gateway;
 pub(crate) mod import;
 pub(crate) mod ir;
 pub(crate) mod keys;
 pub(crate) mod lang;
-pub(crate) mod model;
 pub(crate) mod midnight;
+pub(crate) mod model;
 pub(crate) mod neural;
 pub(crate) mod optimize;
 pub(crate) mod package;
@@ -36,7 +37,6 @@ pub(crate) mod subsystem;
 pub(crate) mod swarm;
 pub(crate) mod telemetry;
 pub(crate) mod test_vectors;
-pub(crate) mod chat;
 pub(crate) mod update;
 pub(crate) mod wallet;
 pub(crate) mod witness;
@@ -151,7 +151,14 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
             json,
             events_jsonl,
             command,
-        } => wallet::handle_wallet(network, persistent_root, cache_root, json, events_jsonl, command),
+        } => wallet::handle_wallet(
+            network,
+            persistent_root,
+            cache_root,
+            json,
+            events_jsonl,
+            command,
+        ),
         Commands::Agent {
             json,
             events_jsonl,
@@ -822,24 +829,16 @@ fn command_name(command: &Commands) -> String {
             MidnightCommands::Disclosure { .. } => "midnight:disclosure".to_string(),
             MidnightCommands::Resolve { .. } => "midnight:resolve".to_string(),
             MidnightCommands::Contract { command } => match command {
-                MidnightContractCommands::Compile { .. } => {
-                    "midnight:contract:compile".to_string()
-                }
+                MidnightContractCommands::Compile { .. } => "midnight:contract:compile".to_string(),
                 MidnightContractCommands::DeployPrepare { .. } => {
                     "midnight:contract:deploy-prepare".to_string()
                 }
                 MidnightContractCommands::CallPrepare { .. } => {
                     "midnight:contract:call-prepare".to_string()
                 }
-                MidnightContractCommands::Test { .. } => {
-                    "midnight:contract:test".to_string()
-                }
-                MidnightContractCommands::Deploy { .. } => {
-                    "midnight:contract:deploy".to_string()
-                }
-                MidnightContractCommands::Call { .. } => {
-                    "midnight:contract:call".to_string()
-                }
+                MidnightContractCommands::Test { .. } => "midnight:contract:test".to_string(),
+                MidnightContractCommands::Deploy { .. } => "midnight:contract:deploy".to_string(),
+                MidnightContractCommands::Call { .. } => "midnight:contract:call".to_string(),
                 MidnightContractCommands::VerifyExplorer { .. } => {
                     "midnight:contract:verify-explorer".to_string()
                 }

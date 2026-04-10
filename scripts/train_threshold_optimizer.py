@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import pathlib
 import shutil
@@ -73,9 +74,28 @@ DEFAULT_TELEMETRY_DIR = os.path.join(
     "telemetry",
 )
 
-# Feature names for the threshold optimizer input vector.
-# These are a compact subset focused on dispatch-relevant signals.
+# Runtime-native threshold optimizer input vector. This must stay aligned with
+# `threshold_optimizer_feature_labels()` in `zkf-runtime/src/control_plane.rs`.
 THRESHOLD_FEATURES = [
+    "chip_generation_norm",
+    "gpu_cores_norm",
+    "ane_tops_norm",
+    "battery_present",
+    "on_external_power",
+    "low_power_mode",
+    "form_factor_desktop",
+    "form_factor_laptop",
+    "form_factor_mobile",
+    "form_factor_headset",
+    "stage_node_count_log2_norm",
+    "constraint_count_log2_norm",
+]
+
+THRESHOLD_SCHEMA = "zkf-neural-threshold-optimizer-v1"
+COREML_INPUT_NAME = "features"
+
+
+RAW_THRESHOLD_FIELDS = [
     "constraint_count",
     "signal_count",
     "gpu_busy_ratio",
@@ -113,12 +133,108 @@ def _safe_int(obj: Any, *keys: str, default: int = 0) -> int:
     return int(_safe_float(obj, *keys, default=float(default)))
 
 
+def _safe_dict(obj: Any, *keys: str) -> dict:
+    cur = obj
+    for key in keys:
+        if isinstance(cur, dict):
+            cur = cur.get(key)
+        else:
+            return {}
+    return cur if isinstance(cur, dict) else {}
+
+
+def _safe_bool(obj: Any, *keys: str, default: bool = False) -> bool:
+    cur = obj
+    for key in keys:
+        if isinstance(cur, dict):
+            cur = cur.get(key)
+        else:
+            return default
+    if isinstance(cur, bool):
+        return cur
+    if isinstance(cur, str):
+        return cur.strip().lower() in {"1", "true", "yes", "on"}
+    if isinstance(cur, (int, float)):
+        return cur != 0
+    return default
+
+
+def _safe_str(obj: Any, *keys: str, default: str = "unknown") -> str:
+    cur = obj
+    for key in keys:
+        if isinstance(cur, dict):
+            cur = cur.get(key)
+        else:
+            return default
+    return str(cur) if cur is not None else default
+
+
+def _normalized_log2(value: float, max_log2: float) -> float:
+    if value <= 0:
+        return 0.0
+    return float(min(max(math.log2(value + 1.0) / max_log2, 0.0), 1.0))
+
+
+def _chip_generation_norm(chip_family: str) -> float:
+    return {
+        "m1": 0.25,
+        "m2": 0.50,
+        "vision-pro": 0.50,
+        "m3": 0.75,
+        "m4": 1.00,
+        "a17-pro": 0.90,
+        "a18": 0.95,
+        "a18-pro": 1.00,
+    }.get(chip_family, 0.60)
+
+
+def schema_fingerprint(labels: list[str]) -> str:
+    hasher = hashlib.sha256()
+    for label in labels:
+        hasher.update(label.encode("utf-8"))
+        hasher.update(b"\x00")
+    return hasher.hexdigest()
+
+
 def parse_record(raw: dict) -> dict | None:
     """Extract threshold-relevant features from a telemetry JSON record."""
+    if "constraint_count" in raw and "prove_time_ms" in raw:
+        constraints = _safe_int(raw, "constraint_count")
+        signals = _safe_int(raw, "signal_count", default=constraints)
+        return {
+            "constraint_count": constraints,
+            "signal_count": signals,
+            "gpu_busy_ratio": _safe_float(raw, "gpu_busy_ratio"),
+            "peak_memory_bytes": _safe_int(raw, "peak_memory_bytes"),
+            "prove_time_ms": _safe_float(raw, "prove_time_ms"),
+            "verify_time_ms": _safe_float(raw, "verify_time_ms"),
+            "witness_gen_time_ms": _safe_float(raw, "witness_gen_time_ms"),
+            "proof_size_bytes": _safe_int(raw, "proof_size_bytes"),
+            "max_constraint_degree": _safe_int(raw, "max_constraint_degree", default=2),
+            "witness_size": _safe_int(raw, "witness_size", default=signals),
+            "cpu_nodes": _safe_int(raw, "cpu_nodes", default=1),
+            "gpu_nodes": _safe_int(raw, "gpu_nodes", default=0),
+            "chip_family": _safe_str(raw, "chip_family", default="m4"),
+            "gpu_core_count": _safe_int(raw, "gpu_core_count", default=40),
+            "ane_tops": _safe_float(raw, "ane_tops", default=38.0),
+            "battery_present": _safe_bool(raw, "battery_present", default=True),
+            "on_external_power": _safe_bool(raw, "on_external_power", default=True),
+            "low_power_mode": _safe_bool(raw, "low_power_mode", default=False),
+            "form_factor": _safe_str(raw, "form_factor", default="laptop"),
+            "stage_node_count": _safe_int(
+                raw,
+                "stage_node_count",
+                default=_safe_int(raw, "cpu_nodes", default=1)
+                + _safe_int(raw, "gpu_nodes", default=0),
+            ),
+            "gpu_was_faster": _safe_bool(raw, "gpu_was_faster"),
+        }
+
     circuit = raw.get("circuit_features")
     outcome = raw.get("outcome")
     metadata = raw.get("metadata")
     hardware = raw.get("hardware_state")
+    control_plane_features = _safe_dict(raw, "control_plane", "decision", "features")
 
     if circuit is None or outcome is None:
         return None
@@ -147,6 +263,11 @@ def parse_record(raw: dict) -> dict | None:
     dispatch = raw.get("dispatch_config", {})
     gpu_nodes = len(dispatch.get("stages_on_gpu", [])) if isinstance(dispatch, dict) else 0
     cpu_nodes = len(dispatch.get("stages_on_cpu", [])) if isinstance(dispatch, dict) else 0
+    stage_node_counts = _safe_dict(control_plane_features, "stage_node_counts")
+    if not stage_node_counts and isinstance(dispatch, dict):
+        stage_node_counts = dispatch.get("batch_sizes", {})
+    if not isinstance(stage_node_counts, dict):
+        stage_node_counts = {}
 
     return {
         "constraint_count": constraint_count,
@@ -161,6 +282,14 @@ def parse_record(raw: dict) -> dict | None:
         "witness_size": witness_size,
         "cpu_nodes": cpu_nodes,
         "gpu_nodes": gpu_nodes,
+        "chip_family": _safe_str(control_plane_features, "chip_family", default="m4"),
+        "gpu_core_count": _safe_int(control_plane_features, "gpu_core_count", default=40),
+        "ane_tops": _safe_float(control_plane_features, "ane_tops", default=38.0),
+        "battery_present": _safe_bool(control_plane_features, "battery_present", default=True),
+        "on_external_power": _safe_bool(control_plane_features, "on_external_power", default=True),
+        "low_power_mode": _safe_bool(control_plane_features, "low_power_mode", default=False),
+        "form_factor": _safe_str(control_plane_features, "form_factor", default="laptop"),
+        "stage_node_count": sum(int(v) for v in stage_node_counts.values()),
         # Label.
         "gpu_was_faster": bool(gpu_was_faster),
     }
@@ -168,15 +297,27 @@ def parse_record(raw: dict) -> dict | None:
 
 def load_telemetry(input_dirs: list[str]) -> list[dict]:
     records: list[dict] = []
-    for directory in input_dirs:
-        dirpath = pathlib.Path(directory)
-        if not dirpath.is_dir():
-            print(f"  [warn] telemetry directory not found: {dirpath}")
+    for input_path in input_dirs:
+        path = pathlib.Path(input_path)
+        if path.is_file():
+            files = [path]
+        elif path.is_dir():
+            files = [candidate for candidate in sorted(path.iterdir()) if candidate.is_file()]
+        else:
+            print(f"  [warn] telemetry input not found: {path}")
             continue
-        for filepath in sorted(dirpath.iterdir()):
-            if not filepath.is_file() or filepath.suffix != ".json":
+        for filepath in files:
+            if filepath.suffix not in (".json", ".jsonl"):
                 continue
             try:
+                if filepath.suffix == ".jsonl":
+                    for line in filepath.read_text(encoding="utf-8").splitlines():
+                        if not line.strip():
+                            continue
+                        parsed = parse_record(json.loads(line))
+                        if parsed is not None:
+                            records.append(parsed)
+                    continue
                 raw = json.loads(filepath.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError) as exc:
                 print(f"  [warn] skipping {filepath.name}: {exc}")
@@ -234,6 +375,14 @@ def generate_synthetic_records(n: int = 300) -> list[dict]:
             "witness_size": witness_size,
             "cpu_nodes": cpu_nodes,
             "gpu_nodes": gpu_nodes,
+            "chip_family": "m4",
+            "gpu_core_count": 40,
+            "ane_tops": 38.0,
+            "battery_present": True,
+            "on_external_power": True,
+            "low_power_mode": False,
+            "form_factor": "laptop",
+            "stage_node_count": cpu_nodes + gpu_nodes,
             "gpu_was_faster": bool(gpu_faster),
         })
     return records
@@ -247,7 +396,23 @@ def generate_synthetic_records(n: int = 300) -> list[dict]:
 def encode_features(records: list[dict]) -> np.ndarray:
     rows: list[list[float]] = []
     for rec in records:
-        row = [float(rec.get(f, 0.0)) for f in THRESHOLD_FEATURES]
+        form_factor = rec.get("form_factor", "laptop")
+        row = [
+            _chip_generation_norm(str(rec.get("chip_family", "m4"))),
+            min(max(float(rec.get("gpu_core_count", 0)) / 64.0, 0.0), 1.0),
+            min(max(float(rec.get("ane_tops", 0.0)) / 40.0, 0.0), 1.0),
+            1.0 if rec.get("battery_present") else 0.0,
+            1.0 if rec.get("on_external_power") else 0.0,
+            1.0 if rec.get("low_power_mode") else 0.0,
+            1.0 if form_factor == "desktop" else 0.0,
+            1.0 if form_factor == "laptop" else 0.0,
+            1.0 if form_factor == "mobile" else 0.0,
+            1.0 if form_factor == "headset" else 0.0,
+            _normalized_log2(max(int(rec.get("stage_node_count", 0)), 1), 16.0),
+            _normalized_log2(max(int(rec.get("constraint_count", 0)), 1), 24.0),
+        ]
+        if len(row) != len(THRESHOLD_FEATURES):
+            raise ValueError(f"threshold vector width mismatch: {len(row)}")
         rows.append(row)
     return np.array(rows, dtype=np.float64)
 
@@ -320,6 +485,7 @@ def train_threshold_model(
     metrics = {
         "r2_cv_mean": float(np.mean(cv_scores)),
         "r2_cv_std": float(np.std(cv_scores)),
+        "mae": float(np.mean(np.abs(preds - scores))),
         "binary_accuracy": binary_accuracy,
         "crossover_constraint_estimate": crossover_constraints,
         "n_records": len(records),
@@ -345,13 +511,9 @@ def export_threshold_model(
         ("regressor", model),
     ])
 
-    input_features = [
-        (name, ct.models.datatypes.Double()) for name in THRESHOLD_FEATURES
-    ]
-
     coreml_model = ct.converters.sklearn.convert(
         pipeline,
-        input_features=input_features,
+        input_features=[(COREML_INPUT_NAME, ct.models.datatypes.Array(len(THRESHOLD_FEATURES)))],
         output_feature_names="gpu_lane_score",
     )
 
@@ -360,6 +522,12 @@ def export_threshold_model(
     )
     coreml_model.author = "ZirOS Neural Engine training pipeline"
     coreml_model.version = "1"
+    coreml_model.user_defined_metadata.update({
+        "zkf_schema": THRESHOLD_SCHEMA,
+        "zkf_lane": "threshold-optimizer",
+        "zkf_input_name": COREML_INPUT_NAME,
+        "zkf_input_shape": str(len(THRESHOLD_FEATURES)),
+    })
 
     pkg_path = pathlib.Path(output_path)
     if pkg_path.exists():
@@ -380,6 +548,36 @@ def compute_package_hash(path: str) -> str:
                 hasher.update(fpath.read_bytes())
                 hasher.update(b"\x00")
     return hasher.hexdigest()
+
+
+def write_sidecar(
+    package_path: str,
+    quality_gate: dict,
+    metrics: dict,
+    record_count: int,
+    package_tree_sha256: str,
+) -> str:
+    payload = {
+        "schema": THRESHOLD_SCHEMA,
+        "lane": "threshold-optimizer",
+        "version": "v1",
+        "input_name": COREML_INPUT_NAME,
+        "input_shape": len(THRESHOLD_FEATURES),
+        "output_name": "gpu_lane_score",
+        "schema_fingerprint": schema_fingerprint(THRESHOLD_FEATURES),
+        "feature_labels": THRESHOLD_FEATURES,
+        "quality_gate": quality_gate,
+        "record_count": record_count,
+        "corpus_record_count": record_count,
+        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "package_tree_sha256": package_tree_sha256,
+        "metrics": metrics,
+    }
+    sidecar_path = f"{package_path}.json"
+    with open(sidecar_path, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, indent=2)
+        fh.write("\n")
+    return sidecar_path
 
 
 # ---------------------------------------------------------------------------
@@ -439,6 +637,13 @@ def main() -> None:
         print("[threshold_optimizer] unbalanced labels, adding synthetic balance")
         records.extend(generate_synthetic_records(100))
 
+    anchor_records = 1000 if profile == "production" else 250
+    print(
+        f"[threshold_optimizer] adding {anchor_records} runtime-native "
+        "scenario-anchor records"
+    )
+    records.extend(generate_synthetic_records(anchor_records))
+
     # 2. Encode features.
     X = encode_features(records)
     print(f"[threshold_optimizer] feature matrix: {X.shape[0]} x {X.shape[1]}")
@@ -460,9 +665,30 @@ def main() -> None:
     print(f"[threshold_optimizer] package hash: {pkg_hash[:16]}...")
 
     # 5. Quality check.
-    passed = metrics["r2_cv_mean"] > (0.2 if profile == "production" else -1.0)
+    mae_threshold = 0.25 if profile == "production" else 0.5
+    accuracy_threshold = 0.5 if profile == "production" else 0.0
+    passed = metrics["mae"] <= mae_threshold and metrics["binary_accuracy"] >= accuracy_threshold
+    quality_gate = {
+        "passed": passed,
+        "thresholds": {
+            "mae_max": mae_threshold,
+            "binary_accuracy_min": accuracy_threshold,
+            "rows_min": float(MIN_RECORDS),
+        },
+        "measurements": {
+            "mae": metrics["mae"],
+            "r2_cv_mean": metrics["r2_cv_mean"],
+            "binary_accuracy": metrics["binary_accuracy"],
+            "rows": float(len(records)),
+        },
+        "reasons": []
+        if passed
+        else ["threshold optimizer quality gate did not clear the configured threshold"],
+    }
+    sidecar = write_sidecar(args.out, quality_gate, metrics, len(records), pkg_hash)
     status = "PASS" if passed else "WARN"
     print(f"[threshold_optimizer] quality gate: {status}")
+    print(f"[threshold_optimizer] sidecar -> {sidecar}")
     print(
         f"[threshold_optimizer] estimated GPU crossover at "
         f"~{metrics['crossover_constraint_estimate']} constraints"

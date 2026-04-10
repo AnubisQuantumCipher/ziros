@@ -451,7 +451,10 @@ mod tests {
 
     fn delegated_gpu_artifact() -> ProofArtifact {
         let mut metadata = BTreeMap::new();
-        metadata.insert("groth16_msm_engine".to_string(), "metal-bn254-msm".to_string());
+        metadata.insert(
+            "groth16_msm_engine".to_string(),
+            "metal-bn254-msm".to_string(),
+        );
         metadata.insert(
             "qap_witness_map_engine".to_string(),
             "metal-bn254-ntt+streamed-reduction".to_string(),
@@ -490,7 +493,10 @@ mod tests {
 
         let outputs = build_runtime_outputs(&exec_ctx, &report, None, None);
 
-        assert_eq!(outputs["runtime_gpu_stage_busy_ratio"], serde_json::json!(0.0));
+        assert_eq!(
+            outputs["runtime_gpu_stage_busy_ratio"],
+            serde_json::json!(0.0)
+        );
         assert_eq!(
             outputs["runtime_effective_gpu_stage_busy_ratio"],
             serde_json::json!(0.25)

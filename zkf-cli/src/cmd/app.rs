@@ -381,8 +381,7 @@ fn render_gallery() -> String {
         render_gallery_card(AppStyle::Minimal, &theme),
         render_gallery_card(AppStyle::Colored, &theme),
         render_gallery_card(AppStyle::Tui, &theme),
-        "Flagship pattern: use `--style tui` for operator consoles like aegisvault."
-            .to_string(),
+        "Flagship pattern: use `--style tui` for operator consoles like aegisvault.".to_string(),
     ]
     .join("\n\n")
 }

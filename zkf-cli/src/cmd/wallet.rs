@@ -7,15 +7,15 @@ use serde_json::json;
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
-use zkf_command_surface::{
-    CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id,
-};
 use zkf_command_surface::wallet::{
-    BridgePendingKindV1, WalletContextV1, approve_pending, begin_bridge, begin_native, grant_origin,
-    issue_bridge_grant, issue_native_grant, lock, open_session, pending_review, reject_pending,
-    revoke_origin, snapshot, sync_health, unlock,
+    BridgePendingKindV1, WalletContextV1, approve_pending, begin_bridge, begin_native,
+    grant_origin, issue_bridge_grant, issue_native_grant, lock, open_session, pending_review,
+    reject_pending, revoke_origin, snapshot, sync_health, unlock,
 };
-use zkf_wallet::{ApprovalMethod, ApprovalToken, BridgeScope, SubmissionGrant, TxReviewPayload, WalletNetwork};
+use zkf_command_surface::{CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id};
+use zkf_wallet::{
+    ApprovalMethod, ApprovalToken, BridgeScope, SubmissionGrant, TxReviewPayload, WalletNetwork,
+};
 
 pub(crate) fn handle_wallet(
     network: String,
@@ -42,16 +42,25 @@ pub(crate) fn handle_wallet(
     let mut wallet = context.open_handle()?;
     match command {
         WalletCommands::Snapshot => print_output(json_output, &snapshot(&mut wallet)?)?,
-        WalletCommands::Unlock { prompt } => print_output(json_output, &unlock(&mut wallet, &prompt)?)?,
+        WalletCommands::Unlock { prompt } => {
+            print_output(json_output, &unlock(&mut wallet, &prompt)?)?
+        }
         WalletCommands::Lock => print_output(json_output, &lock(&mut wallet)?)?,
         WalletCommands::SyncHealth => print_output(json_output, &sync_health(&mut wallet)?)?,
         WalletCommands::Origin { command } => match command {
-            WalletOriginCommands::Grant { origin, scopes, note } => {
+            WalletOriginCommands::Grant {
+                origin,
+                scopes,
+                note,
+            } => {
                 let scopes = scopes
                     .into_iter()
                     .map(|scope| parse_scope(&scope))
                     .collect::<Result<BTreeSet<_>, _>>()?;
-                print_output(json_output, &grant_origin(&mut wallet, origin, scopes, note)?)?
+                print_output(
+                    json_output,
+                    &grant_origin(&mut wallet, origin, scopes, note)?,
+                )?
             }
             WalletOriginCommands::Revoke { origin } => {
                 print_output(json_output, &revoke_origin(&mut wallet, &origin)?)?
@@ -74,7 +83,10 @@ pub(crate) fn handle_wallet(
             } => {
                 let review = read_json::<TxReviewPayload>(&review)?;
                 let kind = parse_pending_kind(&kind)?;
-                print_output(json_output, &begin_bridge(&mut wallet, &session_id, kind, review)?)?
+                print_output(
+                    json_output,
+                    &begin_bridge(&mut wallet, &session_id, kind, review)?,
+                )?
             }
             WalletPendingCommands::Review { pending_id } => {
                 print_output(json_output, &pending_review(&wallet, &pending_id)?)?
@@ -105,7 +117,10 @@ pub(crate) fn handle_wallet(
             } => {
                 let token = read_json::<ApprovalToken>(&token)?;
                 let method = ApprovalMethod::parse(&method).map_err(|error| error.to_string())?;
-                print_output(json_output, &issue_native_grant(&mut wallet, method, &tx_digest, &token)?)?
+                print_output(
+                    json_output,
+                    &issue_native_grant(&mut wallet, method, &tx_digest, &token)?,
+                )?
             }
             WalletGrantCommands::IssueBridge {
                 session_id,

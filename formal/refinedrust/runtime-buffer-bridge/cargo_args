@@ -1,0 +1,6 @@
+-p
+zkf-runtime
+--lib
+--no-default-features
+--features
+kani-minimal,refinedrust

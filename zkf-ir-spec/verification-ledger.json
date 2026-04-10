@@ -453,6 +453,17 @@
       "trusted_assumptions": []
     },
     {
+      "theorem_id": "runtime.buffer_resident_accounting_refinedrust",
+      "title": "BufferBridgeCore resident-byte increment arithmetic is checked by RefinedRust on the shipped proof surface",
+      "scope": "zkf-runtime::buffer_bridge_core::resident_bytes_after_add",
+      "checker": "refined_rust",
+      "status": "mechanized_local",
+      "assurance_class": "mechanized_implementation_claim",
+      "evidence_path": "formal/refinedrust/runtime-buffer-bridge/STATUS.md",
+      "notes": "RefinedRust/Radium generated and Rocq-checked `buffer_bridge_core_resident_bytes_after_add_proof` for the shipped `resident_bytes_after_add` helper, and the pure `BufferBridgeCore` allocate/write/reload paths delegate resident-byte increment arithmetic through that helper. The claim is limited to exact `usize` addition under the explicit no-overflow precondition; eviction subtraction, filesystem spill behavior, GPU residency, and full typed-view semantics remain covered by the existing Verus/Kani/proptest buffer rows.",
+      "trusted_assumptions": []
+    },
+    {
       "theorem_id": "runtime.buffer_alias_separation_bounded",
       "title": "Pure BufferBridgeCore distinct slots remain alias-separated under mutation and free",
       "scope": "zkf-runtime::buffer_bridge_core",
@@ -1677,11 +1688,11 @@
       "theorem_id": "protocol.groth16_completeness",
       "title": "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses",
       "scope": "zkf-backends::arkworks",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact Groth16 completeness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 completeness here; verifier acceptance is scoped to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `groth16_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16ExactCompletenessHypothesis` hold on the extracted boundary and the shipped verifier guard is true, then `groth16_exact_completeness_reduction` returns `true`. The explicit hypotheses remain in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "groth16ImportedCrsValidityHypothesis",
         "groth16ExactCompletenessHypothesis"
@@ -1691,11 +1702,11 @@
       "theorem_id": "protocol.groth16_knowledge_soundness",
       "title": "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses",
       "scope": "zkf-backends::arkworks",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact Groth16 knowledge soundness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 KEA-style soundness here; the shipped boundary is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `groth16_exact_knowledge_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis` hold and the shipped verifier accepts, then `groth16_exact_knowledge_soundness_reduction` returns `true`. The explicit KEA-style hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "groth16ImportedCrsValidityHypothesis",
         "groth16KnowledgeOfExponentHypothesis"
@@ -1705,11 +1716,11 @@
       "theorem_id": "protocol.groth16_zero_knowledge",
       "title": "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses",
       "scope": "zkf-backends::arkworks",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact Groth16 zero knowledge is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 zero knowledge here; the public-view equivalence claim is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `groth16_exact_zero_knowledge_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_groth16_exact_spec.rs`: if `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis` hold on the extracted boundary, then `groth16_exact_zero_knowledge_reduction` returns `true`. The explicit simulator hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "groth16ImportedCrsValidityHypothesis",
         "groth16ExactZeroKnowledgeHypothesis"
@@ -1719,11 +1730,11 @@
       "theorem_id": "protocol.fri_completeness",
       "title": "FRI exact Plonky3 shipped surface satisfies completeness under explicit Reed-Solomon completeness hypotheses",
       "scope": "zkf-backends::plonky3",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact FRI completeness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of FRI completeness here; verifier acceptance is scoped to `friExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `fri_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_fri_exact_spec.rs`: if `friExactCompletenessHypothesis` holds and the shipped verifier guard is true, then `fri_exact_completeness_reduction` returns `true`. The explicit Reed-Solomon completeness hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "friExactCompletenessHypothesis"
       ]
@@ -1732,11 +1743,11 @@
       "theorem_id": "protocol.fri_proximity_soundness",
       "title": "FRI exact Plonky3 shipped surface reduces proximity soundness to explicit Reed-Solomon hypotheses",
       "scope": "zkf-backends::plonky3",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact FRI proximity soundness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of Reed-Solomon proximity soundness here; the verifier boundary is scoped to `friReedSolomonProximitySoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `fri_exact_proximity_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_fri_exact_spec.rs`: if `friReedSolomonProximitySoundnessHypothesis` holds and the shipped verifier accepts, then `fri_exact_proximity_soundness_reduction` returns `true`. The explicit Reed-Solomon proximity hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "friReedSolomonProximitySoundnessHypothesis"
       ]
@@ -1745,11 +1756,11 @@
       "theorem_id": "protocol.nova_completeness",
       "title": "Classic Nova exact native profile satisfies completeness under explicit folding hypotheses",
       "scope": "zkf-backends::nova_native",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact Nova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova completeness here; verifier acceptance is scoped to `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `nova_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_nova_exact_spec.rs`: if `novaExactCompletenessHypothesis` holds, `completeClassicNovaIvcMetadata` holds, and the shipped verifier guard is true, then `nova_exact_completeness_reduction` returns `true`. The explicit folding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "novaExactCompletenessHypothesis",
         "completeClassicNovaIvcMetadata"
@@ -1759,11 +1770,11 @@
       "theorem_id": "protocol.nova_folding_soundness",
       "title": "Classic Nova exact native profile reduces folding soundness to explicit commitment-binding hypotheses",
       "scope": "zkf-backends::nova_native",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact Nova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova folding soundness here; the verifier boundary is scoped to `novaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `nova_exact_folding_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_nova_exact_spec.rs`: if `novaExactFoldingSoundnessHypothesis` holds and the shipped verifier accepts, then `nova_exact_folding_soundness_reduction` returns `true`. The explicit commitment-binding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "novaExactFoldingSoundnessHypothesis"
       ]
@@ -1970,11 +1981,11 @@
       "theorem_id": "protocol.hypernova_completeness",
       "title": "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses",
       "scope": "zkf-backends::nova_native",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact HyperNova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova completeness here; verifier acceptance is scoped to `hypernovaExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `hypernova_exact_completeness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_hypernova_exact_spec.rs`: if `hypernovaExactCompletenessHypothesis` holds and the shipped verifier guard is true, then `hypernova_exact_completeness_reduction` returns `true`. The explicit CCS folding hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "hypernovaExactCompletenessHypothesis"
       ]
@@ -1983,11 +1994,11 @@
       "theorem_id": "protocol.hypernova_folding_soundness",
       "title": "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses",
       "scope": "zkf-backends::nova_native",
-      "checker": "external_assumption",
-      "status": "assumed_external",
+      "checker": "rocq",
+      "status": "mechanized_local",
       "assurance_class": "trusted_protocol_tcb",
-      "evidence_path": "PROOF_BOUNDARY.md",
-      "notes": "Exact HyperNova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova folding soundness here; the verifier boundary is scoped to `hypernovaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`.",
+      "evidence_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
+      "notes": "Local Rocq theorem `hypernova_exact_folding_soundness_reduction_ok` mechanizes the shipped exact-surface reduction over Hax extraction of `zkf-backends/src/proof_hypernova_exact_spec.rs`: if `hypernovaExactFoldingSoundnessHypothesis` holds and the shipped verifier accepts, then `hypernova_exact_folding_soundness_reduction` returns `true`. The explicit CCS commitment hypothesis remains in `trusted_assumptions`, so this row stays a trusted protocol TCB claim rather than a discharged cryptographic theorem.",
       "trusted_assumptions": [
         "hypernovaExactFoldingSoundnessHypothesis"
       ]

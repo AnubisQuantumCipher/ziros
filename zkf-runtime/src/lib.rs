@@ -1,4 +1,8 @@
 #![allow(unexpected_cfgs)]
+#![cfg_attr(feature = "refinedrust", feature(custom_inner_attributes))]
+#![cfg_attr(feature = "refinedrust", feature(register_tool))]
+#![cfg_attr(feature = "refinedrust", register_tool(rr))]
+#![cfg_attr(feature = "refinedrust", rr::package("zkf-runtime"))]
 
 //! ZKF Runtime — Unified Memory Prover Graph (UMPG) execution layer.
 //!

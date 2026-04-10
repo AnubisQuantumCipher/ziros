@@ -3,14 +3,14 @@
     "evm_status": "secondary-ready",
     "midnight_status": "ready"
   },
-  "generated_at": "2026-04-10T13:46:26.237089Z",
+  "generated_at": "2026-04-10T20:16:33.178281Z",
   "headline_counts": {
     "hypothesis_carried_theorem": 0,
     "hypothesis_stated": 0,
-    "mechanized_implementation_claim": 166,
-    "mechanized_local": 176,
+    "mechanized_implementation_claim": 167,
+    "mechanized_local": 189,
     "pending": 0,
-    "total_entries": 189,
+    "total_entries": 193,
     "trusted_protocol_tcb": 9
   },
   "private_release_paths": {
@@ -23,10 +23,10 @@
   "release_tag": "v0.7.3",
   "release_version": "0.7.3",
   "schema": "ziros-public-attestation-export-v1",
-  "source_commit": "2576444c8b26d55188e0036b32a12acb3920d556",
+  "source_commit": "91aca7694bf6099bdad09562e24641fd7c16e808",
   "support_matrix_summary": {
     "backend_count": 9,
-    "frontend_count": 7,
+    "frontend_count": 8,
     "gadget_count": 11,
     "generated_for": "0.7.3"
   },

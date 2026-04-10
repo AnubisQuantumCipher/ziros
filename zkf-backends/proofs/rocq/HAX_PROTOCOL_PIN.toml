@@ -1,0 +1,8 @@
+[hax]
+repo = "https://github.com/cryspen/hax"
+rev = "1f0259212fa994fb351853026397042c497d07b9"
+backend = "coq"
+crate = "zkf-protocol-exact-hax"
+include = "-**"
+sync_target = "zkf-backends/proofs/rocq/extraction"
+source_module = "zkf_protocol_exact_hax::{proof_groth16_exact_spec,proof_fri_exact_spec,proof_nova_exact_spec,proof_hypernova_exact_spec}"

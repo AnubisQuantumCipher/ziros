@@ -1,0 +1,28 @@
+{
+  "schema": "zkf-formal-tool-pin-v1",
+  "tool": "refinedrust",
+  "role": "foundational_rust_memory_and_functional_correctness",
+  "counting_policy": "counted_only_after_generated_rocq_and_surface_proofs_pass",
+  "upstream_repository": "https://gitlab.mpi-sws.org/lgaeher/refinedrust-dev.git",
+  "upstream_commit": "a3b377de4306b0c92cc5935f6db19d2c39514ed8",
+  "observed_at": "2026-04-10",
+  "preferred_installation": "nix_shell",
+  "fallback_installation": "opam_and_rustup",
+  "required_checker": "rocq",
+  "required_rocq_version": "9.1.0",
+  "required_dune_version_min": "3.21.0",
+  "observed_dune_version": "3.22.1",
+  "default_output_root": "target-local/formal/refinedrust",
+  "repo_evidence_root": "formal/refinedrust",
+  "trusted_boundary": [
+    "RefinedRust upstream implementation and generated Radium model until proof-checking",
+    "Rocq/Coq kernel and imported proof libraries",
+    "Rust compiler semantics not modeled by the admitted RefinedRust surface",
+    "surface manifests that intentionally exclude unsupported Rust features"
+  ],
+  "notes": [
+    "RefinedRust evidence may be promoted into zkf-ir-spec/verification-ledger.json only after cargo refinedrust and dune build both pass for the target surface.",
+    "A generated translation without a passing Rocq build is not counted as mechanized_local.",
+    "Unsupported Rust features must narrow the target capsule rather than weaken the claim."
+  ]
+}

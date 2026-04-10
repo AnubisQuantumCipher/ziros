@@ -48,6 +48,15 @@ pub(crate) struct BufferBridgeCore {
     peak_resident_bytes: usize,
 }
 
+#[cfg_attr(feature = "refinedrust", rr::verify)]
+#[cfg_attr(feature = "refinedrust", rr::params("current" : "Z", "added" : "Z"))]
+#[cfg_attr(feature = "refinedrust", rr::args("current", "added"))]
+#[cfg_attr(feature = "refinedrust", rr::requires("(current + added)%Z ∈ usize"))]
+#[cfg_attr(feature = "refinedrust", rr::returns("(current + added)%Z"))]
+pub(crate) fn resident_bytes_after_add(current: usize, added: usize) -> usize {
+    current + added
+}
+
 impl Default for BufferBridgeCore {
     fn default() -> Self {
         Self {
@@ -91,7 +100,8 @@ impl BufferBridgeCore {
             digest: None,
         };
         self.slot_count += 1;
-        self.current_resident_bytes += handle.size_bytes;
+        self.current_resident_bytes =
+            resident_bytes_after_add(self.current_resident_bytes, handle.size_bytes);
         if self.current_resident_bytes > self.peak_resident_bytes {
             self.peak_resident_bytes = self.current_resident_bytes;
         }
@@ -117,7 +127,8 @@ impl BufferBridgeCore {
         self.slots[index].len = new_len;
         self.slots[index].bytes[..new_len].copy_from_slice(data);
         if new_len > old_len {
-            self.current_resident_bytes += new_len - old_len;
+            self.current_resident_bytes =
+                resident_bytes_after_add(self.current_resident_bytes, new_len - old_len);
             if self.current_resident_bytes > self.peak_resident_bytes {
                 self.peak_resident_bytes = self.current_resident_bytes;
             }
@@ -212,7 +223,8 @@ impl BufferBridgeCore {
         }
 
         meta.resident = true;
-        self.current_resident_bytes += meta.len;
+        self.current_resident_bytes =
+            resident_bytes_after_add(self.current_resident_bytes, meta.len);
         if self.current_resident_bytes > self.peak_resident_bytes {
             self.peak_resident_bytes = self.current_resident_bytes;
         }
@@ -304,5 +316,17 @@ impl BufferBridgeCore {
             i += 1;
         }
         Some(acc.to_le_bytes())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resident_bytes_after_add;
+
+    #[test]
+    fn resident_bytes_after_add_matches_checked_addition() {
+        assert_eq!(resident_bytes_after_add(0, 0), 0);
+        assert_eq!(resident_bytes_after_add(17, 23), 40);
+        assert_eq!(resident_bytes_after_add(4096, 256), 4352);
     }
 }

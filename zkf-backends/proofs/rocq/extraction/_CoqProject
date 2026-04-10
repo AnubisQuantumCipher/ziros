@@ -1,4 +1,9 @@
 -R ./ TODO
--arg -w
--arg all
-
+Zkf_backends_Proof_blackbox_ecdsa_spec.v
+Zkf_backends_Proof_blackbox_hash_spec.v
+Zkf_backends_Proof_lookup_lowering_spec.v
+Zkf_backends_Proof_plonky3_surface.v
+Zkf_protocol_exact_hax_Proof_fri_exact_spec.v
+Zkf_protocol_exact_hax_Proof_groth16_exact_spec.v
+Zkf_protocol_exact_hax_Proof_hypernova_exact_spec.v
+Zkf_protocol_exact_hax_Proof_nova_exact_spec.v

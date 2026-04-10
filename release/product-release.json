@@ -1,7 +1,7 @@
 {
   "contract_operator_summary": {
     "evm": {
-      "generated_at": "2026-04-10T13:46:26.231072Z",
+      "generated_at": "2026-04-10T20:16:33.160355Z",
       "primary_domain": "evm",
       "schema": "ziros-evm-operator-readiness-v1",
       "status": "secondary-ready",
@@ -142,7 +142,7 @@
             "status": "not_checkable_from_cli"
           }
         ],
-        "generated_at": "1775828786Z",
+        "generated_at": "1775852193Z",
         "network": "preprod",
         "recommended_fixes": [
           "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
@@ -165,7 +165,7 @@
         "total": 13,
         "warned": 1
       },
-      "generated_at": "2026-04-10T13:46:26.230615Z",
+      "generated_at": "2026-04-10T20:16:33.159332Z",
       "live_submit_blockers": [
         "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
         "wallet: No browser wallet session or headless operator wallet credentials were available.",
@@ -191,7 +191,7 @@
       "version": "0.7.3"
     }
   },
-  "generated_at": "2026-04-10T13:46:26.232304Z",
+  "generated_at": "2026-04-10T20:16:33.164635Z",
   "product_release_ready": true,
   "release_boundary": {
     "allowlist_path": "release/public_release_allowlist.json",
@@ -203,7 +203,7 @@
   "release_tag": "v0.7.3",
   "release_version": "0.7.3",
   "schema": "ziros-product-release-v1",
-  "source_commit": "2576444c8b26d55188e0036b32a12acb3920d556",
+  "source_commit": "91aca7694bf6099bdad09562e24641fd7c16e808",
   "theorem_release_grade_ready": true,
   "truth_surfaces": {
     "agent_forensics": "forensics/",
@@ -221,24 +221,24 @@
       "attestation_backed_lane": 0,
       "bounded_check": 0,
       "hypothesis_carried_theorem": 0,
-      "mechanized_implementation_claim": 166,
-      "model_only_claim": 14,
+      "mechanized_implementation_claim": 167,
+      "model_only_claim": 17,
       "trusted_protocol_tcb": 9
     },
     "status_counts": {
-      "assumed_external": 9,
+      "assumed_external": 0,
       "bounded_checked": 0,
       "hypothesis_stated": 0,
       "mechanized_generated": 4,
-      "mechanized_local": 176,
+      "mechanized_local": 189,
       "pending": 0
     },
-    "total_entries": 189
+    "total_entries": 193
   },
   "version": "0.7.3",
   "working_tree_dirty": true,
   "workspace_members": {
-    "count": 22,
+    "count": 25,
     "names": [
       "zkf-agent",
       "zkf-backends",
@@ -254,8 +254,11 @@
       "zkf-gadgets",
       "zkf-ir-spec",
       "zkf-keymanager",
+      "zkf-lang",
       "zkf-lib",
+      "zkf-lsp",
       "zkf-metal",
+      "zkf-protocol-exact-hax",
       "zkf-registry",
       "zkf-runtime",
       "zkf-sdk",

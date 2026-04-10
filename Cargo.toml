@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "formal/protocol-exact-hax",
   "zkf-core",
   "zkf-cloudfs",
   "zkf-lang",

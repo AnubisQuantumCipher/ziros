@@ -14,10 +14,10 @@ swarm defense envelope.
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 192.
-- Machine-checked rows: 183 total (179 `mechanized_local`, 4 `mechanized_generated`).
-- Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 9 `assumed_external`, 0 `pending`.
-- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
+- Total ledger entries: 193.
+- Machine-checked rows: 193 total (189 `mechanized_local`, 4 `mechanized_generated`).
+- Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
+- Assurance classes: 167 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
 - Release-grade ready: `true`.
@@ -28,8 +28,8 @@ When prose and the ledger disagree, the ledger wins.
 
 ## Rust Formal Tool Lanes
 
-RefinedRust and Thrust are now recognized as formal-tool lanes, but they do not
-change the freeze counts until evidence is promoted deliberately:
+RefinedRust and Thrust are now recognized as formal-tool lanes, but they only
+change the freeze counts after a checked surface is promoted deliberately:
 
 - RefinedRust can become a counted `mechanized_local` implementation claim only
   after the target surface has generated Rocq/Radium output and a passing
@@ -40,8 +40,37 @@ change the freeze counts until evidence is promoted deliberately:
 - Tool pins and support evidence live under `formal/tools/` and
   `formal/tool-evidence/`. Fresh run output lives under `target-local/formal/`.
 
-The current ledger still has no RefinedRust-counted row and no Thrust-counted
-row.
+The current ledger has one counted RefinedRust row:
+`runtime.buffer_resident_accounting_refinedrust`, with evidence under
+`formal/refinedrust/runtime-buffer-bridge/`. It is intentionally narrow and does
+not replace the existing Verus/Kani/proptest buffer rows. The current ledger has
+no Thrust-counted row.
+
+## Protocol TCB Rows
+
+The nine `protocol.*` rows are now machine-checked local reduction theorems
+over the shipped exact-surface summaries in:
+
+- `zkf-backends/src/proof_groth16_exact_spec.rs`
+- `zkf-backends/src/proof_fri_exact_spec.rs`
+- `zkf-backends/src/proof_nova_exact_spec.rs`
+- `zkf-backends/src/proof_hypernova_exact_spec.rs`
+
+The reduction lane is regenerated through `formal/protocol-exact-hax/` and
+`scripts/run_protocol_exact_rocq_proofs.sh`, which extracts those shipped Rust
+surfaces into `zkf-backends/proofs/rocq/extraction/` and checks
+`zkf-backends/proofs/rocq/ProtocolExactProofs.v`.
+
+This closes the local proof obligation for the reduction itself, but it does
+not discharge the cryptographic hypotheses. Assumptions such as
+`groth16ExactCompletenessHypothesis`,
+`friReedSolomonProximitySoundnessHypothesis`,
+`novaExactFoldingSoundnessHypothesis`, and
+`hypernovaExactFoldingSoundnessHypothesis` remain explicit in
+`trusted_assumptions`, so the assurance class stays `trusted_protocol_tcb`.
+ZirOS still does not claim an in-tree mechanization of Groth16, FRI, Nova, or
+HyperNova in full; it claims a machine-checked reduction on the shipped exact
+boundary plus explicit remaining hypotheses.
 
 ## Verified GPU Lane
 

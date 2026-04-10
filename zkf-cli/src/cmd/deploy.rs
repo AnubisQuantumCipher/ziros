@@ -16,13 +16,7 @@ pub(crate) fn handle_deploy(
     evm_target: String,
     json: bool,
 ) -> Result<(), String> {
-    let report = export_verifier_to_path(
-        artifact_path,
-        backend,
-        out,
-        contract_name,
-        evm_target,
-    )?;
+    let report = export_verifier_to_path(artifact_path, backend, out, contract_name, evm_target)?;
 
     if json {
         println!(

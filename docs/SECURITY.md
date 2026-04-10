@@ -31,8 +31,23 @@ The practical TCB for this checkout includes:
   `mechanized_local` row after generated Rocq proof checking
 - Thrust and its CHC solver only as non-counted support evidence unless the
   release-grade ledger policy is changed explicitly
+- Flux, Creusot, and Prusti are not admitted ZirOS assurance lanes in this
+  checkout; ad hoc comparison use does not widen the TCB-backed theorem set
 - Apple’s Metal compiler/runtime/driver plus Apple GPU hardware on the Metal lane
 - Upstream backend libraries that are not fully mechanized in the local ledger
+
+## Rust Verification Doctrine
+
+- Unsafe, FFI, raw-pointer, aliasing-sensitive, and layout-sensitive Rust
+  should be designed as small RefinedRust-capable capsules by default.
+- Safe proof-core logic should prefer Verus for counted implementation theorems
+  and shell contracts.
+- Kani is bounded support evidence only.
+- Thrust is safe-Rust screening and support evidence only.
+- Flux, Creusot, and Prusti are comparison tools only until the truth surfaces
+  explicitly admit them.
+- No Rust verification tool in this doctrine proves Groth16, FRI, Nova, or
+  HyperNova protocol soundness by itself.
 
 ## Fail-Closed Design
 
@@ -94,21 +109,12 @@ When prose and generated evidence disagree, trust the live truth surfaces:
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 192.
-- Machine-checked rows: 183 total (179 `mechanized_local`, 4 `mechanized_generated`).
-- Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 9 `assumed_external`, 0 `pending`.
-- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
+- Total ledger entries: 193.
+- Machine-checked rows: 193 total (189 `mechanized_local`, 4 `mechanized_generated`).
+- Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
+- Assurance classes: 167 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
 - Rows with non-empty `trusted_assumptions`: 9.
-- Explicit protocol TCB rows:
-  - `protocol.fri_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.fri_proximity_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.groth16_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.groth16_knowledge_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.groth16_zero_knowledge`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.hypernova_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.hypernova_folding_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.nova_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
-  - `protocol.nova_folding_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
+- All protocol rows are `mechanized_local`.
 <!-- END GENERATED VERIFICATION STATUS -->

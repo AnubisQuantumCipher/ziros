@@ -141,23 +141,28 @@ impl ModelLane {
     pub fn default_file_names(self) -> &'static [&'static str] {
         match self {
             Self::Scheduler => &[
+                "scheduler_v3.mlpackage",
                 "scheduler_v2.mlpackage",
                 "scheduler_v1.mlpackage",
                 "zkf-runtime-policy.mlpackage",
             ],
             Self::Backend => &[
+                "backend_recommender_v3.mlpackage",
                 "backend_recommender_v2.mlpackage",
                 "backend_recommender_v1.mlpackage",
             ],
             Self::Duration => &[
+                "duration_estimator_v3.mlpackage",
                 "duration_estimator_v2.mlpackage",
                 "duration_estimator_v1.mlpackage",
             ],
             Self::Anomaly => &[
+                "anomaly_detector_v3.mlpackage",
                 "anomaly_detector_v2.mlpackage",
                 "anomaly_detector_v1.mlpackage",
             ],
             Self::Security => &[
+                "security_detector_v3.mlpackage",
                 "security_detector_v2.mlpackage",
                 "security_detector_v1.mlpackage",
             ],

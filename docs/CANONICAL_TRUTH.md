@@ -66,17 +66,33 @@ Additional trust semantics guidance lives in
 
 ## Formal Tool Evidence Truth
 
-- RefinedRust is admitted as a future counted Rust verification lane only when
-  the target surface has generated Rocq/Radium output and a passing `dune build`
-  over the generated and stable proof files.
+- The permanent Rust proof-tool doctrine lives in
+  `FORMAL_TOOLCHAIN_INTEGRATION.md`.
+- RefinedRust is a core ZirOS development lane for unsafe, FFI, raw-pointer,
+  and layout-sensitive Rust. Those boundaries should be designed as small
+  RefinedRust-capable capsules first rather than left as large mixed-feature
+  modules. RefinedRust is admitted as a counted Rust verification lane only for
+  surfaces with generated Rocq/Radium output and a passing `dune build` over
+  the generated and stable proof files. The current counted surface is
+  `runtime-buffer-bridge`, scoped to resident-byte increment arithmetic in
+  `zkf-runtime::buffer_bridge_core`.
+- Verus is the default counted Rust theorem lane for safe proof-core logic,
+  arithmetic invariants, deterministic state machines, and shell contracts over
+  effectful boundaries.
+- Kani is bounded support evidence for bug-finding, counterexamples, and narrow
+  regression checks. Kani results must not increase `mechanized_total`.
 - Thrust is admitted as non-counted support evidence for safe-Rust refinement
   checks, invariant discovery, and regression screening. Thrust results must not
   increase `mechanized_total` or replace existing Rocq, Verus, Lean, or F*
   theorem rows in this checkout.
+- Flux, Creusot, and Prusti are reference-only comparison tools in this
+  checkout. They do not currently create admitted truth-surface claims, counted
+  rows, or support-lane totals.
 - The checked-in tool pins under `formal/tools/` record tool identity and
   trusted boundaries. They do not by themselves create a proof claim.
-- Fresh RefinedRust and Thrust runner output belongs under `target-local/formal/`
-  unless a proof tranche intentionally promotes a checked evidence surface.
+- Fresh RefinedRust, Kani, Thrust, and comparison-runner output belongs under
+  `target-local/formal/` unless a proof tranche intentionally promotes a
+  checked evidence surface.
 
 Detailed operator guidance lives in
 `FORMAL_TOOLCHAIN_INTEGRATION.md`.

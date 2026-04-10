@@ -21,5 +21,9 @@ Current completion boundary:
 
 - backend proof-kernel extraction wiring exists locally
 - the shipped Plonky3 backend now delegates through `proof_plonky3_spec.rs`
-- no backend theorem is promoted in the ledger from this workspace until the extracted
-  files and hand-written proofs are actually green
+- the Plonky3/blackbox backend proof files are green on the checked-in extraction lane
+- the protocol exact reduction lane uses the dedicated `zkf-protocol-exact-hax`
+  crate and `HAX_PROTOCOL_PIN.toml` to extract the shipped
+  `proof_*_exact_spec.rs` modules into this workspace
+- `scripts/run_protocol_exact_rocq_proofs.sh` regenerates the protocol exact
+  extraction files and checks `ProtocolExactProofs.v`

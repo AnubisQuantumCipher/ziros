@@ -44,6 +44,7 @@ tempfile = "3"
 default = ["full"]
 full = ["dep:zkf-backends", "cpu-backends"]
 kani-minimal = []
+refinedrust = []
 neural-engine = []
 metal-gpu = []
 cpu-backends = [
