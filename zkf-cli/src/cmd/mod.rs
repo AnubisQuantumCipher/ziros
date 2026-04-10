@@ -19,6 +19,7 @@ pub(crate) mod gateway;
 pub(crate) mod import;
 pub(crate) mod ir;
 pub(crate) mod keys;
+pub(crate) mod lang;
 pub(crate) mod model;
 pub(crate) mod midnight;
 pub(crate) mod optimize;
@@ -43,8 +44,9 @@ use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
     EvmCommands, EvmFoundryCommands, EvmVerifierCommands, GatewayCommands, IrCommands,
-    MidnightCommands, MidnightContractCommands, MidnightProofServerCommands, ModelAddCommands,
-    ModelCommands, SubsystemCommands, TelemetryCommands, UpdateCommands, WalletCommands,
+    LangCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
+    ModelAddCommands, ModelCommands, SubsystemCommands, TelemetryCommands, UpdateCommands,
+    WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -156,6 +158,77 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
         Commands::Credential { command } => credential::handle_credential(command),
         Commands::Capabilities { json: _ } => capabilities::handle_capabilities(),
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
+        Commands::Lang { command } => match command {
+            LangCommands::Check { source, json } => lang::handle_lang_check(source, json),
+            LangCommands::Lower {
+                source,
+                out,
+                to,
+                json,
+            } => lang::handle_lang_lower(source, out, to, json),
+            LangCommands::Obligations { source, json } => {
+                lang::handle_lang_obligations(source, json)
+            }
+            LangCommands::Fmt { source, out, check } => lang::handle_lang_fmt(source, out, check),
+            LangCommands::Prove {
+                source,
+                inputs,
+                json,
+                backend,
+                objective,
+                mode,
+                export,
+                allow_attestation,
+                out,
+                compiled_out,
+                solver,
+                seed,
+                groth16_setup_blob,
+                allow_dev_deterministic_groth16,
+                hybrid,
+            } => lang::handle_lang_prove(
+                lang::LangProveArgs {
+                    source,
+                    inputs,
+                    json,
+                    backend,
+                    objective,
+                    mode,
+                    export,
+                    allow_attestation,
+                    out,
+                    compiled_out,
+                    solver,
+                    seed,
+                    groth16_setup_blob,
+                    allow_dev_deterministic_groth16,
+                    hybrid,
+                },
+                allow_compat,
+            ),
+            LangCommands::Verify {
+                source,
+                artifact,
+                backend,
+                compiled,
+                seed,
+                groth16_setup_blob,
+                allow_dev_deterministic_groth16,
+                hybrid,
+            } => lang::handle_lang_verify(
+                lang::LangVerifyArgs {
+                    source,
+                    artifact,
+                    backend,
+                    compiled,
+                    seed,
+                    groth16_setup_blob,
+                    allow_dev_deterministic_groth16,
+                    hybrid,
+                },
+                allow_compat,
+            ),
+        },
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
         Commands::Doctor { json } => capabilities::handle_doctor(json),
         Commands::MetalDoctor { json, strict } => capabilities::handle_metal_doctor(json, strict),
@@ -794,6 +867,14 @@ fn command_name(command: &Commands) -> String {
         },
         Commands::Capabilities { .. } => "capabilities".to_string(),
         Commands::Frontends { .. } => "frontends".to_string(),
+        Commands::Lang { command } => match command {
+            LangCommands::Check { .. } => "lang:check".to_string(),
+            LangCommands::Lower { .. } => "lang:lower".to_string(),
+            LangCommands::Obligations { .. } => "lang:obligations".to_string(),
+            LangCommands::Fmt { .. } => "lang:fmt".to_string(),
+            LangCommands::Prove { .. } => "lang:prove".to_string(),
+            LangCommands::Verify { .. } => "lang:verify".to_string(),
+        },
         Commands::SupportMatrix { .. } => "support-matrix".to_string(),
         Commands::Doctor { .. } => "doctor".to_string(),
         Commands::MetalDoctor { .. } => "metal-doctor".to_string(),

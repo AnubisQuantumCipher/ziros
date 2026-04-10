@@ -134,6 +134,11 @@ pub(crate) enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Check, format, and lower native Zir source programs.
+    Lang {
+        #[command(subcommand)]
+        command: LangCommands,
+    },
     /// Emit the repo support matrix from live backend/frontend/gadget metadata.
     SupportMatrix {
         #[arg(long)]
@@ -2170,6 +2175,96 @@ pub(crate) enum IrCommands {
         program: PathBuf,
         #[arg(long)]
         json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum LangCommands {
+    /// Parse, type-check, and compatibility-check a `.zir` source file.
+    Check {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Lower a `.zir` source file into ZIR v1 or IR v2 JSON.
+    Lower {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value = "zir-v1")]
+        to: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Emit language proof and lowering obligations for a `.zir` source file.
+    Obligations {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Format a `.zir` source file.
+    Fmt {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        check: bool,
+    },
+    /// Lower a `.zir` source file and prove it through the existing UMPG proof path.
+    Prove {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        inputs: PathBuf,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        backend: Option<String>,
+        #[arg(long, default_value = "fastest-prove")]
+        objective: String,
+        #[arg(long)]
+        mode: Option<String>,
+        #[arg(long)]
+        export: Option<String>,
+        #[arg(long)]
+        allow_attestation: bool,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        compiled_out: Option<PathBuf>,
+        #[arg(long)]
+        solver: Option<String>,
+        #[arg(long)]
+        seed: Option<String>,
+        #[arg(long)]
+        groth16_setup_blob: Option<PathBuf>,
+        #[arg(long)]
+        allow_dev_deterministic_groth16: bool,
+        #[arg(long)]
+        hybrid: bool,
+    },
+    /// Lower a `.zir` source file and verify an artifact through the existing verifier path.
+    Verify {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        backend: String,
+        #[arg(long)]
+        compiled: Option<PathBuf>,
+        #[arg(long)]
+        seed: Option<String>,
+        #[arg(long)]
+        groth16_setup_blob: Option<PathBuf>,
+        #[arg(long)]
+        allow_dev_deterministic_groth16: bool,
+        #[arg(long)]
+        hybrid: bool,
     },
 }
 

@@ -1,0 +1,11 @@
+[package]
+name = "zkf-lang"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Native Zir language parser, checker, and lowering frontend"
+
+[dependencies]
+serde.workspace = true
+zkf-core = { path = "../zkf-core" }

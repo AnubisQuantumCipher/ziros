@@ -69,6 +69,7 @@ zkf-core = { path = "../zkf-core", default-features = false, features = ["full"]
 zkf-examples = { path = "../zkf-examples" }
 zkf-frontends = { path = "../zkf-frontends" }
 zkf-gadgets = { path = "../zkf-gadgets" }
+zkf-lang = { path = "../zkf-lang" }
 zkf-lib = { path = "../zkf-lib" }
 zkf-registry = { path = "../zkf-registry" }
 zkf-ui = { path = "../zkf-ui" }

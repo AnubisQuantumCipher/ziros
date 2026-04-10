@@ -2,6 +2,7 @@
 members = [
   "zkf-core",
   "zkf-cloudfs",
+  "zkf-lang",
   "zkf-frontends",
   "zkf-backends",
   "zkf-gadgets",

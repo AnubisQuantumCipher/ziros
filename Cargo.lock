@@ -12464,6 +12464,7 @@ dependencies = [
  "zkf-frontends",
  "zkf-gadgets",
  "zkf-keymanager",
+ "zkf-lang",
  "zkf-lib",
  "zkf-registry",
  "zkf-runtime",
@@ -12684,6 +12685,14 @@ dependencies = [
  "tempfile",
  "zeroize",
  "zkf-cloudfs",
+ "zkf-core",
+]
+
+[[package]]
+name = "zkf-lang"
+version = "0.7.3"
+dependencies = [
+ "serde",
  "zkf-core",
 ]
 
