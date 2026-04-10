@@ -29,7 +29,7 @@ pub(crate) fn run_inspect(
     frontend: FrontendKind,
     input: &Path,
 ) -> Result<FrontendInspection, String> {
-    let value: Value = read_json(input)?;
+    let value: Value = read_frontend_value(frontend, input)?;
     let engine = frontend_for(frontend);
     engine.inspect(&value).map_err(render_zkf_error)
 }
@@ -58,7 +58,7 @@ pub(crate) fn run_import(opts: &ImportOptions<'_>) -> Result<(), String> {
         package_out,
         json,
     } = *opts;
-    let value: Value = read_json(input)?;
+    let value: Value = read_frontend_value(frontend, input)?;
     let field = field.as_deref().map(parse_field).transpose()?;
     let engine = frontend_for(frontend);
     let probe = engine.probe(&value);
@@ -434,6 +434,7 @@ fn handle_auto_inspect(input: PathBuf, json: bool) -> Result<(), String> {
     }
 
     let candidates = [
+        FrontendKind::Zir,
         FrontendKind::Noir,
         FrontendKind::Circom,
         FrontendKind::Cairo,
@@ -476,6 +477,25 @@ fn handle_auto_inspect(input: PathBuf, json: bool) -> Result<(), String> {
             input.display()
         )
     }))
+}
+
+fn read_frontend_value(frontend: FrontendKind, input: &Path) -> Result<Value, String> {
+    if frontend != FrontendKind::Zir {
+        return read_json(input);
+    }
+    let text =
+        fs::read_to_string(input).map_err(|error| format!("{}: {error}", input.display()))?;
+    match serde_json::from_str::<Value>(&text) {
+        Ok(value)
+            if value
+                .get("schema")
+                .and_then(Value::as_str)
+                .is_some_and(|schema| schema == "zkf-zir-source-v1") =>
+        {
+            Ok(value)
+        }
+        _ => Ok(Value::String(text)),
+    }
 }
 
 pub(crate) fn handle_import_acir(

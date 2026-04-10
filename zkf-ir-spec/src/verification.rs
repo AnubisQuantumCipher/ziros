@@ -8,6 +8,8 @@ pub enum VerificationCheckerKind {
     Proptest,
     Lean,
     Rocq,
+    #[serde(rename = "rocq+verus")]
+    RocqVerus,
     Fstar,
     Verus,
     GeneratedProof,
@@ -68,7 +70,8 @@ impl VerificationLedgerEntry {
 
         if self.theorem_id.starts_with("protocol.") {
             VerificationAssuranceClass::TrustedProtocolTcb
-        } else if self.theorem_id.starts_with("model.") {
+        } else if self.theorem_id.starts_with("model.") || self.theorem_id.starts_with("zir.lang.")
+        {
             VerificationAssuranceClass::ModelOnlyClaim
         } else {
             VerificationAssuranceClass::MechanizedImplementationClaim
@@ -2785,6 +2788,43 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 notes:
                     "Local Verus theorem `sed_surface_constants_match` proves the Sovereign Economic Defense proof-surface constants for Goldilocks scale, BN254 scale, integration steps, and range bounds, including the 63-bit squared-bound fit used by the shipped Goldilocks lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.tier1_eval_determinism_model".to_string(),
+                title: "Tier 1 Zir expression evaluation model is deterministic".to_string(),
+                scope: "zkf-lang::source-model".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangSemantics.v".to_string(),
+                notes:
+                    "Local Rocq theorem `zir_tier1_eval_deterministic` proves determinism for the Tier 1 arithmetic expression model used to state the native Zir source semantics. This is model-only evidence and does not claim full parser/compiler implementation correctness."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.source_to_zir_shape_model".to_string(),
+                title: "Tier 1 source-to-ZIR constraint-shape model preserves core constraint forms"
+                    .to_string(),
+                scope: "zkf-lang::source-model".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangLoweringProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorems `zir_source_to_zir_preserves_equality_shape`, `zir_source_to_zir_preserves_range_shape`, and `zir_source_to_zir_preserves_boolean_shape` prove the model lowering preserves the Tier 1 equality/range/boolean constraint forms. This is model-only evidence and does not claim an end-to-end verified Rust compiler."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.privacy_expose_model".to_string(),
+                title: "Zir exposure model rejects unassigned private input exposure".to_string(),
+                scope: "zkf-lang::privacy-model".to_string(),
+                checker: VerificationCheckerKind::RocqVerus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangPrivacyProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `private_unassigned_input_cannot_be_exposed` and Verus theorem `private_unassigned_cannot_expose` prove the privacy model rejects direct exposure of unassigned private inputs. This supports the shipped Zir checker boundary but remains a model-only claim until tied to extracted implementation proof."
                         .to_string(),
                 trusted_assumptions: vec![],
             },

@@ -2101,6 +2101,39 @@
       "evidence_path": "zkf-lib/proofs/verus/sovereign_economic_defense_verus.rs",
       "notes": "Local Verus theorem `sed_surface_constants_match` proves the Sovereign Economic Defense proof-surface constants for Goldilocks scale, BN254 scale, integration steps, and range bounds, including the 63-bit squared-bound fit used by the shipped Goldilocks lane.",
       "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "zir.lang.tier1_eval_determinism_model",
+      "title": "Tier 1 Zir expression evaluation model is deterministic",
+      "scope": "zkf-lang::source-model",
+      "checker": "rocq",
+      "status": "mechanized_local",
+      "assurance_class": "model_only_claim",
+      "evidence_path": "zkf-lang/proofs/rocq/ZirLangSemantics.v",
+      "notes": "Local Rocq theorem `zir_tier1_eval_deterministic` proves determinism for the Tier 1 arithmetic expression model used to state the native Zir source semantics. This is model-only evidence and does not claim full parser/compiler implementation correctness.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "zir.lang.source_to_zir_shape_model",
+      "title": "Tier 1 source-to-ZIR constraint-shape model preserves core constraint forms",
+      "scope": "zkf-lang::source-model",
+      "checker": "rocq",
+      "status": "mechanized_local",
+      "assurance_class": "model_only_claim",
+      "evidence_path": "zkf-lang/proofs/rocq/ZirLangLoweringProofs.v",
+      "notes": "Local Rocq theorems `zir_source_to_zir_preserves_equality_shape`, `zir_source_to_zir_preserves_range_shape`, and `zir_source_to_zir_preserves_boolean_shape` prove the model lowering preserves the Tier 1 equality/range/boolean constraint forms. This is model-only evidence and does not claim an end-to-end verified Rust compiler.",
+      "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "zir.lang.privacy_expose_model",
+      "title": "Zir exposure model rejects unassigned private input exposure",
+      "scope": "zkf-lang::privacy-model",
+      "checker": "rocq+verus",
+      "status": "mechanized_local",
+      "assurance_class": "model_only_claim",
+      "evidence_path": "zkf-lang/proofs/rocq/ZirLangPrivacyProofs.v",
+      "notes": "Local Rocq theorem `private_unassigned_input_cannot_be_exposed` and Verus theorem `private_unassigned_cannot_expose` prove the privacy model rejects direct exposure of unassigned private inputs. This supports the shipped Zir checker boundary but remains a model-only claim until tied to extracted implementation proof.",
+      "trusted_assumptions": []
     }
   ]
 }

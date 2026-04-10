@@ -45,9 +45,9 @@ use crate::benchmark::{BenchmarkOptions, render_markdown_table, run_benchmarks};
 use crate::cli::{
     AgentCommands, AppCommands, CircuitCommands, ClusterCommands, Commands, CredentialCommands,
     EvmCommands, EvmFoundryCommands, EvmVerifierCommands, GatewayCommands, IrCommands,
-    LangCommands, MidnightCommands, MidnightContractCommands, MidnightProofServerCommands,
-    ModelAddCommands, ModelCommands, NeuralCommands, SubsystemCommands, TelemetryCommands,
-    UpdateCommands, WalletCommands,
+    LangCommands, LangFlowCommands, LangLspCommands, MidnightCommands, MidnightContractCommands,
+    MidnightProofServerCommands, ModelAddCommands, ModelCommands, NeuralCommands,
+    SubsystemCommands, TelemetryCommands, UpdateCommands, WalletCommands,
 };
 use crate::util::{
     parse_backend_request, parse_benchmark_backends, parse_optimization_objective,
@@ -162,12 +162,19 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
         Commands::Frontends { json: _ } => capabilities::handle_frontends(),
         Commands::Lang { command } => match command {
             LangCommands::Check { source, json } => lang::handle_lang_check(source, json),
+            LangCommands::Inspect { source, json } => lang::handle_lang_inspect(source, json),
             LangCommands::Lower {
                 source,
                 out,
                 to,
                 json,
             } => lang::handle_lang_lower(source, out, to, json),
+            LangCommands::Package {
+                source,
+                out,
+                to,
+                json,
+            } => lang::handle_lang_package(source, out, to, json),
             LangCommands::Obligations { source, json } => {
                 lang::handle_lang_obligations(source, json)
             }
@@ -230,6 +237,24 @@ pub(crate) fn handle(command: Commands, allow_compat: bool) -> Result<(), String
                 },
                 allow_compat,
             ),
+            LangCommands::Flow { command } => match command {
+                LangFlowCommands::Check { workflow, json } => {
+                    lang::handle_lang_flow_check(workflow, json)
+                }
+                LangFlowCommands::Plan {
+                    workflow,
+                    out,
+                    json,
+                } => lang::handle_lang_flow_plan(workflow, out, json),
+                LangFlowCommands::Run {
+                    workflow,
+                    approve,
+                    json,
+                } => lang::handle_lang_flow_run(workflow, approve, json, allow_compat),
+            },
+            LangCommands::Lsp { command } => match command {
+                LangLspCommands::Serve => lang::handle_lang_lsp_serve(),
+            },
         },
         Commands::SupportMatrix { out } => capabilities::handle_support_matrix(out),
         Commands::Doctor { json } => capabilities::handle_doctor(json),
@@ -876,11 +901,21 @@ fn command_name(command: &Commands) -> String {
         Commands::Frontends { .. } => "frontends".to_string(),
         Commands::Lang { command } => match command {
             LangCommands::Check { .. } => "lang:check".to_string(),
+            LangCommands::Inspect { .. } => "lang:inspect".to_string(),
             LangCommands::Lower { .. } => "lang:lower".to_string(),
+            LangCommands::Package { .. } => "lang:package".to_string(),
             LangCommands::Obligations { .. } => "lang:obligations".to_string(),
             LangCommands::Fmt { .. } => "lang:fmt".to_string(),
             LangCommands::Prove { .. } => "lang:prove".to_string(),
             LangCommands::Verify { .. } => "lang:verify".to_string(),
+            LangCommands::Flow { command } => match command {
+                LangFlowCommands::Check { .. } => "lang:flow:check".to_string(),
+                LangFlowCommands::Plan { .. } => "lang:flow:plan".to_string(),
+                LangFlowCommands::Run { .. } => "lang:flow:run".to_string(),
+            },
+            LangCommands::Lsp { command } => match command {
+                LangLspCommands::Serve => "lang:lsp:serve".to_string(),
+            },
         },
         Commands::SupportMatrix { .. } => "support-matrix".to_string(),
         Commands::Doctor { .. } => "doctor".to_string(),

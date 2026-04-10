@@ -2219,8 +2219,26 @@ pub(crate) enum LangCommands {
         #[arg(long)]
         json: bool,
     },
+    /// Inspect circuits, entries, fields, and tiers in a `.zir` source file.
+    Inspect {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
     /// Lower a `.zir` source file into ZIR v1 or IR v2 JSON.
     Lower {
+        #[arg(value_name = "SOURCE")]
+        source: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value = "zir-v1")]
+        to: String,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Package a `.zir` source file with source provenance and lowering evidence.
+    Package {
         #[arg(value_name = "SOURCE")]
         source: PathBuf,
         #[arg(long)]
@@ -2298,6 +2316,51 @@ pub(crate) enum LangCommands {
         #[arg(long)]
         hybrid: bool,
     },
+    /// Check, plan, or run a bounded `.zirflow` workflow.
+    Flow {
+        #[command(subcommand)]
+        command: LangFlowCommands,
+    },
+    /// Serve the Zir language server over stdio.
+    Lsp {
+        #[command(subcommand)]
+        command: LangLspCommands,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum LangFlowCommands {
+    /// Parse and validate a `.zirflow` workflow.
+    Check {
+        #[arg(value_name = "WORKFLOW")]
+        workflow: PathBuf,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Emit a deterministic `.zirflow` execution plan.
+    Plan {
+        #[arg(value_name = "WORKFLOW")]
+        workflow: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Execute a `.zirflow` plan after explicit approval.
+    Run {
+        #[arg(value_name = "WORKFLOW")]
+        workflow: PathBuf,
+        #[arg(long)]
+        approve: bool,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum LangLspCommands {
+    /// Serve the Zir language server on stdin/stdout.
+    Serve,
 }
 
 #[derive(Debug, Subcommand)]

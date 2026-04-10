@@ -1,0 +1,7 @@
+{
+  "invoice_amount": "100000",
+  "settlement_amount": "100000",
+  "fee_amount": "250",
+  "maturity_days": "45",
+  "risk_score": "24"
+}

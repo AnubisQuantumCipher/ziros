@@ -9,6 +9,7 @@ pub mod plonky3_air_export;
 #[cfg(hax)]
 mod proof_noir_recheck_spec;
 mod translation;
+mod zir;
 
 use cairo::CairoFrontend;
 use circom::CircomFrontend;
@@ -26,6 +27,7 @@ pub use translation::{
     FrontendTranslator, NoopFrontendTranslator, TranslationMeta, TranslationTarget,
     infer_noir_translation_meta,
 };
+use zir::ZirFrontend;
 use zkf_core::{
     FieldId, Program, ToolRequirement, Witness, WitnessInputs, ZkfError, ZkfResult,
     program_v2_to_zir,
@@ -34,6 +36,7 @@ use zkf_core::{
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum FrontendKind {
+    Zir,
     Noir,
     Circom,
     Cairo,
@@ -46,6 +49,7 @@ pub enum FrontendKind {
 impl FrontendKind {
     pub fn as_str(self) -> &'static str {
         match self {
+            FrontendKind::Zir => "zir",
             FrontendKind::Noir => "noir",
             FrontendKind::Circom => "circom",
             FrontendKind::Cairo => "cairo",
@@ -68,6 +72,7 @@ impl FromStr for FrontendKind {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
+            "zir" | "zir-source" | "native-zir" => Ok(Self::Zir),
             "noir" | "acir" => Ok(Self::Noir),
             "circom" | "r1cs" | "snarkjs-r1cs" => Ok(Self::Circom),
             "cairo" | "sierra" | "starknet" => Ok(Self::Cairo),
@@ -279,6 +284,7 @@ pub trait FrontendEngine: Send + Sync {
 
 pub fn frontend_for(kind: FrontendKind) -> Box<dyn FrontendEngine> {
     match kind {
+        FrontendKind::Zir => Box::new(ZirFrontend),
         FrontendKind::Noir => Box::new(NoirAcirFrontend),
         FrontendKind::Circom => Box::new(CircomFrontend),
         FrontendKind::Cairo => Box::new(CairoFrontend),
@@ -291,6 +297,7 @@ pub fn frontend_for(kind: FrontendKind) -> Box<dyn FrontendEngine> {
 
 pub fn frontend_capabilities_matrix() -> Vec<FrontendCapabilities> {
     [
+        FrontendKind::Zir,
         FrontendKind::Noir,
         FrontendKind::Circom,
         FrontendKind::Cairo,

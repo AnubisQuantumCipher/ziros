@@ -1564,6 +1564,9 @@ fn scaffold_app(
     style: AppStyle,
     out: Option<PathBuf>,
 ) -> Result<PathBuf, String> {
+    if template_name == "zir-range-proof" || template_name == "zir-trade-finance-core" {
+        return scaffold_zir_app(name, template_name, style, out);
+    }
     let spec = template_spec(template_name, template_args)?;
     zkf_lib::build_app_spec(&spec).map_err(|error| error.to_string())?;
     let backend = scaffold_backend(spec.program.field);
@@ -1600,6 +1603,71 @@ fn scaffold_app(
         &readme_content(name, template_name, style, &spec),
     )?;
 
+    Ok(root)
+}
+
+fn scaffold_zir_app(
+    name: &str,
+    template_name: &str,
+    style: AppStyle,
+    out: Option<PathBuf>,
+) -> Result<PathBuf, String> {
+    let root = out_dir(name, out)?;
+    std::fs::create_dir_all(root.join("src"))
+        .map_err(|error| format!("{}: {error}", root.join("src").display()))?;
+    let program = if template_name == "zir-trade-finance-core" {
+        include_str!("../../../zkf-examples/zir/private_trade_finance_settlement.zir")
+    } else {
+        r#"circuit range_proof(field: bn254, tier: 1) {
+  private value: u64<16>;
+  public accepted: field;
+
+  accepted = 1;
+  constrain leq(value, 65535, 16);
+  constrain accepted == 1;
+  expose accepted;
+}
+"#
+    };
+    let valid_inputs = if template_name == "zir-trade-finance-core" {
+        include_str!("../../../zkf-examples/zir/private_trade_finance_settlement.inputs.valid.json")
+    } else {
+        "{\n  \"value\": \"42\"\n}\n"
+    };
+    let invalid_inputs = if template_name == "zir-trade-finance-core" {
+        include_str!(
+            "../../../zkf-examples/zir/private_trade_finance_settlement.inputs.invalid.json"
+        )
+    } else {
+        "{\n  \"value\": \"70000\"\n}\n"
+    };
+    write_text(&root.join("program.zir"), program)?;
+    write_text(&root.join("inputs.valid.json"), valid_inputs)?;
+    write_text(&root.join("inputs.invalid.json"), invalid_inputs)?;
+    write_text(
+        &root.join("workflow.zirflow"),
+        &format!(
+            "workflow {name} {{\n  source \"./program.zir\" as main;\n  check main tier tier1;\n  lower main to zir-v1 out \"./build/program.zir.json\";\n  package main out \"./build/package\";\n  prove main backend \"nova\" inputs \"./inputs.valid.json\" out \"./build/proof.json\";\n  verify main backend \"nova\" artifact \"./build/proof.json\";\n}}\n"
+        ),
+    )?;
+    write_text(
+        &root.join("Cargo.toml"),
+        &format!(
+            "[package]\nname = \"{}\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[dependencies]\n",
+            crate_name(name)
+        ),
+    )?;
+    write_text(
+        &root.join("src/main.rs"),
+        "fn main() {\n    println!(\"Run: ziros lang flow plan workflow.zirflow --json\");\n}\n",
+    )?;
+    write_text(
+        &root.join("README.md"),
+        &format!(
+            "# {name}\n\nNative Zir app scaffold.\n\n```bash\nziros lang check program.zir --json\nziros lang package program.zir --out build/package --json\nziros lang flow plan workflow.zirflow --json\n```\n\nTemplate: `{template_name}`\nStyle: `{}`\n",
+            style.as_str()
+        ),
+    )?;
     Ok(root)
 }
 

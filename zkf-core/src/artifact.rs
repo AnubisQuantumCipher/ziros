@@ -433,7 +433,7 @@ pub struct HybridProofBundle {
     pub replay_guard: Option<HybridReplayGuard>,
 }
 
-pub const PACKAGE_SCHEMA_VERSION: u32 = 4;
+pub const PACKAGE_SCHEMA_VERSION: u32 = 5;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct FrontendProvenance {
@@ -470,6 +470,14 @@ pub struct PackageFileRef {
 pub struct PackageFiles {
     pub program: PackageFileRef,
     pub original_artifact: PackageFileRef,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<PackageFileRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_map: Option<PackageFileRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub check_report: Option<PackageFileRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub obligations: Option<PackageFileRef>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub translation_report: Option<PackageFileRef>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -556,6 +564,10 @@ impl PackageManifest {
                     path: original_artifact_path.into(),
                     sha256: String::new(),
                 },
+                source: None,
+                source_map: None,
+                check_report: None,
+                obligations: None,
                 translation_report: None,
                 witness: None,
                 public_inputs: None,
@@ -660,14 +672,14 @@ mod tests {
     }
 
     #[test]
-    fn manifest_defaults_to_schema_v4() {
+    fn manifest_defaults_to_current_schema() {
         let manifest = PackageManifest::from_program(
             &sample_program(),
             FrontendProvenance::new("unit"),
             "program.json",
             "source.json",
         );
-        assert_eq!(manifest.schema_version, 4);
+        assert_eq!(manifest.schema_version, PACKAGE_SCHEMA_VERSION);
         assert!(manifest.files.replay_manifests.is_empty());
     }
 

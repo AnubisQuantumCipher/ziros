@@ -8,4 +8,6 @@ description = "Native Zir language parser, checker, and lowering frontend"
 
 [dependencies]
 serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
 zkf-core = { path = "../zkf-core" }

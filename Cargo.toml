@@ -22,6 +22,7 @@ members = [
   "zkf-wallet",
   "zkf-command-surface",
   "zkf-agent",
+  "zkf-lsp",
 ]
 exclude = [
   "vendor/ark-relations-patched",
@@ -83,6 +84,8 @@ toml = "0.8"
 serde_stacker = "0.1"
 stacker = "0.1"
 sha2 = "0.10"
+tokio = { version = "1.46.1", features = ["full"] }
+tower-lsp = "0.20"
 crossterm = "0.28"
 indicatif = "0.17"
 owo-colors = "4"
