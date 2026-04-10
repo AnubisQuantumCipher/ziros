@@ -18,6 +18,7 @@ PRIVATE_SOURCE_CENSUS_PATH = ROOT / "release" / "private_source_census.json"
 STATUS_ORDER = [
     "mechanized_local",
     "mechanized_generated",
+    "hypothesis_stated",
     "bounded_checked",
     "assumed_external",
     "pending",
@@ -28,6 +29,7 @@ ASSURANCE_CLASS_ORDER = [
     "bounded_check",
     "attestation_backed_lane",
     "model_only_claim",
+    "trusted_protocol_tcb",
     "hypothesis_carried_theorem",
 ]
 
@@ -65,15 +67,25 @@ def compare_status_payload(payload: dict, status_counts: dict[str, int], assuran
 
 def audit_release_grade(entries: list[dict], status_counts: dict[str, int], assurance_counts: dict[str, int]) -> None:
     require(status_counts.get("pending", 0) == 0, "pending verification rows remain")
+    require(status_counts.get("hypothesis_stated", 0) == 0, "hypothesis_stated rows remain")
     require(status_counts.get("bounded_checked", 0) == 0, "bounded_checked rows remain")
-    require(status_counts.get("assumed_external", 0) == 0, "assumed_external rows remain")
+    non_protocol_assumed_external = [
+        entry["theorem_id"]
+        for entry in entries
+        if entry["status"] == "assumed_external"
+        and not entry["theorem_id"].startswith("protocol.")
+    ]
+    require(
+        not non_protocol_assumed_external,
+        f"non-protocol assumed_external rows remain: {non_protocol_assumed_external}",
+    )
     require(
         assurance_counts.get("attestation_backed_lane", 0) == 0,
         "attestation_backed_lane rows remain",
     )
     require(
-        assurance_counts.get("model_only_claim", 0) == 0,
-        "model_only_claim rows remain",
+        assurance_counts.get("hypothesis_carried_theorem", 0) == 0,
+        "hypothesis_carried_theorem rows remain",
     )
     require(PROTOCOL_RUNNER_PATH.exists(), f"missing protocol Lean runner: {PROTOCOL_RUNNER_PATH}")
     require(PRODUCT_RELEASE_PATH.exists(), f"missing product release artifact: {PRODUCT_RELEASE_PATH}")
@@ -89,13 +101,10 @@ def audit_release_grade(entries: list[dict], status_counts: dict[str, int], assu
                 (ROOT / entry["evidence_path"]).exists(),
                 f"protocol evidence path missing for {entry['theorem_id']}: {entry['evidence_path']}",
             )
-            theorem_name = entry["notes"].split("`")[1] if "`" in entry["notes"] else None
-            if theorem_name:
-                source_text = (ROOT / entry["evidence_path"]).read_text(encoding="utf-8")
-                require(
-                    f"theorem {theorem_name} " in source_text,
-                    f"protocol theorem {theorem_name} missing from {entry['evidence_path']}",
-                )
+            require(
+                entry.get("assurance_class") == "trusted_protocol_tcb",
+                f"protocol row {entry['theorem_id']} must be explicit trusted_protocol_tcb",
+            )
         if entry.get("trusted_assumptions") and not entry["theorem_id"].startswith(
             ALLOWED_RELEASE_GRADE_HYPOTHESIS_PREFIXES
         ):

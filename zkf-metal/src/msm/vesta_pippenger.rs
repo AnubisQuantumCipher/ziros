@@ -1,23 +1,23 @@
 //! GPU-accelerated Pippenger MSM dispatch for Vesta curve.
 //!
 //! Mirrors the BN254 Pippenger pipeline in `pippenger.rs`, adapted for
-//! `pasta_curves` Vesta types and the Vesta Fq Metal shader.
+//! halo2curves Vesta types and the Vesta Fq Metal shader.
 
 use crate::async_dispatch::GpuFuture;
 use crate::device::MetalContext;
 use crate::launch_contracts::{self, CurveFamily, MsmContractInput, MsmRouteClass};
 use crate::msm::vesta;
+use halo2curves::group::Group;
+use halo2curves::pasta::{Fp, Vesta, VestaAffine};
 use objc2_metal::{
     MTLCommandBuffer, MTLCommandEncoder, MTLComputeCommandEncoder, MTLComputePipelineState, MTLSize,
 };
-use pasta_curves::group::Group;
-use pasta_curves::{Eq, EqAffine, Fp};
 use std::ptr::NonNull;
 
 /// Execute Pippenger MSM on Metal GPU for Vesta curve.
 ///
 /// For inputs below the GPU threshold, returns `None` to signal CPU fallback.
-pub fn metal_vesta_msm(ctx: &MetalContext, scalars: &[Fp], bases: &[EqAffine]) -> Option<Eq> {
+pub fn metal_vesta_msm(ctx: &MetalContext, scalars: &[Fp], bases: &[VestaAffine]) -> Option<Vesta> {
     let n = scalars.len();
     let threshold = crate::tuning::current_thresholds().msm;
     if n != bases.len() || n < threshold {
@@ -182,14 +182,14 @@ pub fn metal_vesta_msm(ctx: &MetalContext, scalars: &[Fp], bases: &[EqAffine]) -
     // --- Phase 3: Read results and do bucket reduction + window combination (CPU) ---
     let bucket_data: Vec<u64> = ctx.read_buffer(&bucket_buf, bucket_result_size);
 
-    let mut window_results: Vec<Eq> = Vec::with_capacity(num_windows as usize);
+    let mut window_results: Vec<Vesta> = Vec::with_capacity(num_windows as usize);
 
     for w in 0..num_windows as usize {
-        let mut buckets: Vec<Eq> = Vec::with_capacity(num_buckets);
+        let mut buckets: Vec<Vesta> = Vec::with_capacity(num_buckets);
         for b in 0..num_buckets {
             let offset = (w * num_buckets + b) * 12;
             let proj = vesta::gpu_proj_to_vesta(&bucket_data[offset..offset + 12])
-                .unwrap_or_else(Eq::identity);
+                .unwrap_or_else(Vesta::identity);
             buckets.push(proj);
         }
         window_results.push(vesta::bucket_reduce_window(&buckets));
@@ -202,7 +202,11 @@ pub fn metal_vesta_msm(ctx: &MetalContext, scalars: &[Fp], bases: &[EqAffine]) -
 ///
 /// Halved bucket count via signed-digit NAF encoding.
 /// Point negation on Vesta: negate Y coordinate (same as BN254 pattern).
-pub fn metal_vesta_msm_naf(ctx: &MetalContext, scalars: &[Fp], bases: &[EqAffine]) -> Option<Eq> {
+pub fn metal_vesta_msm_naf(
+    ctx: &MetalContext,
+    scalars: &[Fp],
+    bases: &[VestaAffine],
+) -> Option<Vesta> {
     let n = scalars.len();
     let threshold = crate::tuning::current_thresholds().msm;
     if n != bases.len() || n < threshold {
@@ -318,14 +322,14 @@ pub fn metal_vesta_msm_naf(ctx: &MetalContext, scalars: &[Fp], bases: &[EqAffine
 
     // Read and reduce
     let bucket_data: Vec<u64> = ctx.read_buffer(&bucket_buf, bucket_result_size);
-    let mut window_results: Vec<Eq> = Vec::with_capacity(num_windows as usize);
+    let mut window_results: Vec<Vesta> = Vec::with_capacity(num_windows as usize);
 
     for w in 0..num_windows as usize {
-        let mut buckets: Vec<Eq> = Vec::with_capacity(num_buckets);
+        let mut buckets: Vec<Vesta> = Vec::with_capacity(num_buckets);
         for b in 0..num_buckets {
             let offset = (w * num_buckets + b) * 12;
             let proj = vesta::gpu_proj_to_vesta(&bucket_data[offset..offset + 12])
-                .unwrap_or_else(Eq::identity);
+                .unwrap_or_else(Vesta::identity);
             buckets.push(proj);
         }
         window_results.push(vesta::bucket_reduce_window(&buckets));
@@ -348,21 +352,21 @@ fn optimal_window_size_naf(n: usize) -> u32 {
 }
 
 /// CPU Pippenger implementation for Vesta (reference + fallback).
-pub fn cpu_vesta_pippenger(scalars: &[Fp], bases: &[EqAffine]) -> Eq {
+pub fn cpu_vesta_pippenger(scalars: &[Fp], bases: &[VestaAffine]) -> Vesta {
     let c = optimal_window_size(scalars.len());
     let num_windows = vesta::num_windows(c);
     let num_buckets = vesta::num_buckets(c) as usize;
 
-    let mut window_results: Vec<Eq> = Vec::with_capacity(num_windows as usize);
+    let mut window_results: Vec<Vesta> = Vec::with_capacity(num_windows as usize);
 
     for w in 0..num_windows {
-        let mut buckets = vec![Eq::identity(); num_buckets];
+        let mut buckets = vec![Vesta::identity(); num_buckets];
 
         for (scalar, base) in scalars.iter().zip(bases.iter()) {
             let limbs = vesta::scalar_to_limbs(scalar);
             let bucket_idx = extract_window(&limbs, w, c) as usize;
             if bucket_idx != 0 {
-                buckets[bucket_idx] += Eq::from(*base);
+                buckets[bucket_idx] += Vesta::from(*base);
             }
         }
 
@@ -377,7 +381,7 @@ pub fn cpu_vesta_pippenger(scalars: &[Fp], bases: &[EqAffine]) -> Eq {
 /// This is the entry point Halo2 will call once its `best_multiexp` path is patched.
 /// Prefers NAF path (halved buckets), falls back to standard if NAF kernel unavailable.
 /// Returns `Some(result)` if GPU acceleration succeeded, `None` to fall back to CPU.
-pub fn try_metal_vesta_msm(scalars: &[Fp], bases: &[EqAffine]) -> Option<Eq> {
+pub fn try_metal_vesta_msm(scalars: &[Fp], bases: &[VestaAffine]) -> Option<Vesta> {
     let ctx = crate::device::global_context()?;
     metal_vesta_msm_naf(ctx, scalars, bases).or_else(|| metal_vesta_msm(ctx, scalars, bases))
 }
@@ -414,9 +418,9 @@ fn extract_window(limbs: &[u64; 4], window_idx: u32, c: u32) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ff::Field;
-    use pasta_curves::group::{Curve, Group};
-    use pasta_curves::{Eq, Fp};
+    use halo2curves::ff::Field;
+    use halo2curves::group::{Curve, Group};
+    use halo2curves::pasta::{Fp, Vesta};
     use rand::{
         SeedableRng,
         rngs::{OsRng, StdRng},
@@ -426,14 +430,14 @@ mod tests {
     fn cpu_vesta_pippenger_small() {
         let n = 64;
         let scalars: Vec<Fp> = (0..n).map(|_| Fp::random(OsRng)).collect();
-        let bases: Vec<EqAffine> = (0..n).map(|_| Eq::random(OsRng).to_affine()).collect();
+        let bases: Vec<VestaAffine> = (0..n).map(|_| Vesta::random(OsRng).to_affine()).collect();
 
         // Naive MSM for reference
-        let expected: Eq = scalars
+        let expected: Vesta = scalars
             .iter()
             .zip(bases.iter())
-            .map(|(s, b)| Eq::from(*b) * s)
-            .fold(Eq::identity(), |acc, p| acc + p);
+            .map(|(s, b)| Vesta::from(*b) * s)
+            .fold(Vesta::identity(), |acc, p| acc + p);
 
         let result = cpu_vesta_pippenger(&scalars, &bases);
         assert_eq!(
@@ -456,7 +460,7 @@ mod tests {
         let threshold = crate::tuning::current_thresholds().msm;
         let n = threshold;
         let scalars: Vec<Fp> = (0..n).map(|_| Fp::random(OsRng)).collect();
-        let bases: Vec<EqAffine> = (0..n).map(|_| Eq::random(OsRng).to_affine()).collect();
+        let bases: Vec<VestaAffine> = (0..n).map(|_| Vesta::random(OsRng).to_affine()).collect();
 
         let cpu_result = cpu_vesta_pippenger(&scalars, &bases);
         let gpu_result = metal_vesta_msm(ctx, &scalars, &bases);
@@ -489,12 +493,13 @@ mod tests {
         let threshold = crate::tuning::current_thresholds().msm;
         let n = threshold;
         let mut scalars: Vec<Fp> = (0..n).map(|_| Fp::random(OsRng)).collect();
-        let mut bases: Vec<EqAffine> = (0..n).map(|_| Eq::random(OsRng).to_affine()).collect();
+        let mut bases: Vec<VestaAffine> =
+            (0..n).map(|_| Vesta::random(OsRng).to_affine()).collect();
 
         // Inject identity points at various positions
         for i in [0, 10, n / 2, n - 1] {
             if i < n {
-                bases[i] = Eq::identity().to_affine();
+                bases[i] = Vesta::identity().to_affine();
                 scalars[i] = Fp::ZERO;
             }
         }
@@ -532,11 +537,12 @@ mod tests {
             let mut rng = StdRng::seed_from_u64(seed);
             let n = threshold + ((seed as usize) & 7);
             let mut scalars: Vec<Fp> = (0..n).map(|_| Fp::random(&mut rng)).collect();
-            let mut bases: Vec<EqAffine> =
-                (0..n).map(|_| Eq::random(&mut rng).to_affine()).collect();
+            let mut bases: Vec<VestaAffine> = (0..n)
+                .map(|_| Vesta::random(&mut rng).to_affine())
+                .collect();
 
             if n >= 4 {
-                bases[seed as usize % n] = Eq::identity().to_affine();
+                bases[seed as usize % n] = Vesta::identity().to_affine();
                 scalars[(seed as usize + 1) % n] = Fp::ZERO;
             }
 

@@ -9,16 +9,16 @@ use super::{
     claims_truth_settlement_binding_witness_from_inputs, flatten_private_inputs,
     private_claims_truth_sample_inputs,
 };
-use crate::app::audit::audit_program_default;
 use crate::app::api::{compile, prove, verify};
+use crate::app::audit::audit_program_default;
+#[cfg(test)]
+use crate::app::evidence::read_json;
 use crate::app::evidence::{
     collect_formal_evidence_for_generated_app, generated_app_closure_bundle_summary,
     hash_json_value, json_pretty, load_generated_implementation_closure_summary, sha256_hex,
     sync_generated_truth_documents, write_json, write_text,
 };
 use crate::app::verifier::export_groth16_solidity_verifier;
-#[cfg(test)]
-use crate::app::evidence::read_json;
 use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -31,7 +31,7 @@ use zkf_backends::{
     with_proof_seed_override, with_setup_seed_override,
 };
 use zkf_core::{
-    BackendKind, CompiledProgram, FieldId, ProofArtifact, Program, Witness, ZkfError, ZkfResult,
+    BackendKind, CompiledProgram, FieldId, Program, ProofArtifact, Witness, ZkfError, ZkfResult,
     check_constraints,
 };
 use zkf_runtime::{
@@ -155,7 +155,10 @@ fn bigint_string(value: &num_bigint::BigInt) -> String {
 }
 
 fn bytes_hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>()
+    bytes
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>()
 }
 
 fn render_public_outputs(
@@ -250,8 +253,8 @@ fn direct_compile_and_prove(
     Ok((compiled, artifact))
 }
 
-pub fn run_private_claims_truth_hypernova_diagnostics(
-) -> ZkfResult<PrivateClaimsTruthHypernovaDiagnosticReport> {
+pub fn run_private_claims_truth_hypernova_diagnostics()
+-> ZkfResult<PrivateClaimsTruthHypernovaDiagnosticReport> {
     let request = private_claims_truth_sample_inputs();
     let program = build_claim_decision_core_program()?;
     let (witness, _) = claims_truth_claim_decision_witness_from_inputs(&request)?;
@@ -323,7 +326,11 @@ fn runtime_prove_core(
     }
     let typed_inputs = flatten_private_inputs(inputs)?;
     let compiled = with_setup_seed_override(Some(SETUP_SEED), || {
-        compile(program, &config.primary_backend.requested_name, Some(SETUP_SEED))
+        compile(
+            program,
+            &config.primary_backend.requested_name,
+            Some(SETUP_SEED),
+        )
     })?;
     let prepared = prepare_witness_for_proving(&compiled, witness)?;
     check_constraints(&compiled.program, &prepared)?;
@@ -356,7 +363,9 @@ fn runtime_report_json(
         .as_ref()
         .map(serde_json::to_value)
         .transpose()
-        .map_err(|error| ZkfError::Serialization(format!("serialize control-plane summary: {error}")))?;
+        .map_err(|error| {
+            ZkfError::Serialization(format!("serialize control-plane summary: {error}"))
+        })?;
     let security = execution
         .result
         .security
@@ -372,6 +381,7 @@ fn runtime_report_json(
         .as_ref()
         .map(|summary| summary.realized_gpu_capable_stages.clone())
         .unwrap_or_default();
+    let realized_gpu_stage_coverage = realized_gpu_capable_stages.len();
     let metal_available = execution
         .result
         .control_plane
@@ -401,7 +411,8 @@ fn runtime_report_json(
         "security": security,
         "metal_available": metal_available,
         "realized_gpu_capable_stages": realized_gpu_capable_stages,
-        "actual_gpu_stage_coverage": execution.result.report.gpu_nodes,
+        "actual_gpu_stage_coverage": realized_gpu_stage_coverage,
+        "direct_runtime_gpu_node_count": execution.result.report.gpu_nodes,
         "actual_cpu_stage_coverage": execution.result.report.cpu_nodes,
         "actual_fallback_count": execution.result.report.fallback_nodes,
         "deterministic_seed_capture": {
@@ -470,8 +481,9 @@ fn midnight_flow_typescript(entries: &[MidnightFlowCallEntry]) -> ZkfResult<Stri
     for entry in entries {
         flows.insert(entry.call_id.clone(), entry.inputs.clone());
     }
-    let rendered = serde_json::to_string_pretty(&Value::Object(flows))
-        .map_err(|error| ZkfError::Serialization(format!("serialize claims flow surface: {error}")))?;
+    let rendered = serde_json::to_string_pretty(&Value::Object(flows)).map_err(|error| {
+        ZkfError::Serialization(format!("serialize claims flow surface: {error}"))
+    })?;
     Ok(format!(
         "export const CLAIMS_TRUTH_SETTLEMENT_FLOW = {rendered} as const;\n"
     ))
@@ -716,9 +728,8 @@ fn write_recursive_manifest(root: &Path) -> ZkfResult<Value> {
         for entry in fs::read_dir(current)
             .map_err(|error| ZkfError::Io(format!("read_dir {}: {error}", current.display())))?
         {
-            let entry = entry.map_err(|error| {
-                ZkfError::Io(format!("walk {}: {error}", current.display()))
-            })?;
+            let entry = entry
+                .map_err(|error| ZkfError::Io(format!("walk {}: {error}", current.display())))?;
             let path = entry.path();
             if path.is_dir() {
                 visit(root, &path, entries)?;
@@ -929,12 +940,30 @@ fn build_engineering_report(
 
     report.push_str("## Midnight Contribution\n\n");
     let midnight_contracts = [
-        ("claim_registration", "binds the public decision registration event to the on-chain settlement lifecycle without disclosing raw claimant evidence"),
-        ("settlement_authorization", "binds the payout, reserve, and settlement finality flag to the attested decision state"),
-        ("dispute_hold", "captures investigation or dispute holds as explicit public state transitions"),
-        ("disclosure_access", "anchors the role-coded disclosure commitment and makes selective disclosure auditable"),
-        ("reinsurer_release", "captures reinsurer participation and release commitments"),
-        ("claimant_receipt", "lets the claimant acknowledge the payment instruction without revealing unnecessary claim state"),
+        (
+            "claim_registration",
+            "binds the public decision registration event to the on-chain settlement lifecycle without disclosing raw claimant evidence",
+        ),
+        (
+            "settlement_authorization",
+            "binds the payout, reserve, and settlement finality flag to the attested decision state",
+        ),
+        (
+            "dispute_hold",
+            "captures investigation or dispute holds as explicit public state transitions",
+        ),
+        (
+            "disclosure_access",
+            "anchors the role-coded disclosure commitment and makes selective disclosure auditable",
+        ),
+        (
+            "reinsurer_release",
+            "captures reinsurer participation and release commitments",
+        ),
+        (
+            "claimant_receipt",
+            "lets the claimant acknowledge the payment instruction without revealing unnecessary claim state",
+        ),
     ];
     for (name, explanation) in midnight_contracts {
         report.push_str(&format!(
@@ -957,9 +986,18 @@ fn build_engineering_report(
     report.push_str("## Artifact Inventory\n\n");
     if let Some(entries) = evidence_manifest.get("entries").and_then(Value::as_array) {
         for entry in entries.iter().take(80) {
-            let path = entry.get("path").and_then(Value::as_str).unwrap_or_default();
-            let digest = entry.get("sha256").and_then(Value::as_str).unwrap_or_default();
-            let size = entry.get("size_bytes").and_then(Value::as_u64).unwrap_or_default();
+            let path = entry
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let digest = entry
+                .get("sha256")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let size = entry
+                .get("size_bytes")
+                .and_then(Value::as_u64)
+                .unwrap_or_default();
             report.push_str(&format!(
                 "Artifact `{path}` is shipped with SHA-256 `{digest}` and byte size `{size}`. This matters operationally because release integrity is only meaningful when every emitted object is digest-addressable and included in the evidence summary.\n\n"
             ));
@@ -1057,7 +1095,10 @@ fn build_engineering_report(
             ));
         }
         for entry in appendix_artifacts.iter().take(30) {
-            let path = entry.get("path").and_then(Value::as_str).unwrap_or_default();
+            let path = entry
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             report.push_str(&format!(
                 "Appendix artifact note for `{path}`: this file participates in the release bundle because serious deployments require operators to inspect, hash, archive, and compare every emitted object. The claims subsystem therefore treats the artifact manifest as part of the product, not as ancillary build noise.\n\n"
             ));
@@ -1091,10 +1132,19 @@ fn summary_markdown(
         public_outputs.human_review_required,
         public_outputs.eligible_for_midnight_settlement,
         public_outputs.proof_verification_result,
-        telemetry_report["backend_selected"].as_str().unwrap_or("unknown"),
-        telemetry_report["graph_execution_report"]["gpu_nodes"].as_u64().unwrap_or_default(),
-        telemetry_report["graph_execution_report"]["cpu_nodes"].as_u64().unwrap_or_default(),
-        evidence_manifest["entries"].as_array().map(Vec::len).unwrap_or_default(),
+        telemetry_report["backend_selected"]
+            .as_str()
+            .unwrap_or("unknown"),
+        telemetry_report["graph_execution_report"]["gpu_nodes"]
+            .as_u64()
+            .unwrap_or_default(),
+        telemetry_report["graph_execution_report"]["cpu_nodes"]
+            .as_u64()
+            .unwrap_or_default(),
+        evidence_manifest["entries"]
+            .as_array()
+            .map(Vec::len)
+            .unwrap_or_default(),
     )
 }
 
@@ -1139,7 +1189,8 @@ pub fn run_private_claims_truth_export(
         });
     let core_audit = audit_program_default(&core_program, Some(config.primary_backend.backend));
     let core_started = Instant::now();
-    let (core_witness, core_computation) = claims_truth_claim_decision_witness_from_inputs(&request)?;
+    let (core_witness, core_computation) =
+        claims_truth_claim_decision_witness_from_inputs(&request)?;
     let (core_compiled, core_artifact, telemetry_report) = match config.profile {
         PrivateClaimsTruthExportProfile::Flagship => {
             let execution = runtime_prove_core(&config, &core_program, &request, &core_witness)?;
@@ -1193,11 +1244,8 @@ pub fn run_private_claims_truth_export(
         audit_program_default(&settlement_program, Some(config.primary_backend.backend));
     let (settlement_witness, settlement_computation) =
         claims_truth_settlement_binding_witness_from_inputs(&request, &core_computation)?;
-    let (settlement_compiled, settlement_artifact) = direct_compile_and_prove(
-        &settlement_program,
-        &settlement_witness,
-        proof_backend_name,
-    )?;
+    let (settlement_compiled, settlement_artifact) =
+        direct_compile_and_prove(&settlement_program, &settlement_witness, proof_backend_name)?;
     let settlement_verified = verify(&settlement_compiled, &settlement_artifact)?;
     let settlement_ms = settlement_started.elapsed().as_secs_f64() * 1000.0;
     if !settlement_verified {
@@ -1235,11 +1283,8 @@ pub fn run_private_claims_truth_export(
                 &core_computation,
                 role_code,
             )?;
-        let (compiled, artifact) = direct_compile_and_prove(
-            &disclosure_program,
-            &disclosure_witness,
-            proof_backend_name,
-        )?;
+        let (compiled, artifact) =
+            direct_compile_and_prove(&disclosure_program, &disclosure_witness, proof_backend_name)?;
         let verified = verify(&compiled, &artifact)?;
         if !verified {
             return Err(ZkfError::Backend(format!(
@@ -1313,11 +1358,8 @@ pub fn run_private_claims_truth_export(
     ];
     let (shard_witness, shard_computation) =
         claims_truth_batch_shard_handoff_witness_from_commitments(&shard_commitments)?;
-    let (shard_compiled, shard_artifact) = direct_compile_and_prove(
-        &shard_program,
-        &shard_witness,
-        proof_backend_name,
-    )?;
+    let (shard_compiled, shard_artifact) =
+        direct_compile_and_prove(&shard_program, &shard_witness, proof_backend_name)?;
     let shard_verified = verify(&shard_compiled, &shard_artifact)?;
     let shard_ms = shard_started.elapsed().as_secs_f64() * 1000.0;
     if !shard_verified {
@@ -1337,18 +1379,17 @@ pub fn run_private_claims_truth_export(
 
     let compatibility_export_ms = if let Some(compatibility_backend) = compatibility_backend {
         let compat_started = Instant::now();
-        let (compat_compiled, compat_artifact) = if matches!(
-            config.profile,
-            PrivateClaimsTruthExportProfile::Smoke
-        ) {
-            (core_compiled.clone(), core_artifact.clone())
-        } else {
-            direct_compile_and_prove(&core_program, &core_witness, compatibility_backend)?
-        };
+        let (compat_compiled, compat_artifact) =
+            if matches!(config.profile, PrivateClaimsTruthExportProfile::Smoke) {
+                (core_compiled.clone(), core_artifact.clone())
+            } else {
+                direct_compile_and_prove(&core_program, &core_witness, compatibility_backend)?
+            };
         let compat_verified = verify(&compat_compiled, &compat_artifact)?;
         if !compat_verified {
             return Err(ZkfError::Backend(
-                "claims compatibility verifier export proof verification returned false".to_string(),
+                "claims compatibility verifier export proof verification returned false"
+                    .to_string(),
             ));
         }
         let compat_program_path = config
@@ -1365,10 +1406,8 @@ pub fn run_private_claims_truth_export(
         write_json(&compat_program_path, &core_program)?;
         write_json(&compat_compiled_path, &compat_compiled)?;
         write_json(&compat_proof_path, &compat_artifact)?;
-        let solidity = export_groth16_solidity_verifier(
-            &compat_artifact,
-            Some("ClaimsTruthVerifier"),
-        )?;
+        let solidity =
+            export_groth16_solidity_verifier(&compat_artifact, Some("ClaimsTruthVerifier"))?;
         let solidity_dir = config.out_dir.join("solidity");
         ensure_dir(&solidity_dir)?;
         write_text(&solidity_dir.join("ClaimsTruthVerifier.sol"), &solidity)?;
@@ -1404,7 +1443,10 @@ pub fn run_private_claims_truth_export(
         "generated_app_closure": generated_app_closure_bundle_summary(APP_ID)?,
         "implementation_closure_summary": load_generated_implementation_closure_summary()?,
     });
-    write_json(&config.out_dir.join("closure_artifacts.json"), &closure_artifacts)?;
+    write_json(
+        &config.out_dir.join("closure_artifacts.json"),
+        &closure_artifacts,
+    )?;
 
     let translation_report = translation_report_json(
         core_program.field.as_str(),
@@ -1414,7 +1456,9 @@ pub fn run_private_claims_truth_export(
         &midnight_manifest,
     );
     write_json(
-        &config.out_dir.join("private_claims_truth.translation_report.json"),
+        &config
+            .out_dir
+            .join("private_claims_truth.translation_report.json"),
         &translation_report,
     )?;
 
@@ -1428,15 +1472,15 @@ pub fn run_private_claims_truth_export(
         compatibility_export_ms,
     };
     let run_report = json!({
-        "schema": "claims-truth-run-report-v1",
-        "application": APP_ID,
-        "profile": config.profile.as_str(),
-        "primary_backend": config.primary_backend.requested_name,
-        "effective_core_backend": core_compiled.backend.as_str(),
-        "lane_classification": lane_classification,
-        "distributed_mode_requested": config.distributed_mode_requested,
-            "timings_ms": &timing_summary,
-        });
+    "schema": "claims-truth-run-report-v1",
+    "application": APP_ID,
+    "profile": config.profile.as_str(),
+    "primary_backend": config.primary_backend.requested_name,
+    "effective_core_backend": core_compiled.backend.as_str(),
+    "lane_classification": lane_classification,
+    "distributed_mode_requested": config.distributed_mode_requested,
+        "timings_ms": &timing_summary,
+    });
     write_json(
         &config.out_dir.join("private_claims_truth.run_report.json"),
         &run_report,
@@ -1445,7 +1489,9 @@ pub fn run_private_claims_truth_export(
     let (_, formal_evidence) = collect_formal_evidence_for_generated_app(&config.out_dir, APP_ID)?;
     let evidence_manifest = write_recursive_manifest(&config.out_dir)?;
     write_json(
-        &config.out_dir.join("private_claims_truth.evidence_summary.json"),
+        &config
+            .out_dir
+            .join("private_claims_truth.evidence_summary.json"),
         &json!({
             "schema": "claims-truth-evidence-summary-v1",
             "formal": formal_evidence,
@@ -1453,12 +1499,12 @@ pub fn run_private_claims_truth_export(
         }),
     )?;
     let deterministic_manifest = json!({
-        "schema": "claims-truth-deterministic-manifest-v1",
-            "setup_seed_hex": bytes_hex(&SETUP_SEED),
-            "proof_seed_hex": bytes_hex(&PROOF_SEED),
-            "public_outputs_hash": hash_json_value(&serde_json::to_value(&public_outputs).map_err(|error| ZkfError::Serialization(format!("serialize public outputs: {error}")) )?)?,
-            "run_report_hash": hash_json_value(&run_report)?,
-        });
+    "schema": "claims-truth-deterministic-manifest-v1",
+        "setup_seed_hex": bytes_hex(&SETUP_SEED),
+        "proof_seed_hex": bytes_hex(&PROOF_SEED),
+        "public_outputs_hash": hash_json_value(&serde_json::to_value(&public_outputs).map_err(|error| ZkfError::Serialization(format!("serialize public outputs: {error}")) )?)?,
+        "run_report_hash": hash_json_value(&run_report)?,
+    });
     write_json(
         &config.out_dir.join("deterministic_manifest.json"),
         &deterministic_manifest,
@@ -1559,9 +1605,10 @@ mod export_tests {
         roles
             .into_iter()
             .map(|(role_code, role_name)| {
-                let (_, disclosure) =
-                    claims_truth_disclosure_projection_witness_from_inputs(request, core, role_code)
-                        .expect("disclosure");
+                let (_, disclosure) = claims_truth_disclosure_projection_witness_from_inputs(
+                    request, core, role_code,
+                )
+                .expect("disclosure");
                 DisclosureBundleEntry {
                     role_code,
                     role_name: role_name.to_string(),
@@ -1581,18 +1628,17 @@ mod export_tests {
     fn midnight_contract_package_uses_field_commitments_and_complete_flows() {
         let request = private_claims_truth_sample_inputs();
         let (_, core) = claims_truth_claim_decision_witness_from_inputs(&request).expect("core");
-        let (_, settlement) =
-            claims_truth_settlement_binding_witness_from_inputs(&request, &core).expect("settlement");
+        let (_, settlement) = claims_truth_settlement_binding_witness_from_inputs(&request, &core)
+            .expect("settlement");
         let disclosures = sample_disclosure_entries(&request, &core);
         let root = tempfile::tempdir().expect("tempdir");
 
         write_midnight_contract_package(root.path(), &core, &settlement, &disclosures)
             .expect("package");
 
-        let claim_registration = fs::read_to_string(
-            root.path()
-                .join("midnight_package/claims-truth-settlement/contracts/compact/claim_registration.compact"),
-        )
+        let claim_registration = fs::read_to_string(root.path().join(
+            "midnight_package/claims-truth-settlement/contracts/compact/claim_registration.compact",
+        ))
         .expect("claim_registration");
         assert!(claim_registration.contains("export ledger claim_packet_commitment: Field;"));
         assert!(!claim_registration.contains("Uint<64>"));
@@ -1606,7 +1652,8 @@ mod export_tests {
         assert!(settlement_authorization.contains("witness reserveCommitment(): Field;"));
 
         let flow_manifest: Value = read_json(
-            &root.path()
+            &root
+                .path()
                 .join("midnight_package/claims-truth-settlement/flow_manifest.json"),
         )
         .expect("flow manifest");
@@ -1627,7 +1674,9 @@ mod export_tests {
 
         let authorize = calls
             .iter()
-            .find(|entry| entry.get("call_id").and_then(Value::as_str) == Some("authorize_settlement"))
+            .find(|entry| {
+                entry.get("call_id").and_then(Value::as_str) == Some("authorize_settlement")
+            })
             .expect("authorize call");
         assert!(authorize["inputs"].get("payoutCommitment").is_some());
         assert!(authorize["inputs"].get("reserveCommitment").is_some());
@@ -1636,8 +1685,7 @@ mod export_tests {
         let hold = calls
             .iter()
             .find(|entry| {
-                entry.get("call_id").and_then(Value::as_str)
-                    == Some("place_investigation_hold")
+                entry.get("call_id").and_then(Value::as_str) == Some("place_investigation_hold")
             })
             .expect("hold call");
         assert!(hold["inputs"].get("holdActive").is_some());

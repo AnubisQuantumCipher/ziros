@@ -6,16 +6,26 @@ artifact_root="${1:-$repo_root/dist/showcases/private_trade_finance_settlement}"
 subsystem_root="${2:-$repo_root/dist/subsystems/private_trade_finance_settlement}"
 profile="${3:-flagship}"
 
+canonicalize_target_path() {
+  local target="$1"
+  mkdir -p "$(dirname "$target")"
+  printf '%s/%s\n' "$(cd "$(dirname "$target")" && pwd -L)" "$(basename "$target")"
+}
+
+artifact_root="$(canonicalize_target_path "$artifact_root")"
+subsystem_root="$(canonicalize_target_path "$subsystem_root")"
+
 mkdir -p "$(dirname "$artifact_root")" "$(dirname "$subsystem_root")"
 
 echo "[trade-finance-subsystem] exporting finished showcase bundle into $artifact_root" >&2
 env ZKF_PRIVATE_TRADE_FINANCE_SETTLEMENT_PROFILE="$profile" \
-  cargo run --release -p zkf-lib --example private_trade_finance_settlement_showcase -- "$artifact_root"
+  cargo run --release -p zkf-lib --features metal-gpu --example private_trade_finance_settlement_showcase -- "$artifact_root"
 
 echo "[trade-finance-subsystem] validating Midnight contract package into $artifact_root/midnight_validation" >&2
-bash "$repo_root/scripts/validate_private_trade_finance_midnight_contracts.sh" "$artifact_root" preprod
+bash "$repo_root/scripts/validate_private_trade_finance_midnight_contracts.sh" "$artifact_root" preview
 
 echo "[trade-finance-subsystem] scaffolding subsystem shell into $subsystem_root" >&2
+rm -rf "$subsystem_root"
 cargo run -p zkf-cli -- subsystem scaffold \
   --name private-trade-finance-and-settlement \
   --style full \
@@ -44,6 +54,9 @@ cp "$artifact_root/public_outputs.json" "$subsystem_root/03_inputs/public_output
 cp "$artifact_root/witness_summary.json" "$subsystem_root/17_report/witness_summary.json"
 cp "$artifact_root/private_trade_finance_settlement.run_report.json" "$subsystem_root/17_report/run_report.json"
 cp "$artifact_root/private_trade_finance_settlement.translation_report.json" "$subsystem_root/17_report/translation_report.json"
+cp "$artifact_root/private_trade_finance_settlement.compiled_digest_linkage.json" "$subsystem_root/17_report/compiled_digest_linkage.json"
+cp "$artifact_root/private_trade_finance_settlement.poseidon_binding_report.json" "$subsystem_root/17_report/poseidon_binding_report.json"
+cp "$artifact_root/private_trade_finance_settlement.disclosure_noninterference_report.json" "$subsystem_root/17_report/disclosure_noninterference_report.json"
 cp "$artifact_root/telemetry/private_trade_finance_settlement.telemetry_report.json" "$subsystem_root/17_report/telemetry_report.json"
 cp "$artifact_root/private_trade_finance_settlement.evidence_summary.json" "$subsystem_root/17_report/evidence_summary.json"
 cp "$artifact_root/private_trade_finance_settlement.summary.json" "$subsystem_root/17_report/summary.json"
@@ -106,9 +119,10 @@ cat > "$subsystem_root/06_docs/disclosure_policy.md" <<'EOF'
 # Disclosure Policy
 
 - Raw supplier, buyer, invoice, and financing-policy identifying information remains private and is not exported into the subsystem bundle.
-- External OCR, telematics, photo-analysis, vendor, and authority inputs are digest-bound rather than publicly disclosed.
+- External OCR, logistics-event, photo-analysis, vendor, and buyer-approval inputs are digest-bound rather than publicly disclosed.
 - Denials and high-risk actions preserve a public `human_review_required` flag.
-- Midnight package sources are emitted for preprod integration, but live deployment still requires separate operator wallet and network readiness checks.
+- Disclosure access is bound to a role, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure authorization commitment.
+- Midnight package sources are emitted for preview integration, but live deployment still requires separate operator wallet and network readiness checks.
 EOF
 
 verifier_exists="false"
@@ -214,6 +228,7 @@ manifest["circuit_modules"] = [
         "guaranteed_primitives": [
             "role-selector",
             "selective-disclosure-binding",
+            "credential-authorization-binding",
         ],
     },
     {
@@ -284,12 +299,12 @@ manifest["disclosure_policy"] = {
     "public_inputs_documented": True,
     "notes": [
         "Rejections and high-risk actions preserve human review.",
-        "Midnight package is emitted for preprod integration and requires separate operator readiness.",
+        "Midnight package is emitted for preview integration and requires separate operator readiness.",
     ],
 }
 manifest["deployment_profile"] = {
     "primary_chain": "midnight",
-    "primary_network": "preprod-emitted",
+    "primary_network": "preview-emitted",
     "supports_live_deploy": False,
     "explorer_expected": False,
     "secondary_targets": ["runtime-hypernova"] + (["evm-verifier-export"] if verifier_exists else []),
@@ -323,14 +338,32 @@ if [[ -f "$artifact_root/solidity/TradeFinanceVerifier.sol" ]]; then
   cp "$artifact_root/solidity/TradeFinanceVerifier.sol" "$subsystem_root/15_solidity/TradeFinanceVerifier.sol"
 fi
 
+echo "[trade-finance-subsystem] post-processing subsystem package for reviewer-safe portability" >&2
+python3 "$repo_root/scripts/postprocess_private_trade_finance_settlement_subsystem.py" \
+  "$repo_root" \
+  "$artifact_root" \
+  "$subsystem_root" > /dev/null
+
+echo "[trade-finance-subsystem] re-signing subsystem credential after post-processing" >&2
+cargo run -q -p zkf-cli --example resign_subsystem_credential -- "$subsystem_root" > /dev/null
+
 echo "[trade-finance-subsystem] verifying subsystem completeness" >&2
-cargo run -p zkf-cli -- subsystem verify-completeness \
+"$repo_root/target-public/debug/zkf-cli" subsystem verify-completeness \
   --root "$subsystem_root" \
   --json > "$subsystem_root/17_report/verify-completeness.json"
 
 echo "[trade-finance-subsystem] bundling public subsystem view" >&2
-cargo run -p zkf-cli -- subsystem bundle-public \
+"$repo_root/target-public/debug/zkf-cli" subsystem bundle-public \
   --root "$subsystem_root" \
   --json > "$subsystem_root/17_report/bundle-public.json"
+
+echo "[trade-finance-subsystem] final portability scrub after generated reports" >&2
+python3 "$repo_root/scripts/postprocess_private_trade_finance_settlement_subsystem.py" \
+  "$repo_root" \
+  "$artifact_root" \
+  "$subsystem_root" > /dev/null
+
+echo "[trade-finance-subsystem] re-signing subsystem credential after final scrub" >&2
+cargo run -q -p zkf-cli --example resign_subsystem_credential -- "$subsystem_root" > /dev/null
 
 echo "$subsystem_root"

@@ -90,6 +90,8 @@ def sanitize_public_ledger(private_entries: list[dict]) -> dict:
                 "evidence_kind": (
                     "hypothesis_registry_note"
                     if entry["assurance_class"] == "hypothesis_carried_theorem"
+                    else "trusted_protocol_tcb_note"
+                    if entry["assurance_class"] == "trusted_protocol_tcb"
                     else "proof_artifact"
                 ),
                 "notes": entry["notes"],
@@ -107,6 +109,15 @@ def build_ledger_summary(public_ledger: dict) -> dict:
     checker_counts = Counter(entry["checker"] for entry in entries)
     scope_counts = Counter(entry["scope"].split("::", 1)[0] for entry in entries)
     assurance_counts = Counter(entry["assurance_class"] for entry in entries)
+    for assurance_class in [
+        "mechanized_implementation_claim",
+        "bounded_check",
+        "attestation_backed_lane",
+        "model_only_claim",
+        "trusted_protocol_tcb",
+        "hypothesis_carried_theorem",
+    ]:
+        assurance_counts.setdefault(assurance_class, 0)
     trusted_rows = [entry["theorem_id"] for entry in entries if entry["trusted_assumptions"]]
     return {
         "total": len(entries),
@@ -145,9 +156,9 @@ def build_protocol_registry(private_entries: list[dict]) -> dict:
                 "scope": entry["scope"],
                 "checker": entry["checker"],
                 "proof_family": proof_family,
-                "proof_status": "hypothesis_stated_no_repo_local_artifact",
+                "proof_status": "trusted_protocol_tcb_no_repo_local_artifact",
                 "exact_surface": exact_surface,
-                "evidence_kind": "hypothesis_registry_note",
+                "evidence_kind": "trusted_protocol_tcb_registry_note",
                 "trusted_assumptions": entry.get("trusted_assumptions", []),
                 "notes": entry["notes"],
             }
@@ -420,6 +431,22 @@ def build_claim_graph(
                     "path": "attestation/latest.json",
                     "json_pointer": "/headline_counts/hypothesis_carried_rows",
                 },
+            ],
+        },
+        {
+            "claim_id": "ledger.trusted_protocol_tcb_rows",
+            "category": "explicit_tcb",
+            "claim_text": "Trusted protocol TCB rows disclosed separately from implementation-bound theorem rows.",
+            "expected_value": ledger_summary["by_assurance_class"].get("trusted_protocol_tcb", 0),
+            "sources": [
+                {
+                    "path": "ledger/ledger-summary.json",
+                    "json_pointer": "/by_assurance_class/trusted_protocol_tcb",
+                },
+                {
+                    "path": "attestation/latest.json",
+                    "json_pointer": "/headline_counts/trusted_protocol_tcb_rows",
+                },
                 {"path": "attestation/latest.json", "json_pointer": "/hypothesis_registry/count"},
             ],
         },
@@ -601,6 +628,7 @@ def build_attestation(
         "headline_counts": {
             "implementation_bound_rows": ledger_summary["by_assurance_class"]["mechanized_implementation_claim"],
             "hypothesis_carried_rows": ledger_summary["by_assurance_class"]["hypothesis_carried_theorem"],
+            "trusted_protocol_tcb_rows": ledger_summary["by_assurance_class"].get("trusted_protocol_tcb", 0),
             "mechanized_local_rows": ledger_summary["mechanized_local"],
             "pending_rows": ledger_summary["pending"],
             "zero_unclassified_files": workspace_census_summary["zero_unclassified_files"],
@@ -745,6 +773,7 @@ def build_public_summary_block(
             f"| Public release | `{publication['release_tag']}` via [publication/manifest.json](publication/manifest.json) |",
             f"| Headline theorem count | **{attestation['headline_counts']['implementation_bound_rows']} implementation-bound mechanized rows** |",
             f"| Disclosed hypotheses | {attestation['headline_counts']['hypothesis_carried_rows']} hypothesis-carried rows, published separately in [attestation/latest.json](attestation/latest.json) and [evidence/protocol-proof-registry.json](evidence/protocol-proof-registry.json) |",
+            f"| Trusted protocol TCB | {attestation['headline_counts']['trusted_protocol_tcb_rows']} explicit protocol TCB rows, published separately from implementation-bound proof rows |",
             f"| Public conformance | {conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed across `plonky3`, `halo2`, `nova`, and `hypernova` |",
             f"| Sealed-source census | {workspace_census_summary['total_tracked_files']} tracked files classified; zero unclassified = `{workspace_census_summary['zero_unclassified_files']}` |",
             f"| Midnight readiness | full universal path for `{midnight_version}`: status=`{midnight_readiness['status']}`, local_operator=`{midnight_readiness['ready_for_local_operator']}`, live_submit=`{midnight_readiness['ready_for_live_submit']}` via [midnight/readiness.json](midnight/readiness.json) |",
@@ -771,6 +800,7 @@ def build_weekly_status_block(
             "| --- | --- | --- |",
             f"| Headline theorem count | Implementation-bound machine-checked rows only | **{attestation['headline_counts']['implementation_bound_rows']} implementation-bound rows** |",
             f"| Hypothesis registry | Explicit assumptions for non-headline theorem rows | **{attestation['headline_counts']['hypothesis_carried_rows']} rows disclosed separately** |",
+            f"| Protocol TCB registry | External protocol assumptions isolated from implementation-bound theorem rows | **{attestation['headline_counts']['trusted_protocol_tcb_rows']} trusted protocol TCB rows** |",
             f"| Public backend conformance | Compile -> prove -> verify across 4 published backends | **{conformance_summary['headline_tests_passed']}/{conformance_summary['headline_tests_run']} tests passed** |",
             f"| Sealed-source census | Opaque private-file census summarized publicly | **{workspace_census_summary['total_tracked_files']} files; zero unclassified = {workspace_census_summary['zero_unclassified_files']}** |",
             f"| Binary integrity | Published release manifest `{publication['binary_manifest_path']}` | **SHA-256 verified for `{publication['binary_target']}`** |",

@@ -84,9 +84,15 @@ pub(crate) fn artifact_realized_gpu_capable_stages(
         stages.insert("qap-witness-map".to_string());
     }
 
-    let msm_metal = stage_accelerator_is_metal(&breakdown, "msm_window")
+    let msm_metal = stage_accelerator_is_metal(&breakdown, "msm")
+        || stage_accelerator_is_metal(&breakdown, "msm_window")
         || stage_accelerator_is_metal(&breakdown, "groth16_prove_core")
-        || metadata_value_contains_metal(artifact, "groth16_msm_engine");
+        || metadata_value_contains_metal(artifact, "groth16_msm_engine")
+        || metadata_value_contains_metal(artifact, "nova_msm_engine")
+        || artifact
+            .metadata
+            .get("msm_accelerator")
+            .is_some_and(|value| value == "metal");
     if msm_metal {
         stages.insert("msm".to_string());
     }
@@ -199,9 +205,12 @@ mod tests {
         }
     }
 
-    fn delegated_gpu_artifact() -> ProofArtifact {
+    fn delegated_artifact() -> ProofArtifact {
         let mut metadata = BTreeMap::new();
-        metadata.insert("groth16_msm_engine".to_string(), "metal-bn254-msm".to_string());
+        metadata.insert(
+            "groth16_msm_engine".to_string(),
+            "metal-bn254-msm".to_string(),
+        );
         metadata.insert(
             "qap_witness_map_engine".to_string(),
             "metal-bn254-ntt+streamed-reduction".to_string(),
@@ -232,20 +241,59 @@ mod tests {
         }
     }
 
+    fn delegated_nova_artifact() -> ProofArtifact {
+        let mut metadata = BTreeMap::new();
+        metadata.insert(
+            "nova_msm_engine".to_string(),
+            "metal-pasta-msm/pallas+vesta".to_string(),
+        );
+        metadata.insert("msm_accelerator".to_string(), "metal".to_string());
+        metadata.insert("metal_gpu_busy_ratio".to_string(), "0.5".to_string());
+        metadata.insert("metal_no_cpu_fallback".to_string(), "true".to_string());
+        metadata.insert(
+            "metal_stage_breakdown".to_string(),
+            serde_json::json!({
+                "msm": {"accelerator": "metal-pasta-msm"}
+            })
+            .to_string(),
+        );
+        ProofArtifact {
+            backend: BackendKind::Nova,
+            program_digest: "test-nova".to_string(),
+            proof: Vec::new(),
+            verification_key: Vec::new(),
+            public_inputs: Vec::new(),
+            metadata,
+            security_profile: None,
+            hybrid_bundle: None,
+            credential_bundle: None,
+            archive_metadata: None,
+            proof_origin_signature: None,
+            proof_origin_public_keys: None,
+        }
+    }
+
     #[test]
     fn delegated_artifact_contributes_realized_gpu_stages() {
-        let artifact = delegated_gpu_artifact();
+        let artifact = delegated_artifact();
         let stages = artifact_realized_gpu_capable_stages(Some(&artifact));
         assert_eq!(stages, vec!["fft-ntt", "msm", "qap-witness-map"]);
         assert_eq!(artifact_gpu_busy_ratio(Some(&artifact)), 0.625);
     }
 
     #[test]
+    fn delegated_nova_artifact_contributes_realized_gpu_msm() {
+        let artifact = delegated_nova_artifact();
+        let stages = artifact_realized_gpu_capable_stages(Some(&artifact));
+        assert_eq!(stages, vec!["msm"]);
+        assert_eq!(artifact_gpu_busy_ratio(Some(&artifact)), 0.5);
+    }
+
+    #[test]
     fn effective_summary_marks_backend_delegated_gpu() {
         let report = report_without_runtime_gpu();
-        let artifact = delegated_gpu_artifact();
-        let summary =
-            backend_delegated_gpu_summary(&report, Some(&artifact)).expect("gpu summary");
+        let artifact = delegated_artifact();
+        let summary = backend_delegated_gpu_summary(&report, Some(&artifact)).expect("gpu summary");
 
         assert_eq!(summary.classification, "backend-delegated");
         assert_eq!(

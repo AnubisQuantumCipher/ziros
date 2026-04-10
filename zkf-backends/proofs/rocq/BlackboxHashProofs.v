@@ -33,6 +33,37 @@ Proof.
   exact Haux.
 Qed.
 
+Theorem poseidon_pastafq_width4_lowering_sound_ok :
+  forall semantics,
+    critical_hash_lowering_semantics
+      SpecCriticalHashBlackBoxOp_Poseidon
+      SpecCriticalHashFieldId_PastaFq
+      usize_4
+      usize_4 = Option_Some semantics ->
+    PoseidonPastaFqWidth4LoweringSemantics semantics.
+Proof.
+  intros semantics Hsemantics.
+  unfold critical_hash_lowering_semantics in Hsemantics.
+  cbn in Hsemantics.
+  inversion Hsemantics; subst.
+  repeat split; reflexivity.
+Qed.
+
+Theorem poseidon_pastafq_width4_aux_witness_sound_ok :
+  forall semantics,
+    critical_hash_lowering_semantics
+      SpecCriticalHashBlackBoxOp_Poseidon
+      SpecCriticalHashFieldId_PastaFq
+      usize_4
+      usize_4 = Option_Some semantics ->
+    f_aux_witness_mode semantics = CriticalHashAuxWitnessMode_ConstraintSolverDerived.
+Proof.
+  intros semantics Hsemantics.
+  eapply poseidon_pastafq_width4_lowering_sound_ok in Hsemantics.
+  destruct Hsemantics as [_ [_ [_ Haux]]].
+  exact Haux.
+Qed.
+
 Theorem sha256_bytes_to_digest_lowering_sound_ok :
   forall field inputs_len semantics,
     critical_hash_lowering_semantics

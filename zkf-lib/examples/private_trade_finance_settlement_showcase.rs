@@ -2,8 +2,9 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 use zkf_lib::{
-    BackendKind, PrivateTradeFinanceSettlementExportConfig, PrivateTradeFinanceSettlementExportProfile, ZkfError,
-    ZkfResult, parse_backend_selection, run_private_trade_finance_settlement_export,
+    BackendKind, PrivateTradeFinanceSettlementExportConfig,
+    PrivateTradeFinanceSettlementExportProfile, ZkfError, ZkfResult, parse_backend_selection,
+    run_private_trade_finance_settlement_export,
     run_private_trade_finance_settlement_hypernova_diagnostics,
 };
 
@@ -22,8 +23,8 @@ fn env_flag(name: &str) -> bool {
 }
 
 fn export_profile() -> ZkfResult<PrivateTradeFinanceSettlementExportProfile> {
-    let raw =
-        env::var("ZKF_PRIVATE_TRADE_FINANCE_SETTLEMENT_PROFILE").unwrap_or_else(|_| "flagship".to_string());
+    let raw = env::var("ZKF_PRIVATE_TRADE_FINANCE_SETTLEMENT_PROFILE")
+        .unwrap_or_else(|_| "flagship".to_string());
     PrivateTradeFinanceSettlementExportProfile::parse(&raw)
 }
 
@@ -87,10 +88,7 @@ fn main() -> ZkfResult<()> {
         );
         return Ok(());
     }
-    let report_path = run_with_large_stack_result(
-        "private-trade-finance-showcase",
-        run_export,
-    )?;
+    let report_path = run_with_large_stack_result("private-trade-finance-showcase", run_export)?;
     println!("{}", report_path.display());
     Ok(())
 }

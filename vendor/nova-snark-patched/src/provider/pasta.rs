@@ -2,7 +2,7 @@
 use crate::{
   impl_traits_no_dlog_ext,
   provider::{
-    msm::{msm, msm_pallas, msm_small, msm_small_with_max_num_bits},
+    msm::{msm_pallas, msm_small, msm_small_with_max_num_bits, msm_vesta},
     traits::{DlogGroup, DlogGroupExt},
   },
   traits::{Group, PrimeFieldExt, TranscriptReprTrait},
@@ -10,9 +10,9 @@ use crate::{
 use digest::{ExtendableOutput, Update};
 use ff::FromUniformBytes;
 use halo2curves::{
-  group::{cofactor::CofactorCurveAffine, Curve, Group as AnotherGroup},
-  pasta::{Pallas, PallasAffine, Vesta, VestaAffine},
   CurveAffine, CurveExt,
+  group::{Curve, Group as AnotherGroup, cofactor::CofactorCurveAffine},
+  pasta::{Pallas, PallasAffine, Vesta, VestaAffine},
 };
 use num_bigint::BigInt;
 use num_integer::Integer;
@@ -71,7 +71,7 @@ impl_traits_no_dlog_ext!(
 
 impl DlogGroupExt for vesta::Point {
   fn vartime_multiscalar_mul(scalars: &[Self::Scalar], bases: &[Self::AffineGroupElement]) -> Self {
-    msm(scalars, bases)
+    msm_vesta(scalars, bases)
   }
 
   fn vartime_multiscalar_mul_small<T: Integer + Into<u64> + Copy + Sync + ToPrimitive>(

@@ -14,7 +14,7 @@ native-nova = ["dep:nova-snark", "nova-snark/experimental", "zkf-core/native-nov
 nova-compression = ["native-nova"]
 native-sp1 = ["dep:sp1-sdk", "zkf-core/native-sp1"]
 native-risc-zero = ["dep:risc0-zkvm", "dep:risc0-binfmt", "dep:risc0-zkos-v1compat", "zkf-core/native-risc-zero"]
-metal-gpu = ["dep:zkf-metal"]
+metal-gpu = ["dep:zkf-metal", "nova-snark/metal-gpu"]
 
 [dependencies]
 acir.workspace = true

@@ -41,6 +41,7 @@ flamegraph = [
     "pprof2/criterion",
 ]
 io = []
+metal-gpu = ["dep:zkf-metal"]
 test-utils = []
 
 [lib]
@@ -223,6 +224,9 @@ version = "0.2.15"
 features = ["js"]
 default-features = false
 
+[target.'cfg(target_os = "macos")'.dependencies.zkf-metal]
+path = "../../zkf-metal"
+optional = true
 
 [target.'cfg(target_arch = "x86_64")'.dependencies.halo2curves]
 version = "0.9.0"

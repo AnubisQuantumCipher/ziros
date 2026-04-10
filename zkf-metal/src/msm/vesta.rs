@@ -1,13 +1,13 @@
 //! Vesta curve helpers for Rust-side MSM operations.
 //!
-//! Handles serialization between `pasta_curves` Vesta types and Metal buffer
+//! Handles serialization between halo2curves Vesta types and Metal buffer
 //! layouts, plus the final window combination step (CPU-side).
 
-use ff::{Field, PrimeField};
-use pasta_curves::arithmetic::CurveAffine;
-use pasta_curves::group::Group;
-use pasta_curves::group::prime::PrimeCurveAffine;
-use pasta_curves::{Eq, EqAffine, Fp, Fq};
+use halo2curves::CurveAffine;
+use halo2curves::ff::{Field, PrimeField};
+use halo2curves::group::Group;
+use halo2curves::group::prime::PrimeCurveAffine;
+use halo2curves::pasta::{Fp, Fq, Vesta, VestaAffine};
 
 const _: () = assert!(std::mem::size_of::<Fq>() == 32);
 const _: () = assert!(std::mem::align_of::<Fq>() == 8);
@@ -90,7 +90,7 @@ pub fn mont_limbs_to_fq(limbs: [u64; 4]) -> Fq {
 
 /// Serialize a Vesta affine point's coordinates to 4×u64 Montgomery limbs.
 /// Returns (x_limbs, y_limbs).
-pub fn affine_to_limbs(p: &EqAffine) -> ([u64; 4], [u64; 4]) {
+pub fn affine_to_limbs(p: &VestaAffine) -> ([u64; 4], [u64; 4]) {
     let coords = p.coordinates().unwrap();
     (fq_to_mont_limbs(coords.x()), fq_to_mont_limbs(coords.y()))
 }
@@ -118,7 +118,7 @@ pub fn scalar_to_limbs(s: &Fp) -> [u64; 4] {
 }
 
 /// Check if a Vesta affine point is the identity (point at infinity).
-pub fn is_identity(p: &EqAffine) -> bool {
+pub fn is_identity(p: &VestaAffine) -> bool {
     bool::from(p.is_identity())
 }
 
@@ -126,11 +126,11 @@ pub fn is_identity(p: &EqAffine) -> bool {
 ///
 /// Given `window_results[i]` = partial MSM for window i,
 /// compute: `result = ∑ window_results[i] * 2^(i*c)`
-pub fn combine_windows(window_results: &[Eq], c: u32) -> Eq {
+pub fn combine_windows(window_results: &[Vesta], c: u32) -> Vesta {
     use std::ops::AddAssign;
 
     if window_results.is_empty() {
-        return Eq::identity();
+        return Vesta::identity();
     }
 
     let mut result = *window_results.last().unwrap();
@@ -147,9 +147,9 @@ pub fn combine_windows(window_results: &[Eq], c: u32) -> Eq {
 }
 
 /// Perform bucket reduction for one window (CPU fallback).
-pub fn bucket_reduce_window(buckets: &[Eq]) -> Eq {
-    let mut running_sum = Eq::identity();
-    let mut result = Eq::identity();
+pub fn bucket_reduce_window(buckets: &[Vesta]) -> Vesta {
+    let mut running_sum = Vesta::identity();
+    let mut result = Vesta::identity();
 
     for i in (1..buckets.len()).rev() {
         running_sum += buckets[i];
@@ -159,17 +159,17 @@ pub fn bucket_reduce_window(buckets: &[Eq]) -> Eq {
     result
 }
 
-/// Convert GPU projective point (12 u64s in Montgomery form) to `pasta_curves` Vesta.
+/// Convert GPU projective point (12 u64s in Montgomery form) to halo2curves Vesta.
 ///
 /// Layout: [X(4 limbs), Y(4 limbs), Z(4 limbs)] in Montgomery form.
 /// Converts Jacobian → affine → projective through the public API.
-pub fn gpu_proj_to_vesta(data: &[u64]) -> Option<Eq> {
+pub fn gpu_proj_to_vesta(data: &[u64]) -> Option<Vesta> {
     assert!(data.len() >= 12);
 
     let z = mont_limbs_to_fq([data[8], data[9], data[10], data[11]]);
 
     if z == Fq::ZERO {
-        return Some(Eq::identity());
+        return Some(Vesta::identity());
     }
 
     let x = mont_limbs_to_fq([data[0], data[1], data[2], data[3]]);
@@ -187,7 +187,7 @@ pub fn gpu_proj_to_vesta(data: &[u64]) -> Option<Eq> {
     let y_aff = y * z3_inv;
 
     // Construct affine point (validates on-curve)
-    let affine = EqAffine::from_xy(x_aff, y_aff);
+    let affine = VestaAffine::from_xy(x_aff, y_aff);
     if bool::from(affine.is_none()) {
         return None;
     }

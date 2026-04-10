@@ -4,6 +4,15 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -L)"
 artifact_root="${1:-$repo_root/dist/showcases/private_trade_finance_settlement}"
 network="${2:-preprod}"
+
+canonicalize_target_path() {
+  local target="$1"
+  mkdir -p "$(dirname "$target")"
+  printf '%s/%s\n' "$(cd "$(dirname "$target")" && pwd -L)" "$(basename "$target")"
+}
+
+artifact_root="$(canonicalize_target_path "$artifact_root")"
+
 package_root="$artifact_root/midnight_package/trade-finance-settlement"
 package_manifest="$package_root/package_manifest.json"
 flow_manifest="$package_root/flow_manifest.json"

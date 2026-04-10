@@ -6,6 +6,15 @@ artifact_root="${1:-$repo_root/dist/showcases/private_claims_truth_and_settlemen
 subsystem_root="${2:-$repo_root/dist/subsystems/private_claims_truth_and_settlement}"
 profile="${3:-flagship}"
 
+canonicalize_target_path() {
+  local target="$1"
+  mkdir -p "$(dirname "$target")"
+  printf '%s/%s\n' "$(cd "$(dirname "$target")" && pwd -L)" "$(basename "$target")"
+}
+
+artifact_root="$(canonicalize_target_path "$artifact_root")"
+subsystem_root="$(canonicalize_target_path "$subsystem_root")"
+
 mkdir -p "$(dirname "$artifact_root")" "$(dirname "$subsystem_root")"
 
 echo "[claims-subsystem] exporting finished showcase bundle into $artifact_root" >&2
@@ -16,6 +25,7 @@ echo "[claims-subsystem] validating Midnight contract package into $artifact_roo
 bash "$repo_root/scripts/validate_private_claims_truth_midnight_contracts.sh" "$artifact_root" preprod
 
 echo "[claims-subsystem] scaffolding subsystem shell into $subsystem_root" >&2
+rm -rf "$subsystem_root"
 cargo run -p zkf-cli -- subsystem scaffold \
   --name private-claims-truth-and-settlement \
   --style full \

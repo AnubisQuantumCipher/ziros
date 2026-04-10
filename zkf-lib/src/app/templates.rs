@@ -66,21 +66,21 @@ pub use super::orbital::{
     private_nbody_orbital_showcase_with_steps, private_nbody_orbital_witness,
     private_nbody_orbital_witness_with_steps,
 };
-use super::private_identity as private_identity_app;
 pub use super::private_claims_truth::{
-    CLAIMS_FIXED_POINT_SCALE, PRIVATE_CLAIMS_MAX_DIGESTS, PRIVATE_CLAIMS_MAX_LINE_ITEMS,
-    PRIVATE_CLAIMS_MAX_PERILS, PRIVATE_CLAIMS_PUBLIC_OUTPUTS, ClaimsActionClassV1,
-    ClaimsTruthClaimEventDataV1, ClaimsTruthConsistencyFraudInputsV1,
-    ClaimsTruthEstimateLineItemV1, ClaimsTruthEvidenceDataV1, ClaimsTruthInvoiceLineItemV1,
-    ClaimsTruthPolicyDataV1, ClaimsTruthPrivateInputsV1, ClaimsTruthPublicOutputsV1,
-    ClaimsTruthSettlementGovernanceInputsV1, build_batch_shard_handoff_program,
+    CLAIMS_FIXED_POINT_SCALE, ClaimsActionClassV1, ClaimsTruthClaimEventDataV1,
+    ClaimsTruthConsistencyFraudInputsV1, ClaimsTruthEstimateLineItemV1, ClaimsTruthEvidenceDataV1,
+    ClaimsTruthInvoiceLineItemV1, ClaimsTruthPolicyDataV1, ClaimsTruthPrivateInputsV1,
+    ClaimsTruthPublicOutputsV1, ClaimsTruthSettlementGovernanceInputsV1,
+    PRIVATE_CLAIMS_MAX_DIGESTS, PRIVATE_CLAIMS_MAX_LINE_ITEMS, PRIVATE_CLAIMS_MAX_PERILS,
+    PRIVATE_CLAIMS_PUBLIC_OUTPUTS, build_batch_shard_handoff_program,
     build_claim_decision_core_program, build_disclosure_projection_program,
     build_settlement_binding_program, claims_truth_private_input_names_v1,
-    private_claims_truth_inconsistency_denial_inputs,
-    private_claims_truth_investigation_inputs, private_claims_truth_manual_review_inputs,
-    private_claims_truth_policy_denial_inputs, private_claims_truth_sample_inputs,
-    private_claims_truth_showcase, private_claims_truth_violation_inputs,
+    private_claims_truth_inconsistency_denial_inputs, private_claims_truth_investigation_inputs,
+    private_claims_truth_manual_review_inputs, private_claims_truth_policy_denial_inputs,
+    private_claims_truth_sample_inputs, private_claims_truth_showcase,
+    private_claims_truth_violation_inputs,
 };
+use super::private_identity as private_identity_app;
 pub use super::real_gas::{
     REAL_GAS_COMPONENTS, REAL_GAS_PUBLIC_OUTPUTS, RealGasModelFamilyV1, RealGasStateRequestV1,
     build_real_gas_state_program, real_gas_state_inputs_from_request, real_gas_state_showcase,

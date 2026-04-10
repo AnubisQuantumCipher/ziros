@@ -78,6 +78,9 @@ def main() -> None:
             "hypothesis_carried_rows": status["assurance_class_counts"][
                 "hypothesis_carried_theorem"
             ],
+            "trusted_protocol_tcb_rows": status["assurance_class_counts"].get(
+                "trusted_protocol_tcb", 0
+            ),
             "mechanized_local_rows": status["counts"]["mechanized_local"],
             "pending_rows": status["counts"]["pending"],
         },

@@ -1907,11 +1907,23 @@ fn export_scenario_bundle(
             ("verifiers".to_string(), out_dir.join("calldata.json")),
             ("traces".to_string(), out_dir.join("runtime_trace.json")),
             ("audits".to_string(), out_dir.join("audit_summary.json")),
-            ("reports".to_string(), out_dir.join("formal_evidence_summary.json")),
-            ("reports".to_string(), out_dir.join("benchmark_summary.json")),
+            (
+                "reports".to_string(),
+                out_dir.join("formal_evidence_summary.json"),
+            ),
+            (
+                "reports".to_string(),
+                out_dir.join("benchmark_summary.json"),
+            ),
             ("reports".to_string(), out_dir.join("truth_report.json")),
-            ("reports".to_string(), out_dir.join("mission_assurance_report.json")),
-            ("reports".to_string(), out_dir.join("human_readable_summary.md")),
+            (
+                "reports".to_string(),
+                out_dir.join("mission_assurance_report.json"),
+            ),
+            (
+                "reports".to_string(),
+                out_dir.join("human_readable_summary.md"),
+            ),
             ("reports".to_string(), out_dir.join("export_manifest.json")),
         ],
     )?;

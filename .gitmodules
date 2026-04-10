@@ -1,0 +1,3 @@
+[submodule "midnight-docs"]
+	path = midnight-docs
+	url = https://github.com/midnightntwrk/midnight-docs.git

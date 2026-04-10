@@ -1,17 +1,17 @@
-use serde_json::{Map, Value, json};
+use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use super::doctor::{DoctorArgs, handle_doctor};
-use super::gateway::{VerifyCompactRequest, admit_compact_request};
+use super::doctor::{handle_doctor, DoctorArgs};
+use super::gateway::{admit_compact_request, VerifyCompactRequest};
 use super::shared::{
-    MidnightNetwork, REQUIRED_COMPACTC_VERSION, REQUIRED_NODE_MAJOR, compare_project_package_pins,
-    copy_dir_recursive_filtered, copy_file, current_timestamp_rfc3339ish, ensure_sed_dapp_root,
-    midnight_template_catalog, network_config, node_version, npm_version, read_text,
-    resolve_compactc_binary, template_contract_filename, template_contract_source,
+    compare_project_package_pins, copy_dir_recursive_filtered, copy_file,
+    current_timestamp_rfc3339ish, ensure_sed_dapp_root, midnight_template_catalog, network_config,
+    node_version, npm_version, read_text, resolve_compactc_binary, template_contract_filename,
+    template_contract_source, MidnightNetwork, REQUIRED_COMPACTC_VERSION, REQUIRED_NODE_MAJOR,
 };
 use crate::util::write_json;
 
@@ -761,7 +761,7 @@ function normalizeProvingMode(value: string | undefined): MidnightProvingMode {{
 }}
 
 function networkIdForSdk(network: MidnightNetwork): NetworkId {{
-  if (network === 'preview' || network === 'local' || network === 'offline') {{
+  if (network === 'local' || network === 'offline') {{
     return 'preprod' as NetworkId;
   }}
   return network as NetworkId;
@@ -915,7 +915,7 @@ export async function buildCompactWitnesses(
   return Object.fromEntries(
     Object.entries(values).map(([name, value]) => [
       name,
-      ({{ privateState }}: {{ privateState: undefined }}) => [privateState, [value]],
+      ({{ privateState }}: {{ privateState: undefined }}) => [privateState, value],
     ]),
   ) as Record<string, WitnessFunction>;
 }}
@@ -1346,6 +1346,7 @@ export async function deployAll(options: DeployAllOptions = {}): Promise<void> {
     }
 
     for (const contract of CONTRACTS) {
+      await waitForSpendableDust(walletProvider);
       console.log(`--- Deploying ${contract.displayName} ---`);
       await deploySingleContract(contract.key, { ...options, walletProvider });
       console.log(`Wallet dust: ${dustSummary(await collectDustDiagnostics(walletProvider))}`);
@@ -1466,6 +1467,7 @@ export async function callAll(options: CallAllOptions = {}): Promise<void> {
   try {
     await waitForSpendableDust(walletProvider);
     for (const contract of CONTRACTS) {
+      await waitForSpendableDust(walletProvider);
       console.log(`--- Calling ${contract.displayName} ---`);
       await callSingleContract(contract.key, { ...options, walletProvider });
     }

@@ -15,6 +15,7 @@ From Core Require Import ControlFlow.
 
 Inductive t_SupportedCriticalHashOp : Type :=
 | SupportedCriticalHashOp_PoseidonBn254Width4
+| SupportedCriticalHashOp_PoseidonPastaFqWidth4
 | SupportedCriticalHashOp_Sha256BytesToDigest.
 
 
@@ -33,6 +34,7 @@ Inductive t_SpecCriticalHashBlackBoxOp : Type :=
 
 Inductive t_SpecCriticalHashFieldId : Type :=
 | SpecCriticalHashFieldId_Bn254
+| SpecCriticalHashFieldId_PastaFq
 | SpecCriticalHashFieldId_Goldilocks
 | SpecCriticalHashFieldId_BabyBear
 | SpecCriticalHashFieldId_Mersenne31
@@ -76,6 +78,13 @@ Definition critical_hash_proof_surface (op : t_SpecCriticalHashBlackBoxOp) (fiel
       match andb (f_eq (inputs_len) ((4 : t_usize))) (f_eq (outputs_len) ((4 : t_usize))) with
       | true =>
         Option_Some (Option_Some (SupportedCriticalHashOp_PoseidonBn254Width4))
+      | _ =>
+        Option_None
+      end
+    | SpecCriticalHashFieldId_PastaFq =>
+      match andb (f_eq (inputs_len) ((4 : t_usize))) (f_eq (outputs_len) ((4 : t_usize))) with
+      | true =>
+        Option_Some (Option_Some (SupportedCriticalHashOp_PoseidonPastaFqWidth4))
       | _ =>
         Option_None
       end

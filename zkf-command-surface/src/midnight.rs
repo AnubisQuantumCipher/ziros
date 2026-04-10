@@ -187,10 +187,16 @@ pub fn status(
     gateway_url: Option<&str>,
 ) -> Result<MidnightStatusReportV1, String> {
     let project_root = locate_midnight_project_root(project);
-    let proof_server_url = proof_server_url.unwrap_or(DEFAULT_PROOF_SERVER_URL);
-    let gateway_url = gateway_url.unwrap_or(DEFAULT_GATEWAY_URL);
-    let proof_server = probe_endpoint(proof_server_url);
-    let gateway = probe_endpoint(gateway_url);
+    let proof_server_url = proof_server_url
+        .map(str::to_string)
+        .or_else(|| env::var("MIDNIGHT_PROOF_SERVER_URL").ok())
+        .unwrap_or_else(|| DEFAULT_PROOF_SERVER_URL.to_string());
+    let gateway_url = gateway_url
+        .map(str::to_string)
+        .or_else(|| env::var("MIDNIGHT_GATEWAY_URL").ok())
+        .unwrap_or_else(|| DEFAULT_GATEWAY_URL.to_string());
+    let proof_server = probe_endpoint(&proof_server_url);
+    let gateway = probe_endpoint(&gateway_url);
     let compactc = binary_status("compactc", REQUIRED_COMPACTC_VERSION, resolve_compactc_binary());
     let compact_manager = binary_status(
         "compact",
@@ -400,8 +406,13 @@ pub fn call_prepare(
     Ok(report)
 }
 
-pub fn test_contract(project_root: &Path, network: MidnightNetworkV1) -> Result<MidnightContractTestReportV1, String> {
-    let status = status(network, Some(project_root), None, None)?;
+pub fn test_contract(
+    project_root: &Path,
+    network: MidnightNetworkV1,
+    proof_server_url: Option<&str>,
+    gateway_url: Option<&str>,
+) -> Result<MidnightContractTestReportV1, String> {
+    let status = status(network, Some(project_root), proof_server_url, gateway_url)?;
     let output = run_package_script(project_root, "test:e2e")?;
     Ok(MidnightContractTestReportV1 {
         schema: "zkf-midnight-contract-test-v1".to_string(),
@@ -451,8 +462,10 @@ pub fn verify_explorer(project_root: &Path) -> Result<Vec<ExplorerVerificationSt
 pub fn diagnose_contract(
     project_root: &Path,
     network: MidnightNetworkV1,
+    proof_server_url: Option<&str>,
+    gateway_url: Option<&str>,
 ) -> Result<MidnightContractDiagnoseReportV1, String> {
-    let status = status(network, Some(project_root), None, None)?;
+    let status = status(network, Some(project_root), proof_server_url, gateway_url)?;
     let package_json = read_json(&project_root.join("package.json"))?;
     let scripts = package_json
         .get("scripts")
@@ -756,4 +769,26 @@ fn write_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
     }
     let bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     fs::write(path, bytes).map_err(|error| format!("{}: {error}", path.display()))
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn status_uses_env_gateway_and_proof_server_urls_when_args_are_omitted() {
+        unsafe {
+            std::env::set_var("MIDNIGHT_PROOF_SERVER_URL", "http://127.0.0.1:6309");
+            std::env::set_var("MIDNIGHT_GATEWAY_URL", "http://127.0.0.1:6312");
+        }
+        let report = status(MidnightNetworkV1::Preview, None, None, None).expect("status report");
+        assert_eq!(report.network, "preview");
+        assert_eq!(report.proof_server.url, "http://127.0.0.1:6309");
+        assert_eq!(report.gateway.url, "http://127.0.0.1:6312");
+        unsafe {
+            std::env::remove_var("MIDNIGHT_PROOF_SERVER_URL");
+            std::env::remove_var("MIDNIGHT_GATEWAY_URL");
+        }
+    }
 }

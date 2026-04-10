@@ -28,6 +28,7 @@ ASSURANCE_CLASS_ORDER = [
     "bounded_check",
     "attestation_backed_lane",
     "model_only_claim",
+    "trusted_protocol_tcb",
     "hypothesis_carried_theorem",
 ]
 RUNTIME_COVERAGE_ORDER = [
@@ -106,6 +107,8 @@ def protocol_rows(entries: list[dict]) -> list[dict]:
         {
             "theorem_id": entry["theorem_id"],
             "status": entry["status"],
+            "assurance_class": entry.get("assurance_class", ""),
+            "checker": entry.get("checker", ""),
             "scope": entry["scope"],
             "evidence_path": entry.get("evidence_path", ""),
         }
@@ -129,17 +132,26 @@ def release_grade_blockers(
         blockers.append(
             f"{counts['hypothesis_stated']} hypothesis_stated row(s) remain"
         )
-    if counts.get("assumed_external", 0):
+    non_protocol_assumed_external = [
+        entry["theorem_id"]
+        for entry in entries
+        if entry["status"] == "assumed_external"
+        and not entry["theorem_id"].startswith("protocol.")
+    ]
+    if non_protocol_assumed_external:
         blockers.append(
-            f"{counts['assumed_external']} assumed_external row(s) remain"
+            f"{len(non_protocol_assumed_external)} non-protocol assumed_external row(s) remain"
         )
     if counts.get("bounded_checked", 0):
         blockers.append(
             f"{counts['bounded_checked']} bounded_checked row(s) remain"
         )
-    if trust_rows:
+    non_protocol_trust_rows = [
+        theorem_id for theorem_id in trust_rows if not theorem_id.startswith("protocol.")
+    ]
+    if non_protocol_trust_rows:
         blockers.append(
-            f"{len(trust_rows)} row(s) still carry trusted_assumptions"
+            f"{len(non_protocol_trust_rows)} non-protocol row(s) still carry trusted_assumptions"
         )
     strict_rows = [
         entry["theorem_id"]
@@ -253,8 +265,8 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
         f"{assurance_counts.get(claim_class, 0)} {claim_class}"
         for claim_class in ASSURANCE_CLASS_ORDER
     )
-    open_protocol_rows = [
-        row["theorem_id"] for row in protocol if row["status"] != "mechanized_local"
+    trusted_protocol_rows = [
+        row["theorem_id"] for row in protocol if row["status"] == "assumed_external"
     ]
     current_priority = existing_status.get(
         "current_priority",
@@ -276,8 +288,8 @@ def build_status_payload(entries: list[dict], existing_status: dict | None = Non
         "(implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). "
         "All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. "
         + (
-            "Open protocol rows: " + ", ".join(open_protocol_rows) + "."
-            if open_protocol_rows
+            "Trusted protocol TCB rows: " + ", ".join(trusted_protocol_rows) + "."
+            if trusted_protocol_rows
             else "All protocol rows are mechanized_local."
         )
     )
@@ -351,13 +363,13 @@ def security_block(payload: dict) -> str:
         f"- Total ledger entries: {payload['total_entries']}.",
         f"- Machine-checked rows: {payload['mechanized_total']} total ({counts['mechanized_local']} `mechanized_local`, {counts['mechanized_generated']} `mechanized_generated`).",
         f"- Remaining non-machine-checked rows: {counts['hypothesis_stated']} `hypothesis_stated`, {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
-        f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
+        f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['trusted_protocol_tcb']} `trusted_protocol_tcb`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
         f"- Whole-runtime target inventory: {runtime_coverage['total_files']} files / {runtime_coverage['total_functions']} functions, with {runtime_coverage['complete_files']} files / {runtime_coverage['complete_functions']} functions at a completion state.",
         f"- Swarm proof-boundary closure: `{str(swarm_boundary['closed']).lower()}` (`{runtime_swarm['name']}` = {runtime_swarm['complete_files']}/{runtime_swarm['total_files']} files complete, `{distributed_swarm['name']}` = {distributed_swarm['complete_files']}/{distributed_swarm['total_files']} files complete).",
         f"- Rows with non-empty `trusted_assumptions`: {len(payload['trusted_assumption_rows'])}.",
     ]
     if open_protocol:
-        lines.append("- Open protocol rows:")
+        lines.append("- Explicit protocol TCB rows:")
         for row in open_protocol:
             evidence_path = row["evidence_path"] or "no-local-proof-artifact"
             lines.append(
@@ -382,7 +394,7 @@ def proof_boundary_block(payload: dict) -> str:
         f"- Total ledger entries: {payload['total_entries']}.",
         f"- Machine-checked rows: {payload['mechanized_total']} total ({counts['mechanized_local']} `mechanized_local`, {counts['mechanized_generated']} `mechanized_generated`).",
         f"- Remaining non-machine-checked rows: {counts['hypothesis_stated']} `hypothesis_stated`, {counts['bounded_checked']} `bounded_checked`, {counts['assumed_external']} `assumed_external`, {counts['pending']} `pending`.",
-        f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
+        f"- Assurance classes: {assurance_counts['mechanized_implementation_claim']} `mechanized_implementation_claim`, {assurance_counts['bounded_check']} `bounded_check`, {assurance_counts['attestation_backed_lane']} `attestation_backed_lane`, {assurance_counts['model_only_claim']} `model_only_claim`, {assurance_counts['trusted_protocol_tcb']} `trusted_protocol_tcb`, {assurance_counts['hypothesis_carried_theorem']} `hypothesis_carried_theorem`.",
         f"- Whole-runtime target inventory: {runtime_coverage['total_files']} files / {runtime_coverage['total_functions']} functions, with {runtime_coverage['complete_files']} files / {runtime_coverage['complete_functions']} functions at a completion state.",
         f"- Swarm proof-boundary closure: `{str(swarm_boundary['closed']).lower()}` (`{runtime_swarm['name']}` = {runtime_swarm['complete_files']}/{runtime_swarm['total_files']} files complete, `{distributed_swarm['name']}` = {distributed_swarm['complete_files']}/{distributed_swarm['total_files']} files complete).",
         f"- Release-grade ready: `{str(payload['release_grade_ready']).lower()}`.",

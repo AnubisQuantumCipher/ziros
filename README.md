@@ -18,14 +18,14 @@ ZirOS core is proprietary and private. No public source-use grant, Change Date, 
 | Fact | Current checkout value |
 | --- | --- |
 | Workspace crates | 22 |
-| First-party Rust source lines | 346,935 tracked `.rs` lines outside `vendor/` |
+| First-party Rust source lines | 371,387 tracked `.rs` lines outside `vendor/` |
 | Proving backends in `support-matrix.json` | 9 total: 6 `ready`, 1 `limited`, 2 `broken` |
 | Frontend families in `support-matrix.json` | 7 total: 6 `ready`, 1 `limited` |
 | Gadget families in `support-matrix.json` | 11 total: 8 `ready`, 3 `limited` |
 | Canonical finite fields in `zkf-core` | 7: `bn254`, `bls12-381`, `pasta-fp`, `pasta-fq`, `goldilocks`, `babybear`, `mersenne31` |
 | Metal shader sources | 18 `.metal` files with 52 kernel entrypoints |
 | Verified Metal manifests | 9 checked-in manifest files under `zkf-metal/proofs/manifests` |
-| Verification ledger | 169 total rows, 160 `mechanized_local`, 9 `hypothesis_stated`, 0 `model_only_claim`, 0 `attestation_backed_lane`, 9 `hypothesis_carried_theorem`, 0 pending |
+| Verification ledger | 189 total rows, 176 `mechanized_local`, 0 `hypothesis_stated`, 14 `model_only_claim`, 0 `attestation_backed_lane`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`, 0 pending |
 | Runtime proof coverage | 89 files and 1,788 functions marked complete |
 | Midnight universal lane | ready across 7 contract classes; live_submit=false; blockers=3 |
 | EVM secondary lane | secondary-ready across 3 target profiles; surfaces=7 |

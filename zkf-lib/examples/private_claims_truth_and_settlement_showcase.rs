@@ -87,10 +87,7 @@ fn main() -> ZkfResult<()> {
         );
         return Ok(());
     }
-    let report_path = run_with_large_stack_result(
-        "private-claims-truth-showcase",
-        run_export,
-    )?;
+    let report_path = run_with_large_stack_result("private-claims-truth-showcase", run_export)?;
     println!("{}", report_path.display());
     Ok(())
 }

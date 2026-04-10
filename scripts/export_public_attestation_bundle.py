@@ -78,6 +78,7 @@ def main() -> int:
             "hypothesis_stated": completion["counts"]["hypothesis_stated"],
             "mechanized_implementation_claim": completion["assurance_class_counts"]["mechanized_implementation_claim"],
             "hypothesis_carried_theorem": completion["assurance_class_counts"]["hypothesis_carried_theorem"],
+            "trusted_protocol_tcb": completion["assurance_class_counts"].get("trusted_protocol_tcb", 0),
             "pending": completion["counts"]["pending"],
         },
         "support_matrix_summary": {

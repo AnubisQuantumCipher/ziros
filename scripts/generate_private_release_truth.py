@@ -185,6 +185,7 @@ def build_readme_summary(
         f"{completion['counts']['hypothesis_stated']} `hypothesis_stated`, "
         f"{completion['assurance_class_counts'].get('model_only_claim', 0)} `model_only_claim`, "
         f"{completion['assurance_class_counts'].get('attestation_backed_lane', 0)} `attestation_backed_lane`, "
+        f"{assurance.get('trusted_protocol_tcb', 0)} `trusted_protocol_tcb`, "
         f"{assurance.get('hypothesis_carried_theorem', 0)} `hypothesis_carried_theorem`, "
         f"{completion['counts'].get('pending', 0)} pending |",
         f"| Runtime proof coverage | {runtime.get('complete_files', 0)} files and {runtime.get('complete_functions', 0):,} functions marked complete |",
@@ -642,6 +643,7 @@ def main() -> None:
             "hypothesis_stated": completion["counts"]["hypothesis_stated"],
             "mechanized_implementation_claim": completion["assurance_class_counts"]["mechanized_implementation_claim"],
             "hypothesis_carried_theorem": completion["assurance_class_counts"]["hypothesis_carried_theorem"],
+            "trusted_protocol_tcb": completion["assurance_class_counts"].get("trusted_protocol_tcb", 0),
             "pending": completion["counts"]["pending"],
         },
         "support_matrix_summary": {

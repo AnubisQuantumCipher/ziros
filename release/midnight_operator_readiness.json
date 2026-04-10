@@ -8,7 +8,7 @@
   "doctor_report": {
     "checks": [
       {
-        "actual": "0.30.0 @ /Users/sicarii/.compact/versions/0.30.0/aarch64-darwin/compactc",
+        "actual": "0.30.0 @ /Users/sicarii/.local/bin/compactc",
         "expected": "0.30.0",
         "id": "compactc",
         "label": "Compact compiler",
@@ -94,7 +94,7 @@
       {
         "detail": "CLI-only mode cannot honestly inspect window.midnight.mnLace.",
         "expected": "Midnight Lace extension available in a browser context",
-        "fix": "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED/MNEMONIC for headless wallet diagnostics.",
+        "fix": "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME for headless wallet diagnostics.",
         "id": "lace",
         "label": "Lace availability",
         "required": false,
@@ -103,7 +103,7 @@
       {
         "detail": "No browser wallet session or headless operator wallet credentials were available.",
         "expected": "A Midnight wallet session bound to the selected network",
-        "fix": "Provide MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC, or allow the browser-assisted Lace check.",
+        "fix": "Provide MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME, or allow the browser-assisted Lace check.",
         "id": "wallet",
         "label": "Wallet session",
         "required": false,
@@ -119,7 +119,7 @@
         "status": "not_checkable_from_cli"
       }
     ],
-    "generated_at": "1775578768Z",
+    "generated_at": "1775828786Z",
     "network": "preprod",
     "recommended_fixes": [
       "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
@@ -142,7 +142,7 @@
     "total": 13,
     "warned": 1
   },
-  "generated_at": "2026-04-07T16:19:28.955288Z",
+  "generated_at": "2026-04-10T13:46:26.230615Z",
   "live_submit_blockers": [
     "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
     "wallet: No browser wallet session or headless operator wallet credentials were available.",

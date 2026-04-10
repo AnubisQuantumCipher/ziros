@@ -3,6 +3,7 @@
   "generated_from": {
     "repo_root": "/Users/sicarii/Desktop/ZirOS",
     "truth_files": [
+      "/Users/sicarii/Desktop/ZirOS/SOUL.md",
       "/Users/sicarii/Desktop/ZirOS/AGENTS.md",
       "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
       "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
@@ -112,6 +113,7 @@
   },
   "path_roots": {
     "repo_root": "/Users/sicarii/Desktop/ZirOS",
+    "canonical_soul": "/Users/sicarii/Desktop/ZirOS/SOUL.md",
     "operator_specimen_root": "/Users/sicarii/Projects/hibikari",
     "live_mcp_file": "/Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
     "agent_socket": "/Users/sicarii/.ziros/agent/ziros-agentd.sock",

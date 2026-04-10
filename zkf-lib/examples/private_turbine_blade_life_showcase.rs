@@ -45,8 +45,8 @@ fn integration_steps() -> ZkfResult<usize> {
 }
 
 fn export_profile() -> ZkfResult<PrivateTurbineBladeExportProfile> {
-    let raw = env::var("ZKF_PRIVATE_TURBINE_BLADE_PROFILE")
-        .unwrap_or_else(|_| "flagship".to_string());
+    let raw =
+        env::var("ZKF_PRIVATE_TURBINE_BLADE_PROFILE").unwrap_or_else(|_| "flagship".to_string());
     PrivateTurbineBladeExportProfile::parse(&raw)
 }
 

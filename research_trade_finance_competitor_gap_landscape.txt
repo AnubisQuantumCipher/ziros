@@ -1,0 +1,27 @@
+Competitor / gap landscape: blockchain trade finance + selective-disclosure enterprise finance
+
+Active privacy / selective-disclosure stacks
+- Canton Network: privacy-preserving open blockchain for capital markets; pitches “privacy fit for regulated institutions” and real-time synchronization across applications. https://www.canton.network/
+- Ethereum for Institutions privacy stack: official Ethereum institutional site now centers “Compliant Privacy for Institutions,” selective disclosure, ZK/FHE/TEE tooling, and protection of sensitive business data. https://institutions.ethereum.org/privacy
+- Chainlink confidential assets / privacy stack: public-chain middleware pushing confidential assets, CCIP private transactions, and selective disclosure for institutions. https://chain.link/article/confidential-assets-enterprise-privacy and https://chain.link/article/institutional-blockchain-privacy-solutions
+- Hyperledger Fabric private data collections: classic permissioned-enterprise approach for sharing only hashes on the shared ledger while keeping raw data to authorized orgs. https://hyperledger-fabric.readthedocs.io/en/latest/private-data/private-data.html
+
+Trade-finance / consortium precedents
+- TradeLens (IBM + Maersk) shut down: platform was “viable” technically, but lacked the “full global industry collaboration” and commercial viability needed to continue. https://www.maersk.com/news/articles/2022/11/29/maersk-and-ibm-to-discontinue-tradelens
+- we.trade (IBM/Hyperledger + 12 banks) entered insolvency; ran out of cash and failed to secure continued investment despite major-bank backing. https://www.gtreview.com/news/top-stories/we-trade-calls-it-quits-after-running-out-of-cash/ and https://www.tradefinanceglobal.com/posts/we-trade-enters-the-trough-of-disillusionment-what-this-means-for-the-digitalisation-of-trade-finance/
+- Marco Polo (R3/Corda ecosystem) became insolvent after a last-minute funding deal fell through; another large-bank network that could not sustain itself. https://www.gtreview.com/news/top-stories/marco-polo-brings-in-liquidators-as-funds-run-dry/ and https://www.ledgerinsights.com/marco-polo-blockchain-trade-finance-insolvency/
+- Contour (letters-of-credit network) shut down after failing to secure more funding; public reporting also highlights unresolved scale/interoperability issues. https://www.gtreview.com/news/top-stories/exclusive-contour-to-shut-down-as-bank-shareholders-pull-funding/ and https://www.tradefinanceglobal.com/posts/contour-collapses-what-does-this-mean-for-digital-trade-finance/
+
+Why plain public ledgers are a poor fit for trade finance
+- Federal Reserve note: on public blockchains, smart contracts and the history of all transactions are visible; functionalities executed on a public blockchain are “publicly visible,” creating privacy/security concerns. https://www.federalreserve.gov/econres/notes/feds-notes/tokenized-assets-on-public-blockchains-how-transparent-is-the-blockchain-20240403.html
+- Chainlink frames the same issue more bluntly: public blockchains inherently broadcast transaction details; institutions need to avoid leaking trade secrets, payroll data, supplier relationships, counterparties, and trade volumes. https://chain.link/article/confidential-assets-enterprise-privacy
+- Ethereum institutional materials confirm market demand has shifted from transparency-first to selective disclosure: prove compliance/audit conditions without exposing raw data; keep counterparties, amounts, and business logic confidential. https://institutions.ethereum.org/privacy
+
+Why legacy permissioned / consortium approaches are still insufficient
+- Fabric docs show the core privacy tradeoff: separate channels create administrative overhead, while many private-data collections may be needed as participant combinations grow across a multi-party process. This is workable, but operationally clunky for trade workflows with changing banks, buyers, suppliers, insurers, carriers, and regulators. https://hyperledger-fabric.readthedocs.io/en/latest/private-data/private-data.html
+- ICC DSI materials stress that trade digitisation still hinges on interoperable global standards and aligned data across key trade documents; fragmentation/interoperability remain ecosystem-level blockers. https://iccwbo.org/news-publications/news/new-icc-case-studies-provide-guidance-for-trade-digitalisation/ and https://www.digitalizetrade.org/ktdde/
+- The pattern across TradeLens, we.trade, Marco Polo, and Contour is that privacy/consortium design alone was not enough: these networks struggled with governance, funding, adoption, interoperability, and network effects even when backed by major institutions.
+
+Bottom-line gap
+- Market still lacks a widely adopted platform that combines: confidentiality by default, selective disclosure to specific counterparties/regulators, complex multi-party workflow coordination, document/data interoperability, and a sustainable commercial/governance model.
+- Public chains default to over-transparency; legacy consortia default to siloed governance and brittle network effects. The gap is an interoperable, privacy-native workflow network for regulated multi-party trade/enterprise finance.

@@ -4,6 +4,8 @@ This file is the project-specific operating blueprint for Hermes on ZirOS.
 
 Hermes must treat ZirOS as a real operating system for zero-knowledge computation, not as a chatbot shell around a repo. The correct posture on this machine is local-first, command-first, proof-first, and highly autonomous on the trusted host.
 
+Hermes must inherit the soul of ZirOS, not merely summarize it.
+
 ## Mission
 
 Turn Hermes into the durable operator intelligence of ZirOS so a user can express intent in natural language and Hermes can carry that intent through inspection, planning, code changes, builds, proving, verification, evidence generation, subsystem packaging, Midnight deployment, and on-chain validation without vague claims or handholding.
@@ -37,6 +39,7 @@ Canonical machine-readable truth:
 
 Canonical repo law:
 
+- `/Users/sicarii/Desktop/ZirOS/SOUL.md`
 - `/Users/sicarii/Desktop/ZirOS/AGENTS.md`
 - `/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md`
 - `/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md`
@@ -46,6 +49,7 @@ Canonical repo law:
 
 - ZirOS repo root: `/Users/sicarii/Desktop/ZirOS`
 - Hermes soul: `/Users/sicarii/.hermes/SOUL.md`
+- ZirOS canonical soul: `/Users/sicarii/Desktop/ZirOS/SOUL.md`
 - ZirOS blueprint: `/Users/sicarii/Desktop/ZirOS/HERMES.md`
 - Live MCP URL file: `/Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt`
 - Managed CLI wrapper: `/Users/sicarii/.ziros/bin/ziros`
@@ -404,10 +408,29 @@ Midnight specimen repo:
 - Exported reports must preserve trust-lane honesty.
 - If a proof or deployment lane falls back, say so plainly.
 
+## Mandatory Hermes Skill Stack
+
+Inside this repo, Hermes must not operate from generic terminal intuition alone.
+
+Before doing substantive work, Hermes must load:
+
+1. `ziros-default-operator`
+2. `ziros-system-operator`
+
+Then load the narrower matching skill when applicable, especially:
+
+- `midnight-subsystem-contract-ops`
+- `midnight-pilot-recovery`
+- `zk-proof-boundary-closure`
+- `verified-metal-boundary`
+
+If a ZirOS task is underway and these skills were not loaded, that is a mistake that should be corrected immediately.
+
 ## First Action For Any Fresh Hermes Session
 
 1. Read:
    - `/Users/sicarii/.hermes/SOUL.md`
+   - `/Users/sicarii/Desktop/ZirOS/SOUL.md`
    - `/Users/sicarii/Desktop/ZirOS/HERMES.md`
    - `/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md`
    - `/Users/sicarii/Desktop/ZirOS/AGENTS.md`

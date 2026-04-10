@@ -9,9 +9,8 @@ use zkf_backends::prepare_witness_for_proving;
 #[cfg(test)]
 use zkf_core::check_constraints;
 use zkf_core::{
-    BigIntFieldValue, Expr, FieldElement, FieldId, FieldValue, Program, Witness, WitnessInputs, ZkfError,
-    ZkfResult,
-    generate_witness,
+    BigIntFieldValue, Expr, FieldElement, FieldId, FieldValue, Program, Witness, WitnessInputs,
+    ZkfError, ZkfResult, generate_witness,
 };
 
 use super::builder::ProgramBuilder;
@@ -96,8 +95,7 @@ pub struct ClaimsTruthInvoiceLineItemV1 {
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct ClaimsTruthEvidenceDataV1 {
-    pub repair_estimate_line_items:
-        [ClaimsTruthEstimateLineItemV1; PRIVATE_CLAIMS_MAX_LINE_ITEMS],
+    pub repair_estimate_line_items: [ClaimsTruthEstimateLineItemV1; PRIVATE_CLAIMS_MAX_LINE_ITEMS],
     pub invoice_line_items: [ClaimsTruthInvoiceLineItemV1; PRIVATE_CLAIMS_MAX_LINE_ITEMS],
     pub replacement_cost_schedules: [u64; PRIVATE_CLAIMS_MAX_LINE_ITEMS],
     pub depreciation_basis_values: [u64; PRIVATE_CLAIMS_MAX_LINE_ITEMS],
@@ -357,7 +355,11 @@ fn write_value(
     values.insert(name.into(), field(value));
 }
 
-fn write_bool_value(values: &mut BTreeMap<String, FieldElement>, name: impl Into<String>, value: bool) {
+fn write_bool_value(
+    values: &mut BTreeMap<String, FieldElement>,
+    name: impl Into<String>,
+    value: bool,
+) {
     values.insert(
         name.into(),
         if value {
@@ -595,7 +597,10 @@ fn append_boolean_or(
     builder.private_signal(target)?;
     builder.bind(
         target,
-        sub_expr(add_expr(vec![left.clone(), right.clone()]), mul_expr(left, right)),
+        sub_expr(
+            add_expr(vec![left.clone(), right.clone()]),
+            mul_expr(left, right),
+        ),
     )?;
     builder.constrain_boolean(target)?;
     Ok(())
@@ -632,7 +637,8 @@ fn append_nonzero_indicator(
     value: Expr,
     prefix: &str,
 ) -> ZkfResult<()> {
-    let zero_eq = append_equality_with_inverse(builder, value, const_expr(0), &format!("{prefix}_zero"))?;
+    let zero_eq =
+        append_equality_with_inverse(builder, value, const_expr(0), &format!("{prefix}_zero"))?;
     builder.private_signal(target)?;
     builder.bind(target, sub_expr(const_expr(1), signal_expr(&zero_eq)))?;
     builder.constrain_boolean(target)?;
@@ -701,13 +707,11 @@ fn write_exact_division_support_bigint(
         .clone()
         .try_into()
         .map_err(|_| ZkfError::InvalidArtifact(format!("{prefix} remainder did not fit in u64")))?;
-    let slack_value = denominator
-        .checked_sub(remainder_u64 + 1)
-        .ok_or_else(|| {
-            ZkfError::InvalidArtifact(format!(
-                "{prefix} denominator={denominator} is inconsistent with remainder={remainder_u64}"
-            ))
-        })?;
+    let slack_value = denominator.checked_sub(remainder_u64 + 1).ok_or_else(|| {
+        ZkfError::InvalidArtifact(format!(
+            "{prefix} denominator={denominator} is inconsistent with remainder={remainder_u64}"
+        ))
+    })?;
     write_value(values, quotient, quotient_value);
     write_value(values, remainder, remainder_value);
     write_value(values, slack, slack_value);
@@ -1374,8 +1378,7 @@ fn declare_private_inputs(builder: &mut ProgramBuilder) -> ZkfResult<()> {
 }
 
 pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
-    let mut builder =
-        ProgramBuilder::new("claims_truth_claim_decision_core_v1", CLAIMS_FIELD);
+    let mut builder = ProgramBuilder::new("claims_truth_claim_decision_core_v1", CLAIMS_FIELD);
     declare_private_inputs(&mut builder)?;
     for output in expected_public_output_names() {
         builder.public_output(output)?;
@@ -1383,7 +1386,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.metadata_entry("nova_ivc_in", "claim_packet_commitment")?;
     builder.metadata_entry("nova_ivc_out", "settlement_instruction_commitment")?;
     builder.constant_signal("__claims_score_cap", field(CLAIMS_SCORE_CAP))?;
-    builder.constant_signal("__claims_component_score_cap", field(CLAIMS_COMPONENT_SCORE_CAP))?;
+    builder.constant_signal(
+        "__claims_component_score_cap",
+        field(CLAIMS_COMPONENT_SCORE_CAP),
+    )?;
     builder.constant_signal("__claims_scale", field(CLAIMS_FIXED_POINT_SCALE))?;
     builder.constant_signal("__claims_one", FieldElement::ONE)?;
     builder.constant_signal("__claims_zero", FieldElement::ZERO)?;
@@ -1548,7 +1554,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
             signal_expr(&claim_input_name("incident_timestamp")),
         ),
     )?;
-    builder.constrain_range("claims_report_delay", bits_for_bound(CLAIMS_TIMESTAMP_BOUND))?;
+    builder.constrain_range(
+        "claims_report_delay",
+        bits_for_bound(CLAIMS_TIMESTAMP_BOUND),
+    )?;
     builder.private_signal("claims_report_delay_margin_shifted")?;
     builder.constrain_equal(
         signal_expr("claims_report_delay_margin_shifted"),
@@ -1700,7 +1709,9 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
         "claims_total_replacement_amount",
         add_expr(
             (0..PRIVATE_CLAIMS_MAX_LINE_ITEMS)
-                .map(|index| signal_expr(&evidence_line_name("estimate", "replacement_cost", index)))
+                .map(|index| {
+                    signal_expr(&evidence_line_name("estimate", "replacement_cost", index))
+                })
                 .collect(),
         ),
     )?;
@@ -1771,7 +1782,12 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     }
     builder.bind(
         "claims_duplicate_match_count",
-        add_expr(duplicate_eq_bits.iter().map(|name| signal_expr(name)).collect()),
+        add_expr(
+            duplicate_eq_bits
+                .iter()
+                .map(|name| signal_expr(name))
+                .collect(),
+        ),
     )?;
 
     let nonzero_digest_sources = vec![
@@ -1788,7 +1804,12 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     }
     builder.bind(
         "claims_complete_digest_count",
-        add_expr(complete_digest_bits.iter().map(|name| signal_expr(name)).collect()),
+        add_expr(
+            complete_digest_bits
+                .iter()
+                .map(|name| signal_expr(name))
+                .collect(),
+        ),
     )?;
 
     builder.append_exact_division_constraints(
@@ -1806,7 +1827,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
         add_expr(vec![
             mul_expr(signal_expr("claims_chronology_ratio"), const_expr(1_000)),
             mul_expr(
-                sub_expr(const_expr(1), signal_expr("claims_reported_after_incident_bit")),
+                sub_expr(
+                    const_expr(1),
+                    signal_expr("claims_reported_after_incident_bit"),
+                ),
                 const_expr(2_000),
             ),
         ]),
@@ -1893,7 +1917,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.private_signal("claims_total_vendor_baseline_plus_one")?;
     builder.bind(
         "claims_total_vendor_baseline_plus_one",
-        add_expr(vec![signal_expr("claims_total_vendor_baseline"), const_expr(1)]),
+        add_expr(vec![
+            signal_expr("claims_total_vendor_baseline"),
+            const_expr(1),
+        ]),
     )?;
     builder.append_exact_division_constraints(
         signal_expr("claims_vendor_gap"),
@@ -1935,7 +1962,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     )?;
 
     builder.private_signal("claims_expected_digest_count")?;
-    builder.bind("claims_expected_digest_count", const_expr(nonzero_digest_sources.len() as u64))?;
+    builder.bind(
+        "claims_expected_digest_count",
+        const_expr(nonzero_digest_sources.len() as u64),
+    )?;
     builder.private_signal("claims_missing_digest_count")?;
     builder.bind(
         "claims_missing_digest_count",
@@ -1947,7 +1977,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.private_signal("claims_evidence_completeness_score")?;
     builder.bind(
         "claims_evidence_completeness_score",
-        mul_expr(signal_expr("claims_missing_digest_count"), const_expr(1_000)),
+        mul_expr(
+            signal_expr("claims_missing_digest_count"),
+            const_expr(1_000),
+        ),
     )?;
     builder.constrain_range(
         "claims_evidence_completeness_score",
@@ -1961,11 +1994,17 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
             signal_expr("claims_valuation_score"),
             signal_expr("claims_quantity_score"),
             mul_expr(
-                sub_expr(const_expr(1), signal_expr("claims_geographic_reasonable_bit")),
+                sub_expr(
+                    const_expr(1),
+                    signal_expr("claims_geographic_reasonable_bit"),
+                ),
                 const_expr(800),
             ),
             mul_expr(
-                sub_expr(const_expr(1), signal_expr("claims_reported_after_incident_bit")),
+                sub_expr(
+                    const_expr(1),
+                    signal_expr("claims_reported_after_incident_bit"),
+                ),
                 const_expr(2_000),
             ),
             signal_expr("claims_evidence_completeness_score"),
@@ -1992,7 +2031,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.private_signal("claims_duplication_score")?;
     builder.bind(
         "claims_duplication_score",
-        mul_expr(signal_expr("claims_duplicate_match_count"), const_expr(3_000)),
+        mul_expr(
+            signal_expr("claims_duplicate_match_count"),
+            const_expr(3_000),
+        ),
     )?;
     builder.private_signal("claims_fraud_evidence_score_raw")?;
     builder.bind(
@@ -2265,7 +2307,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.private_signal("claims_not_inconsistency_bit")?;
     builder.bind(
         "claims_not_inconsistency_bit",
-        sub_expr(const_expr(1), signal_expr("claims_inconsistency_threshold_hit_bit")),
+        sub_expr(
+            const_expr(1),
+            signal_expr("claims_inconsistency_threshold_hit_bit"),
+        ),
     )?;
     builder.constrain_boolean("claims_not_inconsistency_bit")?;
     builder.private_signal("claims_not_fraud_review_bit")?;
@@ -2276,7 +2321,10 @@ pub fn build_claim_decision_core_program() -> ZkfResult<Program> {
     builder.constrain_boolean("claims_not_fraud_review_bit")?;
 
     builder.private_signal("claims_action_deny_policy_bit")?;
-    builder.bind("claims_action_deny_policy_bit", signal_expr("claims_policy_ineligible_bit"))?;
+    builder.bind(
+        "claims_action_deny_policy_bit",
+        signal_expr("claims_policy_ineligible_bit"),
+    )?;
     builder.constrain_boolean("claims_action_deny_policy_bit")?;
     append_boolean_and(
         &mut builder,
@@ -2472,7 +2520,10 @@ pub fn build_settlement_binding_program() -> ZkfResult<Program> {
     )?;
     builder.constrain_equal(
         signal_expr("claims_settlement_finality_flag"),
-        sub_expr(const_expr(1), signal_expr("claims_settlement_hold_required_bit")),
+        sub_expr(
+            const_expr(1),
+            signal_expr("claims_settlement_hold_required_bit"),
+        ),
     )?;
     let settlement_commitment = builder.append_poseidon_hash(
         "claims_settlement_instruction_commitment_inner",
@@ -2571,10 +2622,22 @@ pub fn build_disclosure_projection_program() -> ZkfResult<Program> {
     builder.constrain_equal(
         signal_expr("claims_disclosure_role_code"),
         add_expr(vec![
-            mul_expr(signal_expr("claims_disclosure_role_regulator"), const_expr(1)),
-            mul_expr(signal_expr("claims_disclosure_role_reinsurer"), const_expr(2)),
-            mul_expr(signal_expr("claims_disclosure_role_claimant"), const_expr(3)),
-            mul_expr(signal_expr("claims_disclosure_role_investigator"), const_expr(4)),
+            mul_expr(
+                signal_expr("claims_disclosure_role_regulator"),
+                const_expr(1),
+            ),
+            mul_expr(
+                signal_expr("claims_disclosure_role_reinsurer"),
+                const_expr(2),
+            ),
+            mul_expr(
+                signal_expr("claims_disclosure_role_claimant"),
+                const_expr(3),
+            ),
+            mul_expr(
+                signal_expr("claims_disclosure_role_investigator"),
+                const_expr(4),
+            ),
         ]),
     )?;
     builder.constrain_range("claims_disclosure_role_code", 3)?;
@@ -2746,7 +2809,11 @@ fn bigint_from_map(values: &BTreeMap<String, FieldElement>, name: &str) -> BigIn
 
 fn write_square_nonlinear_anchor(values: &mut BTreeMap<String, FieldElement>, signal: &str) {
     let value = bigint_from_map(values, signal);
-    write_value(values, format!("{signal}_square_anchor"), value.clone() * value);
+    write_value(
+        values,
+        format!("{signal}_square_anchor"),
+        value.clone() * value,
+    );
 }
 
 fn u64_from_map(values: &BTreeMap<String, FieldElement>, name: &str) -> u64 {
@@ -2826,10 +2893,15 @@ fn compute_core_support_values(
         "claims_claim_category_present",
     )?;
     let within_period = incident_after_effective && expiration_after_incident;
-    let policy_eligible = within_period && covered_peril_supported && !peril_excluded && claim_category_present;
+    let policy_eligible =
+        within_period && covered_peril_supported && !peril_excluded && claim_category_present;
     write_value(&mut values, "claims_covered_peril_count", coverage_count);
     write_value(&mut values, "claims_excluded_peril_count", exclusion_count);
-    write_value(&mut values, "claims_claimed_category_count", claim_category_count);
+    write_value(
+        &mut values,
+        "claims_claimed_category_count",
+        claim_category_count,
+    );
     write_bool_value(&mut values, "claims_within_period_bit", within_period);
     write_bool_value(
         &mut values,
@@ -2910,12 +2982,17 @@ fn compute_core_support_values(
         let quantity_gap = quantity_max - quantity_min;
         total_estimate_amount = total_estimate_amount.saturating_add(estimate_total);
         total_invoice_amount = total_invoice_amount.saturating_add(invoice.invoice_amount);
-        total_replacement_amount = total_replacement_amount.saturating_add(estimate.replacement_cost);
+        total_replacement_amount =
+            total_replacement_amount.saturating_add(estimate.replacement_cost);
         total_valuation_gap = total_valuation_gap
             .saturating_add(replacement_gap)
             .saturating_add(invoice_gap);
         total_quantity_gap = total_quantity_gap.saturating_add(quantity_gap);
-        write_value(&mut values, format!("claims_estimate_total_{index}"), estimate_total);
+        write_value(
+            &mut values,
+            format!("claims_estimate_total_{index}"),
+            estimate_total,
+        );
         let prefix = format!("claims_replacement_min_{index}");
         write_geq_support(
             &mut values,
@@ -2976,24 +3053,72 @@ fn compute_core_support_values(
             CLAIMS_VALUE_BOUND,
             &prefix,
         )?;
-        write_value(&mut values, format!("claims_replacement_gap_{index}"), replacement_gap);
-        write_value(&mut values, format!("claims_invoice_gap_{index}"), invoice_gap);
-        write_value(&mut values, format!("claims_quantity_gap_{index}"), quantity_gap);
-        write_value(&mut values, format!("claims_replacement_min_{index}"), replacement_min);
-        write_value(&mut values, format!("claims_replacement_max_{index}"), replacement_max);
-        write_value(&mut values, format!("claims_invoice_amount_min_{index}"), invoice_min);
-        write_value(&mut values, format!("claims_invoice_amount_max_{index}"), invoice_max);
-        write_value(&mut values, format!("claims_invoice_quantity_min_{index}"), quantity_min);
-        write_value(&mut values, format!("claims_invoice_quantity_max_{index}"), quantity_max);
+        write_value(
+            &mut values,
+            format!("claims_replacement_gap_{index}"),
+            replacement_gap,
+        );
+        write_value(
+            &mut values,
+            format!("claims_invoice_gap_{index}"),
+            invoice_gap,
+        );
+        write_value(
+            &mut values,
+            format!("claims_quantity_gap_{index}"),
+            quantity_gap,
+        );
+        write_value(
+            &mut values,
+            format!("claims_replacement_min_{index}"),
+            replacement_min,
+        );
+        write_value(
+            &mut values,
+            format!("claims_replacement_max_{index}"),
+            replacement_max,
+        );
+        write_value(
+            &mut values,
+            format!("claims_invoice_amount_min_{index}"),
+            invoice_min,
+        );
+        write_value(
+            &mut values,
+            format!("claims_invoice_amount_max_{index}"),
+            invoice_max,
+        );
+        write_value(
+            &mut values,
+            format!("claims_invoice_quantity_min_{index}"),
+            quantity_min,
+        );
+        write_value(
+            &mut values,
+            format!("claims_invoice_quantity_max_{index}"),
+            quantity_max,
+        );
     }
-    write_value(&mut values, "claims_total_estimate_amount", total_estimate_amount);
-    write_value(&mut values, "claims_total_invoice_amount", total_invoice_amount);
+    write_value(
+        &mut values,
+        "claims_total_estimate_amount",
+        total_estimate_amount,
+    );
+    write_value(
+        &mut values,
+        "claims_total_invoice_amount",
+        total_invoice_amount,
+    );
     write_value(
         &mut values,
         "claims_total_replacement_amount",
         total_replacement_amount,
     );
-    write_value(&mut values, "claims_total_valuation_gap", total_valuation_gap);
+    write_value(
+        &mut values,
+        "claims_total_valuation_gap",
+        total_valuation_gap,
+    );
     write_value(&mut values, "claims_total_quantity_gap", total_quantity_gap);
 
     let total_price_baseline = request
@@ -3014,9 +3139,21 @@ fn compute_core_support_values(
         .iter()
         .copied()
         .sum::<u64>();
-    write_value(&mut values, "claims_total_price_baseline", total_price_baseline);
-    write_value(&mut values, "claims_total_vendor_baseline", total_vendor_baseline);
-    write_value(&mut values, "claims_total_vendor_digest", total_vendor_digest);
+    write_value(
+        &mut values,
+        "claims_total_price_baseline",
+        total_price_baseline,
+    );
+    write_value(
+        &mut values,
+        "claims_total_vendor_baseline",
+        total_vendor_baseline,
+    );
+    write_value(
+        &mut values,
+        "claims_total_vendor_digest",
+        total_vendor_digest,
+    );
     let geographic_reasonable = write_geq_support(
         &mut values,
         "claims_geographic_reasonable_bit",
@@ -3056,7 +3193,11 @@ fn compute_core_support_values(
         };
         values.insert(format!("claims_duplicate_match_{index}_inv"), inv);
     }
-    write_value(&mut values, "claims_duplicate_match_count", duplicate_match_count);
+    write_value(
+        &mut values,
+        "claims_duplicate_match_count",
+        duplicate_match_count,
+    );
 
     let digest_presence_values = [
         BigInt::from(request.evidence.photo_analysis_result_digest),
@@ -3071,12 +3212,20 @@ fn compute_core_support_values(
         let is_zero = source == &zero();
         write_equality_with_inverse_support(&mut values, source, &zero(), &prefix);
         let present = !is_zero;
-        write_bool_value(&mut values, format!("claims_digest_present_{index}"), present);
+        write_bool_value(
+            &mut values,
+            format!("claims_digest_present_{index}"),
+            present,
+        );
         if present {
             complete_digest_count += 1;
         }
     }
-    write_value(&mut values, "claims_complete_digest_count", complete_digest_count);
+    write_value(
+        &mut values,
+        "claims_complete_digest_count",
+        complete_digest_count,
+    );
 
     let chronology_ratio = report_delay / request.analysis_inputs.chronology_consistency_threshold;
     let _chronology_remainder =
@@ -3093,7 +3242,11 @@ fn compute_core_support_values(
     let chronology_score = (chronology_ratio.saturating_mul(1_000)
         + u64::from(!reported_after_incident) * 2_000)
         .min(CLAIMS_COMPONENT_SCORE_CAP);
-    write_value(&mut values, "claims_chronology_score_raw", chronology_ratio * 1_000);
+    write_value(
+        &mut values,
+        "claims_chronology_score_raw",
+        chronology_ratio * 1_000,
+    );
     write_geq_support(
         &mut values,
         "claims_chronology_score_geq_bit",
@@ -3114,9 +3267,16 @@ fn compute_core_support_values(
         "claims_valuation_ratio_slack",
         "claims_valuation_ratio",
     )?;
-    let valuation_ratio = total_valuation_gap / request.analysis_inputs.valuation_tolerance_threshold;
-    let valuation_score = valuation_ratio.saturating_mul(1_000).min(CLAIMS_COMPONENT_SCORE_CAP);
-    write_value(&mut values, "claims_valuation_score_raw", valuation_ratio * 1_000);
+    let valuation_ratio =
+        total_valuation_gap / request.analysis_inputs.valuation_tolerance_threshold;
+    let valuation_score = valuation_ratio
+        .saturating_mul(1_000)
+        .min(CLAIMS_COMPONENT_SCORE_CAP);
+    write_value(
+        &mut values,
+        "claims_valuation_score_raw",
+        valuation_ratio * 1_000,
+    );
     write_geq_support(
         &mut values,
         "claims_valuation_score_geq_bit",
@@ -3138,8 +3298,14 @@ fn compute_core_support_values(
         "claims_quantity_ratio",
     )?;
     let quantity_ratio = total_quantity_gap / request.analysis_inputs.quantity_tolerance_threshold;
-    let quantity_score = quantity_ratio.saturating_mul(1_000).min(CLAIMS_COMPONENT_SCORE_CAP);
-    write_value(&mut values, "claims_quantity_score_raw", quantity_ratio * 1_000);
+    let quantity_score = quantity_ratio
+        .saturating_mul(1_000)
+        .min(CLAIMS_COMPONENT_SCORE_CAP);
+    write_value(
+        &mut values,
+        "claims_quantity_score_raw",
+        quantity_ratio * 1_000,
+    );
     write_geq_support(
         &mut values,
         "claims_quantity_score_geq_bit",
@@ -3196,7 +3362,9 @@ fn compute_core_support_values(
         "claims_vendor_ratio",
     )?;
     let vendor_ratio = vendor_gap / (total_vendor_baseline + 1);
-    let vendor_score = vendor_ratio.saturating_mul(750).min(CLAIMS_COMPONENT_SCORE_CAP);
+    let vendor_score = vendor_ratio
+        .saturating_mul(750)
+        .min(CLAIMS_COMPONENT_SCORE_CAP);
     write_value(&mut values, "claims_vendor_score_raw", vendor_ratio * 750);
     write_geq_support(
         &mut values,
@@ -3209,8 +3377,8 @@ fn compute_core_support_values(
     )?;
     write_value(&mut values, "claims_vendor_score", vendor_score);
 
-    let policy_mismatch_score = (u64::from(!policy_eligible) * 5_000)
-        .saturating_add(u64::from(peril_excluded) * 2_000);
+    let policy_mismatch_score =
+        (u64::from(!policy_eligible) * 5_000).saturating_add(u64::from(peril_excluded) * 2_000);
     write_value(
         &mut values,
         "claims_policy_mismatch_score",
@@ -3222,7 +3390,11 @@ fn compute_core_support_values(
         expected_digest_count,
     );
     let missing_digest_count = expected_digest_count - complete_digest_count;
-    write_value(&mut values, "claims_missing_digest_count", missing_digest_count);
+    write_value(
+        &mut values,
+        "claims_missing_digest_count",
+        missing_digest_count,
+    );
     let evidence_completeness_score = missing_digest_count * 1_000;
     write_value(
         &mut values,
@@ -3309,8 +3481,16 @@ fn compute_core_support_values(
         [
             &BigInt::from(CLAIMS_DOMAIN_CONSISTENCY),
             &BigInt::from(consistency_score),
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[0]),
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[1]),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[0],
+            ),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[1],
+            ),
         ],
     )?;
     let fraud_evidence_score_commitment = write_poseidon_hash_support(
@@ -3319,8 +3499,16 @@ fn compute_core_support_values(
         [
             &BigInt::from(CLAIMS_DOMAIN_FRAUD),
             &BigInt::from(fraud_evidence_score),
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[0]),
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[1]),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[0],
+            ),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[1],
+            ),
         ],
     )?;
 
@@ -3371,7 +3559,8 @@ fn compute_core_support_values(
         "claims_depreciation",
     )?;
     let depreciation_amount = depreciation_raw / CLAIMS_FIXED_POINT_SCALE;
-    let depreciation_adjusted_amount = deductible_adjusted_amount.saturating_sub(depreciation_amount);
+    let depreciation_adjusted_amount =
+        deductible_adjusted_amount.saturating_sub(depreciation_amount);
     write_value(
         &mut values,
         "claims_depreciation_adjusted_amount",
@@ -3456,7 +3645,11 @@ fn compute_core_support_values(
     );
     let reinsurer_share_raw =
         reinsurer_share_base.saturating_mul(request.policy.reinsurer_sharing_parameters[0]);
-    write_value(&mut values, "claims_reinsurer_share_raw", reinsurer_share_raw);
+    write_value(
+        &mut values,
+        "claims_reinsurer_share_raw",
+        reinsurer_share_raw,
+    );
     write_exact_division_support(
         &mut values,
         reinsurer_share_raw,
@@ -3527,7 +3720,11 @@ fn compute_core_support_values(
     )?;
     let manual_hit = manual_payout_hit || manual_reserve_hit;
     write_bool_value(&mut values, "claims_manual_review_hit_bit", manual_hit);
-    write_bool_value(&mut values, "claims_policy_ineligible_bit", !policy_eligible);
+    write_bool_value(
+        &mut values,
+        "claims_policy_ineligible_bit",
+        !policy_eligible,
+    );
     write_bool_value(
         &mut values,
         "claims_not_inconsistency_bit",
@@ -3552,16 +3749,25 @@ fn compute_core_support_values(
         ClaimsActionClassV1::ApproveAndSettle
     };
     let action_class_code = action_class.code();
-    let action_non_auto_sum =
-        u64::from(deny_policy_bit) + u64::from(deny_inconsistency_bit) + u64::from(escalate_bit)
-            + u64::from(manual_review_bit);
-    write_bool_value(&mut values, "claims_action_deny_policy_bit", deny_policy_bit);
+    let action_non_auto_sum = u64::from(deny_policy_bit)
+        + u64::from(deny_inconsistency_bit)
+        + u64::from(escalate_bit)
+        + u64::from(manual_review_bit);
+    write_bool_value(
+        &mut values,
+        "claims_action_deny_policy_bit",
+        deny_policy_bit,
+    );
     write_bool_value(
         &mut values,
         "claims_action_deny_inconsistency_bit",
         deny_inconsistency_bit,
     );
-    write_bool_value(&mut values, "claims_action_can_review_bit", policy_eligible && !inconsistency_hit);
+    write_bool_value(
+        &mut values,
+        "claims_action_can_review_bit",
+        policy_eligible && !inconsistency_hit,
+    );
     write_bool_value(&mut values, "claims_action_escalate_bit", escalate_bit);
     write_bool_value(
         &mut values,
@@ -3573,7 +3779,11 @@ fn compute_core_support_values(
         "claims_action_manual_review_bit",
         manual_review_bit,
     );
-    write_value(&mut values, "claims_action_non_auto_sum", action_non_auto_sum);
+    write_value(
+        &mut values,
+        "claims_action_non_auto_sum",
+        action_non_auto_sum,
+    );
     write_bool_value(
         &mut values,
         "claims_action_approve_and_settle_bit",
@@ -3633,7 +3843,11 @@ fn compute_core_support_values(
             &settlement_instruction_commitment,
             &claim_packet_commitment,
             &coverage_decision_commitment,
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[1]),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[1],
+            ),
         ],
     )?;
     write_square_nonlinear_anchor(&mut values, "claims_report_delay_margin_shifted");
@@ -3784,12 +3998,16 @@ fn compute_settlement_binding_values(
     write_value(
         &mut values,
         "claims_settlement_public_blinding_0",
-        request.settlement_governance.public_disclosure_blinding_values[0],
+        request
+            .settlement_governance
+            .public_disclosure_blinding_values[0],
     );
     write_value(
         &mut values,
         "claims_settlement_public_blinding_1",
-        request.settlement_governance.public_disclosure_blinding_values[1],
+        request
+            .settlement_governance
+            .public_disclosure_blinding_values[1],
     );
     let hold_by_fraud = write_geq_support(
         &mut values,
@@ -3855,7 +4073,11 @@ fn compute_settlement_binding_values(
             &settlement_instruction_commitment,
             &core.claim_packet_commitment,
             &core.coverage_decision_commitment,
-            &BigInt::from(request.settlement_governance.public_disclosure_blinding_values[1]),
+            &BigInt::from(
+                request
+                    .settlement_governance
+                    .public_disclosure_blinding_values[1],
+            ),
         ],
     )?;
     let dispute_hold_commitment = write_poseidon_hash_support(
@@ -3936,10 +4158,22 @@ fn compute_disclosure_projection_values(
         role_code == 4,
     ];
     write_bool_value(&mut values, "claims_disclosure_role_auditor", role_bits[0]);
-    write_bool_value(&mut values, "claims_disclosure_role_regulator", role_bits[1]);
-    write_bool_value(&mut values, "claims_disclosure_role_reinsurer", role_bits[2]);
+    write_bool_value(
+        &mut values,
+        "claims_disclosure_role_regulator",
+        role_bits[1],
+    );
+    write_bool_value(
+        &mut values,
+        "claims_disclosure_role_reinsurer",
+        role_bits[2],
+    );
     write_bool_value(&mut values, "claims_disclosure_role_claimant", role_bits[3]);
-    write_bool_value(&mut values, "claims_disclosure_role_investigator", role_bits[4]);
+    write_bool_value(
+        &mut values,
+        "claims_disclosure_role_investigator",
+        role_bits[4],
+    );
     write_value(
         &mut values,
         "claims_disclosure_claim_packet_commitment",
@@ -4145,12 +4379,7 @@ fn compute_batch_shard_values(
     let assignment_commitment = write_poseidon_hash_support(
         &mut values,
         "claims_shard_assignment_commitment_inner",
-        [
-            &assignment_0,
-            &assignment_1,
-            &assignment_2,
-            &assignment_3,
-        ],
+        [&assignment_0, &assignment_1, &assignment_2, &assignment_3],
     )?;
     write_value(
         &mut values,
@@ -4424,7 +4653,11 @@ mod tests {
         let program = build_claim_decision_core_program().expect("program");
         let (mut values, _) =
             compute_core_support_values(&private_claims_truth_sample_inputs()).expect("values");
-        write_value(&mut values, evidence_name("evidence_manifest_digest"), 12345u64);
+        write_value(
+            &mut values,
+            evidence_name("evidence_manifest_digest"),
+            12345u64,
+        );
         match generate_witness(&program, &values) {
             Ok(witness) => {
                 let err = check_constraints(&program, &witness).expect_err("must fail");
@@ -4443,8 +4676,11 @@ mod tests {
         let request = private_claims_truth_sample_inputs();
         let (core_witness, core) =
             claims_truth_claim_decision_witness_from_inputs(&request).expect("core");
-        check_constraints(&build_claim_decision_core_program().expect("program"), &core_witness)
-            .expect("core constraints");
+        check_constraints(
+            &build_claim_decision_core_program().expect("program"),
+            &core_witness,
+        )
+        .expect("core constraints");
         let (settlement_witness, settlement) =
             claims_truth_settlement_binding_witness_from_inputs(&request, &core)
                 .expect("settlement");
@@ -4485,9 +4721,8 @@ mod tests {
             core_a.consistency_score_commitment.clone(),
             core_a.settlement_instruction_commitment.clone(),
         ];
-        let (witness, _) =
-            claims_truth_batch_shard_handoff_witness_from_commitments(&commitments)
-                .expect("shard witness");
+        let (witness, _) = claims_truth_batch_shard_handoff_witness_from_commitments(&commitments)
+            .expect("shard witness");
         check_constraints(
             &build_batch_shard_handoff_program().expect("program"),
             &witness,

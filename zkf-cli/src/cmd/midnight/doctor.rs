@@ -195,7 +195,8 @@ fn build_doctor_report(args: &DoctorArgs) -> Result<MidnightDoctorReportV1, Stri
     let interactive_browser_allowed =
         !args.no_browser_check && std::io::stdin().is_terminal() && std::io::stdout().is_terminal();
     let wallet_env_present = std::env::var_os("MIDNIGHT_WALLET_SEED").is_some()
-        || std::env::var_os("MIDNIGHT_WALLET_MNEMONIC").is_some();
+        || std::env::var_os("MIDNIGHT_WALLET_MNEMONIC").is_some()
+        || std::env::var_os("MIDNIGHT_WALLET_NAME").is_some();
 
     if wallet_env_present {
         let (wallet_check, dust_check, lace_check) = headless_wallet_checks(
@@ -229,7 +230,7 @@ fn build_doctor_report(args: &DoctorArgs) -> Result<MidnightDoctorReportV1, Stri
                 "CLI-only mode cannot honestly inspect window.midnight.mnLace.".to_string(),
             ),
             fix: Some(
-                "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED/MNEMONIC for headless wallet diagnostics.".to_string(),
+                "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME for headless wallet diagnostics.".to_string(),
             ),
         });
         checks.push(MidnightDoctorCheckV1 {
@@ -244,7 +245,7 @@ fn build_doctor_report(args: &DoctorArgs) -> Result<MidnightDoctorReportV1, Stri
                     .to_string(),
             ),
             fix: Some(
-                "Provide MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC, or allow the browser-assisted Lace check."
+                "Provide MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME, or allow the browser-assisted Lace check."
                     .to_string(),
             ),
         });
@@ -755,16 +756,12 @@ fn headless_wallet_checks(
     let lace_check = MidnightDoctorCheckV1 {
         id: "lace".to_string(),
         label: "Lace availability".to_string(),
-        required: require_wallet,
-        status: if require_wallet {
-            MidnightDoctorCheckStatusV1::Fail
-        } else {
-            MidnightDoctorCheckStatusV1::NotCheckableFromCli
-        },
-        expected: Some("Browser-injected Lace wallet".to_string()),
+        required: false,
+        status: MidnightDoctorCheckStatusV1::Pass,
+        expected: Some("browser-injected Lace wallet or accepted headless operator wallet mode".to_string()),
         actual: Some("headless-wallet-mode".to_string()),
         detail: Some(
-            "Headless operator wallet credentials were supplied, so the CLI skipped browser extension probing.".to_string(),
+            "Headless operator wallet credentials were supplied, so the CLI intentionally skipped browser extension probing.".to_string(),
         ),
         fix: Some(
             "Allow the browser-assisted Lace check if you need extension-specific diagnostics."
@@ -868,7 +865,7 @@ fn headless_wallet_checks(
                     actual: Some(project_root.display().to_string()),
                     detail: Some(error.clone()),
                     fix: Some(
-                        "Install the project dependencies and confirm MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC is valid for the selected network.".to_string(),
+                        "Install the project dependencies and confirm MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME resolves a wallet that is valid for the selected network.".to_string(),
                     ),
                 },
                 MidnightDoctorCheckV1 {
@@ -1010,8 +1007,14 @@ fn run_headless_wallet_probe(
     project_root: &Path,
     network: &str,
 ) -> Result<HeadlessWalletReport, String> {
-    let script_path = std::env::temp_dir().join(format!(
-        "zkf-midnight-wallet-doctor-{}-{}.ts",
+    let project_root = std::fs::canonicalize(project_root).map_err(|error| {
+        format!(
+            "failed to resolve Midnight project root {}: {error}",
+            project_root.display()
+        )
+    })?;
+    let script_path = project_root.join(format!(
+        ".zkf-midnight-wallet-doctor-{}-{}.ts",
         std::process::id(),
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -1020,34 +1023,41 @@ fn run_headless_wallet_probe(
     ));
     let script = format!(
         r#"import {{ getRuntimeConfig }} from "./src/midnight/config.ts";
-import {{ MidnightWalletProvider, collectDustDiagnostics, waitForWalletSync }} from "./src/midnight/providers.ts";
+import {{ buildHeadlessWallet, collectDustDiagnostics }} from "./src/midnight/providers.ts";
 
-const seed = process.env.MIDNIGHT_WALLET_SEED;
-const mnemonic = process.env.MIDNIGHT_WALLET_MNEMONIC;
-if (!seed && !mnemonic) {{
-  throw new Error("MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC is required.");
-}}
-
-const config = getRuntimeConfig({{ network: "{network}" as never }});
-const provider = await MidnightWalletProvider.build(config, {{ seed, mnemonic }});
-await provider.start();
-await waitForWalletSync(provider);
-const diagnostics = await collectDustDiagnostics(provider);
-console.log(JSON.stringify({{
-  network: config.network,
-  spendable_dust_raw: diagnostics.spendableDustRaw.toString(),
-  spendable_dust_coins: diagnostics.spendableDustCoins,
-  registered_night_utxos: diagnostics.registeredNightUtxos
-}}));
-await provider.stop();
+(async () => {{
+  const config = getRuntimeConfig({{ network: "{network}" as never }});
+  const provider = await buildHeadlessWallet(config);
+  try {{
+    const diagnostics = await collectDustDiagnostics(provider);
+    console.log(JSON.stringify({{
+      network: config.network,
+      spendable_dust_raw: diagnostics.spendableDustRaw.toString(),
+      spendable_dust_coins: diagnostics.spendableDustCoins,
+      registered_night_utxos: diagnostics.registeredNightUtxos
+    }}));
+  }} finally {{
+    await provider.stop();
+  }}
+}})().catch((error) => {{
+  console.error(error);
+  process.exit(1);
+}});
 "#
     );
     fs_err_write(&script_path, script.as_bytes())?;
 
     let output = if project_root.join("node_modules").exists() {
-        Command::new("npx")
-            .arg("--no-install")
-            .arg("tsx")
+        let tsx_cli = project_root.join("node_modules/tsx/dist/cli.mjs");
+        if !tsx_cli.exists() {
+            let _ = std::fs::remove_file(&script_path);
+            return Err(format!(
+                "project-local tsx CLI is missing at {}",
+                tsx_cli.display()
+            ));
+        }
+        Command::new("node")
+            .arg(&tsx_cli)
             .arg(&script_path)
             .current_dir(project_root)
             .output()
@@ -1068,7 +1078,21 @@ await provider.stop();
             String::from_utf8_lossy(&output.stderr)
         ));
     }
-    serde_json::from_slice::<HeadlessWalletReport>(&output.stdout)
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let json_line = stdout
+        .lines()
+        .rev()
+        .find(|line| {
+            let trimmed = line.trim();
+            trimmed.starts_with('{') && trimmed.ends_with('}')
+        })
+        .ok_or_else(|| {
+            format!(
+                "failed to find headless wallet probe JSON in stdout: {}",
+                stdout.trim()
+            )
+        })?;
+    serde_json::from_str::<HeadlessWalletReport>(json_line)
         .map_err(|error| format!("failed to parse headless wallet probe JSON: {error}"))
 }
 
@@ -1334,9 +1358,7 @@ mod tests {
             dust.status,
             MidnightDoctorCheckStatusV1::NotCheckableFromCli
         );
-        assert_eq!(
-            lace.status,
-            MidnightDoctorCheckStatusV1::NotCheckableFromCli
-        );
+        assert_eq!(lace.status, MidnightDoctorCheckStatusV1::Pass);
+        assert_eq!(lace.actual.as_deref(), Some("headless-wallet-mode"));
     }
 }

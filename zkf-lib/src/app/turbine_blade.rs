@@ -2547,14 +2547,14 @@ mod export {
     use zkf_backends::foundry_test::{generate_foundry_test_from_artifact, proof_to_calldata_json};
     use zkf_backends::metal_runtime::metal_runtime_report;
     use zkf_backends::{
-        BackendSelection, backend_surface_status, requested_groth16_setup_blob_path,
-        prepare_witness_for_proving, with_allow_dev_deterministic_groth16_override,
+        BackendSelection, backend_surface_status, prepare_witness_for_proving,
+        requested_groth16_setup_blob_path, with_allow_dev_deterministic_groth16_override,
         with_proof_seed_override, with_setup_seed_override,
     };
     use zkf_core::ccs::CcsProgram;
     use zkf_core::{
-        BackendKind, CompiledProgram, ProofArtifact, Program, Witness, WitnessInputs, check_constraints,
-        optimize_program,
+        BackendKind, CompiledProgram, Program, ProofArtifact, Witness, WitnessInputs,
+        check_constraints, optimize_program,
     };
     use zkf_runtime::{
         BackendProofExecutionResult, ExecutionMode, OptimizationObjective, RequiredTrustLane,
@@ -2871,10 +2871,8 @@ mod export {
 
     fn telemetry_snapshot() -> BTreeSet<String> {
         let mut snapshot = BTreeSet::new();
-        let dir =
-            PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(
-                ".zkf/telemetry",
-            );
+        let dir = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+            .join(".zkf/telemetry");
         if let Ok(read_dir) = fs::read_dir(dir) {
             for entry in read_dir.flatten() {
                 snapshot.insert(entry.path().display().to_string());
@@ -2967,7 +2965,8 @@ mod export {
 
         let shard_count = usize::min(DISTRIBUTED_SHARD_COUNT, steps.max(1));
         let shard_width = steps.div_ceil(shard_count);
-        let master_seed = Sha256::digest(b"private_turbine_blade_life_showcase_distributed_plan_v1");
+        let master_seed =
+            Sha256::digest(b"private_turbine_blade_life_showcase_distributed_plan_v1");
         let mut shards = Vec::new();
         let mut aggregate = Sha256::new();
         for shard_index in 0..shard_count {
@@ -3077,8 +3076,7 @@ mod export {
                 ),
                 None => format!(
                     "The primary {} lane completed successfully via `{}` and reverified. This bundle used the compiled proof/export path rather than the runtime scheduler path.",
-                    primary_backend_name,
-                    primary_execution_path,
+                    primary_backend_name, primary_execution_path,
                 ),
             },
             "omitted_in_smoke" => format!(
@@ -3248,7 +3246,10 @@ Structured audit summary:
             ZkfError::Io(format!("create {}: {error}", verification_dir.display()))
         })?;
         fs::create_dir_all(&telemetry_bundle_dir).map_err(|error| {
-            ZkfError::Io(format!("create {}: {error}", telemetry_bundle_dir.display()))
+            ZkfError::Io(format!(
+                "create {}: {error}",
+                telemetry_bundle_dir.display()
+            ))
         })?;
 
         let verifier_source = export_groth16_solidity_verifier(
@@ -3272,40 +3273,42 @@ Structured audit summary:
 
         let telemetry_paths = new_telemetry_paths(&telemetry_before, &telemetry_after);
         let distributed_report = shard_plan(config.steps, config.distributed_plan_requested);
-        let primary_gpu_attribution = match (
-            primary_execution.as_ref(),
-            primary_artifact,
-        ) {
+        let primary_gpu_attribution = match (primary_execution.as_ref(), primary_artifact) {
             (Some(execution), Some(artifact)) => effective_gpu_attribution_summary(
                 execution.result.report.gpu_nodes,
                 execution.result.report.gpu_stage_busy_ratio(),
                 &artifact.metadata,
             ),
-            (None, Some(artifact)) => {
-                effective_gpu_attribution_summary(0, 0.0, &artifact.metadata)
-            }
+            (None, Some(artifact)) => effective_gpu_attribution_summary(0, 0.0, &artifact.metadata),
             _ => json!({"status": "omitted_in_smoke"}),
         };
         let compat_gpu_attribution =
             effective_gpu_attribution_summary(0, 0.0, &compat_proof.artifact.metadata);
 
-        let program_original_path = compiled_dir.join("private_turbine_blade.program.original.json");
+        let program_original_path =
+            compiled_dir.join("private_turbine_blade.program.original.json");
         let program_optimized_path =
             compiled_dir.join("private_turbine_blade.program.optimized.json");
-        let primary_compiled_path = compiled_dir.join("private_turbine_blade.primary.compiled.json");
+        let primary_compiled_path =
+            compiled_dir.join("private_turbine_blade.primary.compiled.json");
         let compat_compiled_path = compiled_dir.join("private_turbine_blade.compat.compiled.json");
         let primary_proof_path = proofs_dir.join("private_turbine_blade.primary.proof.json");
         let compat_proof_path = proofs_dir.join("private_turbine_blade.compat.proof.json");
-        let verifier_path = config.out_dir.join("foundry/src/PrivateTurbineBladeVerifier.sol");
-        let foundry_test_path = config.out_dir.join("foundry/test/PrivateTurbineBladeVerifier.t.sol");
+        let verifier_path = config
+            .out_dir
+            .join("foundry/src/PrivateTurbineBladeVerifier.sol");
+        let foundry_test_path = config
+            .out_dir
+            .join("foundry/test/PrivateTurbineBladeVerifier.t.sol");
         let foundry_report_path = config.out_dir.join("foundry_report.txt");
         let progress_report_path = progress_path(&config.out_dir);
         let calldata_path = verification_dir.join("private_turbine_blade.calldata.json");
         let public_inputs_path = config.out_dir.join("public_inputs.json");
         let witness_summary_path = config.out_dir.join("witness_summary.json");
         let run_report_path = config.out_dir.join("private_turbine_blade.run_report.json");
-        let translation_report_path =
-            config.out_dir.join("private_turbine_blade.translation_report.json");
+        let translation_report_path = config
+            .out_dir
+            .join("private_turbine_blade.translation_report.json");
         let telemetry_report_path =
             telemetry_bundle_dir.join("private_turbine_blade.telemetry_report.json");
         let verification_report_path =
@@ -3314,9 +3317,12 @@ Structured audit summary:
             verification_dir.join("private_turbine_blade.smoke_validation.json");
         let summary_path = config.out_dir.join("private_turbine_blade.summary.json");
         let audit_path = config.out_dir.join("private_turbine_blade.audit.json");
-        let evidence_manifest_path =
-            config.out_dir.join("private_turbine_blade.evidence_manifest.json");
-        let matrix_path = config.out_dir.join("private_turbine_blade.matrix_summary.json");
+        let evidence_manifest_path = config
+            .out_dir
+            .join("private_turbine_blade.evidence_manifest.json");
+        let matrix_path = config
+            .out_dir
+            .join("private_turbine_blade.matrix_summary.json");
         let report_path = config.out_dir.join("private_turbine_blade.report.md");
         let swarm_assignments_path = config.out_dir.join("swarm_assignments.json");
         let aggregation_report_path = config.out_dir.join("aggregation_report.json");
@@ -3557,7 +3563,8 @@ Structured audit summary:
             "telemetry_paths": telemetry_paths,
         });
 
-        let (_, formal_evidence) = collect_formal_evidence_for_generated_app(&config.out_dir, APP_ID)?;
+        let (_, formal_evidence) =
+            collect_formal_evidence_for_generated_app(&config.out_dir, APP_ID)?;
         let generated_closure = generated_app_closure_bundle_summary(APP_ID)?;
 
         let run_report = json!({
@@ -3627,9 +3634,11 @@ Structured audit summary:
             "compiled/private_turbine_blade.program.optimized.json".to_string(),
             "compiled/private_turbine_blade.compat.compiled.json".to_string(),
         ];
-        let mut proof_artifacts = vec!["proofs/private_turbine_blade.compat.proof.json".to_string()];
+        let mut proof_artifacts =
+            vec!["proofs/private_turbine_blade.compat.proof.json".to_string()];
         if config.profile.is_flagship() {
-            compiled_artifacts.push("compiled/private_turbine_blade.primary.compiled.json".to_string());
+            compiled_artifacts
+                .push("compiled/private_turbine_blade.primary.compiled.json".to_string());
             proof_artifacts.push("proofs/private_turbine_blade.primary.proof.json".to_string());
         }
         let mut verification_artifacts = vec![
@@ -3835,8 +3844,9 @@ Structured audit summary:
     fn run_private_turbine_blade_export_inner(
         config: PrivateTurbineBladeExportConfig,
     ) -> ZkfResult<PathBuf> {
-        fs::create_dir_all(&config.out_dir)
-            .map_err(|error| ZkfError::Io(format!("create {}: {error}", config.out_dir.display())))?;
+        fs::create_dir_all(&config.out_dir).map_err(|error| {
+            ZkfError::Io(format!("create {}: {error}", config.out_dir.display()))
+        })?;
         if config.steps == 0 {
             return Err(ZkfError::Backend(
                 "private turbine blade export requires at least one step".to_string(),
@@ -3877,7 +3887,8 @@ Structured audit summary:
         let (optimized_program, optimizer_report) = optimize_program(&original_program);
         let optimize_ms = optimize_start.elapsed().as_secs_f64() * 1_000.0;
 
-        let trusted_setup_requested = requested_groth16_setup_blob_path(&optimized_program).is_some();
+        let trusted_setup_requested =
+            requested_groth16_setup_blob_path(&optimized_program).is_some();
         let trusted_setup_used = trusted_setup_requested;
         let setup_provenance = if trusted_setup_used {
             "trusted-imported".to_string()
@@ -4053,7 +4064,9 @@ Structured audit summary:
             (None, None, None, None, None, None)
         };
 
-        eprintln!("private_turbine_blade_life_showcase: running compatibility groth16 export prove");
+        eprintln!(
+            "private_turbine_blade_life_showcase: running compatibility groth16 export prove"
+        );
         let (compat_proof, compat_prove_ms) = if config.profile.is_flagship()
             && config.primary_backend.backend == BackendKind::ArkworksGroth16
         {
@@ -4116,35 +4129,36 @@ Structured audit summary:
 
         eprintln!("private_turbine_blade_life_showcase: exporting bundle");
         let finalize_config = config.clone();
-        let report_path = run_with_stage_heartbeat(&finalize_config, "bundle-finalize", move || {
-            export_bundle(BundleInputs {
-                config,
-                original_program,
-                optimized_program,
-                optimizer_report,
-                witness_public_outputs,
-                primary_execution,
-                primary_direct_proof,
-                compat_proof,
-                manual_witness,
-                telemetry_before,
-                telemetry_after,
-                trusted_setup_requested,
-                trusted_setup_used,
-                setup_provenance,
-                timings: ExportTimings {
-                    template_build_ms,
-                    witness_ms,
-                    optimize_ms,
-                    primary_compile_ms,
-                    primary_prepare_witness_ms,
-                    primary_prove_ms,
-                    primary_verify_ms,
-                    compat_prove_ms,
-                    compat_verify_ms,
-                },
-            })
-        })?;
+        let report_path =
+            run_with_stage_heartbeat(&finalize_config, "bundle-finalize", move || {
+                export_bundle(BundleInputs {
+                    config,
+                    original_program,
+                    optimized_program,
+                    optimizer_report,
+                    witness_public_outputs,
+                    primary_execution,
+                    primary_direct_proof,
+                    compat_proof,
+                    manual_witness,
+                    telemetry_before,
+                    telemetry_after,
+                    trusted_setup_requested,
+                    trusted_setup_used,
+                    setup_provenance,
+                    timings: ExportTimings {
+                        template_build_ms,
+                        witness_ms,
+                        optimize_ms,
+                        primary_compile_ms,
+                        primary_prepare_witness_ms,
+                        primary_prove_ms,
+                        primary_verify_ms,
+                        compat_prove_ms,
+                        compat_verify_ms,
+                    },
+                })
+            })?;
         maybe_write_progress(
             &finalize_config.out_dir,
             finalize_config.profile,
@@ -4203,11 +4217,13 @@ Structured audit summary:
                 read_json(&out_dir.join("private_turbine_blade.summary.json")).expect("summary");
             assert_eq!(summary["export_profile"], "smoke");
             assert_eq!(summary["primary_lane"]["status"], "omitted_in_smoke");
-            let evidence: Value = read_json(
-                &out_dir.join("private_turbine_blade.evidence_manifest.json"),
-            )
-            .expect("evidence manifest");
-            assert_eq!(evidence["bundle_contract"], "private-turbine-blade-smoke-v1");
+            let evidence: Value =
+                read_json(&out_dir.join("private_turbine_blade.evidence_manifest.json"))
+                    .expect("evidence manifest");
+            assert_eq!(
+                evidence["bundle_contract"],
+                "private-turbine-blade-smoke-v1"
+            );
             let smoke_validation: Value = read_json(
                 &out_dir.join("verification/private_turbine_blade.smoke_validation.json"),
             )
@@ -4222,7 +4238,10 @@ Structured audit summary:
             assert!(verify(&compat_compiled, &compat_artifact).expect("compat verify"));
             let foundry_report =
                 fs::read_to_string(out_dir.join("foundry_report.txt")).expect("foundry report");
-            assert!(!foundry_report.trim().is_empty(), "foundry report should not be empty");
+            assert!(
+                !foundry_report.trim().is_empty(),
+                "foundry report should not be empty"
+            );
             let _ = fs::remove_dir_all(&out_dir);
         }
     }

@@ -640,6 +640,7 @@ pub fn append_backend_runtime_metadata_for_field(
         }),
     );
     metadata.insert("metal_complete".to_string(), metal_complete.to_string());
+    metadata.remove("cpu_math_fallback_reason");
     if let Some(reason) = &cpu_math_fallback_reason {
         metadata.insert("cpu_math_fallback_reason".to_string(), reason.clone());
     }
@@ -749,7 +750,9 @@ pub fn append_backend_runtime_metadata_for_field(
                 .unwrap_or_else(|_| "{}".to_string()),
         );
         for (stage, accelerator) in &runtime.active_accelerators {
-            metadata.insert(format!("best_{stage}_accelerator"), accelerator.clone());
+            metadata
+                .entry(format!("best_{stage}_accelerator"))
+                .or_insert_with(|| accelerator.clone());
         }
     }
     if !runtime.cpu_fallback_reasons.is_empty() {
@@ -1292,6 +1295,9 @@ fn stage_is_gpu_backed(
             groth16_strict_ready && active_stage_is_metal(runtime, "msm")
         }
         (BackendKind::Halo2, GpuStage::Msm) => active_stage_is_metal(runtime, "msm"),
+        (BackendKind::Nova | BackendKind::HyperNova, GpuStage::Msm) => {
+            active_stage_is_metal(runtime, "msm")
+        }
         (BackendKind::Halo2 | BackendKind::Halo2Bls12381, GpuStage::FftNtt) => false,
         (BackendKind::Halo2Bls12381, GpuStage::Msm) => false,
         _ => false,
@@ -1342,9 +1348,10 @@ fn cpu_math_fallback_reason_for_backend_runtime(
         (BackendKind::Halo2Bls12381, _) => {
             Some("halo2-bls12-381-msm-and-fft-hot-paths-remain-cpu-classified".to_string())
         }
-        (BackendKind::Nova | BackendKind::HyperNova, _) => {
-            Some("nova-provider-msm-hot-path-is-not-patched-to-metal".to_string())
-        }
+        (BackendKind::Nova | BackendKind::HyperNova, _) => Some(format!(
+            "nova-metal-msm-not-realized-for-this-run (cpu stages: {})",
+            coverage.cpu_stages.join(",")
+        )),
         _ => Some(format!("cpu-only-stages:{}", coverage.cpu_stages.join(","))),
     }
 }

@@ -11,6 +11,12 @@ Definition PoseidonBn254Width4LoweringSemantics (semantics : t_CriticalHashLower
   f_supported_outputs_len semantics = usize_4 /\
   f_aux_witness_mode semantics = CriticalHashAuxWitnessMode_ConstraintSolverDerived.
 
+Definition PoseidonPastaFqWidth4LoweringSemantics (semantics : t_CriticalHashLoweringSemantics) : Prop :=
+  f_supported_op semantics = SupportedCriticalHashOp_PoseidonPastaFqWidth4 /\
+  f_supported_inputs_len semantics = usize_4 /\
+  f_supported_outputs_len semantics = usize_4 /\
+  f_aux_witness_mode semantics = CriticalHashAuxWitnessMode_ConstraintSolverDerived.
+
 Definition Sha256BytesToDigestLoweringSemantics
   (inputs_len : t_usize)
   (semantics : t_CriticalHashLoweringSemantics)

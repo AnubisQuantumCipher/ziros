@@ -1,7 +1,7 @@
 #![cfg_attr(not(test), allow(dead_code))]
 #![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
 
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -13,7 +13,7 @@ use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 use zkf_cloudfs::CloudFS;
-use zkf_core::{json_from_slice, json_to_vec_pretty, ZkfError, ZkfResult};
+use zkf_core::{ZkfError, ZkfResult, json_from_slice, json_to_vec_pretty};
 
 #[derive(Clone, Copy, Debug)]
 pub struct FormalScriptSpec {
@@ -556,6 +556,105 @@ fn ledger_surface_specs() -> Vec<LedgerSurfaceSpec> {
             extraction_paths: &[],
         },
         LedgerSurfaceSpec {
+            surface_id: "app.trade_finance.model_semantics",
+            label: "Trade-finance finished-app model semantics surface",
+            source_path: "zkf-lib/src/app/private_trade_finance_settlement.rs",
+            claims: &[
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.packet_binding_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.eligibility_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.consistency_score_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.duplicate_financing_risk_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.approved_advance_fee_reserve_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.action_derivation_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.settlement_binding_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.disclosure_role_binding_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.disclosure_noninterference",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.disclosure_authorization_binding_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.duplicate_registry_handoff_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.witness_helper.comparator_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.witness_helper.selector_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "model.trade_finance.witness_helper.shard_assignment_soundness",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+            ],
+            extraction_paths: &[
+                "zkf-lib/proofs/verus/trade_finance_verus.rs",
+                "zkf-lib/proofs/lean/TradeFinanceProofs.lean",
+                "zkf-lib/proofs/rocq/TradeFinanceProofs.v",
+            ],
+        },
+        LedgerSurfaceSpec {
+            surface_id: "app.trade_finance.gap_register",
+            label: "Trade-finance generated app-boundary certificate register",
+            source_path: "zkf-lib/src/app/private_trade_finance_settlement.rs",
+            claims: &[
+                LedgerClaimSpec {
+                    theorem_id: "gap.trade_finance.pastafq_poseidon_binding",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "gap.trade_finance.compiled_digest_linkage",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "gap.trade_finance.disclosure_credential_authorization",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+                LedgerClaimSpec {
+                    theorem_id: "gap.trade_finance.disclosure_noninterference_emitted",
+                    expected_scope: "zkf-lib::app::private_trade_finance_settlement",
+                },
+            ],
+            extraction_paths: &[
+                "zkf-lib/proofs/verus/trade_finance_verus.rs",
+                "zkf-lib/proofs/lean/TradeFinanceProofs.lean",
+                "zkf-lib/proofs/rocq/TradeFinanceProofs.v",
+                "zkf-backends/src/proof_blackbox_hash_spec.rs",
+                "zkf-backends/proofs/rocq/BlackboxHashProofs.v",
+                "zkf-lib/src/app/private_trade_finance_settlement_export.rs",
+            ],
+        },
+        LedgerSurfaceSpec {
             surface_id: "protocol.groth16_exact",
             label: "Groth16 exact shipped protocol surface",
             source_path: "zkf-backends/src/arkworks.rs",
@@ -848,7 +947,7 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "parameterization": {
                     "business_lane": "private trade finance settlement",
                     "line_item_count": 4,
-                    "rule_flag_count": 4,
+                    "policy_predicate_count": 4,
                     "disclosure_roles": ["supplier", "financier", "buyer", "auditor", "regulator"],
                     "fixed_point_scale": "10^4",
                 },
@@ -877,6 +976,8 @@ fn app_closure_specs() -> Vec<AppClosureSpec> {
                 "runtime.hybrid_core",
                 "runtime.proof_runtime_spec",
                 "lib.proof_embedded_app_spec",
+                "app.trade_finance.model_semantics",
+                "app.trade_finance.gap_register",
                 "backend.audited_backend_boundary",
                 "backend.groth16_boundary_model",
                 "protocol.hypernova_exact",
@@ -1892,6 +1993,44 @@ pub fn effective_gpu_attribution_summary(
     })
 }
 
+fn formal_script_execution_mode(log: &str) -> &'static str {
+    let normalized = log.to_ascii_lowercase();
+    if normalized.contains("structural verus surface check only")
+        || normalized.contains("structural fallback")
+        || normalized.contains("verus unavailable; running structural")
+    {
+        "structural-fallback"
+    } else {
+        "prover-executed"
+    }
+}
+
+fn formal_script_status(success: bool, timed_out: bool, log: &str) -> &'static str {
+    if timed_out || !success {
+        "failed"
+    } else if formal_script_execution_mode(log) == "structural-fallback" {
+        "structural-only"
+    } else {
+        "passed"
+    }
+}
+
+fn overall_formal_status(runs: &[serde_json::Value]) -> &'static str {
+    let mut saw_structural_only = false;
+    for run in runs {
+        match run.get("status").and_then(serde_json::Value::as_str) {
+            Some("passed") => {}
+            Some("structural-only") => saw_structural_only = true,
+            _ => return "failed",
+        }
+    }
+    if saw_structural_only {
+        "included-with-fallback"
+    } else {
+        "included"
+    }
+}
+
 fn run_formal_script(
     repo_root: &Path,
     script_relative_path: &str,
@@ -2001,11 +2140,7 @@ fn run_formal_script(
                 ));
             }
             (
-                if !timed_out && output.status.success() {
-                    "passed"
-                } else {
-                    "failed"
-                },
+                formal_script_status(output.status.success(), timed_out, &log),
                 if timed_out {
                     None
                 } else {
@@ -2030,6 +2165,7 @@ fn run_formal_script(
     Ok(json!({
         "command": command_description,
         "status": status,
+        "execution_mode": formal_script_execution_mode(&log),
         "exit_code": exit_code,
         "log_path": format!(
             "formal/{}",
@@ -2061,14 +2197,7 @@ pub fn collect_formal_evidence(
         runs.push(run);
     }
 
-    let overall_status = if runs
-        .iter()
-        .all(|run| run.get("status").and_then(serde_json::Value::as_str) == Some("passed"))
-    {
-        "included"
-    } else {
-        "failed"
-    };
+    let overall_status = overall_formal_status(&runs);
 
     let mut status_markdown = String::from("# Formal Evidence Status\n\n");
     status_markdown.push_str(&format!("- overall_status: `{overall_status}`\n"));
@@ -2086,12 +2215,16 @@ pub fn collect_formal_evidence(
             .get("command")
             .and_then(serde_json::Value::as_str)
             .unwrap_or("unknown");
+        let execution_mode = run
+            .get("execution_mode")
+            .and_then(serde_json::Value::as_str)
+            .unwrap_or("unknown");
         let log_path = run
             .get("log_path")
             .and_then(serde_json::Value::as_str)
             .unwrap_or("unknown");
         status_markdown.push_str(&format!(
-            "- {name}: `{status}` via `{command}` -> `{log_path}`\n"
+            "- {name}: `{status}` via `{command}` -> `{log_path}` (execution_mode=`{execution_mode}`)\n"
         ));
     }
     write_text(&formal_dir.join("STATUS.md"), &status_markdown)?;
@@ -2282,6 +2415,28 @@ mod tests {
             hash_json_value(&left_canonical).expect("hash left"),
             hash_json_value(&right_canonical).expect("hash right")
         );
+    }
+
+    #[test]
+    fn formal_script_structural_fallback_is_not_marked_passed() {
+        let log = "verus unavailable; running structural Verus surface check only\n";
+        assert_eq!(formal_script_execution_mode(log), "structural-fallback");
+        assert_eq!(formal_script_status(true, false, log), "structural-only");
+    }
+
+    #[test]
+    fn overall_formal_status_distinguishes_fallbacks_from_full_passes() {
+        let full = vec![json!({ "status": "passed" }), json!({ "status": "passed" })];
+        assert_eq!(overall_formal_status(&full), "included");
+
+        let fallback = vec![
+            json!({ "status": "passed" }),
+            json!({ "status": "structural-only" }),
+        ];
+        assert_eq!(overall_formal_status(&fallback), "included-with-fallback");
+
+        let failed = vec![json!({ "status": "passed" }), json!({ "status": "failed" })];
+        assert_eq!(overall_formal_status(&failed), "failed");
     }
 
     #[test]

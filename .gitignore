@@ -10,6 +10,7 @@
 /zkf-wallet-helper/node_modules/
 /zkf-wallet-helper/dist/
 /zkf-wallet-helper/*.tgz
+/scripts/private_trade_finance_18_dapp_template/node_modules/
 /zkf-wallet-mailbox/node_modules/
 /zkf-wallet-mailbox/dist/
 /zkf-wallet-mailbox/logs/

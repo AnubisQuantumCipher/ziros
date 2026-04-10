@@ -6,6 +6,15 @@ artifact_root="${1:-$repo_root/dist/showcases/private_turbine_blade_life}"
 subsystem_root="${2:-$repo_root/dist/subsystems/private_turbine_blade_life}"
 profile="${3:-flagship}"
 
+canonicalize_target_path() {
+  local target="$1"
+  mkdir -p "$(dirname "$target")"
+  printf '%s/%s\n' "$(cd "$(dirname "$target")" && pwd -L)" "$(basename "$target")"
+}
+
+artifact_root="$(canonicalize_target_path "$artifact_root")"
+subsystem_root="$(canonicalize_target_path "$subsystem_root")"
+
 mkdir -p "$(dirname "$artifact_root")" "$(dirname "$subsystem_root")"
 
 if [[ "$profile" != "flagship" ]]; then
@@ -29,6 +38,7 @@ if summary.get("export_profile") != "flagship":
 PY
 
 echo "[turbine-subsystem] scaffolding subsystem shell into $subsystem_root" >&2
+rm -rf "$subsystem_root"
 cargo run -p zkf-cli -- subsystem scaffold \
   --name private-turbine-blade-life \
   --style full \

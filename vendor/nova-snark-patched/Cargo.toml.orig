@@ -43,6 +43,9 @@ halo2curves = { version = "0.9.0", features = ["std", "bits", "derive_serde"] }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.15", default-features = false, features = ["js"] }
 
+[target.'cfg(target_os = "macos")'.dependencies]
+zkf-metal = { path = "../../zkf-metal", optional = true }
+
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
 flate2 = "1.0.35"
@@ -94,5 +97,6 @@ flamegraph = ["pprof2/flamegraph", "pprof2/criterion"]
 experimental = []
 evm = []
 io = []
+metal-gpu = ["dep:zkf-metal"]
 # Enables insecure setup methods that generate random tau. Only for testing!
 test-utils = []

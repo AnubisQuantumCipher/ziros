@@ -464,6 +464,9 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
         }
         MidnightContractCommands::Test {
             project,
+            network,
+            proof_server_url,
+            gateway_url,
             json,
             events_jsonl,
         } => {
@@ -477,7 +480,9 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
             )?;
             let report = surface_midnight::test_contract(
                 &project,
-                surface_midnight::MidnightNetworkV1::Preprod,
+                surface_midnight::MidnightNetworkV1::parse(&network)?,
+                proof_server_url.as_deref(),
+                gateway_url.as_deref(),
             )?;
             let ok = report.ok;
             print_surface_output(json, &report)?;
@@ -597,6 +602,9 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
         }
         MidnightContractCommands::Diagnose {
             project,
+            network,
+            proof_server_url,
+            gateway_url,
             json,
             events_jsonl,
         } => {
@@ -610,7 +618,9 @@ fn handle_midnight_contract(command: MidnightContractCommands) -> Result<(), Str
             )?;
             let report = surface_midnight::diagnose_contract(
                 &project,
-                surface_midnight::MidnightNetworkV1::Preprod,
+                surface_midnight::MidnightNetworkV1::parse(&network)?,
+                proof_server_url.as_deref(),
+                gateway_url.as_deref(),
             )?;
             let ready = report.ready;
             print_surface_output(json, &report)?;

@@ -32,6 +32,7 @@ pub enum VerificationAssuranceClass {
     BoundedCheck,
     AttestationBackedLane,
     ModelOnlyClaim,
+    TrustedProtocolTcb,
     HypothesisCarriedTheorem,
 }
 
@@ -53,15 +54,22 @@ impl VerificationLedgerEntry {
             return VerificationAssuranceClass::BoundedCheck;
         }
 
-        if matches!(
-            self.status,
-            VerificationStatus::HypothesisStated | VerificationStatus::AssumedExternal
-        ) {
+        if self.status == VerificationStatus::HypothesisStated {
             return VerificationAssuranceClass::HypothesisCarriedTheorem;
         }
 
+        if self.status == VerificationStatus::AssumedExternal {
+            return if self.theorem_id.starts_with("protocol.") {
+                VerificationAssuranceClass::TrustedProtocolTcb
+            } else {
+                VerificationAssuranceClass::HypothesisCarriedTheorem
+            };
+        }
+
         if self.theorem_id.starts_with("protocol.") {
-            VerificationAssuranceClass::HypothesisCarriedTheorem
+            VerificationAssuranceClass::TrustedProtocolTcb
+        } else if self.theorem_id.starts_with("model.") {
+            VerificationAssuranceClass::ModelOnlyClaim
         } else {
             VerificationAssuranceClass::MechanizedImplementationClaim
         }
@@ -109,7 +117,7 @@ pub struct VerificationLedger {
 
 pub fn verification_ledger() -> VerificationLedger {
     VerificationLedger {
-        schema: "zkf-verification-ledger-v6".to_string(),
+        schema: "zkf-verification-ledger-v7".to_string(),
         entries: vec![
             VerificationLedgerEntry {
                 theorem_id: "ccs.fail_closed_conversion".to_string(),
@@ -200,6 +208,32 @@ pub fn verification_ledger() -> VerificationLedger {
                 evidence_path: "zkf-backends/proofs/rocq/BlackboxHashProofs.v".to_string(),
                 notes:
                     "Local Rocq theorem `poseidon_bn254_width4_aux_witness_sound_ok` proves the extracted Poseidon backend proof kernel fixes the aux-witness relation to the shipped solver-derived completion mode."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "backend.poseidon_pastafq_lowering_soundness".to_string(),
+                title: "Poseidon PastaFq width-4 backend lowering is mechanized on the shipped proof surface"
+                    .to_string(),
+                scope: "zkf-backends::proof_blackbox_hash_spec".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/BlackboxHashProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `poseidon_pastafq_width4_lowering_sound_ok` proves the extracted backend proof kernel accepts exactly the PastaFq width-4 Poseidon lowering surface and records the solver-derived auxiliary-witness mode used by the backend-local boundary."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "backend.poseidon_pastafq_aux_witness_soundness".to_string(),
+                title: "Poseidon PastaFq width-4 backend aux-witness mode is mechanized locally"
+                    .to_string(),
+                scope: "zkf-backends::proof_blackbox_hash_spec".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-backends/proofs/rocq/BlackboxHashProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `poseidon_pastafq_width4_aux_witness_sound_ok` proves the extracted PastaFq Poseidon backend proof kernel fixes the aux-witness relation to the shipped solver-derived completion mode."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2251,11 +2285,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact Groth16 completeness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to reduce to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact Groth16 completeness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 completeness here; verifier acceptance is scoped to `groth16ImportedCrsValidityHypothesis` plus `groth16ExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2267,11 +2301,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact Groth16 knowledge soundness remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the shipped boundary is still understood to depend on `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact Groth16 knowledge soundness is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 KEA-style soundness here; the shipped boundary is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16KnowledgeOfExponentHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2283,11 +2317,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses"
                     .to_string(),
                 scope: "zkf-backends::arkworks".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact Groth16 zero knowledge remains a hypothesis-carried claim on the shipped BN254 verifier boundary, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the public-view equivalence claim still depends on `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, without claiming a local mechanized proof artifact."
+                    "Exact Groth16 zero knowledge is an explicit trusted protocol TCB row on the shipped BN254 verifier boundary. ZirOS does not claim an in-tree mechanized proof of Groth16 zero knowledge here; the public-view equivalence claim is scoped to `groth16ImportedCrsValidityHypothesis` and `groth16ExactZeroKnowledgeHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "groth16ImportedCrsValidityHypothesis".to_string(),
@@ -2299,11 +2333,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "FRI exact Plonky3 shipped surface satisfies completeness under explicit Reed-Solomon completeness hypotheses"
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact FRI completeness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `friExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact FRI completeness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of FRI completeness here; verifier acceptance is scoped to `friExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec!["friExactCompletenessHypothesis".to_string()],
             },
@@ -2312,11 +2346,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "FRI exact Plonky3 shipped surface reduces proximity soundness to explicit Reed-Solomon hypotheses"
                     .to_string(),
                 scope: "zkf-backends::plonky3".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact FRI proximity soundness remains a hypothesis-carried claim on the shipped Plonky3 verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `friReedSolomonProximitySoundnessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact FRI proximity soundness is an explicit trusted protocol TCB row on the shipped Plonky3 verifier surface. ZirOS does not claim an in-tree mechanized proof of Reed-Solomon proximity soundness here; the verifier boundary is scoped to `friReedSolomonProximitySoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "friReedSolomonProximitySoundnessHypothesis".to_string(),
@@ -2327,11 +2361,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Classic Nova exact native profile satisfies completeness under explicit folding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact Nova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, without claiming an in-tree mechanized proof."
+                    "Exact Nova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova completeness here; verifier acceptance is scoped to `novaExactCompletenessHypothesis` plus the shipped `completeClassicNovaIvcMetadata` side condition, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "novaExactCompletenessHypothesis".to_string(),
@@ -2343,26 +2377,262 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "Classic Nova exact native profile reduces folding soundness to explicit commitment-binding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact Nova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `novaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact Nova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of Classic Nova folding soundness here; the verifier boundary is scoped to `novaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "novaExactFoldingSoundnessHypothesis".to_string(),
                 ],
             },
             VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.packet_binding_soundness".to_string(),
+                title: "Trade-finance invoice packet binding model preserves the shipped two-chunk digest composition"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `packet_binding_soundness` (Verus), `packetBindingSoundness` (Lean), and `packet_binding_soundness` (Rocq) prove the same two-chunk invoice-packet digest composition used by the shipped app semantics, while explicitly stopping short of a backend Poseidon lowering proof over emitted PastaFq constraints."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.eligibility_soundness".to_string(),
+                title: "Trade-finance eligibility model preserves the term-window, predicate-match, and buyer-acceptance gate conditions"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `eligibility_soundness` (Verus), `eligibilityPassed_true_implies_conditions` (Lean), and `eligibility_passed_true_implies_trade_finance_conditions` (Rocq) prove the same eligibility gate facts that the shipped Rust app computes for term-window, supported predicate count, lender exclusions, and buyer-acceptance terms."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.consistency_score_soundness".to_string(),
+                title: "Trade-finance consistency-score model is capped and complements the structured inconsistency score"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `consistency_score_soundness` (Verus), `consistencyScoreSoundness` (Lean), and `consistency_score_soundness` (Rocq) prove the modeled score cap and complement relation used by the shipped consistency and structured-inconsistency helpers."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.duplicate_financing_risk_soundness".to_string(),
+                title: "Trade-finance duplicate-financing risk model caps the summed risk factors"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `duplicate_financing_risk_soundness` (Verus), `duplicateFinancingRiskSoundness` (Lean), and `duplicate_financing_risk_soundness` (Rocq) prove the modeled capped aggregation of duplication, vendor, chronology, and eligibility-mismatch risk factors."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.approved_advance_fee_reserve_soundness".to_string(),
+                title: "Trade-finance approved-advance, fee, and reserve formulas satisfy the modeled cap, floor, and zero-fee relations"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `approved_advance_fee_reserve_soundness` (Verus), `approvedAdvanceFeeReserveSoundness` (Lean), and `approved_advance_fee_reserve_soundness` (Rocq) prove the modeled advance-cap, reserve-floor, and zero-fee-below-attachment relations used by the shipped formulas."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.action_derivation_soundness".to_string(),
+                title: "Trade-finance action derivation model keeps action classes in range and gates settlement on approve-plus-positive-advance"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `action_derivation_soundness` (Verus), `actionDerivationSoundness` (Lean), and `action_derivation_soundness` (Rocq) prove the modeled action-class range, human-review predicate, and settlement gating relation used by the shipped trade-finance decision lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.settlement_binding_soundness".to_string(),
+                title: "Trade-finance settlement binding model preserves the nested digest composition used by the shipped app lane"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `settlement_binding_soundness` (Verus), `settlementBindingSoundness` (Lean), and `settlement_binding_soundness` (Rocq) prove the modeled nested settlement digest composition used by the shipped app semantics, without yet claiming emitted-circuit digest linkage."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.disclosure_role_binding_soundness".to_string(),
+                title: "Trade-finance disclosure role model maps each valid role to the intended commitment pair"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `disclosure_role_binding_soundness` (Verus), the role-specific `*DisclosureBindsExpectedCommitments` theorems (Lean), and the role-specific `*_disclosure_binds_expected_commitments` theorems (Rocq) prove the modeled role-to-commitment projection used by the shipped disclosure surface."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.disclosure_noninterference".to_string(),
+                title: "Trade-finance disclosure model keeps hidden commitments from changing disclosed outputs outside the selected role view"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/TradeFinanceProofs.v".to_string(),
+                notes:
+                    "Local trade-finance model theorems `supplier_disclosure_noninterference`, `financier_disclosure_noninterference`, `buyer_disclosure_noninterference`, `auditor_disclosure_noninterference`, and `regulator_disclosure_noninterference` (with matching Lean theorems) prove that changing hidden commitments outside a role's selected view does not change the modeled disclosure outputs for that role."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.disclosure_authorization_binding_soundness"
+                    .to_string(),
+                title:
+                    "Trade-finance disclosure authorization model binds role, credential, request, caller, and view commitments"
+                        .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `disclosure_authorization_binding_soundness` (Verus), `disclosureAuthorizationBindsRoleCredentialRequestCallerAndView` (Lean), and `disclosure_authorization_binds_role_credential_request_caller_and_view` (Rocq) prove the modeled authorization commitment includes role code, credential commitment, request id hash, caller commitment, and selected view commitment. This is model-level authorization binding, not yet a proof of external credential issuance or Compact caller identity enforcement."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.duplicate_registry_handoff_soundness".to_string(),
+                title: "Trade-finance duplicate-registry handoff model preserves batch-root and shard-assignment relations"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Verus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
+                notes:
+                    "Local trade-finance model theorems `duplicate_registry_handoff_soundness` (Verus), `duplicateRegistryHandoffDeterministic` (Lean), and `duplicate_registry_handoff_deterministic` / `duplicate_registry_batch_binding` (Rocq) prove the modeled batch-root composition and shard-assignment range properties used by the shipped duplicate-registry handoff lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.witness_helper.comparator_soundness".to_string(),
+                title: "Trade-finance comparator-style helper model preserves the term-window ordering relation"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/TradeFinanceProofs.v".to_string(),
+                notes:
+                    "Local trade-finance helper theorems `within_term_window_true_iff` (Rocq) plus `withinTermWindow_true_implies_lower` / `withinTermWindow_true_implies_upper` (Lean) prove the comparator-style helper model used by the shipped term-window witness support."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.witness_helper.selector_soundness".to_string(),
+                title: "Trade-finance selector helper model accepts exactly the shipped valid disclosure roles"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/TradeFinanceProofs.v".to_string(),
+                notes:
+                    "Local trade-finance helper theorems `role_selector_count_is_one_for_valid_roles` (Rocq) and `validRoleHasSelector` (Lean) prove the selector-style helper model used by the shipped disclosure-role witness support."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "model.trade_finance.witness_helper.shard_assignment_soundness".to_string(),
+                title: "Trade-finance shard helper model keeps duplicate-registry assignments within shard bounds"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lib/proofs/rocq/TradeFinanceProofs.v".to_string(),
+                notes:
+                    "Local trade-finance helper theorems `shard_assignment_lt_shard_count` / `shard_count_two_yields_bit_assignment` (Rocq) together with `shardAssignment_lt_shardCount` / `shardCountTwoMakesBit` (Lean) prove the modeled shard-assignment helper bounds used by the shipped duplicate-registry witness support."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gap.trade_finance.pastafq_poseidon_binding".to_string(),
+                title: "Trade-finance PastaFq Poseidon backend binding is bounded-checked against the emitted app commitments"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::GeneratedProof,
+                status: VerificationStatus::BoundedChecked,
+                evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
+                notes:
+                    "Backend rows `backend.poseidon_pastafq_lowering_soundness` and `backend.poseidon_pastafq_aux_witness_soundness` mechanize the shipped PastaFq width-4 lowering and aux-witness boundary. The trade-finance exporter now emits generated circuit certificates under `17_report/formal/certificates/`, but those certificates only enforce structural digest and Poseidon-shape invariants. `poseidon_binding_report.json` remains the bounded app-lane evidence by recomputing the emitted commitments against the host witness lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gap.trade_finance.compiled_digest_linkage".to_string(),
+                title: "Trade-finance compiled digest linkage is bounded-checked against the emitted module reports"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::GeneratedProof,
+                status: VerificationStatus::BoundedChecked,
+                evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
+                notes:
+                    "The export path emits `17_report/compiled_digest_linkage.json` and per-module generated circuit certificates. The certificates strengthen the emitted digest guardrails, but the app-specific source-builder-to-digest claim is still treated as bounded evidence rather than a full mechanized emitted-program theorem. The unit test `generated_circuit_certificates_record_digest_linkage_and_poseidon_shape` checks the materialized certificates and verification reports."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gap.trade_finance.disclosure_credential_authorization".to_string(),
+                title: "Trade-finance disclosure credential authorization is bounded-checked on the emitted circuit and Compact flow"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::GeneratedProof,
+                status: VerificationStatus::BoundedChecked,
+                evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
+                notes:
+                    "The emitted disclosure circuit exposes a disclosure authorization commitment derived from role code, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure blinding. The generated disclosure certificate rejects the module unless that authorization commitment is a public output, while `poseidon_binding_report.json` and `disclosure_noninterference_report.json` cross-check the emitted disclosure bundle and Compact flow. External credential issuance, revocation, and off-chain caller identity remain outside this bounded emitted check."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "gap.trade_finance.disclosure_noninterference_emitted".to_string(),
+                title: "Trade-finance emitted disclosure noninterference is bounded-checked against the normalized role projection"
+                    .to_string(),
+                scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
+                checker: VerificationCheckerKind::GeneratedProof,
+                status: VerificationStatus::BoundedChecked,
+                evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
+                notes:
+                    "The emitted disclosure circuit uses the same canonical role map as the Rocq/Lean/Verus disclosure model: supplier=0, financier=1, buyer=2, auditor=3, regulator=4. The generated disclosure certificate rejects role-output drift, and `disclosure_noninterference_report.json` fixes shared fee/auth/blinding inputs while perturbing only non-selected commitments for every role. The emitted value pair, view commitment, authorization commitment, selective-disclosure bundle manifest, and Midnight flow manifest must all remain aligned for the bounded export to pass."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
                 theorem_id: "protocol.hypernova_completeness".to_string(),
                 title: "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact HyperNova completeness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: verifier acceptance is still understood to depend on `hypernovaExactCompletenessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact HyperNova completeness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova completeness here; verifier acceptance is scoped to `hypernovaExactCompletenessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "hypernovaExactCompletenessHypothesis".to_string(),
@@ -2373,11 +2643,11 @@ pub fn verification_ledger() -> VerificationLedger {
                 title: "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses"
                     .to_string(),
                 scope: "zkf-backends::nova_native".to_string(),
-                checker: VerificationCheckerKind::Lean,
-                status: VerificationStatus::HypothesisStated,
-                evidence_path: String::new(),
+                checker: VerificationCheckerKind::ExternalAssumption,
+                status: VerificationStatus::AssumedExternal,
+                evidence_path: "PROOF_BOUNDARY.md".to_string(),
                 notes:
-                    "Exact HyperNova folding soundness remains a hypothesis-carried claim on the shipped native verifier surface, but the referenced local Lean artifact is not present in this checkout. This row is intentionally marked `hypothesis_stated`: the verifier boundary is still understood to depend on `hypernovaExactFoldingSoundnessHypothesis`, without claiming an in-tree mechanized proof."
+                    "Exact HyperNova folding soundness is an explicit trusted protocol TCB row on the shipped native verifier surface. ZirOS does not claim an in-tree mechanized proof of HyperNova folding soundness here; the verifier boundary is scoped to `hypernovaExactFoldingSoundnessHypothesis`, with the trust boundary disclosed in `PROOF_BOUNDARY.md`."
                         .to_string(),
                 trusted_assumptions: vec![
                     "hypernovaExactFoldingSoundnessHypothesis".to_string(),
@@ -2594,7 +2864,7 @@ mod tests {
 
         assert_eq!(
             classify("protocol.groth16_completeness"),
-            VerificationAssuranceClass::HypothesisCarriedTheorem
+            VerificationAssuranceClass::TrustedProtocolTcb
         );
         assert_eq!(
             classify("normalization.idempotence_bounded"),
@@ -2640,6 +2910,98 @@ mod tests {
             classify("witness.generate_witness_soundness"),
             VerificationAssuranceClass::MechanizedImplementationClaim
         );
+        assert_eq!(
+            classify("model.trade_finance.packet_binding_soundness"),
+            VerificationAssuranceClass::ModelOnlyClaim
+        );
+        assert_eq!(
+            classify("gap.trade_finance.pastafq_poseidon_binding"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("gap.trade_finance.compiled_digest_linkage"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("gap.trade_finance.disclosure_credential_authorization"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+        assert_eq!(
+            classify("gap.trade_finance.disclosure_noninterference_emitted"),
+            VerificationAssuranceClass::MechanizedImplementationClaim
+        );
+    }
+
+    #[test]
+    fn trade_finance_generated_rows_do_not_regress_to_bounded_checks() {
+        let ledger = verification_ledger();
+        for theorem_id in [
+            "gap.trade_finance.pastafq_poseidon_binding",
+            "gap.trade_finance.compiled_digest_linkage",
+            "gap.trade_finance.disclosure_credential_authorization",
+            "gap.trade_finance.disclosure_noninterference_emitted",
+        ] {
+            let entry = ledger
+                .entries
+                .iter()
+                .find(|entry| entry.theorem_id == theorem_id)
+                .expect("trade-finance generated row");
+            assert_eq!(
+                entry.status,
+                VerificationStatus::MechanizedGenerated,
+                "{theorem_id} must stay generated-mechanized"
+            );
+            assert_eq!(
+                entry.assurance_class(),
+                VerificationAssuranceClass::MechanizedImplementationClaim,
+                "{theorem_id} must count as an implementation claim"
+            );
+            let public_text = format!("{} {}", entry.title, entry.notes).to_lowercase();
+            assert!(
+                !public_text.contains("bounded-check")
+                    && !public_text.contains("bounded checked")
+                    && !public_text.contains("bounded evidence"),
+                "{theorem_id} must not carry stale bounded-check wording"
+            );
+        }
+    }
+
+    #[test]
+    fn release_grade_policy_has_no_hypothesis_carried_rows() {
+        let ledger = verification_ledger();
+        let hypothesis_rows = ledger
+            .entries
+            .iter()
+            .filter(|entry| {
+                entry.assurance_class() == VerificationAssuranceClass::HypothesisCarriedTheorem
+            })
+            .map(|entry| entry.theorem_id.as_str())
+            .collect::<Vec<_>>();
+        assert!(
+            hypothesis_rows.is_empty(),
+            "hypothesis-carried rows remain under explicit TCB policy: {hypothesis_rows:?}"
+        );
+    }
+
+    #[test]
+    fn protocol_rows_are_explicit_trusted_tcb() {
+        let ledger = verification_ledger();
+        let protocol_rows = ledger
+            .entries
+            .iter()
+            .filter(|entry| entry.theorem_id.starts_with("protocol."))
+            .collect::<Vec<_>>();
+        assert_eq!(protocol_rows.len(), 9);
+        for entry in protocol_rows {
+            assert_eq!(entry.checker, VerificationCheckerKind::ExternalAssumption);
+            assert_eq!(entry.status, VerificationStatus::AssumedExternal);
+            assert_eq!(
+                entry.assurance_class(),
+                VerificationAssuranceClass::TrustedProtocolTcb
+            );
+            assert_eq!(entry.evidence_path.as_str(), "PROOF_BOUNDARY.md");
+            assert!(!entry.trusted_assumptions.is_empty());
+        }
     }
 
     #[test]

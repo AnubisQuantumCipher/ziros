@@ -44,6 +44,7 @@ def main() -> int:
     expected_counts = {
         "implementation_bound_rows": headline_counts["mechanized_implementation_claim"],
         "hypothesis_carried_rows": headline_counts["hypothesis_carried_theorem"],
+        "trusted_protocol_tcb_rows": headline_counts.get("trusted_protocol_tcb", 0),
         "mechanized_local_rows": headline_counts["total_entries"],
         "pending_rows": headline_counts["pending"],
     }

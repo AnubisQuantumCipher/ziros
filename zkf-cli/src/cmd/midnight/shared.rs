@@ -903,11 +903,18 @@ pub(crate) fn compile_compact_contract(
         .output()
         .map_err(|error| format!("failed to run {}: {error}", compactc.display()))?;
     if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if stderr.contains("Exception in chmod")
+            && stderr.contains(".prover")
+            && let Some(zkir_path) = discover_first_zkir(out_dir)
+        {
+            return Ok(zkir_path);
+        }
         return Err(format!(
             "compactc failed for {}: stdout={}; stderr={}",
             source_path.display(),
             String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
+            stderr
         ));
     }
 

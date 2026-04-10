@@ -20,6 +20,9 @@ use nova_snark::nova::{
     RecursiveSNARK as ClassicRecursiveSnark,
 };
 use nova_snark::provider::ipa_pc::EvaluationEngine;
+use nova_snark::provider::msm::{
+    PastaMetalMsmTelemetry, reset_pasta_metal_msm_telemetry, take_pasta_metal_msm_telemetry,
+};
 use nova_snark::provider::{PallasEngine, VestaEngine};
 use nova_snark::spartan::snark::RelaxedR1CSSNARK;
 use nova_snark::traits::Engine;
@@ -58,6 +61,55 @@ const LARGE_NOVA_SETUP_SIGNAL_THRESHOLD: usize = 250_000;
 const LARGE_NOVA_SETUP_CONSTRAINT_THRESHOLD: usize = 250_000;
 const FORTY_EIGHT_GIB: u64 = 48 * 1024 * 1024 * 1024;
 const SIXTY_FOUR_GIB: u64 = 64 * 1024 * 1024 * 1024;
+
+fn append_nova_metal_msm_metadata(
+    metadata: &mut BTreeMap<String, String>,
+    telemetry: &PastaMetalMsmTelemetry,
+) {
+    if !telemetry.metal_used() {
+        return;
+    }
+
+    let runtime = crate::metal_runtime::metal_runtime_report();
+    let msm_engine = format!("metal-pasta-msm/{}", telemetry.curves.join("+"));
+    metadata.insert("msm_accelerator".to_string(), "metal".to_string());
+    metadata.insert("nova_msm_engine".to_string(), msm_engine.clone());
+    metadata.insert("best_msm_accelerator".to_string(), msm_engine);
+    metadata.insert(
+        "metal_gpu_busy_ratio".to_string(),
+        runtime.metal_gpu_busy_ratio.to_string(),
+    );
+    metadata.insert(
+        "metal_stage_breakdown".to_string(),
+        serde_json::json!({
+            "msm": {
+                "accelerator": "metal-pasta-msm",
+                "curves": telemetry.curves,
+            }
+        })
+        .to_string(),
+    );
+    metadata.insert(
+        "metal_inflight_jobs".to_string(),
+        runtime.metal_inflight_jobs.to_string(),
+    );
+    metadata.insert(
+        "metal_no_cpu_fallback".to_string(),
+        (telemetry.used_curve("pallas") && telemetry.used_curve("vesta")).to_string(),
+    );
+    metadata.insert(
+        "metal_counter_source".to_string(),
+        runtime.metal_counter_source.clone(),
+    );
+    metadata.insert(
+        "metal_dispatch_circuit_open".to_string(),
+        runtime.metal_dispatch_circuit_open.to_string(),
+    );
+    metadata.insert(
+        "metal_dispatch_last_failure".to_string(),
+        runtime.metal_dispatch_last_failure.unwrap_or_default(),
+    );
+}
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub(crate) enum NovaProfile {
@@ -666,6 +718,7 @@ fn prove_native(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<Proo
     let public_inputs = collect_public_inputs(&compiled.program, witness)?;
     let z0 = proof_initial_state(compiled, witness, &public_inputs)?;
     let circuit = IrStepCircuit::from_witness(compiled.program.clone(), witness, z0)?;
+    reset_pasta_metal_msm_telemetry();
 
     let (proof, final_state) = match profile {
         NovaProfile::Classic => {
@@ -705,6 +758,7 @@ fn prove_native(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<Proo
         }
     };
 
+    let nova_metal_msm = take_pasta_metal_msm_telemetry();
     let verification_key = verification_key_fingerprint(compiled, profile);
 
     let mut metadata = BTreeMap::new();
@@ -713,6 +767,7 @@ fn prove_native(compiled: &CompiledProgram, witness: &Witness) -> ZkfResult<Proo
     metadata.insert("nova_curve_cycle".to_string(), "pallas-vesta".to_string());
     metadata.insert("nova_profile".to_string(), profile.as_str().to_string());
     append_ivc_state_metadata(&mut metadata, compiled, z0, final_state);
+    append_nova_metal_msm_metadata(&mut metadata, &nova_metal_msm);
     append_backend_runtime_metadata(&mut metadata, BackendKind::Nova);
 
     Ok(ProofArtifact {
@@ -1132,6 +1187,7 @@ pub fn fold_native(
     // single-step proving but makes the relaxed R1CS unsatisfiable when folding
     // N > 1 steps — Nova's IVC already commits to z0/z_N internally.
     let first_circuit = IrStepCircuit::for_fold(compiled.program.clone(), first_witness)?;
+    reset_pasta_metal_msm_telemetry();
 
     let mut recursive = ClassicRecursive::new(&params, &first_circuit, &[z0])
         .map_err(|err| ZkfError::Backend(format!("nova fold setup failed: {err}")))?;
@@ -1174,6 +1230,7 @@ pub fn fold_native(
         (bytes, false)
     };
 
+    let nova_metal_msm = take_pasta_metal_msm_telemetry();
     let verification_key = verification_key_fingerprint(compiled, profile);
 
     let mut metadata = BTreeMap::new();
@@ -1193,6 +1250,7 @@ pub fn fold_native(
         "nova_ivc_final_state".to_string(),
         scalar_to_field_element(final_state).to_string(),
     );
+    append_nova_metal_msm_metadata(&mut metadata, &nova_metal_msm);
     append_backend_runtime_metadata(&mut metadata, BackendKind::Nova);
 
     let artifact = ProofArtifact {

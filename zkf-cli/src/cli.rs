@@ -716,7 +716,7 @@ pub(crate) enum SubsystemCommands {
     DeployPrepare {
         #[arg(long)]
         root: PathBuf,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
         #[arg(long)]
         json: bool,
@@ -730,7 +730,7 @@ pub(crate) enum SubsystemCommands {
         call: String,
         #[arg(long)]
         inputs: PathBuf,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
         #[arg(long)]
         json: bool,
@@ -758,11 +758,11 @@ pub(crate) enum MidnightCommands {
         json: bool,
         #[arg(long)]
         project: Option<PathBuf>,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
         proof_server_url: Option<String>,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
         gateway_url: Option<String>,
         #[arg(long)]
         events_jsonl: Option<PathBuf>,
@@ -794,7 +794,7 @@ pub(crate) enum MidnightCommands {
         template: String,
         #[arg(long)]
         out: Option<PathBuf>,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
     },
     /// Diagnose Midnight-specific toolchain, package, wallet, and network readiness.
@@ -806,11 +806,11 @@ pub(crate) enum MidnightCommands {
         strict: bool,
         #[arg(long)]
         project: Option<PathBuf>,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
         proof_server_url: Option<String>,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
         gateway_url: Option<String>,
         #[arg(long, conflicts_with = "no_browser_check")]
         browser_check: bool,
@@ -830,7 +830,7 @@ pub(crate) enum MidnightCommands {
     /// Auto-resolve Midnight SDK version mismatches for a project.
     #[command(name = "resolve")]
     Resolve {
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
         #[arg(long)]
         project: Option<PathBuf>,
@@ -908,7 +908,7 @@ pub(crate) enum MidnightContractCommands {
         source: PathBuf,
         #[arg(long)]
         out: PathBuf,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
         #[arg(long)]
         json: bool,
@@ -924,11 +924,11 @@ pub(crate) enum MidnightContractCommands {
         out: PathBuf,
         #[arg(long)]
         project: Option<PathBuf>,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
         proof_server_url: Option<String>,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
         gateway_url: Option<String>,
         #[arg(long)]
         json: bool,
@@ -948,11 +948,11 @@ pub(crate) enum MidnightContractCommands {
         out: PathBuf,
         #[arg(long)]
         project: Option<PathBuf>,
-        #[arg(long, default_value = "preprod")]
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
         network: String,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
         proof_server_url: Option<String>,
-        #[arg(long)]
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
         gateway_url: Option<String>,
         #[arg(long)]
         json: bool,
@@ -963,6 +963,12 @@ pub(crate) enum MidnightContractCommands {
     Test {
         #[arg(long)]
         project: PathBuf,
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
+        network: String,
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
+        proof_server_url: Option<String>,
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
+        gateway_url: Option<String>,
         #[arg(long)]
         json: bool,
         #[arg(long)]
@@ -1000,6 +1006,12 @@ pub(crate) enum MidnightContractCommands {
     Diagnose {
         #[arg(long)]
         project: PathBuf,
+        #[arg(long, default_value = "preprod", env = "MIDNIGHT_NETWORK")]
+        network: String,
+        #[arg(long, env = "MIDNIGHT_PROOF_SERVER_URL")]
+        proof_server_url: Option<String>,
+        #[arg(long, env = "MIDNIGHT_GATEWAY_URL")]
+        gateway_url: Option<String>,
         #[arg(long)]
         json: bool,
         #[arg(long)]

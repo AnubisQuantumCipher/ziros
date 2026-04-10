@@ -235,11 +235,12 @@ def main() -> None:
         != attestation["claims_verified"]["verification_ledger"]["implementation_bound_rows"]
     ):
         raise SystemExit("headline implementation count mismatch")
-    if (
-        attestation["headline_counts"]["hypothesis_carried_rows"]
-        != attestation["hypothesis_registry"]["count"]
-    ):
-        raise SystemExit("headline hypothesis count mismatch")
+    expected_protocol_registry_rows = (
+        attestation["headline_counts"].get("hypothesis_carried_rows", 0)
+        + attestation["headline_counts"].get("trusted_protocol_tcb_rows", 0)
+    )
+    if attestation["hypothesis_registry"]["count"] != expected_protocol_registry_rows:
+        raise SystemExit("headline protocol registry count mismatch")
 
     print(json.dumps({"ok": True, "root": str(root)}, indent=2))
 

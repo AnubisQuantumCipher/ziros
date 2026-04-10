@@ -478,15 +478,15 @@
     {
       "claims": [
         {
-          "checker": "lean",
+          "checker": "external_assumption",
           "claim_id": "protocol.groth16_completeness",
           "classification": "hypothesis-carried",
-          "proof_path": null,
+          "proof_path": "PROOF_BOUNDARY.md",
           "source": "verification-ledger",
-          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "hypothesis_stated",
+          "status": "assumed_external",
           "title": "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -494,15 +494,15 @@
           ]
         },
         {
-          "checker": "lean",
+          "checker": "external_assumption",
           "claim_id": "protocol.groth16_knowledge_soundness",
           "classification": "hypothesis-carried",
-          "proof_path": null,
+          "proof_path": "PROOF_BOUNDARY.md",
           "source": "verification-ledger",
-          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "hypothesis_stated",
+          "status": "assumed_external",
           "title": "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -510,15 +510,15 @@
           ]
         },
         {
-          "checker": "lean",
+          "checker": "external_assumption",
           "claim_id": "protocol.groth16_zero_knowledge",
           "classification": "hypothesis-carried",
-          "proof_path": null,
+          "proof_path": "PROOF_BOUNDARY.md",
           "source": "verification-ledger",
-          "source_assurance_class": "hypothesis_carried_theorem",
+          "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "hypothesis_stated",
+          "status": "assumed_external",
           "title": "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -543,7 +543,9 @@
       "source": "verification-ledger",
       "supporting_paths": {
         "extraction_paths": [],
-        "proof_paths": [],
+        "proof_paths": [
+          "PROOF_BOUNDARY.md"
+        ],
         "source_path": "zkf-backends/src/arkworks.rs"
       },
       "surface_id": "protocol.groth16_exact"

@@ -90,21 +90,21 @@ When prose and generated evidence disagree, trust the live truth surfaces:
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 169.
-- Machine-checked rows: 160 total (160 `mechanized_local`, 0 `mechanized_generated`).
-- Remaining non-machine-checked rows: 9 `hypothesis_stated`, 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
-- Assurance classes: 160 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 0 `model_only_claim`, 9 `hypothesis_carried_theorem`.
+- Total ledger entries: 189.
+- Machine-checked rows: 180 total (176 `mechanized_local`, 4 `mechanized_generated`).
+- Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 9 `assumed_external`, 0 `pending`.
+- Assurance classes: 166 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 14 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
 - Rows with non-empty `trusted_assumptions`: 9.
-- Open protocol rows:
-  - `protocol.fri_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.fri_proximity_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.groth16_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.groth16_knowledge_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.groth16_zero_knowledge`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.hypernova_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.hypernova_folding_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.nova_completeness`: `hypothesis_stated` via `no-local-proof-artifact`
-  - `protocol.nova_folding_soundness`: `hypothesis_stated` via `no-local-proof-artifact`
+- Explicit protocol TCB rows:
+  - `protocol.fri_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.fri_proximity_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.groth16_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.groth16_knowledge_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.groth16_zero_knowledge`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.hypernova_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.hypernova_folding_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.nova_completeness`: `assumed_external` via `PROOF_BOUNDARY.md`
+  - `protocol.nova_folding_soundness`: `assumed_external` via `PROOF_BOUNDARY.md`
 <!-- END GENERATED VERIFICATION STATUS -->

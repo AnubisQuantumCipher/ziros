@@ -16,15 +16,103 @@
 //! The MSM implementations (for integer types and field types) are adapted from halo2/jolt.
 use ff::{Field, PrimeField};
 use halo2curves::{
-  group::Group,
-  pasta::{Fq as PallasScalar, Pallas, PallasAffine},
   CurveAffine,
+  group::Group,
+  pasta::{Fp as VestaScalar, Fq as PallasScalar, Pallas, PallasAffine, Vesta, VestaAffine},
 };
 use num_integer::Integer;
 use num_traits::{ToPrimitive, Zero};
+use once_cell::sync::Lazy;
 use rayon::{current_num_threads, prelude::*};
-#[cfg(target_os = "macos")]
+use std::collections::BTreeSet;
+use std::sync::Mutex;
+
+#[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+use zkf_metal::{
+  try_metal_pallas_msm as dispatch_metal_pallas_msm,
+  try_metal_vesta_msm as dispatch_metal_vesta_msm,
+};
+
+/// Summary of Pasta-curve Metal MSM usage observed inside the Nova provider.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PastaMetalMsmTelemetry {
+  /// Curve labels whose large-scalar MSM partitions were dispatched through Metal.
+  pub curves: Vec<String>,
+}
+
+impl PastaMetalMsmTelemetry {
+  /// Returns true when at least one Pasta MSM partition ran through Metal.
+  pub fn metal_used(&self) -> bool {
+    !self.curves.is_empty()
+  }
+
+  /// Returns true when the named Pasta curve was observed on the Metal path.
+  pub fn used_curve(&self, curve: &str) -> bool {
+    self.curves.iter().any(|entry| entry == curve)
+  }
+}
+
+static LAST_PASTA_METAL_MSM: Lazy<Mutex<BTreeSet<String>>> =
+  Lazy::new(|| Mutex::new(BTreeSet::new()));
+
+/// Attempt full-curve Pasta MSM on Metal once the batch is large enough.
+///
+/// Nova's historical path only routed the large-scalar partition through
+/// Metal. That can leave one Pasta curve on CPU even when the overall MSM is
+/// large and the Metal kernels are available. Prefer a full-curve Metal
+/// attempt for large batches, then fall back to the partitioned strategy.
+const PASTA_METAL_EAGER_THRESHOLD: usize = 512;
+
+#[allow(dead_code)]
+fn record_pasta_metal_curve(curve: &'static str) {
+  if let Ok(mut curves) = LAST_PASTA_METAL_MSM.lock() {
+    curves.insert(curve.to_string());
+  }
+}
+
+/// Clear any recorded Pasta Metal MSM usage before starting a fresh proof run.
+pub fn reset_pasta_metal_msm_telemetry() {
+  if let Ok(mut curves) = LAST_PASTA_METAL_MSM.lock() {
+    curves.clear();
+  }
+}
+
+/// Drain and return the Pasta Metal MSM telemetry captured for the current proof run.
+pub fn take_pasta_metal_msm_telemetry() -> PastaMetalMsmTelemetry {
+  if let Ok(mut curves) = LAST_PASTA_METAL_MSM.lock() {
+    let snapshot = curves.iter().cloned().collect();
+    curves.clear();
+    PastaMetalMsmTelemetry { curves: snapshot }
+  } else {
+    PastaMetalMsmTelemetry::default()
+  }
+}
+
+#[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+fn try_metal_pallas_msm(scalars: &[PallasScalar], bases: &[PallasAffine]) -> Option<Pallas> {
+  let result = dispatch_metal_pallas_msm(scalars, bases);
+  if result.is_some() {
+    record_pasta_metal_curve("pallas");
+  }
+  result
+}
+
+#[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
 fn try_metal_pallas_msm(_scalars: &[PallasScalar], _bases: &[PallasAffine]) -> Option<Pallas> {
+  None
+}
+
+#[cfg(all(target_os = "macos", feature = "metal-gpu"))]
+fn try_metal_vesta_msm(scalars: &[VestaScalar], bases: &[VestaAffine]) -> Option<Vesta> {
+  let result = dispatch_metal_vesta_msm(scalars, bases);
+  if result.is_some() {
+    record_pasta_metal_curve("vesta");
+  }
+  result
+}
+
+#[cfg(not(all(target_os = "macos", feature = "metal-gpu")))]
+fn try_metal_vesta_msm(_scalars: &[VestaScalar], _bases: &[VestaAffine]) -> Option<Vesta> {
   None
 }
 
@@ -442,6 +530,13 @@ pub fn msm_pallas(coeffs: &[PallasScalar], bases: &[PallasAffine]) -> Pallas {
     return msm_simple(coeffs, bases);
   }
 
+  #[cfg(target_os = "macos")]
+  if n >= PASTA_METAL_EAGER_THRESHOLD {
+    if let Some(result) = try_metal_pallas_msm(coeffs, bases) {
+      return result;
+    }
+  }
+
   const NUM_GROUPS: usize = 11;
 
   let classified: Vec<u64> = coeffs
@@ -613,6 +708,200 @@ pub fn msm_pallas(coeffs: &[PallasScalar], bases: &[PallasAffine]) -> Pallas {
   binary_result + small_and_large_result
 }
 
+/// Vesta-specialized MSM entrypoint for Nova's Pasta cycle.
+///
+/// This intentionally mirrors `msm()` so the large-scalar group can route
+/// through Metal on Apple Silicon while keeping Nova's existing bucket MSM
+/// strategy for the small-scalar partitions.
+pub fn msm_vesta(coeffs: &[VestaScalar], bases: &[VestaAffine]) -> Vesta {
+  assert_eq!(coeffs.len(), bases.len());
+  let n = coeffs.len();
+  if n == 0 {
+    return Vesta::identity();
+  }
+
+  if n <= 16 {
+    return msm_simple(coeffs, bases);
+  }
+
+  #[cfg(target_os = "macos")]
+  if n >= PASTA_METAL_EAGER_THRESHOLD {
+    if let Some(result) = try_metal_vesta_msm(coeffs, bases) {
+      return result;
+    }
+  }
+
+  const NUM_GROUPS: usize = 11;
+
+  let classified: Vec<u64> = coeffs
+    .par_iter()
+    .enumerate()
+    .filter_map(|(i, s)| {
+      if bool::from(s.is_zero()) {
+        return None;
+      }
+      let neg_s = -(*s);
+      let bits_s = scalar_num_bits(s);
+      let bits_neg = scalar_num_bits(&neg_s);
+
+      let group = if bits_s <= 1 {
+        0u8
+      } else if bits_neg <= 1 {
+        1u8
+      } else if bits_s <= 8 {
+        2u8
+      } else if bits_neg <= 8 {
+        3u8
+      } else if bits_s <= 16 {
+        4u8
+      } else if bits_neg <= 16 {
+        5u8
+      } else if bits_s <= 32 {
+        6u8
+      } else if bits_neg <= 32 {
+        7u8
+      } else if bits_s <= 64 {
+        8u8
+      } else if bits_neg <= 64 {
+        9u8
+      } else {
+        10u8
+      };
+      Some(((i as u64) & 0x0FFF_FFFF_FFFF_FFFF) | ((group as u64) << 60))
+    })
+    .collect();
+
+  if classified.is_empty() {
+    return Vesta::identity();
+  }
+
+  let mut classified = classified;
+  classified.par_sort_unstable_by_key(|v| (v >> 60) as u8);
+
+  let extract_group = |v: u64| (v >> 60) as u8;
+  let extract_index = |v: u64| (v & 0x0FFF_FFFF_FFFF_FFFF) as usize;
+
+  let mut boundaries = [0usize; NUM_GROUPS + 1];
+  {
+    let mut pos = 0;
+    for g in 0..NUM_GROUPS as u8 {
+      boundaries[g as usize] = pos;
+      pos += classified[pos..].partition_point(|v| extract_group(*v) <= g);
+    }
+    boundaries[NUM_GROUPS] = classified.len();
+  }
+
+  let extract_u64_group =
+    |start: usize, end: usize, negate: bool| -> (Vec<VestaAffine>, Vec<u64>) {
+      classified[start..end]
+        .iter()
+        .map(|&v| {
+          let idx = extract_index(v);
+          let b = bases[idx];
+          let s = if negate { -coeffs[idx] } else { coeffs[idx] };
+          (b, repr_low_u64(&s))
+        })
+        .unzip()
+    };
+
+  let extract_binary_group = |start: usize, end: usize| -> Vec<VestaAffine> {
+    classified[start..end]
+      .iter()
+      .map(|&v| bases[extract_index(v)])
+      .collect()
+  };
+
+  let (g0_start, g0_end) = (boundaries[0], boundaries[1]);
+  let (g1_start, g1_end) = (boundaries[1], boundaries[2]);
+  let (g2_start, g2_end) = (boundaries[2], boundaries[3]);
+  let (g3_start, g3_end) = (boundaries[3], boundaries[4]);
+  let (g4_start, g4_end) = (boundaries[4], boundaries[5]);
+  let (g5_start, g5_end) = (boundaries[5], boundaries[6]);
+  let (g6_start, g6_end) = (boundaries[6], boundaries[7]);
+  let (g7_start, g7_end) = (boundaries[7], boundaries[8]);
+  let (g8_start, g8_end) = (boundaries[8], boundaries[9]);
+  let (g9_start, g9_end) = (boundaries[9], boundaries[10]);
+  let (g10_start, g10_end) = (boundaries[10], boundaries[11]);
+
+  let (binary_result, small_and_large_result) = rayon::join(
+    || {
+      let (pos, neg) = rayon::join(
+        || {
+          let bases_pos = extract_binary_group(g0_start, g0_end);
+          accumulate_bases::<VestaAffine>(&bases_pos)
+        },
+        || {
+          let bases_neg = extract_binary_group(g1_start, g1_end);
+          accumulate_bases::<VestaAffine>(&bases_neg)
+        },
+      );
+      pos - neg
+    },
+    || {
+      let (small_result, large_result) = rayon::join(
+        || {
+          let ((r8, r16), (r32, r64)) = rayon::join(
+            || {
+              rayon::join(
+                || {
+                  let (pos_b, pos_s) = extract_u64_group(g2_start, g2_end, false);
+                  let (neg_b, neg_s) = extract_u64_group(g3_start, g3_end, true);
+                  msm_small_with_max_num_bits(&pos_s, &pos_b, 8)
+                    - msm_small_with_max_num_bits(&neg_s, &neg_b, 8)
+                },
+                || {
+                  let (pos_b, pos_s) = extract_u64_group(g4_start, g4_end, false);
+                  let (neg_b, neg_s) = extract_u64_group(g5_start, g5_end, true);
+                  msm_small_with_max_num_bits(&pos_s, &pos_b, 16)
+                    - msm_small_with_max_num_bits(&neg_s, &neg_b, 16)
+                },
+              )
+            },
+            || {
+              rayon::join(
+                || {
+                  let (pos_b, pos_s) = extract_u64_group(g6_start, g6_end, false);
+                  let (neg_b, neg_s) = extract_u64_group(g7_start, g7_end, true);
+                  msm_small_with_max_num_bits(&pos_s, &pos_b, 32)
+                    - msm_small_with_max_num_bits(&neg_s, &neg_b, 32)
+                },
+                || {
+                  let (pos_b, pos_s) = extract_u64_group(g8_start, g8_end, false);
+                  let (neg_b, neg_s) = extract_u64_group(g9_start, g9_end, true);
+                  msm_small_with_max_num_bits(&pos_s, &pos_b, 64)
+                    - msm_small_with_max_num_bits(&neg_s, &neg_b, 64)
+                },
+              )
+            },
+          );
+          r8 + r16 + r32 + r64
+        },
+        || {
+          if g10_start >= g10_end {
+            return Vesta::identity();
+          }
+          let (large_bases, large_coeffs): (Vec<VestaAffine>, Vec<VestaScalar>) = classified
+            [g10_start..g10_end]
+            .iter()
+            .map(|&v| {
+              let idx = extract_index(v);
+              (bases[idx], coeffs[idx])
+            })
+            .unzip();
+          #[cfg(target_os = "macos")]
+          if let Some(result) = try_metal_vesta_msm(&large_coeffs, &large_bases) {
+            return result;
+          }
+          halo2curves::msm::msm_best(&large_coeffs, &large_bases)
+        },
+      );
+      small_result + large_result
+    },
+  );
+
+  binary_result + small_and_large_result
+}
+
 /// Simple MSM fallback for very small inputs.
 fn msm_simple<C: CurveAffine>(coeffs: &[C::Scalar], bases: &[C]) -> C::Curve {
   coeffs
@@ -649,11 +938,7 @@ fn accumulate_bases<C: CurveAffine>(bases: &[C]) -> C::Curve {
 }
 
 fn num_bits(n: usize) -> usize {
-  if n == 0 {
-    0
-  } else {
-    (n.ilog2() + 1) as usize
-  }
+  if n == 0 { 0 } else { (n.ilog2() + 1) as usize }
 }
 
 // ==================================================================================
@@ -911,7 +1196,7 @@ mod tests {
     secp_secq::{secp256k1, secq256k1},
   };
   use ff::Field;
-  use halo2curves::{group::Group, CurveAffine};
+  use halo2curves::{CurveAffine, group::Group};
   use rand_core::OsRng;
 
   fn test_general_msm_with<F: Field, A: CurveAffine<ScalarExt = F>>() {
