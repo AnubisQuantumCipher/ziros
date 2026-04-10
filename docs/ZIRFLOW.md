@@ -8,8 +8,8 @@ workflow trade_finance_settlement {
   check settlement tier tier1;
   lower settlement to zir-v1 out "./build/private_trade_finance_settlement.zir.json";
   package settlement out "./build/private_trade_finance_settlement.package";
-  prove settlement backend "arkworks-groth16" inputs "./private_trade_finance_settlement.inputs.valid.json" out "./build/private_trade_finance_settlement.proof.json" allow_dev_deterministic_groth16;
-  verify settlement backend "arkworks-groth16" artifact "./build/private_trade_finance_settlement.proof.json" allow_dev_deterministic_groth16;
+  prove settlement backend "nova" inputs "./private_trade_finance_settlement.inputs.valid.json" out "./build/private_trade_finance_settlement.proof.json";
+  verify settlement backend "nova" artifact "./build/private_trade_finance_settlement.proof.json";
 }
 ```
 
@@ -23,4 +23,4 @@ ziros lang flow run workflow.zirflow --approve --json
 
 `flow run` requires `--approve` for write, package, prove, or verify steps. ZirFlow has no arbitrary shell execution; all source, output, proof, and artifact paths are visible in the plan.
 
-`allow_dev_deterministic_groth16` is an explicit development-only workflow flag for local smoke tests without an external Groth16 setup blob.
+`allow_dev_deterministic_groth16` is an explicit development-only workflow flag for local Groth16 smoke tests without an external setup blob; the shipped example uses the native `nova` backend so the strict backend-readiness audit can pass.

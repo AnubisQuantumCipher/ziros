@@ -1646,7 +1646,7 @@ fn scaffold_zir_app(
     write_text(
         &root.join("workflow.zirflow"),
         &format!(
-            "workflow {name} {{\n  source \"./program.zir\" as main;\n  check main tier tier1;\n  lower main to zir-v1 out \"./build/program.zir.json\";\n  package main out \"./build/package\";\n  prove main backend \"arkworks-groth16\" inputs \"./inputs.valid.json\" out \"./build/proof.json\" allow_dev_deterministic_groth16;\n  verify main backend \"arkworks-groth16\" artifact \"./build/proof.json\" allow_dev_deterministic_groth16;\n}}\n"
+            "workflow {name} {{\n  source \"./program.zir\" as main;\n  check main tier tier1;\n  lower main to zir-v1 out \"./build/program.zir.json\";\n  package main out \"./build/package\";\n  prove main backend \"nova\" inputs \"./inputs.valid.json\" out \"./build/proof.json\";\n  verify main backend \"nova\" artifact \"./build/proof.json\";\n}}\n"
         ),
     )?;
     write_text(
