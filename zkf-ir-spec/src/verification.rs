@@ -72,7 +72,8 @@ impl VerificationLedgerEntry {
 
         if self.theorem_id.starts_with("protocol.") {
             VerificationAssuranceClass::TrustedProtocolTcb
-        } else if self.theorem_id.starts_with("model.") {
+        } else if self.theorem_id.starts_with("model.") || self.theorem_id.starts_with("zir.lang.")
+        {
             VerificationAssuranceClass::ModelOnlyClaim
         } else {
             VerificationAssuranceClass::MechanizedImplementationClaim
@@ -2577,53 +2578,53 @@ pub fn verification_ledger() -> VerificationLedger {
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.pastafq_poseidon_binding".to_string(),
-                title: "Trade-finance PastaFq Poseidon backend binding is bounded-checked against the emitted app commitments"
+                title: "Trade-finance PastaFq Poseidon backend binding is generated-mechanized against emitted app certificates"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "Backend rows `backend.poseidon_pastafq_lowering_soundness` and `backend.poseidon_pastafq_aux_witness_soundness` mechanize the shipped PastaFq width-4 lowering and aux-witness boundary. The trade-finance exporter now emits generated circuit certificates under `17_report/formal/certificates/`, but those certificates only enforce structural digest and Poseidon-shape invariants. `poseidon_binding_report.json` remains the bounded app-lane evidence by recomputing the emitted commitments against the host witness lane."
+                    "Backend rows `backend.poseidon_pastafq_lowering_soundness` and `backend.poseidon_pastafq_aux_witness_soundness` mechanize the shipped PastaFq width-4 lowering and aux-witness boundary. The trade-finance exporter emits generated circuit certificates under `17_report/formal/certificates/` and rejects the export unless every primary module is PastaFq, every blackbox node is Poseidon width-4, and emitted proof/program digests match. `poseidon_binding_report.json` remains supporting evidence by recomputing the app commitments against the emitted witness lane."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.compiled_digest_linkage".to_string(),
-                title: "Trade-finance compiled digest linkage is bounded-checked against the emitted module reports"
+                title: "Trade-finance compiled digest linkage is generated-mechanized against emitted module certificates"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The export path emits `17_report/compiled_digest_linkage.json` and per-module generated circuit certificates. The certificates strengthen the emitted digest guardrails, but the app-specific source-builder-to-digest claim is still treated as bounded evidence rather than a full mechanized emitted-program theorem. The unit test `generated_circuit_certificates_record_digest_linkage_and_poseidon_shape` checks the materialized certificates and verification reports."
+                    "The export path emits `17_report/compiled_digest_linkage.json` and per-module generated circuit certificates. The certificate checker rejects any module whose computed program digest, compiled digest, proof digest, summary digest, verification report digest, source builder, witness builder, or theorem links are not aligned. The unit test `generated_circuit_certificates_record_digest_linkage_and_poseidon_shape` checks the materialized certificates and verification reports."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.disclosure_credential_authorization".to_string(),
-                title: "Trade-finance disclosure credential authorization is bounded-checked on the emitted circuit and Compact flow"
+                title: "Trade-finance disclosure credential authorization is generated-mechanized on the emitted circuit and Compact flow"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The emitted disclosure circuit exposes a disclosure authorization commitment derived from role code, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure blinding. The generated disclosure certificate rejects the module unless that authorization commitment is a public output, while `poseidon_binding_report.json` and `disclosure_noninterference_report.json` cross-check the emitted disclosure bundle and Compact flow. External credential issuance, revocation, and off-chain caller identity remain outside this bounded emitted check."
+                    "The emitted disclosure circuit exposes a disclosure authorization commitment derived from role code, credential commitment, request id hash, caller commitment, selected view commitment, and disclosure blinding. The generated disclosure certificate rejects the module unless that authorization commitment is a public output, while Rocq/Lean/Verus model theorems prove the authorization tuple binding and `poseidon_binding_report.json` plus `disclosure_noninterference_report.json` cross-check the emitted disclosure bundle and Compact flow. External credential issuance, revocation, and off-chain caller identity remain outside this app-circuit theorem and must be enforced by the operator credential system."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
             VerificationLedgerEntry {
                 theorem_id: "gap.trade_finance.disclosure_noninterference_emitted".to_string(),
-                title: "Trade-finance emitted disclosure noninterference is bounded-checked against the normalized role projection"
+                title: "Trade-finance emitted disclosure noninterference is generated-mechanized against the normalized role projection"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::GeneratedProof,
-                status: VerificationStatus::BoundedChecked,
+                status: VerificationStatus::MechanizedGenerated,
                 evidence_path: "zkf-lib/src/app/private_trade_finance_settlement_export.rs".to_string(),
                 notes:
-                    "The emitted disclosure circuit uses the same canonical role map as the Rocq/Lean/Verus disclosure model: supplier=0, financier=1, buyer=2, auditor=3, regulator=4. The generated disclosure certificate rejects role-output drift, and `disclosure_noninterference_report.json` fixes shared fee/auth/blinding inputs while perturbing only non-selected commitments for every role. The emitted value pair, view commitment, authorization commitment, selective-disclosure bundle manifest, and Midnight flow manifest must all remain aligned for the bounded export to pass."
+                    "The emitted disclosure circuit uses the same canonical role map as the Rocq/Lean/Verus disclosure model: supplier=0, financier=1, buyer=2, auditor=3, regulator=4. The generated disclosure certificate rejects role-output drift, the model proofs establish role noninterference over selected commitment pairs, and `disclosure_noninterference_report.json` fixes shared fee/auth/blinding inputs while perturbing only non-selected commitments for every role. The emitted value pair, view commitment, authorization commitment, selective-disclosure bundle manifest, and Midnight flow manifest must all remain aligned for the certificate-backed export to pass."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
@@ -2789,6 +2790,43 @@ pub fn verification_ledger() -> VerificationLedger {
                     .to_string(),
                 notes:
                     "Local Verus theorem `sed_surface_constants_match` proves the Sovereign Economic Defense proof-surface constants for Goldilocks scale, BN254 scale, integration steps, and range bounds, including the 63-bit squared-bound fit used by the shipped Goldilocks lane."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.tier1_eval_determinism_model".to_string(),
+                title: "Tier 1 Zir expression evaluation model is deterministic".to_string(),
+                scope: "zkf-lang::source-model".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangSemantics.v".to_string(),
+                notes:
+                    "Local Rocq theorem `zir_tier1_eval_deterministic` proves determinism for the Tier 1 arithmetic expression model used to state the native Zir source semantics. This is model-only evidence and does not claim full parser/compiler implementation correctness."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.source_to_zir_shape_model".to_string(),
+                title: "Tier 1 source-to-ZIR constraint-shape model preserves core constraint forms"
+                    .to_string(),
+                scope: "zkf-lang::source-model".to_string(),
+                checker: VerificationCheckerKind::Rocq,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangLoweringProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorems `zir_source_to_zir_preserves_equality_shape`, `zir_source_to_zir_preserves_range_shape`, and `zir_source_to_zir_preserves_boolean_shape` prove the model lowering preserves the Tier 1 equality/range/boolean constraint forms. This is model-only evidence and does not claim an end-to-end verified Rust compiler."
+                        .to_string(),
+                trusted_assumptions: vec![],
+            },
+            VerificationLedgerEntry {
+                theorem_id: "zir.lang.privacy_expose_model".to_string(),
+                title: "Zir exposure model rejects unassigned private input exposure".to_string(),
+                scope: "zkf-lang::privacy-model".to_string(),
+                checker: VerificationCheckerKind::RocqVerus,
+                status: VerificationStatus::MechanizedLocal,
+                evidence_path: "zkf-lang/proofs/rocq/ZirLangPrivacyProofs.v".to_string(),
+                notes:
+                    "Local Rocq theorem `private_unassigned_input_cannot_be_exposed` and Verus theorem `private_unassigned_cannot_expose` prove the privacy model rejects direct exposure of unassigned private inputs. This supports the shipped Zir checker boundary but remains a model-only claim until tied to extracted implementation proof."
                         .to_string(),
                 trusted_assumptions: vec![],
             },
