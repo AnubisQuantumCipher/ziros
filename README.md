@@ -122,7 +122,7 @@ flowchart LR
 | Gadgets and circuits | Poseidon, SHA-256, BLAKE3, Merkle, range, comparison, ECDSA, Schnorr, KZG, PLONK gate, boolean logic | `zkf-gadgets` |
 | Runtime and scheduling | UMPG graph execution, trust lanes, unified buffer pool, runtime planning, telemetry, package workflows, runtime verification | `zkf-runtime`, `zkf-cli` |
 | Hardware acceleration | Apple Silicon, Metal, unified memory, CPU crypto extensions, CPU SME lane, GPU abstraction layer | `zkf-metal`, `zkf-gpu`, `zkf-crypto-accel` |
-| Formal methods | Lean 4, Rocq, F*, Verus, Kani, verification ledger, proof-boundary metadata, checked manifests | `zkf-metal/proofs`, `zkf-core/proofs`, `zkf-backends/proofs`, `zkf-ir-spec` |
+| Formal methods | Lean 4, Rocq, F*, Verus, RefinedRust, Kani, Thrust, verification ledger, proof-boundary metadata, checked manifests | `zkf-metal/proofs`, `zkf-core/proofs`, `zkf-backends/proofs`, `zkf-ir-spec`, `formal/` |
 | Interface stack | Clap CLI, Axum/Tower HTTP service, PyO3/maturin Python package, C FFI/cbindgen, LSP server, Ratatui/Crossterm terminal UI | `zkf-cli`, `zkf-api`, `zkf-python`, `zkf-ffi`, `zkf-lsp`, `zkf-ui`, `zkf-tui` |
 | Defensive and distributed systems | Multi-node coordination, swarm identity/reputation/rule lifecycle, supply-chain audit store, benchmark harnesses | `zkf-distributed`, `supply-chain`, `benchmarks` |
 | Public proof and showcase surfaces | verifier-only binary, public Metal proof helpers, carbon and rollup apps, standalone builder-spec app, Midnight showcase | `zkf-verify`, `zkf-metal-public-cli`, `tools/zkf-metal-public-proof`, `zkCarbon`, `zk_rollup`, `private_budget_approval`, `uccr-showcase` |
@@ -143,15 +143,15 @@ flowchart LR
 
 | Backend | Status | Mode | Fields | Assurance lane | Proof semantics | Current host GPU coverage | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `plonky3` | `ready` | `native` | `goldilocks`, `babybear`, `mersenne31` | `native-cryptographic-proof` | `proof-enforced-lowered-ir` | `2/2 GPU stages active on current host` | Transparent STARK path with native GPU hash/NTT coverage |
-| `halo2` | `ready` | `native` | `pasta-fp` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `1/2 GPU stages active on current host` | Native Halo2 IPA lane |
+| `plonky3` | `ready` | `native` | `goldilocks`, `babybear`, `mersenne31` | `native-cryptographic-proof` | `proof-enforced-lowered-ir` | `0/2 GPU stages active on current host` | Transparent STARK path with native field profiles and wrapper-capable single-proof semantics |
+| `halo2` | `ready` | `native` | `pasta-fp` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `0/2 GPU stages active on current host` | Native Halo2 IPA lane with automatic wide-range chunk lowering |
 | `halo2-bls12-381` | `ready` | `native` | `bls12-381` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `0/2 GPU stages active on current host` | Native Halo2 KZG lane |
-| `arkworks-groth16` | `limited` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `3/3 GPU stages active on current host` | Support matrix marks it non-production until upstream production disclaimer is resolved |
-| `nova` | `ready` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native recursive shell |
-| `hypernova` | `ready` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native multifolding shell |
+| `arkworks-groth16` | `limited` | `native` | `bn254` | `native-cryptographic-proof` | `proof-enforced-basic-ir` | `0/3 GPU stages active on current host` | Small-proof BN254 lane, but still non-production because of the upstream ark-groth16 production disclaimer |
+| `nova` | `ready` | `native` | `bn254`, `pasta-fp`, `pasta-fq` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native recursive shell with compatibility delegation disabled by default |
+| `hypernova` | `ready` | `native` | `bn254`, `pasta-fp`, `pasta-fq` | `native-cryptographic-proof` | `proof-enforced-basic-ir-recursive-shell` | `0/1 GPU stages active on current host` | Native multifolding shell over the Nova-backed CCS profile |
 | `sp1` | `broken` | `delegated` | `goldilocks`, `babybear`, `mersenne31` | `attestation-backed-host-validated-lane` | `attestation-over-host-validation` | `0/0 GPU stages active on current host` | Delegated compatibility lane to `plonky3`; native backend not compiled into this host surface |
 | `risc-zero` | `broken` | `delegated` | `goldilocks`, `babybear`, `mersenne31` | `attestation-backed-host-validated-lane` | `attestation-over-host-validation` | `0/0 GPU stages active on current host` | Delegated compatibility lane to `plonky3`; native backend not compiled into this host surface |
-| `midnight-compact` | `broken` | `native` | `pasta-fp`, `pasta-fq` | `delegated-or-external-lane` | `external-or-delegated` | `0/0 GPU stages active on current host` | Requires external proof-server configuration or explicit compatibility delegation |
+| `midnight-compact` | `ready` | `native` | `pasta-fp`, `pasta-fq` | `delegated-or-external-lane` | `external-or-delegated` | `0/0 GPU stages active on current host` | Typed Midnight operator lane; live submit is still blocked on this host by gateway, wallet, and DUST readiness evidence |
 
 Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extensions beside the core backend crate, including strict wrapping helpers and specialized integration lanes. In this checkout those are backend extensions, not separate backend rows in `support-matrix.json`.
 
@@ -159,6 +159,7 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 
 | Frontend | Status | Input forms | Notes |
 | --- | --- | --- | --- |
+| `zir` | `ready` | `zir-source`, `zkf-zir-source-descriptor-json` | Native Zir source frontend; Tier 1 is bounded and total, Tier 2 preserves advanced ZIR features and fails closed on unsupported lowerings |
 | `noir` | `ready` | `noir-artifact-json`, `acir-program-json` | Imports ACIR plus native BlackBox metadata and Brillig hint surfaces |
 | `circom` | `ready` | `circom-r1cs-json`, `zkf-program-json`, `frontend-descriptor-json` | Supports snarkjs-style import and descriptor-driven witness execution |
 | `cairo` | `limited` | `sierra-json`, `cairo-descriptor-json`, `zkf-program-json`, `zkf-zir-program-json` | Supports a shipped Sierra subset; unsupported libfuncs fail closed |
@@ -243,22 +244,23 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 
 | Metric | Value |
 | --- | --- |
-| Total verification-ledger rows | 169 |
-| `mechanized_local` rows | 160 |
-| `mechanized_generated` rows | 0 |
-| `hypothesis_stated` rows | 9 |
+| Total verification-ledger rows | 193 |
+| `mechanized_local` rows | 189 |
+| `mechanized_generated` rows | 4 |
+| `hypothesis_stated` rows | 0 |
 | `bounded_checked` rows | 0 |
 | `assumed_external` rows | 0 |
 | Pending rows | 0 |
-| `mechanized_implementation_claim` | 157 |
+| `mechanized_implementation_claim` | 167 |
 | `attestation_backed_lane` | 0 |
-| `model_only_claim` | 0 |
-| `hypothesis_carried_theorem` | 12 (9 protocol + 3 attestation-honesty) |
+| `model_only_claim` | 17 |
+| `trusted_protocol_tcb` | 9 |
+| `hypothesis_carried_theorem` | 0 |
 | Trusted assumptions | 9 |
-| Release grade ready | false |
+| Release grade ready | true |
 | Runtime/distributed proof coverage | 89 files, 1,788 functions complete |
-| Rust tests passed | 1,047 (core 200, backends 345, runtime 155, distributed 97, ir-spec 38, cli 212) |
-| Proof languages | Lean 4, Rocq/Coq, Verus, F*, Kani |
+| Current checked release-grade gates | `cargo build --workspace`; `cargo test -p zkf-ir-spec --lib`; `bash scripts/run_protocol_exact_rocq_proofs.sh`; `python3 scripts/generate_verification_status_artifacts.py --check`; `python3 scripts/proof_audit.py --release-grade`; `python3.11 scripts/check_private_truth_drift.py` |
+| Proof languages | Lean 4, Rocq/Coq, Verus, F*, RefinedRust, Kani, Thrust |
 
 ### Trust Vocabulary
 
@@ -266,7 +268,8 @@ Wrapping and export surfaces: `zkf-backends-pro` carries advanced backend extens
 | --- | --- |
 | `mechanized` | Machine-checked theorem over a shipped implementation or tracked proof boundary |
 | `attestation-backed` | Host-validated lane, not an in-circuit cryptographic proof |
-| `model-only` | Theorem about a model or boundary summary, not direct end-to-end implementation correctness. **ZirOS has 0 model-only claims as of March 30, 2026** — all former model-only rows have been rebound to shipped production code. |
+| `model-only` | Theorem about a model or boundary summary, not direct end-to-end implementation correctness. The current checkout carries 17 `model_only_claim` rows explicitly rather than flattening them into implementation claims. |
+| `trusted_protocol_tcb` | Machine-checked reduction or implementation boundary that still depends on explicit cryptographic protocol hypotheses or upstream protocol trust assumptions. |
 | `hypothesis-carried` | Mechanized theorem that still depends on explicit upstream or cryptographic hypotheses |
 | `Cryptographic` | Runtime trust model for in-circuit proof-enforced outputs |
 | `Attestation` | Runtime trust model for host-validated outputs |
@@ -290,9 +293,20 @@ Strict cryptographic lanes (compile, prove, wrap, deploy, release-safe consumpti
 
 `zkf-core/src/proof_constant_time_bridge.rs` (350 lines) is a production-called bridge for the recursive expression evaluator, replacing the former proof-only spec. Both `eval_expr_constant_time()` and `eval_expr()` route through the bridge. F* verification via hax extraction (`Zkf_core.Proof_constant_time_bridge.fst`) proves structural visit-schedule and result-shape equivalence. The claim boundary is honest: this proves evaluator-shell schedule equivalence, not universal microarchitectural non-interference of every field operation.
 
-### Assurance Closure (March 30, 2026)
+### Assurance Closure (April 10, 2026)
 
-All 16 former model-only claims rebound to shipped production code. All 3 former attestation-backed lanes converted to hypothesis-carried theorems with explicit attestation-honesty premises. 1 new theorem added: `setup.groth16_deterministic_production_gate`. The current checkout now carries the nine protocol rows honestly as hypothesis-stated because the referenced exact proof artifacts are not present in-tree. Result: **0 model-only claims, 0 attestation-backed lanes, 160/169 machine-checked with 9 protocol rows explicitly hypothesis-stated.**
+The current checkout has closed the former `protocol.*` gap with a dedicated
+exact-surface Hax extraction lane and Rocq proofs under
+`zkf-backends/proofs/rocq/ProtocolExactSemantics.v` and
+`zkf-backends/proofs/rocq/ProtocolExactProofs.v`. Result: **193/193
+machine-checked rows, including 189 `mechanized_local` rows and 4
+`mechanized_generated` rows.**
+
+The nine protocol rows are no longer `hypothesis_stated` or
+`assumed_external`. They are now `mechanized_local` reduction theorems over the
+shipped exact Rust summaries, while remaining in the `trusted_protocol_tcb`
+assurance class because the cryptographic hypotheses are still explicit rather
+than fully discharged in-tree.
 
 ### The Verified Metal Lane
 
@@ -481,10 +495,11 @@ On non-macOS platforms, the iCloud layer falls back to local file storage at `~/
 
 `.zkf-completion-status.json` records the current checked build/test posture for this tree:
 
-- build truth dated March 30, 2026 includes `cargo build --workspace`
-- test truth dated March 30, 2026 includes 1,047 tests across 6 crates: `cargo test -p zkf-core --lib` (200), `cargo test -p zkf-backends --lib` (345), `cargo test -p zkf-runtime --lib` (155), `cargo test -p zkf-distributed --lib` (97), `cargo test -p zkf-ir-spec --lib` (38), `cargo test -p zkf-cli` (212)
-- proof runner truth: `run_rocq_proofs.sh`, `run_verus_workspace.sh` (3 workspaces), `run_verus_sovereign_economic_defense_proofs.sh`, `run_verus_reentry_assurance_proofs.sh`, `make -C zkf-core/proofs/fstar verify`
-- truth surface sync: `python3 scripts/generate_verification_status_artifacts.py --check` passes
+- build truth includes `cargo build --workspace`
+- current focused regression truth includes `cargo test -p zkf-ir-spec --lib`
+- protocol exact proof truth includes `bash scripts/run_protocol_exact_rocq_proofs.sh`
+- release-grade audit truth includes `python3 scripts/proof_audit.py --release-grade`
+- documentation and release-truth sync includes `python3 scripts/generate_verification_status_artifacts.py --check` and `python3.11 scripts/check_private_truth_drift.py`
 
 ## Quick Start
 
