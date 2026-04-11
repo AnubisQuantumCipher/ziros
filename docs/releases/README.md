@@ -4,6 +4,7 @@ This directory holds release-facing documentation for private source drops, stag
 
 ## Current entries
 
+- [2026-04-11 — ZirOS v0.7.5 Private Source Release](2026-04-11-v0.7.5-private-source-release.md)
 - [2026-04-08 — ZirOS Private Source Release](2026-04-08-private-source-release.md)
 - [2026-04-08 — Operator Experience Report](2026-04-08-operator-experience-report.md)
 

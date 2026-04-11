@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-04-11 — v0.7.5 private source release
+
+- Cut a new private source release at `v0.7.5` from the post-`v0.7.4` checkout state.
+- Added the trade-finance Midnight package closure fix so the validator now works in both showcase and packaged-subsystem layouts, preserves per-contract/per-call prepare assets, and rejects PATH binaries that lack the `midnight` command surface.
+- Added `scripts/generate_trade_finance_contract_forensics.py` together with refreshed trade-finance capability, readiness, market, and contract-blueprint forensics outputs.
+- Hardened the packaged trade-finance subsystem so repo-dependent Lean, Rocq, Verus, and materialize scripts fail closed with evidence-path guidance instead of advertising missing local repo paths as runnable package surfaces.
+- Refreshed private release truth surfaces for the current workspace version and source commit, including product release state, operator readiness, theorem coverage, public attestation export inputs, and the README-generated private summary block.
+- Rebuilt the release binary/archive lane for macOS ARM64 and refreshed the public attestation repo metadata for the same release tag without widening the proof/trust claims beyond the current truth surfaces.
+
 ## 2026-04-08 — Private source release tranche
 
 - Added a release-facing documentation index under `docs/releases/` together with a private source release note and a 5,000-word operator experience report.

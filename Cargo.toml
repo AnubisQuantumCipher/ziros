@@ -33,7 +33,7 @@ exclude = [
 resolver = "2"
 
 [workspace.package]
-version = "0.7.3"
+version = "0.7.5"
 edition = "2024"
 license = "LicenseRef-ZirOS-Proprietary"
 authors = ["AnubisQuantumCipher"]
