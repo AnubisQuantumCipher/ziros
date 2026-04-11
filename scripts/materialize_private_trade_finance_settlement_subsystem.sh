@@ -79,16 +79,8 @@ if [[ -d "$artifact_root/formal" ]]; then
   cp -R "$artifact_root/formal" "$subsystem_root/17_report/formal"
 fi
 
-cp "$repo_root/scripts/run_rocq_trade_finance_proofs.sh" \
-  "$subsystem_root/05_scripts/run_rocq_trade_finance_proofs.sh"
-cp "$repo_root/scripts/run_lean_trade_finance_proofs.sh" \
-  "$subsystem_root/05_scripts/run_lean_trade_finance_proofs.sh"
-cp "$repo_root/scripts/run_verus_trade_finance_proofs.sh" \
-  "$subsystem_root/05_scripts/run_verus_trade_finance_proofs.sh"
 cp "$repo_root/scripts/validate_private_trade_finance_midnight_contracts.sh" \
   "$subsystem_root/05_scripts/validate_private_trade_finance_midnight_contracts.sh"
-cp "$repo_root/scripts/materialize_private_trade_finance_settlement_subsystem.sh" \
-  "$subsystem_root/05_scripts/materialize_private_trade_finance_settlement_subsystem.sh"
 
 cat > "$subsystem_root/06_docs/README.md" <<EOF
 # Private Trade Finance Settlement Subsystem

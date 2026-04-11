@@ -1,0 +1,108 @@
+{
+  "binary": "dist/aarch64-apple-darwin/zkf",
+  "compact_manager": {
+    "actual": "0.30.0 @ /Users/sicarii/.local/bin/compact",
+    "detail": "The installed compact manager version does not match the pinned Midnight lane.",
+    "expected": "0.5.1",
+    "fix": "Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.",
+    "id": "compact",
+    "label": "Compact manager",
+    "required": false,
+    "status": "warn"
+  },
+  "compactc": {
+    "actual": "0.30.0 @ /Users/sicarii/.local/bin/compactc",
+    "expected": "0.30.0",
+    "id": "compactc",
+    "label": "Compact compiler",
+    "required": true,
+    "status": "pass"
+  },
+  "doctor_summary": {
+    "failed": 0,
+    "not_checkable": 4,
+    "overall_status": "warn",
+    "passed": 7,
+    "total": 13,
+    "warned": 2
+  },
+  "dust": {
+    "detail": "DUST balance is not checkable from a bare CLI process.",
+    "expected": "A nonzero spendable tDUST balance",
+    "fix": "Run the browser-assisted Lace check or supply a project with installed Midnight dependencies and headless wallet credentials.",
+    "id": "dust",
+    "label": "Spendable tDUST",
+    "required": false,
+    "status": "not_checkable_from_cli"
+  },
+  "explorer": {
+    "actual": "HTTP 200 @ https://explorer.preview.midnight.network",
+    "expected": "reachable endpoint",
+    "id": "explorer",
+    "label": "Midnight Explorer",
+    "required": false,
+    "status": "pass"
+  },
+  "gateway": {
+    "actual": "http://127.0.0.1:6311",
+    "detail": "{\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+    "expected": "ready gateway with compactc 0.30.0 and attestor key exposure",
+    "fix": "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0.",
+    "id": "gateway",
+    "label": "Midnight Compact gateway",
+    "required": true,
+    "status": "warn"
+  },
+  "generated_at": "2026-04-11T19:15:57.898090Z",
+  "host_truth": {
+    "bitrove_ops_path": ".ops/bitrove-first-dollar/README.md",
+    "notes": [
+      "Local Midnight proof server is healthy on http://127.0.0.1:6300 according to both the Bitrove ops bundle and midnight doctor.",
+      "Gateway access is currently protected and returns a missing Cloudflare Access JWT assertion instead of open readiness.",
+      "Preview RPC reachability is the only hard fail in the live doctor run used for this report."
+    ]
+  },
+  "network": "preview",
+  "proof_server": {
+    "actual": "8.0.3 @ http://127.0.0.1:6300",
+    "expected": "wire contract 8.0.3",
+    "fix": "Start or restart the native proof server with `zkf midnight proof-server serve --engine umpg`.",
+    "id": "proof-server",
+    "label": "Midnight proof server",
+    "required": true,
+    "status": "pass"
+  },
+  "recommended_fixes": [
+    "Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.",
+    "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
+  ],
+  "rpc": {
+    "actual": "HTTP 405 @ https://rpc.preview.midnight.network",
+    "expected": "reachable endpoint",
+    "id": "rpc",
+    "label": "Midnight RPC",
+    "required": true,
+    "status": "pass"
+  },
+  "schema": "ziros-live-midnight-readiness-v1",
+  "trade_finance_validation": {
+    "call_count": 10,
+    "contract_count": 6,
+    "gateway_ready": {
+      "auth_required": true,
+      "http_code": 401,
+      "reachable": true,
+      "url": "http://127.0.0.1:6311/ready"
+    },
+    "summary_path": "dist/showcases/private_trade_finance_settlement/midnight_validation/summary.json"
+  },
+  "wallet": {
+    "detail": "No browser wallet session or headless operator wallet credentials were available.",
+    "expected": "A Midnight wallet session bound to the selected network",
+    "fix": "Provide MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC, or allow the browser-assisted Lace check.",
+    "id": "wallet",
+    "label": "Wallet session",
+    "required": false,
+    "status": "not_checkable_from_cli"
+  }
+}

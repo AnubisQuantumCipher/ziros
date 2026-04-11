@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-04-11T19:15:57.898136Z",
+  "market_verdict": {
+    "problem_statement": "American importers, exporters, suppliers, and financiers need private receivables registration, milestone-based settlement release, dispute hold, and selective regulator/auditor disclosure without exposing raw commercial documents on a public ledger.",
+    "why_this_is_billion_scale": [
+      "Trade finance is a trillion-dollar financing domain with a large documented unmet financing gap.",
+      "U.S. small-business export working-capital programs exist because receivables and transaction-specific export finance remains a real financing bottleneck.",
+      "The privacy, interoperability, and document-standard barriers called out by Federal Reserve, ICC, and ADB line up directly with the repo's selective-disclosure and commitment-binding capabilities."
+    ]
+  },
+  "rejected_markets": [
+    {
+      "market": "freight_fraud",
+      "reason": "Very strong repo adjacency through Bitrove and provenance flows, but the shipped proof and Midnight contract logic is more mature on trade-finance settlement."
+    },
+    {
+      "market": "insurance_claims",
+      "reason": "Also strong in-repo, but the current Midnight package and generated contract family is more concretely receivables/trade-finance oriented."
+    }
+  ],
+  "schema": "trade-finance-market-sources-v1",
+  "selected_market": "trade_finance_receivables_settlement",
+  "sources": [
+    {
+      "claim": "Public blockchain smart contracts and transaction histories are visible, creating privacy and security concerns for sensitive financial workflows.",
+      "id": "federal_reserve_public_chain_transparency",
+      "published_date": "2024-04-03",
+      "publisher": "Federal Reserve",
+      "title": "Tokenized Assets on Public Blockchains: How Transparent Is the Blockchain?",
+      "url": "https://www.federalreserve.gov/econres/notes/feds-notes/tokenized-assets-on-public-blockchains-how-transparent-is-the-blockchain-20240403.html",
+      "why_it_matters": "Supports the need for selective disclosure instead of fully transparent trade-finance settlement."
+    },
+    {
+      "claim": "Institutions want confidential counterparties, data, and business logic with selective disclosure for regulators and auditors.",
+      "id": "ethereum_institutions_privacy",
+      "published_date": "2026-03-01",
+      "publisher": "Ethereum for Institutions",
+      "title": "Compliant Privacy for Institutions",
+      "url": "https://institutions.ethereum.org/privacy",
+      "why_it_matters": "Confirms that confidentiality plus auditability is a real institutional requirement, not a niche preference."
+    },
+    {
+      "claim": "The global trade finance gap reached an estimated $2.5 trillion in 2022, and digitalization is held back by a lack of harmonized standards and electronic document legislation.",
+      "id": "adb_trade_finance_gap",
+      "published_date": "2023-09-01",
+      "publisher": "Asian Development Bank",
+      "title": "2023 Trade Finance Gaps, Growth, and Jobs Survey",
+      "url": "https://www.adb.org/sites/default/files/publication/906596/adb-brief-256-2023-trade-finance-gaps-growth-jobs-survey.pdf",
+      "why_it_matters": "Establishes trade finance as a very large economic problem where digital trust and interoperable documents matter."
+    },
+    {
+      "claim": "Trade digitalisation works best when document standards, interoperability, financial services, fraud prevention, and consent-based data sharing are coordinated.",
+      "id": "icc_trade_digitalisation_case_studies",
+      "published_date": "2024-09-03",
+      "publisher": "International Chamber of Commerce",
+      "title": "New ICC case studies provide guidance for trade digitalisation",
+      "url": "https://iccwbo.org/news-publications/news/new-icc-case-studies-provide-guidance-for-trade-digitalisation/",
+      "why_it_matters": "Supports the need for a workflow-centered contract family rather than a single isolated contract."
+    },
+    {
+      "claim": "U.S. small businesses need export working-capital support for transaction-specific financing tied to export receivables and purchase orders.",
+      "id": "sba_export_working_capital",
+      "published_date": "2026-01-01",
+      "publisher": "U.S. Small Business Administration",
+      "title": "Export Working Capital Program",
+      "url": "https://www.sba.gov/funding-programs/loans/export-loans/export-working-capital-program",
+      "why_it_matters": "Anchors the opportunity in an actual American financing need rather than a purely global narrative."
+    }
+  ]
+}

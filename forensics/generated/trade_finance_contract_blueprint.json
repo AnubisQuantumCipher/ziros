@@ -1,0 +1,546 @@
+{
+  "call_sequence": [
+    {
+      "call_id": "register_financing_request",
+      "circuit_name": "register_financing_request",
+      "compact_source": "contracts/compact/financing_request_registration.compact",
+      "contract_id": "financing_request_registration",
+      "inputs": {
+        "actionClassCode": 0,
+        "eligibilityCommitment": "21953397089345867476274361615296970351276575588827348876947072920715347219092",
+        "invoicePacketCommitment": "14587383994334637737170274621422104405301108676943149237578673879401388419439"
+      }
+    },
+    {
+      "call_id": "authorize_settlement",
+      "circuit_name": "authorize_settlement",
+      "compact_source": "contracts/compact/settlement_authorization.compact",
+      "contract_id": "settlement_authorization",
+      "inputs": {
+        "approvedAdvanceCommitment": "8898259341307840847083905076112052529517453949480504635003214818368896041103",
+        "maturityScheduleCommitment": "26955345866911869585680506564537156853810452716010055808941472946556210832534",
+        "reserveAmountCommitment": "26671777811257525934241105186130994673943193537802039068511219952199583328203",
+        "settlementFinalityFlag": true
+      }
+    },
+    {
+      "call_id": "place_dispute_hold",
+      "circuit_name": "place_dispute_hold",
+      "compact_source": "contracts/compact/dispute_hold.compact",
+      "contract_id": "dispute_hold",
+      "inputs": {
+        "disputeHoldCommitment": "2460600427372041471959241682823644731905176255980159745948639652939038913106",
+        "holdActive": false
+      }
+    },
+    {
+      "call_id": "grant_disclosure_view_supplier",
+      "circuit_name": "grant_disclosure_view",
+      "compact_source": "contracts/compact/disclosure_access.compact",
+      "contract_id": "disclosure_access",
+      "inputs": {
+        "disclosureAuthorizationCommitment": "16384769765210742405948200655139122796717137044161987106403998069143540909658",
+        "disclosureRoleCode": 0,
+        "disclosureViewCommitment": "12659993712846179335158542615105381239710041272916080763972255348625128560333"
+      }
+    },
+    {
+      "call_id": "grant_disclosure_view_financier",
+      "circuit_name": "grant_disclosure_view",
+      "compact_source": "contracts/compact/disclosure_access.compact",
+      "contract_id": "disclosure_access",
+      "inputs": {
+        "disclosureAuthorizationCommitment": "7396184397390442385224418602706073926117074844028142748634775466682159218221",
+        "disclosureRoleCode": 1,
+        "disclosureViewCommitment": "5587848484333463900435272530293170730417536016270594485413349783797734171183"
+      }
+    },
+    {
+      "call_id": "grant_disclosure_view_buyer",
+      "circuit_name": "grant_disclosure_view",
+      "compact_source": "contracts/compact/disclosure_access.compact",
+      "contract_id": "disclosure_access",
+      "inputs": {
+        "disclosureAuthorizationCommitment": "612467264292924290645251032494114342081737343857371819882338109502820282808",
+        "disclosureRoleCode": 2,
+        "disclosureViewCommitment": "3459646001600758852072038621854025003955505238452797754711563595765155174608"
+      }
+    },
+    {
+      "call_id": "grant_disclosure_view_auditor",
+      "circuit_name": "grant_disclosure_view",
+      "compact_source": "contracts/compact/disclosure_access.compact",
+      "contract_id": "disclosure_access",
+      "inputs": {
+        "disclosureAuthorizationCommitment": "8718203734552093993703204039395451340489099438084663398271643526023460492957",
+        "disclosureRoleCode": 3,
+        "disclosureViewCommitment": "26857155997008603874732269139334952612685863671280391504666827585760299411483"
+      }
+    },
+    {
+      "call_id": "grant_disclosure_view_regulator",
+      "circuit_name": "grant_disclosure_view",
+      "compact_source": "contracts/compact/disclosure_access.compact",
+      "contract_id": "disclosure_access",
+      "inputs": {
+        "disclosureAuthorizationCommitment": "11800405003985838880568953566019690104683242657109498796316466875167831739926",
+        "disclosureRoleCode": 4,
+        "disclosureViewCommitment": "8327302272764463510522752919930159790719042665506325508252944423133450337334"
+      }
+    },
+    {
+      "call_id": "complete_buyer_repayment",
+      "circuit_name": "complete_buyer_repayment",
+      "compact_source": "contracts/compact/repayment_completion.compact",
+      "contract_id": "repayment_completion",
+      "inputs": {
+        "repaymentCompletionCommitment": "2161028795077444732973641048713758892583317277165574892775947106722100664511",
+        "repaymentSettled": true
+      }
+    },
+    {
+      "call_id": "confirm_supplier_receipt",
+      "circuit_name": "confirm_supplier_receipt",
+      "compact_source": "contracts/compact/supplier_receipt_confirmation.compact",
+      "contract_id": "supplier_receipt_confirmation",
+      "inputs": {
+        "maturityScheduleCommitment": "26955345866911869585680506564537156853810452716010055808941472946556210832534",
+        "supplierReceiptConfirmed": true
+      }
+    }
+  ],
+  "contracts": [
+    {
+      "calls": [
+        {
+          "call_id": "register_financing_request",
+          "circuit_name": "register_financing_request",
+          "inputs": {
+            "actionClassCode": 0,
+            "eligibilityCommitment": "21953397089345867476274361615296970351276575588827348876947072920715347219092",
+            "invoicePacketCommitment": "14587383994334637737170274621422104405301108676943149237578673879401388419439"
+          },
+          "role": null
+        }
+      ],
+      "contract_id": "financing_request_registration",
+      "failure_modes": [
+        "Mismatched invoice or eligibility commitments would bind the wrong receivable packet.",
+        "Wrong action class code would misroute the financing workflow."
+      ],
+      "purpose": "Registers the invoice packet commitment, eligibility commitment, and action class needed to open the financing workflow.",
+      "shape": {
+        "circuits": [
+          "register_financing_request"
+        ],
+        "contract_id": "financing_request_registration",
+        "export_ledgers": [
+          {
+            "name": "invoice_packet_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "eligibility_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "action_class_code",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "registered",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 19,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/financing_request_registration.compact",
+        "witness_inputs": [
+          {
+            "name": "invoicePacketCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "eligibilityCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "actionClassCode",
+            "type": "Uint<8>"
+          }
+        ]
+      }
+    },
+    {
+      "calls": [
+        {
+          "call_id": "authorize_settlement",
+          "circuit_name": "authorize_settlement",
+          "inputs": {
+            "approvedAdvanceCommitment": "8898259341307840847083905076112052529517453949480504635003214818368896041103",
+            "maturityScheduleCommitment": "26955345866911869585680506564537156853810452716010055808941472946556210832534",
+            "reserveAmountCommitment": "26671777811257525934241105186130994673943193537802039068511219952199583328203",
+            "settlementFinalityFlag": true
+          },
+          "role": null
+        }
+      ],
+      "contract_id": "settlement_authorization",
+      "failure_modes": [
+        "Wrong reserve or approved-advance commitment would release under the wrong economic terms.",
+        "A false finality flag would prematurely or incorrectly authorize settlement."
+      ],
+      "purpose": "Publishes the maturity, approved advance, reserve, and finality commitments that authorize settlement release.",
+      "shape": {
+        "circuits": [
+          "authorize_settlement"
+        ],
+        "contract_id": "settlement_authorization",
+        "export_ledgers": [
+          {
+            "name": "maturity_schedule_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "approved_advance_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "reserve_amount_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "settlement_finality_flag",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 20,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/settlement_authorization.compact",
+        "witness_inputs": [
+          {
+            "name": "maturityScheduleCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "approvedAdvanceCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "reserveAmountCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "settlementFinalityFlag",
+            "type": "Boolean"
+          }
+        ]
+      }
+    },
+    {
+      "calls": [
+        {
+          "call_id": "place_dispute_hold",
+          "circuit_name": "place_dispute_hold",
+          "inputs": {
+            "disputeHoldCommitment": "2460600427372041471959241682823644731905176255980159745948639652939038913106",
+            "holdActive": false
+          },
+          "role": null
+        }
+      ],
+      "contract_id": "dispute_hold",
+      "failure_modes": [
+        "Missing explicit hold state would force off-chain interpretation of disputes.",
+        "Incorrect hold flag could either freeze legitimate settlement or release disputed settlement."
+      ],
+      "purpose": "Allows an explicit hold state that can block downstream release without revealing the underlying dispute facts.",
+      "shape": {
+        "circuits": [
+          "place_dispute_hold"
+        ],
+        "contract_id": "dispute_hold",
+        "export_ledgers": [
+          {
+            "name": "dispute_hold_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "hold_active",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/dispute_hold.compact",
+        "witness_inputs": [
+          {
+            "name": "disputeHoldCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "holdActive",
+            "type": "Boolean"
+          }
+        ]
+      }
+    },
+    {
+      "calls": [
+        {
+          "call_id": "grant_disclosure_view_supplier",
+          "circuit_name": "grant_disclosure_view",
+          "inputs": {
+            "disclosureAuthorizationCommitment": "16384769765210742405948200655139122796717137044161987106403998069143540909658",
+            "disclosureRoleCode": 0,
+            "disclosureViewCommitment": "12659993712846179335158542615105381239710041272916080763972255348625128560333"
+          },
+          "role": "supplier"
+        },
+        {
+          "call_id": "grant_disclosure_view_financier",
+          "circuit_name": "grant_disclosure_view",
+          "inputs": {
+            "disclosureAuthorizationCommitment": "7396184397390442385224418602706073926117074844028142748634775466682159218221",
+            "disclosureRoleCode": 1,
+            "disclosureViewCommitment": "5587848484333463900435272530293170730417536016270594485413349783797734171183"
+          },
+          "role": "financier"
+        },
+        {
+          "call_id": "grant_disclosure_view_buyer",
+          "circuit_name": "grant_disclosure_view",
+          "inputs": {
+            "disclosureAuthorizationCommitment": "612467264292924290645251032494114342081737343857371819882338109502820282808",
+            "disclosureRoleCode": 2,
+            "disclosureViewCommitment": "3459646001600758852072038621854025003955505238452797754711563595765155174608"
+          },
+          "role": "buyer"
+        },
+        {
+          "call_id": "grant_disclosure_view_auditor",
+          "circuit_name": "grant_disclosure_view",
+          "inputs": {
+            "disclosureAuthorizationCommitment": "8718203734552093993703204039395451340489099438084663398271643526023460492957",
+            "disclosureRoleCode": 3,
+            "disclosureViewCommitment": "26857155997008603874732269139334952612685863671280391504666827585760299411483"
+          },
+          "role": "auditor"
+        },
+        {
+          "call_id": "grant_disclosure_view_regulator",
+          "circuit_name": "grant_disclosure_view",
+          "inputs": {
+            "disclosureAuthorizationCommitment": "11800405003985838880568953566019690104683242657109498796316466875167831739926",
+            "disclosureRoleCode": 4,
+            "disclosureViewCommitment": "8327302272764463510522752919930159790719042665506325508252944423133450337334"
+          },
+          "role": "regulator"
+        }
+      ],
+      "contract_id": "disclosure_access",
+      "failure_modes": [
+        "Incorrect role code would over-disclose the wrong view.",
+        "Incorrect disclosure authorization commitment would break auditability or access control."
+      ],
+      "purpose": "Grants role-specific selective-disclosure views to supplier, financier, buyer, auditor, and regulator lanes.",
+      "shape": {
+        "circuits": [
+          "grant_disclosure_view"
+        ],
+        "contract_id": "disclosure_access",
+        "export_ledgers": [
+          {
+            "name": "disclosure_role_code",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "disclosure_view_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "disclosure_authorization_commitment",
+            "type": "Field"
+          }
+        ],
+        "line_count": 17,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/disclosure_access.compact",
+        "witness_inputs": [
+          {
+            "name": "disclosureRoleCode",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "disclosureViewCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "disclosureAuthorizationCommitment",
+            "type": "Field"
+          }
+        ]
+      }
+    },
+    {
+      "calls": [
+        {
+          "call_id": "complete_buyer_repayment",
+          "circuit_name": "complete_buyer_repayment",
+          "inputs": {
+            "repaymentCompletionCommitment": "2161028795077444732973641048713758892583317277165574892775947106722100664511",
+            "repaymentSettled": true
+          },
+          "role": null
+        }
+      ],
+      "contract_id": "repayment_completion",
+      "failure_modes": [
+        "Incorrect repayment commitment would claim repayment without matching the proof-backed artifact.",
+        "Incorrect release boolean would over-release or under-release funds."
+      ],
+      "purpose": "Publishes repayment completion plus release state for the buyer repayment milestone.",
+      "shape": {
+        "circuits": [
+          "complete_buyer_repayment"
+        ],
+        "contract_id": "repayment_completion",
+        "export_ledgers": [
+          {
+            "name": "repayment_completion_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "released",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/repayment_completion.compact",
+        "witness_inputs": [
+          {
+            "name": "repaymentCompletionCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "repaymentSettled",
+            "type": "Boolean"
+          }
+        ]
+      }
+    },
+    {
+      "calls": [
+        {
+          "call_id": "confirm_supplier_receipt",
+          "circuit_name": "confirm_supplier_receipt",
+          "inputs": {
+            "maturityScheduleCommitment": "26955345866911869585680506564537156853810452716010055808941472946556210832534",
+            "supplierReceiptConfirmed": true
+          },
+          "role": null
+        }
+      ],
+      "contract_id": "supplier_receipt_confirmation",
+      "failure_modes": [
+        "Incorrect maturity schedule commitment would decouple receipt confirmation from the financed terms.",
+        "Incorrect receipt flag would misstate delivery/acceptance status."
+      ],
+      "purpose": "Publishes supplier receipt confirmation against the maturity schedule commitment.",
+      "shape": {
+        "circuits": [
+          "confirm_supplier_receipt"
+        ],
+        "contract_id": "supplier_receipt_confirmation",
+        "export_ledgers": [
+          {
+            "name": "maturity_schedule_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "supplier_receipt_confirmation_confirmed",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/supplier_receipt_confirmation.compact",
+        "witness_inputs": [
+          {
+            "name": "maturityScheduleCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "supplierReceiptConfirmed",
+            "type": "Boolean"
+          }
+        ]
+      }
+    }
+  ],
+  "generated_at": "2026-04-11T19:15:57.898530Z",
+  "implementation_scope": {
+    "in_scope": [
+      "Keep the six-contract split and exact call graph.",
+      "Treat ledger fields as commitments and flags only.",
+      "Bind every on-chain step to an off-chain proof-backed artifact family.",
+      "Preserve explicit dispute hold and explicit role-bound disclosure grants."
+    ],
+    "out_of_scope": [
+      "Merging the flow into a single monolithic Compact contract.",
+      "Publishing raw invoice, buyer, supplier, or financing policy data on chain.",
+      "Reclassifying midnight-compact as a native strict cryptographic backend.",
+      "Expanding into wallet UI or broader operator control plane changes."
+    ]
+  },
+  "package": {
+    "contract_count": 6,
+    "flow_count": 10,
+    "flow_manifest_path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/flow_manifest.json",
+    "network_target": "midnight-preview-emitted",
+    "package_id": "trade-finance-settlement",
+    "package_manifest_path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/package_manifest.json"
+  },
+  "proof_story": {
+    "honest_contract": [
+      "HyperNova is the primary strict proof lane for the trade-finance exporter.",
+      "Midnight Compact is the commitment and workflow publication layer.",
+      "Midnight Compact must remain labeled delegated-or-external rather than a native recursive verifier lane."
+    ],
+    "lane_classification": "primary-strict",
+    "midnight_backend_row": {
+      "assurance_lane": "delegated-or-external-lane",
+      "fields": [
+        "pasta-fp",
+        "pasta-fq"
+      ],
+      "gpu_coverage": "0/0 GPU stages active on current host",
+      "id": "midnight-compact",
+      "mode": "native",
+      "notes": "Midnight-first operator lane derived from typed readiness and doctor evidence. ready_for_live_submit=false blockers=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}; wallet: No browser wallet session or headless operator wallet credentials were available.; dust: DUST balance is not checkable from a bare CLI process. advisories=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+      "proof_semantics": "external-or-delegated",
+      "status": "ready"
+    },
+    "offchain_effective_backend": "hypernova",
+    "offchain_primary_backend": "hypernova"
+  },
+  "role_code_map": {
+    "0": "supplier",
+    "1": "financier",
+    "2": "buyer",
+    "3": "auditor",
+    "4": "regulator"
+  },
+  "schema": "trade-finance-contract-blueprint-v1",
+  "selected_market": "trade_finance_receivables_settlement",
+  "validation_contract": {
+    "call_prepare_assets_root": "call_prepare_assets",
+    "call_prepare_root": "call_prepare",
+    "compile_root": "compile",
+    "deploy_prepare_assets_root": "deploy_prepare_assets",
+    "deploy_prepare_root": "deploy_prepare",
+    "gateway_ready": {
+      "auth_required": true,
+      "http_code": 401,
+      "reachable": true,
+      "url": "http://127.0.0.1:6311/ready"
+    },
+    "network": "preview",
+    "validation_summary_path": "dist/showcases/private_trade_finance_settlement/midnight_validation/summary.json"
+  }
+}

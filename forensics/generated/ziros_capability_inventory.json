@@ -1,0 +1,3611 @@
+{
+  "formal_verification": {
+    "doctrine": {
+      "comparison_only_lanes": [
+        "flux",
+        "creusot",
+        "prusti"
+      ],
+      "counted_refinedrust_surface": "runtime-buffer-bridge",
+      "counted_rust_lanes": [
+        "refined_rust",
+        "verus"
+      ],
+      "doctrine_path": "docs/FORMAL_TOOLCHAIN_INTEGRATION.md",
+      "security_path": "docs/SECURITY.md",
+      "support_only_lanes": [
+        "kani",
+        "thrust"
+      ]
+    },
+    "ledger_summary": {
+      "assurance_counts": {
+        "mechanized_implementation_claim": 167,
+        "model_only_claim": 17,
+        "trusted_protocol_tcb": 9
+      },
+      "checker_counts": {
+        "fstar": 2,
+        "generated_proof": 4,
+        "lean": 13,
+        "refined_rust": 1,
+        "rocq": 76,
+        "rocq+verus": 1,
+        "verus": 96
+      },
+      "model_rows": [
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.packet_binding_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.eligibility_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.consistency_score_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.duplicate_financing_risk_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.approved_advance_fee_reserve_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.action_derivation_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.settlement_binding_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.disclosure_role_binding_soundness"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.disclosure_noninterference"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.disclosure_authorization_binding_soundness"
+        },
+        {
+          "checker": "verus",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.duplicate_registry_handoff_soundness"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.witness_helper.comparator_soundness"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.witness_helper.selector_soundness"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lib::app::private_trade_finance_settlement",
+          "status": "mechanized_local",
+          "theorem_id": "model.trade_finance.witness_helper.shard_assignment_soundness"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lang::source-model",
+          "status": "mechanized_local",
+          "theorem_id": "zir.lang.tier1_eval_determinism_model"
+        },
+        {
+          "checker": "rocq",
+          "scope": "zkf-lang::source-model",
+          "status": "mechanized_local",
+          "theorem_id": "zir.lang.source_to_zir_shape_model"
+        },
+        {
+          "checker": "rocq+verus",
+          "scope": "zkf-lang::privacy-model",
+          "status": "mechanized_local",
+          "theorem_id": "zir.lang.privacy_expose_model"
+        }
+      ],
+      "status_counts": {
+        "mechanized_generated": 4,
+        "mechanized_local": 189
+      },
+      "theorem_prefix_counts": {
+        "aggregation": 1,
+        "app": 26,
+        "backend": 13,
+        "ccs": 2,
+        "distributed": 7,
+        "field": 3,
+        "frontend": 1,
+        "gap": 4,
+        "gpu": 11,
+        "hybrid": 7,
+        "lowering": 1,
+        "model": 14,
+        "normalization": 7,
+        "optimizer": 4,
+        "orbital": 6,
+        "pipeline": 2,
+        "private_identity": 2,
+        "protocol": 9,
+        "runtime": 21,
+        "security": 1,
+        "sed": 8,
+        "setup": 1,
+        "swarm": 30,
+        "witness": 8,
+        "wrapping": 1,
+        "zir": 3
+      },
+      "total_entries": 193
+    },
+    "status_summary": {
+      "assurance_class_counts": {
+        "attestation_backed_lane": 0,
+        "bounded_check": 0,
+        "hypothesis_carried_theorem": 0,
+        "mechanized_implementation_claim": 167,
+        "model_only_claim": 17,
+        "trusted_protocol_tcb": 9
+      },
+      "counts": {
+        "assumed_external": 0,
+        "bounded_checked": 0,
+        "hypothesis_stated": 0,
+        "mechanized_generated": 4,
+        "mechanized_local": 189,
+        "pending": 0
+      },
+      "current_priority": "formal-verification-zero-repo-assumption-program",
+      "current_priority_progress": "Release-grade closure status on the current checkout. Ledger inventory totals 193 rows with 193 machine-checked rows. Ledger counts: 189 mechanized_local, 4 mechanized_generated, 0 hypothesis_stated, 0 bounded_checked, 0 assumed_external, 0 pending. Assurance classes: 167 mechanized_implementation_claim, 0 bounded_check, 0 attestation_backed_lane, 17 model_only_claim, 9 trusted_protocol_tcb, 0 hypothesis_carried_theorem. Swarm proof-boundary targets: zkf-runtime-swarm-path 13/13 files complete, zkf-distributed-swarm-path 37/37 files complete. Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state (implementation_mechanized, shell_contract_mechanized, or explicit_tcb_adapter). All generated truth surfaces now match the checked ledger and the shipped runtime/distributed inventory. All protocol rows are mechanized_local.",
+      "release_grade_ready": true,
+      "runtime_proof_coverage": {
+        "complete_files": 89,
+        "complete_functions": 1788,
+        "file_counts": {
+          "explicit_tcb_adapter": 30,
+          "implementation_mechanized": 27,
+          "shell_contract_mechanized": 32
+        },
+        "function_counts": {
+          "explicit_tcb_adapter": 552,
+          "implementation_mechanized": 199,
+          "shell_contract_mechanized": 1037
+        },
+        "schema": "zkf-runtime-proof-coverage-v1",
+        "targets": [
+          {
+            "closed": true,
+            "complete_files": 39,
+            "complete_functions": 950,
+            "file_counts": {
+              "explicit_tcb_adapter": 12,
+              "implementation_mechanized": 12,
+              "shell_contract_mechanized": 15
+            },
+            "function_counts": {
+              "explicit_tcb_adapter": 348,
+              "implementation_mechanized": 88,
+              "shell_contract_mechanized": 514
+            },
+            "name": "zkf-runtime-full",
+            "total_files": 39,
+            "total_functions": 950
+          },
+          {
+            "closed": true,
+            "complete_files": 13,
+            "complete_functions": 284,
+            "file_counts": {
+              "explicit_tcb_adapter": 1,
+              "implementation_mechanized": 6,
+              "shell_contract_mechanized": 6
+            },
+            "function_counts": {
+              "explicit_tcb_adapter": 7,
+              "implementation_mechanized": 42,
+              "shell_contract_mechanized": 235
+            },
+            "name": "zkf-runtime-swarm-path",
+            "total_files": 13,
+            "total_functions": 284
+          },
+          {
+            "closed": true,
+            "complete_files": 37,
+            "complete_functions": 554,
+            "file_counts": {
+              "explicit_tcb_adapter": 17,
+              "implementation_mechanized": 9,
+              "shell_contract_mechanized": 11
+            },
+            "function_counts": {
+              "explicit_tcb_adapter": 197,
+              "implementation_mechanized": 69,
+              "shell_contract_mechanized": 288
+            },
+            "name": "zkf-distributed-swarm-path",
+            "total_files": 37,
+            "total_functions": 554
+          },
+          {
+            "closed": true,
+            "complete_files": 0,
+            "complete_functions": 0,
+            "file_counts": {},
+            "function_counts": {},
+            "name": "zkf-runtime-app-proof-surfaces",
+            "total_files": 0,
+            "total_functions": 0
+          }
+        ],
+        "total_files": 89,
+        "total_functions": 1788
+      }
+    }
+  },
+  "generated_at": "2026-04-11T19:15:57.895321Z",
+  "line_counts": {
+    "AGENTS.md": 79,
+    "docs/CANONICAL_TRUTH.md": 132,
+    "docs/CLI.md": 810,
+    "docs/FORMAL_TOOLCHAIN_INTEGRATION.md": 224,
+    "docs/SECURITY.md": 120,
+    "docs/ZIRFLOW.md": 26,
+    "docs/ZIR_LANGUAGE.md": 58,
+    "zkf-lib/src/app/private_trade_finance_settlement_export.rs": 3941
+  },
+  "live_binary_reports": {
+    "capabilities": {
+      "command": [
+        "/Users/sicarii/Desktop/ZirOS/dist/aarch64-apple-darwin/zkf",
+        "capabilities",
+        "--json"
+      ],
+      "exit_code": 0,
+      "json": [
+        {
+          "aggregation_semantics": "single-proof-with-optional-wrapper",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "plonky3",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "export_scheme": "optional-groth16-wrapper",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 1.0,
+            "metal_stages": [
+              "fft-ntt",
+              "hash-merkle"
+            ],
+            "required_stages": [
+              "fft-ntt",
+              "hash-merkle"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": true,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "fri-goldilocks",
+            "fri-babybear",
+            "circle-mersenne31"
+          ],
+          "network_target": null,
+          "notes": "Plonky3 STARK backend with native field profiles: Goldilocks/BabyBear over FRI and Mersenne31 over Circle PCS. Supports Equal/Boolean constraints, range constraints via bit decomposition (field-safe bit cap), and division via derived quotient columns.",
+          "production_ready": true,
+          "proof_engine": "metal-first-stark",
+          "proof_semantics": "proof-enforced-lowered-ir",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "ready",
+          "recursion_ready": true,
+          "runtime_ready": true,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "goldilocks",
+            "baby-bear",
+            "mersenne31"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "single-proof-only",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "halo2",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "cpu_math_fallback_reason": "halo2-pasta-msm-is-metal-accelerated-on-macos-but-fft-ntt-remains-cpu-classified (cpu stages: fft-ntt)",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.5,
+            "cpu_stages": [
+              "fft-ntt"
+            ],
+            "metal_stages": [
+              "msm"
+            ],
+            "required_stages": [
+              "fft-ntt",
+              "msm"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": false,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "ipa"
+          ],
+          "network_target": null,
+          "notes": "Plonkish backend implemented with Halo2 (IPA). Supports Equal/Boolean/Range/Div. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically.",
+          "production_ready": true,
+          "proof_engine": "halo2-ipa",
+          "proof_semantics": "proof-enforced-basic-ir",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "ready",
+          "recursion_ready": true,
+          "runtime_ready": true,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "pasta-fp"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "single-proof-only",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "halo2-bls12381",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "cpu_math_fallback_reason": "halo2-bls12-381-msm-and-fft-hot-paths-remain-cpu-classified",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "cpu_stages": [
+              "fft-ntt",
+              "msm"
+            ],
+            "metal_stages": [],
+            "required_stages": [
+              "fft-ntt",
+              "msm"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": false,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "kzg",
+            "trusted_setup"
+          ],
+          "network_target": null,
+          "notes": "PLONK+KZG on BLS12-381 via PSE halo2 fork. Real BLS12-381 Fr field, SHPLONK multiopen, deterministic trusted setup. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically.",
+          "production_ready": true,
+          "proof_engine": "halo2-kzg",
+          "proof_semantics": "proof-enforced-basic-ir",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "ready",
+          "recursion_ready": true,
+          "runtime_ready": true,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "bls12-381"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": false,
+          "trusted_setup": true,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "single-proof-only",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "arkworks-groth16",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "export_scheme": "groth16",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 1.0,
+            "metal_stages": [
+              "fft-ntt",
+              "qap-witness-map",
+              "msm"
+            ],
+            "required_stages": [
+              "fft-ntt",
+              "qap-witness-map",
+              "msm"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": true,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "groth16"
+          ],
+          "network_target": null,
+          "notes": "Groth16 on BN254 for smallest proof size and cheap on-chain verification.",
+          "operator_action": "treat arkworks-groth16 as non-production until the upstream production disclaimer is resolved or the dependency is replaced",
+          "production_ready": false,
+          "proof_engine": "groth16-compatibility",
+          "proof_semantics": "proof-enforced-basic-ir",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "limited",
+          "readiness_reason": "upstream-ark-groth16-production-disclaimer",
+          "recursion_ready": false,
+          "runtime_ready": true,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "bn254"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": false,
+          "trusted_setup": true,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "zkvm-attestation",
+          "assurance_lane": "attestation-backed-host-validated-lane",
+          "backend": "sp1",
+          "blackbox_semantics": "host-validated-before-attestation",
+          "compiled_in": false,
+          "cpu_math_fallback_reason": "not-claimed-for-this-backend",
+          "explicit_compat_alias": "sp1-compat",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "metal_stages": [],
+            "required_stages": []
+          },
+          "implementation_type": "delegated",
+          "lookup_lowering_support": false,
+          "lookup_semantics": "not-supported-on-ir-constraints",
+          "metal_complete": false,
+          "mode": "compat",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "compat-delegate-plonky3"
+          ],
+          "network_target": null,
+          "notes": "SP1 compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs.",
+          "operator_action": "build a binary with the native feature enabled or request `sp1-compat` with --allow-compat",
+          "production_ready": false,
+          "proof_engine": "zkvm-attestation",
+          "proof_semantics": "attestation-over-host-validation",
+          "prover_acceleration_scope": "not-claimed-host-validation",
+          "readiness": "blocked",
+          "readiness_reason": "native-backend-not-compiled",
+          "recursion_ready": true,
+          "runtime_ready": false,
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "goldilocks",
+            "baby-bear",
+            "mersenne31"
+          ],
+          "toolchain_ready": false,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": true
+        },
+        {
+          "aggregation_semantics": "zkvm-attestation",
+          "assurance_lane": "attestation-backed-host-validated-lane",
+          "backend": "risc-zero",
+          "blackbox_semantics": "host-validated-before-attestation",
+          "compiled_in": false,
+          "cpu_math_fallback_reason": "not-claimed-for-this-backend",
+          "explicit_compat_alias": "risc-zero-compat",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "metal_stages": [],
+            "required_stages": []
+          },
+          "implementation_type": "delegated",
+          "lookup_lowering_support": false,
+          "lookup_semantics": "not-supported-on-ir-constraints",
+          "metal_complete": false,
+          "mode": "compat",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "compat-delegate-plonky3"
+          ],
+          "network_target": null,
+          "notes": "RISC Zero compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. Native RISC Zero integration requires the `native-risc-zero` feature flag.",
+          "operator_action": "build a binary with the native feature enabled or request `risc-zero-compat` with --allow-compat",
+          "production_ready": false,
+          "proof_engine": "zkvm-attestation",
+          "proof_semantics": "attestation-over-host-validation",
+          "prover_acceleration_scope": "not-claimed-host-validation",
+          "readiness": "blocked",
+          "readiness_reason": "native-backend-not-compiled",
+          "recursion_ready": true,
+          "runtime_ready": false,
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "goldilocks",
+            "baby-bear",
+            "mersenne31"
+          ],
+          "toolchain_ready": false,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": true
+        },
+        {
+          "aggregation_semantics": "cryptographic-recursive-folding",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "nova",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "cpu_math_fallback_reason": "nova-provider-msm-hot-path-is-not-patched-to-metal",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "cpu_stages": [
+              "msm"
+            ],
+            "metal_stages": [],
+            "required_stages": [
+              "msm"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": false,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "classic",
+            "hypernova"
+          ],
+          "network_target": null,
+          "notes": "Native Nova backend (nova-snark) with IR-backed step circuit and classic/hypernova profiles. Compatibility delegation is disabled by default and can be enabled only with ZKF_NOVA_ALLOW_COMPAT_DELEGATE=true.",
+          "production_ready": true,
+          "proof_engine": "recursive-folding",
+          "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "ready",
+          "recursion_ready": true,
+          "runtime_ready": true,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "bn254"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "cryptographic-recursive-multifolding",
+          "assurance_lane": "native-cryptographic-proof",
+          "backend": "hyper-nova",
+          "blackbox_semantics": "host-validated-blackbox",
+          "compiled_in": true,
+          "cpu_math_fallback_reason": "nova-provider-msm-hot-path-is-not-patched-to-metal",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "cpu_stages": [
+              "msm"
+            ],
+            "metal_stages": [],
+            "required_stages": [
+              "msm"
+            ]
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": true,
+          "lookup_semantics": "arithmetic-lowering-required",
+          "metal_complete": false,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "hypernova-ccs",
+            "pallas-vesta"
+          ],
+          "network_target": null,
+          "notes": "HyperNova native mode: delegates to Nova native backend with HyperNova CCS profile for real multifolding over Pallas/Vesta curve cycle. Supports BN254 IR programs (mapped to Pallas scalar field).",
+          "production_ready": true,
+          "proof_engine": "recursive-folding",
+          "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+          "prover_acceleration_scope": "proof-enforced-prover-stages",
+          "readiness": "ready",
+          "recursion_ready": true,
+          "runtime_ready": true,
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "bn254"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": false
+        },
+        {
+          "aggregation_semantics": "single-proof-only",
+          "assurance_lane": "delegated-or-external-lane",
+          "backend": "midnight-compact",
+          "blackbox_semantics": "external-or-host-validated",
+          "compiled_in": true,
+          "cpu_math_fallback_reason": "not-claimed-for-this-backend",
+          "gpu_stage_coverage": {
+            "coverage_ratio": 0.0,
+            "metal_stages": [],
+            "required_stages": []
+          },
+          "implementation_type": "native",
+          "lookup_lowering_support": false,
+          "lookup_semantics": "not-supported-on-ir-constraints",
+          "metal_complete": false,
+          "mode": "native",
+          "native_lookup_support": false,
+          "native_profiles": [
+            "proof-server-v1"
+          ],
+          "network_target": "midnight",
+          "notes": "Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true.",
+          "operator_action": "configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds",
+          "production_ready": false,
+          "proof_engine": "external-compact-delegate",
+          "proof_semantics": "external-or-delegated",
+          "prover_acceleration_scope": "not-claimed-external-or-delegated",
+          "readiness": "blocked",
+          "readiness_reason": "midnight-proof-server-unconfigured",
+          "recursion_ready": false,
+          "runtime_ready": false,
+          "supported_blackbox_ops": [
+            "poseidon",
+            "sha256",
+            "keccak256",
+            "pedersen",
+            "ecdsa_secp256k1",
+            "ecdsa_secp256r1",
+            "schnorr_verify",
+            "blake2s",
+            "recursive_aggregation_marker",
+            "scalar_mul_g1",
+            "point_add_g1",
+            "pairing_check"
+          ],
+          "supported_constraint_kinds": [
+            "equal",
+            "boolean",
+            "range",
+            "blackbox"
+          ],
+          "supported_fields": [
+            "pasta-fp",
+            "pasta-fq"
+          ],
+          "toolchain_ready": true,
+          "transparent_setup": true,
+          "trusted_setup": false,
+          "zkvm_mode": false
+        }
+      ],
+      "ok": true,
+      "stderr": "",
+      "stdout": "[\n  {\n    \"backend\": \"plonky3\",\n    \"mode\": \"native\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"fri-goldilocks\",\n      \"fri-babybear\",\n      \"circle-mersenne31\"\n    ],\n    \"notes\": \"Plonky3 STARK backend with native field profiles: Goldilocks/BabyBear over FRI and Mersenne31 over Circle PCS. Supports Equal/Boolean constraints, range constraints via bit decomposition (field-safe bit cap), and division via derived quotient columns.\",\n    \"supported_fields\": [\n      \"goldilocks\",\n      \"baby-bear\",\n      \"mersenne31\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": true,\n    \"readiness\": \"ready\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"single-proof-with-optional-wrapper\",\n    \"proof_engine\": \"metal-first-stark\",\n    \"proof_semantics\": \"proof-enforced-lowered-ir\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 1.0,\n      \"required_stages\": [\n        \"fft-ntt\",\n        \"hash-merkle\"\n      ],\n      \"metal_stages\": [\n        \"fft-ntt\",\n        \"hash-merkle\"\n      ]\n    },\n    \"metal_complete\": true,\n    \"export_scheme\": \"optional-groth16-wrapper\"\n  },\n  {\n    \"backend\": \"halo2\",\n    \"mode\": \"native\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"ipa\"\n    ],\n    \"notes\": \"Plonkish backend implemented with Halo2 (IPA). Supports Equal/Boolean/Range/Div. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically.\",\n    \"supported_fields\": [\n      \"pasta-fp\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": true,\n    \"readiness\": \"ready\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"single-proof-only\",\n    \"proof_engine\": \"halo2-ipa\",\n    \"proof_semantics\": \"proof-enforced-basic-ir\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.5,\n      \"required_stages\": [\n        \"fft-ntt\",\n        \"msm\"\n      ],\n      \"metal_stages\": [\n        \"msm\"\n      ],\n      \"cpu_stages\": [\n        \"fft-ntt\"\n      ]\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"halo2-pasta-msm-is-metal-accelerated-on-macos-but-fft-ntt-remains-cpu-classified (cpu stages: fft-ntt)\"\n  },\n  {\n    \"backend\": \"halo2-bls12381\",\n    \"mode\": \"native\",\n    \"trusted_setup\": true,\n    \"recursion_ready\": true,\n    \"transparent_setup\": false,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"kzg\",\n      \"trusted_setup\"\n    ],\n    \"notes\": \"PLONK+KZG on BLS12-381 via PSE halo2 fork. Real BLS12-381 Fr field, SHPLONK multiopen, deterministic trusted setup. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically.\",\n    \"supported_fields\": [\n      \"bls12-381\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": true,\n    \"readiness\": \"ready\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"single-proof-only\",\n    \"proof_engine\": \"halo2-kzg\",\n    \"proof_semantics\": \"proof-enforced-basic-ir\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [\n        \"fft-ntt\",\n        \"msm\"\n      ],\n      \"metal_stages\": [],\n      \"cpu_stages\": [\n        \"fft-ntt\",\n        \"msm\"\n      ]\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"halo2-bls12-381-msm-and-fft-hot-paths-remain-cpu-classified\"\n  },\n  {\n    \"backend\": \"arkworks-groth16\",\n    \"mode\": \"native\",\n    \"trusted_setup\": true,\n    \"recursion_ready\": false,\n    \"transparent_setup\": false,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"groth16\"\n    ],\n    \"notes\": \"Groth16 on BN254 for smallest proof size and cheap on-chain verification.\",\n    \"supported_fields\": [\n      \"bn254\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": false,\n    \"readiness\": \"limited\",\n    \"readiness_reason\": \"upstream-ark-groth16-production-disclaimer\",\n    \"operator_action\": \"treat arkworks-groth16 as non-production until the upstream production disclaimer is resolved or the dependency is replaced\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"single-proof-only\",\n    \"proof_engine\": \"groth16-compatibility\",\n    \"proof_semantics\": \"proof-enforced-basic-ir\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 1.0,\n      \"required_stages\": [\n        \"fft-ntt\",\n        \"qap-witness-map\",\n        \"msm\"\n      ],\n      \"metal_stages\": [\n        \"fft-ntt\",\n        \"qap-witness-map\",\n        \"msm\"\n      ]\n    },\n    \"metal_complete\": true,\n    \"export_scheme\": \"groth16\"\n  },\n  {\n    \"backend\": \"sp1\",\n    \"mode\": \"compat\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": true,\n    \"network_target\": null,\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"compat-delegate-plonky3\"\n    ],\n    \"notes\": \"SP1 compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs.\",\n    \"supported_fields\": [\n      \"goldilocks\",\n      \"baby-bear\",\n      \"mersenne31\"\n    ],\n    \"implementation_type\": \"delegated\",\n    \"compiled_in\": false,\n    \"toolchain_ready\": false,\n    \"runtime_ready\": false,\n    \"production_ready\": false,\n    \"readiness\": \"blocked\",\n    \"readiness_reason\": \"native-backend-not-compiled\",\n    \"operator_action\": \"build a binary with the native feature enabled or request `sp1-compat` with --allow-compat\",\n    \"explicit_compat_alias\": \"sp1-compat\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": false,\n    \"lookup_semantics\": \"not-supported-on-ir-constraints\",\n    \"assurance_lane\": \"attestation-backed-host-validated-lane\",\n    \"aggregation_semantics\": \"zkvm-attestation\",\n    \"proof_engine\": \"zkvm-attestation\",\n    \"proof_semantics\": \"attestation-over-host-validation\",\n    \"blackbox_semantics\": \"host-validated-before-attestation\",\n    \"prover_acceleration_scope\": \"not-claimed-host-validation\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [],\n      \"metal_stages\": []\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"not-claimed-for-this-backend\"\n  },\n  {\n    \"backend\": \"risc-zero\",\n    \"mode\": \"compat\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": true,\n    \"network_target\": null,\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"compat-delegate-plonky3\"\n    ],\n    \"notes\": \"RISC Zero compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. Native RISC Zero integration requires the `native-risc-zero` feature flag.\",\n    \"supported_fields\": [\n      \"goldilocks\",\n      \"baby-bear\",\n      \"mersenne31\"\n    ],\n    \"implementation_type\": \"delegated\",\n    \"compiled_in\": false,\n    \"toolchain_ready\": false,\n    \"runtime_ready\": false,\n    \"production_ready\": false,\n    \"readiness\": \"blocked\",\n    \"readiness_reason\": \"native-backend-not-compiled\",\n    \"operator_action\": \"build a binary with the native feature enabled or request `risc-zero-compat` with --allow-compat\",\n    \"explicit_compat_alias\": \"risc-zero-compat\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": false,\n    \"lookup_semantics\": \"not-supported-on-ir-constraints\",\n    \"assurance_lane\": \"attestation-backed-host-validated-lane\",\n    \"aggregation_semantics\": \"zkvm-attestation\",\n    \"proof_engine\": \"zkvm-attestation\",\n    \"proof_semantics\": \"attestation-over-host-validation\",\n    \"blackbox_semantics\": \"host-validated-before-attestation\",\n    \"prover_acceleration_scope\": \"not-claimed-host-validation\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [],\n      \"metal_stages\": []\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"not-claimed-for-this-backend\"\n  },\n  {\n    \"backend\": \"nova\",\n    \"mode\": \"native\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"classic\",\n      \"hypernova\"\n    ],\n    \"notes\": \"Native Nova backend (nova-snark) with IR-backed step circuit and classic/hypernova profiles. Compatibility delegation is disabled by default and can be enabled only with ZKF_NOVA_ALLOW_COMPAT_DELEGATE=true.\",\n    \"supported_fields\": [\n      \"bn254\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": true,\n    \"readiness\": \"ready\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"cryptographic-recursive-folding\",\n    \"proof_engine\": \"recursive-folding\",\n    \"proof_semantics\": \"proof-enforced-basic-ir-recursive-shell\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [\n        \"msm\"\n      ],\n      \"metal_stages\": [],\n      \"cpu_stages\": [\n        \"msm\"\n      ]\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"nova-provider-msm-hot-path-is-not-patched-to-metal\"\n  },\n  {\n    \"backend\": \"hyper-nova\",\n    \"mode\": \"native\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": true,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": false,\n    \"network_target\": null,\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"hypernova-ccs\",\n      \"pallas-vesta\"\n    ],\n    \"notes\": \"HyperNova native mode: delegates to Nova native backend with HyperNova CCS profile for real multifolding over Pallas/Vesta curve cycle. Supports BN254 IR programs (mapped to Pallas scalar field).\",\n    \"supported_fields\": [\n      \"bn254\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": true,\n    \"production_ready\": true,\n    \"readiness\": \"ready\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": true,\n    \"lookup_semantics\": \"arithmetic-lowering-required\",\n    \"assurance_lane\": \"native-cryptographic-proof\",\n    \"aggregation_semantics\": \"cryptographic-recursive-multifolding\",\n    \"proof_engine\": \"recursive-folding\",\n    \"proof_semantics\": \"proof-enforced-basic-ir-recursive-shell\",\n    \"blackbox_semantics\": \"host-validated-blackbox\",\n    \"prover_acceleration_scope\": \"proof-enforced-prover-stages\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [\n        \"msm\"\n      ],\n      \"metal_stages\": [],\n      \"cpu_stages\": [\n        \"msm\"\n      ]\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"nova-provider-msm-hot-path-is-not-patched-to-metal\"\n  },\n  {\n    \"backend\": \"midnight-compact\",\n    \"mode\": \"native\",\n    \"trusted_setup\": false,\n    \"recursion_ready\": false,\n    \"transparent_setup\": true,\n    \"zkvm_mode\": false,\n    \"network_target\": \"midnight\",\n    \"supported_blackbox_ops\": [\n      \"poseidon\",\n      \"sha256\",\n      \"keccak256\",\n      \"pedersen\",\n      \"ecdsa_secp256k1\",\n      \"ecdsa_secp256r1\",\n      \"schnorr_verify\",\n      \"blake2s\",\n      \"recursive_aggregation_marker\",\n      \"scalar_mul_g1\",\n      \"point_add_g1\",\n      \"pairing_check\"\n    ],\n    \"supported_constraint_kinds\": [\n      \"equal\",\n      \"boolean\",\n      \"range\",\n      \"blackbox\"\n    ],\n    \"native_profiles\": [\n      \"proof-server-v1\"\n    ],\n    \"notes\": \"Midnight runtime: proves via proof server when ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL is set; otherwise delegates to arkworks-groth16 when ZKF_MIDNIGHT_ALLOW_COMPAT_DELEGATE=true.\",\n    \"supported_fields\": [\n      \"pasta-fp\",\n      \"pasta-fq\"\n    ],\n    \"implementation_type\": \"native\",\n    \"compiled_in\": true,\n    \"toolchain_ready\": true,\n    \"runtime_ready\": false,\n    \"production_ready\": false,\n    \"readiness\": \"blocked\",\n    \"readiness_reason\": \"midnight-proof-server-unconfigured\",\n    \"operator_action\": \"configure real http(s) ZKF_MIDNIGHT_PROOF_SERVER_PROVE_URL and ZKF_MIDNIGHT_PROOF_SERVER_VERIFY_URL endpoints and ensure GET /health succeeds\",\n    \"native_lookup_support\": false,\n    \"lookup_lowering_support\": false,\n    \"lookup_semantics\": \"not-supported-on-ir-constraints\",\n    \"assurance_lane\": \"delegated-or-external-lane\",\n    \"aggregation_semantics\": \"single-proof-only\",\n    \"proof_engine\": \"external-compact-delegate\",\n    \"proof_semantics\": \"external-or-delegated\",\n    \"blackbox_semantics\": \"external-or-host-validated\",\n    \"prover_acceleration_scope\": \"not-claimed-external-or-delegated\",\n    \"gpu_stage_coverage\": {\n      \"coverage_ratio\": 0.0,\n      \"required_stages\": [],\n      \"metal_stages\": []\n    },\n    \"metal_complete\": false,\n    \"cpu_math_fallback_reason\": \"not-claimed-for-this-backend\"\n  }\n]",
+      "timed_out": false
+    },
+    "frontends": {
+      "command": [
+        "/Users/sicarii/Desktop/ZirOS/dist/aarch64-apple-darwin/zkf",
+        "frontends",
+        "--json"
+      ],
+      "exit_code": 0,
+      "json": [
+        {
+          "can_compile_to_ir": true,
+          "can_execute": true,
+          "frontend": "noir",
+          "input_formats": [
+            "noir-artifact-json",
+            "acir-program-json"
+          ],
+          "notes": "ACIR import supports AssertZero, RANGE, AND/XOR (bit-decomposed), native BlackBox constraints (SHA256/Keccak256/Pedersen/Schnorr/ECDSA/Blake2s/RecursiveAggregation marker), plus compatibility hint-backed blackbox metadata for unsupported ops, Directive::ToLeRadix, MemoryInit/MemoryOp (constant and dynamic index via multiplexer), Brillig hints, and multi-function Call inlining."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": true,
+          "frontend": "circom",
+          "input_formats": [
+            "circom-r1cs-json",
+            "zkf-program-json",
+            "frontend-descriptor-json"
+          ],
+          "notes": "Circom frontend supports snarkjs-style R1CS JSON import (`constraints`, `nVars`) and descriptor/direct Program passthrough; execution supports native witness-runner descriptors (`witness_runner.kind=snarkjs`) plus command hooks and descriptor witness loading."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": true,
+          "frontend": "cairo",
+          "input_formats": [
+            "sierra-json",
+            "cairo-descriptor-json",
+            "zkf-program-json",
+            "zkf-zir-program-json"
+          ],
+          "notes": "Cairo frontend imports Sierra IR (JSON) into ZKF. Supports descriptor-based import with optional build hooks (e.g., `scarb build`), direct ZIR loading for stateful Cairo/StarkNet flows, and descriptor-driven execution via `execute_command`. Native Sierra \u2192 constraint translation handles the supported felt252/integer/enum/struct/memory/control-flow subset. Unsupported Sierra libfuncs fail closed during import instead of being silently lowered to fallback BlackBox constraints."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": true,
+          "frontend": "compact",
+          "input_formats": [
+            "compact-zkir-json",
+            "compact-descriptor-json",
+            "zkf-program-json",
+            "compact-source"
+          ],
+          "notes": "Midnight Compact frontend: imports local compactc 0.30.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": false,
+          "frontend": "halo2-rust",
+          "input_formats": [
+            "zkf-halo2-export-json",
+            "zkf-halo2-export-descriptor-json"
+          ],
+          "notes": "Halo2 frontend import accepts explicit ZkfHalo2Export schema (`schema=zkf-halo2-export-v1`) via embedded export object or `halo2_export_path`."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": false,
+          "frontend": "plonky3-air",
+          "input_formats": [
+            "zkf-plonky3-air-export-json",
+            "zkf-plonky3-air-export-descriptor-json"
+          ],
+          "notes": "Plonky3 AIR frontend import accepts explicit ZkfPlonky3AirExport schema (`schema=zkf-plonky3-air-export-v1`) via embedded export object or `plonky3_air_export_path`."
+        },
+        {
+          "can_compile_to_ir": true,
+          "can_execute": true,
+          "frontend": "zkvm",
+          "input_formats": [
+            "zkvm-descriptor-json",
+            "zkf-program-json"
+          ],
+          "notes": "External-tool frontend for zkVM (SP1, RISC Zero): supports descriptor-based import/execute with toolchain hooks, ELF binary detection, and witness loading."
+        }
+      ],
+      "ok": true,
+      "stderr": "",
+      "stdout": "[\n  {\n    \"frontend\": \"noir\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": true,\n    \"input_formats\": [\n      \"noir-artifact-json\",\n      \"acir-program-json\"\n    ],\n    \"notes\": \"ACIR import supports AssertZero, RANGE, AND/XOR (bit-decomposed), native BlackBox constraints (SHA256/Keccak256/Pedersen/Schnorr/ECDSA/Blake2s/RecursiveAggregation marker), plus compatibility hint-backed blackbox metadata for unsupported ops, Directive::ToLeRadix, MemoryInit/MemoryOp (constant and dynamic index via multiplexer), Brillig hints, and multi-function Call inlining.\"\n  },\n  {\n    \"frontend\": \"circom\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": true,\n    \"input_formats\": [\n      \"circom-r1cs-json\",\n      \"zkf-program-json\",\n      \"frontend-descriptor-json\"\n    ],\n    \"notes\": \"Circom frontend supports snarkjs-style R1CS JSON import (`constraints`, `nVars`) and descriptor/direct Program passthrough; execution supports native witness-runner descriptors (`witness_runner.kind=snarkjs`) plus command hooks and descriptor witness loading.\"\n  },\n  {\n    \"frontend\": \"cairo\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": true,\n    \"input_formats\": [\n      \"sierra-json\",\n      \"cairo-descriptor-json\",\n      \"zkf-program-json\",\n      \"zkf-zir-program-json\"\n    ],\n    \"notes\": \"Cairo frontend imports Sierra IR (JSON) into ZKF. Supports descriptor-based import with optional build hooks (e.g., `scarb build`), direct ZIR loading for stateful Cairo/StarkNet flows, and descriptor-driven execution via `execute_command`. Native Sierra \u2192 constraint translation handles the supported felt252/integer/enum/struct/memory/control-flow subset. Unsupported Sierra libfuncs fail closed during import instead of being silently lowered to fallback BlackBox constraints.\"\n  },\n  {\n    \"frontend\": \"compact\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": true,\n    \"input_formats\": [\n      \"compact-zkir-json\",\n      \"compact-descriptor-json\",\n      \"zkf-program-json\",\n      \"compact-source\"\n    ],\n    \"notes\": \"Midnight Compact frontend: imports local compactc 0.30.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows.\"\n  },\n  {\n    \"frontend\": \"halo2-rust\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": false,\n    \"input_formats\": [\n      \"zkf-halo2-export-json\",\n      \"zkf-halo2-export-descriptor-json\"\n    ],\n    \"notes\": \"Halo2 frontend import accepts explicit ZkfHalo2Export schema (`schema=zkf-halo2-export-v1`) via embedded export object or `halo2_export_path`.\"\n  },\n  {\n    \"frontend\": \"plonky3-air\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": false,\n    \"input_formats\": [\n      \"zkf-plonky3-air-export-json\",\n      \"zkf-plonky3-air-export-descriptor-json\"\n    ],\n    \"notes\": \"Plonky3 AIR frontend import accepts explicit ZkfPlonky3AirExport schema (`schema=zkf-plonky3-air-export-v1`) via embedded export object or `plonky3_air_export_path`.\"\n  },\n  {\n    \"frontend\": \"zkvm\",\n    \"can_compile_to_ir\": true,\n    \"can_execute\": true,\n    \"input_formats\": [\n      \"zkvm-descriptor-json\",\n      \"zkf-program-json\"\n    ],\n    \"notes\": \"External-tool frontend for zkVM (SP1, RISC Zero): supports descriptor-based import/execute with toolchain hooks, ELF binary detection, and witness loading.\"\n  }\n]",
+      "timed_out": false
+    },
+    "midnight_doctor": {
+      "command": [
+        "/Users/sicarii/Desktop/ZirOS/dist/aarch64-apple-darwin/zkf",
+        "midnight",
+        "doctor",
+        "--json",
+        "--network",
+        "preview"
+      ],
+      "exit_code": 0,
+      "json": {
+        "checks": [
+          {
+            "actual": "0.30.0 @ /Users/sicarii/.local/bin/compactc",
+            "expected": "0.30.0",
+            "id": "compactc",
+            "label": "Compact compiler",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "actual": "0.30.0 @ /Users/sicarii/.local/bin/compact",
+            "detail": "The installed compact manager version does not match the pinned Midnight lane.",
+            "expected": "0.5.1",
+            "fix": "Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.",
+            "id": "compact",
+            "label": "Compact manager",
+            "required": false,
+            "status": "warn"
+          },
+          {
+            "actual": "24.13.1",
+            "expected": ">=22.0.0",
+            "fix": "Install Node.js 22.x or newer.",
+            "id": "node",
+            "label": "Node.js",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "actual": "11.8.0",
+            "id": "npm",
+            "label": "npm",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "detail": "No Midnight project root was supplied.",
+            "expected": "22 @midnight-ntwrk packages pinned to the March 2026 lane",
+            "fix": "Re-run with --project <path> inside a scaffolded Midnight DApp.",
+            "id": "packages",
+            "label": "Pinned Midnight packages",
+            "required": true,
+            "status": "not_checkable_from_cli"
+          },
+          {
+            "actual": "8.0.3 @ http://127.0.0.1:6300",
+            "expected": "wire contract 8.0.3",
+            "fix": "Start or restart the native proof server with `zkf midnight proof-server serve --engine umpg`.",
+            "id": "proof-server",
+            "label": "Midnight proof server",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "actual": "http://127.0.0.1:6311",
+            "detail": "{\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+            "expected": "ready gateway with compactc 0.30.0 and attestor key exposure",
+            "fix": "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0.",
+            "id": "gateway",
+            "label": "Midnight Compact gateway",
+            "required": true,
+            "status": "warn"
+          },
+          {
+            "actual": "HTTP 405 @ https://rpc.preview.midnight.network",
+            "expected": "reachable endpoint",
+            "id": "rpc",
+            "label": "Midnight RPC",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "actual": "HTTP 405 @ https://indexer.preview.midnight.network/api/v4/graphql",
+            "expected": "reachable endpoint",
+            "id": "indexer",
+            "label": "Midnight Indexer",
+            "required": true,
+            "status": "pass"
+          },
+          {
+            "actual": "HTTP 200 @ https://explorer.preview.midnight.network",
+            "expected": "reachable endpoint",
+            "id": "explorer",
+            "label": "Midnight Explorer",
+            "required": false,
+            "status": "pass"
+          },
+          {
+            "detail": "CLI-only mode cannot honestly inspect window.midnight.mnLace.",
+            "expected": "Midnight Lace extension available in a browser context",
+            "fix": "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED/MNEMONIC for headless wallet diagnostics.",
+            "id": "lace",
+            "label": "Lace availability",
+            "required": false,
+            "status": "not_checkable_from_cli"
+          },
+          {
+            "detail": "No browser wallet session or headless operator wallet credentials were available.",
+            "expected": "A Midnight wallet session bound to the selected network",
+            "fix": "Provide MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC, or allow the browser-assisted Lace check.",
+            "id": "wallet",
+            "label": "Wallet session",
+            "required": false,
+            "status": "not_checkable_from_cli"
+          },
+          {
+            "detail": "DUST balance is not checkable from a bare CLI process.",
+            "expected": "A nonzero spendable tDUST balance",
+            "fix": "Run the browser-assisted Lace check or supply a project with installed Midnight dependencies and headless wallet credentials.",
+            "id": "dust",
+            "label": "Spendable tDUST",
+            "required": false,
+            "status": "not_checkable_from_cli"
+          }
+        ],
+        "generated_at": "1775934957Z",
+        "network": "preview",
+        "recommended_fixes": [
+          "Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.",
+          "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
+        ],
+        "schema": "zkf-midnight-doctor-report-v1",
+        "summary": {
+          "failed": 0,
+          "not_checkable": 4,
+          "overall_status": "warn",
+          "passed": 7,
+          "total": 13,
+          "warned": 2
+        }
+      },
+      "ok": true,
+      "stderr": "",
+      "stdout": "{\n  \"schema\": \"zkf-midnight-doctor-report-v1\",\n  \"generated_at\": \"1775934957Z\",\n  \"network\": \"preview\",\n  \"summary\": {\n    \"total\": 13,\n    \"passed\": 7,\n    \"warned\": 2,\n    \"failed\": 0,\n    \"not_checkable\": 4,\n    \"overall_status\": \"warn\"\n  },\n  \"checks\": [\n    {\n      \"id\": \"compactc\",\n      \"label\": \"Compact compiler\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"expected\": \"0.30.0\",\n      \"actual\": \"0.30.0 @ /Users/sicarii/.local/bin/compactc\"\n    },\n    {\n      \"id\": \"compact\",\n      \"label\": \"Compact manager\",\n      \"required\": false,\n      \"status\": \"warn\",\n      \"expected\": \"0.5.1\",\n      \"actual\": \"0.30.0 @ /Users/sicarii/.local/bin/compact\",\n      \"detail\": \"The installed compact manager version does not match the pinned Midnight lane.\",\n      \"fix\": \"Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.\"\n    },\n    {\n      \"id\": \"node\",\n      \"label\": \"Node.js\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"expected\": \">=22.0.0\",\n      \"actual\": \"24.13.1\",\n      \"fix\": \"Install Node.js 22.x or newer.\"\n    },\n    {\n      \"id\": \"npm\",\n      \"label\": \"npm\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"actual\": \"11.8.0\"\n    },\n    {\n      \"id\": \"packages\",\n      \"label\": \"Pinned Midnight packages\",\n      \"required\": true,\n      \"status\": \"not_checkable_from_cli\",\n      \"expected\": \"22 @midnight-ntwrk packages pinned to the March 2026 lane\",\n      \"detail\": \"No Midnight project root was supplied.\",\n      \"fix\": \"Re-run with --project <path> inside a scaffolded Midnight DApp.\"\n    },\n    {\n      \"id\": \"proof-server\",\n      \"label\": \"Midnight proof server\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"expected\": \"wire contract 8.0.3\",\n      \"actual\": \"8.0.3 @ http://127.0.0.1:6300\",\n      \"fix\": \"Start or restart the native proof server with `zkf midnight proof-server serve --engine umpg`.\"\n    },\n    {\n      \"id\": \"gateway\",\n      \"label\": \"Midnight Compact gateway\",\n      \"required\": true,\n      \"status\": \"warn\",\n      \"expected\": \"ready gateway with compactc 0.30.0 and attestor key exposure\",\n      \"actual\": \"http://127.0.0.1:6311\",\n      \"detail\": \"{\\\"error\\\":\\\"forbidden\\\",\\\"reason\\\":\\\"missing_cf_access_jwt_assertion\\\"}\",\n      \"fix\": \"Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0.\"\n    },\n    {\n      \"id\": \"rpc\",\n      \"label\": \"Midnight RPC\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"expected\": \"reachable endpoint\",\n      \"actual\": \"HTTP 405 @ https://rpc.preview.midnight.network\"\n    },\n    {\n      \"id\": \"indexer\",\n      \"label\": \"Midnight Indexer\",\n      \"required\": true,\n      \"status\": \"pass\",\n      \"expected\": \"reachable endpoint\",\n      \"actual\": \"HTTP 405 @ https://indexer.preview.midnight.network/api/v4/graphql\"\n    },\n    {\n      \"id\": \"explorer\",\n      \"label\": \"Midnight Explorer\",\n      \"required\": false,\n      \"status\": \"pass\",\n      \"expected\": \"reachable endpoint\",\n      \"actual\": \"HTTP 200 @ https://explorer.preview.midnight.network\"\n    },\n    {\n      \"id\": \"lace\",\n      \"label\": \"Lace availability\",\n      \"required\": false,\n      \"status\": \"not_checkable_from_cli\",\n      \"expected\": \"Midnight Lace extension available in a browser context\",\n      \"detail\": \"CLI-only mode cannot honestly inspect window.midnight.mnLace.\",\n      \"fix\": \"Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED/MNEMONIC for headless wallet diagnostics.\"\n    },\n    {\n      \"id\": \"wallet\",\n      \"label\": \"Wallet session\",\n      \"required\": false,\n      \"status\": \"not_checkable_from_cli\",\n      \"expected\": \"A Midnight wallet session bound to the selected network\",\n      \"detail\": \"No browser wallet session or headless operator wallet credentials were available.\",\n      \"fix\": \"Provide MIDNIGHT_WALLET_SEED or MIDNIGHT_WALLET_MNEMONIC, or allow the browser-assisted Lace check.\"\n    },\n    {\n      \"id\": \"dust\",\n      \"label\": \"Spendable tDUST\",\n      \"required\": false,\n      \"status\": \"not_checkable_from_cli\",\n      \"expected\": \"A nonzero spendable tDUST balance\",\n      \"detail\": \"DUST balance is not checkable from a bare CLI process.\",\n      \"fix\": \"Run the browser-assisted Lace check or supply a project with installed Midnight dependencies and headless wallet credentials.\"\n    }\n  ],\n  \"recommended_fixes\": [\n    \"Install Compact manager 0.5.1 to match the pinned Midnight toolchain lane.\",\n    \"Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0.\"\n  ]\n}",
+      "timed_out": false
+    },
+    "midnight_templates": {
+      "command": [
+        "/Users/sicarii/Desktop/ZirOS/dist/aarch64-apple-darwin/zkf",
+        "midnight",
+        "templates",
+        "--json"
+      ],
+      "exit_code": 0,
+      "json": [
+        {
+          "backend_lane": "midnight-native-contract+ziros-proof-server",
+          "compact_asset_paths": [
+            "contracts/compact/token_transfer.compact"
+          ],
+          "description": "Midnight-native token transfer starter with a pinned ZirOS proof server lane and SED-style dashboard shell.",
+          "display_name": "Token Transfer",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "token-transfer"
+        },
+        {
+          "backend_lane": "sed-circuit-1+midnight-compact",
+          "compact_asset_paths": [
+            "contracts/compact/cooperative_treasury.compact"
+          ],
+          "description": "Reuse the shipped SED cooperative treasury contract, selective-disclosure runtime, and deployment evidence lane.",
+          "display_name": "Cooperative Treasury",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "cooperative-treasury"
+        },
+        {
+          "backend_lane": "ziros-private-vote+midnight-compact",
+          "compact_asset_paths": [
+            "contracts/compact/private_voting.compact"
+          ],
+          "description": "Anonymous voting scaffold bound to a Compact commitment contract and the existing ZirOS private-vote lane.",
+          "display_name": "Private Voting",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "private-voting"
+        },
+        {
+          "backend_lane": "ziros-private-identity+midnight-compact",
+          "compact_asset_paths": [
+            "contracts/compact/credential_verification.compact"
+          ],
+          "description": "Private identity and age-gating scaffold with an honest Groth16-labeled proof lane and Compact admission contract.",
+          "display_name": "Credential Verification",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "credential-verification"
+        },
+        {
+          "backend_lane": "ziros-poseidon-commitment+midnight-compact",
+          "compact_asset_paths": [
+            "contracts/compact/private_auction.compact"
+          ],
+          "description": "Sealed-bid auction starter with a Compact commitment contract and ZirOS selective-disclosure dashboard lane.",
+          "display_name": "Private Auction",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "private-auction"
+        },
+        {
+          "backend_lane": "ziros-provenance+midnight-compact",
+          "compact_asset_paths": [
+            "contracts/compact/supply_chain_provenance.compact"
+          ],
+          "description": "Selective-disclosure provenance scaffold backed by a Compact attestation contract and ZirOS provenance-style proof lane.",
+          "display_name": "Supply Chain Provenance",
+          "gateway_sample_vectors": [
+            "generated-smoke-vector"
+          ],
+          "package_pins": [
+            "@midnight-ntwrk/compact-js@2.5.0",
+            "@midnight-ntwrk/compact-runtime@0.15.0",
+            "@midnight-ntwrk/dapp-connector-api@4.0.1",
+            "@midnight-ntwrk/ledger-v8@8.0.3",
+            "@midnight-ntwrk/midnight-js-contracts@4.0.2",
+            "@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-network-id@4.0.2",
+            "@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2",
+            "@midnight-ntwrk/midnight-js-types@4.0.2",
+            "@midnight-ntwrk/midnight-js-utils@4.0.2",
+            "@midnight-ntwrk/testkit-js@4.0.2",
+            "@midnight-ntwrk/wallet-sdk-address-format@3.1.0",
+            "@midnight-ntwrk/wallet-sdk-capabilities@3.2.0",
+            "@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-facade@3.0.0",
+            "@midnight-ntwrk/wallet-sdk-hd@3.0.1",
+            "@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0",
+            "@midnight-ntwrk/wallet-sdk-shielded@2.1.0",
+            "@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0",
+            "@midnight-ntwrk/midnight-js-compact@4.0.2"
+          ],
+          "release_ready": true,
+          "role_views": [
+            "public",
+            "reviewer",
+            "operator"
+          ],
+          "schema": "zkf-midnight-template-catalog-entry-v1",
+          "template_id": "supply-chain-provenance"
+        }
+      ],
+      "ok": true,
+      "stderr": "",
+      "stdout": "[\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"token-transfer\",\n    \"display_name\": \"Token Transfer\",\n    \"description\": \"Midnight-native token transfer starter with a pinned ZirOS proof server lane and SED-style dashboard shell.\",\n    \"backend_lane\": \"midnight-native-contract+ziros-proof-server\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/token_transfer.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  },\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"cooperative-treasury\",\n    \"display_name\": \"Cooperative Treasury\",\n    \"description\": \"Reuse the shipped SED cooperative treasury contract, selective-disclosure runtime, and deployment evidence lane.\",\n    \"backend_lane\": \"sed-circuit-1+midnight-compact\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/cooperative_treasury.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  },\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"private-voting\",\n    \"display_name\": \"Private Voting\",\n    \"description\": \"Anonymous voting scaffold bound to a Compact commitment contract and the existing ZirOS private-vote lane.\",\n    \"backend_lane\": \"ziros-private-vote+midnight-compact\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/private_voting.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  },\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"credential-verification\",\n    \"display_name\": \"Credential Verification\",\n    \"description\": \"Private identity and age-gating scaffold with an honest Groth16-labeled proof lane and Compact admission contract.\",\n    \"backend_lane\": \"ziros-private-identity+midnight-compact\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/credential_verification.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  },\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"private-auction\",\n    \"display_name\": \"Private Auction\",\n    \"description\": \"Sealed-bid auction starter with a Compact commitment contract and ZirOS selective-disclosure dashboard lane.\",\n    \"backend_lane\": \"ziros-poseidon-commitment+midnight-compact\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/private_auction.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  },\n  {\n    \"schema\": \"zkf-midnight-template-catalog-entry-v1\",\n    \"template_id\": \"supply-chain-provenance\",\n    \"display_name\": \"Supply Chain Provenance\",\n    \"description\": \"Selective-disclosure provenance scaffold backed by a Compact attestation contract and ZirOS provenance-style proof lane.\",\n    \"backend_lane\": \"ziros-provenance+midnight-compact\",\n    \"compact_asset_paths\": [\n      \"contracts/compact/supply_chain_provenance.compact\"\n    ],\n    \"role_views\": [\n      \"public\",\n      \"reviewer\",\n      \"operator\"\n    ],\n    \"gateway_sample_vectors\": [\n      \"generated-smoke-vector\"\n    ],\n    \"package_pins\": [\n      \"@midnight-ntwrk/compact-js@2.5.0\",\n      \"@midnight-ntwrk/compact-runtime@0.15.0\",\n      \"@midnight-ntwrk/dapp-connector-api@4.0.1\",\n      \"@midnight-ntwrk/ledger-v8@8.0.3\",\n      \"@midnight-ntwrk/midnight-js-contracts@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-http-client-proof-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-indexer-public-data-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-level-private-state-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-network-id@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-node-zk-config-provider@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-types@4.0.2\",\n      \"@midnight-ntwrk/midnight-js-utils@4.0.2\",\n      \"@midnight-ntwrk/testkit-js@4.0.2\",\n      \"@midnight-ntwrk/wallet-sdk-address-format@3.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-capabilities@3.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-dust-wallet@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-facade@3.0.0\",\n      \"@midnight-ntwrk/wallet-sdk-hd@3.0.1\",\n      \"@midnight-ntwrk/wallet-sdk-indexer-client@1.2.0\",\n      \"@midnight-ntwrk/wallet-sdk-shielded@2.1.0\",\n      \"@midnight-ntwrk/wallet-sdk-unshielded-wallet@2.1.0\",\n      \"@midnight-ntwrk/midnight-js-compact@4.0.2\"\n    ],\n    \"release_ready\": true\n  }\n]",
+      "timed_out": false
+    }
+  },
+  "program_families": {
+    "lang_command_path": "zkf-cli/src/cmd/lang.rs",
+    "supported_families": [
+      "zir-source",
+      "zir-v1",
+      "ir-v2",
+      "zirflow"
+    ],
+    "tier_model": {
+      "tier_1": "bounded total circuit subset",
+      "tier_2": "advanced ZIR subset preserved in zir-v1 and fail-closed when forced through unsupported lowerings"
+    },
+    "verification_rs_path": "zkf-ir-spec/src/verification.rs",
+    "zir_language_path": "docs/ZIR_LANGUAGE.md",
+    "zirflow_path": "docs/ZIRFLOW.md"
+  },
+  "schema": "ziros-capability-inventory-v1",
+  "support_matrix": {
+    "backends": [
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ],
+        "gpu_coverage": "0/2 GPU stages active on current host",
+        "id": "plonky3",
+        "mode": "native",
+        "notes": "Plonky3 STARK backend with native field profiles: Goldilocks/BabyBear over FRI and Mersenne31 over Circle PCS. Supports Equal/Boolean constraints, range constraints via bit decomposition (field-safe bit cap), and division via derived quotient columns. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-lowered-ir aggregation_semantics=single-proof-with-optional-wrapper",
+        "proof_semantics": "proof-enforced-lowered-ir",
+        "status": "ready"
+      },
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "pasta-fp"
+        ],
+        "gpu_coverage": "0/2 GPU stages active on current host",
+        "id": "halo2",
+        "mode": "native",
+        "notes": "Plonkish backend implemented with Halo2 (IPA). Supports Equal/Boolean/Range/Div. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only",
+        "proof_semantics": "proof-enforced-basic-ir",
+        "status": "ready"
+      },
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "bls12-381"
+        ],
+        "gpu_coverage": "0/2 GPU stages active on current host",
+        "id": "halo2-bls12-381",
+        "mode": "native",
+        "notes": "PLONK+KZG on BLS12-381 via PSE halo2 fork. Real BLS12-381 Fr field, SHPLONK multiopen, deterministic trusted setup. Range constraints wider than 16 bits are lowered into 16-bit lookup chunks automatically. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only",
+        "proof_semantics": "proof-enforced-basic-ir",
+        "status": "ready"
+      },
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "bn254"
+        ],
+        "gpu_coverage": "0/3 GPU stages active on current host",
+        "id": "arkworks-groth16",
+        "mode": "native",
+        "notes": "Groth16 on BN254 for smallest proof size and cheap on-chain verification. implementation_type=native compiled_in=true production_ready=false assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir aggregation_semantics=single-proof-only readiness_reason=upstream-ark-groth16-production-disclaimer operator_action=treat arkworks-groth16 as non-production until the upstream production disclaimer is resolved or the dependency is replaced",
+        "proof_semantics": "proof-enforced-basic-ir",
+        "status": "limited"
+      },
+      {
+        "assurance_lane": "attestation-backed-host-validated-lane",
+        "delegates_to": "plonky3",
+        "fields": [
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ],
+        "gpu_coverage": "0/0 GPU stages active on current host",
+        "id": "sp1",
+        "mode": "delegated",
+        "notes": "SP1 compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. implementation_type=delegated compiled_in=false production_ready=false assurance_lane=attestation-backed-host-validated-lane proof_semantics=attestation-over-host-validation aggregation_semantics=zkvm-attestation explicit_compat_alias=sp1-compat readiness_reason=native-backend-not-compiled operator_action=build a binary with the native feature enabled or request `sp1-compat` with --allow-compat",
+        "proof_semantics": "attestation-over-host-validation",
+        "status": "broken"
+      },
+      {
+        "assurance_lane": "attestation-backed-host-validated-lane",
+        "delegates_to": "plonky3",
+        "fields": [
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ],
+        "gpu_coverage": "0/0 GPU stages active on current host",
+        "id": "risc-zero",
+        "mode": "delegated",
+        "notes": "RISC Zero compatibility mode: delegates proof generation to plonky3 backend for Goldilocks programs. Native RISC Zero integration requires the `native-risc-zero` feature flag. implementation_type=delegated compiled_in=false production_ready=false assurance_lane=attestation-backed-host-validated-lane proof_semantics=attestation-over-host-validation aggregation_semantics=zkvm-attestation explicit_compat_alias=risc-zero-compat readiness_reason=native-backend-not-compiled operator_action=build a binary with the native feature enabled or request `risc-zero-compat` with --allow-compat",
+        "proof_semantics": "attestation-over-host-validation",
+        "status": "broken"
+      },
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "bn254",
+          "pasta-fp",
+          "pasta-fq"
+        ],
+        "gpu_coverage": "0/1 GPU stages active on current host",
+        "id": "nova",
+        "mode": "native",
+        "notes": "Native Nova backend (nova-snark) with IR-backed step circuit and classic/hypernova profiles. Compatibility delegation is disabled by default and can be enabled only with ZKF_NOVA_ALLOW_COMPAT_DELEGATE=true. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir-recursive-shell aggregation_semantics=cryptographic-recursive-folding",
+        "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+        "status": "ready"
+      },
+      {
+        "assurance_lane": "native-cryptographic-proof",
+        "fields": [
+          "bn254",
+          "pasta-fp",
+          "pasta-fq"
+        ],
+        "gpu_coverage": "0/1 GPU stages active on current host",
+        "id": "hypernova",
+        "mode": "native",
+        "notes": "HyperNova native mode: delegates to Nova native backend with HyperNova CCS profile for real multifolding over Pallas/Vesta curve cycle. Supports BN254, PastaFp, and PastaFq IR programs. implementation_type=native compiled_in=true production_ready=true assurance_lane=native-cryptographic-proof proof_semantics=proof-enforced-basic-ir-recursive-shell aggregation_semantics=cryptographic-recursive-multifolding",
+        "proof_semantics": "proof-enforced-basic-ir-recursive-shell",
+        "status": "ready"
+      },
+      {
+        "assurance_lane": "delegated-or-external-lane",
+        "fields": [
+          "pasta-fp",
+          "pasta-fq"
+        ],
+        "gpu_coverage": "0/0 GPU stages active on current host",
+        "id": "midnight-compact",
+        "mode": "native",
+        "notes": "Midnight-first operator lane derived from typed readiness and doctor evidence. ready_for_live_submit=false blockers=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}; wallet: No browser wallet session or headless operator wallet credentials were available.; dust: DUST balance is not checkable from a bare CLI process. advisories=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+        "proof_semantics": "external-or-delegated",
+        "status": "ready"
+      }
+    ],
+    "frontends": [
+      {
+        "id": "zir",
+        "input_formats": [
+          "zir-source",
+          "zkf-zir-source-descriptor-json"
+        ],
+        "notes": "Native Zir source frontend. Tier 1 is total and bounded; Tier 2 preserves advanced ZIR features and fails closed when forced through unsupported lowerings.",
+        "status": "ready"
+      },
+      {
+        "id": "noir",
+        "input_formats": [
+          "noir-artifact-json",
+          "acir-program-json"
+        ],
+        "notes": "ACIR import supports AssertZero, RANGE, AND/XOR (bit-decomposed), native BlackBox constraints (SHA256/Keccak256/Pedersen/Schnorr/ECDSA/Blake2s/RecursiveAggregation marker), plus compatibility hint-backed blackbox metadata for unsupported ops, Directive::ToLeRadix, MemoryInit/MemoryOp (constant and dynamic index via multiplexer), Brillig hints, and multi-function Call inlining.",
+        "status": "ready"
+      },
+      {
+        "id": "circom",
+        "input_formats": [
+          "circom-r1cs-json",
+          "zkf-program-json",
+          "frontend-descriptor-json"
+        ],
+        "notes": "Circom frontend supports snarkjs-style R1CS JSON import (`constraints`, `nVars`) and descriptor/direct Program passthrough; execution supports native witness-runner descriptors (`witness_runner.kind=snarkjs`) plus command hooks and descriptor witness loading.",
+        "status": "ready"
+      },
+      {
+        "id": "cairo",
+        "input_formats": [
+          "sierra-json",
+          "cairo-descriptor-json",
+          "zkf-program-json",
+          "zkf-zir-program-json"
+        ],
+        "notes": "Cairo frontend imports Sierra IR (JSON) into ZKF. Supports descriptor-based import with optional build hooks (e.g., `scarb build`), direct ZIR loading for stateful Cairo/StarkNet flows, and descriptor-driven execution via `execute_command`. Native Sierra \u2192 constraint translation handles the supported felt252/integer/enum/struct/memory/control-flow subset. Unsupported Sierra libfuncs fail closed during import instead of being silently lowered to fallback BlackBox constraints.",
+        "status": "limited"
+      },
+      {
+        "id": "compact",
+        "input_formats": [
+          "compact-zkir-json",
+          "compact-descriptor-json",
+          "zkf-program-json",
+          "compact-source"
+        ],
+        "notes": "Midnight Compact frontend: imports local compactc 0.30.0 zkir v2.0 circuits directly, auto-discovers contract sidecars when available, and still supports descriptor-based fallback flows.",
+        "status": "ready"
+      },
+      {
+        "id": "halo2-rust",
+        "input_formats": [
+          "zkf-halo2-export-json",
+          "zkf-halo2-export-descriptor-json"
+        ],
+        "notes": "Halo2 frontend import accepts explicit ZkfHalo2Export schema (`schema=zkf-halo2-export-v1`) via embedded export object or `halo2_export_path`.",
+        "status": "ready"
+      },
+      {
+        "id": "plonky3-air",
+        "input_formats": [
+          "zkf-plonky3-air-export-json",
+          "zkf-plonky3-air-export-descriptor-json"
+        ],
+        "notes": "Plonky3 AIR frontend import accepts explicit ZkfPlonky3AirExport schema (`schema=zkf-plonky3-air-export-v1`) via embedded export object or `plonky3_air_export_path`.",
+        "status": "ready"
+      },
+      {
+        "id": "zkvm",
+        "input_formats": [
+          "zkvm-descriptor-json",
+          "zkf-program-json"
+        ],
+        "notes": "External-tool frontend for zkVM (SP1, RISC Zero): supports descriptor-based import/execute with toolchain hooks, ELF binary detection, and witness loading.",
+        "status": "ready"
+      }
+    ],
+    "gadgets": [
+      {
+        "audit_status": "unaudited",
+        "id": "blake3",
+        "notes": "BLAKE3 hash function circuit.",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "boolean",
+        "notes": "Boolean logic gates (AND, OR, NOT, XOR).",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "unaudited",
+        "id": "comparison",
+        "notes": "Comparison operations (less-than, greater-than, equal).",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "ecdsa",
+        "notes": "ECDSA signature verification over secp256k1 (Bitcoin/Ethereum). blackbox_ops=ecdsa_secp256k1,ecdsa_secp256r1",
+        "status": "limited",
+        "supported_fields": [
+          "bn254"
+        ]
+      },
+      {
+        "audit_status": "unaudited",
+        "id": "kzg",
+        "notes": "KZG polynomial commitment pairing verification. blackbox_ops=pairing_check",
+        "status": "limited",
+        "supported_fields": [
+          "bn254",
+          "bls12-381"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "merkle",
+        "notes": "Merkle tree inclusion proof verification.",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "unaudited",
+        "id": "plonk_gate",
+        "notes": "Universal Plonk gate constraint with configurable selectors.",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "poseidon",
+        "notes": "Poseidon algebraic hash function (ZK-friendly). blackbox_ops=poseidon",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "range",
+        "notes": "Range constraint: value < 2^bits.",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      },
+      {
+        "audit_status": "unaudited",
+        "id": "schnorr",
+        "notes": "Schnorr signature verification. blackbox_ops=schnorr_verify",
+        "status": "limited",
+        "supported_fields": [
+          "bn254"
+        ]
+      },
+      {
+        "audit_status": "informally-reviewed",
+        "id": "sha256",
+        "notes": "SHA-256 hash function circuit (NIST FIPS 180-4). blackbox_ops=sha256",
+        "status": "ready",
+        "supported_fields": [
+          "bn254",
+          "bls12-381",
+          "pasta-fp",
+          "pasta-fq",
+          "goldilocks",
+          "babybear",
+          "mersenne31"
+        ]
+      }
+    ],
+    "generated_for": "0.7.3",
+    "registry": {
+      "local": "ready",
+      "notes": "Local + remote registries with CombinedRegistry fallback, SemVer resolution, and SHA-256 manifest/content integrity checks.",
+      "remote": "ready",
+      "security": "ready",
+      "version_resolution": "ready"
+    },
+    "roadmap_completion": {
+      "phase_10_production_hardening": "in_progress",
+      "phase_1_acir_native_semantics": "ready",
+      "phase_2_acvm_solver_completion": "ready",
+      "phase_3_plonky3_multifield": "ready",
+      "phase_4_nova_hypernova_native": "ready",
+      "phase_5_sp1_native_sdk": "delegated",
+      "phase_6_midnight_native_runtime": "delegated",
+      "phase_7_attestation_composition": "ready",
+      "phase_8_frontend_expansion": "ready",
+      "phase_9_advanced_tooling": "in_progress"
+    },
+    "schema_version": "2.0"
+  },
+  "trade_finance_showcase": {
+    "app_path": "zkf-lib/src/app/private_trade_finance_settlement.rs",
+    "contract_shapes": [
+      {
+        "circuits": [
+          "grant_disclosure_view"
+        ],
+        "contract_id": "disclosure_access",
+        "export_ledgers": [
+          {
+            "name": "disclosure_role_code",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "disclosure_view_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "disclosure_authorization_commitment",
+            "type": "Field"
+          }
+        ],
+        "line_count": 17,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/disclosure_access.compact",
+        "witness_inputs": [
+          {
+            "name": "disclosureRoleCode",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "disclosureViewCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "disclosureAuthorizationCommitment",
+            "type": "Field"
+          }
+        ]
+      },
+      {
+        "circuits": [
+          "place_dispute_hold"
+        ],
+        "contract_id": "dispute_hold",
+        "export_ledgers": [
+          {
+            "name": "dispute_hold_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "hold_active",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/dispute_hold.compact",
+        "witness_inputs": [
+          {
+            "name": "disputeHoldCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "holdActive",
+            "type": "Boolean"
+          }
+        ]
+      },
+      {
+        "circuits": [
+          "register_financing_request"
+        ],
+        "contract_id": "financing_request_registration",
+        "export_ledgers": [
+          {
+            "name": "invoice_packet_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "eligibility_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "action_class_code",
+            "type": "Uint<8>"
+          },
+          {
+            "name": "registered",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 19,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/financing_request_registration.compact",
+        "witness_inputs": [
+          {
+            "name": "invoicePacketCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "eligibilityCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "actionClassCode",
+            "type": "Uint<8>"
+          }
+        ]
+      },
+      {
+        "circuits": [
+          "complete_buyer_repayment"
+        ],
+        "contract_id": "repayment_completion",
+        "export_ledgers": [
+          {
+            "name": "repayment_completion_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "released",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/repayment_completion.compact",
+        "witness_inputs": [
+          {
+            "name": "repaymentCompletionCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "repaymentSettled",
+            "type": "Boolean"
+          }
+        ]
+      },
+      {
+        "circuits": [
+          "authorize_settlement"
+        ],
+        "contract_id": "settlement_authorization",
+        "export_ledgers": [
+          {
+            "name": "maturity_schedule_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "approved_advance_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "reserve_amount_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "settlement_finality_flag",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 20,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/settlement_authorization.compact",
+        "witness_inputs": [
+          {
+            "name": "maturityScheduleCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "approvedAdvanceCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "reserveAmountCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "settlementFinalityFlag",
+            "type": "Boolean"
+          }
+        ]
+      },
+      {
+        "circuits": [
+          "confirm_supplier_receipt"
+        ],
+        "contract_id": "supplier_receipt_confirmation",
+        "export_ledgers": [
+          {
+            "name": "maturity_schedule_commitment",
+            "type": "Field"
+          },
+          {
+            "name": "supplier_receipt_confirmation_confirmed",
+            "type": "Boolean"
+          }
+        ],
+        "line_count": 14,
+        "path": "dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement/contracts/compact/supplier_receipt_confirmation.compact",
+        "witness_inputs": [
+          {
+            "name": "maturityScheduleCommitment",
+            "type": "Field"
+          },
+          {
+            "name": "supplierReceiptConfirmed",
+            "type": "Boolean"
+          }
+        ]
+      }
+    ],
+    "evidence_summary": {
+      "files": {
+        "entries": [
+          {
+            "path": "private_trade_finance_settlement.summary.json",
+            "sha256": "6a4fb85fe2c108c92cbca235c958b3a7f903411e5170c508add3e15ecd1727fd",
+            "size_bytes": 426
+          },
+          {
+            "path": "private_trade_finance_settlement.evidence_summary.json",
+            "sha256": "125d18a1ce500a15cd6a0e56b54f83f8e4c17c0b32d45202df34a98a219741b6",
+            "size_bytes": 37221
+          },
+          {
+            "path": "audit_bundle.json",
+            "sha256": "102a9e7893c0524fc3b722e1f712dd59c6761adc411c71de88ba205a587e2f1e",
+            "size_bytes": 5684
+          },
+          {
+            "path": "private_trade_finance_settlement.translation_report.json",
+            "sha256": "6cd12f1b0f32e39d7c61d1b81b149b3b75630882728b2321adc8f4867de41664",
+            "size_bytes": 7614
+          },
+          {
+            "path": "private_trade_finance_settlement.disclosure_noninterference_report.json",
+            "sha256": "ece9918198553cb737214cd2fa8663e78451316eda40753a09872a0993acd3db",
+            "size_bytes": 32414
+          },
+          {
+            "path": "formal/exercised_surfaces.json",
+            "sha256": "0d8608be925450c8d340ddee4dd4b27e305ad588b2d930e9daf3d9378f3758f3",
+            "size_bytes": 47258
+          },
+          {
+            "path": "formal/lean_trade_finance.log",
+            "sha256": "7f7085cf87ba4d9717f42be4358589e94cf5412b97d2dd094de9bd2e265ba991",
+            "size_bytes": 46
+          },
+          {
+            "path": "formal/STATUS.md",
+            "sha256": "b009b98c4aace83de039c012cefb1275a9fc07ffc8ed281fccfec571167becdb",
+            "size_bytes": 572
+          },
+          {
+            "path": "formal/verus_trade_finance.log",
+            "sha256": "b5ff387cfa86d0afa13c9fec98b59bcfc242e320c90e668cbba9024b760cbb3c",
+            "size_bytes": 172
+          },
+          {
+            "path": "formal/certificates/trade_finance_settlement_binding.primary.circuit_certificate.json",
+            "sha256": "eaffff5bf57a917a8fc51b102efe317f2f837af7c853540b4b165b7558510f8e",
+            "size_bytes": 9912
+          },
+          {
+            "path": "formal/certificates/trade_finance_duplicate_registry_handoff.primary.circuit_certificate.json",
+            "sha256": "c261c5dadcd10c7b1c51b5cff68a593724a0d446f97c8f77ced3a829ccfda0aa",
+            "size_bytes": 5120
+          },
+          {
+            "path": "formal/certificates/trade_finance_disclosure_projection.primary.circuit_certificate.json",
+            "sha256": "93afb10924d4b3f0869574cc515ea399baa84ae617c11a97f2e63dc70d664f57",
+            "size_bytes": 6245
+          },
+          {
+            "path": "formal/certificates/trade_finance_decision_core.primary.circuit_certificate.json",
+            "sha256": "22ccab682db127e11ce0e06043f512d9d7b3b95d67004f688f91674c7abea265",
+            "size_bytes": 33775
+          },
+          {
+            "path": "formal/rocq_trade_finance.log",
+            "sha256": "106709e507c45ccebd5fc0f3914190da2ec9eba59cabb4b502993caaae084000",
+            "size_bytes": 46
+          },
+          {
+            "path": "summary.md",
+            "sha256": "a3f99741e310ed2d1b4514df69082dadcfd578ff3d3e873710692376fef982eb",
+            "size_bytes": 290
+          },
+          {
+            "path": "private_trade_finance_settlement.compiled_digest_linkage.json",
+            "sha256": "63067e94b36be451f8b2b034b94f78e84a0268b51aaade99556ca1f99c908eae",
+            "size_bytes": 5678
+          },
+          {
+            "path": "subsystem_prebundle.json",
+            "sha256": "2044abaccce48862f3dcf8edd4170bfb9fc467d1bb59d979f73b5a23af634316",
+            "size_bytes": 1260
+          },
+          {
+            "path": "private_trade_finance_settlement.poseidon_binding_report.json",
+            "sha256": "034571ebca67e2da49de8ff1e3074ceced5f2eead4fbbc0dc9242d82a119648d",
+            "size_bytes": 11817
+          },
+          {
+            "path": "deterministic_manifest.json",
+            "sha256": "874d59dad0e7f9f1fc1c6672678f49111a82f39ee4e617abd12312610b6fee61",
+            "size_bytes": 415
+          },
+          {
+            "path": "proofs/trade_finance_duplicate_registry_handoff.primary.proof.json",
+            "sha256": "5500448209d78cbe569a5f95094b3d80207bedc87a64b198b1d4dea5cc7d3a66",
+            "size_bytes": 2816324
+          },
+          {
+            "path": "proofs/trade_finance_settlement_binding.primary.proof.json",
+            "sha256": "db8ee5080d22e76b05e7de1f745df555a2271843b4085b2b471078a88e20ad9d",
+            "size_bytes": 5618250
+          },
+          {
+            "path": "proofs/trade_finance_disclosure_projection.primary.proof.json",
+            "sha256": "a432d29f55add11017fd57317e89a0f92c41aa343e89e1c0500442d8bd9f7006",
+            "size_bytes": 2816501
+          },
+          {
+            "path": "proofs/trade_finance_decision_core.primary.proof.json",
+            "sha256": "d80795299abd949afd1562cbb3c23f34965b23b176b9a4369c641b13d2c50fd0",
+            "size_bytes": 44809515
+          },
+          {
+            "path": "closure_artifacts.json",
+            "sha256": "fcbf90684cb97312239ea3bb9edcb870137810177588853eb8a4c86a603f1486",
+            "size_bytes": 57704
+          },
+          {
+            "path": "compiled/trade_finance_settlement_binding.primary.compiled.json",
+            "sha256": "ae3143dc56fa08dee6ed8489f93945c200aa2ffb1e14ab2ddd65f16bbecee460",
+            "size_bytes": 22186712
+          },
+          {
+            "path": "compiled/trade_finance_duplicate_registry_handoff.primary.program.json",
+            "sha256": "606c866e83af9dd44658d7d8b9afbf5fcd825d6b8b40d9caf29463404e51d627",
+            "size_bytes": 21630
+          },
+          {
+            "path": "compiled/trade_finance_decision_core.primary.compiled.json",
+            "sha256": "3c913e7fc24669176f366bc8f5f15f8585ffd15789b22a355f5514f2ec5da5e7",
+            "size_bytes": 107846414
+          },
+          {
+            "path": "compiled/trade_finance_disclosure_projection.primary.compiled.json",
+            "sha256": "ed424b16ccf7654aa58ed95dee42d772e2207311ee78cf57365c3df86ab9068b",
+            "size_bytes": 14143353
+          },
+          {
+            "path": "compiled/trade_finance_disclosure_projection.primary.program.json",
+            "sha256": "58690bf024c13010528ad1d6f5c898309fe4b9d13b8163b444c9d2e1a54cc0b3",
+            "size_bytes": 23432
+          },
+          {
+            "path": "compiled/trade_finance_duplicate_registry_handoff.primary.compiled.json",
+            "sha256": "03608805cee7a1be7fd326b5521af34433b252fe2caeb96631161259f553cb5c",
+            "size_bytes": 13692809
+          },
+          {
+            "path": "compiled/trade_finance_settlement_binding.primary.program.json",
+            "sha256": "ecdd197fff1b721c6a5101c5e086b5bce13ea1af1cf7672a149a3398adcb98ed",
+            "size_bytes": 30900
+          },
+          {
+            "path": "compiled/trade_finance_decision_core.primary.program.json",
+            "sha256": "1f4cbeef77eeb180dce87a990b4b4e4258d91924cedeb1f370671153330e9502",
+            "size_bytes": 487256
+          },
+          {
+            "path": "selective_disclosure/buyer.bundle.json",
+            "sha256": "98a7a84352f43c6b51eccbc11ec112719d38fb9797a1f3407c90efe08fd3a43e",
+            "size_bytes": 630
+          },
+          {
+            "path": "selective_disclosure/supplier.proof.json",
+            "sha256": "83a524bbd2c8a2c8e228db256e3364d0752ea346f448caf5be464bd206a8a18d",
+            "size_bytes": 2816502
+          },
+          {
+            "path": "selective_disclosure/financier.verification.json",
+            "sha256": "851f042177f9c8f3a9ebe0a1b42826f7d9461e959ad3e9e231c2abd4a93a0f43",
+            "size_bytes": 335
+          },
+          {
+            "path": "selective_disclosure/regulator.verification.json",
+            "sha256": "a01824f79bbedcb10845919f03479a748fddaf368c6214c5653f515342d63e64",
+            "size_bytes": 336
+          },
+          {
+            "path": "selective_disclosure/supplier.verification.json",
+            "sha256": "01cf68f96f870a4d9fdd5ca54e71c3092175412bf6f2d2607432884cb4a0e7d5",
+            "size_bytes": 336
+          },
+          {
+            "path": "selective_disclosure/auditor.proof.json",
+            "sha256": "a432d29f55add11017fd57317e89a0f92c41aa343e89e1c0500442d8bd9f7006",
+            "size_bytes": 2816501
+          },
+          {
+            "path": "selective_disclosure/financier.proof.json",
+            "sha256": "ba0f3d2902e6fee6d2cd028cd60a7940acf7c493b8e43edc0bd4a5c66a5b40bf",
+            "size_bytes": 2816500
+          },
+          {
+            "path": "selective_disclosure/regulator.proof.json",
+            "sha256": "efae3197759b6d6c1ef74a1ef7795b768933c0c3fc9cd8ab57c27456c9ed52af",
+            "size_bytes": 2816502
+          },
+          {
+            "path": "selective_disclosure/regulator.bundle.json",
+            "sha256": "031f1a5be887e819703c5b93d04b3efee69d3cc4fdf810ce0358112a5d0a3ed3",
+            "size_bytes": 644
+          },
+          {
+            "path": "selective_disclosure/auditor.bundle.json",
+            "sha256": "898aca0969ac3443b5b7b8a3d03b8b59166e7a7b12a14a418d756d70973c4834",
+            "size_bytes": 637
+          },
+          {
+            "path": "selective_disclosure/auditor.verification.json",
+            "sha256": "3c17367ce93923929d3252cc3fce4fe65948f59ccdf90f601a6b6439980df368",
+            "size_bytes": 334
+          },
+          {
+            "path": "selective_disclosure/supplier.bundle.json",
+            "sha256": "5f067bb381d50e5984e4605d0fe54a471e9bda410855bed248712cfb74a5aad0",
+            "size_bytes": 641
+          },
+          {
+            "path": "selective_disclosure/buyer.proof.json",
+            "sha256": "3b9139c2b52b8eca9c624d56388bd019bc031fc3ba4eac29c7a6783b529752d9",
+            "size_bytes": 2816500
+          },
+          {
+            "path": "selective_disclosure/bundle_manifest.json",
+            "sha256": "63fcf19cdb725e46b76961df7841b969dc5e2a2b8f649b6036f85791324bacbe",
+            "size_bytes": 3187
+          },
+          {
+            "path": "selective_disclosure/financier.bundle.json",
+            "sha256": "ef6243aff6fa9e8ddf59a25a2453af5ebcb23fef218f8148d94b76908e6f44ea",
+            "size_bytes": 642
+          },
+          {
+            "path": "selective_disclosure/buyer.verification.json",
+            "sha256": "a9acae7d2bb43e594d26b667f135b5db9a1e3e1eb97361bb7f824e6770dd2c35",
+            "size_bytes": 330
+          },
+          {
+            "path": "verification/trade_finance_decision_core.primary.verification.json",
+            "sha256": "075842d5d458304b7519cb6268777828994aecd039ef3a221f65403192639445",
+            "size_bytes": 888
+          },
+          {
+            "path": "verification/trade_finance_duplicate_registry_handoff.primary.verification.json",
+            "sha256": "ab1a7f95f830769a5402a7d122d6a60f4e211cdf60326c20e07ee5bba342e5ef",
+            "size_bytes": 450
+          },
+          {
+            "path": "verification/trade_finance_settlement_binding.primary.verification.json",
+            "sha256": "e8c7c0812776d6c81cca3a15fc0fda0ce31f0765bcf5f68e1b94998dd3d494fc",
+            "size_bytes": 704
+          },
+          {
+            "path": "verification/trade_finance_disclosure_projection.primary.verification.json",
+            "sha256": "8fa6603b19f39afb428c93331e08d3cf963a1804b46df51a1fe0184a13a2f7db",
+            "size_bytes": 622
+          },
+          {
+            "path": "audit/trade_finance_disclosure_projection.primary.audit.json",
+            "sha256": "005a2ca8fb8e83dec459e8708cf15fb232a9e369b3a6a1bd6dd95059c28e3b1e",
+            "size_bytes": 19692
+          },
+          {
+            "path": "audit/trade_finance_decision_core.primary.audit.json",
+            "sha256": "820c2913b995a5d9422f0feb2467ce0236a235de7d41028412af6ed5f6a1e1d6",
+            "size_bytes": 274482
+          },
+          {
+            "path": "audit/trade_finance_settlement_binding.primary.audit.json",
+            "sha256": "a0d58844b8b6ad9225301dca76a7c56d5c673dab9e6b603a3b7a8c0e23840136",
+            "size_bytes": 46206
+          },
+          {
+            "path": "audit/trade_finance_duplicate_registry_handoff.primary.audit.json",
+            "sha256": "e4c2e769934c9f3765503842306eeb99019bc18c6ca32994f96ca7a91d86ca2b",
+            "size_bytes": 24452
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/package_manifest.json",
+            "sha256": "a61804f90df47141f8631018a4f0d33ef1c2547161feb5824ee1a5f11ab91db9",
+            "size_bytes": 583
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/flow_manifest.json",
+            "sha256": "ab5844f841121972b74d1ed293cbfa1242294b76bab62ef99b40b9450c5efaf9",
+            "size_bytes": 5118
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/dispute_hold.compact",
+            "sha256": "d9bb5ee194f26d4271f5a3d652bd936b8d7c52f01e066197a0afe15576370fb7",
+            "size_bytes": 365
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/supplier_receipt_confirmation.compact",
+            "sha256": "899ae56cfaadf649a73eb995d70379e0905e7e9c8fb3d656b2fe22d069ff9171",
+            "size_bytes": 475
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/repayment_completion.compact",
+            "sha256": "163ec98230929bd36d604115271916060e46e3ee1a983466f15032f8c4419ceb",
+            "size_bytes": 409
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/disclosure_access.compact",
+            "sha256": "c75d74fe0bdb8740a1123fcbbe353808e647e36222c110825f07f068ff5e576b",
+            "size_bytes": 611
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/financing_request_registration.compact",
+            "sha256": "0e732b96fb391bc63d8630fdad302720a1174018f659c7249886fcb3bd9a4ccd",
+            "size_bytes": 616
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/contracts/compact/settlement_authorization.compact",
+            "sha256": "c49c3f8163da68e0f4354d337073a9df2cf91ed20a47f17537660dafd4ec2f7a",
+            "size_bytes": 759
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/README.md",
+            "sha256": "b85c94abd67befbea70e118fe3d4d624b48c8deffb4a3ad591623939e7318b9a",
+            "size_bytes": 322
+          },
+          {
+            "path": "midnight_package/trade-finance-settlement/src/flows.ts",
+            "sha256": "cc467ef57722ddfd832a429948db863b5fcc20f7e42e4651654bc85087ac10f6",
+            "size_bytes": 2809
+          },
+          {
+            "path": "public_outputs.json",
+            "sha256": "e536753d0a162becc69e926c3be213964cb4f389e1c6ed8829fa9b9a4d9fa68e",
+            "size_bytes": 1052
+          },
+          {
+            "path": "telemetry/private_trade_finance_settlement.telemetry_report.json",
+            "sha256": "b06cf65a1769b6ed415a7b16b4269e5c660c9233497b6b0a67f7e03e85e857e8",
+            "size_bytes": 19898
+          },
+          {
+            "path": "private_trade_finance_settlement.report.md",
+            "sha256": "230d4a50dbba98ea6e6187f79ace21b95f20686d8930a58098358910963a1d5e",
+            "size_bytes": 143392
+          },
+          {
+            "path": "operator_notes.md",
+            "sha256": "f48162a83b71a169aa0995eb29aad55a2152dc0e4702312df3f4a992bd24831d",
+            "size_bytes": 1089
+          },
+          {
+            "path": "midnight_validation/summary.json",
+            "sha256": "36a04727d264fe8309d1398b2e87c2943d0d57bc3346638b86d95322f7c9eab5",
+            "size_bytes": 3050
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/contract/index.js",
+            "sha256": "9bdf1668ca78b81616099865d148501903133959d890562b87dfb2c5d30ababa",
+            "size_bytes": 15385
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/contract/index.js.map",
+            "sha256": "464e1155b789a24e19d9c6c232b3cf2b19c48d06f80f09cf61829a98b1420a16",
+            "size_bytes": 712
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/contract/index.d.ts",
+            "sha256": "3a2bc38b5bf3cf5e2c9a90022341d2aafa2e676495b908228440a031a1e0673a",
+            "size_bytes": 1482
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/zkir/place_dispute_hold.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/zkir/place_dispute_hold.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/keys/place_dispute_hold.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/keys/place_dispute_hold.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/place_dispute_hold/compiler/contract-info.json",
+            "sha256": "6991759e2db3d76d039ce54f6398e989f0107794c1b9fdd082d10ddb6254fbc6",
+            "size_bytes": 647
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/contract/index.js",
+            "sha256": "472ac45b5c8a5a4164aee9c4199156178e116181d039756a89f86003437f35c9",
+            "size_bytes": 24534
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/contract/index.js.map",
+            "sha256": "b6e4cc5266cafc192f8d3a76c620d6d0cb730d823f3b56d0c784f8c3231ccc80",
+            "size_bytes": 1039
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/contract/index.d.ts",
+            "sha256": "88bcdf3a0307c247d9f3cee186745e240241c9289dc11b4cabf90923173ead3f",
+            "size_bytes": 1809
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/zkir/authorize_settlement.bzkir",
+            "sha256": "a90dbf27dc15176d2da150b73fdb851bd9ed175898d822b1fa4865e1dbf46064",
+            "size_bytes": 222
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/zkir/authorize_settlement.zkir",
+            "sha256": "ed0fd39e5f58749759b483e04921ff343e47c471fd2f892b81e2e8b9ef1ba38c",
+            "size_bytes": 3243
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/keys/authorize_settlement.verifier",
+            "sha256": "3c1528c326ea8b009d22d179ee643e93f753482eb21154fb580fc90343ca1f06",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/keys/authorize_settlement.prover",
+            "sha256": "c04351b9db482e8c04ab71cc73d18f04cc0ada9c7d2ff9ab688c6617c7faf4f6",
+            "size_bytes": 22552
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/authorize_settlement/compiler/contract-info.json",
+            "sha256": "4b2d79d047c283aa670d774e14a344eb635908f6837c7aa4eae8d17e471bb6de",
+            "size_bytes": 956
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_financier/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_auditor/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/contract/index.js",
+            "sha256": "883458d137cefa7a8ad807517ffd3ee41f9989ef2f547b76f07050b0e184adf9",
+            "size_bytes": 15686
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/contract/index.js.map",
+            "sha256": "3e28e1caf757117a513c48dee5e4fae75d1c861f7e17d5365efa0b5b7f49a1b3",
+            "size_bytes": 724
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/contract/index.d.ts",
+            "sha256": "483f03c4132d3bb567e0df40e47c4a2bc4b9abb02c8a8955f398cb9e1a67fd4c",
+            "size_bytes": 1519
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/zkir/complete_buyer_repayment.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/zkir/complete_buyer_repayment.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/keys/complete_buyer_repayment.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/keys/complete_buyer_repayment.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/complete_buyer_repayment/compiler/contract-info.json",
+            "sha256": "673058281293bd39c29fd516f081ac326447e895938b7238c3d361866f09576a",
+            "size_bytes": 667
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_buyer/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/contract/index.js",
+            "sha256": "f48fd24fe579c2ef125b19319ce3d0cec9f45cfc59fa406822a37183142ec3af",
+            "size_bytes": 15720
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/contract/index.js.map",
+            "sha256": "daaaefabdaed22678cc2a260f1bc48feab1610843c9a9a82b8a8955d0c784fda",
+            "size_bytes": 736
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/contract/index.d.ts",
+            "sha256": "f3255a2a8dc45399ff14dbad888553155b180d2f083f98300434ee388498dfa2",
+            "size_bytes": 1552
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/zkir/confirm_supplier_receipt.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/zkir/confirm_supplier_receipt.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/keys/confirm_supplier_receipt.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/keys/confirm_supplier_receipt.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/confirm_supplier_receipt/compiler/contract-info.json",
+            "sha256": "d126589b3614e57d3cb69b0790c33d2cee69323b6e2414655ae867fb4eaf0e86",
+            "size_bytes": 672
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_supplier/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/grant_disclosure_view_regulator/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/contract/index.js",
+            "sha256": "be44ed638538ee9efe9daf297427f9d44dc159298328fc72ac6efea8837a17b6",
+            "size_bytes": 23262
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/contract/index.js.map",
+            "sha256": "4a9b783ef037b82fe518830257dae313ec0e752e7059efce85b9dc85ca1e380a",
+            "size_bytes": 966
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/contract/index.d.ts",
+            "sha256": "68a7a5a4fccc91c0d43fb6a1032a19e8579dc5470bccffdda8d6d7e4ccea3841",
+            "size_bytes": 1687
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/zkir/register_financing_request.bzkir",
+            "sha256": "43df27a593f0a3903e948ae45a4c820ce0bd1aa31bc6b77102b96c33ca026250",
+            "size_bytes": 221
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/zkir/register_financing_request.zkir",
+            "sha256": "4a25a4e27eac47fe68d797275c8248a24c4af0dfb9c48aa44a871c1da0410945",
+            "size_bytes": 3200
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/keys/register_financing_request.prover",
+            "sha256": "6292fb46ad5f7bbf29ac33bb0b3905d33610e0cfc3874db4e7fcea5e72b28b6c",
+            "size_bytes": 23014
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/keys/register_financing_request.verifier",
+            "sha256": "3340c03d9117c54d8c0390171750083c173ae1a213b9811afabccbeda8300de6",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/call_prepare_assets/register_financing_request/compiler/contract-info.json",
+            "sha256": "34edb9747c76cf41dfa3812ebb9c700af0660eca70d79a52b1f64d2b2b6b0b9b",
+            "size_bytes": 824
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/contract/index.js",
+            "sha256": "883458d137cefa7a8ad807517ffd3ee41f9989ef2f547b76f07050b0e184adf9",
+            "size_bytes": 15686
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/contract/index.js.map",
+            "sha256": "3e28e1caf757117a513c48dee5e4fae75d1c861f7e17d5365efa0b5b7f49a1b3",
+            "size_bytes": 724
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/contract/index.d.ts",
+            "sha256": "483f03c4132d3bb567e0df40e47c4a2bc4b9abb02c8a8955f398cb9e1a67fd4c",
+            "size_bytes": 1519
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/zkir/complete_buyer_repayment.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/zkir/complete_buyer_repayment.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/keys/complete_buyer_repayment.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/keys/complete_buyer_repayment.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/repayment_completion/compiler/contract-info.json",
+            "sha256": "673058281293bd39c29fd516f081ac326447e895938b7238c3d361866f09576a",
+            "size_bytes": 667
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/contract/index.js",
+            "sha256": "be44ed638538ee9efe9daf297427f9d44dc159298328fc72ac6efea8837a17b6",
+            "size_bytes": 23262
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/contract/index.js.map",
+            "sha256": "4a9b783ef037b82fe518830257dae313ec0e752e7059efce85b9dc85ca1e380a",
+            "size_bytes": 966
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/contract/index.d.ts",
+            "sha256": "68a7a5a4fccc91c0d43fb6a1032a19e8579dc5470bccffdda8d6d7e4ccea3841",
+            "size_bytes": 1687
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/zkir/register_financing_request.bzkir",
+            "sha256": "43df27a593f0a3903e948ae45a4c820ce0bd1aa31bc6b77102b96c33ca026250",
+            "size_bytes": 221
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/zkir/register_financing_request.zkir",
+            "sha256": "4a25a4e27eac47fe68d797275c8248a24c4af0dfb9c48aa44a871c1da0410945",
+            "size_bytes": 3200
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/keys/register_financing_request.prover",
+            "sha256": "6292fb46ad5f7bbf29ac33bb0b3905d33610e0cfc3874db4e7fcea5e72b28b6c",
+            "size_bytes": 23014
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/keys/register_financing_request.verifier",
+            "sha256": "3340c03d9117c54d8c0390171750083c173ae1a213b9811afabccbeda8300de6",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/financing_request_registration/compiler/contract-info.json",
+            "sha256": "34edb9747c76cf41dfa3812ebb9c700af0660eca70d79a52b1f64d2b2b6b0b9b",
+            "size_bytes": 824
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/contract/index.js",
+            "sha256": "f48fd24fe579c2ef125b19319ce3d0cec9f45cfc59fa406822a37183142ec3af",
+            "size_bytes": 15720
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/contract/index.js.map",
+            "sha256": "daaaefabdaed22678cc2a260f1bc48feab1610843c9a9a82b8a8955d0c784fda",
+            "size_bytes": 736
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/contract/index.d.ts",
+            "sha256": "f3255a2a8dc45399ff14dbad888553155b180d2f083f98300434ee388498dfa2",
+            "size_bytes": 1552
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/zkir/confirm_supplier_receipt.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/zkir/confirm_supplier_receipt.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/keys/confirm_supplier_receipt.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/keys/confirm_supplier_receipt.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/supplier_receipt_confirmation/compiler/contract-info.json",
+            "sha256": "d126589b3614e57d3cb69b0790c33d2cee69323b6e2414655ae867fb4eaf0e86",
+            "size_bytes": 672
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/contract/index.js.map",
+            "sha256": "081f1db7296817dd66e913507163610bc502319ab52f413df2d7189261b48637",
+            "size_bytes": 879
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/disclosure_access/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/contract/index.js",
+            "sha256": "9bdf1668ca78b81616099865d148501903133959d890562b87dfb2c5d30ababa",
+            "size_bytes": 15385
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/contract/index.js.map",
+            "sha256": "464e1155b789a24e19d9c6c232b3cf2b19c48d06f80f09cf61829a98b1420a16",
+            "size_bytes": 712
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/contract/index.d.ts",
+            "sha256": "3a2bc38b5bf3cf5e2c9a90022341d2aafa2e676495b908228440a031a1e0673a",
+            "size_bytes": 1482
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/zkir/place_dispute_hold.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/zkir/place_dispute_hold.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/keys/place_dispute_hold.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/keys/place_dispute_hold.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/dispute_hold/compiler/contract-info.json",
+            "sha256": "6991759e2db3d76d039ce54f6398e989f0107794c1b9fdd082d10ddb6254fbc6",
+            "size_bytes": 647
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/contract/index.js",
+            "sha256": "472ac45b5c8a5a4164aee9c4199156178e116181d039756a89f86003437f35c9",
+            "size_bytes": 24534
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/contract/index.js.map",
+            "sha256": "b6e4cc5266cafc192f8d3a76c620d6d0cb730d823f3b56d0c784f8c3231ccc80",
+            "size_bytes": 1039
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/contract/index.d.ts",
+            "sha256": "88bcdf3a0307c247d9f3cee186745e240241c9289dc11b4cabf90923173ead3f",
+            "size_bytes": 1809
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/zkir/authorize_settlement.bzkir",
+            "sha256": "a90dbf27dc15176d2da150b73fdb851bd9ed175898d822b1fa4865e1dbf46064",
+            "size_bytes": 222
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/zkir/authorize_settlement.zkir",
+            "sha256": "ed0fd39e5f58749759b483e04921ff343e47c471fd2f892b81e2e8b9ef1ba38c",
+            "size_bytes": 3243
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/keys/authorize_settlement.verifier",
+            "sha256": "3c1528c326ea8b009d22d179ee643e93f753482eb21154fb580fc90343ca1f06",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/keys/authorize_settlement.prover",
+            "sha256": "c04351b9db482e8c04ab71cc73d18f04cc0ada9c7d2ff9ab688c6617c7faf4f6",
+            "size_bytes": 22552
+          },
+          {
+            "path": "midnight_validation/deploy_prepare_assets/settlement_authorization/compiler/contract-info.json",
+            "sha256": "4b2d79d047c283aa670d774e14a344eb635908f6837c7aa4eae8d17e471bb6de",
+            "size_bytes": 956
+          },
+          {
+            "path": "midnight_validation/midnight_status.json",
+            "sha256": "d04e1c2c50c0177fc007dc8a390452b04760010d673cca892f3044c8de809a92",
+            "size_bytes": 1394
+          },
+          {
+            "path": "midnight_validation/admission/settlement_authorization.json",
+            "sha256": "71f48bf80c6d67df3a7fb4fc5f1b0cc604b7b381bee6c28bad7c0e3e1e94b4d9",
+            "size_bytes": 304
+          },
+          {
+            "path": "midnight_validation/admission/financing_request_registration.json",
+            "sha256": "dcaf0e98711ee8f9feb05bcde1a35a1d05bd9a819fbd90b96d98d7fe87283b61",
+            "size_bytes": 316
+          },
+          {
+            "path": "midnight_validation/admission/repayment_completion.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/admission/dispute_hold.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/admission/disclosure_access.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/admission/supplier_receipt_confirmation.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/admission/financing_request_registration.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/admission/dispute_hold.json",
+            "sha256": "c9fce3f586a4e9c29581896ec0c1524b3ea6c6c566e71289aefe5da91c6cedff",
+            "size_bytes": 280
+          },
+          {
+            "path": "midnight_validation/admission/repayment_completion.json",
+            "sha256": "3b6807d710dc8fefbf530510339617e4168c0dbd4c3a891797a13acf401695f7",
+            "size_bytes": 296
+          },
+          {
+            "path": "midnight_validation/admission/disclosure_access.json",
+            "sha256": "f18ba3e671012436c1209d507e49a04899f75babc1970d3a329280d7763fa56d",
+            "size_bytes": 290
+          },
+          {
+            "path": "midnight_validation/admission/supplier_receipt_confirmation.json",
+            "sha256": "ca55cdbd282d8ab06af5d2858a6e42702b0d1f17a5598577e66f76529b9ec935",
+            "size_bytes": 314
+          },
+          {
+            "path": "midnight_validation/admission/settlement_authorization.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/gateway_ready.body",
+            "sha256": "1c40c79418fbf3d0fa0a02f9c3512f885defee9ae838f9028a481e6a4b241154",
+            "size_bytes": 67
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/contract/index.js",
+            "sha256": "883458d137cefa7a8ad807517ffd3ee41f9989ef2f547b76f07050b0e184adf9",
+            "size_bytes": 15686
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/contract/index.js.map",
+            "sha256": "8c99d4b5bb1a619830c18d1388b2fa9364c548d822b08b101bd962be1f24cd27",
+            "size_bytes": 727
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/contract/index.d.ts",
+            "sha256": "483f03c4132d3bb567e0df40e47c4a2bc4b9abb02c8a8955f398cb9e1a67fd4c",
+            "size_bytes": 1519
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/zkir/complete_buyer_repayment.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/zkir/complete_buyer_repayment.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/keys/complete_buyer_repayment.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/keys/complete_buyer_repayment.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/compiled/repayment_completion/compiler/contract-info.json",
+            "sha256": "673058281293bd39c29fd516f081ac326447e895938b7238c3d361866f09576a",
+            "size_bytes": 667
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/contract/index.js",
+            "sha256": "be44ed638538ee9efe9daf297427f9d44dc159298328fc72ac6efea8837a17b6",
+            "size_bytes": 23262
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/contract/index.js.map",
+            "sha256": "55afa90919c233baea6d92c3db105345f755dde5e0c861076264bc9717ae379f",
+            "size_bytes": 969
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/contract/index.d.ts",
+            "sha256": "68a7a5a4fccc91c0d43fb6a1032a19e8579dc5470bccffdda8d6d7e4ccea3841",
+            "size_bytes": 1687
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/zkir/register_financing_request.bzkir",
+            "sha256": "43df27a593f0a3903e948ae45a4c820ce0bd1aa31bc6b77102b96c33ca026250",
+            "size_bytes": 221
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/zkir/register_financing_request.zkir",
+            "sha256": "4a25a4e27eac47fe68d797275c8248a24c4af0dfb9c48aa44a871c1da0410945",
+            "size_bytes": 3200
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/keys/register_financing_request.prover",
+            "sha256": "6292fb46ad5f7bbf29ac33bb0b3905d33610e0cfc3874db4e7fcea5e72b28b6c",
+            "size_bytes": 23014
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/keys/register_financing_request.verifier",
+            "sha256": "3340c03d9117c54d8c0390171750083c173ae1a213b9811afabccbeda8300de6",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/financing_request_registration/compiler/contract-info.json",
+            "sha256": "34edb9747c76cf41dfa3812ebb9c700af0660eca70d79a52b1f64d2b2b6b0b9b",
+            "size_bytes": 824
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/contract/index.js",
+            "sha256": "f48fd24fe579c2ef125b19319ce3d0cec9f45cfc59fa406822a37183142ec3af",
+            "size_bytes": 15720
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/contract/index.js.map",
+            "sha256": "8a3f6cad078db2eb8be9b92299245645bbc7bbb148fa9492c3f3245f25bcfe13",
+            "size_bytes": 739
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/contract/index.d.ts",
+            "sha256": "f3255a2a8dc45399ff14dbad888553155b180d2f083f98300434ee388498dfa2",
+            "size_bytes": 1552
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/zkir/confirm_supplier_receipt.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/zkir/confirm_supplier_receipt.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/keys/confirm_supplier_receipt.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/keys/confirm_supplier_receipt.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/compiled/supplier_receipt_confirmation/compiler/contract-info.json",
+            "sha256": "d126589b3614e57d3cb69b0790c33d2cee69323b6e2414655ae867fb4eaf0e86",
+            "size_bytes": 672
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/contract/index.js",
+            "sha256": "719e4c1f51f5e68a11fab6f7858a272019c15d9c459916202c71233241f9e92e",
+            "size_bytes": 20161
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/contract/index.js.map",
+            "sha256": "1392f5e067785c98d05f1a0462c0065e68a093387ae8db07eaca8f65f82364f0",
+            "size_bytes": 882
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/contract/index.d.ts",
+            "sha256": "0e31710986cf94bb7e4137ff0ac52b146b5a813116668620f25369ef6dbf0a9f",
+            "size_bytes": 1673
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/zkir/grant_disclosure_view.zkir",
+            "sha256": "2f9b7c1c585940ae6fed64deb1c871379349bcd1bec849913f1b2dde3d6912f2",
+            "size_bytes": 2518
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/zkir/grant_disclosure_view.bzkir",
+            "sha256": "3fe7bb5826bbf9b840ce20d2f61f80b9ea115a3447bc55b787c7c7c323d8f4dc",
+            "size_bytes": 184
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/keys/grant_disclosure_view.prover",
+            "sha256": "f06c552c38b34105333b7f018bb325462e7606058848d0aa5386fb0d0686bc78",
+            "size_bytes": 22979
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/keys/grant_disclosure_view.verifier",
+            "sha256": "ecc1964140e565d2a0d6d9c0373b1658911d28119aef653b2936ce7c260c049e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/disclosure_access/compiler/contract-info.json",
+            "sha256": "37536c9b30b7085307b00a6e2791dfdedfaa33b40ff1bffb2f0c23e1eba4732e",
+            "size_bytes": 835
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/contract/index.js",
+            "sha256": "9bdf1668ca78b81616099865d148501903133959d890562b87dfb2c5d30ababa",
+            "size_bytes": 15385
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/contract/index.js.map",
+            "sha256": "d765fea1f0bb18d256404a41e99fd12ecb31fc85239205df23663d275a0317c6",
+            "size_bytes": 715
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/contract/index.d.ts",
+            "sha256": "3a2bc38b5bf3cf5e2c9a90022341d2aafa2e676495b908228440a031a1e0673a",
+            "size_bytes": 1482
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/zkir/place_dispute_hold.bzkir",
+            "sha256": "7cb358d98148b70f1c2a4edf76060d3e727e660e73c396fbe677ee168e43a314",
+            "size_bytes": 145
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/zkir/place_dispute_hold.zkir",
+            "sha256": "e542ae21cb800ed8ce48f2b810d8cca72ff78bcf798f78e6f4ed87815ac60fb2",
+            "size_bytes": 1786
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/keys/place_dispute_hold.prover",
+            "sha256": "3bcb32f3c19b47c2e488d505f2d16be9d7a857373146a2f36544eb16f4d68b36",
+            "size_bytes": 22468
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/keys/place_dispute_hold.verifier",
+            "sha256": "a2225b9ee086da97b4a8c6ca8db8907c2d8e2dc49b74c3394b965f84c5526c1e",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/dispute_hold/compiler/contract-info.json",
+            "sha256": "6991759e2db3d76d039ce54f6398e989f0107794c1b9fdd082d10ddb6254fbc6",
+            "size_bytes": 647
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/contract/index.js",
+            "sha256": "472ac45b5c8a5a4164aee9c4199156178e116181d039756a89f86003437f35c9",
+            "size_bytes": 24534
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/contract/index.js.map",
+            "sha256": "d65ab13c73f93b517db1de7ca6a0e5de06c70b421016f0a71f4fba4743b1b5ea",
+            "size_bytes": 1042
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/contract/index.d.ts",
+            "sha256": "88bcdf3a0307c247d9f3cee186745e240241c9289dc11b4cabf90923173ead3f",
+            "size_bytes": 1809
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/zkir/authorize_settlement.bzkir",
+            "sha256": "a90dbf27dc15176d2da150b73fdb851bd9ed175898d822b1fa4865e1dbf46064",
+            "size_bytes": 222
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/zkir/authorize_settlement.zkir",
+            "sha256": "ed0fd39e5f58749759b483e04921ff343e47c471fd2f892b81e2e8b9ef1ba38c",
+            "size_bytes": 3243
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/keys/authorize_settlement.verifier",
+            "sha256": "3c1528c326ea8b009d22d179ee643e93f753482eb21154fb580fc90343ca1f06",
+            "size_bytes": 1351
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/keys/authorize_settlement.prover",
+            "sha256": "c04351b9db482e8c04ab71cc73d18f04cc0ada9c7d2ff9ab688c6617c7faf4f6",
+            "size_bytes": 22552
+          },
+          {
+            "path": "midnight_validation/compiled/settlement_authorization/compiler/contract-info.json",
+            "sha256": "4b2d79d047c283aa670d774e14a344eb635908f6837c7aa4eae8d17e471bb6de",
+            "size_bytes": 956
+          },
+          {
+            "path": "midnight_validation/compile/settlement_authorization.json",
+            "sha256": "e1b7c58f1f7817908e1496e4432f1ae638ff9e4d9481d9187c74022410ef54f1",
+            "size_bytes": 646
+          },
+          {
+            "path": "midnight_validation/compile/financing_request_registration.json",
+            "sha256": "a4c935f6bd99cbf5c54cb8f3358dd07498e7dd2c803728932798885ec9b1a183",
+            "size_bytes": 670
+          },
+          {
+            "path": "midnight_validation/compile/dispute_hold.json",
+            "sha256": "1aed0568dc7f74c49c37ca7ed7b69ef11ff79f7738e24e8af2c18576709a26b1",
+            "size_bytes": 608
+          },
+          {
+            "path": "midnight_validation/compile/repayment_completion.json",
+            "sha256": "56be3f8aeaae421587f0a5beb9fe2d801ce9e721ed2a5d070fcc99d6af38287a",
+            "size_bytes": 638
+          },
+          {
+            "path": "midnight_validation/compile/disclosure_access.json",
+            "sha256": "c557c671b0d5b07094cd799974adcd2b8fade00b725b9caa3a7364806fa6b26e",
+            "size_bytes": 626
+          },
+          {
+            "path": "midnight_validation/compile/supplier_receipt_confirmation.json",
+            "sha256": "28ab7dc1a703de1eb28bd593c19a882f23aae2743302dd9ed09fc4e6512822a3",
+            "size_bytes": 665
+          },
+          {
+            "path": "midnight_validation/gateway_ready.json",
+            "sha256": "c48c56cf376ad4a13261c88fa44f71d4da17b69363e9b1ab21f11fc391cb7113",
+            "size_bytes": 109
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/settlement_authorization.json",
+            "sha256": "8c057162e75833bab3469ff56caaadb5761dafe8e3fcc618bd5da80adffd9755",
+            "size_bytes": 1664
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/financing_request_registration.json",
+            "sha256": "6ab54375f9941c5ee54de7955f1a2402285c6ca87403a654936dd2638945abbb",
+            "size_bytes": 1718
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/dispute_hold.json",
+            "sha256": "8b81cfc382349d227bee2210d03f1c9bb6e257b431c4c8b83f772b9522eb16e2",
+            "size_bytes": 1566
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/repayment_completion.json",
+            "sha256": "e4de5f8f70ba12bbcda558004bc90a65eb941cfef27a1b21a9821d9440983bee",
+            "size_bytes": 1636
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/disclosure_access.json",
+            "sha256": "aee5f07af46c74402873a4ce1ea3a80e7b53f9936d49f1b97a7c1c6dc002401e",
+            "size_bytes": 1609
+          },
+          {
+            "path": "midnight_validation/deploy_prepare/supplier_receipt_confirmation.json",
+            "sha256": "02c7901f9dad91ab589dedf2525cbbc2153174e5e5c8429b44f02a86f3fc8f53",
+            "size_bytes": 1708
+          },
+          {
+            "path": "midnight_validation/call_prepare/grant_disclosure_view_buyer.json",
+            "sha256": "a356c75de43bbf937626c17c4d1006c8fd9fa7c0cb660b375d8218d562d0d113",
+            "size_bytes": 1850
+          },
+          {
+            "path": "midnight_validation/call_prepare/grant_disclosure_view_regulator.json",
+            "sha256": "b38b2aa8dfc1f37019001956104e8346a5ac9165af088125c342f82b6d78dad1",
+            "size_bytes": 1878
+          },
+          {
+            "path": "midnight_validation/call_prepare/place_dispute_hold.json",
+            "sha256": "970ccb4fd7807f79be2af739d8e008d2881ac3a15e3699d1ad87351ec11597aa",
+            "size_bytes": 1771
+          },
+          {
+            "path": "midnight_validation/call_prepare/authorize_settlement.json",
+            "sha256": "4eb1b99219196b91c12f48cf01bd73c8f2a1aebe124096b6c3f52c25572bce94",
+            "size_bytes": 1813
+          },
+          {
+            "path": "midnight_validation/call_prepare/complete_buyer_repayment.json",
+            "sha256": "7ee4dd30ea3322fd12d2be1868e9ac0385652d717c8a16cf49f805baa937810a",
+            "size_bytes": 1841
+          },
+          {
+            "path": "midnight_validation/call_prepare/grant_disclosure_view_financier.json",
+            "sha256": "2a4ae9dad3d967e9e5853d526740cfe451a568986b439cd16fa64881516e07f1",
+            "size_bytes": 1878
+          },
+          {
+            "path": "midnight_validation/call_prepare/register_financing_request.json",
+            "sha256": "f8b017193db8b7a7e058d559ac90f7746540c5d38429a602df1c37a1d0d6ea2b",
+            "size_bytes": 1879
+          },
+          {
+            "path": "midnight_validation/call_prepare/grant_disclosure_view_supplier.json",
+            "sha256": "d6940074f0c291bce9cbcbfb3a3af082f42298b4309447a9b5488674d7a66486",
+            "size_bytes": 1871
+          },
+          {
+            "path": "midnight_validation/call_prepare/grant_disclosure_view_auditor.json",
+            "sha256": "fd7d1089def9870307bd74162a9f45952888eb9d3b99e970a48fd70676cc3b41",
+            "size_bytes": 1864
+          },
+          {
+            "path": "midnight_validation/call_prepare/confirm_supplier_receipt.json",
+            "sha256": "6dacd6cb57f031fc82d1bf4421bb61b9c7a44c7e981bb488fa7586693bf3efaf",
+            "size_bytes": 1859
+          },
+          {
+            "path": "midnight_validation/inputs/grant_disclosure_view_buyer.json",
+            "sha256": "ffe03689c74c2ceca57ca815055cfd86dc905ce7d8a72dff8e3017c00dfbe96a",
+            "size_bytes": 258
+          },
+          {
+            "path": "midnight_validation/inputs/grant_disclosure_view_regulator.json",
+            "sha256": "1216eb20fc62feb7253ef70dab38398dcee56fe9ad06791a6e55a94c98b0e0de",
+            "size_bytes": 260
+          },
+          {
+            "path": "midnight_validation/inputs/place_dispute_hold.json",
+            "sha256": "a2131f887bcee344a83c9b1b29fa4d545d6c60893687b684716568b9b039cfd9",
+            "size_bytes": 133
+          },
+          {
+            "path": "midnight_validation/inputs/authorize_settlement.json",
+            "sha256": "cdebffc8f62322484b17a5573eacf61ac21b554887938ab40ecfada56528b828",
+            "size_bytes": 371
+          },
+          {
+            "path": "midnight_validation/inputs/complete_buyer_repayment.json",
+            "sha256": "f881981c3543c0f743e1f771709375378001505d0571b57c30de3a440fa6e2aa",
+            "size_bytes": 146
+          },
+          {
+            "path": "midnight_validation/inputs/grant_disclosure_view_financier.json",
+            "sha256": "3fa15cc24de66bc901ed71b9b0447053604f95ca0d0f30e7faf3f87813d48e08",
+            "size_bytes": 259
+          },
+          {
+            "path": "midnight_validation/inputs/register_financing_request.json",
+            "sha256": "0959a3c529a863762becd67e37290d37538751be439b02dd1b2c277d4416eae8",
+            "size_bytes": 245
+          },
+          {
+            "path": "midnight_validation/inputs/grant_disclosure_view_supplier.json",
+            "sha256": "f620d9b19fb335988590836fa54f5673557d055a9e088e1964d848609c35f3d1",
+            "size_bytes": 261
+          },
+          {
+            "path": "midnight_validation/inputs/grant_disclosure_view_auditor.json",
+            "sha256": "019950ad19910794964b3c4e1b9c458db2e29cb29bcf455d0f53aca34c5735ac",
+            "size_bytes": 260
+          },
+          {
+            "path": "midnight_validation/inputs/confirm_supplier_receipt.json",
+            "sha256": "9290463311c9b48d0205138c3db9528b7490033fa1e0716fa65e9bf8692f6d6d",
+            "size_bytes": 152
+          },
+          {
+            "path": "deployment_notes.md",
+            "sha256": "e7a7772790e0f647b4f367fa8f8eb72c9ecafd2b61b2bc02f30bc75569b6d26c",
+            "size_bytes": 990
+          },
+          {
+            "path": "public_inputs.json",
+            "sha256": "107075b9c89dbca56811276611ebc348ea71de908675e9df94092e91ac9bd1a0",
+            "size_bytes": 687
+          },
+          {
+            "path": "witness_summary.json",
+            "sha256": "c7df66edcc242a59c0b0bd20fc1cdfb643547bca2b4f2b9108b73dfc7bf0dfab",
+            "size_bytes": 1012
+          },
+          {
+            "path": "private_trade_finance_settlement.run_report.json",
+            "sha256": "0a26e6b9174adddb60439911b1831eec7423df58956b89cc6a148fddc699023d",
+            "size_bytes": 585
+          }
+        ],
+        "schema": "trade-finance-evidence-summary-v1"
+      },
+      "formal": {
+        "files": {
+          "exercised_surfaces": "formal/exercised_surfaces.json",
+          "logs": [
+            "formal/rocq_trade_finance.log",
+            "formal/lean_trade_finance.log",
+            "formal/verus_trade_finance.log"
+          ],
+          "status": "formal/STATUS.md"
+        },
+        "runs": [
+          {
+            "command": "bash scripts/run_rocq_trade_finance_proofs.sh",
+            "execution_mode": "prover-executed",
+            "exit_code": 0,
+            "log_path": "formal/rocq_trade_finance.log",
+            "name": "rocq_trade_finance",
+            "status": "passed"
+          },
+          {
+            "command": "bash scripts/run_lean_trade_finance_proofs.sh",
+            "execution_mode": "prover-executed",
+            "exit_code": 0,
+            "log_path": "formal/lean_trade_finance.log",
+            "name": "lean_trade_finance",
+            "status": "passed"
+          },
+          {
+            "command": "bash scripts/run_verus_trade_finance_proofs.sh",
+            "execution_mode": "prover-executed",
+            "exit_code": 0,
+            "log_path": "formal/verus_trade_finance.log",
+            "name": "verus_trade_finance",
+            "status": "passed"
+          }
+        ],
+        "status": "included"
+      },
+      "schema": "trade-finance-evidence-summary-v1"
+    },
+    "example_path": "zkf-lib/examples/private_trade_finance_settlement_showcase.rs",
+    "export_path": "zkf-lib/src/app/private_trade_finance_settlement_export.rs",
+    "report_path": "dist/showcases/private_trade_finance_settlement/private_trade_finance_settlement.report.md",
+    "run_report": {
+      "application": "private_trade_finance_settlement_showcase",
+      "distributed_mode_requested": false,
+      "effective_core_backend": "hypernova",
+      "lane_classification": "primary-strict",
+      "primary_backend": "hypernova",
+      "profile": "flagship",
+      "schema": "trade-finance-run-report-v1",
+      "timings_ms": {
+        "compatibility_export_ms": 0.0,
+        "core_compile_ms": 5030.879833,
+        "core_runtime_prove_ms": 27071.902167,
+        "core_verify_ms": 15358.309000000001,
+        "disclosure_bundle_ms": 26206.147125,
+        "settlement_prove_ms": 6604.540959,
+        "shard_prove_ms": 4611.639125
+      }
+    },
+    "summary": {
+      "action_class": "approve",
+      "application": "private_trade_finance_settlement_showcase",
+      "compatibility_backend": "not-emitted",
+      "effective_core_backend": "hypernova",
+      "eligible_for_midnight_settlement": true,
+      "human_review_required": false,
+      "lane_classification": "primary-strict",
+      "primary_backend": "hypernova",
+      "profile": "flagship",
+      "report_word_count": 11662,
+      "schema": "trade-finance-summary-v1"
+    },
+    "validation_summary": {
+      "admission_reports_root": "admission",
+      "artifact_layout": "showcase",
+      "artifact_root": "/Users/sicarii/Desktop/ZirOS/dist/showcases/private_trade_finance_settlement",
+      "call_count": 10,
+      "call_ids": [
+        "register_financing_request",
+        "authorize_settlement",
+        "place_dispute_hold",
+        "grant_disclosure_view_supplier",
+        "grant_disclosure_view_financier",
+        "grant_disclosure_view_buyer",
+        "grant_disclosure_view_auditor",
+        "grant_disclosure_view_regulator",
+        "complete_buyer_repayment",
+        "confirm_supplier_receipt"
+      ],
+      "call_prepare_assets_root": "call_prepare_assets",
+      "call_prepare_reports_root": "call_prepare",
+      "compile_reports_root": "compile",
+      "contract_count": 6,
+      "contracts": [
+        "contracts/compact/financing_request_registration.compact",
+        "contracts/compact/settlement_authorization.compact",
+        "contracts/compact/dispute_hold.compact",
+        "contracts/compact/disclosure_access.compact",
+        "contracts/compact/repayment_completion.compact",
+        "contracts/compact/supplier_receipt_confirmation.compact"
+      ],
+      "deploy_prepare_assets_root": "deploy_prepare_assets",
+      "deploy_prepare_reports_root": "deploy_prepare",
+      "gateway_ready": {
+        "auth_required": true,
+        "http_code": 401,
+        "reachable": true,
+        "url": "http://127.0.0.1:6311/ready"
+      },
+      "inputs_root": "inputs",
+      "network": "preview",
+      "package_root": "/Users/sicarii/Desktop/ZirOS/dist/showcases/private_trade_finance_settlement/midnight_package/trade-finance-settlement",
+      "schema": "trade-finance-midnight-validation-summary-v1",
+      "status": {
+        "compact_manager": {
+          "available": true,
+          "binary": "compact",
+          "expected_version": "0.2.0",
+          "resolved_path": "/Users/sicarii/.local/bin/compact",
+          "version": "0.2.0"
+        },
+        "compactc": {
+          "available": true,
+          "binary": "compactc",
+          "expected_version": "0.30.0",
+          "resolved_path": "/Users/sicarii/.compact/versions/0.30.0/aarch64-darwin/compactc",
+          "version": "0.30.0"
+        },
+        "gateway": {
+          "reachable": true,
+          "status_code": 401,
+          "url": "http://127.0.0.1:6311"
+        },
+        "generated_at": "2026-04-11T19:09:10.901185+00:00",
+        "network": "preprod",
+        "proof_server": {
+          "reachable": true,
+          "status_code": 200,
+          "url": "http://127.0.0.1:6300"
+        },
+        "ready": true,
+        "schema": "zkf-midnight-status-v1",
+        "support_matrix_row": {
+          "assurance_lane": "delegated-or-external-lane",
+          "id": "midnight-compact",
+          "notes": "Midnight-first operator lane derived from typed readiness and doctor evidence. ready_for_live_submit=false blockers=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}; wallet: No browser wallet session or headless operator wallet credentials were available.; dust: DUST balance is not checkable from a bare CLI process. advisories=gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+          "proof_semantics": "external-or-delegated",
+          "status": "ready"
+        }
+      }
+    }
+  },
+  "truth_surfaces": [
+    "AGENTS.md",
+    "docs/CANONICAL_TRUTH.md",
+    ".zkf-completion-status.json",
+    "zkf-ir-spec/verification-ledger.json",
+    "support-matrix.json"
+  ]
+}

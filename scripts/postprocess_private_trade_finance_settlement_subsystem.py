@@ -23,7 +23,11 @@ DASHBOARD_TSX = 'export function Dashboard() {\n  return (\n    <main>\n      <h
 WITNESS_MJS = 'import { localProofServer } from "./proof-server.mjs";\n\nconst payload = {\n  witnessExported: false,\n  reason: "No private witness bundle is shipped in the public trade-finance package.",\n  publicInputsPath: "03_inputs/public_inputs.json",\n  publicOutputsPath: "03_inputs/public_outputs.json",\n  contractCallExamplesPath: "17_report/midnight_validation/inputs",\n  proving: localProofServer()\n};\n\nconsole.log(JSON.stringify(payload, null, 2));\n'
 PROVE_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n\necho "private_trade_finance_settlement_subsystem does not ship a private witness bundle in the public package." >&2\necho "Re-prove from the private operator/exporter lane using the flagship trade_finance_decision_core.primary witness material." >&2\necho "Public references remain available at $ROOT/03_inputs/public_inputs.json and $ROOT/03_inputs/public_outputs.json." >&2\nexit 64\n'
 VERIFY_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\nBIN="${ZKF_SUBSYSTEM_ZKF_BIN:-$ROOT/20_release/bin/zkf}"\nARTIFACT="${1:-$ROOT/08_proofs/proof.json}"\n\nif [[ $# -gt 1 ]]; then\n  echo "usage: verify.sh [proof.json]" >&2\n  exit 64\nfi\nif [[ "${1:-}" == --* ]]; then\n  echo "backend and engine overrides are not accepted by this subsystem wrapper" >&2\n  exit 64\nfi\n\n"$BIN" verify \\\n  --program "$ROOT/07_compiled/program.json" \\\n  --compiled "$ROOT/07_compiled/compiled.json" \\\n  --artifact "$ARTIFACT" \\\n  --backend "hypernova"\n\nprintf \'subsystem %s verified with primary backend %s\\n\' "private_trade_finance_settlement_subsystem" "hypernova"\n'
-DEPLOY_MIDNIGHT_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\nBIN="${ZKF_SUBSYSTEM_ZIROS_BIN:-${ZKF_SUBSYSTEM_ZKF_BIN:-$ROOT/20_release/bin/ziros}}"\nNETWORK="${2:-preprod}"\nCONTRACT_ID="${1:-financing_request_registration}"\nCONTRACT_PATH="$ROOT/16_compact/trade-finance-settlement/contracts/compact/${CONTRACT_ID}.compact"\nOUT_PATH="${3:-$ROOT/17_report/midnight_validation/deploy_prepare/${CONTRACT_ID}.json}"\n\nif [[ ! -f "$CONTRACT_PATH" ]]; then\n  echo "unknown trade-finance contract id: $CONTRACT_ID" >&2\n  echo "expected file: $CONTRACT_PATH" >&2\n  exit 64\nfi\n\nmkdir -p "$(dirname "$OUT_PATH")"\n"$BIN" midnight contract deploy-prepare \\\n  --source "$CONTRACT_PATH" \\\n  --out "$OUT_PATH" \\\n  --network "$NETWORK" \\\n  --json > /dev/null\n\nprintf \'prepared %s for %s at %s\\n\' "$CONTRACT_ID" "$NETWORK" "$OUT_PATH"\n'
+DEPLOY_MIDNIGHT_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\nBIN="${ZKF_SUBSYSTEM_ZIROS_BIN:-${ZKF_SUBSYSTEM_ZKF_BIN:-$ROOT/20_release/bin/zkf}}"\nNETWORK="${2:-preprod}"\nCONTRACT_ID="${1:-financing_request_registration}"\nCONTRACT_PATH="$ROOT/16_compact/trade-finance-settlement/contracts/compact/${CONTRACT_ID}.compact"\nOUT_PATH="${3:-$ROOT/17_report/midnight_validation/deploy_prepare/${CONTRACT_ID}.json}"\n\nif [[ ! -f "$CONTRACT_PATH" ]]; then\n  echo "unknown trade-finance contract id: $CONTRACT_ID" >&2\n  echo "expected file: $CONTRACT_PATH" >&2\n  exit 64\nfi\n\nmkdir -p "$(dirname "$OUT_PATH")"\n"$BIN" midnight contract deploy-prepare \\\n  --source "$CONTRACT_PATH" \\\n  --out "$OUT_PATH" \\\n  --network "$NETWORK" \\\n  --json > /dev/null\n\nprintf \'prepared %s for %s at %s\\n\' "$CONTRACT_ID" "$NETWORK" "$OUT_PATH"\n'
+LEAN_PROOF_STUB_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n\necho "public subsystem package does not ship Lean theorem sources or repo proof tooling." >&2\necho "inspect shipped evidence instead: $ROOT/17_report/formal/lean_trade_finance.log and $ROOT/17_report/formal/certificates/." >&2\nexit 64\n'
+ROCQ_PROOF_STUB_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n\necho "public subsystem package does not ship Rocq theorem sources or repo proof tooling." >&2\necho "inspect shipped evidence instead: $ROOT/17_report/formal/rocq_trade_finance.log and $ROOT/17_report/formal/certificates/." >&2\nexit 64\n'
+VERUS_PROOF_STUB_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n\necho "public subsystem package does not ship Verus source capsules or repo proof tooling." >&2\necho "inspect shipped evidence instead: $ROOT/17_report/formal/verus_trade_finance.log and $ROOT/17_report/formal/certificates/." >&2\nexit 64\n'
+MATERIALIZE_STUB_SH = '#!/usr/bin/env bash\nset -euo pipefail\n\nROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n\necho "private_trade_finance_settlement_subsystem is already a materialized public package." >&2\necho "rematerialization requires the full ZirOS repo and scripts/materialize_private_trade_finance_settlement_subsystem.sh." >&2\necho "use shipped evidence under $ROOT/17_report/ and compact sources under $ROOT/16_compact/ instead." >&2\nexit 64\n'
 SOLIDITY_STUB = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n\ncontract SubsystemVerifierRegistry {\n    string public constant SUBSYSTEM_ID = "private_trade_finance_settlement_subsystem";\n    string public constant PRIMARY_CIRCUIT_ID = "trade_finance_decision_core.primary";\n    string public constant PRIMARY_BACKEND = "hypernova";\n    string public constant NOTE = "No Solidity verifier is emitted for this Midnight/offchain package; use the verification receipts under 09_verification and the Compact contracts under 16_compact instead.";\n}\n'
 PUBLIC_BUNDLE_README = '# Public Bundle Policy\n\nPublish-safe materials for `private_trade_finance_settlement_subsystem` live here.\n\nThe intended public bundle is the trade-finance-native evidence set:\n- `02_manifest/subsystem_manifest.json`\n- `07_compiled/trade_finance_*.primary.*`\n- `08_proofs/trade_finance_*.primary.proof.json`\n- `09_verification/trade_finance_*.primary.verification.json`\n- `10_audit/trade_finance_*.primary.audit.json`\n- `16_compact/trade-finance-settlement/*`\n- `17_report/*`\n\nFor convenience, the top-level aliases `07_compiled/program.json`, `07_compiled/compiled.json`, `08_proofs/proof.json`, `09_verification/verification.json`, and `10_audit/audit.json` mirror the primary `trade_finance_decision_core.primary` artifacts.\n\nWitness inputs and other private operator material stay out of this directory and out of the persistent iCloud tree.\n'
 
@@ -107,6 +111,8 @@ def map_showcase_relative(rel: str) -> str:
 
 def provenance_rel(path_or_rel: str) -> str | None:
     text = path_or_rel
+    if text == "zkf-completion-status.json":
+        text = ".zkf-completion-status.json"
     if text in PROVENANCE_FILES:
         return f"17_report/formal/provenance/{text}"
     for rel, src in PROVENANCE_FILES.items():
@@ -174,6 +180,14 @@ def rewrite_json_file(path: Path) -> None:
 
 
 def module_entry(module_id: str, backend: str) -> dict:
+    def normalize_path(value: object, preferred_prefix: str, legacy_prefix: str) -> str:
+        text = str(value)
+        if text.startswith(preferred_prefix):
+            return text
+        if text.startswith(legacy_prefix):
+            return preferred_prefix + text[len(legacy_prefix):]
+        return preferred_prefix + text
+
     linkage_path = REPORT_ROOT / "compiled_digest_linkage.json"
     if linkage_path.is_file():
         linkage = read_json(linkage_path)
@@ -181,18 +195,48 @@ def module_entry(module_id: str, backend: str) -> dict:
             if entry.get("module_id") != module_id:
                 continue
             return {
-                "audit_path": str(entry.get("audit_path", f"audit/{module_id}.audit.json")).replace("audit/", "10_audit/"),
+                "audit_path": normalize_path(
+                    entry.get("audit_path", f"audit/{module_id}.audit.json"),
+                    "10_audit/",
+                    "audit/",
+                ),
                 "backend": entry.get("backend", backend),
-                "certificate_path": str(entry.get("certificate_path", f"formal/certificates/{module_id}.circuit_certificate.json")).replace("formal/", "17_report/formal/"),
-                "compiled_path": str(entry.get("compiled_path", f"compiled/{module_id}.compiled.json")).replace("compiled/", "07_compiled/"),
+                "certificate_path": normalize_path(
+                    entry.get(
+                        "certificate_path",
+                        f"formal/certificates/{module_id}.circuit_certificate.json",
+                    ),
+                    "17_report/formal/",
+                    "formal/",
+                ),
+                "compiled_path": normalize_path(
+                    entry.get("compiled_path", f"compiled/{module_id}.compiled.json"),
+                    "07_compiled/",
+                    "compiled/",
+                ),
                 "module_id": module_id,
                 "program_digest": entry.get("program_digest", ""),
-                "program_path": str(entry.get("program_path", f"compiled/{module_id}.program.json")).replace("compiled/", "07_compiled/"),
-                "proof_path": str(entry.get("proof_path", f"proofs/{module_id}.proof.json")).replace("proofs/", "08_proofs/"),
+                "program_path": normalize_path(
+                    entry.get("program_path", f"compiled/{module_id}.program.json"),
+                    "07_compiled/",
+                    "compiled/",
+                ),
+                "proof_path": normalize_path(
+                    entry.get("proof_path", f"proofs/{module_id}.proof.json"),
+                    "08_proofs/",
+                    "proofs/",
+                ),
                 "semantic_theorem_ids": entry.get("semantic_theorem_ids", []),
                 "source_builder": entry.get("source_builder", "unknown"),
                 "source_witness_builder": entry.get("source_witness_builder", "unknown"),
-                "verification_path": str(entry.get("verification_path", f"verification/{module_id}.verification.json")).replace("verification/", "09_verification/"),
+                "verification_path": normalize_path(
+                    entry.get(
+                        "verification_path",
+                        f"verification/{module_id}.verification.json",
+                    ),
+                    "09_verification/",
+                    "verification/",
+                ),
             }
     return {
         "audit_path": f"10_audit/{module_id}.audit.json",
@@ -217,11 +261,22 @@ def write_shell_surfaces() -> None:
     write_text(SUBSYSTEM_ROOT / "19_cli/prove.sh", PROVE_SH)
     write_text(SUBSYSTEM_ROOT / "19_cli/verify.sh", VERIFY_SH)
     write_text(SUBSYSTEM_ROOT / "05_scripts/deploy-midnight.sh", DEPLOY_MIDNIGHT_SH)
+    write_text(SUBSYSTEM_ROOT / "05_scripts/run_lean_trade_finance_proofs.sh", LEAN_PROOF_STUB_SH)
+    write_text(SUBSYSTEM_ROOT / "05_scripts/run_rocq_trade_finance_proofs.sh", ROCQ_PROOF_STUB_SH)
+    write_text(SUBSYSTEM_ROOT / "05_scripts/run_verus_trade_finance_proofs.sh", VERUS_PROOF_STUB_SH)
+    write_text(
+        SUBSYSTEM_ROOT / "05_scripts/materialize_private_trade_finance_settlement_subsystem.sh",
+        MATERIALIZE_STUB_SH,
+    )
     write_text(SUBSYSTEM_ROOT / "15_solidity/SubsystemVerifierRegistry.sol", SOLIDITY_STUB)
     write_text(SUBSYSTEM_ROOT / "13_public_bundle/README.md", PUBLIC_BUNDLE_README)
     (SUBSYSTEM_ROOT / "19_cli/prove.sh").chmod(0o755)
     (SUBSYSTEM_ROOT / "19_cli/verify.sh").chmod(0o755)
     (SUBSYSTEM_ROOT / "05_scripts/deploy-midnight.sh").chmod(0o755)
+    (SUBSYSTEM_ROOT / "05_scripts/run_lean_trade_finance_proofs.sh").chmod(0o755)
+    (SUBSYSTEM_ROOT / "05_scripts/run_rocq_trade_finance_proofs.sh").chmod(0o755)
+    (SUBSYSTEM_ROOT / "05_scripts/run_verus_trade_finance_proofs.sh").chmod(0o755)
+    (SUBSYSTEM_ROOT / "05_scripts/materialize_private_trade_finance_settlement_subsystem.sh").chmod(0o755)
 
 
 def populate_operator_dapp() -> None:
@@ -237,11 +292,14 @@ def populate_operator_dapp() -> None:
             ignore=shutil.ignore_patterns("node_modules"),
         )
     compact_src = SUBSYSTEM_ROOT / "16_compact/trade-finance-settlement/contracts/compact"
+    flow_src = SUBSYSTEM_ROOT / "16_compact/trade-finance-settlement/src"
     compiled_src = REPORT_ROOT / "midnight_validation/compiled"
     package_manifest_src = SUBSYSTEM_ROOT / "16_compact/trade-finance-settlement/package_manifest.json"
     flow_manifest_src = SUBSYSTEM_ROOT / "16_compact/trade-finance-settlement/flow_manifest.json"
     if compact_src.is_dir():
         shutil.copytree(compact_src, contracts_root / "compact", dirs_exist_ok=True)
+    if flow_src.is_dir():
+        shutil.copytree(flow_src, contracts_root / "src", dirs_exist_ok=True)
     if compiled_src.is_dir():
         shutil.copytree(compiled_src, contracts_root / "compiled", dirs_exist_ok=True)
     if package_manifest_src.is_file():

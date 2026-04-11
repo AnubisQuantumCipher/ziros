@@ -2,7 +2,13 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -L)"
-artifact_root="${1:-$repo_root/dist/showcases/private_trade_finance_settlement}"
+default_artifact_root="$repo_root/dist/showcases/private_trade_finance_settlement"
+if [[ -f "$repo_root/16_compact/trade-finance-settlement/package_manifest.json" ]]; then
+  default_artifact_root="$repo_root"
+elif [[ -f "$repo_root/midnight_package/trade-finance-settlement/package_manifest.json" ]]; then
+  default_artifact_root="$repo_root"
+fi
+artifact_root="${1:-$default_artifact_root}"
 network="${2:-preprod}"
 
 canonicalize_target_path() {
@@ -13,14 +19,31 @@ canonicalize_target_path() {
 
 artifact_root="$(canonicalize_target_path "$artifact_root")"
 
-package_root="$artifact_root/midnight_package/trade-finance-settlement"
+artifact_layout=""
+package_root=""
+validation_root=""
+if [[ -f "$artifact_root/midnight_package/trade-finance-settlement/package_manifest.json" ]]; then
+  artifact_layout="showcase"
+  package_root="$artifact_root/midnight_package/trade-finance-settlement"
+  validation_root="$artifact_root/midnight_validation"
+elif [[ -f "$artifact_root/16_compact/trade-finance-settlement/package_manifest.json" ]]; then
+  artifact_layout="subsystem"
+  package_root="$artifact_root/16_compact/trade-finance-settlement"
+  validation_root="$artifact_root/17_report/midnight_validation"
+else
+  echo "could not detect trade-finance artifact layout under: $artifact_root" >&2
+  echo "expected either midnight_package/trade-finance-settlement or 16_compact/trade-finance-settlement" >&2
+  exit 1
+fi
+
 package_manifest="$package_root/package_manifest.json"
 flow_manifest="$package_root/flow_manifest.json"
-validation_root="$artifact_root/midnight_validation"
 compile_root="$validation_root/compiled"
 compile_reports="$validation_root/compile"
 deploy_reports="$validation_root/deploy_prepare"
 call_reports="$validation_root/call_prepare"
+deploy_assets="$validation_root/deploy_prepare_assets"
+call_assets="$validation_root/call_prepare_assets"
 inputs_root="$validation_root/inputs"
 admission_root="$validation_root/admission"
 
@@ -46,8 +69,12 @@ mkdir -p \
   "$compile_reports" \
   "$deploy_reports" \
   "$call_reports" \
+  "$deploy_assets" \
+  "$call_assets" \
   "$inputs_root" \
   "$admission_root"
+rm -rf "$deploy_assets" "$call_assets"
+mkdir -p "$deploy_assets" "$call_assets"
 
 if [[ -z "${COMPACTC_BIN:-}" && -x "$HOME/.compact/versions/0.30.0/aarch64-darwin/compactc" ]]; then
   export COMPACTC_BIN="$HOME/.compact/versions/0.30.0/aarch64-darwin/compactc"
@@ -56,26 +83,135 @@ if [[ -n "${COMPACTC_BIN:-}" && -x "${COMPACTC_BIN}" ]]; then
   export PATH="$(dirname "${COMPACTC_BIN}"):$PATH"
 fi
 
-ziros_bin=""
-if [[ -f "$repo_root/Cargo.toml" ]]; then
-  cargo build -q -p zkf-cli --manifest-path "$repo_root/Cargo.toml"
-  if [[ -x "$repo_root/target/debug/ziros" ]]; then
-    ziros_bin="$repo_root/target/debug/ziros"
+first_executable() {
+  local candidate
+  for candidate in "$@"; do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+supports_midnight_subcommand() {
+  local candidate="$1"
+  [[ -n "$candidate" && -x "$candidate" ]] || return 1
+  "$candidate" midnight --help >/dev/null 2>&1
+}
+
+first_midnight_capable_executable() {
+  local candidate
+  for candidate in "$@"; do
+    if supports_midnight_subcommand "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+resolve_cli_bin() {
+  local resolved=""
+  resolved="$(
+    first_midnight_capable_executable \
+      "${ZKF_SUBSYSTEM_ZIROS_BIN:-}" \
+      "${ZKF_SUBSYSTEM_ZKF_BIN:-}" \
+      "$artifact_root/20_release/bin/zkf" \
+      "$repo_root/target/debug/zkf" \
+      "$repo_root/target/debug/ziros"
+  )" || true
+  if [[ -n "$resolved" ]]; then
+    printf '%s\n' "$resolved"
+    return 0
   fi
-fi
-if [[ -z "$ziros_bin" ]]; then
-  ziros_bin="$(command -v ziros || true)"
-fi
-if [[ -z "$ziros_bin" ]]; then
-  echo "could not resolve a ziros binary or repo-local zkf-cli build" >&2
-  exit 1
-fi
+
+  resolved="$(command -v zkf || true)"
+  if supports_midnight_subcommand "$resolved"; then
+    printf '%s\n' "$resolved"
+    return 0
+  fi
+
+  resolved="$(command -v ziros || true)"
+  if supports_midnight_subcommand "$resolved"; then
+    printf '%s\n' "$resolved"
+    return 0
+  fi
+
+  if [[ -f "$repo_root/Cargo.toml" ]]; then
+    cargo build -q -p zkf-cli --manifest-path "$repo_root/Cargo.toml"
+    resolved="$(
+      first_midnight_capable_executable \
+        "$repo_root/target/debug/zkf" \
+        "$repo_root/target/debug/ziros"
+    )" || true
+    if [[ -n "$resolved" ]]; then
+      printf '%s\n' "$resolved"
+      return 0
+    fi
+  fi
+
+  echo "could not resolve a zkf/ziros CLI binary from env, bundled package, repo-local build, or PATH" >&2
+  return 1
+}
+
+clear_prepare_sidecars() {
+  local root="$1"
+  rm -rf \
+    "$root/contract" \
+    "$root/compiler" \
+    "$root/keys" \
+    "$root/zkir"
+}
+
+snapshot_prepare_assets() {
+  local source_root="$1"
+  local bundle_root="$2"
+  local dir_name
+  rm -rf "$bundle_root"
+  mkdir -p "$bundle_root"
+  for dir_name in contract compiler keys zkir; do
+    if [[ -d "$source_root/$dir_name" ]]; then
+      cp -R "$source_root/$dir_name" "$bundle_root/$dir_name"
+    fi
+  done
+}
+
+augment_prepare_report() {
+  local json_path="$1"
+  local bundle_root="$2"
+  local compiled_zkir_path="$3"
+  if [[ ! -f "$json_path" ]]; then
+    return 0
+  fi
+  local tmp_json
+  tmp_json="$(mktemp)"
+  jq \
+    --arg zkir_path "$compiled_zkir_path" \
+    --arg asset_bundle_root "$bundle_root" \
+    --arg contract_bundle_root "$bundle_root/contract" \
+    --arg compiler_bundle_root "$bundle_root/compiler" \
+    --arg keys_bundle_root "$bundle_root/keys" \
+    --arg zkir_bundle_root "$bundle_root/zkir" \
+    '.zkir_path = $zkir_path
+     | .asset_bundle_root = $asset_bundle_root
+     | .contract_bundle_root = $contract_bundle_root
+     | .compiler_bundle_root = $compiler_bundle_root
+     | .keys_bundle_root = $keys_bundle_root
+     | .zkir_bundle_root = $zkir_bundle_root' \
+    "$json_path" > "$tmp_json"
+  mv "$tmp_json" "$json_path"
+}
+
+ziros_bin="$(resolve_cli_bin)"
 
 run_ziros() {
   "$ziros_bin" "$@"
 }
 
 hash -r
+clear_prepare_sidecars "$deploy_reports"
+clear_prepare_sidecars "$call_reports"
 run_ziros midnight status --json > "$validation_root/midnight_status.json"
 if [[ "$(jq -r '.ready' "$validation_root/midnight_status.json")" != "true" ]]; then
   echo "Midnight status is not ready:" >&2
@@ -116,6 +252,19 @@ while IFS= read -r rel_path; do
     --out "$deploy_reports/$contract_id.json" \
     --network "$network" \
     --json > /dev/null
+  if [[ -f "$deploy_reports/$contract_id.json" ]]; then
+    bundle_root="$deploy_assets/$contract_id"
+    snapshot_prepare_assets "$deploy_reports" "$bundle_root"
+    zkir_basename="$(
+      jq -r '.zkir_path | split("/") | last' "$deploy_reports/$contract_id.json"
+    )"
+    compiled_zkir_path="$(jq -r '.zkir_path // empty' "$deploy_reports/$contract_id.json")"
+    if [[ -n "$zkir_basename" && "$zkir_basename" != "null" ]]; then
+      compiled_zkir_path="$compile_root/$contract_id/zkir/$zkir_basename"
+    fi
+    augment_prepare_report "$deploy_reports/$contract_id.json" "$bundle_root" "$compiled_zkir_path"
+  fi
+  clear_prepare_sidecars "$deploy_reports"
 
   admission_code="$(
     curl -sS \
@@ -143,6 +292,7 @@ for ((index = 0; index < call_count; index++)); do
   call_id="$(jq -r ".calls[$index].call_id" "$flow_manifest")"
   rel_source="$(jq -r ".calls[$index].compact_source" "$flow_manifest")"
   circuit_name="$(jq -r ".calls[$index].circuit_name" "$flow_manifest")"
+  contract_id="$(basename "$rel_source" .compact)"
   source_path="$package_root/$rel_source"
   inputs_path="$inputs_root/$call_id.json"
   jq ".calls[$index].inputs" "$flow_manifest" > "$inputs_path"
@@ -154,10 +304,24 @@ for ((index = 0; index < call_count; index++)); do
     --out "$call_reports/$call_id.json" \
     --network "$network" \
     --json > /dev/null
+  if [[ -f "$call_reports/$call_id.json" ]]; then
+    bundle_root="$call_assets/$call_id"
+    snapshot_prepare_assets "$call_reports" "$bundle_root"
+    zkir_basename="$(
+      jq -r '.zkir_path | split("/") | last' "$call_reports/$call_id.json"
+    )"
+    compiled_zkir_path="$(jq -r '.zkir_path // empty' "$call_reports/$call_id.json")"
+    if [[ -n "$zkir_basename" && "$zkir_basename" != "null" ]]; then
+      compiled_zkir_path="$compile_root/$contract_id/zkir/$zkir_basename"
+    fi
+    augment_prepare_report "$call_reports/$call_id.json" "$bundle_root" "$compiled_zkir_path"
+  fi
+  clear_prepare_sidecars "$call_reports"
 done
 
 jq -n \
   --arg schema "trade-finance-midnight-validation-summary-v1" \
+  --arg artifact_layout "$artifact_layout" \
   --arg artifact_root "$artifact_root" \
   --arg package_root "$package_root" \
   --arg network "$network" \
@@ -167,6 +331,7 @@ jq -n \
   --slurpfile flow "$flow_manifest" \
   '{
     schema: $schema,
+    artifact_layout: $artifact_layout,
     artifact_root: $artifact_root,
     package_root: $package_root,
     network: $network,
@@ -179,6 +344,8 @@ jq -n \
     compile_reports_root: "compile",
     deploy_prepare_reports_root: "deploy_prepare",
     call_prepare_reports_root: "call_prepare",
+    deploy_prepare_assets_root: "deploy_prepare_assets",
+    call_prepare_assets_root: "call_prepare_assets",
     inputs_root: "inputs",
     admission_reports_root: "admission"
   }' > "$validation_root/summary.json"
