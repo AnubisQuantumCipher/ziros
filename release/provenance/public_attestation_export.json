@@ -1,29 +1,431 @@
 {
-  "contract_operator_summary": {
-    "evm_status": "secondary-ready",
-    "midnight_status": "ready"
-  },
-  "generated_at": "2026-04-11T20:32:02.407590Z",
+  "generated_at": "2026-04-11T20:53:50.913763Z",
   "headline_counts": {
     "hypothesis_carried_theorem": 0,
     "hypothesis_stated": 0,
     "mechanized_implementation_claim": 167,
-    "mechanized_local": 189,
+    "mechanized_total": 193,
     "pending": 0,
     "total_entries": 193,
     "trusted_protocol_tcb": 9
   },
-  "private_release_paths": {
-    "evm_contract_taxonomy": "release/evm_secondary_contract_taxonomy.json",
-    "midnight_contract_taxonomy": "release/midnight_universal_contract_taxonomy.json",
-    "private_source_census": "release/private_source_census.json",
-    "product_release": "release/product-release.json",
-    "public_release_allowlist": "release/public_release_allowlist.json"
+  "operator_readiness_summary": {
+    "evm": {
+      "status": "secondary-ready",
+      "supported_surface_count": 7,
+      "supported_target_count": 3
+    },
+    "midnight": {
+      "contract_universe_count": 7,
+      "ready_for_live_submit": false,
+      "ready_for_local_operator": true,
+      "status": "ready"
+    },
+    "product_release_ready": true,
+    "theorem_release_grade_ready": true
+  },
+  "private_release_inputs": {
+    "private_source_census": {
+      "counts_by_extension": {
+        ".aux": 54,
+        ".bin": 1,
+        ".bzkir": 1,
+        ".c": 1,
+        ".cache": 2,
+        ".cl": 12,
+        ".compact": 4,
+        ".entitlements": 4,
+        ".example": 1,
+        ".fst": 20,
+        ".glob": 54,
+        ".gz": 2,
+        ".h": 2,
+        ".html": 2,
+        ".js": 7,
+        ".json": 108,
+        ".jsonl": 2,
+        ".lean": 27,
+        ".lock": 2,
+        ".m": 1,
+        ".map": 5,
+        ".md": 95,
+        ".metal": 18,
+        ".mjs": 1,
+        ".mlmodel": 8,
+        ".orig": 3,
+        ".pbxproj": 2,
+        ".plist": 3,
+        ".png": 10,
+        ".prover": 1,
+        ".py": 21,
+        ".rs": 763,
+        ".sh": 49,
+        ".swift": 25,
+        ".toml": 46,
+        ".ts": 69,
+        ".ttf": 5,
+        ".txt": 7,
+        ".v": 109,
+        ".verifier": 1,
+        ".vo": 54,
+        ".vok": 54,
+        ".vos": 54,
+        ".xcscheme": 3,
+        ".xcworkspacedata": 2,
+        ".yaml": 1,
+        ".yml": 4,
+        ".zir": 1,
+        ".zirflow": 1,
+        ".zkir": 9,
+        "<no-ext>": 42
+      },
+      "counts_by_family": {
+        "compact_or_zkir": 14,
+        "docs": 102,
+        "formal_proofs": 156,
+        "json": 108,
+        "metal": 18,
+        "other": 440,
+        "rust": 763,
+        "scripts": 70,
+        "swift": 25,
+        "typescript_or_js": 77
+      },
+      "generated_at": "2026-04-11T20:32:02.398750Z",
+      "schema": "ziros-private-source-census-v1",
+      "source_commit": "fa91d639c8df088a91d0be7bd40d8695e9993313",
+      "tracked_file_count": 1773,
+      "tracked_rust_line_count": 377959,
+      "tracked_rust_lines": 377959,
+      "workspace_crate_count": 25,
+      "workspace_member_count": 25,
+      "zero_unclassified_assertion": true
+    },
+    "product_release": {
+      "contract_operator_summary": {
+        "evm": {
+          "generated_at": "2026-04-11T20:32:02.395742Z",
+          "primary_domain": "evm",
+          "schema": "ziros-evm-operator-readiness-v1",
+          "status": "secondary-ready",
+          "supported_surfaces": [
+            "zkf evm verifier export",
+            "zkf evm estimate-gas",
+            "zkf evm foundry init",
+            "zkf evm deploy",
+            "zkf evm call",
+            "zkf evm test",
+            "zkf evm diagnose"
+          ],
+          "supported_targets": [
+            "ethereum",
+            "optimism-arbitrum-l2",
+            "generic-evm"
+          ],
+          "version": "0.7.5"
+        },
+        "midnight": {
+          "advisories": [
+            "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}"
+          ],
+          "blockers": [],
+          "contract_universe_count": 7,
+          "doctor_error": null,
+          "doctor_report": {
+            "checks": [
+              {
+                "actual": "0.30.0 @ /Users/sicarii/.local/bin/compactc",
+                "expected": "0.30.0",
+                "id": "compactc",
+                "label": "Compact compiler",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "actual": "0.2.0 @ /Users/sicarii/.local/bin/compact",
+                "expected": "0.2.0",
+                "id": "compact",
+                "label": "Compact manager",
+                "required": false,
+                "status": "pass"
+              },
+              {
+                "actual": "24.13.1",
+                "expected": ">=22.0.0",
+                "fix": "Install Node.js 22.x or newer.",
+                "id": "node",
+                "label": "Node.js",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "actual": "11.8.0",
+                "id": "npm",
+                "label": "npm",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "detail": "No Midnight project root was supplied.",
+                "expected": "22 @midnight-ntwrk packages pinned to the March 2026 lane",
+                "fix": "Re-run with --project <path> inside a scaffolded Midnight DApp.",
+                "id": "packages",
+                "label": "Pinned Midnight packages",
+                "required": true,
+                "status": "not_checkable_from_cli"
+              },
+              {
+                "actual": "8.0.3 @ http://127.0.0.1:6300",
+                "expected": "wire contract 8.0.3",
+                "fix": "Start or restart the native proof server with `zkf midnight proof-server serve --engine umpg`.",
+                "id": "proof-server",
+                "label": "Midnight proof server",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "actual": "http://127.0.0.1:6311",
+                "detail": "{\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+                "expected": "ready gateway with compactc 0.30.0 and attestor key exposure",
+                "fix": "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0.",
+                "id": "gateway",
+                "label": "Midnight Compact gateway",
+                "required": true,
+                "status": "warn"
+              },
+              {
+                "actual": "HTTP 405 @ https://rpc.preprod.midnight.network",
+                "expected": "reachable endpoint",
+                "id": "rpc",
+                "label": "Midnight RPC",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "actual": "HTTP 405 @ https://indexer.preprod.midnight.network/api/v4/graphql",
+                "expected": "reachable endpoint",
+                "id": "indexer",
+                "label": "Midnight Indexer",
+                "required": true,
+                "status": "pass"
+              },
+              {
+                "actual": "HTTP 200 @ https://explorer.preprod.midnight.network",
+                "expected": "reachable endpoint",
+                "id": "explorer",
+                "label": "Midnight Explorer",
+                "required": false,
+                "status": "pass"
+              },
+              {
+                "detail": "CLI-only mode cannot honestly inspect window.midnight.mnLace.",
+                "expected": "Midnight Lace extension available in a browser context",
+                "fix": "Re-run with browser access enabled, or provide a project plus MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME for headless wallet diagnostics.",
+                "id": "lace",
+                "label": "Lace availability",
+                "required": false,
+                "status": "not_checkable_from_cli"
+              },
+              {
+                "detail": "No browser wallet session or headless operator wallet credentials were available.",
+                "expected": "A Midnight wallet session bound to the selected network",
+                "fix": "Provide MIDNIGHT_WALLET_SEED, MIDNIGHT_WALLET_MNEMONIC, or MIDNIGHT_WALLET_NAME, or allow the browser-assisted Lace check.",
+                "id": "wallet",
+                "label": "Wallet session",
+                "required": false,
+                "status": "not_checkable_from_cli"
+              },
+              {
+                "detail": "DUST balance is not checkable from a bare CLI process.",
+                "expected": "A nonzero spendable tDUST balance",
+                "fix": "Run the browser-assisted Lace check or supply a project with installed Midnight dependencies and headless wallet credentials.",
+                "id": "dust",
+                "label": "Spendable tDUST",
+                "required": false,
+                "status": "not_checkable_from_cli"
+              }
+            ],
+            "generated_at": "1775939522Z",
+            "network": "preprod",
+            "recommended_fixes": [
+              "Start the gateway with `zkf midnight gateway serve --port 6311` after installing compactc 0.30.0."
+            ],
+            "schema": "zkf-midnight-doctor-report-v1",
+            "summary": {
+              "failed": 0,
+              "not_checkable": 4,
+              "overall_status": "warn",
+              "passed": 8,
+              "total": 13,
+              "warned": 1
+            }
+          },
+          "doctor_summary": {
+            "failed": 0,
+            "not_checkable": 4,
+            "overall_status": "warn",
+            "passed": 8,
+            "total": 13,
+            "warned": 1
+          },
+          "generated_at": "2026-04-11T20:32:02.393477Z",
+          "live_submit_blockers": [
+            "gateway: {\"error\":\"forbidden\",\"reason\":\"missing_cf_access_jwt_assertion\"}",
+            "wallet: No browser wallet session or headless operator wallet credentials were available.",
+            "dust: DUST balance is not checkable from a bare CLI process."
+          ],
+          "primary_domain": "midnight",
+          "ready_for_live_submit": false,
+          "ready_for_local_operator": true,
+          "required_cli_surfaces": [
+            "zkf midnight status",
+            "zkf midnight contract compile",
+            "zkf midnight contract deploy-prepare",
+            "zkf midnight contract call-prepare",
+            "zkf midnight contract test",
+            "zkf midnight contract deploy",
+            "zkf midnight contract call",
+            "zkf midnight contract verify-explorer",
+            "zkf midnight contract diagnose"
+          ],
+          "schema": "ziros-midnight-operator-readiness-v1",
+          "status": "ready",
+          "validation_template": "token-transfer",
+          "version": "0.7.5"
+        }
+      },
+      "generated_at": "2026-04-11T20:32:02.397907Z",
+      "product_release_ready": true,
+      "release_boundary": {
+        "allowlist_path": "release/public_release_allowlist.json",
+        "boundary_report_path": "release/public_release_boundary_report.json",
+        "public_export_script": "scripts/export_public_attestation_bundle.py",
+        "public_repo": "/Users/sicarii/Projects/ziros-attestation",
+        "scanner_script": "scripts/check_public_release_boundary.py"
+      },
+      "release_tag": "v0.7.5",
+      "release_version": "0.7.5",
+      "schema": "ziros-product-release-v1",
+      "source_commit": "fa91d639c8df088a91d0be7bd40d8695e9993313",
+      "theorem_release_grade_ready": true,
+      "truth_surfaces": {
+        "agent_forensics": "forensics/",
+        "canonical_truth": "docs/CANONICAL_TRUTH.md",
+        "completion_status": ".zkf-completion-status.json",
+        "evm_contract_taxonomy": "release/evm_secondary_contract_taxonomy.json",
+        "guaranteed_primitive_set": "release/guaranteed_circuit_primitive_set.json",
+        "midnight_contract_taxonomy": "release/midnight_universal_contract_taxonomy.json",
+        "support_matrix": "support-matrix.json",
+        "verification_ledger": "zkf-ir-spec/verification-ledger.json",
+        "vision_alignment_report": "release/vision_alignment_report.json"
+      },
+      "verification_summary": {
+        "assurance_class_counts": {
+          "attestation_backed_lane": 0,
+          "bounded_check": 0,
+          "hypothesis_carried_theorem": 0,
+          "mechanized_implementation_claim": 167,
+          "model_only_claim": 17,
+          "trusted_protocol_tcb": 9
+        },
+        "status_counts": {
+          "assumed_external": 0,
+          "bounded_checked": 0,
+          "hypothesis_stated": 0,
+          "mechanized_generated": 4,
+          "mechanized_local": 189,
+          "pending": 0
+        },
+        "total_entries": 193
+      },
+      "version": "0.7.5",
+      "working_tree_dirty": false,
+      "workspace_members": {
+        "count": 25,
+        "names": [
+          "zkf-agent",
+          "zkf-backends",
+          "zkf-cli",
+          "zkf-cloudfs",
+          "zkf-command-surface",
+          "zkf-conformance",
+          "zkf-core",
+          "zkf-distributed",
+          "zkf-examples",
+          "zkf-ffi",
+          "zkf-frontends",
+          "zkf-gadgets",
+          "zkf-ir-spec",
+          "zkf-keymanager",
+          "zkf-lang",
+          "zkf-lib",
+          "zkf-lsp",
+          "zkf-metal",
+          "zkf-protocol-exact-hax",
+          "zkf-registry",
+          "zkf-runtime",
+          "zkf-sdk",
+          "zkf-storage",
+          "zkf-ui",
+          "zkf-wallet"
+        ]
+      }
+    },
+    "public_release_allowlist": {
+      "allowed_public_extensions": [
+        ".json",
+        ".md",
+        ".txt",
+        ".yml",
+        ".yaml"
+      ],
+      "forbidden_path_fragments": [
+        "/Users/",
+        "/private/var/",
+        "node_modules/",
+        ".tmp/",
+        "logs/",
+        "__pycache__/",
+        "target-local/",
+        "target-public/",
+        "ZirOSAgentHost/build/",
+        "ZirOSAgentHost/.build/"
+      ],
+      "forbidden_suffixes": [
+        ".map",
+        ".rs",
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs",
+        ".py",
+        ".sh",
+        ".swift",
+        ".metal",
+        ".metallib",
+        ".lean",
+        ".v",
+        ".fst",
+        ".fsti",
+        ".zip"
+      ],
+      "generated_at": "2026-04-11T20:32:02.407442Z",
+      "package_roots": [
+        "attestation",
+        "zkf-wallet-helper",
+        "zkf-wallet-mailbox",
+        "ziros-twitter-mcp"
+      ],
+      "public_repo_root": "/Users/sicarii/Projects/ziros-attestation",
+      "schema": "ziros-public-release-allowlist-v1",
+      "version": "0.7.5"
+    }
   },
   "release_tag": "v0.7.5",
-  "release_version": "0.7.5",
-  "schema": "ziros-public-attestation-export-v1",
-  "source_commit": "fa91d639c8df088a91d0be7bd40d8695e9993313",
+  "schema": "ziros-public-attestation-export-bundle-v1",
+  "source_commit": "12200b2788578e2300c1e23c9c8f84189a0338d5",
   "support_matrix_summary": {
     "backend_count": 9,
     "frontend_count": 8,
