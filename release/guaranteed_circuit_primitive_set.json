@@ -4,7 +4,7 @@
     "midnight-compact": true,
     "sp1": true
   },
-  "generated_at": "2026-04-11T03:12:28.833885Z",
+  "generated_at": "2026-04-11T20:28:30.349631Z",
   "primitive_families": [
     "arithmetic",
     "boolean",
@@ -66,5 +66,5 @@
       "state-transition"
     ]
   },
-  "version": "0.7.3"
+  "version": "0.7.5"
 }

@@ -349,7 +349,7 @@
       ]
     }
   ],
-  "generated_for": "0.7.3",
+  "generated_for": "0.7.5",
   "registry": {
     "local": "ready",
     "notes": "Local + remote registries with CombinedRegistry fallback, SemVer resolution, and SHA-256 manifest/content integrity checks.",

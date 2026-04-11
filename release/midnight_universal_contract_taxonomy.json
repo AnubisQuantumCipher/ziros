@@ -8,9 +8,9 @@
     "supply-chain-provenance",
     "custom-subsystem-contract"
   ],
-  "generated_at": "2026-04-11T03:12:28.833613Z",
+  "generated_at": "2026-04-11T20:28:30.348864Z",
   "primary_domain": "midnight",
   "schema": "ziros-midnight-universal-contract-taxonomy-v1",
   "universality_model": "phased-universal",
-  "version": "0.7.3"
+  "version": "0.7.5"
 }

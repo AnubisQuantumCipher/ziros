@@ -38,7 +38,7 @@
     ".fsti",
     ".zip"
   ],
-  "generated_at": "2026-04-11T03:12:40.729623Z",
+  "generated_at": "2026-04-11T20:32:02.407442Z",
   "package_roots": [
     "attestation",
     "zkf-wallet-helper",
@@ -47,5 +47,5 @@
   ],
   "public_repo_root": "/Users/sicarii/Projects/ziros-attestation",
   "schema": "ziros-public-release-allowlist-v1",
-  "version": "0.7.3"
+  "version": "0.7.5"
 }
