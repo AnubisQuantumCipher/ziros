@@ -18,7 +18,7 @@ ZirOS core is proprietary and private. No public source-use grant, Change Date, 
 | Fact | Current checkout value |
 | --- | --- |
 | Workspace crates | 25 |
-| First-party Rust source lines | 377,949 tracked `.rs` lines outside `vendor/` |
+| First-party Rust source lines | 377,959 tracked `.rs` lines outside `vendor/` |
 | Proving backends in `support-matrix.json` | 9 total: 6 `ready`, 1 `limited`, 2 `broken` |
 | Frontend families in `support-matrix.json` | 8 total: 7 `ready`, 1 `limited` |
 | Gadget families in `support-matrix.json` | 11 total: 8 `ready`, 3 `limited` |
