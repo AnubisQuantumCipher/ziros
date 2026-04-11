@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T04:56:48.147649Z",
+  "generated_at": "2026-04-11T20:51:06.524632Z",
   "issues": [],
   "ok": true,
   "package_reports": [
@@ -128,8 +128,8 @@
       ]
     }
   ],
-  "require_clean": false,
+  "require_clean": true,
   "schema": "ziros-public-release-boundary-report-v1",
   "staging_report": null,
-  "working_tree_dirty": true
+  "working_tree_dirty": false
 }
