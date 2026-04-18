@@ -16,25 +16,23 @@ pub fn try_compile_goal_intent(goal: &str, options: &AgentRunOptionsV1) -> Optio
         options.provider_override.as_deref(),
         options.model_override.as_deref(),
     );
-    let route = routes
-        .iter()
-        .find(|candidate| {
-            candidate.role == "assistant"
-                && matches!(
-                    candidate.provider.as_str(),
-                    "openai-api" | "openai-compatible-local" | "mlx-local"
-                )
-                && candidate
-                    .summary
-                    .get("base_url")
-                    .and_then(serde_json::Value::as_str)
-                    .is_some()
-                && candidate
-                    .summary
-                    .get("model")
-                    .and_then(serde_json::Value::as_str)
-                    .is_some()
-        })?;
+    let route = routes.iter().find(|candidate| {
+        candidate.role == "assistant"
+            && matches!(
+                candidate.provider.as_str(),
+                "openai-api" | "openai-compatible-local" | "mlx-local"
+            )
+            && candidate
+                .summary
+                .get("base_url")
+                .and_then(serde_json::Value::as_str)
+                .is_some()
+            && candidate
+                .summary
+                .get("model")
+                .and_then(serde_json::Value::as_str)
+                .is_some()
+    })?;
     let model = route.summary.get("model")?.as_str()?;
     let base_url = route.summary.get("base_url")?.as_str()?;
 
@@ -116,7 +114,9 @@ fn compile_goal_intent_via_chat_completions(
         .to_string();
     let parsed = serde_json::from_str::<ModelIntentEnvelope>(&content)
         .ok()
-        .or_else(|| extract_json_object(&content).and_then(|value| serde_json::from_str(&value).ok()))?;
+        .or_else(|| {
+            extract_json_object(&content).and_then(|value| serde_json::from_str(&value).ok())
+        })?;
     if workflow_catalog()
         .into_iter()
         .all(|candidate| candidate.workflow_kind != parsed.workflow_kind)

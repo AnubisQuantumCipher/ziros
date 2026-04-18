@@ -1,0 +1,474 @@
+{
+  "generated_at": "2026-04-18T10:02:39.142682+00:00",
+  "status": "blocked",
+  "shared_health": {
+    "status": "DEGRADED",
+    "checks": [
+      {
+        "name": "Keychain: ghost-admin-api-key",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Keychain: discord-bot-token",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Keychain: stripe-secret-key",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Keychain: github-pat",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Keychain: openai-media-api-key",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Ghost CMS",
+        "ok": false,
+        "detail": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+      },
+      {
+        "name": "Proton Bridge SMTP",
+        "ok": false,
+        "detail": "[Errno 1] Operation not permitted"
+      },
+      {
+        "name": "Metering Proxy Port",
+        "ok": false,
+        "detail": "[Errno 1] Operation not permitted"
+      },
+      {
+        "name": "Tracked Redirect Port",
+        "ok": false,
+        "detail": "[Errno 1] Operation not permitted"
+      },
+      {
+        "name": "Business Dashboard Freshness",
+        "ok": false,
+        "detail": "business dashboard missing"
+      },
+      {
+        "name": "Proof Server Health",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "Proof Queue Capacity",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "Cloudflare Access Edge",
+        "ok": false,
+        "detail": "HTTP 000"
+      },
+      {
+        "name": "Cloudflare Access Authenticated",
+        "ok": true,
+        "detail": "skipped (no customer credential present)"
+      },
+      {
+        "name": "Proof Usage Freshness",
+        "ok": false,
+        "detail": "proof-usage-daily.json missing or invalid"
+      },
+      {
+        "name": "Recent Proof Failures",
+        "ok": true,
+        "detail": "failure_rate=0.0"
+      },
+      {
+        "name": "Ops Watchdog Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Ops Blocker Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Ops Watchdog Blocker State",
+        "ok": true,
+        "detail": "status=blocked blocked=discord-community, newsletter-pipeline, twitter-evening, twitter-morning"
+      },
+      {
+        "name": "Midnight Pain Monitor Freshness",
+        "ok": false,
+        "detail": "latest.json missing or invalid"
+      },
+      {
+        "name": "Promotion Planner Freshness",
+        "ok": false,
+        "detail": "latest plan missing or invalid"
+      },
+      {
+        "name": "Tracked Redirect Local",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "Tracked Redirect Public",
+        "ok": false,
+        "detail": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+      },
+      {
+        "name": "Lead Pipeline Freshness",
+        "ok": false,
+        "detail": "lead pipeline missing or invalid"
+      },
+      {
+        "name": "CTA Click Attribution Surface",
+        "ok": false,
+        "detail": "click-attribution.jsonl missing"
+      },
+      {
+        "name": "Outward Gate Freshness: twitter-morning",
+        "ok": true,
+        "detail": "status=blocked age=0m"
+      },
+      {
+        "name": "Outward Gate Status: twitter-morning",
+        "ok": false,
+        "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Twitter Auth Material"
+      },
+      {
+        "name": "Outward Gate Freshness: twitter-evening",
+        "ok": true,
+        "detail": "status=blocked age=0m"
+      },
+      {
+        "name": "Outward Gate Status: twitter-evening",
+        "ok": false,
+        "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Twitter Auth Material"
+      },
+      {
+        "name": "Outward Gate Freshness: discord-community",
+        "ok": true,
+        "detail": "status=blocked age=0m"
+      },
+      {
+        "name": "Outward Gate Status: discord-community",
+        "ok": false,
+        "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Discord Auth Probe"
+      },
+      {
+        "name": "Outward Gate Freshness: newsletter-pipeline",
+        "ok": true,
+        "detail": "status=blocked age=0m"
+      },
+      {
+        "name": "Outward Gate Status: newsletter-pipeline",
+        "ok": false,
+        "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Ghost Admin Probe"
+      },
+      {
+        "name": "Proton Health Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Proton Bridge Ready",
+        "ok": false,
+        "detail": "{\"imap\": {\"detail\": \"security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.\", \"ok\": false}, \""
+      },
+      {
+        "name": "Proton SMTP Token Ready",
+        "ok": false,
+        "detail": "{\"delivery_sender\": null, \"fallback_active\": false, \"pool_ready\": false, \"senders\": {\"billing@ziros.dev\": {\"detail\": \"security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\\nsecurity: Se"
+      },
+      {
+        "name": "Proton Custom Domain DNS",
+        "ok": false,
+        "detail": "{\"authoritative_nameservers\": [], \"dkim_records\": {\"protonmail\": [], \"protonmail2\": [], \"protonmail3\": []}, \"dkim_selector_count\": 0, \"dmarc_present\": false, \"dmarc_records\": [], \"domain\": \"ziros.dev\", \"mx_present\": false, \"mx_records\": [],"
+      },
+      {
+        "name": "Proton Drive Archive Root",
+        "ok": true,
+        "detail": "{\"archive_root_present\": true, \"ready\": true, \"root_present\": true}"
+      },
+      {
+        "name": "Proton Domain Status Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Proton Drive Archive Freshness",
+        "ok": false,
+        "detail": "proton-drive-archive.json missing or invalid"
+      },
+      {
+        "name": "Public Edge Watchdog Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Public Edge Watchdog State",
+        "ok": false,
+        "detail": "status=degraded heals=watchdog"
+      },
+      {
+        "name": "Billing Service Local",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "Billing Service Public",
+        "ok": false,
+        "detail": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+      },
+      {
+        "name": "Claim Surface Local",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "Stripe Webhook Secret",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "Self-Serve Gate Freshness",
+        "ok": false,
+        "detail": "self-serve-state.json missing or invalid"
+      },
+      {
+        "name": "Money Path Smoke Freshness",
+        "ok": false,
+        "detail": "money-path-smoke.json missing or invalid"
+      },
+      {
+        "name": "Restore Drill Freshness",
+        "ok": false,
+        "detail": "no full restore drill recorded"
+      },
+      {
+        "name": "Hosted Lane SLA Freshness",
+        "ok": true,
+        "detail": "0m old"
+      },
+      {
+        "name": "Hosted Lane SLA Incident State",
+        "ok": true,
+        "detail": "current_status=degraded open_incident=False"
+      },
+      {
+        "name": "Hosted Lane SLA Objective",
+        "ok": false,
+        "detail": "uptime=0.0 target=99.0 credit=25%"
+      },
+      {
+        "name": "Hosted Lane SLA Terms Surface",
+        "ok": true,
+        "detail": "version=2026-04-05-developer-lane-marketplace-v1 target=99.0"
+      },
+      {
+        "name": "Cost Monitor Freshness",
+        "ok": false,
+        "detail": "cost-monitor.json missing or invalid"
+      }
+    ],
+    "failed": [
+      "Keychain: ghost-admin-api-key",
+      "Keychain: discord-bot-token",
+      "Keychain: stripe-secret-key",
+      "Keychain: github-pat",
+      "Keychain: openai-media-api-key",
+      "Ghost CMS",
+      "Proton Bridge SMTP",
+      "Metering Proxy Port",
+      "Tracked Redirect Port",
+      "Business Dashboard Freshness",
+      "Proof Server Health",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Proof Usage Freshness",
+      "Midnight Pain Monitor Freshness",
+      "Promotion Planner Freshness",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Lead Pipeline Freshness",
+      "CTA Click Attribution Surface",
+      "Outward Gate Status: twitter-morning",
+      "Outward Gate Status: twitter-evening",
+      "Outward Gate Status: discord-community",
+      "Outward Gate Status: newsletter-pipeline",
+      "Proton Bridge Ready",
+      "Proton SMTP Token Ready",
+      "Proton Custom Domain DNS",
+      "Proton Drive Archive Freshness",
+      "Public Edge Watchdog State",
+      "Billing Service Local",
+      "Billing Service Public",
+      "Claim Surface Local",
+      "Stripe Webhook Secret",
+      "Self-Serve Gate Freshness",
+      "Money Path Smoke Freshness",
+      "Restore Drill Freshness",
+      "Hosted Lane SLA Objective",
+      "Cost Monitor Freshness"
+    ],
+    "timestamp": "2026-04-18T06:02:38.438549"
+  },
+  "lane_summary": {
+    "twitter-morning": {
+      "status": "blocked",
+      "failed": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "generated_at": "2026-04-18T10:02:38.610015+00:00"
+    },
+    "twitter-evening": {
+      "status": "blocked",
+      "failed": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "generated_at": "2026-04-18T10:02:38.788136+00:00"
+    },
+    "discord-community": {
+      "status": "blocked",
+      "failed": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Discord Auth Probe"
+      ],
+      "generated_at": "2026-04-18T10:02:38.940254+00:00"
+    },
+    "newsletter-pipeline": {
+      "status": "blocked",
+      "failed": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Ghost Admin Probe"
+      ],
+      "generated_at": "2026-04-18T10:02:39.137136+00:00"
+    }
+  },
+  "drift": {
+    "truth_surface_drift": [
+      "Business Dashboard Freshness",
+      "CTA Click Attribution Surface",
+      "Claim Surface Local",
+      "Cost Monitor Freshness",
+      "Lead Pipeline Freshness",
+      "Midnight Pain Monitor Freshness",
+      "Money Path Smoke Freshness",
+      "Promotion Planner Freshness",
+      "Proof Usage Freshness",
+      "Proton Drive Archive Freshness",
+      "Restore Drill Freshness",
+      "Self-Serve Gate Freshness"
+    ],
+    "dependency_drift": [
+      "Billing Service Local",
+      "Billing Service Public",
+      "Ghost CMS",
+      "Hosted Lane SLA Objective",
+      "Metering Proxy Port",
+      "Outward Gate Status: discord-community",
+      "Outward Gate Status: newsletter-pipeline",
+      "Outward Gate Status: twitter-evening",
+      "Outward Gate Status: twitter-morning",
+      "Proof Queue Capacity",
+      "Proof Server Health",
+      "Proton Bridge Ready",
+      "Proton Bridge SMTP",
+      "Proton Custom Domain DNS",
+      "Proton SMTP Token Ready",
+      "Public Edge Watchdog State",
+      "Stripe Webhook Secret",
+      "Tracked Redirect Local",
+      "Tracked Redirect Port",
+      "Tracked Redirect Public",
+      "discord-community: Billing Hosted Public",
+      "discord-community: Billing Service Local",
+      "discord-community: Cloudflare Access Edge",
+      "discord-community: Planner Freshness",
+      "discord-community: Proof Queue Capacity",
+      "discord-community: Proof Server Local",
+      "discord-community: Self-Serve Checkout Path",
+      "discord-community: Tracked Redirect Local",
+      "discord-community: Tracked Redirect Public",
+      "newsletter-pipeline: Billing Hosted Public",
+      "newsletter-pipeline: Billing Service Local",
+      "newsletter-pipeline: Cloudflare Access Edge",
+      "newsletter-pipeline: Planner Freshness",
+      "newsletter-pipeline: Proof Queue Capacity",
+      "newsletter-pipeline: Proof Server Local",
+      "newsletter-pipeline: Self-Serve Checkout Path",
+      "newsletter-pipeline: Tracked Redirect Local",
+      "newsletter-pipeline: Tracked Redirect Public",
+      "twitter-evening: Billing Hosted Public",
+      "twitter-evening: Billing Service Local",
+      "twitter-evening: Cloudflare Access Edge",
+      "twitter-evening: Planner Freshness",
+      "twitter-evening: Proof Queue Capacity",
+      "twitter-evening: Proof Server Local",
+      "twitter-evening: Self-Serve Checkout Path",
+      "twitter-evening: Tracked Redirect Local",
+      "twitter-evening: Tracked Redirect Public",
+      "twitter-morning: Billing Hosted Public",
+      "twitter-morning: Billing Service Local",
+      "twitter-morning: Cloudflare Access Edge",
+      "twitter-morning: Planner Freshness",
+      "twitter-morning: Proof Queue Capacity",
+      "twitter-morning: Proof Server Local",
+      "twitter-morning: Self-Serve Checkout Path",
+      "twitter-morning: Tracked Redirect Local",
+      "twitter-morning: Tracked Redirect Public"
+    ],
+    "auth_runtime_drift": [
+      "Cloudflare Access Edge",
+      "Keychain: discord-bot-token",
+      "Keychain: ghost-admin-api-key",
+      "Keychain: github-pat",
+      "Keychain: openai-media-api-key",
+      "Keychain: stripe-secret-key",
+      "discord-community: Discord Auth Probe",
+      "newsletter-pipeline: Ghost Admin Probe",
+      "twitter-evening: Twitter Auth Material",
+      "twitter-morning: Twitter Auth Material"
+    ]
+  },
+  "report_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/reports/ops-drift/ops-drift-report-2026-04-18.md",
+  "blocker_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/ops-watchdog/blocker-state.json"
+}

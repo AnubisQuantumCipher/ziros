@@ -113,10 +113,16 @@ pub struct ProviderProfileV1 {
 }
 
 impl ProviderProfileV1 {
-    pub fn selected_model(&self, requested_role: &str, model_override: Option<&str>) -> Option<String> {
-        model_override
-            .map(str::to_string)
-            .or_else(|| self.role_models.model_for_role(requested_role).map(str::to_string))
+    pub fn selected_model(
+        &self,
+        requested_role: &str,
+        model_override: Option<&str>,
+    ) -> Option<String> {
+        model_override.map(str::to_string).or_else(|| {
+            self.role_models
+                .model_for_role(requested_role)
+                .map(str::to_string)
+        })
     }
 }
 
@@ -148,8 +154,7 @@ pub fn load_provider_profile_store() -> Result<ProviderProfileStoreV1, String> {
     }
     let content = fs::read_to_string(&path)
         .map_err(|error| format!("failed to read {}: {error}", path.display()))?;
-    toml::from_str(&content)
-        .map_err(|error| format!("failed to parse {}: {error}", path.display()))
+    toml::from_str(&content).map_err(|error| format!("failed to parse {}: {error}", path.display()))
 }
 
 pub fn save_provider_profile_store(store: &ProviderProfileStoreV1) -> Result<(), String> {
@@ -180,9 +185,14 @@ pub fn upsert_provider_profile(
 
 pub fn remove_provider_profile(profile_id: &str) -> Result<ProviderProfileStoreV1, String> {
     let mut store = load_provider_profile_store()?;
-    store.profiles.retain(|profile| profile.profile_id != profile_id);
+    store
+        .profiles
+        .retain(|profile| profile.profile_id != profile_id);
     if store.default_profile.as_deref() == Some(profile_id) {
-        store.default_profile = store.profiles.first().map(|profile| profile.profile_id.clone());
+        store.default_profile = store
+            .profiles
+            .first()
+            .map(|profile| profile.profile_id.clone());
     }
     save_provider_profile_store(&store)?;
     Ok(store)
@@ -265,7 +275,9 @@ pub fn load_api_key(credential: Option<&ProviderCredentialRefV1>) -> Option<Stri
         let account = credential.keychain_account.as_deref()?;
         let service = credential.keychain_service.as_deref()?;
         let bytes = manager.retrieve_key(account, service).ok()?;
-        return String::from_utf8(bytes).ok().filter(|value| !value.trim().is_empty());
+        return String::from_utf8(bytes)
+            .ok()
+            .filter(|value| !value.trim().is_empty());
     }
 
     None

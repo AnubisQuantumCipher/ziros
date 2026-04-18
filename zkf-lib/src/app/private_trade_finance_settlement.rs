@@ -28,6 +28,7 @@ const TRADE_FINANCE_ACTION_APPROVE_WITH_MANUAL_REVIEW: u64 = 1;
 const TRADE_FINANCE_ACTION_ESCALATE_FOR_INVESTIGATION: u64 = 2;
 const TRADE_FINANCE_ACTION_DENY_FOR_POLICY_RULE: u64 = 3;
 const TRADE_FINANCE_ACTION_DENY_FOR_INCONSISTENCY: u64 = 4;
+const TRADE_FINANCE_ACTION_CLASS_MAX: u64 = TRADE_FINANCE_ACTION_DENY_FOR_INCONSISTENCY;
 const TRADE_FINANCE_DISCLOSURE_ROLE_SUPPLIER: u64 = 0;
 const TRADE_FINANCE_DISCLOSURE_ROLE_FINANCIER: u64 = 1;
 const TRADE_FINANCE_DISCLOSURE_ROLE_BUYER: u64 = 2;
@@ -2695,6 +2696,7 @@ pub fn build_trade_finance_settlement_binding_program() -> ZkfResult<Program> {
     ] {
         builder.public_output(name)?;
     }
+    builder.constrain_range("trade_finance_settlement_action_class_code", 3)?;
     append_geq_comparator_bit(
         &mut builder,
         signal_expr("trade_finance_settlement_duplicate_financing_risk_score"),
@@ -2712,6 +2714,19 @@ pub fn build_trade_finance_settlement_binding_program() -> ZkfResult<Program> {
         "trade_finance_settlement_non_auto_action_slack",
         8,
         "trade_finance_settlement_non_auto_action",
+    )?;
+    append_geq_comparator_bit(
+        &mut builder,
+        const_expr(TRADE_FINANCE_ACTION_CLASS_MAX),
+        signal_expr("trade_finance_settlement_action_class_code"),
+        "trade_finance_settlement_action_class_in_range_bit",
+        "trade_finance_settlement_action_class_in_range_slack",
+        TRADE_FINANCE_ACTION_CLASS_MAX,
+        "trade_finance_settlement_action_class_in_range",
+    )?;
+    builder.constrain_equal(
+        signal_expr("trade_finance_settlement_action_class_in_range_bit"),
+        const_expr(1),
     )?;
     append_boolean_or(
         &mut builder,
@@ -3015,6 +3030,10 @@ pub fn build_trade_finance_duplicate_registry_handoff_program() -> ZkfResult<Pro
     ] {
         builder.public_output(name)?;
     }
+    builder.constrain_range(
+        "trade_finance_shard_shard_count",
+        bits_for_bound(TRADE_FINANCE_SHARD_COUNT_MAX),
+    )?;
     append_geq_comparator_bit(
         &mut builder,
         signal_expr("trade_finance_shard_shard_count"),
@@ -3028,6 +3047,16 @@ pub fn build_trade_finance_duplicate_registry_handoff_program() -> ZkfResult<Pro
         signal_expr("trade_finance_shard_count_valid_bit"),
         const_expr(1),
     )?;
+    append_geq_comparator_bit(
+        &mut builder,
+        const_expr(TRADE_FINANCE_SHARD_COUNT_MAX),
+        signal_expr("trade_finance_shard_shard_count"),
+        "trade_finance_shard_count_max_bit",
+        "trade_finance_shard_count_max_slack",
+        TRADE_FINANCE_SHARD_COUNT_MAX,
+        "trade_finance_shard_count_max",
+    )?;
+    builder.constrain_equal(signal_expr("trade_finance_shard_count_max_bit"), const_expr(1))?;
     let mut assignment_names = Vec::new();
     for index in 0..PRIVATE_TRADE_FINANCE_MAX_DIGESTS {
         builder.append_exact_division_constraints(
@@ -4404,6 +4433,15 @@ fn compute_trade_finance_settlement_binding_values(
         8,
         "trade_finance_settlement_non_auto_action",
     )?;
+    write_geq_support(
+        &mut values,
+        "trade_finance_settlement_action_class_in_range_bit",
+        "trade_finance_settlement_action_class_in_range_slack",
+        &BigInt::from(TRADE_FINANCE_ACTION_CLASS_MAX),
+        &BigInt::from(core.action_class.code()),
+        TRADE_FINANCE_ACTION_CLASS_MAX,
+        "trade_finance_settlement_action_class_in_range",
+    )?;
     let hold_required = hold_by_fraud || non_auto_action;
     write_bool_value(
         &mut values,
@@ -4792,7 +4830,8 @@ fn compute_batch_shard_values(
     TradeFinanceDuplicateRegistryComputationInternal,
 )> {
     let mut values = WitnessInputs::new();
-    write_value(&mut values, "trade_finance_shard_shard_count", 2u64);
+    let shard_count = 2u64;
+    write_value(&mut values, "trade_finance_shard_shard_count", shard_count);
     write_value(&mut values, "trade_finance_shard_blinding_0", 17u64);
     write_value(&mut values, "trade_finance_shard_blinding_1", 29u64);
     for (index, commitment) in commitments.iter().enumerate() {
@@ -4804,7 +4843,7 @@ fn compute_batch_shard_values(
         write_exact_division_support_bigint(
             &mut values,
             commitment,
-            2,
+            shard_count,
             &format!("trade_finance_shard_assignment_quotient_{index}"),
             &format!("trade_finance_shard_assignment_{index}"),
             &format!("trade_finance_shard_assignment_slack_{index}"),
@@ -4815,10 +4854,19 @@ fn compute_batch_shard_values(
         &mut values,
         "trade_finance_shard_count_valid_bit",
         "trade_finance_shard_count_valid_slack",
-        &BigInt::from(2u8),
+        &BigInt::from(shard_count),
         &BigInt::from(2u8),
         TRADE_FINANCE_SHARD_COUNT_MAX,
         "trade_finance_shard_count_valid",
+    )?;
+    write_geq_support(
+        &mut values,
+        "trade_finance_shard_count_max_bit",
+        "trade_finance_shard_count_max_slack",
+        &BigInt::from(TRADE_FINANCE_SHARD_COUNT_MAX),
+        &BigInt::from(shard_count),
+        TRADE_FINANCE_SHARD_COUNT_MAX,
+        "trade_finance_shard_count_max",
     )?;
     let batch_root_inner = write_poseidon_hash_support(
         &mut values,
@@ -5529,6 +5577,157 @@ mod tests {
     }
 
     #[test]
+    fn trade_finance_settlement_binding_rejects_out_of_range_action_code() {
+        let request = private_trade_finance_settlement_sample_inputs();
+        let (_, core) =
+            trade_finance_receivable_decision_witness_from_inputs(&request).expect("core");
+        let program = build_trade_finance_settlement_binding_program().expect("program");
+        let (mut values, _) =
+            compute_trade_finance_settlement_binding_values(&request, &core).expect("values");
+        let invalid_action = BigInt::from(TRADE_FINANCE_ACTION_CLASS_MAX + 1);
+        write_value(
+            &mut values,
+            "trade_finance_settlement_action_class_code",
+            invalid_action.clone(),
+        );
+
+        let hold_by_duplicate = bigint_from_map(
+            &values,
+            "trade_finance_settlement_hold_by_duplicate_risk_bit",
+        ) == one();
+        let non_auto_action = write_geq_support(
+            &mut values,
+            "trade_finance_settlement_non_auto_action_bit",
+            "trade_finance_settlement_non_auto_action_slack",
+            &invalid_action,
+            &BigInt::from(1u8),
+            8,
+            "trade_finance_settlement_non_auto_action",
+        )
+        .expect("non-auto support");
+        let action_in_range = write_geq_support(
+            &mut values,
+            "trade_finance_settlement_action_class_in_range_bit",
+            "trade_finance_settlement_action_class_in_range_slack",
+            &BigInt::from(TRADE_FINANCE_ACTION_CLASS_MAX),
+            &invalid_action,
+            TRADE_FINANCE_ACTION_CLASS_MAX,
+            "trade_finance_settlement_action_class_in_range",
+        )
+        .expect("action range support");
+        let hold_required = hold_by_duplicate || non_auto_action;
+        write_bool_value(
+            &mut values,
+            "trade_finance_settlement_hold_required_bit",
+            hold_required,
+        );
+        write_bool_value(
+            &mut values,
+            "trade_finance_settlement_finality_flag",
+            !hold_required,
+        );
+
+        let approved_advance_amount =
+            bigint_from_map(&values, "trade_finance_settlement_approved_advance_amount");
+        let reserve_amount = bigint_from_map(&values, "trade_finance_settlement_reserve_amount");
+        let supplier_destination = bigint_from_map(
+            &values,
+            "trade_finance_settlement_supplier_advance_destination_commitment",
+        );
+        let reserve_account = bigint_from_map(
+            &values,
+            "trade_finance_settlement_financier_reserve_account_commitment",
+        );
+        let settlement_blinding_0 = bigint_from_map(&values, "trade_finance_settlement_blinding_0");
+        let settlement_blinding_1 = bigint_from_map(&values, "trade_finance_settlement_blinding_1");
+        let invoice_packet = bigint_from_map(
+            &values,
+            "trade_finance_settlement_invoice_packet_commitment",
+        );
+        let eligibility = bigint_from_map(
+            &values,
+            "trade_finance_settlement_eligibility_commitment",
+        );
+        let public_blinding_1 =
+            bigint_from_map(&values, "trade_finance_settlement_public_blinding_1");
+        let duplicate_risk = bigint_from_map(
+            &values,
+            "trade_finance_settlement_duplicate_financing_risk_score",
+        );
+        let dispute_threshold =
+            bigint_from_map(&values, "trade_finance_settlement_dispute_threshold");
+
+        let settlement_instruction_inner = write_poseidon_hash_support(
+            &mut values,
+            "trade_finance_settlement_instruction_commitment_inner",
+            [
+                &approved_advance_amount,
+                &reserve_amount,
+                &invalid_action,
+                &supplier_destination,
+            ],
+        )
+        .expect("inner commitment");
+        let settlement_instruction_outer = write_poseidon_hash_support(
+            &mut values,
+            "trade_finance_settlement_instruction_commitment_outer",
+            [
+                &settlement_instruction_inner,
+                &reserve_account,
+                &settlement_blinding_0,
+                &settlement_blinding_1,
+            ],
+        )
+        .expect("outer commitment");
+        let settlement_instruction_commitment = write_poseidon_hash_support(
+            &mut values,
+            "trade_finance_settlement_instruction_commitment_binding",
+            [
+                &settlement_instruction_outer,
+                &invoice_packet,
+                &eligibility,
+                &public_blinding_1,
+            ],
+        )
+        .expect("binding commitment");
+        write_value(
+            &mut values,
+            "trade_finance_settlement_settlement_instruction_commitment",
+            settlement_instruction_commitment,
+        );
+        let dispute_hold_commitment = write_poseidon_hash_support(
+            &mut values,
+            "trade_finance_settlement_dispute_hold_commitment_inner",
+            [
+                &BigInt::from(TRADE_FINANCE_DOMAIN_SETTLEMENT),
+                &invalid_action,
+                &duplicate_risk,
+                &dispute_threshold,
+            ],
+        )
+        .expect("dispute commitment");
+        write_value(
+            &mut values,
+            "trade_finance_settlement_dispute_hold_commitment",
+            dispute_hold_commitment,
+        );
+
+        let text = match generate_witness(&program, &values) {
+            Ok(witness) => check_constraints(&program, &witness)
+                .expect_err("action code must fail")
+                .to_string(),
+            Err(err) => err.to_string(),
+        };
+        assert!(!action_in_range, "out-of-range action should clear the range bit");
+        assert!(
+            text.contains("action_class")
+                || text.contains("Constraint")
+                || text.contains("constraint"),
+            "unexpected error: {text}"
+        );
+    }
+
+    #[test]
     fn trade_finance_disclosure_projection_is_deterministic() {
         let request = private_trade_finance_settlement_sample_inputs();
         let (_, core_a) =
@@ -5617,6 +5816,91 @@ mod tests {
             &witness,
         )
         .expect("shard constraints");
+    }
+
+    #[test]
+    fn trade_finance_duplicate_registry_handoff_rejects_shard_count_above_max() {
+        let request = private_trade_finance_settlement_sample_inputs();
+        let (_, core_a) =
+            trade_finance_receivable_decision_witness_from_inputs(&request).expect("core");
+        let commitments = [
+            core_a.invoice_packet_commitment.clone(),
+            core_a.eligibility_commitment.clone(),
+            core_a.consistency_score_commitment.clone(),
+            core_a.settlement_instruction_commitment.clone(),
+        ];
+        let program = build_trade_finance_duplicate_registry_handoff_program().expect("program");
+        let (mut values, _) = compute_batch_shard_values(&commitments).expect("values");
+        let invalid_shard_count = TRADE_FINANCE_SHARD_COUNT_MAX + 1;
+        write_value(
+            &mut values,
+            "trade_finance_shard_shard_count",
+            invalid_shard_count,
+        );
+        write_geq_support(
+            &mut values,
+            "trade_finance_shard_count_valid_bit",
+            "trade_finance_shard_count_valid_slack",
+            &BigInt::from(invalid_shard_count),
+            &BigInt::from(2u8),
+            TRADE_FINANCE_SHARD_COUNT_MAX,
+            "trade_finance_shard_count_valid",
+        )
+        .expect("lower-bound support");
+        let shard_count_in_range = write_geq_support(
+            &mut values,
+            "trade_finance_shard_count_max_bit",
+            "trade_finance_shard_count_max_slack",
+            &BigInt::from(TRADE_FINANCE_SHARD_COUNT_MAX),
+            &BigInt::from(invalid_shard_count),
+            TRADE_FINANCE_SHARD_COUNT_MAX,
+            "trade_finance_shard_count_max",
+        )
+        .expect("upper-bound support");
+        for (index, commitment) in commitments.iter().enumerate() {
+            write_exact_division_support_bigint(
+                &mut values,
+                commitment,
+                invalid_shard_count,
+                &format!("trade_finance_shard_assignment_quotient_{index}"),
+                &format!("trade_finance_shard_assignment_{index}"),
+                &format!("trade_finance_shard_assignment_slack_{index}"),
+                &format!("trade_finance_shard_assignment_{index}"),
+            )
+            .expect("assignment support");
+        }
+        let assignment_0 = bigint_from_map(&values, "trade_finance_shard_assignment_0");
+        let assignment_1 = bigint_from_map(&values, "trade_finance_shard_assignment_1");
+        let assignment_2 = bigint_from_map(&values, "trade_finance_shard_assignment_2");
+        let assignment_3 = bigint_from_map(&values, "trade_finance_shard_assignment_3");
+        let assignment_commitment = write_poseidon_hash_support(
+            &mut values,
+            "trade_finance_shard_assignment_commitment_inner",
+            [&assignment_0, &assignment_1, &assignment_2, &assignment_3],
+        )
+        .expect("assignment commitment");
+        write_value(
+            &mut values,
+            "trade_finance_shard_assignment_commitment",
+            assignment_commitment,
+        );
+
+        let text = match generate_witness(&program, &values) {
+            Ok(witness) => check_constraints(&program, &witness)
+                .expect_err("shard count must fail")
+                .to_string(),
+            Err(err) => err.to_string(),
+        };
+        assert!(
+            !shard_count_in_range,
+            "out-of-range shard count should clear the max-range bit"
+        );
+        assert!(
+            text.contains("shard_count")
+                || text.contains("Constraint")
+                || text.contains("constraint"),
+            "unexpected error: {text}"
+        );
     }
 
     #[test]

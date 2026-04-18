@@ -1,4 +1,4 @@
-use actix_web::http::header::CONTENT_TYPE;
+use actix_web::http::{StatusCode, header::CONTENT_TYPE};
 use actix_web::{App, HttpResponse, HttpServer, Responder, web};
 use futures::stream;
 use serde::{Deserialize, Serialize};
@@ -11,8 +11,8 @@ use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use zkf_agent::{
     AgentRunOptionsV1, McpExposureV1, ensure_ziros_layout, handle_mcp_jsonrpc_bytes,
-    load_provider_profile_store, mcp_server_manifest, run_goal, ziros_home_root, ziros_logs_root,
-    ziros_managed_bin_root,
+    load_bridge_policy, load_provider_profile_store, mcp_server_manifest, run_goal,
+    ziros_home_root, ziros_logs_root, ziros_managed_bin_root,
 };
 
 use crate::cli::GatewayCommands;
@@ -334,14 +334,22 @@ async fn gateway_chat_completions(
     state: web::Data<GatewayState>,
     request: web::Json<GatewayChatRequest>,
 ) -> impl Responder {
+    if let Err(error) = ensure_remote_goal_execution_allowed(&state) {
+        return gateway_error_response(StatusCode::FORBIDDEN, "ziros_gateway_read_only", error);
+    }
     let goal = extract_goal(&request.messages)
         .unwrap_or_else(|| "inspect current operator state".to_string());
-    match run_gateway_goal(
-        &state,
-        request.model.clone(),
-        project_root_from_metadata(&state, request.metadata.as_ref()),
-        &goal,
-    ) {
+    let project_root = match project_root_from_metadata(&state, request.metadata.as_ref()) {
+        Ok(project_root) => project_root,
+        Err(error) => {
+            return gateway_error_response(
+                StatusCode::BAD_REQUEST,
+                "ziros_gateway_invalid_metadata",
+                error,
+            );
+        }
+    };
+    match run_gateway_goal(&state, request.model.clone(), project_root, &goal) {
         Ok((content, model)) => {
             if request.stream {
                 let stream_payload = format!(
@@ -396,14 +404,22 @@ async fn gateway_responses(
     state: web::Data<GatewayState>,
     request: web::Json<GatewayChatRequest>,
 ) -> impl Responder {
+    if let Err(error) = ensure_remote_goal_execution_allowed(&state) {
+        return gateway_error_response(StatusCode::FORBIDDEN, "ziros_gateway_read_only", error);
+    }
     let goal = extract_goal(&request.messages)
         .unwrap_or_else(|| "inspect current operator state".to_string());
-    match run_gateway_goal(
-        &state,
-        request.model.clone(),
-        project_root_from_metadata(&state, request.metadata.as_ref()),
-        &goal,
-    ) {
+    let project_root = match project_root_from_metadata(&state, request.metadata.as_ref()) {
+        Ok(project_root) => project_root,
+        Err(error) => {
+            return gateway_error_response(
+                StatusCode::BAD_REQUEST,
+                "ziros_gateway_invalid_metadata",
+                error,
+            );
+        }
+    };
+    match run_gateway_goal(&state, request.model.clone(), project_root, &goal) {
         Ok((content, model)) => HttpResponse::Ok().json(json!({
             "id": format!("resp-{}", now_unix()),
             "object": "response",
@@ -438,6 +454,8 @@ fn run_gateway_goal(
     project_root: Option<PathBuf>,
     goal: &str,
 ) -> Result<(String, String), String> {
+    let bridge_policy = load_bridge_policy()?;
+    let reasoning_model_label = bridge_policy.primary_model_label.clone();
     let provider = state.provider.clone().or_else(|| {
         load_provider_profile_store()
             .ok()
@@ -450,6 +468,9 @@ fn run_gateway_goal(
             project_root,
             provider_override: provider,
             model_override: model.clone(),
+            reasoning_lane: Some(bridge_policy.primary_lane.clone()),
+            reasoning_model_label: Some(reasoning_model_label.clone()),
+            reasoning_origin: Some("chatgpt-pro-bridge".to_string()),
             ..AgentRunOptionsV1::default()
         },
     )?;
@@ -461,7 +482,19 @@ fn run_gateway_goal(
         report.session.status.as_str(),
         report.receipts.len(),
     );
-    Ok((summary, model.unwrap_or_else(|| "ziros-agent".to_string())))
+    Ok((summary, reasoning_model_label))
+}
+
+fn ensure_remote_goal_execution_allowed(state: &GatewayState) -> Result<(), String> {
+    if matches!(state.remote_mcp_exposure, McpExposureV1::RemoteBridgeWrite) {
+        return Ok(());
+    }
+    Err(
+        "remote OpenAI-compatible execution is disabled in read-only bridge mode; use /mcp \
+agent_bridge_prepare and accept the handoff locally, or restart the gateway with \
+--allow-remote-writes."
+            .to_string(),
+    )
 }
 
 fn extract_goal(messages: &[GatewayMessage]) -> Option<String> {
@@ -494,12 +527,30 @@ fn text_from_content(content: &Value) -> Option<String> {
     })
 }
 
-fn project_root_from_metadata(state: &GatewayState, metadata: Option<&Value>) -> Option<PathBuf> {
-    metadata
+fn project_root_from_metadata(
+    state: &GatewayState,
+    metadata: Option<&Value>,
+) -> Result<Option<PathBuf>, String> {
+    if metadata
         .and_then(|value| value.get("project_root"))
-        .and_then(Value::as_str)
-        .map(PathBuf::from)
-        .or_else(|| state.project_root.clone())
+        .is_some()
+    {
+        return Err(
+            "caller-supplied metadata.project_root is not accepted on the remote gateway; \
+configure a fixed local project root when starting the gateway instead."
+                .to_string(),
+        );
+    }
+    Ok(state.project_root.clone())
+}
+
+fn gateway_error_response(status: StatusCode, error_type: &str, message: String) -> HttpResponse {
+    HttpResponse::build(status).json(json!({
+        "error": {
+            "type": error_type,
+            "message": message,
+        }
+    }))
 }
 
 fn now_unix() -> u64 {
@@ -952,4 +1003,49 @@ fn home_dir() -> PathBuf {
     std::env::var_os("HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("."))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn read_only_gateway_disables_openai_execution() {
+        let state = GatewayState {
+            project_root: None,
+            provider: None,
+            model: None,
+            remote_mcp_exposure: McpExposureV1::RemoteBridgeReadOnly,
+        };
+        let error = ensure_remote_goal_execution_allowed(&state).expect_err("read-only error");
+        assert!(error.contains("agent_bridge_prepare"));
+        assert!(error.contains("--allow-remote-writes"));
+    }
+
+    #[test]
+    fn remote_gateway_rejects_caller_project_root_metadata() {
+        let state = GatewayState {
+            project_root: Some(PathBuf::from("/safe-root")),
+            provider: None,
+            model: None,
+            remote_mcp_exposure: McpExposureV1::RemoteBridgeWrite,
+        };
+        let error =
+            project_root_from_metadata(&state, Some(&json!({ "project_root": "/tmp/pwn" })))
+                .expect_err("metadata project_root rejection");
+        assert!(error.contains("metadata.project_root"));
+    }
+
+    #[test]
+    fn remote_gateway_uses_server_configured_project_root_only() {
+        let state = GatewayState {
+            project_root: Some(PathBuf::from("/safe-root")),
+            provider: None,
+            model: None,
+            remote_mcp_exposure: McpExposureV1::RemoteBridgeWrite,
+        };
+        let project_root = project_root_from_metadata(&state, Some(&json!({ "note": "ok" })))
+            .expect("configured project root");
+        assert_eq!(project_root, Some(PathBuf::from("/safe-root")));
+    }
 }

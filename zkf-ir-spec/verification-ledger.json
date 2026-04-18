@@ -1781,13 +1781,13 @@
     },
     {
       "theorem_id": "model.trade_finance.packet_binding_soundness",
-      "title": "Trade-finance invoice packet binding model preserves the shipped two-chunk digest composition",
+      "title": "Trade-finance invoice packet binding model preserves a reduced two-chunk digest helper",
       "scope": "zkf-lib::app::private_trade_finance_settlement",
       "checker": "verus",
       "status": "mechanized_local",
       "assurance_class": "model_only_claim",
       "evidence_path": "zkf-lib/proofs/verus/trade_finance_verus.rs",
-      "notes": "Local trade-finance model theorems `packet_binding_soundness` (Verus), `packetBindingSoundness` (Lean), and `packet_binding_soundness` (Rocq) prove the same two-chunk invoice-packet digest composition used by the shipped app semantics, while explicitly stopping short of a backend Poseidon lowering proof over emitted PastaFq constraints.",
+      "notes": "Local trade-finance model theorems `packet_binding_soundness` (Verus), `packetBindingSoundness` (Lean), and `packet_binding_soundness` (Rocq) prove the same reduced two-chunk packet helper used inside the proof surface. They do not by themselves prove the shipped 37-step invoice-packet anchor chain or a backend Poseidon lowering over emitted PastaFq constraints; that emitted linkage is carried separately by generated trade-finance closure artifacts.",
       "trusted_assumptions": []
     },
     {
@@ -2145,6 +2145,17 @@
       "evidence_path": "zkf-lang/proofs/rocq/ZirLangPrivacyProofs.v",
       "notes": "Local Rocq theorem `private_unassigned_input_cannot_be_exposed` and Verus theorem `private_unassigned_cannot_expose` prove the privacy model rejects direct exposure of unassigned private inputs. This supports the shipped Zir checker boundary but remains a model-only claim until tied to extracted implementation proof.",
       "trusted_assumptions": []
+    },
+    {
+      "theorem_id": "hermes.pqc_zkproof_boundary_metabolized",
+      "title": "PQC envelope and ZKProof standardization integrated into proof-boundary closure skill",
+      "scope": "hermes.defender-knowledge-tissue + zk-proof-boundary-closure",
+      "checker": "manual + skill_patch + browser_research",
+      "status": "bounded_check",
+      "assurance_class": "bounded_check",
+      "evidence_path": "PROOF_BOUNDARY.md + zk-proof-boundary-closure/SKILL.md + /Users/sicarii/Documents/cryptography-study/mega-corpus",
+      "notes": "Web research (NIST PQC FIPS 203/204/205 + zkproof.org workgroups) metabolized into updated zk-proof-boundary-closure skill. Adds PQC parameter discipline (ML-KEM-1024/ML-DSA-87 priority, constant-time), ZKProof alignment for soundness/succinctness/selective disclosure (Midnight trade finance use case), explicit boundaries per ziros-proof-honesty and formal-verification-constitution. PROOF_BOUNDARY.md patched. Does not count as mechanized_implementation_claim. Supports future high-assurance ZirOS/Midnight work. Evidence: this ledger entry + skill patch + session tools.",
+      "trusted_assumptions": ["web_sources_accurate_as_of_2026-04", "no_new_mechanized_theorems_added"]
     }
   ]
 }

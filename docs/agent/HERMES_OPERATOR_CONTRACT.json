@@ -1,16 +1,21 @@
 {
-  "schema": "ziros-hermes-operator-contract-v1",
+  "schema": "ziros-hermes-operator-contract-v2",
   "generated_from": {
     "repo_root": "/Users/sicarii/Desktop/ZirOS",
     "truth_files": [
       "/Users/sicarii/Desktop/ZirOS/SOUL.md",
       "/Users/sicarii/Desktop/ZirOS/AGENTS.md",
       "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
-      "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
       "/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
+      "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_BOOTSTRAP_PROMPT.md",
       "/Users/sicarii/Desktop/ZirOS/.zkf-completion-status.json",
       "/Users/sicarii/Desktop/ZirOS/support-matrix.json",
-      "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json"
+      "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json",
+      "/Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json",
+      "/Users/sicarii/Desktop/ZirOS/setup/hermes/config/ziros-overlay.yaml",
+      "/Users/sicarii/Desktop/ZirOS/setup/hermes/policy/ziros-guardrails.json"
     ],
     "code_paths": [
       "/Users/sicarii/Desktop/ZirOS/zkf-runtime/src/lib.rs",
@@ -40,16 +45,19 @@
         "cat /Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
         "TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict",
         "~/.ziros/bin/ziros-managed.bin capabilities --json",
-        "~/.ziros/bin/ziros-managed.bin agent --json provider status"
+        "~/.ziros/bin/ziros-managed.bin agent --json provider status",
+        "~/.ziros/bin/ziros-managed.bin agent --json bridge status"
       ]
     },
     {
       "rank": 2,
       "kind": "machine-readable-repo-truth",
       "sources": [
+        "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json",
         "/Users/sicarii/Desktop/ZirOS/.zkf-completion-status.json",
+        "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
         "/Users/sicarii/Desktop/ZirOS/support-matrix.json",
-        "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec/verification-ledger.json"
+        "/Users/sicarii/Desktop/ZirOS/forensics/"
       ]
     },
     {
@@ -58,7 +66,7 @@
       "sources": [
         "/Users/sicarii/Desktop/ZirOS/AGENTS.md",
         "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
-        "/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md",
+        "/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md",
         "/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md"
       ]
     },
@@ -73,6 +81,67 @@
         "/Users/sicarii/Desktop/ZirOS/zkf-distributed",
         "/Users/sicarii/Desktop/ZirOS/zkf-ir-spec"
       ]
+    },
+    {
+      "rank": 5,
+      "kind": "non-canonical-local-overlay",
+      "sources": [
+        "/Users/sicarii/.hermes/SOUL.md",
+        "/Users/sicarii/.hermes/memories/",
+        "/Users/sicarii/.hermes/sessions/",
+        "/Users/sicarii/.hermes/plans/",
+        "/Users/sicarii/.hermes/cron/",
+        "/Users/sicarii/.hermes/skills/",
+        "/Users/sicarii/.hermes/ziros-pack/",
+        "/Users/sicarii/.hermes/ziros-pack.lock.json"
+      ]
+    }
+  ],
+  "authority_split": {
+    "machine_truth": [
+      "formal and capability claims",
+      "release-grade status",
+      "proof-boundary honesty"
+    ],
+    "agents_md": [
+      "repo mutation discipline",
+      "build and test obligations",
+      "proof-tool doctrine",
+      "soundness invariants"
+    ],
+    "hermes_constitution": [
+      "operator posture",
+      "lane honesty",
+      "publication defaults",
+      "memory and skill law"
+    ],
+    "operator_core": [
+      "shared merged operator model",
+      "lane definitions",
+      "repo-managed pack behavior",
+      "non-canonical local overlay classification"
+    ]
+  },
+  "lanes": [
+    {
+      "name": "strict-proof",
+      "meaning": "mechanized or admitted proof surface work",
+      "release_grade_evidence": true
+    },
+    {
+      "name": "operator-managed",
+      "meaning": "build, test, inspect, package, deploy, report, and local automation work",
+      "release_grade_evidence": false
+    },
+    {
+      "name": "support-evidence",
+      "meaning": "bounded or solver-backed support checks",
+      "release_grade_evidence": false
+    },
+    {
+      "name": "external-delegated",
+      "meaning": "remote or third-party systems outside ZirOS-owned proof truth",
+      "release_grade_evidence": false
     }
   ],
   "binary_topology": {
@@ -114,10 +183,27 @@
   "path_roots": {
     "repo_root": "/Users/sicarii/Desktop/ZirOS",
     "canonical_soul": "/Users/sicarii/Desktop/ZirOS/SOUL.md",
+    "operator_core": "/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md",
+    "operator_contract": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_OPERATOR_CONTRACT.json",
+    "operator_bootstrap_prompt": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_BOOTSTRAP_PROMPT.md",
+    "repo_managed_pack_root": "/Users/sicarii/Desktop/ZirOS/setup/hermes",
+    "repo_managed_pack_manifest": "/Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json",
+    "repo_managed_guardrails": "/Users/sicarii/Desktop/ZirOS/setup/hermes/policy/ziros-guardrails.json",
+    "hermes_home_root": "/Users/sicarii/.hermes",
+    "hermes_pack_root": "/Users/sicarii/.hermes/ziros-pack",
+    "hermes_lock_path": "/Users/sicarii/.hermes/ziros-pack.lock.json",
     "operator_specimen_root": "/Users/sicarii/Projects/hibikari",
     "live_mcp_file": "/Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt",
     "agent_socket": "/Users/sicarii/.ziros/agent/ziros-agentd.sock",
     "strict_cert_tmp_anchor": "/Users/sicarii/.zkf/strict-cert-tmp/zkf-stark-to-groth16/certification/strict-m4-max.json"
+  },
+  "repo_managed_pack": {
+    "manifest": "/Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json",
+    "overlay_config": "/Users/sicarii/Desktop/ZirOS/setup/hermes/config/ziros-overlay.yaml",
+    "guardrails": "/Users/sicarii/Desktop/ZirOS/setup/hermes/policy/ziros-guardrails.json",
+    "bootstrap_prompt": "/Users/sicarii/Desktop/ZirOS/setup/hermes/prompts/ziros-bootstrap.md",
+    "managed_install_root": "/Users/sicarii/.hermes/ziros-pack",
+    "lock_path": "/Users/sicarii/.hermes/ziros-pack.lock.json"
   },
   "observed_runtime_state": {
     "mcp_url": {
@@ -135,7 +221,13 @@
     "strict_metal": "TMPDIR=/Users/sicarii/.zkf/strict-cert-tmp/ ~/.ziros/bin/ziros-certified.bin metal-doctor --json --strict",
     "capabilities": "~/.ziros/bin/ziros-managed.bin capabilities --json",
     "provider_status": "~/.ziros/bin/ziros-managed.bin agent --json provider status",
+    "bridge_status": "~/.ziros/bin/ziros-managed.bin agent --json bridge status",
+    "browser_status": "~/.ziros/bin/ziros-managed.bin agent --json browser status",
+    "browser_open": "~/.ziros/bin/ziros-managed.bin agent --json browser open --url https://platform.openai.com/docs/guides/tools-shell --browser chrome",
     "agent_status": "~/.ziros/bin/ziros-managed.bin agent --json status",
+    "web_fetch": "~/.ziros/bin/ziros-managed.bin agent --json web fetch --url https://platform.openai.com/docs/guides/tools-shell",
+    "hermes_status": "~/.ziros/bin/ziros-managed.bin agent --json hermes status",
+    "hermes_doctor": "~/.ziros/bin/ziros-managed.bin agent --json hermes doctor",
     "midnight_status": "~/.ziros/bin/ziros-managed.bin midnight status --json",
     "midnight_doctor": "~/.ziros/bin/ziros-managed.bin midnight doctor --json --network preview",
     "subsystem_scaffold": "~/.ziros/bin/ziros-managed.bin subsystem scaffold",
@@ -162,6 +254,13 @@
         "explorer-or-indexer-checks",
         "release-surface-validation",
         "web-only-operator-flows"
+      ],
+      "preferred_first_surface": [
+        "ziros agent --json web fetch"
+      ],
+      "interactive_surface": [
+        "ziros agent --json browser open",
+        "ziros agent --json browser eval"
       ]
     },
     "terminal_backends": [
@@ -174,7 +273,7 @@
     ]
   },
   "autonomy_policy": {
-    "default_mode": "max-autonomy-local-first",
+    "default_mode": "max-autonomy-local-first-inside-hard-gates",
     "autonomous_actions": [
       "inspect",
       "search",
@@ -202,6 +301,20 @@
       "pretend-platform-enforced-handoffs-do-not-exist"
     ]
   },
+  "hard_gate_policy": {
+    "profile": "hermes-rigorous",
+    "fail_closed_on": [
+      "unsupported-strict-lane-requests",
+      "missing-local-bridge-acceptance",
+      "missing-wallet-or-key-material",
+      "missing-live-chain-confirmation",
+      "ambiguous-trust-lane-provenance",
+      "repo-managed-pack-drift",
+      "skipped-postflight-verification"
+    ],
+    "structured_command_first": true,
+    "postflight_required": true
+  },
   "approval_exceptions": [
     {
       "case": "platform-enforced-local-bridge-acceptance",
@@ -212,9 +325,20 @@
       "rule": "Hermes may diagnose and prepare, but it must not fabricate or substitute missing wallet secrets, admin keys, or API credentials"
     }
   ],
+  "non_canonical_operator_state": [
+    "/Users/sicarii/.hermes/SOUL.md",
+    "/Users/sicarii/.hermes/memories/",
+    "/Users/sicarii/.hermes/sessions/",
+    "/Users/sicarii/.hermes/plans/",
+    "/Users/sicarii/.hermes/cron/",
+    "/Users/sicarii/.hermes/skills/",
+    "/Users/sicarii/.hermes/ziros-pack/",
+    "/Users/sicarii/.hermes/ziros-pack.lock.json"
+  ],
   "memory_policy": {
     "facts_live_in": "~/.hermes/memories/",
     "procedures_live_in": "~/.hermes/skills/",
+    "classification": "non-canonical-local-overlay",
     "persist_facts": [
       "project-roots",
       "wallet-and-network-choices",
@@ -234,6 +358,13 @@
       "subsystem-scaffold-and-package",
       "verifier-export",
       "proof-first-public-release"
+    ],
+    "repo_managed_skills": [
+      "ziros-operator-core",
+      "ziros-worktree-discipline",
+      "ziros-proof-honesty",
+      "ziros-command-routing",
+      "ziros-release-boundary"
     ]
   },
   "publication_policy": {
@@ -299,6 +430,12 @@
       "delivery": "home-channel-or-local-file"
     },
     {
+      "name": "ziros-hermes-pack-drift",
+      "schedule": "0 */6 * * *",
+      "prompt": "Run python3 scripts/check_hermes_operator_drift.py --write-report and summarize repo-managed Hermes pack drift, missing skills, config drift, or hard-gate violations.",
+      "delivery": "home-channel-or-local-file"
+    },
+    {
       "name": "hibikari-deployment-watch",
       "schedule": "0 9 * * *",
       "prompt": "Inspect /Users/sicarii/Projects/hibikari/deployment-all.json, verify the listed contracts against the live Midnight preview indexer, and summarize invariant drift or missing chain state.",
@@ -306,6 +443,12 @@
     }
   ],
   "browser_policy": {
+    "prefer_structured_fetch_first": true,
+    "structured_fetch_surface": "ziros agent --json web fetch",
+    "interactive_browser_surface": [
+      "ziros agent --json browser open",
+      "ziros agent --json browser eval"
+    ],
     "use_for": [
       "official Hermes docs",
       "official OpenAI docs",
@@ -314,7 +457,8 @@
       "public proof artifacts"
     ],
     "do_not_use_for": [
-      "local command truth that already has a deterministic CLI surface"
+      "local command truth that already has a deterministic CLI surface",
+      "official URL repair when the structured fetch surface is sufficient"
     ]
   },
   "midnight_policy": {
@@ -328,8 +472,9 @@
     ]
   },
   "formal_attestation_policy": {
-    "mechanized_rows": 160,
-    "hypothesis_rows": 9,
+    "mechanized_rows": 193,
+    "hypothesis_rows": 0,
+    "trusted_protocol_tcb_rows": 9,
     "rules": [
       "mechanized local proof outranks prose",
       "hypothesis-carried rows stay labeled",
@@ -362,6 +507,11 @@
       "name": "mcp-handoff-boundary",
       "detect_with": "remote tool can plan but local mutation still requires acceptance",
       "repair_pattern": "prepare bridge handoff and accept locally"
+    },
+    {
+      "name": "repo-managed-pack-drift",
+      "detect_with": "ziros agent hermes doctor --json",
+      "repair_pattern": "run ziros agent hermes sync --json and re-run the doctor"
     }
   ]
 }

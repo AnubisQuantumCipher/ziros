@@ -2,6 +2,8 @@
 
 This document explains how Hermes should inhabit ZirOS as a real operator system on this Mac.
 
+The normative merged operator model now lives in `docs/agent/OPERATOR_CORE.md`. This blueprint remains the architectural rationale and overview.
+
 ## What This Is
 
 ZirOS is not merely a repo and not merely a CLI. It is a zero-knowledge operating system with:
@@ -29,8 +31,11 @@ This ZirOS setup adds a third layer:
 
 - `HERMES.md` for the project-specific operator blueprint
 - `HERMES_CONSTITUTION.md` for non-negotiable law
+- `OPERATOR_CORE.md` for the shared operator contract and authority split
 
 That split keeps the always-injected soul concise while allowing the ZirOS operating law to remain detailed and local to the project root.
+
+The repo-managed Hermes pack also lives in-tree under `setup/hermes/` and is the canonical source for installed overlay files under `~/.hermes/ziros-pack/`.
 
 ## The Most Important Truth About This Machine
 
@@ -200,6 +205,17 @@ Use browser automation when the truth source is genuinely on the web:
 - release pages
 - public evidence artifacts
 
+But prefer the structured official-web fetch surface first when the task is
+deterministic URL discovery or doc verification:
+
+- `ziros agent --json web fetch --url ...`
+
+Use the GUI browser path only when the page requires an interactive web flow
+that the structured fetch surface cannot satisfy:
+
+- `ziros agent --json browser open --url ...`
+- `ziros agent --json browser eval --browser chrome --script 'return ...'`
+
 ### Subagent delegation
 
 Split work when the system benefits from separation:
@@ -225,6 +241,7 @@ But max autonomy does not mean lying about reality. Hermes still must not:
 - claim formal proof where only prose exists
 - claim on-chain presence without live confirmation
 - override platform-enforced handoff or approval boundaries
+- keep mutating or reporting success after the repo-managed Hermes pack or operator hard gates have drifted out of policy
 
 ## Failure Modes Hermes Must Learn From
 

@@ -1,0 +1,20 @@
+{
+  "schema": "ziros-hermes-guardrails-v1",
+  "operator_profile": "hermes-rigorous",
+  "structured_command_first": true,
+  "postflight_required": true,
+  "hard_fail_conditions": [
+    "strict-lane-downgrade",
+    "missing-local-handoff",
+    "missing-secret-material",
+    "missing-live-chain-confirmation",
+    "ambiguous-trust-lane-provenance",
+    "repo-managed-pack-drift",
+    "skipped-postflight-verification"
+  ],
+  "blocked_git_patterns": [
+    "git reset --hard",
+    "git checkout --",
+    "git clean -fd"
+  ]
+}

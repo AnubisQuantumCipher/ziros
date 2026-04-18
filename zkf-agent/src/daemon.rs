@@ -1,64 +1,141 @@
+use crate::state::{ensure_ziros_layout, socket_path as managed_socket_path};
+use crate::types::{
+    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1, AgentBridgeHandoffPrepareRequestV1,
+    AgentBrowserEvalRequestV1, AgentBrowserOpenRequestV1, AgentCancelRequestV1,
+    AgentCheckpointCreateRequestV1, AgentCheckpointRollbackRequestV1,
+    AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1, AgentProviderTestRequestV1,
+    AgentRejectRequestV1, AgentRunOptionsV1, AgentWebFetchRequestV1, AgentWorktreeCleanupRequestV1,
+    AgentWorktreeCreateRequestV1, EventSubscriptionRequestV1,
+};
 use crate::{
-    accept_bridge_handoff, agent_status, approval_lineage, cancel_session, cleanup_worktree,
-    create_checkpoint, create_worktree, event_subscription, list_bridge_handoffs,
+    accept_bridge_handoff, agent_status, approval_lineage, bridge_status, browser_eval_report,
+    browser_open_report, browser_status_report, cancel_session, cleanup_worktree,
+    create_checkpoint, create_worktree, event_subscription, hermes_diff, hermes_doctor,
+    hermes_export_bootstrap, hermes_install, hermes_status, hermes_sync, list_bridge_handoffs,
     list_checkpoints, list_incidents, list_procedures, list_projects, list_worktrees,
     memory_sessions, plan_goal, prepare_bridge_handoff, provider_route, provider_status,
     provider_test, register_project, resume_session, rollback_checkpoint, run_goal,
-    session_artifacts, session_deployments, session_environments, session_logs, workflow_list,
-    workflow_show,
+    session_artifacts, session_deployments, session_environments, session_logs, web_fetch_report,
+    workflow_list, workflow_show,
 };
 use crate::{approve_request, reject_request};
-use crate::types::{
-    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
-    AgentBridgeHandoffPrepareRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
-    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
-    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
-    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
-    EventSubscriptionRequestV1,
-};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::PathBuf;
-use crate::state::{ensure_ziros_layout, socket_path as managed_socket_path};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "method", rename_all = "kebab-case")]
 pub enum AgentRpcRequestV1 {
-    Status { limit: usize },
-    Plan { goal: String, options: AgentRunOptionsV1 },
-    Run { goal: String, options: AgentRunOptionsV1 },
-    Resume { session_id: String },
-    Cancel { request: AgentCancelRequestV1 },
-    Logs { session_id: String },
-    Artifacts { session_id: Option<String> },
-    Approvals { session_id: Option<String> },
-    Deployments { session_id: Option<String> },
-    Environments { session_id: Option<String> },
+    Status {
+        limit: usize,
+    },
+    Plan {
+        goal: String,
+        options: AgentRunOptionsV1,
+    },
+    Run {
+        goal: String,
+        options: AgentRunOptionsV1,
+    },
+    Resume {
+        session_id: String,
+    },
+    Cancel {
+        request: AgentCancelRequestV1,
+    },
+    Logs {
+        session_id: String,
+    },
+    Artifacts {
+        session_id: Option<String>,
+    },
+    Approvals {
+        session_id: Option<String>,
+    },
+    Deployments {
+        session_id: Option<String>,
+    },
+    Environments {
+        session_id: Option<String>,
+    },
     Procedures,
-    Incidents { session_id: Option<String> },
-    MemorySessions { limit: usize },
+    Incidents {
+        session_id: Option<String>,
+    },
+    MemorySessions {
+        limit: usize,
+    },
     WorkflowList,
-    WorkflowShow { workgraph_id: String },
-    ProjectRegister { request: AgentProjectRegisterRequestV1 },
+    WorkflowShow {
+        workgraph_id: String,
+    },
+    ProjectRegister {
+        request: AgentProjectRegisterRequestV1,
+    },
     ProjectList,
-    BridgeHandoffPrepare { request: AgentBridgeHandoffPrepareRequestV1 },
+    BridgeHandoffPrepare {
+        request: AgentBridgeHandoffPrepareRequestV1,
+    },
+    BridgeStatus,
+    BrowserStatus,
+    BrowserOpen {
+        request: AgentBrowserOpenRequestV1,
+    },
+    BrowserEval {
+        request: AgentBrowserEvalRequestV1,
+    },
     BridgeHandoffList,
-    BridgeHandoffAccept { request: AgentBridgeHandoffAcceptRequestV1 },
-    WorktreeList { session_id: Option<String> },
-    WorktreeCreate { request: AgentWorktreeCreateRequestV1 },
-    WorktreeCleanup { request: AgentWorktreeCleanupRequestV1 },
-    CheckpointList { session_id: String },
-    CheckpointCreate { request: AgentCheckpointCreateRequestV1 },
-    CheckpointRollback { request: AgentCheckpointRollbackRequestV1 },
-    ProviderStatus { session_id: Option<String> },
-    ProviderRoute { request: AgentProviderRouteRequestV1 },
-    ProviderTest { request: AgentProviderTestRequestV1 },
-    Approve { request: AgentApproveRequestV1 },
-    Reject { request: AgentRejectRequestV1 },
-    EventSubscribe { request: EventSubscriptionRequestV1 },
+    BridgeHandoffAccept {
+        request: AgentBridgeHandoffAcceptRequestV1,
+    },
+    WorktreeList {
+        session_id: Option<String>,
+    },
+    WorktreeCreate {
+        request: AgentWorktreeCreateRequestV1,
+    },
+    WorktreeCleanup {
+        request: AgentWorktreeCleanupRequestV1,
+    },
+    CheckpointList {
+        session_id: String,
+    },
+    CheckpointCreate {
+        request: AgentCheckpointCreateRequestV1,
+    },
+    CheckpointRollback {
+        request: AgentCheckpointRollbackRequestV1,
+    },
+    ProviderStatus {
+        session_id: Option<String>,
+    },
+    WebFetch {
+        request: AgentWebFetchRequestV1,
+    },
+    ProviderRoute {
+        request: AgentProviderRouteRequestV1,
+    },
+    ProviderTest {
+        request: AgentProviderTestRequestV1,
+    },
+    HermesStatus,
+    HermesDiff,
+    HermesInstall,
+    HermesSync,
+    HermesDoctor,
+    HermesExportBootstrap,
+    Approve {
+        request: AgentApproveRequestV1,
+    },
+    Reject {
+        request: AgentRejectRequestV1,
+    },
+    EventSubscribe {
+        request: EventSubscriptionRequestV1,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -100,7 +177,9 @@ pub fn serve_daemon(socket_path: Option<PathBuf>) -> Result<(), String> {
 fn handle_stream(mut stream: UnixStream) -> Result<(), String> {
     let mut line = String::new();
     let mut reader = BufReader::new(stream.try_clone().map_err(|error| error.to_string())?);
-    reader.read_line(&mut line).map_err(|error| error.to_string())?;
+    reader
+        .read_line(&mut line)
+        .map_err(|error| error.to_string())?;
     if line.trim().is_empty() {
         return Ok(());
     }
@@ -135,7 +214,9 @@ pub fn call_daemon(
     stream.write_all(b"\n").map_err(|error| error.to_string())?;
     let mut reader = BufReader::new(stream);
     let mut line = String::new();
-    reader.read_line(&mut line).map_err(|error| error.to_string())?;
+    reader
+        .read_line(&mut line)
+        .map_err(|error| error.to_string())?;
     serde_json::from_str(&line).map_err(|error| error.to_string())
 }
 
@@ -182,8 +263,9 @@ pub fn handle_rpc_request(request: AgentRpcRequestV1) -> Result<Value, String> {
             serde_json::to_value(list_incidents(session_id.as_deref())?)
                 .map_err(|error| error.to_string())
         }
-        AgentRpcRequestV1::MemorySessions { limit } => serde_json::to_value(memory_sessions(limit)?)
-            .map_err(|error| error.to_string()),
+        AgentRpcRequestV1::MemorySessions { limit } => {
+            serde_json::to_value(memory_sessions(limit)?).map_err(|error| error.to_string())
+        }
         AgentRpcRequestV1::WorkflowList => {
             serde_json::to_value(workflow_list()?).map_err(|error| error.to_string())
         }
@@ -200,12 +282,23 @@ pub fn handle_rpc_request(request: AgentRpcRequestV1) -> Result<Value, String> {
             serde_json::to_value(prepare_bridge_handoff(request)?)
                 .map_err(|error| error.to_string())
         }
+        AgentRpcRequestV1::BridgeStatus => {
+            serde_json::to_value(bridge_status()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BrowserStatus => {
+            serde_json::to_value(browser_status_report()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BrowserOpen { request } => {
+            serde_json::to_value(browser_open_report(request)?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::BrowserEval { request } => {
+            serde_json::to_value(browser_eval_report(request)?).map_err(|error| error.to_string())
+        }
         AgentRpcRequestV1::BridgeHandoffList => {
             serde_json::to_value(list_bridge_handoffs()?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::BridgeHandoffAccept { request } => {
-            serde_json::to_value(accept_bridge_handoff(request)?)
-                .map_err(|error| error.to_string())
+            serde_json::to_value(accept_bridge_handoff(request)?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::WorktreeList { session_id } => {
             serde_json::to_value(list_worktrees(session_id.as_deref())?)
@@ -224,18 +317,38 @@ pub fn handle_rpc_request(request: AgentRpcRequestV1) -> Result<Value, String> {
             serde_json::to_value(create_checkpoint(request)?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::CheckpointRollback { request } => {
-            serde_json::to_value(rollback_checkpoint(request)?)
-                .map_err(|error| error.to_string())
+            serde_json::to_value(rollback_checkpoint(request)?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::ProviderStatus { session_id } => {
             serde_json::to_value(provider_status(session_id.as_deref())?)
                 .map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::WebFetch { request } => {
+            serde_json::to_value(web_fetch_report(request)?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::ProviderRoute { request } => {
             serde_json::to_value(provider_route(request)?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::ProviderTest { request } => {
             serde_json::to_value(provider_test(request)?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesStatus => {
+            serde_json::to_value(hermes_status()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesDiff => {
+            serde_json::to_value(hermes_diff()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesInstall => {
+            serde_json::to_value(hermes_install()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesSync => {
+            serde_json::to_value(hermes_sync()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesDoctor => {
+            serde_json::to_value(hermes_doctor()?).map_err(|error| error.to_string())
+        }
+        AgentRpcRequestV1::HermesExportBootstrap => {
+            serde_json::to_value(hermes_export_bootstrap()?).map_err(|error| error.to_string())
         }
         AgentRpcRequestV1::Approve { request } => {
             serde_json::to_value(approve_request(request)?).map_err(|error| error.to_string())

@@ -14,14 +14,15 @@ swarm defense envelope.
 <!-- BEGIN GENERATED VERIFICATION STATUS -->
 This block is generated from `zkf-ir-spec/verification-ledger.json`.
 
-- Total ledger entries: 193.
+- Total ledger entries: 194.
 - Machine-checked rows: 193 total (189 `mechanized_local`, 4 `mechanized_generated`).
 - Remaining non-machine-checked rows: 0 `hypothesis_stated`, 0 `bounded_checked`, 0 `assumed_external`, 0 `pending`.
-- Assurance classes: 167 `mechanized_implementation_claim`, 0 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
+- Assurance classes: 167 `mechanized_implementation_claim`, 1 `bounded_check`, 0 `attestation_backed_lane`, 17 `model_only_claim`, 9 `trusted_protocol_tcb`, 0 `hypothesis_carried_theorem`.
 - Whole-runtime target inventory: 89 files / 1788 functions, with 89 files / 1788 functions at a completion state.
 - Swarm proof-boundary closure: `true` (`zkf-runtime-swarm-path` = 13/13 files complete, `zkf-distributed-swarm-path` = 37/37 files complete).
-- Release-grade ready: `true`.
-- Release-grade blockers: none.
+- Release-grade ready: `false`.
+- Release-grade blockers:
+  - 1 non-protocol row(s) still carry trusted_assumptions
 <!-- END GENERATED VERIFICATION STATUS -->
 
 When prose and the ledger disagree, the ledger wins.
@@ -78,6 +79,18 @@ The shipped verified GPU lane is now claimed as a split surface:
 
 - structural family-model rows for the shipped hash, Poseidon2, NTT, and MSM inventories, bindings, layouts, and attested source sets
 - mechanized launch, layout, provenance, and fail-closed runtime boundaries
+
+## PQC + ZKProof Metabolized Boundary (Hermes Skill Integration 2026)
+
+Following web research on NIST PQC standards (FIPS 203 ML-KEM, 204 ML-DSA, 205 SLH-DSA; ongoing HQC/Falcon; migration per IR 8547) and ZKProof.org (PLONK-ish, Σ-protocols, Verified Verifier workgroups, community reference at docs.zkproof.org), the zk-proof-boundary-closure skill has been patched with:
+
+- **PQC Envelope Discipline**: All signature/KEM/gossip surfaces must use ML-DSA-87/ML-KEM-1024 (or higher). Parameters reviewed for security level, constant-time, NTT. Classical wrappers labeled transitional/Shor-vulnerable. Ties to capability-matrix/post-quantum.json and swarm/identity.rs.
+- **ZK Standardization Alignment**: Claims must reference ZKProof specs for soundness/zero-knowledge/succinctness. Prefer Plonky3 transparent STARKs. Explicit selective disclosure bounds for Midnight (e.g. private_trade_finance_settlement commitments, eligibility proofs, duplicate-pledge prevention without full revelation).
+- **High-Assurance Heuristics**: Every tranche now cross-references NIST FIPS + ZKProof outputs in ledger notes. Explicit "proven vs assumed" (MLWE hardness, circuit correctness, external TCB for Midnight). Updates to verification-ledger.json, .zkf-completion-status.json, docs/SECURITY.md required on change. Aligns with ziros-proof-honesty (separate mechanized vs delegated vs hypothesis_carried) and formal-verification-constitution (no overclaim, precise vocabulary, close specific gaps like pastafq_poseidon_binding).
+
+This is recorded as bounded_check + skill promotion. Ledger entry added below. Does not inflate mechanized count; treated as defender doctrine over the existing 193 entries. Release-grade status remains true only because existing mechanized rows + explicit boundaries cover it. Next: regenerate status artifacts and run proof_audit.py / generate_verification_status_artifacts.py to sync generated blocks.
+
+When prose and ledger disagree, ledger wins. This update preserves that.
 - one counted arithmetic subtranche: `gpu.ntt_bn254_butterfly_arithmetic_sound` for the admitted `ntt_butterfly_bn254` kernel, assuming the pinned Apple Metal compiler, driver/runtime, and GPU hardware execute the attested metallib and pipeline state correctly
 
 That claim is intentionally narrower than "zero-trust Metal." The verified lane is a pinned subset:

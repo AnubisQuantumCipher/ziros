@@ -44,6 +44,12 @@ pub struct AgentRunOptionsV1 {
     pub provider_override: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_override: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_lane: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_model_label: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_origin: Option<String>,
 }
 
 impl Default for AgentRunOptionsV1 {
@@ -58,8 +64,104 @@ impl Default for AgentRunOptionsV1 {
             intent: None,
             provider_override: None,
             model_override: None,
+            reasoning_lane: None,
+            reasoning_model_label: None,
+            reasoning_origin: None,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum BridgeTaskClassV1 {
+    Study,
+    Retrieval,
+    Planning,
+    Implementation,
+    Audit,
+    Proof,
+    RepoForensics,
+    Benchmark,
+    LocalPoc,
+    Mutation,
+    Release,
+}
+
+impl BridgeTaskClassV1 {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Study => "study",
+            Self::Retrieval => "retrieval",
+            Self::Planning => "planning",
+            Self::Implementation => "implementation",
+            Self::Audit => "audit",
+            Self::Proof => "proof",
+            Self::RepoForensics => "repo-forensics",
+            Self::Benchmark => "benchmark",
+            Self::LocalPoc => "local-poc",
+            Self::Mutation => "mutation",
+            Self::Release => "release",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum BridgeFallbackPolicyV1 {
+    FailClosed,
+    FallbackWithLabel,
+    AlwaysFallback,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgePolicyV1 {
+    pub schema: String,
+    pub primary_lane: String,
+    pub primary_model_label: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub critical_task_classes: Vec<BridgeTaskClassV1>,
+    pub local_execution_required: bool,
+    pub allow_remote_mutation: bool,
+    pub fallback_policy: BridgeFallbackPolicyV1,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub fallback_allowed_task_classes: Vec<BridgeTaskClassV1>,
+    pub downgrade_label_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReasoningProvenanceV1 {
+    pub task_class: BridgeTaskClassV1,
+    pub reasoning_lane: String,
+    pub reasoning_primary: bool,
+    pub reasoning_model_label: String,
+    pub reasoning_origin: String,
+    pub execution_origin: String,
+    pub primary_lane_expected: String,
+    pub primary_lane_used: bool,
+    pub downgraded_from_primary: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub downgrade_reason: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgeStatusReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub policy_path: String,
+    pub bridge_present: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bridge_mcp_url: Option<String>,
+    pub bridge_remote_health: bool,
+    pub bridge_local_gateway_health: bool,
+    pub bridge_gateway_configured: bool,
+    pub bridge_gateway_running: bool,
+    pub bridge_tunnel_running: bool,
+    pub bridge_model_label: String,
+    pub bridge_exposure: String,
+    pub bridge_auth_mode: String,
+    pub primary_intelligence_lane: String,
+    pub fallback_policy: BridgeFallbackPolicyV1,
+    pub policy: BridgePolicyV1,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -128,6 +230,25 @@ pub struct ExecutionPolicyV1 {
     pub compat_allowed: bool,
     pub stop_on_first_failure: bool,
     pub require_explicit_approval_for_high_risk: bool,
+    #[serde(default = "default_operator_profile")]
+    pub operator_profile: OperatorProfileV1,
+    #[serde(default = "default_true")]
+    pub structured_command_first: bool,
+    #[serde(default = "default_true")]
+    pub postflight_required: bool,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum OperatorProfileV1 {
+    Default,
+    HermesRigorous,
+}
+
+impl Default for OperatorProfileV1 {
+    fn default() -> Self {
+        default_operator_profile()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -148,23 +269,21 @@ impl WorkflowRequirementsV1 {
         let require_wallet = hints
             .and_then(|value| value.require_wallet)
             .unwrap_or_else(|| match intent.workflow_kind.as_str() {
-            "midnight-contract-ops" | "subsystem-midnight-ops" => {
-                lower.contains("deploy")
-                    || lower.contains("submit")
-                    || lower.contains("call")
-                    || lower.contains("wallet")
-            }
-            _ => false,
-        });
-        let require_metal = hints
-            .and_then(|value| value.require_metal)
-            .unwrap_or(
-                intent.workflow_kind == "benchmark-report"
-                    || intent.workflow_kind == "subsystem-benchmark"
-                    || lower.contains("metal")
-                    || lower.contains("gpu")
-                    || lower.contains("apple silicon"),
-            );
+                "midnight-contract-ops" | "subsystem-midnight-ops" => {
+                    lower.contains("deploy")
+                        || lower.contains("submit")
+                        || lower.contains("call")
+                        || lower.contains("wallet")
+                }
+                _ => false,
+            });
+        let require_metal = hints.and_then(|value| value.require_metal).unwrap_or(
+            intent.workflow_kind == "benchmark-report"
+                || intent.workflow_kind == "subsystem-benchmark"
+                || lower.contains("metal")
+                || lower.contains("gpu")
+                || lower.contains("apple silicon"),
+        );
         Self {
             strict: options.strict,
             compat_allowed: options.compat_allowed,
@@ -225,6 +344,8 @@ pub struct EnvironmentSnapshotV1 {
     pub midnight_status: Option<MidnightStatusReportV1>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wallet: Option<WalletReadinessV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_provenance: Option<ReasoningProvenanceV1>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -470,6 +591,7 @@ pub struct AgentRunReportV1 {
     pub trust_gate: TrustGateReportV1,
     pub workgraph: WorkgraphV1,
     pub receipts: Vec<ActionReceiptV1>,
+    pub reasoning_provenance: ReasoningProvenanceV1,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -493,6 +615,7 @@ pub struct AgentExplainReportV1 {
     pub session: Option<AgentSessionViewV1>,
     pub trust_gate: TrustGateReportV1,
     pub workgraph: WorkgraphV1,
+    pub reasoning_provenance: ReasoningProvenanceV1,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -610,6 +733,12 @@ pub struct AgentProviderStatusReportV1 {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     pub routes: Vec<ProviderRouteRecordV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_intelligence_lane: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fallback_policy: Option<BridgeFallbackPolicyV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bridge_status: Option<BridgeStatusReportV1>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -619,6 +748,133 @@ pub struct AgentProviderTestReportV1 {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     pub probes: Vec<ProviderProbeResultV1>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum AgentBrowserKindV1 {
+    Default,
+    Safari,
+    Chrome,
+}
+
+impl AgentBrowserKindV1 {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Default => "default",
+            Self::Safari => "safari",
+            Self::Chrome => "chrome",
+        }
+    }
+
+    pub fn display_name(self) -> &'static str {
+        match self {
+            Self::Default => "default browser",
+            Self::Safari => "Safari",
+            Self::Chrome => "Google Chrome",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBrowserStatusReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub platform: String,
+    pub supported: bool,
+    pub safari_installed: bool,
+    pub chrome_installed: bool,
+    pub safari_running: bool,
+    pub chrome_running: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preferred_automation_browser: Option<AgentBrowserKindV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub notes: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBrowserOpenRequestV1 {
+    pub url: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub browser: Option<AgentBrowserKindV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub activate: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub new_window: Option<bool>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBrowserOpenReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub browser: String,
+    pub requested_url: String,
+    pub ok: bool,
+    pub activated: bool,
+    pub new_window: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBrowserEvalRequestV1 {
+    pub script: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub browser: Option<AgentBrowserKindV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub activate: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub wait_millis: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentBrowserEvalReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub browser: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_result: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentWebFetchRequestV1 {
+    pub url: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_bytes: Option<usize>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentWebFetchReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub request_url: String,
+    pub final_url: String,
+    pub host: String,
+    pub policy_scope: String,
+    pub ok: bool,
+    pub status_code: u16,
+    pub status_text: String,
+    pub redirected: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub canonical_url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body_excerpt: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub same_host_links: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -666,6 +922,123 @@ pub struct AgentListProjectsReportV1 {
     pub schema: String,
     pub generated_at: String,
     pub projects: Vec<ProjectRecordV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GuardrailViolationV1 {
+    pub code: String,
+    pub severity: String,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesManagedAssetStatusV1 {
+    pub id: String,
+    pub kind: String,
+    pub source_path: String,
+    pub target_path: String,
+    pub expected_sha256: String,
+    pub installed: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actual_sha256: Option<String>,
+    pub sha256_match: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesConfigStatusV1 {
+    pub path: String,
+    pub exists: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operator_profile: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repo_root: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pack_root: Option<String>,
+    pub auto_load_rule_present: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub missing_skills: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesPackStatusV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub operator_profile: OperatorProfileV1,
+    pub repo_root: String,
+    pub hermes_home: String,
+    pub pack_root: String,
+    pub lock_path: String,
+    pub contract_path: String,
+    pub manifest_path: String,
+    pub install_complete: bool,
+    pub doctor_ok: bool,
+    pub lock_present: bool,
+    pub config: HermesConfigStatusV1,
+    pub assets: Vec<HermesManagedAssetStatusV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub non_canonical_state: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub violations: Vec<GuardrailViolationV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesPackDiffV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub healthy: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub missing_assets: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub changed_assets: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub config_issues: Vec<GuardrailViolationV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub lock_issues: Vec<GuardrailViolationV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesInstallReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub pack_root: String,
+    pub lock_path: String,
+    pub config_path: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub assets_written: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub skills_written: Vec<String>,
+    pub config_updated: bool,
+    pub lock_written: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesBootstrapAssetV1 {
+    pub id: String,
+    pub source_path: String,
+    pub installed_path: String,
+    pub sha256: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesExportBootstrapReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub prompt_path: String,
+    pub prompt_text: String,
+    pub contract_path: String,
+    pub manifest_path: String,
+    pub assets: Vec<HermesBootstrapAssetV1>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HermesDoctorReportV1 {
+    pub schema: String,
+    pub generated_at: String,
+    pub healthy: bool,
+    pub repair_command: String,
+    pub status: HermesPackStatusV1,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -830,6 +1203,34 @@ fn default_event_limit() -> usize {
     50
 }
 
+fn default_true() -> bool {
+    true
+}
+
+fn default_operator_profile() -> OperatorProfileV1 {
+    OperatorProfileV1::HermesRigorous
+}
+
 fn default_use_worktree() -> bool {
     true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ExecutionPolicyV1, OperatorProfileV1};
+
+    #[test]
+    fn execution_policy_backfills_new_fields_for_legacy_payloads() {
+        let payload = serde_json::json!({
+            "strict": true,
+            "compat_allowed": false,
+            "stop_on_first_failure": true,
+            "require_explicit_approval_for_high_risk": true
+        });
+        let policy: ExecutionPolicyV1 =
+            serde_json::from_value(payload).expect("legacy execution policy");
+        assert_eq!(policy.operator_profile, OperatorProfileV1::HermesRigorous);
+        assert!(policy.structured_command_first);
+        assert!(policy.postflight_required);
+    }
 }

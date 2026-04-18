@@ -11,9 +11,13 @@ pub fn create_checkpoint_record(
     label: &str,
     latest_receipt_id: Option<String>,
 ) -> Result<CheckpointRecordV1, String> {
-    let worktree = brain.list_worktrees(Some(&session.session_id))?.into_iter().last();
+    let worktree = brain
+        .list_worktrees(Some(&session.session_id))?
+        .into_iter()
+        .last();
     let (worktree_id, worktree_root, head_commit) = if let Some(record) = worktree {
-        let head_commit = git_capture(Path::new(&record.worktree_root), &["rev-parse", "HEAD"]).ok();
+        let head_commit =
+            git_capture(Path::new(&record.worktree_root), &["rev-parse", "HEAD"]).ok();
         (
             Some(record.worktree_id),
             Some(record.worktree_root),
@@ -41,9 +45,10 @@ pub fn rollback_to_checkpoint_record(
     brain: &BrainStore,
     checkpoint: &CheckpointRecordV1,
 ) -> Result<(), String> {
-    if let (Some(worktree_root), Some(head_commit)) =
-        (checkpoint.worktree_root.as_deref(), checkpoint.head_commit.as_deref())
-    {
+    if let (Some(worktree_root), Some(head_commit)) = (
+        checkpoint.worktree_root.as_deref(),
+        checkpoint.head_commit.as_deref(),
+    ) {
         git(Path::new(worktree_root), &["reset", "--hard", head_commit])?;
     }
     brain.update_session_status(&checkpoint.session_id, checkpoint.session_status)?;

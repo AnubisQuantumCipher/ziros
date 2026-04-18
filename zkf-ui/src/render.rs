@@ -276,6 +276,7 @@ mod tests {
             lookup_lowering_support: None,
             lookup_semantics: None,
             aggregation_semantics: None,
+            underconstrained_analysis: None,
             checks: vec![AuditCheck {
                 name: "constraint_soundness".to_string(),
                 category: AuditCategory::ConstraintSoundness,

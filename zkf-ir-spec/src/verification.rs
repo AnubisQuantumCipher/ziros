@@ -2409,14 +2409,14 @@ pub fn verification_ledger() -> VerificationLedger {
             },
             VerificationLedgerEntry {
                 theorem_id: "model.trade_finance.packet_binding_soundness".to_string(),
-                title: "Trade-finance invoice packet binding model preserves the shipped two-chunk digest composition"
+                title: "Trade-finance invoice packet binding model preserves a reduced two-chunk digest helper"
                     .to_string(),
                 scope: "zkf-lib::app::private_trade_finance_settlement".to_string(),
                 checker: VerificationCheckerKind::Verus,
                 status: VerificationStatus::MechanizedLocal,
                 evidence_path: "zkf-lib/proofs/verus/trade_finance_verus.rs".to_string(),
                 notes:
-                    "Local trade-finance model theorems `packet_binding_soundness` (Verus), `packetBindingSoundness` (Lean), and `packet_binding_soundness` (Rocq) prove the same two-chunk invoice-packet digest composition used by the shipped app semantics, while explicitly stopping short of a backend Poseidon lowering proof over emitted PastaFq constraints."
+                    "Local trade-finance model theorems `packet_binding_soundness` (Verus), `packetBindingSoundness` (Lean), and `packet_binding_soundness` (Rocq) prove the same reduced two-chunk packet helper used inside the proof surface. They do not by themselves prove the shipped 37-step invoice-packet anchor chain or a backend Poseidon lowering over emitted PastaFq constraints; that emitted linkage is carried separately by generated trade-finance closure artifacts."
                         .to_string(),
                 trusted_assumptions: vec![],
             },

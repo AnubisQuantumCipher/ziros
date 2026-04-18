@@ -1399,6 +1399,14 @@ pub(crate) enum AgentCommands {
         #[command(subcommand)]
         command: AgentBridgeCommands,
     },
+    Browser {
+        #[command(subcommand)]
+        command: AgentBrowserCommands,
+    },
+    Web {
+        #[command(subcommand)]
+        command: AgentWebCommands,
+    },
     Workflow {
         #[command(subcommand)]
         command: AgentWorkflowCommands,
@@ -1414,6 +1422,10 @@ pub(crate) enum AgentCommands {
     Provider {
         #[command(subcommand)]
         command: AgentProviderCommands,
+    },
+    Hermes {
+        #[command(subcommand)]
+        command: AgentHermesCommands,
     },
     Mcp {
         #[command(subcommand)]
@@ -1452,6 +1464,7 @@ pub(crate) enum AgentMemoryCommands {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum AgentBridgeCommands {
+    Status,
     Prepare {
         #[arg(long)]
         goal: String,
@@ -1476,6 +1489,43 @@ pub(crate) enum AgentBridgeCommands {
     Accept {
         #[arg(long)]
         handoff_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentWebCommands {
+    Fetch {
+        #[arg(long)]
+        url: String,
+        #[arg(long)]
+        max_bytes: Option<usize>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentBrowserCommands {
+    Status,
+    Open {
+        #[arg(long)]
+        url: String,
+        #[arg(long)]
+        browser: Option<String>,
+        #[arg(long, default_value_t = true)]
+        activate: bool,
+        #[arg(long)]
+        new_window: bool,
+    },
+    Eval {
+        #[arg(long)]
+        script: String,
+        #[arg(long)]
+        url: Option<String>,
+        #[arg(long)]
+        browser: Option<String>,
+        #[arg(long, default_value_t = true)]
+        activate: bool,
+        #[arg(long)]
+        wait_millis: Option<u64>,
     },
 }
 
@@ -1565,6 +1615,17 @@ pub(crate) enum AgentProviderCommands {
         #[arg(long)]
         model: Option<String>,
     },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AgentHermesCommands {
+    Status,
+    Diff,
+    Install,
+    Sync,
+    Doctor,
+    #[command(name = "export-bootstrap")]
+    ExportBootstrap,
 }
 
 #[derive(Debug, Subcommand)]

@@ -1,0 +1,15 @@
+{
+  "changed_assets": [
+    "operator-core",
+    "operator-blueprint",
+    "operator-contract",
+    "bootstrap-prompt",
+    "pack-bootstrap"
+  ],
+  "config_issues": [],
+  "generated_at": "2026-04-14T13:05:24.103839Z",
+  "healthy": false,
+  "lock_issues": [],
+  "missing_assets": [],
+  "schema": "ziros-hermes-operator-drift-v1"
+}

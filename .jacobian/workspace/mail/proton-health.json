@@ -1,0 +1,121 @@
+{
+  "generated_at": "2026-04-18T10:02:38.214443+00:00",
+  "status": "degraded",
+  "bridge": {
+    "process": {
+      "ok": false,
+      "detail": "Proton Mail Bridge process not detected"
+    },
+    "imap": {
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    "smtp": {
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    "ready": false
+  },
+  "smtp_token": {
+    "senders": {
+      "proofs@ziros.dev": {
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      "billing@ziros.dev": {
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      "support@ziros.dev": {
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      }
+    },
+    "ready": false,
+    "pool_ready": false,
+    "delivery_sender": null,
+    "fallback_active": false
+  },
+  "proof_delivery": {
+    "sender": "proofs@ziros.dev",
+    "backend": null,
+    "ready": false,
+    "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.",
+    "smtp_token_ok": false,
+    "bridge_ok": false
+  },
+  "drive": {
+    "root_present": true,
+    "archive_root_present": true,
+    "ready": true
+  },
+  "custom_domain_dns": {
+    "domain": "ziros.dev",
+    "authoritative_nameservers": [],
+    "mx_records": [],
+    "root_txt_records": [],
+    "dmarc_records": [],
+    "dkim_records": {
+      "protonmail": [],
+      "protonmail2": [],
+      "protonmail3": []
+    },
+    "mx_present": false,
+    "spf_present": false,
+    "dmarc_present": false,
+    "dkim_selector_count": 0,
+    "ready": false
+  },
+  "checks": [
+    {
+      "name": "bridge_process",
+      "ok": false,
+      "detail": "Proton Mail Bridge process not detected"
+    },
+    {
+      "name": "bridge_imap",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    {
+      "name": "bridge_smtp",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    {
+      "name": "smtp_token:proofs@ziros.dev",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    {
+      "name": "smtp_token:billing@ziros.dev",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    {
+      "name": "smtp_token:support@ziros.dev",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+    },
+    {
+      "name": "drive_root",
+      "ok": true,
+      "detail": "/Users/sicarii/Library/CloudStorage/ProtonDrive-jacobiai@pm.me-folder"
+    },
+    {
+      "name": "drive_archive_root",
+      "ok": true,
+      "detail": "/Users/sicarii/Library/CloudStorage/ProtonDrive-jacobiai@pm.me-folder/jacobi-files/business"
+    },
+    {
+      "name": "inbox_surface",
+      "ok": false,
+      "detail": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/mail/inbox-latest.json"
+    },
+    {
+      "name": "custom_domain_dns",
+      "ok": false,
+      "detail": "{\"authoritative_nameservers\": [], \"dkim_records\": {\"protonmail\": [], \"protonmail2\": [], \"protonmail3\": []}, \"dkim_selector_count\": 0, \"dmarc_present\": false, \"dmarc_records\": [], \"domain\": \"ziros.dev\", \"mx_present\": false, \"mx_records\": [],"
+    }
+  ]
+}

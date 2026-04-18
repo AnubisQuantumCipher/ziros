@@ -1,7 +1,7 @@
 use crate::types::{
     CapabilityRequirementV1, ExecutionPolicyV1, GoalIntentV1, IntentHintsV1, IntentScopeV1,
-    SuccessPredicateV1, TargetChainProfileV1, TrustGateReportV1, WorkgraphNodeV1, WorkgraphV1,
-    WorkflowRequirementsV1,
+    SuccessPredicateV1, TargetChainProfileV1, TrustGateReportV1, WorkflowRequirementsV1,
+    WorkgraphNodeV1, WorkgraphV1,
 };
 use zkf_command_surface::{RiskClassV1, new_operation_id};
 
@@ -185,7 +185,10 @@ pub fn build_workgraph(
         false,
         Vec::new(),
         vec!["truth-snapshot.json"],
-        vec![success("truth-ready", "A truth snapshot is recorded for the run")],
+        vec![success(
+            "truth-ready",
+            "A truth snapshot is recorded for the run",
+        )],
     );
     let inspect_id = inspect.node_id.clone();
     nodes.push(inspect);
@@ -242,7 +245,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id.clone()],
                 vec!["17_report/report.md"],
-                vec![success("subsystem-complete", "The subsystem bundle is complete")],
+                vec![success(
+                    "subsystem-complete",
+                    "The subsystem bundle is complete",
+                )],
             );
             let completeness_id = completeness.node_id.clone();
             nodes.push(completeness);
@@ -268,7 +274,10 @@ pub fn build_workgraph(
                 RiskClassV1::WorkspaceMutation,
                 false,
                 vec![inspect_id.clone()],
-                vec!["16_compact/contract.compact", "20_release/zkf-release-pin.json"],
+                vec![
+                    "16_compact/contract.compact",
+                    "20_release/zkf-release-pin.json",
+                ],
                 vec![success("subsystem-scaffolded", "A subsystem bundle exists")],
             );
             let scaffold_id = scaffold.node_id.clone();
@@ -281,7 +290,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id.clone()],
                 vec!["17_report/report.md"],
-                vec![success("subsystem-complete", "The subsystem bundle is complete")],
+                vec![success(
+                    "subsystem-complete",
+                    "The subsystem bundle is complete",
+                )],
             );
             let completeness_id = completeness.node_id.clone();
             nodes.push(completeness);
@@ -306,7 +318,10 @@ pub fn build_workgraph(
                     false,
                     vec![midnight_id.clone()],
                     vec!["wallet-snapshot.json"],
-                    vec![success("wallet-ready", "Wallet state is captured for the session")],
+                    vec![success(
+                        "wallet-ready",
+                        "Wallet state is captured for the session",
+                    )],
                 ));
             }
             let compile = node(
@@ -317,7 +332,10 @@ pub fn build_workgraph(
                 false,
                 vec![midnight_id.clone()],
                 vec!["contract.zkir"],
-                vec![success("contract-compiled", "A Compact contract compiles to ZKIR")],
+                vec![success(
+                    "contract-compiled",
+                    "A Compact contract compiles to ZKIR",
+                )],
             );
             let compile_id = compile.node_id.clone();
             nodes.push(compile);
@@ -329,7 +347,10 @@ pub fn build_workgraph(
                 false,
                 vec![compile_id.clone()],
                 vec!["deploy-prepare.json"],
-                vec![success("deploy-prepared", "Deploy preparation output is generated")],
+                vec![success(
+                    "deploy-prepared",
+                    "Deploy preparation output is generated",
+                )],
             );
             let deploy_prepare_id = deploy_prepare.node_id.clone();
             nodes.push(deploy_prepare);
@@ -342,7 +363,10 @@ pub fn build_workgraph(
                     true,
                     vec![deploy_prepare_id],
                     vec!["approval-token.json"],
-                    vec![success("approval-issued", "A wallet approval token is issued")],
+                    vec![success(
+                        "approval-issued",
+                        "A wallet approval token is issued",
+                    )],
                 );
                 let approval_id = approval.node_id.clone();
                 nodes.push(approval);
@@ -386,7 +410,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id.clone()],
                 vec!["08_proofs/proof.json", "09_verification/verification.json"],
-                vec![success("subsystem-proved", "Subsystem proof artifacts are refreshed")],
+                vec![success(
+                    "subsystem-proved",
+                    "Subsystem proof artifacts are refreshed",
+                )],
             );
             let prove_id = prove.node_id.clone();
             nodes.push(prove);
@@ -398,7 +425,10 @@ pub fn build_workgraph(
                 false,
                 vec![prove_id.clone()],
                 vec!["09_verification/verification.json"],
-                vec![success("subsystem-verified", "Subsystem proof artifacts verify")],
+                vec![success(
+                    "subsystem-verified",
+                    "Subsystem proof artifacts verify",
+                )],
             );
             let verify_id = verify.node_id.clone();
             nodes.push(verify);
@@ -410,7 +440,10 @@ pub fn build_workgraph(
                 false,
                 vec![verify_id.clone()],
                 vec!["15_solidity/SubsystemVerifier.sol"],
-                vec![success("evm-exported", "A Solidity verifier bundle is materialized")],
+                vec![success(
+                    "evm-exported",
+                    "A Solidity verifier bundle is materialized",
+                )],
             );
             let export_id = export.node_id.clone();
             nodes.push(export);
@@ -422,7 +455,10 @@ pub fn build_workgraph(
                 false,
                 vec![export_id.clone()],
                 vec!["13_public_bundle/subsystem_bundle.json"],
-                vec![success("public-bundle", "The public subsystem bundle is refreshed")],
+                vec![success(
+                    "public-bundle",
+                    "The public subsystem bundle is refreshed",
+                )],
             ));
             nodes.push(node(
                 "evm-diagnose",
@@ -432,7 +468,10 @@ pub fn build_workgraph(
                 false,
                 vec![export_id],
                 vec!["evm-readiness.json"],
-                vec![success("evm-ready", "The EVM toolchain surface is inspectable")],
+                vec![success(
+                    "evm-ready",
+                    "The EVM toolchain surface is inspectable",
+                )],
             ));
         }
         "subsystem-benchmark" => {
@@ -456,7 +495,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id],
                 vec!["metal-status.json"],
-                vec![success("metal-truth", "Metal truth is recorded for the benchmark")],
+                vec![success(
+                    "metal-truth",
+                    "Metal truth is recorded for the benchmark",
+                )],
             );
             let metal_id = metal.node_id.clone();
             nodes.push(metal);
@@ -468,7 +510,10 @@ pub fn build_workgraph(
                 false,
                 vec![metal_id],
                 vec!["benchmark-report.json"],
-                vec![success("benchmark-report", "A benchmark report is generated")],
+                vec![success(
+                    "benchmark-report",
+                    "A benchmark report is generated",
+                )],
             ));
         }
         "subsystem-evidence-release" => {
@@ -480,7 +525,10 @@ pub fn build_workgraph(
                 false,
                 vec![inspect_id.clone()],
                 vec!["17_report/report.md"],
-                vec![success("subsystem-complete", "The subsystem bundle is complete")],
+                vec![success(
+                    "subsystem-complete",
+                    "The subsystem bundle is complete",
+                )],
             );
             let completeness_id = completeness.node_id.clone();
             nodes.push(completeness);
@@ -492,7 +540,10 @@ pub fn build_workgraph(
                 false,
                 vec![completeness_id],
                 vec!["evidence-bundle.json"],
-                vec![success("bundle-ready", "An evidence bundle summary is generated")],
+                vec![success(
+                    "bundle-ready",
+                    "An evidence bundle summary is generated",
+                )],
             ));
         }
         "midnight-proof-server-ops" => {
@@ -528,7 +579,10 @@ pub fn build_workgraph(
                 false,
                 vec![midnight_id.clone()],
                 vec!["contracts/compact"],
-                vec![success("midnight-project", "A Midnight project exists at the project root")],
+                vec![success(
+                    "midnight-project",
+                    "A Midnight project exists at the project root",
+                )],
             );
             let scaffold_id = scaffold.node_id.clone();
             nodes.push(scaffold);
@@ -541,7 +595,10 @@ pub fn build_workgraph(
                     false,
                     vec![midnight_id.clone()],
                     vec!["wallet-snapshot.json"],
-                    vec![success("wallet-ready", "Wallet state is captured for the session")],
+                    vec![success(
+                        "wallet-ready",
+                        "Wallet state is captured for the session",
+                    )],
                 );
                 nodes.push(wallet);
             }
@@ -553,7 +610,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id.clone()],
                 vec!["contract.zkir"],
-                vec![success("contract-compiled", "A Compact contract compiles to ZKIR")],
+                vec![success(
+                    "contract-compiled",
+                    "A Compact contract compiles to ZKIR",
+                )],
             );
             let compile_id = compile.node_id.clone();
             nodes.push(compile);
@@ -565,7 +625,10 @@ pub fn build_workgraph(
                 false,
                 vec![compile_id.clone()],
                 vec!["deploy-prepare.json"],
-                vec![success("deploy-prepared", "Deploy preparation output is generated")],
+                vec![success(
+                    "deploy-prepared",
+                    "Deploy preparation output is generated",
+                )],
             );
             let deploy_prepare_id = deploy_prepare.node_id.clone();
             nodes.push(deploy_prepare);
@@ -578,7 +641,10 @@ pub fn build_workgraph(
                     true,
                     vec![deploy_prepare_id.clone()],
                     vec!["approval-token.json"],
-                    vec![success("approval-issued", "A wallet approval token is issued")],
+                    vec![success(
+                        "approval-issued",
+                        "A wallet approval token is issued",
+                    )],
                 );
                 let approval_id = approval.node_id.clone();
                 nodes.push(approval);
@@ -606,7 +672,10 @@ pub fn build_workgraph(
                 false,
                 vec![inspect_id.clone()],
                 vec!["metal-status.json"],
-                vec![success("metal-truth", "Metal truth is recorded for the benchmark")],
+                vec![success(
+                    "metal-truth",
+                    "Metal truth is recorded for the benchmark",
+                )],
             );
             let metal_id = metal.node_id.clone();
             nodes.push(metal);
@@ -618,7 +687,10 @@ pub fn build_workgraph(
                 false,
                 vec![metal_id],
                 vec!["benchmark-report.json"],
-                vec![success("benchmark-report", "A benchmark report is generated")],
+                vec![success(
+                    "benchmark-report",
+                    "A benchmark report is generated",
+                )],
             ));
         }
         "proof-app-build" => {
@@ -642,7 +714,10 @@ pub fn build_workgraph(
                 false,
                 vec![scaffold_id],
                 vec!["proof.json", "verification.json"],
-                vec![success("proof-verified", "Proof and verification artifacts are produced")],
+                vec![success(
+                    "proof-verified",
+                    "Proof and verification artifacts are produced",
+                )],
             ));
         }
         "evidence-bundle" => {
@@ -654,7 +729,10 @@ pub fn build_workgraph(
                 false,
                 vec![inspect_id],
                 vec!["evidence-bundle.json"],
-                vec![success("bundle-ready", "An evidence bundle summary is generated")],
+                vec![success(
+                    "bundle-ready",
+                    "An evidence bundle summary is generated",
+                )],
             ));
         }
         "host-readiness" => {
@@ -678,13 +756,25 @@ pub fn build_workgraph(
                 false,
                 vec![inspect_id],
                 vec!["workgraph.json"],
-                vec![success("generic-plan", "A generic plan is produced for operator review")],
+                vec![success(
+                    "generic-plan",
+                    "A generic plan is produced for operator review",
+                )],
             ));
         }
     }
 
-    let status = if trust_gate.blocked { "blocked" } else { "planned" };
-    let node_status = if trust_gate.blocked { "blocked" } else { "pending" }.to_string();
+    let status = if trust_gate.blocked {
+        "blocked"
+    } else {
+        "planned"
+    };
+    let node_status = if trust_gate.blocked {
+        "blocked"
+    } else {
+        "pending"
+    }
+    .to_string();
     for node in &mut nodes {
         node.status = node_status.clone();
     }
@@ -701,6 +791,9 @@ pub fn build_workgraph(
             compat_allowed: requirements.compat_allowed,
             stop_on_first_failure: true,
             require_explicit_approval_for_high_risk: true,
+            operator_profile: crate::types::OperatorProfileV1::HermesRigorous,
+            structured_command_first: true,
+            postflight_required: true,
         },
         capability_requirements: capability_requirements(intent, requirements),
         blocked_prerequisites: trust_gate.prerequisites.clone(),
@@ -718,7 +811,10 @@ fn workflow(
         summary: summary.to_string(),
         workflow_kind: workflow_kind.to_string(),
         scope,
-        requested_outputs: requested_outputs.iter().map(|value| value.to_string()).collect(),
+        requested_outputs: requested_outputs
+            .iter()
+            .map(|value| value.to_string())
+            .collect(),
         hints: None,
     }
 }

@@ -1,6 +1,6 @@
 # ZirOS Agent Closure Spec
 
-Generated: `2026-04-07T05:33:10.164268Z`
+Generated: `2026-04-11T19:40:49.992895Z`
 
 This document enumerates what is already closed by source and what remains to reach the full ZirOS Agent blueprint end-state without changing the architectural direction.
 
@@ -19,10 +19,10 @@ This document enumerates what is already closed by source and what remains to re
 - Add deeper end-to-end tests for daemon restarts, checkpoint rollback, and host-driven approval resumes.
 
 ## Current Quantitative Snapshot
-- Action inventory: `19` actions.
-- Workflow families: `12`.
-- Brain tables: `18`.
-- Agent top-level commands: `18`.
+- Action inventory: `25` actions.
+- Workflow families: `13`.
+- Brain tables: `19`.
+- Agent top-level commands: `20`.
 
 ## Non-Goals For This Tranche
 - Replacing the daemon with XPC.

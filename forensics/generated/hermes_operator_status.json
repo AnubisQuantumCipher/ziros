@@ -1,0 +1,167 @@
+{
+  "assets": [
+    {
+      "actual_sha256": "a42a3e1c76ee3d681f93fc478536edaaee3552723633c58d1e3113848d803a57",
+      "expected_sha256": "a42a3e1c76ee3d681f93fc478536edaaee3552723633c58d1e3113848d803a57",
+      "id": "repo-soul",
+      "installed": true,
+      "kind": "doc",
+      "sha256_match": true,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/SOUL.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/SOUL.md"
+    },
+    {
+      "actual_sha256": "1b8a379e62e6c19de1033f73196b5633b1ce34cb22a101fbb8bf83d523e62b51",
+      "expected_sha256": "1b8a379e62e6c19de1033f73196b5633b1ce34cb22a101fbb8bf83d523e62b51",
+      "id": "repo-blueprint",
+      "installed": true,
+      "kind": "doc",
+      "sha256_match": true,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/HERMES.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES.md"
+    },
+    {
+      "actual_sha256": "3d189bcf5b4c544afa47f33983dd924d4e1b4d8df30a6643d3475ccb448b2d58",
+      "expected_sha256": "352ede5e4ad383c15d58b0c1221be6a13f9dd1ec6e14a6fcbed37f89db7031f4",
+      "id": "operator-core",
+      "installed": true,
+      "kind": "doc",
+      "sha256_match": false,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/OPERATOR_CORE.md"
+    },
+    {
+      "actual_sha256": "12df40bad181e3a8e5d6da5e423b80ca8cfe1a44375f31467765f3bcf709cc75",
+      "expected_sha256": "12df40bad181e3a8e5d6da5e423b80ca8cfe1a44375f31467765f3bcf709cc75",
+      "id": "operator-constitution",
+      "installed": true,
+      "kind": "doc",
+      "sha256_match": true,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES_CONSTITUTION.md"
+    },
+    {
+      "actual_sha256": "c54b4406f1386f3a645cf432777a4c8a1de1e7d8f0852ba7c148b7f708673495",
+      "expected_sha256": "ce4b93e86c0661baaf98f2207d6160cefb20ec9d7bed7e14c0233bf82b69e300",
+      "id": "operator-blueprint",
+      "installed": true,
+      "kind": "doc",
+      "sha256_match": false,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_OPERATOR_BLUEPRINT.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES_OPERATOR_BLUEPRINT.md"
+    },
+    {
+      "actual_sha256": "d3b69a252ef082cdcd92d0fe42ec0752fb1383d854860abc88c08985760b9ccb",
+      "expected_sha256": "76572a7dca5c3599939216fe0e037cbdfdfcc8629cf8f71b60cd132c7f53a7c9",
+      "id": "operator-contract",
+      "installed": true,
+      "kind": "contract",
+      "sha256_match": false,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_OPERATOR_CONTRACT.json",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES_OPERATOR_CONTRACT.json"
+    },
+    {
+      "actual_sha256": "d66e1304096aa15a3a7bbcb7748837f92b014937628ed83cf85878420064b867",
+      "expected_sha256": "9e7faba19d6e5cb70b3e1763ef35d4685f9dedbfbb3db9bec8efee95a17f26fe",
+      "id": "bootstrap-prompt",
+      "installed": true,
+      "kind": "prompt",
+      "sha256_match": false,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_BOOTSTRAP_PROMPT.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/prompts/HERMES_BOOTSTRAP_PROMPT.md"
+    },
+    {
+      "actual_sha256": "759ee160cbd734c060ff7c089e8190ba46ab1b8af75a1d68394f1d1e3b468ada",
+      "expected_sha256": "759ee160cbd734c060ff7c089e8190ba46ab1b8af75a1d68394f1d1e3b468ada",
+      "id": "overlay-config",
+      "installed": true,
+      "kind": "config",
+      "sha256_match": true,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/setup/hermes/config/ziros-overlay.yaml",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/config/ziros-overlay.yaml"
+    },
+    {
+      "actual_sha256": "c73ae5b01194518532b6753b6f1e1f11a977d491716f0d2ff5a98b03397aeac2",
+      "expected_sha256": "c73ae5b01194518532b6753b6f1e1f11a977d491716f0d2ff5a98b03397aeac2",
+      "id": "guardrails",
+      "installed": true,
+      "kind": "policy",
+      "sha256_match": true,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/setup/hermes/policy/ziros-guardrails.json",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/policy/ziros-guardrails.json"
+    },
+    {
+      "actual_sha256": "cb7a2ab1db66a3f8caa3d3c3bc51ec4cbc40d425c855053d91fe175718ff90a4",
+      "expected_sha256": "a61d43d1c6a046ebdea45a71052b9fcb855b75fc968de2d45ebfcc33a3db67a9",
+      "id": "pack-bootstrap",
+      "installed": true,
+      "kind": "prompt",
+      "sha256_match": false,
+      "source_path": "/Users/sicarii/Desktop/ZirOS/setup/hermes/prompts/ziros-bootstrap.md",
+      "target_path": "/Users/sicarii/.hermes/ziros-pack/prompts/ziros-bootstrap.md"
+    }
+  ],
+  "config": {
+    "auto_load_rule_present": true,
+    "exists": true,
+    "missing_skills": [],
+    "operator_profile": "hermes-rigorous",
+    "pack_root": "/Users/sicarii/.hermes/ziros-pack",
+    "path": "/Users/sicarii/.hermes/config.yaml",
+    "repo_root": "/Users/sicarii/Desktop/ZirOS"
+  },
+  "contract_path": "/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_OPERATOR_CONTRACT.json",
+  "doctor_ok": false,
+  "generated_at": "2026-04-14T13:05:24.103642Z",
+  "hermes_home": "/Users/sicarii/.hermes",
+  "install_complete": false,
+  "lock_path": "/Users/sicarii/.hermes/ziros-pack.lock.json",
+  "lock_present": true,
+  "manifest_path": "/Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json",
+  "non_canonical_state": [
+    "/Users/sicarii/.hermes/SOUL.md",
+    "/Users/sicarii/.hermes/memories/",
+    "/Users/sicarii/.hermes/sessions/",
+    "/Users/sicarii/.hermes/plans/",
+    "/Users/sicarii/.hermes/cron/",
+    "/Users/sicarii/.hermes/skills/",
+    "/Users/sicarii/.hermes/ziros-pack/",
+    "/Users/sicarii/.hermes/ziros-pack.lock.json"
+  ],
+  "operator_profile": "hermes-rigorous",
+  "pack_root": "/Users/sicarii/.hermes/ziros-pack",
+  "repo_root": "/Users/sicarii/Desktop/ZirOS",
+  "schema": "ziros-hermes-operator-status-v1",
+  "violations": [
+    {
+      "code": "asset-sha-mismatch",
+      "message": "managed Hermes asset 'operator-core' drifted from the repo copy",
+      "path": "/Users/sicarii/.hermes/ziros-pack/docs/OPERATOR_CORE.md",
+      "severity": "error"
+    },
+    {
+      "code": "asset-sha-mismatch",
+      "message": "managed Hermes asset 'operator-blueprint' drifted from the repo copy",
+      "path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES_OPERATOR_BLUEPRINT.md",
+      "severity": "error"
+    },
+    {
+      "code": "asset-sha-mismatch",
+      "message": "managed Hermes asset 'operator-contract' drifted from the repo copy",
+      "path": "/Users/sicarii/.hermes/ziros-pack/docs/HERMES_OPERATOR_CONTRACT.json",
+      "severity": "error"
+    },
+    {
+      "code": "asset-sha-mismatch",
+      "message": "managed Hermes asset 'bootstrap-prompt' drifted from the repo copy",
+      "path": "/Users/sicarii/.hermes/ziros-pack/prompts/HERMES_BOOTSTRAP_PROMPT.md",
+      "severity": "error"
+    },
+    {
+      "code": "asset-sha-mismatch",
+      "message": "managed Hermes asset 'pack-bootstrap' drifted from the repo copy",
+      "path": "/Users/sicarii/.hermes/ziros-pack/prompts/ziros-bootstrap.md",
+      "severity": "error"
+    }
+  ]
+}

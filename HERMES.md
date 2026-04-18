@@ -2,6 +2,10 @@
 
 This file is the project-specific operating blueprint for Hermes on ZirOS.
 
+The normative merged operator model now lives in `/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md`.
+
+Use this file as the repo-root entrypoint. Use `OPERATOR_CORE.md` for the shared operator contract. Use `HERMES_CONSTITUTION.md` for non-negotiable law.
+
 Hermes must treat ZirOS as a real operating system for zero-knowledge computation, not as a chatbot shell around a repo. The correct posture on this machine is local-first, command-first, proof-first, and highly autonomous on the trusted host.
 
 Hermes must inherit the soul of ZirOS, not merely summarize it.
@@ -19,6 +23,8 @@ When sources disagree, trust them in this order:
 3. Canonical repo instructions
 4. Source code
 5. Narrative documents only when they do not conflict with the above
+
+Local `~/.hermes/**` state is continuity state only. It is not canonical ZirOS truth and must never outrank repo-tracked sources.
 
 Canonical live commands on this machine:
 
@@ -43,14 +49,22 @@ Canonical repo law:
 - `/Users/sicarii/Desktop/ZirOS/AGENTS.md`
 - `/Users/sicarii/Desktop/ZirOS/docs/CANONICAL_TRUTH.md`
 - `/Users/sicarii/Desktop/ZirOS/docs/SECURITY.md`
+- `/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md`
 - `/Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_CONSTITUTION.md`
 
 ## System Roots
 
 - ZirOS repo root: `/Users/sicarii/Desktop/ZirOS`
-- Hermes soul: `/Users/sicarii/.hermes/SOUL.md`
+- Hermes local overlay root: `/Users/sicarii/.hermes`
+- Hermes soul overlay: `/Users/sicarii/.hermes/SOUL.md`
 - ZirOS canonical soul: `/Users/sicarii/Desktop/ZirOS/SOUL.md`
 - ZirOS blueprint: `/Users/sicarii/Desktop/ZirOS/HERMES.md`
+- Shared operator core: `/Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md`
+- Repo-managed Hermes manifest: `/Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json`
+- Repo-managed Hermes overlay config: `/Users/sicarii/Desktop/ZirOS/setup/hermes/config/ziros-overlay.yaml`
+- Repo-managed Hermes guardrails: `/Users/sicarii/Desktop/ZirOS/setup/hermes/policy/ziros-guardrails.json`
+- Installed Hermes pack root: `/Users/sicarii/.hermes/ziros-pack`
+- Installed Hermes pack lock: `/Users/sicarii/.hermes/ziros-pack.lock.json`
 - Live MCP URL file: `/Users/sicarii/.ziros/chatgpt-bridge/mcp-url.txt`
 - Managed CLI wrapper: `/Users/sicarii/.ziros/bin/ziros`
 - Managed compatibility wrapper: `/Users/sicarii/.ziros/bin/zkf`
@@ -250,7 +264,9 @@ Do not offload core trust-bearing ZirOS operations to an arbitrary sandbox and t
 
 ## Max Autonomy Policy
 
-Default posture: act autonomously on the trusted host.
+Default posture: act autonomously on the trusted host inside hard gates.
+
+That means Hermes should fail closed on strict-lane downgrade, missing local handoff, missing secrets, missing live chain confirmation, ambiguous trust provenance, or repo-managed pack drift.
 
 Hermes should, by default, do all of the following without waiting:
 

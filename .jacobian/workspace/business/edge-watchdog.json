@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-04-18T10:02:38.000686+00:00",
+  "status": "degraded",
+  "before": {
+    "cloudflared_launchd": {
+      "ok": true,
+      "detail": "gui/501/com.ziros.cloudflared-ziros-api = {\n\tactive count = 1\n\tpath = /Users/sicarii/Library/LaunchAgents/com.ziros.cloudflared-ziros-api.plist\n\ttype = LaunchAgent\n\tstate = running\n\n\tprogram = /opt/homebrew/bin/cloudflared\n\targuments = {\n\t\t/opt/homebrew/bin/cloudflared\n\t\ttunnel\n\t\t--config\n\t\t/Users/s",
+      "pid": 99936
+    },
+    "redirect_local": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "billing_local": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "metering_local_unauth": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "go_public": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "billing_public": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "api_public_unauth": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    }
+  },
+  "after": {
+    "cloudflared_launchd": {
+      "ok": true,
+      "detail": "gui/501/com.ziros.cloudflared-ziros-api = {\n\tactive count = 1\n\tpath = /Users/sicarii/Library/LaunchAgents/com.ziros.cloudflared-ziros-api.plist\n\ttype = LaunchAgent\n\tstate = running\n\n\tprogram = /opt/homebrew/bin/cloudflared\n\targuments = {\n\t\t/opt/homebrew/bin/cloudflared\n\t\ttunnel\n\t\t--config\n\t\t/Users/s",
+      "pid": 99936
+    },
+    "redirect_local": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "billing_local": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "metering_local_unauth": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "go_public": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "billing_public": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    },
+    "api_public_unauth": {
+      "ok": false,
+      "status": "000",
+      "detail": "HTTP 000",
+      "body_excerpt": ""
+    }
+  },
+  "heal_actions": [
+    {
+      "label": "watchdog",
+      "action": "error",
+      "reason": "Command '['launchctl', 'kickstart', '-k', 'gui/501/com.ziros.proof-cta-redirects']' returned non-zero exit status 1.",
+      "ts": "2026-04-18T10:02:32.941032+00:00"
+    }
+  ],
+  "restart_history": {},
+  "recent_cloudflared_errors": [],
+  "public_ready": false,
+  "local_ready": false,
+  "open_incident": {
+    "incident_id": "edge-1776506538",
+    "opened_at": "2026-04-18T10:02:18.500031+00:00"
+  }
+}

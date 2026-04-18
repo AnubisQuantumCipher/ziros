@@ -1,0 +1,176 @@
+{
+  "generated_at": "2026-04-18T10:02:39.142677+00:00",
+  "global_status": "blocked",
+  "shared_health_status": "degraded",
+  "shared_failed_checks": [
+    "Keychain: ghost-admin-api-key",
+    "Keychain: discord-bot-token",
+    "Keychain: stripe-secret-key",
+    "Keychain: github-pat",
+    "Keychain: openai-media-api-key",
+    "Ghost CMS",
+    "Proton Bridge SMTP",
+    "Metering Proxy Port",
+    "Tracked Redirect Port",
+    "Business Dashboard Freshness",
+    "Proof Server Health",
+    "Proof Queue Capacity",
+    "Cloudflare Access Edge",
+    "Proof Usage Freshness",
+    "Midnight Pain Monitor Freshness",
+    "Promotion Planner Freshness",
+    "Tracked Redirect Local",
+    "Tracked Redirect Public",
+    "Lead Pipeline Freshness",
+    "CTA Click Attribution Surface",
+    "Outward Gate Status: twitter-morning",
+    "Outward Gate Status: twitter-evening",
+    "Outward Gate Status: discord-community",
+    "Outward Gate Status: newsletter-pipeline",
+    "Proton Bridge Ready",
+    "Proton SMTP Token Ready",
+    "Proton Custom Domain DNS",
+    "Proton Drive Archive Freshness",
+    "Public Edge Watchdog State",
+    "Billing Service Local",
+    "Billing Service Public",
+    "Claim Surface Local",
+    "Stripe Webhook Secret",
+    "Self-Serve Gate Freshness",
+    "Money Path Smoke Freshness",
+    "Restore Drill Freshness",
+    "Hosted Lane SLA Objective",
+    "Cost Monitor Freshness"
+  ],
+  "blocking_shared_failed_checks": [
+    "Tracked Redirect Port",
+    "Proof Server Health",
+    "Proof Queue Capacity",
+    "Cloudflare Access Edge",
+    "Tracked Redirect Local",
+    "Tracked Redirect Public",
+    "Proton SMTP Token Ready",
+    "Public Edge Watchdog State",
+    "Billing Service Local",
+    "Billing Service Public",
+    "Stripe Webhook Secret",
+    "Self-Serve Gate Freshness"
+  ],
+  "ready_lanes": [],
+  "blocked_lanes": {
+    "twitter-morning": [
+      "Planner Freshness",
+      "Proof Server Local",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Billing Service Local",
+      "Billing Hosted Public",
+      "Self-Serve Checkout Path",
+      "Twitter Auth Material"
+    ],
+    "twitter-evening": [
+      "Planner Freshness",
+      "Proof Server Local",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Billing Service Local",
+      "Billing Hosted Public",
+      "Self-Serve Checkout Path",
+      "Twitter Auth Material"
+    ],
+    "discord-community": [
+      "Planner Freshness",
+      "Proof Server Local",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Billing Service Local",
+      "Billing Hosted Public",
+      "Self-Serve Checkout Path",
+      "Discord Auth Probe"
+    ],
+    "newsletter-pipeline": [
+      "Planner Freshness",
+      "Proof Server Local",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Billing Service Local",
+      "Billing Hosted Public",
+      "Self-Serve Checkout Path",
+      "Ghost Admin Probe"
+    ]
+  },
+  "lanes": {
+    "twitter-morning": {
+      "status": "blocked",
+      "generated_at": "2026-04-18T10:02:38.610015+00:00",
+      "reasons": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ]
+    },
+    "twitter-evening": {
+      "status": "blocked",
+      "generated_at": "2026-04-18T10:02:38.788136+00:00",
+      "reasons": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ]
+    },
+    "discord-community": {
+      "status": "blocked",
+      "generated_at": "2026-04-18T10:02:38.940254+00:00",
+      "reasons": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Discord Auth Probe"
+      ]
+    },
+    "newsletter-pipeline": {
+      "status": "blocked",
+      "generated_at": "2026-04-18T10:02:39.137136+00:00",
+      "reasons": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Ghost Admin Probe"
+      ]
+    }
+  }
+}

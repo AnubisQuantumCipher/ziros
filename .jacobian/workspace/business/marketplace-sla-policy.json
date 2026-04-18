@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-04-18T10:02:38.273128+00:00",
+  "effective_at": "2026-04-18T10:02:18.693422+00:00",
+  "version": "2026-04-05-developer-lane-marketplace-v1",
+  "lane": "$99 developer lane",
+  "service_name": "Hosted proof lane authenticated availability",
+  "measurement_timezone": "America/New_York",
+  "target_monthly_uptime_pct": 99.0,
+  "observation_interval_minutes": 5,
+  "incident_open_after_consecutive_failed_observations": 2,
+  "service_credit_schedule": [
+    {
+      "below_uptime_pct": 99.0,
+      "credit_pct": 10
+    },
+    {
+      "below_uptime_pct": 97.0,
+      "credit_pct": 25
+    }
+  ],
+  "availability_scope": [
+    "Authenticated requests to https://api.ziros.dev/health return HTTP 200 with a valid Cloudflare Access service token.",
+    "Authenticated requests to https://api.ziros.dev/ready return HTTP 200 with a valid Cloudflare Access service token.",
+    "Authenticated requests to https://api.ziros.dev/version return HTTP 200 with a valid Cloudflare Access service token.",
+    "The local hosted proof server answers /health and reports jobCapacity=4 on /ready."
+  ],
+  "not_in_scope": [
+    "Bitrove's marketplace application uptime, escrow UX, or buyer-side wallet behavior.",
+    "Unfinished tranche-two surfaces such as dispute handling or browser wallet-proving-provider fallback.",
+    "Self-serve checkout, billing page availability, Proton mail delivery, or marketing surfaces.",
+    "Customer-side configuration mistakes or unsupported concurrency beyond the bounded developer-lane envelope."
+  ],
+  "support_model": "Founder-led manual support and incident handling.",
+  "measurement_basis": "Five-minute synthetic observations of the authenticated hosted lane.",
+  "service_credit_basis": "Monthly fee credit on the affected subscription month.",
+  "support_ack_target_hours": 4,
+  "incident_update_cadence_minutes": 60,
+  "planned_maintenance_notice_hours": 24,
+  "breaking_change_notice_days": 7,
+  "public_status_url": "https://billing.ziros.dev/status"
+}

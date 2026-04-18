@@ -3581,7 +3581,8 @@ mod tests {
         BTreeMap<String, BigInt>,
     ) {
         let artifact_path =
-            private_identity_fixture::ensure_private_identity_artifact(env!("CARGO_MANIFEST_DIR"));
+            private_identity_fixture::ensure_private_identity_artifact(env!("CARGO_MANIFEST_DIR"))
+                .expect("private_identity_fixture ensure must return valid PathBuf");
         let artifact_bytes =
             std::fs::read(&artifact_path).expect("private_identity beta.19 artifact should exist");
         let acir_b64 = base64::engine::general_purpose::STANDARD.encode(&artifact_bytes);

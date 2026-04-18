@@ -1,6 +1,6 @@
 # ZirOS Agent Operator Verdict
 
-Generated: `2026-04-07T05:33:10.164335Z`
+Generated: `2026-04-11T19:40:49.992981Z`
 
 ## Verdict
 The current in-tree ZirOS Agent implementation is a real operator substrate and clearly matches the blueprint direction. It is not a mock layer, not a pure CLI shim, and not a host-driven fork of the engine.
@@ -19,6 +19,7 @@ The current in-tree ZirOS Agent implementation is a real operator substrate and 
 - `cargo test -p zkf-command-surface --lib` passed in this implementation pass.
 - `cargo test -p zkf-agent --lib` passed in this implementation pass.
 - `cargo test -p zkf-cli agent_wallet -- --nocapture` passed in this implementation pass.
+- `python3 scripts/check_hermes_operator_drift.py` passed in this implementation pass.
 - `python3 scripts/generate_private_release_truth.py` passed in this implementation pass.
 - `python3 scripts/check_private_truth_drift.py` passed in this implementation pass.
 - `python3 scripts/check_public_release_boundary.py` passed in this implementation pass.

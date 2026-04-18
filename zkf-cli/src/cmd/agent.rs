@@ -1,23 +1,28 @@
 use crate::cli::{
-    AgentApprovalCommands, AgentBridgeCommands, AgentCheckpointCommands, AgentCommands,
-    AgentMcpCommands, AgentMemoryCommands, AgentProjectCommands, AgentProviderCommands,
-    AgentWorkflowCommands, AgentWorktreeCommands,
+    AgentApprovalCommands, AgentBridgeCommands, AgentBrowserCommands, AgentCheckpointCommands,
+    AgentCommands, AgentHermesCommands, AgentMcpCommands, AgentMemoryCommands,
+    AgentProjectCommands, AgentProviderCommands, AgentWebCommands, AgentWorkflowCommands,
+    AgentWorktreeCommands,
 };
 use serde::Serialize;
 use std::path::PathBuf;
 use zkf_agent::{
     ActionReceiptV1, AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
-    AgentBridgeHandoffPrepareRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
+    AgentBridgeHandoffPrepareRequestV1, AgentBrowserEvalRequestV1, AgentBrowserKindV1,
+    AgentBrowserOpenRequestV1, AgentCancelRequestV1, AgentCheckpointCreateRequestV1,
     AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1,
-    AgentProviderTestRequestV1, AgentRejectRequestV1, AgentRunOptionsV1,
+    AgentProviderTestRequestV1, AgentRejectRequestV1, AgentRunOptionsV1, AgentWebFetchRequestV1,
     AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1, accept_bridge_handoff,
-    agent_status, approval_lineage, approve_request, cancel_session, cleanup_worktree,
-    create_checkpoint, create_worktree, explain_session, list_bridge_handoffs, list_checkpoints,
-    list_incidents, list_procedures, list_projects, list_worktrees, memory_sessions, plan_goal,
-    prepare_bridge_handoff, provider_route, provider_status, provider_test, register_project,
-    reject_request, resume_session_with_receipts, rollback_checkpoint, run_goal_with_receipts,
-    serve_mcp_stdio, session_artifacts, session_deployments, session_environments, session_logs,
-    workflow_list, workflow_show,
+    agent_status, approval_lineage, approve_request, bridge_status, browser_eval_report,
+    browser_open_report, browser_status_report, cancel_session, cleanup_worktree,
+    create_checkpoint, create_worktree, explain_session, hermes_diff, hermes_doctor,
+    hermes_export_bootstrap, hermes_install, hermes_status, hermes_sync, list_bridge_handoffs,
+    list_checkpoints, list_incidents, list_procedures, list_projects, list_worktrees,
+    memory_sessions, plan_goal, prepare_bridge_handoff, provider_route, provider_status,
+    provider_test, register_project, reject_request, resume_session_with_receipts,
+    rollback_checkpoint, run_goal_with_receipts, serve_mcp_stdio, session_artifacts,
+    session_deployments, session_environments, session_logs, web_fetch_report, workflow_list,
+    workflow_show,
 };
 use zkf_command_surface::{CommandEventKindV1, CommandEventV1, JsonlEventSink, new_operation_id};
 use zkf_wallet::WalletNetwork;
@@ -215,6 +220,7 @@ pub(crate) fn handle_agent(
             AgentProjectCommands::List => print_output(json_output, &list_projects()?)?,
         },
         AgentCommands::Bridge { command } => match command {
+            AgentBridgeCommands::Status => print_output(json_output, &bridge_status()?)?,
             AgentBridgeCommands::Prepare {
                 goal,
                 origin,
@@ -246,6 +252,45 @@ pub(crate) fn handle_agent(
             AgentBridgeCommands::Accept { handoff_id } => print_output(
                 json_output,
                 &accept_bridge_handoff(AgentBridgeHandoffAcceptRequestV1 { handoff_id })?,
+            )?,
+        },
+        AgentCommands::Browser { command } => match command {
+            AgentBrowserCommands::Status => print_output(json_output, &browser_status_report()?)?,
+            AgentBrowserCommands::Open {
+                url,
+                browser,
+                activate,
+                new_window,
+            } => print_output(
+                json_output,
+                &browser_open_report(AgentBrowserOpenRequestV1 {
+                    url,
+                    browser: parse_browser_kind(browser)?,
+                    activate: Some(activate),
+                    new_window: Some(new_window),
+                })?,
+            )?,
+            AgentBrowserCommands::Eval {
+                script,
+                url,
+                browser,
+                activate,
+                wait_millis,
+            } => print_output(
+                json_output,
+                &browser_eval_report(AgentBrowserEvalRequestV1 {
+                    script,
+                    url,
+                    browser: parse_browser_kind(browser)?,
+                    activate: Some(activate),
+                    wait_millis,
+                })?,
+            )?,
+        },
+        AgentCommands::Web { command } => match command {
+            AgentWebCommands::Fetch { url, max_bytes } => print_output(
+                json_output,
+                &web_fetch_report(AgentWebFetchRequestV1 { url, max_bytes })?,
             )?,
         },
         AgentCommands::Workflow { command } => match command {
@@ -314,6 +359,16 @@ pub(crate) fn handle_agent(
                     model_override: model,
                 })?,
             )?,
+        },
+        AgentCommands::Hermes { command } => match command {
+            AgentHermesCommands::Status => print_output(json_output, &hermes_status()?)?,
+            AgentHermesCommands::Diff => print_output(json_output, &hermes_diff()?)?,
+            AgentHermesCommands::Install => print_output(json_output, &hermes_install()?)?,
+            AgentHermesCommands::Sync => print_output(json_output, &hermes_sync()?)?,
+            AgentHermesCommands::Doctor => print_output(json_output, &hermes_doctor()?)?,
+            AgentHermesCommands::ExportBootstrap => {
+                print_output(json_output, &hermes_export_bootstrap()?)?
+            }
         },
         AgentCommands::Mcp { command } => match command {
             AgentMcpCommands::Serve => serve_mcp_stdio()?,
@@ -393,8 +448,49 @@ fn human_render(value: &serde_json::Value) -> String {
                     "session_status",
                     "workflow_kind",
                     "status",
+                    "healthy",
                     "socket_path",
                     "socket_present",
+                    "pack_root",
+                    "lock_path",
+                    "contract_path",
+                    "manifest_path",
+                    "config_path",
+                    "install_complete",
+                    "doctor_ok",
+                    "repair_command",
+                    "policy_path",
+                    "bridge_present",
+                    "bridge_remote_health",
+                    "bridge_local_gateway_health",
+                    "bridge_gateway_configured",
+                    "bridge_gateway_running",
+                    "bridge_tunnel_running",
+                    "bridge_model_label",
+                    "bridge_exposure",
+                    "bridge_auth_mode",
+                    "primary_intelligence_lane",
+                    "fallback_policy",
+                    "platform",
+                    "supported",
+                    "preferred_automation_browser",
+                    "browser",
+                    "request_url",
+                    "final_url",
+                    "host",
+                    "policy_scope",
+                    "status_code",
+                    "status_text",
+                    "redirected",
+                    "content_type",
+                    "canonical_url",
+                    "title",
+                    "requested_url",
+                    "ok",
+                    "activated",
+                    "new_window",
+                    "current_url",
+                    "raw_result",
                 ] {
                     if let Some(value) = map.get(key) {
                         lines.push(format!("{key}: {}", scalar_or_json(value)));
@@ -417,6 +513,16 @@ fn human_render(value: &serde_json::Value) -> String {
                     "checkpoints",
                     "routes",
                     "probes",
+                    "assets",
+                    "violations",
+                    "missing_assets",
+                    "changed_assets",
+                    "config_issues",
+                    "lock_issues",
+                    "skills_written",
+                    "assets_written",
+                    "same_host_links",
+                    "notes",
                 ] {
                     if let Some(value) = map.get(key).and_then(serde_json::Value::as_array) {
                         lines.push(format!("{key}: {} item(s)", value.len()));
@@ -453,4 +559,18 @@ fn scalar_or_json(value: &serde_json::Value) -> String {
         serde_json::Value::String(value) => value.clone(),
         _ => serde_json::to_string(value).unwrap_or_else(|_| value.to_string()),
     }
+}
+
+fn parse_browser_kind(value: Option<String>) -> Result<Option<AgentBrowserKindV1>, String> {
+    value
+        .map(|browser| match browser.as_str() {
+            "default" => Ok(AgentBrowserKindV1::Default),
+            "safari" => Ok(AgentBrowserKindV1::Safari),
+            "chrome" => Ok(AgentBrowserKindV1::Chrome),
+            other => Err(format!(
+                "invalid browser '{}' ; expected one of: default, safari, chrome",
+                other
+            )),
+        })
+        .transpose()
 }

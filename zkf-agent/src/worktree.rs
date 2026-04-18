@@ -31,7 +31,16 @@ pub fn create_session_worktree(
             fs::create_dir_all(parent)
                 .map_err(|error| format!("failed to create {}: {error}", parent.display()))?;
         }
-        git(&repo_root, &["worktree", "add", "--detach", worktree_root.to_str().unwrap(), "HEAD"])?;
+        git(
+            &repo_root,
+            &[
+                "worktree",
+                "add",
+                "--detach",
+                worktree_root.to_str().unwrap(),
+                "HEAD",
+            ],
+        )?;
     }
 
     let project_root = project_root
@@ -72,8 +81,9 @@ pub fn cleanup_worktree_record(
             ],
         );
         if remove_files && worktree_root.exists() {
-            fs::remove_dir_all(&worktree_root)
-                .map_err(|error| format!("failed to remove {}: {error}", worktree_root.display()))?;
+            fs::remove_dir_all(&worktree_root).map_err(|error| {
+                format!("failed to remove {}: {error}", worktree_root.display())
+            })?;
         }
     }
     Ok(())
@@ -100,15 +110,13 @@ fn remap_project_root(
     worktree_root: &Path,
 ) -> Result<PathBuf, String> {
     if project_root.is_absolute() {
-        let relative = project_root
-            .strip_prefix(repo_root)
-            .map_err(|_| {
-                format!(
-                    "cannot map project root '{}' into managed worktree '{}'",
-                    project_root.display(),
-                    repo_root.display()
-                )
-            })?;
+        let relative = project_root.strip_prefix(repo_root).map_err(|_| {
+            format!(
+                "cannot map project root '{}' into managed worktree '{}'",
+                project_root.display(),
+                repo_root.display()
+            )
+        })?;
         Ok(worktree_root.join(relative))
     } else {
         Ok(worktree_root.join(project_root))

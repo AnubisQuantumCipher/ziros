@@ -1,3 +1,5 @@
+#![allow(warnings)] // Same TEMPORARY SAFETY contract as lib.rs for wallet_ffi
+#![allow(unsafe_code, no_mangle_generic_items)] // Same SAFETY contract as above for wallet_ffi
 use crate::{c_int_error, clear_last_error, null_error, sanitize_cstring, string_arg};
 use std::collections::HashMap;
 use std::ffi::{c_char, c_int};

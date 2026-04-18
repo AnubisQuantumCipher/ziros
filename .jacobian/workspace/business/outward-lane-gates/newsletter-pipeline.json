@@ -1,0 +1,69 @@
+{
+  "lane": "newsletter-pipeline",
+  "generated_at": "2026-04-18T10:02:39.137136+00:00",
+  "status": "blocked",
+  "checks": [
+    {
+      "name": "Planner Freshness",
+      "ok": false,
+      "detail": "planner latest.json missing or invalid"
+    },
+    {
+      "name": "Proof Server Local",
+      "ok": false,
+      "detail": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "Proof Queue Capacity",
+      "ok": false,
+      "detail": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "Cloudflare Access Edge",
+      "ok": false,
+      "detail": "DNS lookup returned no address"
+    },
+    {
+      "name": "Tracked Redirect Local",
+      "ok": false,
+      "detail": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "Tracked Redirect Public",
+      "ok": false,
+      "detail": "DNS lookup returned no address"
+    },
+    {
+      "name": "Billing Service Local",
+      "ok": false,
+      "detail": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "Billing Hosted Public",
+      "ok": false,
+      "detail": "DNS lookup returned no address"
+    },
+    {
+      "name": "Self-Serve Checkout Path",
+      "ok": false,
+      "detail": "self-serve-state.json missing"
+    },
+    {
+      "name": "Ghost Admin Probe",
+      "ok": false,
+      "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.\nError: Ghost Admin API key not found in Keychain.\nStore it with: security add-generic-password -a jacobi -s ghost-admin-api-key -w \"KEY\""
+    }
+  ],
+  "failed": [
+    "Planner Freshness",
+    "Proof Server Local",
+    "Proof Queue Capacity",
+    "Cloudflare Access Edge",
+    "Tracked Redirect Local",
+    "Tracked Redirect Public",
+    "Billing Service Local",
+    "Billing Hosted Public",
+    "Self-Serve Checkout Path",
+    "Ghost Admin Probe"
+  ]
+}

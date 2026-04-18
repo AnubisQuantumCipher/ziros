@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use zkf_agent::{AgentBrowserKindV1, AgentBrowserOpenRequestV1, browser_open_report};
 
 use super::shared::{
     DEFAULT_GATEWAY_URL, DEFAULT_PROOF_SERVER_URL, MidnightNetwork,
@@ -1208,18 +1209,14 @@ async fn browser_check_report(
 }
 
 fn open_browser(url: &str) -> Result<(), String> {
-    #[cfg(target_os = "macos")]
-    let mut command = Command::new("open");
-    #[cfg(target_os = "linux")]
-    let mut command = Command::new("xdg-open");
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
-    let mut command = Command::new("open");
-
-    command
-        .arg(url)
-        .spawn()
-        .map_err(|error| format!("failed to open browser for Lace check: {error}"))?;
-    Ok(())
+    browser_open_report(AgentBrowserOpenRequestV1 {
+        url: url.to_string(),
+        browser: Some(AgentBrowserKindV1::Default),
+        activate: Some(true),
+        new_window: Some(false),
+    })
+    .map(|_| ())
+    .map_err(|error| format!("failed to open browser for Lace check: {error}"))
 }
 
 fn http_probe_text(url: &str) -> Result<String, String> {

@@ -885,10 +885,22 @@ fn command_name(command: &Commands) -> String {
             AgentCommands::Approvals { .. } => "agent:approvals".to_string(),
             AgentCommands::Project { .. } => "agent:project".to_string(),
             AgentCommands::Bridge { .. } => "agent:bridge".to_string(),
+            AgentCommands::Browser { .. } => "agent:browser".to_string(),
+            AgentCommands::Web { .. } => "agent:web".to_string(),
             AgentCommands::Workflow { .. } => "agent:workflow".to_string(),
             AgentCommands::Worktree { .. } => "agent:worktree".to_string(),
             AgentCommands::Checkpoint { .. } => "agent:checkpoint".to_string(),
             AgentCommands::Provider { .. } => "agent:provider".to_string(),
+            AgentCommands::Hermes { command } => match command {
+                crate::cli::AgentHermesCommands::Status => "agent:hermes:status".to_string(),
+                crate::cli::AgentHermesCommands::Diff => "agent:hermes:diff".to_string(),
+                crate::cli::AgentHermesCommands::Install => "agent:hermes:install".to_string(),
+                crate::cli::AgentHermesCommands::Sync => "agent:hermes:sync".to_string(),
+                crate::cli::AgentHermesCommands::Doctor => "agent:hermes:doctor".to_string(),
+                crate::cli::AgentHermesCommands::ExportBootstrap => {
+                    "agent:hermes:export-bootstrap".to_string()
+                }
+            },
             AgentCommands::Mcp { .. } => "agent:mcp".to_string(),
         },
         Commands::Credential { command } => match command {

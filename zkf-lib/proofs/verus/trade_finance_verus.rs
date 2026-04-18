@@ -11,7 +11,7 @@ pub closed spec fn trade_finance_score_cap() -> int {
 }
 
 pub closed spec fn trade_finance_component_score_cap() -> int {
-    5_000
+    4_000
 }
 
 pub closed spec fn trade_finance_role_count() -> int {

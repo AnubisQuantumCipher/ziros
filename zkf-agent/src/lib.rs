@@ -1,17 +1,23 @@
 mod brain;
+mod bridge;
+mod browser;
 mod checkpoint;
 mod daemon;
 mod executor;
-mod provider_profiles;
+mod hermes;
 mod llm;
 mod mcp;
 mod planner;
 mod provider;
+mod provider_profiles;
 mod state;
 mod trust_gate;
 mod types;
+mod web;
 mod worktree;
 
+pub use bridge::{bridge_policy_path, bridge_status, load_bridge_policy, save_bridge_policy};
+pub use browser::{browser_eval, browser_open, browser_status};
 pub use daemon::{
     AgentRpcRequestV1, AgentRpcResponseV1, call_daemon, default_socket_path, handle_rpc_request,
     serve_daemon,
@@ -19,57 +25,73 @@ pub use daemon::{
 pub use mcp::{McpExposureV1, handle_mcp_jsonrpc_bytes, mcp_server_manifest, serve_mcp_stdio};
 pub use provider_profiles::{
     ProviderCredentialRefV1, ProviderKindV1, ProviderProfileStoreV1, ProviderProfileV1,
-    ProviderRoleBindingV1, load_provider_profile_store, load_api_key,
-    openai_credential_ref, ordered_profiles_for_selection, remove_provider_profile,
-    save_provider_profile_store, set_default_provider_profile, store_openai_api_key,
-    upsert_provider_profile,
+    ProviderRoleBindingV1, load_api_key, load_provider_profile_store, openai_credential_ref,
+    ordered_profiles_for_selection, remove_provider_profile, save_provider_profile_store,
+    set_default_provider_profile, store_openai_api_key, upsert_provider_profile,
 };
 pub use state::{
     AgentStateLayoutReportV1, AgentStateMigrationRecordV1, agent_root as ziros_agent_root,
-    brain_path as ziros_agent_brain_path, config_path as ziros_config_path,
-    ensure_ziros_layout, first_run_marker_path as ziros_first_run_marker_path,
-    install_root as ziros_install_root, legacy_agent_root as ziros_legacy_agent_root,
-    logs_root as ziros_logs_root, managed_bin_root as ziros_managed_bin_root,
-    provider_profiles_path as ziros_provider_profiles_path,
-    socket_path as ziros_agent_socket_path, state_root as ziros_state_root,
-    ziros_home_root,
+    brain_path as ziros_agent_brain_path, config_path as ziros_config_path, ensure_ziros_layout,
+    first_run_marker_path as ziros_first_run_marker_path, hermes_config_path, hermes_home_root,
+    hermes_memories_root, hermes_pack_lock_path, hermes_pack_root, hermes_skills_root,
+    hermes_soul_path, install_root as ziros_install_root,
+    legacy_agent_root as ziros_legacy_agent_root, logs_root as ziros_logs_root,
+    managed_bin_root as ziros_managed_bin_root,
+    provider_profiles_path as ziros_provider_profiles_path, socket_path as ziros_agent_socket_path,
+    state_root as ziros_state_root, ziros_home_root,
 };
 pub use types::{
-    ActionReceiptV1, AgentApproveRequestV1, AgentCancelRequestV1, AgentExplainReportV1,
-    AgentApprovalLineageReportV1, AgentArtifactsReportV1,
+    ActionReceiptV1, AgentApprovalLineageReportV1, AgentApproveRequestV1, AgentArtifactsReportV1,
     AgentBridgeHandoffAcceptRequestV1, AgentBridgeHandoffListReportV1,
     AgentBridgeHandoffPrepareReportV1, AgentBridgeHandoffPrepareRequestV1,
-    AgentCheckpointCreateRequestV1, AgentCheckpointListReportV1,
+    AgentBrowserEvalReportV1, AgentBrowserEvalRequestV1, AgentBrowserKindV1,
+    AgentBrowserOpenReportV1, AgentBrowserOpenRequestV1, AgentBrowserStatusReportV1,
+    AgentCancelRequestV1, AgentCheckpointCreateRequestV1, AgentCheckpointListReportV1,
     AgentCheckpointRollbackRequestV1, AgentDeploymentsReportV1, AgentEnvironmentReportV1,
-    AgentIncidentsReportV1, AgentListProjectsReportV1, AgentLogsReportV1,
+    AgentExplainReportV1, AgentIncidentsReportV1, AgentListProjectsReportV1, AgentLogsReportV1,
     AgentMemorySessionsReportV1, AgentProceduresReportV1, AgentProjectRegisterRequestV1,
     AgentProviderRouteRequestV1, AgentProviderStatusReportV1, AgentProviderTestReportV1,
-    AgentProviderTestRequestV1, AgentRunOptionsV1, AgentRunReportV1, AgentSessionViewV1,
-    AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1, AgentWorktreeListReportV1,
-    AgentRejectRequestV1, AgentStatusReportV1, AgentWorkflowListReportV1,
-    AgentWorkflowShowReportV1, ApprovalRequestRecordV1, ApprovalRequestV1, ApprovalResponseV1,
-    ApprovalTokenRecordV1, ArtifactRecordV1, BridgeHandoffRecordV1, CheckpointRecordV1,
-    DeploymentRecordV1, EventSubscriptionRequestV1, EventSubscriptionResponseV1, GoalIntentV1,
-    ProcedureRecordV1, ProjectRecordV1, ProviderProbeResultV1, ProviderRouteRecordV1,
-    ResumeSessionRequestV1, ResumeSessionResponseV1, RunSessionRequestV1,
-    RunSessionResponseV1, SubmissionGrantRecordV1, TrustGateReportV1, WorkgraphV1,
-    WorktreeRecordV1,
+    AgentProviderTestRequestV1, AgentRejectRequestV1, AgentRunOptionsV1, AgentRunReportV1,
+    AgentSessionViewV1, AgentStatusReportV1, AgentWebFetchReportV1, AgentWebFetchRequestV1,
+    AgentWorkflowListReportV1, AgentWorkflowShowReportV1, AgentWorktreeCleanupRequestV1,
+    AgentWorktreeCreateRequestV1, AgentWorktreeListReportV1, ApprovalRequestRecordV1,
+    ApprovalRequestV1, ApprovalResponseV1, ApprovalTokenRecordV1, ArtifactRecordV1,
+    BridgeFallbackPolicyV1, BridgeHandoffRecordV1, BridgePolicyV1, BridgeStatusReportV1,
+    BridgeTaskClassV1, CheckpointRecordV1, DeploymentRecordV1, EventSubscriptionRequestV1,
+    EventSubscriptionResponseV1, GoalIntentV1, GuardrailViolationV1, HermesBootstrapAssetV1,
+    HermesConfigStatusV1, HermesDoctorReportV1, HermesExportBootstrapReportV1,
+    HermesInstallReportV1, HermesManagedAssetStatusV1, HermesPackDiffV1, HermesPackStatusV1,
+    OperatorProfileV1, ProcedureRecordV1, ProjectRecordV1, ProviderProbeResultV1,
+    ProviderRouteRecordV1, ReasoningProvenanceV1, ResumeSessionRequestV1, ResumeSessionResponseV1,
+    RunSessionRequestV1, RunSessionResponseV1, SubmissionGrantRecordV1, TrustGateReportV1,
+    WorkgraphV1, WorktreeRecordV1,
 };
+pub use web::web_fetch;
 
 use brain::BrainStore;
+use bridge::{
+    apply_bridge_policy_guards, build_reasoning_provenance, classify_task, default_bridge_policy,
+    should_bypass_local_model_intent_compilation,
+};
 use checkpoint::{create_checkpoint_record, rollback_to_checkpoint_record};
 use executor::execute_workgraph;
+use hermes::{
+    hermes_diff as hermes_diff_impl, hermes_doctor as hermes_doctor_impl,
+    hermes_export_bootstrap as hermes_export_bootstrap_impl, hermes_install as hermes_install_impl,
+    hermes_status as hermes_status_impl, hermes_sync as hermes_sync_impl,
+};
 use llm::try_compile_goal_intent;
 use planner::{build_workgraph, compile_goal_intent, workflow_catalog};
 use provider::{probe_provider_routes, select_provider_routes};
+use std::collections::HashSet;
 use trust_gate::resolve_trust_gate;
 use types::{
     EnvironmentSnapshotV1, IncidentRecordV1, SessionStatusV1, WalletApprovalOutcomeV1,
     WorkflowRequirementsV1,
 };
-use worktree::{create_session_worktree, cleanup_worktree_record};
-use zkf_command_surface::{CommandErrorClassV1, new_operation_id};
+use worktree::{cleanup_worktree_record, create_session_worktree};
 use zkf_command_surface::wallet::{WalletContextV1, approve_pending, reject_pending};
+use zkf_command_surface::{CommandErrorClassV1, RiskClassV1, new_operation_id};
 
 pub fn agent_status(limit: usize) -> Result<AgentStatusReportV1, String> {
     let brain = BrainStore::open_default()?;
@@ -86,15 +108,22 @@ pub fn agent_status(limit: usize) -> Result<AgentStatusReportV1, String> {
 pub fn plan_goal(goal: &str, options: AgentRunOptionsV1) -> Result<AgentExplainReportV1, String> {
     let intent = resolve_goal_intent(goal, &options);
     let workflow_kind = intent.workflow_kind.clone();
+    let bridge_policy = load_bridge_policy().unwrap_or_else(|_| default_bridge_policy());
+    let task_class = classify_task(goal, &intent);
+    let reasoning_provenance = build_reasoning_provenance(&bridge_policy, task_class, &options);
     let requirements = WorkflowRequirementsV1::for_goal(goal, &intent, &options);
-    let trust_gate = resolve_trust_gate(&workflow_kind, &requirements, options.project_root.clone())?;
-    let workgraph = build_workgraph(goal, &intent, &requirements, &trust_gate);
+    let trust_gate =
+        resolve_trust_gate(&workflow_kind, &requirements, options.project_root.clone())?;
+    let mut workgraph = build_workgraph(goal, &intent, &requirements, &trust_gate);
+    apply_execution_policy_guards(&mut workgraph)?;
+    apply_bridge_policy_guards(&mut workgraph, &bridge_policy, &reasoning_provenance);
     Ok(AgentExplainReportV1 {
         schema: "ziros-agent-explain-v1".to_string(),
         generated_at: zkf_command_surface::now_rfc3339(),
         session: None,
         trust_gate,
         workgraph,
+        reasoning_provenance,
     })
 }
 
@@ -132,7 +161,10 @@ where
 {
     let brain = BrainStore::open_default()?;
     let (mut session, trust_gate, mut workgraph) = load_session_state(&brain, session_id)?;
-    if matches!(session.status, SessionStatusV1::Completed | SessionStatusV1::Cancelled) {
+    if matches!(
+        session.status,
+        SessionStatusV1::Completed | SessionStatusV1::Cancelled
+    ) {
         return Ok(AgentRunReportV1 {
             schema: "ziros-agent-run-v1".to_string(),
             generated_at: zkf_command_surface::now_rfc3339(),
@@ -140,17 +172,49 @@ where
             trust_gate,
             workgraph,
             receipts: brain.list_receipts(session_id)?,
+            reasoning_provenance: ReasoningProvenanceV1 {
+                task_class: BridgeTaskClassV1::Study,
+                reasoning_lane: "session-resume".to_string(),
+                reasoning_primary: false,
+                reasoning_model_label: "session-resume".to_string(),
+                reasoning_origin: "local-agent".to_string(),
+                execution_origin: "local-hermes".to_string(),
+                primary_lane_expected: default_bridge_policy().primary_lane,
+                primary_lane_used: false,
+                downgraded_from_primary: true,
+                downgrade_reason: Some(
+                    "session resume reused stored workgraph state rather than replaying primary reasoning"
+                        .to_string(),
+                ),
+            },
         });
     }
 
     let options = resume_options(&session, &trust_gate);
-    let _ = execute_workgraph(
-        &brain,
-        &mut session,
-        &mut workgraph,
-        &options,
-        &mut on_receipt,
-    )?;
+    apply_execution_policy_guards(&mut workgraph)?;
+    if trust_gate.blocked || !workgraph.blocked_prerequisites.is_empty() {
+        workgraph.status = "blocked".to_string();
+        brain.update_workgraph(&workgraph)?;
+        brain.update_session_status(&session.session_id, SessionStatusV1::Blocked)?;
+        session.status = SessionStatusV1::Blocked;
+        let receipt = brain.append_receipt(&brain.new_receipt(
+            &session.session_id,
+            "execution-policy",
+            "blocked",
+            &serde_json::json!({
+                "blocked_prerequisites": workgraph.blocked_prerequisites.clone(),
+            }),
+        )?)?;
+        on_receipt(&receipt);
+    } else {
+        let _ = execute_workgraph(
+            &brain,
+            &mut session,
+            &mut workgraph,
+            &options,
+            &mut on_receipt,
+        )?;
+    }
     let latest_receipt_id = brain
         .list_receipts(&session.session_id)?
         .last()
@@ -175,6 +239,21 @@ where
         trust_gate,
         workgraph,
         receipts: brain.list_receipts(session_id)?,
+        reasoning_provenance: ReasoningProvenanceV1 {
+            task_class: BridgeTaskClassV1::Study,
+            reasoning_lane: "session-resume".to_string(),
+            reasoning_primary: false,
+            reasoning_model_label: "session-resume".to_string(),
+            reasoning_origin: "local-agent".to_string(),
+            execution_origin: "local-hermes".to_string(),
+            primary_lane_expected: default_bridge_policy().primary_lane,
+            primary_lane_used: false,
+            downgraded_from_primary: true,
+            downgrade_reason: Some(
+                "session resume reused stored workgraph state rather than replaying primary reasoning"
+                    .to_string(),
+            ),
+        },
     })
 }
 
@@ -189,11 +268,18 @@ where
 {
     let intent = resolve_goal_intent(goal, &options);
     let workflow_kind = intent.workflow_kind.clone();
+    let bridge_policy = load_bridge_policy().unwrap_or_else(|_| default_bridge_policy());
+    let task_class = classify_task(goal, &intent);
+    let reasoning_provenance = build_reasoning_provenance(&bridge_policy, task_class, &options);
     let mut options = options;
     options.project_root =
         effective_project_root(&workflow_kind, goal, options.project_root.take())?;
-    let mut session =
-        brain.create_session(goal, &workflow_kind, SessionStatusV1::Planned, options.project_root.clone())?;
+    let mut session = brain.create_session(
+        goal,
+        &workflow_kind,
+        SessionStatusV1::Planned,
+        options.project_root.clone(),
+    )?;
 
     let provider_routes = select_provider_routes(
         Some(&session.session_id),
@@ -225,8 +311,12 @@ where
     let requirements = WorkflowRequirementsV1::for_goal(goal, &intent, &options);
     let trust_gate =
         resolve_trust_gate(&workflow_kind, &requirements, options.project_root.clone())?;
-    let workgraph = build_workgraph(goal, &intent, &requirements, &trust_gate);
+    let mut workgraph = build_workgraph(goal, &intent, &requirements, &trust_gate);
+    apply_execution_policy_guards(&mut workgraph)?;
+    apply_bridge_policy_guards(&mut workgraph, &bridge_policy, &reasoning_provenance);
     let status = if trust_gate.blocked {
+        SessionStatusV1::Blocked
+    } else if !workgraph.blocked_prerequisites.is_empty() {
         SessionStatusV1::Blocked
     } else {
         SessionStatusV1::Planned
@@ -234,7 +324,8 @@ where
     if status != SessionStatusV1::Planned {
         brain.update_session_status(&session.session_id, status)?;
     }
-    let capability_snapshot_id = brain.store_capability_snapshot(&session.session_id, &trust_gate)?;
+    let capability_snapshot_id =
+        brain.store_capability_snapshot(&session.session_id, &trust_gate)?;
     let _environment = brain.store_environment_snapshot(&EnvironmentSnapshotV1 {
         schema: "ziros-agent-environment-snapshot-v1".to_string(),
         snapshot_id: new_operation_id("environment-snapshot"),
@@ -246,9 +337,13 @@ where
         truth_snapshot: trust_gate.truth_snapshot.clone(),
         midnight_status: trust_gate.midnight_status.clone(),
         wallet: trust_gate.wallet.clone(),
+        reasoning_provenance: Some(reasoning_provenance.clone()),
     })?;
-    let workgraph =
-        brain.store_workgraph(&session.session_id, capability_snapshot_id.clone(), &workgraph)?;
+    let workgraph = brain.store_workgraph(
+        &session.session_id,
+        capability_snapshot_id.clone(),
+        &workgraph,
+    )?;
     session = brain.attach_workgraph(
         &session.session_id,
         &workgraph.workgraph_id,
@@ -273,7 +368,24 @@ where
         )?)?;
         on_receipt(&receipt_provider);
     }
-    if let Some(worktree) = brain.list_worktrees(Some(&session.session_id))?.into_iter().last() {
+    let receipt_reasoning = brain.append_receipt(&brain.new_receipt(
+        &session.session_id,
+        "reasoning-lane",
+        if reasoning_provenance.primary_lane_used {
+            "primary"
+        } else if status == SessionStatusV1::Blocked {
+            "blocked"
+        } else {
+            "degraded"
+        },
+        &reasoning_provenance,
+    )?)?;
+    on_receipt(&receipt_reasoning);
+    if let Some(worktree) = brain
+        .list_worktrees(Some(&session.session_id))?
+        .into_iter()
+        .last()
+    {
         let receipt_worktree = brain.append_receipt(&brain.new_receipt(
             &session.session_id,
             "worktree",
@@ -285,14 +397,22 @@ where
     let receipt_gate = brain.append_receipt(&brain.new_receipt(
         &session.session_id,
         "trust-gate",
-        if trust_gate.blocked { "blocked" } else { "ready" },
+        if trust_gate.blocked {
+            "blocked"
+        } else {
+            "ready"
+        },
         &trust_gate,
     )?)?;
     on_receipt(&receipt_gate);
     let receipt_plan = brain.append_receipt(&brain.new_receipt(
         &session.session_id,
         "planner",
-        if trust_gate.blocked { "blocked" } else { "planned" },
+        if trust_gate.blocked || !workgraph.blocked_prerequisites.is_empty() {
+            "blocked"
+        } else {
+            "planned"
+        },
         &workgraph,
     )?)?;
     on_receipt(&receipt_plan);
@@ -306,7 +426,7 @@ where
     let _ = brain.store_checkpoint(&checkpoint)?;
 
     let mut workgraph = workgraph;
-    if !trust_gate.blocked {
+    if !trust_gate.blocked && workgraph.blocked_prerequisites.is_empty() {
         let _ = execute_workgraph(brain, &mut session, &mut workgraph, &options, on_receipt)?;
     } else {
         session.status = status;
@@ -335,7 +455,118 @@ where
         trust_gate,
         workgraph,
         receipts,
+        reasoning_provenance,
     })
+}
+
+fn apply_execution_policy_guards(workgraph: &mut WorkgraphV1) -> Result<(), String> {
+    if workgraph.execution_policy.structured_command_first {
+        let offenders = workgraph
+            .nodes
+            .iter()
+            .filter(|node| !action_uses_structured_surface(&node.action_name))
+            .map(|node| format!("{} ({})", node.label, node.action_name))
+            .collect::<Vec<_>>();
+        if !offenders.is_empty() {
+            workgraph.blocked_prerequisites.push(format!(
+                "structured_command_first violated by: {}",
+                offenders.join(", ")
+            ));
+        }
+    }
+
+    if workgraph.execution_policy.postflight_required
+        && !workgraph_has_required_postflight(workgraph)
+    {
+        workgraph.blocked_prerequisites.push(
+            "postflight_required violated: mutating workgraph has no dependent postflight action"
+                .to_string(),
+        );
+    }
+
+    if workgraph.execution_policy.operator_profile == OperatorProfileV1::HermesRigorous {
+        let doctor = hermes_doctor_impl()?;
+        if !doctor.healthy {
+            let mut codes = doctor
+                .status
+                .violations
+                .iter()
+                .map(|issue| issue.code.as_str())
+                .take(5)
+                .collect::<Vec<_>>();
+            if doctor.status.violations.len() > 5 {
+                codes.push("...");
+            }
+            workgraph.blocked_prerequisites.push(format!(
+                "Hermes rigorous profile unhealthy; run `{}` and resolve: {}",
+                doctor.repair_command,
+                codes.join(", ")
+            ));
+        }
+    }
+
+    workgraph.blocked_prerequisites.sort();
+    workgraph.blocked_prerequisites.dedup();
+    if !workgraph.blocked_prerequisites.is_empty() {
+        workgraph.status = "blocked".to_string();
+    }
+    Ok(())
+}
+
+fn workgraph_has_required_postflight(workgraph: &WorkgraphV1) -> bool {
+    let mutating_nodes = workgraph
+        .nodes
+        .iter()
+        .filter(|node| node.risk_class == RiskClassV1::WorkspaceMutation)
+        .map(|node| node.node_id.as_str())
+        .collect::<HashSet<_>>();
+    if mutating_nodes.is_empty() {
+        return true;
+    }
+    workgraph.nodes.iter().any(|node| {
+        node.risk_class != RiskClassV1::WorkspaceMutation
+            && node_depends_on_any(workgraph, node, &mutating_nodes)
+    })
+}
+
+fn node_depends_on_any(
+    workgraph: &WorkgraphV1,
+    node: &crate::types::WorkgraphNodeV1,
+    candidates: &HashSet<&str>,
+) -> bool {
+    let mut pending = node.depends_on.clone();
+    let mut visited = HashSet::new();
+    while let Some(node_id) = pending.pop() {
+        if !visited.insert(node_id.clone()) {
+            continue;
+        }
+        if candidates.contains(node_id.as_str()) {
+            return true;
+        }
+        if let Some(parent) = workgraph
+            .nodes
+            .iter()
+            .find(|candidate| candidate.node_id == node_id)
+        {
+            pending.extend(parent.depends_on.iter().cloned());
+        }
+    }
+    false
+}
+
+fn action_uses_structured_surface(action_name: &str) -> bool {
+    action_name.starts_with("truth.")
+        || action_name.starts_with("wallet.")
+        || action_name.starts_with("subsystem.")
+        || action_name.starts_with("midnight.")
+        || action_name.starts_with("runtime.")
+        || action_name.starts_with("app.")
+        || action_name.starts_with("proof.")
+        || action_name.starts_with("release.")
+        || action_name.starts_with("evm.")
+        || action_name.starts_with("swarm.")
+        || action_name.starts_with("cluster.")
+        || action_name.starts_with("agent.")
 }
 
 fn explain_session_with_store(
@@ -343,12 +574,33 @@ fn explain_session_with_store(
     session_id: &str,
 ) -> Result<AgentExplainReportV1, String> {
     let (session, trust_gate, workgraph) = load_session_state(brain, session_id)?;
+    let reasoning_provenance = brain
+        .list_environment_snapshots(Some(session_id))?
+        .into_iter()
+        .filter_map(|snapshot| snapshot.reasoning_provenance)
+        .last()
+        .unwrap_or(ReasoningProvenanceV1 {
+            task_class: BridgeTaskClassV1::Study,
+            reasoning_lane: "session-explain".to_string(),
+            reasoning_primary: false,
+            reasoning_model_label: "session-explain".to_string(),
+            reasoning_origin: "local-agent".to_string(),
+            execution_origin: "local-hermes".to_string(),
+            primary_lane_expected: "chatgpt-pro-bridge".to_string(),
+            primary_lane_used: false,
+            downgraded_from_primary: true,
+            downgrade_reason: Some(
+                "session has no stored reasoning provenance; explanation is using local fallback metadata"
+                    .to_string(),
+            ),
+        });
     Ok(AgentExplainReportV1 {
         schema: "ziros-agent-explain-v1".to_string(),
         generated_at: zkf_command_surface::now_rfc3339(),
         session: Some(session),
         trust_gate,
         workgraph,
+        reasoning_provenance,
     })
 }
 
@@ -496,9 +748,7 @@ pub fn list_worktrees(session_id: Option<&str>) -> Result<AgentWorktreeListRepor
     })
 }
 
-pub fn create_worktree(
-    request: AgentWorktreeCreateRequestV1,
-) -> Result<WorktreeRecordV1, String> {
+pub fn create_worktree(request: AgentWorktreeCreateRequestV1) -> Result<WorktreeRecordV1, String> {
     let brain = BrainStore::open_default()?;
     let session = brain
         .get_session(&request.session_id)?
@@ -546,8 +796,13 @@ pub fn create_checkpoint(
         .list_receipts(&request.session_id)?
         .last()
         .map(|receipt| receipt.receipt_id.clone());
-    let checkpoint =
-        create_checkpoint_record(&brain, &session, &workgraph, &request.label, latest_receipt_id)?;
+    let checkpoint = create_checkpoint_record(
+        &brain,
+        &session,
+        &workgraph,
+        &request.label,
+        latest_receipt_id,
+    )?;
     brain.store_checkpoint(&checkpoint)
 }
 
@@ -563,6 +818,7 @@ pub fn rollback_checkpoint(
 }
 
 pub fn provider_status(session_id: Option<&str>) -> Result<AgentProviderStatusReportV1, String> {
+    let bridge_status = bridge_status().ok();
     let routes = match session_id {
         Some(session_id) => {
             let brain = BrainStore::open_default()?;
@@ -580,6 +836,11 @@ pub fn provider_status(session_id: Option<&str>) -> Result<AgentProviderStatusRe
         generated_at: zkf_command_surface::now_rfc3339(),
         session_id: session_id.map(str::to_string),
         routes,
+        primary_intelligence_lane: bridge_status
+            .as_ref()
+            .map(|status| status.primary_intelligence_lane.clone()),
+        fallback_policy: bridge_status.as_ref().map(|status| status.fallback_policy),
+        bridge_status,
     })
 }
 
@@ -587,6 +848,7 @@ pub fn provider_route(
     request: AgentProviderRouteRequestV1,
 ) -> Result<AgentProviderStatusReportV1, String> {
     let session_id = request.session_id.as_deref();
+    let bridge_status = bridge_status().ok();
     let routes = match session_id {
         Some(session_id) => {
             let brain = BrainStore::open_default()?;
@@ -618,6 +880,11 @@ pub fn provider_route(
         generated_at: zkf_command_surface::now_rfc3339(),
         session_id: request.session_id,
         routes,
+        primary_intelligence_lane: bridge_status
+            .as_ref()
+            .map(|status| status.primary_intelligence_lane.clone()),
+        fallback_policy: bridge_status.as_ref().map(|status| status.fallback_policy),
+        bridge_status,
     })
 }
 
@@ -635,6 +902,26 @@ pub fn provider_test(
         session_id: route_report.session_id,
         probes: probe_provider_routes(&route_report.routes),
     })
+}
+
+pub fn web_fetch_report(request: AgentWebFetchRequestV1) -> Result<AgentWebFetchReportV1, String> {
+    web_fetch(request)
+}
+
+pub fn browser_status_report() -> Result<AgentBrowserStatusReportV1, String> {
+    browser_status()
+}
+
+pub fn browser_open_report(
+    request: AgentBrowserOpenRequestV1,
+) -> Result<AgentBrowserOpenReportV1, String> {
+    browser_open(request)
+}
+
+pub fn browser_eval_report(
+    request: AgentBrowserEvalRequestV1,
+) -> Result<AgentBrowserEvalReportV1, String> {
+    browser_eval(request)
 }
 
 pub fn workflow_list() -> Result<AgentWorkflowListReportV1, String> {
@@ -657,9 +944,31 @@ pub fn workflow_show(workgraph_id: &str) -> Result<AgentWorkflowShowReportV1, St
     })
 }
 
-pub fn register_project(
-    request: AgentProjectRegisterRequestV1,
-) -> Result<ProjectRecordV1, String> {
+pub fn hermes_status() -> Result<HermesPackStatusV1, String> {
+    hermes_status_impl()
+}
+
+pub fn hermes_diff() -> Result<HermesPackDiffV1, String> {
+    hermes_diff_impl()
+}
+
+pub fn hermes_install() -> Result<HermesInstallReportV1, String> {
+    hermes_install_impl()
+}
+
+pub fn hermes_sync() -> Result<HermesInstallReportV1, String> {
+    hermes_sync_impl()
+}
+
+pub fn hermes_doctor() -> Result<HermesDoctorReportV1, String> {
+    hermes_doctor_impl()
+}
+
+pub fn hermes_export_bootstrap() -> Result<HermesExportBootstrapReportV1, String> {
+    hermes_export_bootstrap_impl()
+}
+
+pub fn register_project(request: AgentProjectRegisterRequestV1) -> Result<ProjectRecordV1, String> {
     let brain = BrainStore::open_default()?;
     brain.register_project(&request.name, &request.root_path)
 }
@@ -679,6 +988,19 @@ pub fn prepare_bridge_handoff(
     let brain = BrainStore::open_default()?;
     let handoff_id = new_operation_id("bridge-handoff");
     let now = zkf_command_surface::now_rfc3339();
+    let mut options = request.options;
+    if request.origin.contains("remote") || request.origin.contains("chatgpt") {
+        let bridge_policy = load_bridge_policy().unwrap_or_else(|_| default_bridge_policy());
+        if options.reasoning_lane.is_none() {
+            options.reasoning_lane = Some(bridge_policy.primary_lane.clone());
+        }
+        if options.reasoning_model_label.is_none() {
+            options.reasoning_model_label = Some(bridge_policy.primary_model_label.clone());
+        }
+        if options.reasoning_origin.is_none() {
+            options.reasoning_origin = Some("chatgpt-pro-bridge".to_string());
+        }
+    }
     let record = BridgeHandoffRecordV1 {
         schema: "ziros-agent-bridge-handoff-v1".to_string(),
         handoff_id: handoff_id.clone(),
@@ -688,7 +1010,7 @@ pub fn prepare_bridge_handoff(
         origin: request.origin,
         status: "prepared".to_string(),
         goal: request.goal,
-        options: request.options,
+        options,
         local_command: format!(
             "ziros agent bridge accept --handoff-id {}",
             shell_escape_arg(&handoff_id)
@@ -721,6 +1043,12 @@ pub fn accept_bridge_handoff(
     let mut handoff = brain
         .get_bridge_handoff(&request.handoff_id)?
         .ok_or_else(|| format!("unknown bridge handoff '{}'", request.handoff_id))?;
+    if let Err(error) = validate_remote_handoff_options(&handoff) {
+        handoff.updated_at = zkf_command_surface::now_rfc3339();
+        handoff.last_error = Some(error.clone());
+        let _ = brain.store_bridge_handoff(&handoff)?;
+        return Err(error);
+    }
     handoff.status = "accepted".to_string();
     handoff.updated_at = zkf_command_surface::now_rfc3339();
     handoff.last_error = None;
@@ -744,6 +1072,27 @@ pub fn accept_bridge_handoff(
             Err(error)
         }
     }
+}
+
+fn validate_remote_handoff_options(handoff: &BridgeHandoffRecordV1) -> Result<(), String> {
+    let is_remote = handoff.origin.contains("remote") || handoff.origin.contains("chatgpt");
+    if !is_remote {
+        return Ok(());
+    }
+    if !handoff.options.strict {
+        return Err(
+            "refusing to accept remote handoff with strict=false; prepare a fresh strict handoff."
+                .to_string(),
+        );
+    }
+    if handoff.options.project_root.is_some() {
+        return Err(
+            "refusing to accept remote handoff with a caller-supplied project_root; choose the \
+local workspace at accept time instead."
+                .to_string(),
+        );
+    }
+    Ok(())
 }
 
 pub fn approve_request(request: AgentApproveRequestV1) -> Result<WalletApprovalOutcomeV1, String> {
@@ -779,7 +1128,9 @@ pub fn approve_request(request: AgentApproveRequestV1) -> Result<WalletApprovalO
             approval_request_id: approval_request
                 .as_ref()
                 .map(|record| record.approval_request_id.clone()),
-            node_id: approval_request.as_ref().and_then(|record| record.node_id.clone()),
+            node_id: approval_request
+                .as_ref()
+                .and_then(|record| record.node_id.clone()),
             bridge_session_id: request.bridge_session_id.clone(),
         })?;
         if let Some(approval_request) = approval_request.as_ref() {
@@ -787,7 +1138,12 @@ pub fn approve_request(request: AgentApproveRequestV1) -> Result<WalletApprovalO
         } else {
             unblock_approval_nodes(&brain, session_id, "wallet.pending.approve")?;
         }
-        brain.append_receipt(&brain.new_receipt(session_id, "wallet-approve", "approved", &token)?)?;
+        brain.append_receipt(&brain.new_receipt(
+            session_id,
+            "wallet-approve",
+            "approved",
+            &token,
+        )?)?;
         match resume_session_with_receipts(session_id, |_| {}) {
             Ok(resumed) => {
                 session_status = Some(resumed.session.status);
@@ -899,7 +1255,10 @@ fn load_session_state(
     Ok((session, trust_gate, workgraph))
 }
 
-fn resume_options(session: &AgentSessionViewV1, trust_gate: &TrustGateReportV1) -> AgentRunOptionsV1 {
+fn resume_options(
+    session: &AgentSessionViewV1,
+    trust_gate: &TrustGateReportV1,
+) -> AgentRunOptionsV1 {
     let wallet_network = trust_gate
         .wallet
         .as_ref()
@@ -919,12 +1278,18 @@ fn resume_options(session: &AgentSessionViewV1, trust_gate: &TrustGateReportV1) 
         strict: trust_gate.strict,
         compat_allowed: trust_gate.compat_allowed,
         wallet_network,
-        project_root: session.project_root.as_deref().map(std::path::PathBuf::from),
+        project_root: session
+            .project_root
+            .as_deref()
+            .map(std::path::PathBuf::from),
         use_worktree: true,
         workflow_override: Some(trust_gate.workflow_kind.clone()),
         intent: None,
         provider_override: None,
         model_override: None,
+        reasoning_lane: None,
+        reasoning_model_label: None,
+        reasoning_origin: None,
     }
 }
 
@@ -966,17 +1331,28 @@ fn effective_project_root(
         .take(6)
         .collect::<Vec<_>>()
         .join("-");
-    let suffix = if slug.is_empty() { "session" } else { slug.as_str() };
-    Ok(Some(
-        cwd.join(format!("{prefix}-{suffix}-{}", new_operation_id("project"))),
-    ))
+    let suffix = if slug.is_empty() {
+        "session"
+    } else {
+        slug.as_str()
+    };
+    Ok(Some(cwd.join(format!(
+        "{prefix}-{suffix}-{}",
+        new_operation_id("project")
+    ))))
 }
 
 fn resolve_goal_intent(goal: &str, options: &AgentRunOptionsV1) -> GoalIntentV1 {
     options
         .intent
         .clone()
-        .or_else(|| try_compile_goal_intent(goal, options))
+        .or_else(|| {
+            if should_bypass_local_model_intent_compilation(options) {
+                None
+            } else {
+                try_compile_goal_intent(goal, options)
+            }
+        })
         .unwrap_or_else(|| compile_goal_intent(goal, options.workflow_override.as_deref()))
 }
 
@@ -1109,6 +1485,7 @@ fn shell_escape_arg(value: &str) -> String {
 mod tests {
     use super::*;
     use std::fs;
+    use std::path::{Path, PathBuf};
     use std::sync::{Mutex, OnceLock};
     use tempfile::tempdir;
     use zkf_cloudfs::CloudFS;
@@ -1129,7 +1506,9 @@ mod tests {
 
     #[test]
     fn run_goal_executes_repo_analysis_workgraph() {
+        let _guard = env_lock().lock().expect("env lock");
         let temp = tempdir().expect("tempdir");
+        prepare_test_hermes_home(&temp.path().join("hermes-home"));
         let cloudfs = CloudFS::from_roots(
             temp.path().join("persistent"),
             temp.path().join("cache"),
@@ -1147,14 +1526,27 @@ mod tests {
         )
         .expect("run");
         assert_eq!(report.session.status, SessionStatusV1::Completed);
-        assert!(report.workgraph.nodes.iter().all(|node| node.status == "completed"));
-        assert!(report.receipts.iter().any(|receipt| receipt.action_name == "truth.inspect"));
+        assert!(
+            report
+                .workgraph
+                .nodes
+                .iter()
+                .all(|node| node.status == "completed")
+        );
+        assert!(
+            report
+                .receipts
+                .iter()
+                .any(|receipt| receipt.action_name == "truth.inspect")
+        );
+        clear_test_hermes_home();
     }
 
     #[test]
     fn run_goal_executes_proof_app_workgraph_via_cli_fallback() {
         let _guard = env_lock().lock().expect("env lock");
         let temp = tempdir().expect("tempdir");
+        prepare_test_hermes_home(&temp.path().join("hermes-home"));
         let cloudfs = CloudFS::from_roots(
             temp.path().join("persistent"),
             temp.path().join("cache"),
@@ -1244,6 +1636,9 @@ esac
                 intent: None,
                 provider_override: None,
                 model_override: None,
+                reasoning_lane: Some("chatgpt-pro-bridge".to_string()),
+                reasoning_model_label: Some("GPT-5.4 Thinking".to_string()),
+                reasoning_origin: Some("chatgpt-pro-bridge".to_string()),
             },
             &mut |_| {},
         )
@@ -1251,6 +1646,7 @@ esac
         unsafe {
             std::env::remove_var("ZKF_AGENT_ZKF_BIN");
         }
+        clear_test_hermes_home();
 
         assert_eq!(report.session.status, SessionStatusV1::Completed);
         assert!(project_root.join("zirapp.json").exists());
@@ -1260,6 +1656,31 @@ esac
                 .iter()
                 .any(|receipt| receipt.action_name == "proof.compile-prove-verify")
         );
+    }
+
+    #[test]
+    fn plan_goal_blocks_when_hermes_rigorous_pack_is_missing() {
+        let _guard = env_lock().lock().expect("env lock");
+        let temp = tempdir().expect("tempdir");
+        unsafe {
+            std::env::set_var("HERMES_HOME", temp.path().join("missing-pack"));
+        }
+        let report = plan_goal(
+            "inspect the current ZirOS status",
+            AgentRunOptionsV1 {
+                strict: false,
+                ..AgentRunOptionsV1::default()
+            },
+        )
+        .expect("plan");
+        assert!(
+            report
+                .workgraph
+                .blocked_prerequisites
+                .iter()
+                .any(|issue| issue.contains("Hermes rigorous profile unhealthy"))
+        );
+        clear_test_hermes_home();
     }
 
     #[test]
@@ -1314,6 +1735,9 @@ esac
                 compat_allowed: true,
                 stop_on_first_failure: true,
                 require_explicit_approval_for_high_risk: true,
+                operator_profile: crate::types::OperatorProfileV1::HermesRigorous,
+                structured_command_first: true,
+                postflight_required: true,
             },
             capability_requirements: Vec::new(),
             blocked_prerequisites: Vec::new(),
@@ -1330,10 +1754,18 @@ esac
             }],
         };
         let stored = brain
-            .store_workgraph(&session.session_id, capability_snapshot_id.clone(), &workgraph)
+            .store_workgraph(
+                &session.session_id,
+                capability_snapshot_id.clone(),
+                &workgraph,
+            )
             .expect("store workgraph");
         let _ = brain
-            .attach_workgraph(&session.session_id, &stored.workgraph_id, capability_snapshot_id)
+            .attach_workgraph(
+                &session.session_id,
+                &stored.workgraph_id,
+                capability_snapshot_id,
+            )
             .expect("attach");
 
         unblock_approval_nodes(&brain, &session.session_id, "wallet.pending.approve")
@@ -1460,6 +1892,9 @@ esac
                 compat_allowed: true,
                 stop_on_first_failure: true,
                 require_explicit_approval_for_high_risk: true,
+                operator_profile: crate::types::OperatorProfileV1::HermesRigorous,
+                structured_command_first: true,
+                postflight_required: true,
             },
             capability_requirements: Vec::new(),
             blocked_prerequisites: Vec::new(),
@@ -1489,10 +1924,18 @@ esac
             ],
         };
         let stored = brain
-            .store_workgraph(&session.session_id, capability_snapshot_id.clone(), &workgraph)
+            .store_workgraph(
+                &session.session_id,
+                capability_snapshot_id.clone(),
+                &workgraph,
+            )
             .expect("store workgraph");
         let _ = brain
-            .attach_workgraph(&session.session_id, &stored.workgraph_id, capability_snapshot_id)
+            .attach_workgraph(
+                &session.session_id,
+                &stored.workgraph_id,
+                capability_snapshot_id,
+            )
             .expect("attach");
         let approval_request = ApprovalRequestRecordV1 {
             schema: "ziros-agent-approval-request-v1".to_string(),
@@ -1540,7 +1983,12 @@ esac
         );
         let brain = BrainStore::open_with_cloudfs(cloudfs).expect("brain");
         let session = brain
-            .create_session("inspect artifacts", "repo-analysis", SessionStatusV1::Completed, None)
+            .create_session(
+                "inspect artifacts",
+                "repo-analysis",
+                SessionStatusV1::Completed,
+                None,
+            )
             .expect("session");
         brain
             .register_artifact(
@@ -1553,14 +2001,100 @@ esac
             )
             .expect("artifact");
 
-        let report =
-            session_artifacts_with_store(&brain, Some(&session.session_id)).expect("artifact report");
+        let report = session_artifacts_with_store(&brain, Some(&session.session_id))
+            .expect("artifact report");
         assert_eq!(report.artifacts.len(), 1);
         assert_eq!(report.artifacts[0].artifact.label, "plan");
+    }
+
+    #[test]
+    fn remote_handoff_validation_rejects_non_strict_options() {
+        let error = validate_remote_handoff_options(&BridgeHandoffRecordV1 {
+            schema: "ziros-agent-bridge-handoff-v1".to_string(),
+            handoff_id: "bridge-handoff-test".to_string(),
+            bridge_session_id: "bridge-handoff-test".to_string(),
+            created_at: "2026-04-13T00:00:00Z".to_string(),
+            updated_at: "2026-04-13T00:00:00Z".to_string(),
+            origin: "remote-mcp".to_string(),
+            status: "prepared".to_string(),
+            goal: "inspect host readiness".to_string(),
+            options: AgentRunOptionsV1 {
+                strict: false,
+                ..AgentRunOptionsV1::default()
+            },
+            local_command: "ziros agent bridge accept --handoff-id bridge-handoff-test".to_string(),
+            session_id: None,
+            session_status: None,
+            last_error: None,
+        })
+        .expect_err("remote strict=false handoff should be rejected");
+        assert!(error.contains("strict=false"));
+    }
+
+    #[test]
+    fn remote_handoff_validation_rejects_caller_project_root() {
+        let error = validate_remote_handoff_options(&BridgeHandoffRecordV1 {
+            schema: "ziros-agent-bridge-handoff-v1".to_string(),
+            handoff_id: "bridge-handoff-test".to_string(),
+            bridge_session_id: "bridge-handoff-test".to_string(),
+            created_at: "2026-04-13T00:00:00Z".to_string(),
+            updated_at: "2026-04-13T00:00:00Z".to_string(),
+            origin: "chatgpt-pro-bridge".to_string(),
+            status: "prepared".to_string(),
+            goal: "build proof app".to_string(),
+            options: AgentRunOptionsV1 {
+                strict: true,
+                project_root: Some(PathBuf::from("/tmp/attacker")),
+                ..AgentRunOptionsV1::default()
+            },
+            local_command: "ziros agent bridge accept --handoff-id bridge-handoff-test".to_string(),
+            session_id: None,
+            session_status: None,
+            last_error: None,
+        })
+        .expect_err("remote project_root handoff should be rejected");
+        assert!(error.contains("project_root"));
+    }
+
+    #[test]
+    fn local_handoff_validation_allows_non_strict_local_origin() {
+        validate_remote_handoff_options(&BridgeHandoffRecordV1 {
+            schema: "ziros-agent-bridge-handoff-v1".to_string(),
+            handoff_id: "bridge-handoff-test".to_string(),
+            bridge_session_id: "bridge-handoff-test".to_string(),
+            created_at: "2026-04-13T00:00:00Z".to_string(),
+            updated_at: "2026-04-13T00:00:00Z".to_string(),
+            origin: "local-cli".to_string(),
+            status: "prepared".to_string(),
+            goal: "inspect host readiness".to_string(),
+            options: AgentRunOptionsV1 {
+                strict: false,
+                project_root: Some(PathBuf::from("/tmp/local")),
+                ..AgentRunOptionsV1::default()
+            },
+            local_command: "ziros agent bridge accept --handoff-id bridge-handoff-test".to_string(),
+            session_id: None,
+            session_status: None,
+            last_error: None,
+        })
+        .expect("local handoff should remain allowed");
     }
 
     fn env_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    fn prepare_test_hermes_home(path: &Path) {
+        unsafe {
+            std::env::set_var("HERMES_HOME", path);
+        }
+        hermes_sync().expect("sync hermes pack");
+    }
+
+    fn clear_test_hermes_home() {
+        unsafe {
+            std::env::remove_var("HERMES_HOME");
+        }
     }
 }

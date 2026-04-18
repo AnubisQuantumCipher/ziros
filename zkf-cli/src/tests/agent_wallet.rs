@@ -218,6 +218,120 @@ fn agent_cli_parses_provider_status_surface() {
 }
 
 #[test]
+fn agent_cli_parses_bridge_status_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "agent", "--json", "bridge", "status"]);
+    match cli.command {
+        crate::cli::Commands::Agent { json, command, .. } => {
+            assert!(json);
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Bridge {
+                    command: crate::cli::AgentBridgeCommands::Status
+                }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn agent_cli_parses_browser_open_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "agent",
+        "--json",
+        "browser",
+        "open",
+        "--url",
+        "https://platform.openai.com/docs/guides/tools-shell",
+        "--browser",
+        "chrome",
+        "--new-window",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Agent { json, command, .. } => {
+            assert!(json);
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Browser {
+                    command: crate::cli::AgentBrowserCommands::Open {
+                        url,
+                        browser: Some(ref browser),
+                        activate: true,
+                        new_window: true,
+                    }
+                } if url == "https://platform.openai.com/docs/guides/tools-shell"
+                    && browser == "chrome"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn agent_cli_parses_web_fetch_surface() {
+    let cli = crate::cli::Cli::parse_from([
+        "ziros",
+        "agent",
+        "--json",
+        "web",
+        "fetch",
+        "--url",
+        "https://platform.openai.com/docs/guides/tools-shell",
+        "--max-bytes",
+        "4096",
+    ]);
+    match cli.command {
+        crate::cli::Commands::Agent { json, command, .. } => {
+            assert!(json);
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Web {
+                    command: crate::cli::AgentWebCommands::Fetch {
+                        url,
+                        max_bytes: Some(4096),
+                    }
+                } if url == "https://platform.openai.com/docs/guides/tools-shell"
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn agent_cli_parses_hermes_status_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "agent", "--json", "hermes", "status"]);
+    match cli.command {
+        crate::cli::Commands::Agent { json, command, .. } => {
+            assert!(json);
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Hermes {
+                    command: crate::cli::AgentHermesCommands::Status
+                }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
+fn agent_cli_parses_hermes_export_bootstrap_surface() {
+    let cli = crate::cli::Cli::parse_from(["ziros", "agent", "hermes", "export-bootstrap"]);
+    match cli.command {
+        crate::cli::Commands::Agent { command, .. } => {
+            assert!(matches!(
+                command,
+                crate::cli::AgentCommands::Hermes {
+                    command: crate::cli::AgentHermesCommands::ExportBootstrap
+                }
+            ));
+        }
+        other => panic!("unexpected command: {other:?}"),
+    }
+}
+
+#[test]
 fn agent_cli_parses_bridge_prepare_surface() {
     let cli = crate::cli::Cli::parse_from([
         "ziros",

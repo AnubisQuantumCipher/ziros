@@ -42,7 +42,10 @@ pub fn select_provider_routes(
                 let api_key = load_api_key(credential.as_ref());
                 let ready = match profile.provider_kind.as_str() {
                     "openai-api" => api_key.is_some(),
-                    _ => profile.base_url.as_ref().is_some_and(|value| !value.trim().is_empty()),
+                    _ => profile
+                        .base_url
+                        .as_ref()
+                        .is_some_and(|value| !value.trim().is_empty()),
                 };
                 routes.push(route(
                     session_id,
@@ -91,9 +94,11 @@ pub fn select_provider_routes(
         ),
         ("ollama-local", "local-endpoint", &["OLLAMA_HOST"][..]),
     ] {
-        let detected = vars
-            .iter()
-            .find_map(|name| env::var(name).ok().map(|value| ((*name).to_string(), value)));
+        let detected = vars.iter().find_map(|name| {
+            env::var(name)
+                .ok()
+                .map(|value| ((*name).to_string(), value))
+        });
         let ready = detected.is_some() || provider_override == Some(provider);
         if ready {
             let selected_model = model_override
@@ -116,11 +121,17 @@ pub fn select_provider_routes(
         }
     }
 
-    let openai_api_key = env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty());
+    let openai_api_key = env::var("OPENAI_API_KEY")
+        .ok()
+        .filter(|value| !value.trim().is_empty());
     let openai_base = env::var("ZIROS_AGENT_OPENAI_BASE_URL")
         .ok()
         .filter(|value| !value.trim().is_empty())
-        .or_else(|| env::var("OPENAI_API_BASE").ok().filter(|value| !value.trim().is_empty()))
+        .or_else(|| {
+            env::var("OPENAI_API_BASE")
+                .ok()
+                .filter(|value| !value.trim().is_empty())
+        })
         .unwrap_or_else(|| "https://api.openai.com".to_string());
     let openai_model = model_override
         .map(str::to_string)
@@ -153,7 +164,9 @@ pub fn select_provider_routes(
     }
 
     if let Some(provider_override) = provider_override
-        && routes.iter().all(|route| route.provider != provider_override)
+        && routes
+            .iter()
+            .all(|route| route.provider != provider_override)
     {
         routes.insert(
             0,
@@ -197,7 +210,11 @@ fn probe_route(route: &ProviderRouteRecordV1) -> ProviderProbeResultV1 {
         };
     }
 
-    let Some(base_url) = route.summary.get("base_url").and_then(serde_json::Value::as_str) else {
+    let Some(base_url) = route
+        .summary
+        .get("base_url")
+        .and_then(serde_json::Value::as_str)
+    else {
         return ProviderProbeResultV1 {
             schema: "ziros-agent-provider-probe-v1".to_string(),
             probe_id: new_operation_id("provider-probe"),
@@ -307,11 +324,19 @@ fn default_model_for_provider(provider: &str) -> Option<String> {
         "openai-api" => env::var("ZIROS_AGENT_OPENAI_MODEL")
             .ok()
             .filter(|value| !value.trim().is_empty())
-            .or_else(|| env::var("OPENAI_MODEL").ok().filter(|value| !value.trim().is_empty())),
+            .or_else(|| {
+                env::var("OPENAI_MODEL")
+                    .ok()
+                    .filter(|value| !value.trim().is_empty())
+            }),
         "openai-compatible-local" => env::var("ZIROS_AGENT_MODEL_NAME")
             .ok()
             .filter(|value| !value.trim().is_empty())
-            .or_else(|| env::var("OPENAI_MODEL").ok().filter(|value| !value.trim().is_empty())),
+            .or_else(|| {
+                env::var("OPENAI_MODEL")
+                    .ok()
+                    .filter(|value| !value.trim().is_empty())
+            }),
         "mlx-local" => env::var("ZIROS_AGENT_MLX_MODEL")
             .ok()
             .filter(|value| !value.trim().is_empty()),
@@ -354,7 +379,10 @@ pub(crate) fn auth_bearer_for_route(route: &ProviderRouteRecordV1) -> Option<Str
         return Some(value);
     }
 
-    if let Some(value) = env::var("OPENAI_API_KEY").ok().filter(|value| !value.trim().is_empty()) {
+    if let Some(value) = env::var("OPENAI_API_KEY")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+    {
         return Some(value);
     }
 
@@ -443,7 +471,10 @@ mod tests {
 
     #[test]
     fn normalize_base_url_adds_http_scheme_when_missing() {
-        assert_eq!(normalize_base_url("127.0.0.1:1234"), "http://127.0.0.1:1234");
+        assert_eq!(
+            normalize_base_url("127.0.0.1:1234"),
+            "http://127.0.0.1:1234"
+        );
         assert_eq!(
             normalize_base_url("https://127.0.0.1:1234"),
             "https://127.0.0.1:1234"
@@ -531,7 +562,10 @@ mod tests {
                 "auth_mode": "bearer-api-key",
             }),
         );
-        assert_eq!(auth_bearer_for_route(&route).as_deref(), Some("test-openai-key"));
+        assert_eq!(
+            auth_bearer_for_route(&route).as_deref(),
+            Some("test-openai-key")
+        );
         unsafe {
             std::env::remove_var("OPENAI_API_KEY");
         }
@@ -543,18 +577,17 @@ mod tests {
         unsafe {
             std::env::set_var("OPENAI_API_KEY", "test-openai-key");
         }
-        let routes = select_provider_routes(
-            None,
-            "ad-hoc",
-            Some("openai-api"),
-            Some("gpt-5.2-codex"),
-        );
+        let routes =
+            select_provider_routes(None, "ad-hoc", Some("openai-api"), Some("gpt-5.2-codex"));
         let openai = routes
             .iter()
             .find(|route| route.provider == "openai-api")
             .expect("openai route");
         assert_eq!(
-            openai.summary.get("model").and_then(serde_json::Value::as_str),
+            openai
+                .summary
+                .get("model")
+                .and_then(serde_json::Value::as_str),
             Some("gpt-5.2-codex")
         );
         unsafe {

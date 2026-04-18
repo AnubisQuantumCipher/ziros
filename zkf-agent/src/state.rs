@@ -6,8 +6,10 @@ use std::os::unix::fs as unix_fs;
 use std::path::{Path, PathBuf};
 
 const ZIROS_HOME_ENV: &str = "ZIROS_HOME";
+const HERMES_HOME_ENV: &str = "HERMES_HOME";
 const LEGACY_ZKF_ROOT: &str = ".zkf";
 const ZIROS_ROOT: &str = ".ziros";
+const HERMES_ROOT: &str = ".hermes";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentStateMigrationRecordV1 {
@@ -35,6 +37,13 @@ pub fn ziros_home_root() -> PathBuf {
         .map(PathBuf::from)
         .filter(|path| !path.as_os_str().is_empty())
         .unwrap_or_else(|| home_dir().join(ZIROS_ROOT))
+}
+
+pub fn hermes_home_root() -> PathBuf {
+    std::env::var_os(HERMES_HOME_ENV)
+        .map(PathBuf::from)
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| home_dir().join(HERMES_ROOT))
 }
 
 pub fn legacy_zkf_root() -> PathBuf {
@@ -85,17 +94,37 @@ pub fn first_run_marker_path() -> PathBuf {
     state_root().join("ziros-first-run-v1")
 }
 
+pub fn hermes_config_path() -> PathBuf {
+    hermes_home_root().join("config.yaml")
+}
+
+pub fn hermes_pack_root() -> PathBuf {
+    hermes_home_root().join("ziros-pack")
+}
+
+pub fn hermes_pack_lock_path() -> PathBuf {
+    hermes_home_root().join("ziros-pack.lock.json")
+}
+
+pub fn hermes_skills_root() -> PathBuf {
+    hermes_home_root().join("skills")
+}
+
+pub fn hermes_soul_path() -> PathBuf {
+    hermes_home_root().join("SOUL.md")
+}
+
+pub fn hermes_memories_root() -> PathBuf {
+    hermes_home_root().join("memories")
+}
+
 pub fn ensure_ziros_layout() -> Result<AgentStateLayoutReportV1, String> {
     fs::create_dir_all(ziros_home_root())
         .map_err(|error| format!("failed to create {}: {error}", ziros_home_root().display()))?;
     fs::create_dir_all(agent_root())
         .map_err(|error| format!("failed to create {}: {error}", agent_root().display()))?;
-    fs::create_dir_all(managed_bin_root()).map_err(|error| {
-        format!(
-            "failed to create {}: {error}",
-            managed_bin_root().display()
-        )
-    })?;
+    fs::create_dir_all(managed_bin_root())
+        .map_err(|error| format!("failed to create {}: {error}", managed_bin_root().display()))?;
     fs::create_dir_all(logs_root())
         .map_err(|error| format!("failed to create {}: {error}", logs_root().display()))?;
     fs::create_dir_all(state_root())
@@ -201,7 +230,11 @@ fn home_dir() -> PathBuf {
 
 #[cfg(test)]
 mod tests {
-    use super::{brain_path, ensure_ziros_layout, first_run_marker_path, ziros_home_root};
+    use super::{
+        brain_path, ensure_ziros_layout, first_run_marker_path, hermes_config_path,
+        hermes_home_root, hermes_pack_lock_path, hermes_pack_root, hermes_skills_root,
+        ziros_home_root,
+    };
 
     #[test]
     fn layout_uses_ziros_home_root() {
@@ -213,5 +246,18 @@ mod tests {
         assert!(report.ziros_home.ends_with("/.ziros"));
         assert!(brain_path().starts_with(ziros_home_root()));
         assert!(first_run_marker_path().starts_with(ziros_home_root()));
+    }
+
+    #[test]
+    fn hermes_paths_follow_hermes_home_root() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        unsafe {
+            std::env::set_var("HOME", temp.path());
+        }
+        assert!(hermes_home_root().ends_with(".hermes"));
+        assert!(hermes_config_path().starts_with(hermes_home_root()));
+        assert!(hermes_pack_root().starts_with(hermes_home_root()));
+        assert!(hermes_pack_lock_path().starts_with(hermes_home_root()));
+        assert!(hermes_skills_root().starts_with(hermes_home_root()));
     }
 }

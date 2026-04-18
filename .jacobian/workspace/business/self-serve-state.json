@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-04-18T10:02:39.252744+00:00",
+  "mode": "manual_only",
+  "sell_gate_status": "manual_only",
+  "acceptance_gate_blockers": [
+    "credited internal acceptance gate incomplete"
+  ],
+  "shared_health_blockers": [
+    "Cloudflare Access edge unhealthy",
+    "Stripe checkout target missing",
+    "Stripe webhook secret missing",
+    "billing public edge unhealthy",
+    "billing service unhealthy",
+    "billing status surface unhealthy",
+    "claim surface unhealthy",
+    "metering proxy unhealthy",
+    "proof lane unhealthy",
+    "proofs sender unhealthy",
+    "public edge degraded",
+    "redirect public edge unhealthy",
+    "redirect service unhealthy",
+    "restore drill overdue",
+    "watchdog critical shared health failed"
+  ],
+  "blockers": [
+    "Cloudflare Access edge unhealthy",
+    "Stripe checkout target missing",
+    "Stripe webhook secret missing",
+    "billing public edge unhealthy",
+    "billing service unhealthy",
+    "billing status surface unhealthy",
+    "claim surface unhealthy",
+    "credited internal acceptance gate incomplete",
+    "metering proxy unhealthy",
+    "proof lane unhealthy",
+    "proofs sender unhealthy",
+    "public edge degraded",
+    "redirect public edge unhealthy",
+    "redirect service unhealthy",
+    "restore drill overdue",
+    "watchdog critical shared health failed"
+  ],
+  "checkout_paused_reason": "credited internal acceptance gate incomplete, Cloudflare Access edge unhealthy, Stripe checkout target missing, Stripe webhook secret missing, billing public edge unhealthy, billing service unhealthy, billing status surface unhealthy, claim surface unhealthy, metering proxy unhealthy, proof lane unhealthy, proofs sender unhealthy, public edge degraded, redirect public edge unhealthy, redirect service unhealthy, restore drill overdue, watchdog critical shared health failed",
+  "checkout_target": "https://billing.ziros.dev/waitlist",
+  "next_retry_at": "2026-04-18T10:03:39.252749+00:00",
+  "billing_hostname": "billing.ziros.dev"
+}

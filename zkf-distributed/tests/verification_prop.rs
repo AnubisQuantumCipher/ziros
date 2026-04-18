@@ -23,7 +23,7 @@ proptest! {
                 current_buffer_bytes,
                 encrypted_threat_gossip_supported: false,
                 threat_epoch_id: None,
-                threat_epoch_public_key: None,
+                threat_epoch_public_key: None, threat_epoch_ml_kem_public_key: None,
                 threat_digests: Vec::new(),
                 activation_level: None,
                 intelligence_root: None,

@@ -2,8 +2,8 @@ use crate::brain::BrainStore;
 use crate::checkpoint::create_checkpoint_record;
 use crate::types::{
     ActionReceiptV1, AgentRunOptionsV1, AgentSessionViewV1, ApprovalRequestRecordV1,
-    IncidentRecordV1, IntentHintsV1, ProcedureRecordV1, SubmissionGrantRecordV1,
-    WorkgraphNodeV1, WorkgraphV1,
+    IncidentRecordV1, IntentHintsV1, ProcedureRecordV1, SubmissionGrantRecordV1, WorkgraphNodeV1,
+    WorkgraphV1,
 };
 use serde_json::{Value, json};
 use std::fs;
@@ -31,8 +31,8 @@ use zkf_command_surface::wallet::{
     sync_health,
 };
 use zkf_command_surface::{
-    ActionDescriptorV1, ActionResultEnvelopeV1, ArtifactRefV1, CommandErrorClassV1,
-    MetricRecordV1, RiskClassV1,
+    ActionDescriptorV1, ActionResultEnvelopeV1, ArtifactRefV1, CommandErrorClassV1, MetricRecordV1,
+    RiskClassV1,
 };
 use zkf_wallet::WalletNetwork;
 
@@ -135,7 +135,8 @@ where
                     workgraph.nodes[index].status = "completed".to_string();
                     brain.update_workgraph(workgraph)?;
                     for artifact in &envelope.artifacts {
-                        let _ = brain.register_artifact(Some(&session.session_id), artifact.clone())?;
+                        let _ =
+                            brain.register_artifact(Some(&session.session_id), artifact.clone())?;
                     }
                     if node.action_name == "midnight.contract.deploy-prepare" {
                         let _ = brain.store_deployment(&crate::types::DeploymentRecordV1 {
@@ -312,8 +313,9 @@ fn execute_node_action(
 ) -> Result<ActionResultEnvelopeV1, String> {
     let descriptor = descriptor_for(node);
     let payload = match descriptor.name.as_str() {
-        "truth.inspect" => serde_json::to_value(collect_truth_snapshot()?)
-            .map_err(|error| error.to_string())?,
+        "truth.inspect" => {
+            serde_json::to_value(collect_truth_snapshot()?).map_err(|error| error.to_string())?
+        }
         "truth.capabilities" => collect_truth_snapshot()?.capabilities,
         "truth.metal" => collect_truth_snapshot()?.metal,
         "wallet.snapshot" => execute_wallet_snapshot(options)?,
@@ -347,14 +349,22 @@ fn execute_node_action(
             workspace_root(),
         )?)
         .map_err(|error| error.to_string())?,
-        "swarm.status" => serde_json::to_value(swarm_status()?).map_err(|error| error.to_string())?,
-        "cluster.status" => serde_json::to_value(cluster_status()?).map_err(|error| error.to_string())?,
+        "swarm.status" => {
+            serde_json::to_value(swarm_status()?).map_err(|error| error.to_string())?
+        }
+        "cluster.status" => {
+            serde_json::to_value(cluster_status()?).map_err(|error| error.to_string())?
+        }
         "agent.plan" => json!({
             "goal": workgraph.goal,
             "workflow_kind": workgraph.workflow_kind,
             "message": "generic plan retained for operator review",
         }),
-        other => return Err(format!("no ZirOS agent executor is registered for action '{other}'")),
+        other => {
+            return Err(format!(
+                "no ZirOS agent executor is registered for action '{other}'"
+            ));
+        }
     };
 
     let mut envelope = ActionResultEnvelopeV1::success(
@@ -390,7 +400,12 @@ fn execute_wallet_submission_grant(
         .list_approval_tokens(Some(&session.session_id))?
         .into_iter()
         .last()
-        .ok_or_else(|| format!("session '{}' has no stored approval token", session.session_id))?;
+        .ok_or_else(|| {
+            format!(
+                "session '{}' has no stored approval token",
+                session.session_id
+            )
+        })?;
     let mut wallet = WalletContextV1 {
         network: Some(token_record.token.network),
         ..WalletContextV1::default()
@@ -544,8 +559,12 @@ fn execute_midnight_compile(
     options: &AgentRunOptionsV1,
 ) -> Result<Value, String> {
     let project_root = required_project_root(session)?;
-    let source = resolve_compact_contract(&project_root)?
-        .ok_or_else(|| format!("no Compact contract was found under {}", project_root.display()))?;
+    let source = resolve_compact_contract(&project_root)?.ok_or_else(|| {
+        format!(
+            "no Compact contract was found under {}",
+            project_root.display()
+        )
+    })?;
     let out_dir = node_artifact_dir(brain, &session.session_id, "midnight-compile")?;
     let report = compile_contract(
         wallet_network_to_midnight_network(options.wallet_network),
@@ -561,8 +580,12 @@ fn execute_midnight_deploy_prepare(
     options: &AgentRunOptionsV1,
 ) -> Result<Value, String> {
     let project_root = required_project_root(session)?;
-    let source = resolve_compact_contract(&project_root)?
-        .ok_or_else(|| format!("no Compact contract was found under {}", project_root.display()))?;
+    let source = resolve_compact_contract(&project_root)?.ok_or_else(|| {
+        format!(
+            "no Compact contract was found under {}",
+            project_root.display()
+        )
+    })?;
     let out_dir = node_artifact_dir(brain, &session.session_id, "midnight-deploy-prepare")?;
     let out_path = out_dir.join("deploy-prepare.json");
     let report = deploy_prepare(
@@ -638,7 +661,10 @@ fn execute_app_scaffold(
     }))
 }
 
-fn execute_proof_workflow(brain: &BrainStore, session: &AgentSessionViewV1) -> Result<Value, String> {
+fn execute_proof_workflow(
+    brain: &BrainStore,
+    session: &AgentSessionViewV1,
+) -> Result<Value, String> {
     let project_root = required_project_root(session)?;
     let spec_path = project_root.join("zirapp.json");
     let inputs_path = project_root.join("inputs.compliant.json");
@@ -721,11 +747,7 @@ fn required_project_root(session: &AgentSessionViewV1) -> Result<PathBuf, String
         .ok_or_else(|| format!("session '{}' has no project root", session.session_id))
 }
 
-fn node_artifact_dir(
-    brain: &BrainStore,
-    session_id: &str,
-    label: &str,
-) -> Result<PathBuf, String> {
+fn node_artifact_dir(brain: &BrainStore, session_id: &str, label: &str) -> Result<PathBuf, String> {
     let path = brain.cache_root().join("runs").join(session_id).join(label);
     fs::create_dir_all(&path)
         .map_err(|error| format!("failed to create {}: {error}", path.display()))?;
@@ -751,7 +773,10 @@ fn resolve_compact_contract(project_root: &Path) -> Result<Option<PathBuf>, Stri
             .map_err(|error| format!("{}: {error}", contracts_dir.display()))?
             .filter_map(Result::ok)
             .map(|entry| entry.path())
-            .filter(|path| path.extension().is_some_and(|extension| extension == "compact"))
+            .filter(|path| {
+                path.extension()
+                    .is_some_and(|extension| extension == "compact")
+            })
             .collect::<Vec<_>>();
         contracts.sort();
         if let Some(contract) = contracts.into_iter().next() {

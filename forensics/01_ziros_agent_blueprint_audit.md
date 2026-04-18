@@ -1,6 +1,6 @@
 # ZirOS Agent Blueprint Audit
 
-Generated: `2026-04-07T05:33:10.164144Z`
+Generated: `2026-04-11T19:40:49.992733Z`
 
 This audit is source-first. It covers the in-tree ZirOS Agent foundation, the new command substrate, the CLI closure surfaces, and the macOS host shell as they exist in this checkout.
 
@@ -12,7 +12,7 @@ This audit is source-first. It covers the in-tree ZirOS Agent foundation, the ne
 - `zkf-cli/src/cli.rs`
 - `ZirOSAgentHost/`
 ### Findings
-- The scoped agent surface spans `62` files and `23420` lines.
+- The scoped agent surface spans `74` files and `29944` lines.
 - The workspace includes the first-party packages `zkf-cli, zkf-agent, zkf-command-surface`.
 - The agent architecture is in-tree and first-party rather than layered in a separate repo.
 ### Gaps and Concerns
@@ -24,6 +24,7 @@ The structural shape matches the blueprint: in-tree, command-native, daemon-cent
 ### Files Examined
 - `zkf-command-surface/src/app.rs`
 - `zkf-command-surface/src/cluster.rs`
+- `zkf-command-surface/src/evm.rs`
 - `zkf-command-surface/src/midnight.rs`
 - `zkf-command-surface/src/proof.rs`
 - `zkf-command-surface/src/release.rs`
@@ -35,7 +36,7 @@ The structural shape matches the blueprint: in-tree, command-native, daemon-cent
 - `zkf-command-surface/src/types.rs`
 - `zkf-command-surface/src/wallet.rs`
 ### Findings
-- `zkf-command-surface` currently exports `12` modules.
+- `zkf-command-surface` currently exports `13` modules.
 - The substrate now has first-party modules for truth, wallet, midnight, app, runtime, cluster, swarm, release, proof, shell, and shared types.
 - Typed result envelopes, artifact refs, metrics, and error classes are defined in the substrate rather than invented ad hoc in the daemon.
 ### Gaps and Concerns
@@ -53,8 +54,8 @@ The command-surface crate is no longer a thin convenience wrapper; it is the cor
 - `zkf-agent/src/daemon.rs`
 - `zkf-agent/src/mcp.rs`
 ### Findings
-- The executor exposes `19` typed action names across `12` workflow families.
-- The Brain schema materializes `18` SQLite tables, including sessions, workgraphs, receipts, artifacts, procedures, incidents, approvals, deployments, capability snapshots, environment snapshots, and project registry state.
+- The executor exposes `25` typed action names across `13` workflow families.
+- The Brain schema materializes `19` SQLite tables, including sessions, workgraphs, receipts, artifacts, procedures, incidents, approvals, deployments, capability snapshots, environment snapshots, and project registry state.
 - Approval-blocked workgraphs can now resume through exact approval lineage, automatic session continuation, and submission-grant issuance instead of stopping at a placeholder token boundary.
 ### Gaps and Concerns
 - The planner still retains keyword inference as a backward-compatible fallback when callers provide no explicit intent.
@@ -69,7 +70,7 @@ This is now a real operator runtime with active memory, approval lineage, worktr
 - `zkf-cli/src/cmd/midnight.rs`
 - `zkf-cli/src/tests/agent_wallet.rs`
 ### Findings
-- `zkf agent` exposes `18` top-level subcommands and stable memory/workflow subcommands.
+- `zkf agent` exposes `20` top-level subcommands and stable memory/workflow subcommands.
 - Wallet snapshot, unlock, lock, sync-health, origin, session, pending, and grant flows are CLI-addressable.
 - Midnight status, compile, deploy-prepare, and call-prepare are CLI-addressable and machine-readable.
 - Agent and wallet surfaces already accept `--events-jsonl`, preserving the command-native event contract.
@@ -107,12 +108,13 @@ The host reinforces the intended architecture instead of competing with it.
 ### Files Examined
 - `zkf-command-surface/src/wallet.rs`
 - `zkf-agent/src/lib.rs`
+- `zkf-agent/src/hermes.rs`
 - `zkf-agent/src/mcp.rs`
 - `zkf-cli/src/tests/agent_wallet.rs`
 - `zkf-cli/src/benchmark.rs`
 ### Findings
-- Targeted validation succeeded for `10` commands in this implementation pass.
-- Agent-side and CLI-side targeted tests cover `28` unit tests across the new surfaces inventoried here.
+- Targeted validation succeeded for `11` commands in this implementation pass.
+- Agent-side and CLI-side targeted tests cover `53` unit tests across the new surfaces inventoried here.
 - The previously stalling benchmark-path test is explicitly isolated behind `#[ignore]` so it no longer blocks the normal CLI operator suite.
 ### Gaps and Concerns
 - The targeted suite is green, but the full repo-wide operator depth still needs richer end-to-end behavioral coverage.
@@ -126,7 +128,7 @@ Reliability is good enough to keep building on this substrate, and the benchmark
 - `zkf-agent/src/brain.rs`
 - `ZirOSAgentHost/project.yml`
 ### Findings
-- `15` blueprint topics are matched: in_tree_workspace_integration, command_surface_substrate, typed_action_envelopes, daemon_socket_rpc, wallet_cli_closure, midnight_status_and_contract_prepare, workflow_list_and_artifact_surfaces, mcp_parity_for_core_operator_surfaces, planner_as_full_intent_compiler, brain_tables_operationally_populated, host_as_real_macos_app_target, launchd_managed_daemon_shell, end_to_end_operator_depth, sealed_release_boundary, benchmark_suite_isolation.
+- `16` blueprint topics are matched: in_tree_workspace_integration, command_surface_substrate, typed_action_envelopes, daemon_socket_rpc, wallet_cli_closure, midnight_status_and_contract_prepare, workflow_list_and_artifact_surfaces, mcp_parity_for_core_operator_surfaces, planner_as_full_intent_compiler, brain_tables_operationally_populated, host_as_real_macos_app_target, launchd_managed_daemon_shell, end_to_end_operator_depth, sealed_release_boundary, repo_managed_hermes_pack, benchmark_suite_isolation.
 - `0` topics remain partial: none.
 - The intentional absence is XPC/service-management replacement of the daemon transport; the current architecture explicitly preserves the daemon socket as canonical.
 ### Gaps and Concerns

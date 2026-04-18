@@ -24,6 +24,8 @@ Definition fee_amount
   (approved_advance attachment_point participation_cap participation_rate scale : Z) : Z :=
   (Z.min (Z.max 0 (approved_advance - attachment_point)) participation_cap * participation_rate) / scale.
 
+Definition symbolic_hash4 (a b c d : Z) : Z := 109 + a + 101 * b + 103 * c + 107 * d.
+
 Definition action_class_code
   (eligible inconsistency_hit risk_review_hit manual_review_hit : bool) : Z :=
   if negb eligible then 3
@@ -68,14 +70,15 @@ Definition disclosure_value_b
 
 Definition disclosure_authorization_inner
   (role credential_commitment request_id_hash : Z) : Z :=
-  1111 + role + credential_commitment + request_id_hash.
+  symbolic_hash4 1111 role credential_commitment request_id_hash.
 
 Definition disclosure_authorization_commitment
   (role credential_commitment request_id_hash caller_commitment view_commitment public_blinding : Z) : Z :=
-  disclosure_authorization_inner role credential_commitment request_id_hash
-    + caller_commitment
-    + view_commitment
-    + public_blinding.
+  symbolic_hash4
+    (disclosure_authorization_inner role credential_commitment request_id_hash)
+    caller_commitment
+    view_commitment
+    public_blinding.
 
 Definition role_selector_count (role : Z) : Z := if (role <? 5)%Z then 1 else 0.
 
@@ -298,10 +301,11 @@ Theorem disclosure_authorization_binds_role_credential_request_caller_and_view :
       caller_commitment
       view_commitment
       public_blinding =
-    disclosure_authorization_inner role credential_commitment request_id_hash
-      + caller_commitment
-      + view_commitment
-      + public_blinding.
+    symbolic_hash4
+      (disclosure_authorization_inner role credential_commitment request_id_hash)
+      caller_commitment
+      view_commitment
+      public_blinding.
 Proof.
   intros.
   reflexivity.
@@ -405,8 +409,6 @@ Proof.
   reflexivity.
 Qed.
 
-Definition symbolic_hash4 (a b c d : Z) : Z := 109 + a + 101 * b + 103 * c + 107 * d.
-
 Definition packet_binding_step (previous lane_0 lane_1 lane_2 : Z) : Z :=
   symbolic_hash4 previous lane_0 lane_1 lane_2.
 
@@ -468,7 +470,7 @@ Definition settlement_binding_digest
 Definition duplicate_registry_batch_root
   (commitment_0 commitment_1 commitment_2 commitment_3 blinding_0 blinding_1 : Z) : Z :=
   symbolic_hash4
-    (symbolic_hash4 1111 commitment_0 commitment_1 commitment_2)
+    (symbolic_hash4 1108 commitment_0 commitment_1 commitment_2)
     commitment_3
     blinding_0
     blinding_1.
@@ -569,7 +571,7 @@ Qed.
 Theorem duplicate_registry_batch_binding :
   forall commitment_0 commitment_1 commitment_2 commitment_3 blinding_0 blinding_1,
     duplicate_registry_batch_root commitment_0 commitment_1 commitment_2 commitment_3 blinding_0 blinding_1 =
-    symbolic_hash4 (symbolic_hash4 1111 commitment_0 commitment_1 commitment_2) commitment_3 blinding_0 blinding_1.
+    symbolic_hash4 (symbolic_hash4 1108 commitment_0 commitment_1 commitment_2) commitment_3 blinding_0 blinding_1.
 Proof.
   intros.
   reflexivity.

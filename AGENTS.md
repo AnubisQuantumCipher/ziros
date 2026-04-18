@@ -26,6 +26,7 @@ Do not revive the historical "10 gaps" list as if it were current. Several forme
 - Run `cargo test -p <crate>` on every crate you change before considering work done.
 - Write real implementations. Do not land placeholders, TODO deliverables, or documentation that advertises capabilities the checkout does not have.
 - Read existing code before writing new code. Match established patterns and naming.
+- Keep `docs/agent/OPERATOR_CORE.md`, `docs/agent/HERMES_OPERATOR_CONTRACT.json`, and `setup/hermes/` synchronized when Hermes operator policy or managed-pack behavior changes.
 - Follow the permanent Rust proof-tool doctrine in `docs/FORMAL_TOOLCHAIN_INTEGRATION.md`: design unsafe, FFI, raw-pointer, and layout-sensitive Rust as small RefinedRust-shaped capsules first; use Verus first for safe proof-core logic; keep Kani and Thrust as support lanes; treat Flux, Creusot, and Prusti as comparison-only unless the truth surfaces explicitly admit them later.
 - Never delete or weaken passing tests to make changes land.
 - Update `.zkf-completion-status.json`, generated proof-boundary summaries, and forensic reports when status-bearing claims change.

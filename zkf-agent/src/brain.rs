@@ -1,3 +1,4 @@
+use crate::state::{brain_path, ensure_ziros_layout};
 use crate::types::{
     ActionReceiptV1, AgentSessionViewV1, ApprovalRequestRecordV1, ApprovalTokenRecordV1,
     ArtifactRecordV1, BridgeHandoffRecordV1, CheckpointRecordV1, DeploymentRecordV1,
@@ -5,7 +6,6 @@ use crate::types::{
     ProviderRouteRecordV1, SessionStatusV1, SubmissionGrantRecordV1, TrustGateReportV1,
     WorkgraphNodeV1, WorkgraphV1, WorktreeRecordV1,
 };
-use crate::state::{brain_path, ensure_ziros_layout};
 use chacha20poly1305::aead::{Aead, KeyInit};
 use chacha20poly1305::{ChaCha20Poly1305, Nonce};
 use rand::RngCore;
@@ -31,12 +31,17 @@ pub struct BrainStore {
 impl BrainStore {
     pub fn open_default() -> Result<Self, String> {
         let cloudfs = CloudFS::new().map_err(|error| error.to_string())?;
-        Self::open_with_cloudfs(cloudfs)
+        let _ = ensure_ziros_layout()?;
+        Self::open_at_path(cloudfs, brain_path())
     }
 
-    pub fn open_with_cloudfs(cloudfs: CloudFS) -> Result<Self, String> {
-        let _ = ensure_ziros_layout()?;
-        let db_path = brain_path();
+    #[cfg(test)]
+    pub(crate) fn open_with_cloudfs(cloudfs: CloudFS) -> Result<Self, String> {
+        let db_path = isolated_brain_path_for_cloudfs(&cloudfs);
+        Self::open_at_path(cloudfs, db_path)
+    }
+
+    fn open_at_path(cloudfs: CloudFS, db_path: PathBuf) -> Result<Self, String> {
         if let Some(parent) = db_path.parent() {
             fs::create_dir_all(parent)
                 .map_err(|error| format!("failed to create {}: {error}", parent.display()))?;
@@ -92,7 +97,12 @@ impl BrainStore {
             .execute(
                 "INSERT INTO goals (goal_id, session_id, created_at, payload_ciphertext)
                  VALUES (?1, ?2, ?3, ?4)",
-                params![new_operation_id("goal"), session_id, now_rfc3339(), goal_ciphertext],
+                params![
+                    new_operation_id("goal"),
+                    session_id,
+                    now_rfc3339(),
+                    goal_ciphertext
+                ],
             )
             .map_err(|error| error.to_string())?;
         self.get_session(&session_id)?
@@ -216,10 +226,7 @@ impl BrainStore {
         Ok(())
     }
 
-    pub fn append_receipt(
-        &self,
-        receipt: &ActionReceiptV1,
-    ) -> Result<ActionReceiptV1, String> {
+    pub fn append_receipt(&self, receipt: &ActionReceiptV1) -> Result<ActionReceiptV1, String> {
         self.conn
             .execute(
                 "INSERT INTO action_receipts (receipt_id, session_id, created_at, action_name, status, payload_ciphertext)
@@ -399,11 +406,7 @@ impl BrainStore {
         Ok(())
     }
 
-    pub fn register_project(
-        &self,
-        name: &str,
-        root_path: &str,
-    ) -> Result<ProjectRecordV1, String> {
+    pub fn register_project(&self, name: &str, root_path: &str) -> Result<ProjectRecordV1, String> {
         let record = ProjectRecordV1 {
             name: name.to_string(),
             root_path: root_path.to_string(),
@@ -539,7 +542,10 @@ impl BrainStore {
         Ok(record)
     }
 
-    pub fn list_artifacts(&self, session_id: Option<&str>) -> Result<Vec<ArtifactRecordV1>, String> {
+    pub fn list_artifacts(
+        &self,
+        session_id: Option<&str>,
+    ) -> Result<Vec<ArtifactRecordV1>, String> {
         self.list_payloads("artifacts", "artifact_id", session_id, "session_id")
     }
 
@@ -548,7 +554,11 @@ impl BrainStore {
             .execute(
                 "INSERT INTO procedures (procedure_id, created_at, payload_ciphertext)
                  VALUES (?1, ?2, ?3)",
-                params![record.procedure_id, record.created_at, self.encrypt_json(record)?],
+                params![
+                    record.procedure_id,
+                    record.created_at,
+                    self.encrypt_json(record)?
+                ],
             )
             .map_err(|error| error.to_string())?;
         Ok(record.clone())
@@ -563,13 +573,20 @@ impl BrainStore {
             .execute(
                 "INSERT INTO incidents (incident_id, created_at, payload_ciphertext)
                  VALUES (?1, ?2, ?3)",
-                params![record.incident_id, record.created_at, self.encrypt_json(record)?],
+                params![
+                    record.incident_id,
+                    record.created_at,
+                    self.encrypt_json(record)?
+                ],
             )
             .map_err(|error| error.to_string())?;
         Ok(record.clone())
     }
 
-    pub fn list_incidents(&self, session_id: Option<&str>) -> Result<Vec<IncidentRecordV1>, String> {
+    pub fn list_incidents(
+        &self,
+        session_id: Option<&str>,
+    ) -> Result<Vec<IncidentRecordV1>, String> {
         self.list_payloads("incidents", "incident_id", session_id, "session_id")
     }
 
@@ -683,10 +700,7 @@ impl BrainStore {
         self.list_payloads("deployments", "deployment_id", session_id, "session_id")
     }
 
-    pub fn register_worktree(
-        &self,
-        record: &WorktreeRecordV1,
-    ) -> Result<WorktreeRecordV1, String> {
+    pub fn register_worktree(&self, record: &WorktreeRecordV1) -> Result<WorktreeRecordV1, String> {
         self.conn
             .execute(
                 "INSERT INTO worktrees (worktree_id, session_id, created_at, payload_ciphertext)
@@ -702,7 +716,10 @@ impl BrainStore {
         Ok(record.clone())
     }
 
-    pub fn list_worktrees(&self, session_id: Option<&str>) -> Result<Vec<WorktreeRecordV1>, String> {
+    pub fn list_worktrees(
+        &self,
+        session_id: Option<&str>,
+    ) -> Result<Vec<WorktreeRecordV1>, String> {
         self.list_payloads("worktrees", "worktree_id", session_id, "session_id")
     }
 
@@ -730,7 +747,12 @@ impl BrainStore {
     }
 
     pub fn list_checkpoints(&self, session_id: &str) -> Result<Vec<CheckpointRecordV1>, String> {
-        self.list_payloads("checkpoints", "checkpoint_id", Some(session_id), "session_id")
+        self.list_payloads(
+            "checkpoints",
+            "checkpoint_id",
+            Some(session_id),
+            "session_id",
+        )
     }
 
     pub fn get_checkpoint(
@@ -974,9 +996,14 @@ impl BrainStore {
                 "SELECT payload_ciphertext FROM {table} WHERE {session_column} = ?1 ORDER BY created_at ASC, {order_column} ASC"
             )
         } else {
-            format!("SELECT payload_ciphertext FROM {table} ORDER BY created_at ASC, {order_column} ASC")
+            format!(
+                "SELECT payload_ciphertext FROM {table} ORDER BY created_at ASC, {order_column} ASC"
+            )
         };
-        let mut stmt = self.conn.prepare(&query).map_err(|error| error.to_string())?;
+        let mut stmt = self
+            .conn
+            .prepare(&query)
+            .map_err(|error| error.to_string())?;
         let mut records = Vec::new();
         if let Some(session_id) = session_id {
             let rows = stmt
@@ -1023,6 +1050,17 @@ impl BrainStore {
     }
 }
 
+#[cfg(test)]
+fn isolated_brain_path_for_cloudfs(cloudfs: &CloudFS) -> PathBuf {
+    cloudfs
+        .cache_root()
+        .parent()
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| cloudfs.cache_root().to_path_buf())
+        .join("agent")
+        .join("brain.sqlite3")
+}
+
 fn load_or_create_key(manager: &KeyManager) -> Result<[u8; 32], String> {
     let bytes = match manager.retrieve_key(BRAIN_KEY_ID, BRAIN_KEY_SERVICE) {
         Ok(bytes) => bytes,
@@ -1062,9 +1100,74 @@ fn parse_status(raw: &str) -> SessionStatusV1 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::ffi::OsString;
     use tempfile::tempdir;
     use zkf_command_surface::RiskClassV1;
     use zkf_wallet::{ApprovalMethod, ApprovalToken, SubmissionGrant, WalletNetwork};
+
+    struct EnvVarGuard {
+        key: &'static str,
+        previous: Option<OsString>,
+    }
+
+    impl EnvVarGuard {
+        fn set_path(key: &'static str, value: &Path) -> Self {
+            let previous = std::env::var_os(key);
+            unsafe {
+                std::env::set_var(key, value);
+            }
+            Self { key, previous }
+        }
+    }
+
+    impl Drop for EnvVarGuard {
+        fn drop(&mut self) {
+            match &self.previous {
+                Some(value) => unsafe {
+                    std::env::set_var(self.key, value);
+                },
+                None => unsafe {
+                    std::env::remove_var(self.key);
+                },
+            }
+        }
+    }
+
+    #[test]
+    fn open_with_cloudfs_does_not_touch_live_brain_path() {
+        let temp = tempdir().expect("tempdir");
+        let _ziros_home = EnvVarGuard::set_path("ZIROS_HOME", &temp.path().join("ziros-home"));
+        let live_brain = brain_path();
+        assert!(
+            !live_brain.exists(),
+            "fresh test should not have a live brain db"
+        );
+
+        let persistent_root = temp.path().join("persistent");
+        let cache_root = temp.path().join("cache");
+        let isolated_brain = temp.path().join("agent").join("brain.sqlite3");
+        let cloudfs = CloudFS::from_roots(persistent_root.clone(), cache_root.clone(), false);
+        let brain = BrainStore::open_with_cloudfs(cloudfs).expect("brain");
+        brain
+            .register_project("demo", "/tmp/demo")
+            .expect("register");
+
+        assert!(
+            !live_brain.exists(),
+            "open_with_cloudfs must not write to the live brain path: {}",
+            live_brain.display()
+        );
+        assert!(
+            isolated_brain.exists(),
+            "open_with_cloudfs should keep its sqlite db under the supplied temp roots: {}",
+            isolated_brain.display()
+        );
+
+        let reopened =
+            BrainStore::open_with_cloudfs(CloudFS::from_roots(persistent_root, cache_root, false))
+                .expect("reopen brain");
+        assert_eq!(reopened.list_projects().expect("list projects").len(), 1);
+    }
 
     #[test]
     fn brain_store_roundtrips_projects_and_receipts() {
@@ -1080,12 +1183,22 @@ mod tests {
             .expect("register");
         assert_eq!(project.name, "demo");
         let session = brain
-            .create_session("prove something", "proof-app-build", SessionStatusV1::Planned, None)
+            .create_session(
+                "prove something",
+                "proof-app-build",
+                SessionStatusV1::Planned,
+                None,
+            )
             .expect("session");
         let receipt = brain
             .append_receipt(
                 &brain
-                    .new_receipt(&session.session_id, "planner", "planned", &json!({ "ok": true }))
+                    .new_receipt(
+                        &session.session_id,
+                        "planner",
+                        "planned",
+                        &json!({ "ok": true }),
+                    )
                     .expect("new receipt"),
             )
             .expect("receipt");
@@ -1236,6 +1349,9 @@ mod tests {
                         compat_allowed: false,
                         stop_on_first_failure: true,
                         require_explicit_approval_for_high_risk: true,
+                        operator_profile: crate::types::OperatorProfileV1::HermesRigorous,
+                        structured_command_first: true,
+                        postflight_required: true,
                     },
                     capability_requirements: Vec::new(),
                     blocked_prerequisites: Vec::new(),

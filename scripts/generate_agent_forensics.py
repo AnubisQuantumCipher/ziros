@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+import check_hermes_operator_drift as hermes_drift
+
 
 ROOT = Path(__file__).resolve().parents[1]
 FORENSICS_DIR = ROOT / "forensics"
@@ -33,7 +35,10 @@ SCOPE_ENTRIES = [
     ROOT / "Cargo.toml",
     ROOT / "AGENTS.md",
     ROOT / "docs" / "CANONICAL_TRUTH.md",
+    ROOT / "docs" / "agent" / "OPERATOR_CORE.md",
+    ROOT / "docs" / "agent" / "HERMES_OPERATOR_CONTRACT.json",
     ROOT / "support-matrix.json",
+    ROOT / "setup" / "hermes",
     ROOT / "zkf-command-surface",
     ROOT / "zkf-agent",
     ROOT / "zkf-cli" / "src" / "cli.rs",
@@ -47,6 +52,7 @@ SCOPE_ENTRIES = [
     ROOT / "zkf-keymanager",
     ROOT / "ZirOSAgentHost",
     ROOT / "setup" / "launchd",
+    ROOT / "scripts" / "check_hermes_operator_drift.py",
 ]
 
 VALIDATED_COMMANDS = [
@@ -54,6 +60,7 @@ VALIDATED_COMMANDS = [
     "cargo test -p zkf-command-surface --lib",
     "cargo test -p zkf-agent --lib",
     "cargo test -p zkf-cli agent_wallet -- --nocapture",
+    "python3 scripts/check_hermes_operator_drift.py",
     "python3 scripts/generate_private_release_truth.py",
     "python3 scripts/check_private_truth_drift.py",
     "python3 scripts/check_public_release_boundary.py",
@@ -290,6 +297,7 @@ def build_test_reliability_inventory() -> dict:
     test_files = [
         ROOT / "zkf-command-surface" / "src" / "wallet.rs",
         ROOT / "zkf-agent" / "src" / "lib.rs",
+        ROOT / "zkf-agent" / "src" / "hermes.rs",
         ROOT / "zkf-agent" / "src" / "mcp.rs",
         ROOT / "zkf-cli" / "src" / "tests" / "agent_wallet.rs",
     ]
@@ -398,11 +406,23 @@ def build_blueprint_gap_matrix(
             "evidence": [
                 "scripts/generate_private_release_truth.py",
                 "scripts/check_private_truth_drift.py",
+                "scripts/check_hermes_operator_drift.py",
                 "scripts/check_public_release_boundary.py",
                 "release/product-release.json",
                 "release/public_release_boundary_report.json",
             ],
             "note": "Private truth generation, drift detection, and public-boundary scanning are now explicit repo-local surfaces instead of narrative-only release promises.",
+        },
+        {
+            "topic": "repo_managed_hermes_pack",
+            "status": "matched",
+            "evidence": [
+                "docs/agent/OPERATOR_CORE.md",
+                "docs/agent/HERMES_OPERATOR_CONTRACT.json",
+                "setup/hermes/manifest.json",
+                "scripts/check_hermes_operator_drift.py",
+            ],
+            "note": "Hermes now consumes a repo-managed ZirOS pack with hard-gated drift detection instead of relying on ad hoc home-directory state.",
         },
         {
             "topic": "benchmark_suite_isolation",
@@ -651,6 +671,8 @@ def main() -> None:
     host = build_host_surface_inventory()
     tests = build_test_reliability_inventory()
     gaps = build_blueprint_gap_matrix(actions, brain, cli, host)
+    hermes_status = hermes_drift.build_status()
+    hermes_drift_report = hermes_drift.build_drift_report(hermes_status)
 
     write_json(GENERATED_DIR / "workspace_agent_census.json", census)
     write_json(GENERATED_DIR / "command_surface_inventory.json", command_surface)
@@ -660,6 +682,8 @@ def main() -> None:
     write_json(GENERATED_DIR / "host_surface_inventory.json", host)
     write_json(GENERATED_DIR / "test_reliability_inventory.json", tests)
     write_json(GENERATED_DIR / "blueprint_gap_matrix.json", gaps)
+    write_json(GENERATED_DIR / "hermes_operator_status.json", hermes_status)
+    write_json(GENERATED_DIR / "hermes_operator_drift.json", hermes_drift_report)
 
     write_text(
         FORENSICS_DIR / "01_ziros_agent_blueprint_audit.md",

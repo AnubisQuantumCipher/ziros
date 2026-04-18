@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-04-18T10:02:38.274346+00:00",
+  "policy_version": "2026-04-05-developer-lane-marketplace-v1",
+  "lane": "$99 developer lane",
+  "service_name": "Hosted proof lane authenticated availability",
+  "measurement_timezone": "America/New_York",
+  "target_monthly_uptime_pct": 99.0,
+  "measurement_window_start": "2026-04-01T00:00:00-04:00",
+  "measurement_window_end": "2026-05-01T00:00:00-04:00",
+  "observation_interval_minutes": 5,
+  "last_observation": {
+    "ts": "2026-04-18T10:02:38.273814+00:00",
+    "bucket_start": "2026-04-18T10:00:00+00:00",
+    "available": false,
+    "failing_checks": [
+      "proof_server_health",
+      "proof_queue_capacity",
+      "authenticated_health",
+      "authenticated_ready",
+      "authenticated_version"
+    ],
+    "checks": [
+      {
+        "name": "proof_server_health",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "proof_queue_capacity",
+        "ok": false,
+        "detail": "<urlopen error [Errno 1] Operation not permitted>"
+      },
+      {
+        "name": "authenticated_health",
+        "ok": false,
+        "detail": "security: SecKeychainSearchCreateFromAttributes: One or more parameters passed to a function were not valid.\nsecurity: SecKeychainSearchCopyNext: The specified item could not be found in the keychain."
+      },
+      {
+        "name": "authenticated_ready",
+        "ok": false,
+        "detail": "skipped: credential unavailable"
+      },
+      {
+        "name": "authenticated_version",
+        "ok": false,
+        "detail": "skipped: credential unavailable"
+      }
+    ]
+  },
+  "current_status": "degraded",
+  "current_failing_checks": [
+    "proof_server_health",
+    "proof_queue_capacity",
+    "authenticated_health",
+    "authenticated_ready",
+    "authenticated_version"
+  ],
+  "consecutive_failed_observations": 1,
+  "observations_month": 1,
+  "healthy_observations_month": 0,
+  "unhealthy_observations_month": 1,
+  "measured_uptime_pct": 0.0,
+  "downtime_minutes_month": 5,
+  "error_budget_minutes_month": 432.0,
+  "error_budget_remaining_minutes_month": 427.0,
+  "service_credit_if_month_closed_today_pct": 25,
+  "objective_met_if_month_closed_today": false,
+  "incidents_month": 0,
+  "open_incident": null,
+  "support_ack_target_hours": 4,
+  "incident_update_cadence_minutes": 60,
+  "planned_maintenance_notice_hours": 24,
+  "breaking_change_notice_days": 7,
+  "public_status_url": "https://billing.ziros.dev/status",
+  "policy_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-policy.json",
+  "observations_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-observations.jsonl",
+  "incidents_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-incidents.jsonl",
+  "terms_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla.md"
+}

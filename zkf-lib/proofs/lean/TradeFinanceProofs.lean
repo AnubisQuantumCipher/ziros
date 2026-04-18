@@ -16,6 +16,9 @@ def reserveAmount (approvedAdvance reserveMargin reserveFloor : Nat) : Nat :=
 def feeAmount (approvedAdvance attachmentPoint participationCap participationRate scale : Nat) : Nat :=
   ((Nat.min (approvedAdvance - attachmentPoint) participationCap) * participationRate) / scale
 
+def symbolicHash4 (a b c d : Nat) : Nat :=
+  109 + a + 101 * b + 103 * c + 107 * d
+
 def actionClassCode (eligible inconsistencyHit riskReviewHit manualReviewHit : Bool) : Nat :=
   if !eligible then 3
   else if inconsistencyHit then 4
@@ -56,14 +59,15 @@ def disclosureValueB
 
 def disclosureAuthorizationInner
     (role credentialCommitment requestIdHash : Nat) : Nat :=
-  1111 + role + credentialCommitment + requestIdHash
+  symbolicHash4 1111 role credentialCommitment requestIdHash
 
 def disclosureAuthorizationCommitment
     (role credentialCommitment requestIdHash callerCommitment viewCommitment publicBlinding : Nat) : Nat :=
-  disclosureAuthorizationInner role credentialCommitment requestIdHash
-    + callerCommitment
-    + viewCommitment
-    + publicBlinding
+  symbolicHash4
+    (disclosureAuthorizationInner role credentialCommitment requestIdHash)
+    callerCommitment
+    viewCommitment
+    publicBlinding
 
 
 def roleValid (role : Nat) : Bool :=
@@ -217,10 +221,11 @@ theorem disclosureAuthorizationBindsRoleCredentialRequestCallerAndView
       callerCommitment
       viewCommitment
       publicBlinding =
-    disclosureAuthorizationInner role credentialCommitment requestIdHash
-      + callerCommitment
-      + viewCommitment
-      + publicBlinding := by
+    symbolicHash4
+      (disclosureAuthorizationInner role credentialCommitment requestIdHash)
+      callerCommitment
+      viewCommitment
+      publicBlinding := by
   simp [disclosureAuthorizationCommitment]
 
 theorem supplierDisclosureNoninterference
@@ -290,10 +295,6 @@ theorem duplicateRegistryHandoffDeterministic
     batchRootPayload commitment0 commitment1 commitment2 commitment3 blinding0 blinding1 =
       batchRootPayload commitment0 commitment1 commitment2 commitment3 blinding0 blinding1 := by
   rfl
-
-def symbolicHash4 (a b c d : Nat) : Nat :=
-  109 + a + 101 * b + 103 * c + 107 * d
-
 
 def packetBindingStep (previous lane0 lane1 lane2 : Nat) : Nat :=
   symbolicHash4 previous lane0 lane1 lane2
@@ -366,7 +367,7 @@ def settlementBindingDigest
 
 def duplicateRegistryBatchRoot
     (commitment0 commitment1 commitment2 commitment3 blinding0 blinding1 : Nat) : Nat :=
-  symbolicHash4 (symbolicHash4 1111 commitment0 commitment1 commitment2) commitment3 blinding0 blinding1
+  symbolicHash4 (symbolicHash4 1108 commitment0 commitment1 commitment2) commitment3 blinding0 blinding1
 
 
 theorem packetBindingSoundness
@@ -454,7 +455,7 @@ theorem settlementBindingSoundness
 theorem duplicateRegistryBatchBinding
     (commitment0 commitment1 commitment2 commitment3 blinding0 blinding1 : Nat) :
     duplicateRegistryBatchRoot commitment0 commitment1 commitment2 commitment3 blinding0 blinding1 =
-      symbolicHash4 (symbolicHash4 1111 commitment0 commitment1 commitment2) commitment3 blinding0 blinding1 := by
+      symbolicHash4 (symbolicHash4 1108 commitment0 commitment1 commitment2) commitment3 blinding0 blinding1 := by
   rfl
 
 def generatedCircuitCertificateAccepts

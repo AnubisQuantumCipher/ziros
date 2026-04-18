@@ -164,6 +164,12 @@ struct ExportTimingSummary {
     compatibility_export_ms: f64,
 }
 
+struct RuntimeCoreExecution {
+    execution: BackendProofExecutionResult,
+    compile_prepare_ms: f64,
+    runtime_prove_ms: f64,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PrivateTradeFinanceSettlementHypernovaDiagnosticReport {
     pub schema: String,
@@ -274,6 +280,7 @@ fn module_semantic_theorem_ids(prefix: &str) -> Vec<String> {
             "model.trade_finance.duplicate_financing_risk_soundness".to_string(),
             "model.trade_finance.approved_advance_fee_reserve_soundness".to_string(),
             "model.trade_finance.action_derivation_soundness".to_string(),
+            "model.trade_finance.witness_helper.comparator_soundness".to_string(),
         ],
         "trade_finance_settlement_binding.primary" => vec![
             "model.trade_finance.settlement_binding_soundness".to_string(),
@@ -284,6 +291,7 @@ fn module_semantic_theorem_ids(prefix: &str) -> Vec<String> {
             "model.trade_finance.disclosure_role_binding_soundness".to_string(),
             "model.trade_finance.disclosure_noninterference".to_string(),
             "model.trade_finance.disclosure_authorization_binding_soundness".to_string(),
+            "model.trade_finance.witness_helper.selector_soundness".to_string(),
             "gap.trade_finance.disclosure_credential_authorization".to_string(),
             "gap.trade_finance.disclosure_noninterference_emitted".to_string(),
             "gap.trade_finance.compiled_digest_linkage".to_string(),
@@ -679,7 +687,7 @@ fn runtime_prove_core(
     program: &Program,
     inputs: &TradeFinancePrivateInputsV1,
     witness: &Witness,
-) -> ZkfResult<BackendProofExecutionResult> {
+) -> ZkfResult<RuntimeCoreExecution> {
     if !matches!(config.primary_backend.backend, BackendKind::HyperNova) {
         return Err(ZkfError::Backend(format!(
             "trade finance flagship exporter requires primary backend hypernova, got {}",
@@ -687,6 +695,7 @@ fn runtime_prove_core(
         )));
     }
     let typed_inputs = flatten_private_inputs(inputs)?;
+    let compile_started = Instant::now();
     let compiled = with_setup_seed_override(Some(SETUP_SEED), || {
         compile(
             program,
@@ -696,6 +705,7 @@ fn runtime_prove_core(
     })?;
     let prepared = prepare_witness_for_proving(&compiled, witness)?;
     check_constraints(&compiled.program, &prepared)?;
+    let compile_prepare_ms = compile_started.elapsed().as_secs_f64() * 1000.0;
     let prove = || {
         RuntimeExecutor::run_backend_prove_job_with_objective(
             config.primary_backend.backend,
@@ -710,8 +720,15 @@ fn runtime_prove_core(
         )
         .map_err(|error| ZkfError::Backend(error.to_string()))
     };
-    with_setup_seed_override(Some(SETUP_SEED), || {
+    let prove_started = Instant::now();
+    let execution = with_setup_seed_override(Some(SETUP_SEED), || {
         with_proof_seed_override(Some(PROOF_SEED), prove)
+    })?;
+    let runtime_prove_ms = prove_started.elapsed().as_secs_f64() * 1000.0;
+    Ok(RuntimeCoreExecution {
+        execution,
+        compile_prepare_ms,
+        runtime_prove_ms,
     })
 }
 
@@ -2571,28 +2588,44 @@ pub fn run_private_trade_finance_settlement_export(
             )
         });
     let core_audit = audit_program_default(&core_program, Some(config.primary_backend.backend));
-    let core_started = Instant::now();
     let (core_witness, core_computation) = trade_finance_decision_witness_from_inputs(&request)?;
-    let (core_compiled, core_artifact, telemetry_report) = match config.profile {
-        PrivateTradeFinanceSettlementExportProfile::Flagship => {
-            let execution = runtime_prove_core(&config, &core_program, &request, &core_witness)?;
-            let mut telemetry =
-                runtime_report_json(&execution, &config.primary_backend.requested_name)?;
-            annotate_flagship_runtime_requirements(&mut telemetry);
-            validate_flagship_runtime_requirements(&telemetry)?;
-            (execution.compiled, execution.artifact, telemetry)
-        }
-        PrivateTradeFinanceSettlementExportProfile::Smoke => {
-            let (compiled, artifact) =
-                direct_compile_and_prove(&core_program, &core_witness, proof_backend_name)?;
-            let telemetry = smoke_telemetry_report_json(
-                &config.primary_backend.requested_name,
-                proof_backend_name,
-            );
-            (compiled, artifact, telemetry)
-        }
-    };
-    let core_compile_and_prove_ms = core_started.elapsed().as_secs_f64() * 1000.0;
+    let (core_compiled, core_artifact, telemetry_report, core_compile_ms, core_runtime_prove_ms) =
+        match config.profile {
+            PrivateTradeFinanceSettlementExportProfile::Flagship => {
+                let execution =
+                    runtime_prove_core(&config, &core_program, &request, &core_witness)?;
+                let mut telemetry = runtime_report_json(
+                    &execution.execution,
+                    &config.primary_backend.requested_name,
+                )?;
+                annotate_flagship_runtime_requirements(&mut telemetry);
+                validate_flagship_runtime_requirements(&telemetry)?;
+                (
+                    execution.execution.compiled,
+                    execution.execution.artifact,
+                    telemetry,
+                    execution.compile_prepare_ms,
+                    execution.runtime_prove_ms,
+                )
+            }
+            PrivateTradeFinanceSettlementExportProfile::Smoke => {
+                let core_started = Instant::now();
+                let (compiled, artifact) =
+                    direct_compile_and_prove(&core_program, &core_witness, proof_backend_name)?;
+                let core_compile_and_prove_ms = core_started.elapsed().as_secs_f64() * 1000.0;
+                let telemetry = smoke_telemetry_report_json(
+                    &config.primary_backend.requested_name,
+                    proof_backend_name,
+                );
+                (
+                    compiled,
+                    artifact,
+                    telemetry,
+                    core_compile_and_prove_ms,
+                    core_compile_and_prove_ms,
+                )
+            }
+        };
     let core_verify_started = Instant::now();
     let core_verified = verify(&core_compiled, &core_artifact)?;
     let core_verify_ms = core_verify_started.elapsed().as_secs_f64() * 1000.0;
@@ -2900,8 +2933,8 @@ pub fn run_private_trade_finance_settlement_export(
     )?;
 
     let timing_summary = ExportTimingSummary {
-        core_compile_ms: core_compile_and_prove_ms,
-        core_runtime_prove_ms: core_compile_and_prove_ms,
+        core_compile_ms,
+        core_runtime_prove_ms,
         core_verify_ms,
         settlement_prove_ms: settlement_ms,
         disclosure_bundle_ms: disclosure_ms,
@@ -3898,6 +3931,11 @@ mod export_tests {
 
         let execution =
             runtime_prove_core(&config, &program, &request, &witness).expect("runtime prove");
-        assert!(verify(&execution.compiled, &execution.artifact).expect("runtime verify"));
+        assert!(execution.compile_prepare_ms >= 0.0);
+        assert!(execution.runtime_prove_ms >= 0.0);
+        assert!(
+            verify(&execution.execution.compiled, &execution.execution.artifact)
+                .expect("runtime verify")
+        );
     }
 }

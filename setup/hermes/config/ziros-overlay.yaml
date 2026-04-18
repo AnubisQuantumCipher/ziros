@@ -1,0 +1,24 @@
+ziros_repo_managed:
+  operator_profile: hermes-rigorous
+  repo_root: /Users/sicarii/Desktop/ZirOS
+  operator_core: /Users/sicarii/Desktop/ZirOS/docs/agent/OPERATOR_CORE.md
+  operator_contract: /Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_OPERATOR_CONTRACT.json
+  bootstrap_prompt: /Users/sicarii/Desktop/ZirOS/docs/agent/HERMES_BOOTSTRAP_PROMPT.md
+  pack_manifest: /Users/sicarii/Desktop/ZirOS/setup/hermes/manifest.json
+  pack_root: ~/.hermes/ziros-pack
+  non_canonical_state:
+    - ~/.hermes/SOUL.md
+    - ~/.hermes/memories/
+    - ~/.hermes/sessions/
+    - ~/.hermes/plans/
+    - ~/.hermes/cron/
+skills:
+  auto_load_rules:
+    - cwd_prefix: /Users/sicarii/Desktop/ZirOS
+      skills:
+        - ziros-system-operator
+        - ziros-operator-core
+        - ziros-worktree-discipline
+        - ziros-proof-honesty
+        - ziros-command-routing
+        - ziros-release-boundary

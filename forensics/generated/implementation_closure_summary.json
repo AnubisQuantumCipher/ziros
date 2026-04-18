@@ -5,14 +5,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 5,
-        "mechanized": 20,
+        "hypothesis-carried": 0,
+        "mechanized": 25,
         "metadata-only": 4,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -23,14 +22,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 3,
-        "mechanized": 20,
+        "hypothesis-carried": 0,
+        "mechanized": 23,
         "metadata-only": 3,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -41,14 +39,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 3,
-        "mechanized": 20,
+        "hypothesis-carried": 0,
+        "mechanized": 23,
         "metadata-only": 3,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -59,14 +56,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 3,
-        "mechanized": 25,
+        "hypothesis-carried": 0,
+        "mechanized": 28,
         "metadata-only": 3,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -77,14 +73,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 3,
-        "mechanized": 20,
+        "hypothesis-carried": 0,
+        "mechanized": 23,
         "metadata-only": 3,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -95,15 +90,14 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 5,
-        "mechanized": 24,
+        "hypothesis-carried": 0,
+        "mechanized": 29,
         "metadata-only": 4,
         "model-only": 14
       },
       "classifications": [
         "mechanized",
         "model-only",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -114,14 +108,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 1,
-        "hypothesis-carried": 5,
-        "mechanized": 20,
+        "hypothesis-carried": 0,
+        "mechanized": 25,
         "metadata-only": 4,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only",
         "explicit_tcb_adapter"
       ],
@@ -132,14 +125,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 0,
-        "hypothesis-carried": 3,
-        "mechanized": 14,
+        "hypothesis-carried": 0,
+        "mechanized": 17,
         "metadata-only": 3,
         "model-only": 0
       },
       "classifications": [
         "mechanized",
-        "hypothesis-carried",
         "metadata-only"
       ],
       "path": "forensics/generated/app_closure/private_voting_commitment_pipeline.json"
@@ -149,8 +141,8 @@
     "bounded": 0,
     "compatibility alias": 2,
     "explicit_tcb_adapter": 1,
-    "hypothesis-carried": 5,
-    "mechanized": 29,
+    "hypothesis-carried": 0,
+    "mechanized": 34,
     "metadata-only": 4,
     "model-only": 14
   },
@@ -166,7 +158,6 @@
   "classifications": [
     "mechanized",
     "model-only",
-    "hypothesis-carried",
     "compatibility alias",
     "metadata-only",
     "explicit_tcb_adapter"
@@ -280,7 +271,7 @@
           "source_path": "zkf-lib/src/app/private_trade_finance_settlement.rs",
           "source_scope": "zkf-lib::app::private_trade_finance_settlement",
           "status": "mechanized_local",
-          "title": "Trade-finance invoice packet binding model preserves the shipped two-chunk digest composition",
+          "title": "Trade-finance invoice packet binding model preserves a reduced two-chunk digest helper",
           "trusted_assumptions": []
         },
         {
@@ -811,15 +802,15 @@
     {
       "claims": [
         {
-          "checker": "external_assumption",
+          "checker": "rocq",
           "claim_id": "protocol.groth16_completeness",
-          "classification": "hypothesis-carried",
-          "proof_path": "PROOF_BOUNDARY.md",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
           "source": "verification-ledger",
           "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "assumed_external",
+          "status": "mechanized_local",
           "title": "Groth16 exact imported-CRS shipped surface satisfies completeness under explicit imported-CRS and algebraic hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -827,15 +818,15 @@
           ]
         },
         {
-          "checker": "external_assumption",
+          "checker": "rocq",
           "claim_id": "protocol.groth16_knowledge_soundness",
-          "classification": "hypothesis-carried",
-          "proof_path": "PROOF_BOUNDARY.md",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
           "source": "verification-ledger",
           "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "assumed_external",
+          "status": "mechanized_local",
           "title": "Groth16 exact imported-CRS shipped surface reduces knowledge soundness to explicit KEA-style hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -843,15 +834,15 @@
           ]
         },
         {
-          "checker": "external_assumption",
+          "checker": "rocq",
           "claim_id": "protocol.groth16_zero_knowledge",
-          "classification": "hypothesis-carried",
-          "proof_path": "PROOF_BOUNDARY.md",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
           "source": "verification-ledger",
           "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/arkworks.rs",
           "source_scope": "zkf-backends::arkworks",
-          "status": "assumed_external",
+          "status": "mechanized_local",
           "title": "Groth16 exact imported-CRS shipped surface reduces zero knowledge to explicit simulator hypotheses",
           "trusted_assumptions": [
             "groth16ImportedCrsValidityHypothesis",
@@ -863,13 +854,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 0,
-        "hypothesis-carried": 3,
-        "mechanized": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 3,
         "metadata-only": 0,
         "model-only": 0
       },
       "classifications": [
-        "hypothesis-carried"
+        "mechanized"
       ],
       "label": "Groth16 exact shipped protocol surface",
       "path": "zkf-backends/src/arkworks.rs",
@@ -877,7 +868,7 @@
       "supporting_paths": {
         "extraction_paths": [],
         "proof_paths": [
-          "PROOF_BOUNDARY.md"
+          "zkf-backends/proofs/rocq/ProtocolExactProofs.v"
         ],
         "source_path": "zkf-backends/src/arkworks.rs"
       },
@@ -886,30 +877,30 @@
     {
       "claims": [
         {
-          "checker": "external_assumption",
+          "checker": "rocq",
           "claim_id": "protocol.hypernova_completeness",
-          "classification": "hypothesis-carried",
-          "proof_path": "PROOF_BOUNDARY.md",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
           "source": "verification-ledger",
           "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/nova_native.rs",
           "source_scope": "zkf-backends::nova_native",
-          "status": "assumed_external",
+          "status": "mechanized_local",
           "title": "HyperNova exact native profile satisfies completeness under explicit CCS folding hypotheses",
           "trusted_assumptions": [
             "hypernovaExactCompletenessHypothesis"
           ]
         },
         {
-          "checker": "external_assumption",
+          "checker": "rocq",
           "claim_id": "protocol.hypernova_folding_soundness",
-          "classification": "hypothesis-carried",
-          "proof_path": "PROOF_BOUNDARY.md",
+          "classification": "mechanized",
+          "proof_path": "zkf-backends/proofs/rocq/ProtocolExactProofs.v",
           "source": "verification-ledger",
           "source_assurance_class": "trusted_protocol_tcb",
           "source_path": "zkf-backends/src/nova_native.rs",
           "source_scope": "zkf-backends::nova_native",
-          "status": "assumed_external",
+          "status": "mechanized_local",
           "title": "HyperNova exact native profile reduces folding soundness to explicit CCS commitment hypotheses",
           "trusted_assumptions": [
             "hypernovaExactFoldingSoundnessHypothesis"
@@ -920,13 +911,13 @@
         "bounded": 0,
         "compatibility alias": 0,
         "explicit_tcb_adapter": 0,
-        "hypothesis-carried": 2,
-        "mechanized": 0,
+        "hypothesis-carried": 0,
+        "mechanized": 2,
         "metadata-only": 0,
         "model-only": 0
       },
       "classifications": [
-        "hypothesis-carried"
+        "mechanized"
       ],
       "label": "HyperNova exact shipped protocol surface",
       "path": "zkf-backends/src/nova_native.rs",
@@ -936,7 +927,7 @@
           "zkf-backends/src/proof_hypernova_exact_spec.rs"
         ],
         "proof_paths": [
-          "PROOF_BOUNDARY.md"
+          "zkf-backends/proofs/rocq/ProtocolExactProofs.v"
         ],
         "source_path": "zkf-backends/src/nova_native.rs"
       },

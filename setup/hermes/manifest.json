@@ -1,0 +1,108 @@
+{
+  "schema": "ziros-hermes-pack-manifest-v1",
+  "operator_profile": "hermes-rigorous",
+  "repo_root": ".",
+  "pack_root": "ziros-pack",
+  "lock_file": "ziros-pack.lock.json",
+  "assets": [
+    {
+      "id": "repo-soul",
+      "kind": "doc",
+      "source": "SOUL.md",
+      "target": "docs/SOUL.md"
+    },
+    {
+      "id": "repo-blueprint",
+      "kind": "doc",
+      "source": "HERMES.md",
+      "target": "docs/HERMES.md"
+    },
+    {
+      "id": "operator-core",
+      "kind": "doc",
+      "source": "docs/agent/OPERATOR_CORE.md",
+      "target": "docs/OPERATOR_CORE.md"
+    },
+    {
+      "id": "operator-constitution",
+      "kind": "doc",
+      "source": "docs/agent/HERMES_CONSTITUTION.md",
+      "target": "docs/HERMES_CONSTITUTION.md"
+    },
+    {
+      "id": "operator-blueprint",
+      "kind": "doc",
+      "source": "docs/agent/HERMES_OPERATOR_BLUEPRINT.md",
+      "target": "docs/HERMES_OPERATOR_BLUEPRINT.md"
+    },
+    {
+      "id": "operator-contract",
+      "kind": "contract",
+      "source": "docs/agent/HERMES_OPERATOR_CONTRACT.json",
+      "target": "docs/HERMES_OPERATOR_CONTRACT.json"
+    },
+    {
+      "id": "bootstrap-prompt",
+      "kind": "prompt",
+      "source": "docs/agent/HERMES_BOOTSTRAP_PROMPT.md",
+      "target": "prompts/HERMES_BOOTSTRAP_PROMPT.md"
+    },
+    {
+      "id": "overlay-config",
+      "kind": "config",
+      "source": "setup/hermes/config/ziros-overlay.yaml",
+      "target": "config/ziros-overlay.yaml"
+    },
+    {
+      "id": "guardrails",
+      "kind": "policy",
+      "source": "setup/hermes/policy/ziros-guardrails.json",
+      "target": "policy/ziros-guardrails.json"
+    },
+    {
+      "id": "pack-bootstrap",
+      "kind": "prompt",
+      "source": "setup/hermes/prompts/ziros-bootstrap.md",
+      "target": "prompts/ziros-bootstrap.md"
+    }
+  ],
+  "skills": [
+    {
+      "name": "ziros-operator-core",
+      "source": ".codex/skills/ziros-operator-core/SKILL.md",
+      "target": "ziros-operator-core/SKILL.md"
+    },
+    {
+      "name": "ziros-worktree-discipline",
+      "source": ".codex/skills/ziros-worktree-discipline/SKILL.md",
+      "target": "ziros-worktree-discipline/SKILL.md"
+    },
+    {
+      "name": "ziros-proof-honesty",
+      "source": ".codex/skills/ziros-proof-honesty/SKILL.md",
+      "target": "ziros-proof-honesty/SKILL.md"
+    },
+    {
+      "name": "ziros-command-routing",
+      "source": ".codex/skills/ziros-command-routing/SKILL.md",
+      "target": "ziros-command-routing/SKILL.md"
+    },
+    {
+      "name": "ziros-release-boundary",
+      "source": ".codex/skills/ziros-release-boundary/SKILL.md",
+      "target": "ziros-release-boundary/SKILL.md"
+    }
+  ],
+  "managed_config": {
+    "operator_profile": "hermes-rigorous",
+    "cwd_prefix": "/Users/sicarii/Desktop/ZirOS",
+    "autoload_skills": [
+      "ziros-system-operator",
+      "ziros-operator-core",
+      "ziros-worktree-discipline",
+      "ziros-proof-honesty",
+      "ziros-command-routing",
+      "ziros-release-boundary"
+    ]
+  }
+}

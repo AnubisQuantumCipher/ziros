@@ -1,0 +1,965 @@
+{
+  "generated_at": "2026-04-18T10:02:39.269490+00:00",
+  "ghost": {
+    "updated_at": null,
+    "members": null,
+    "syndication": {}
+  },
+  "revenue": {
+    "active_mrr_cents": 0,
+    "active_mrr_usd": 0.0,
+    "active_paid_customers": 0,
+    "pilot_count": 0,
+    "at_risk_customers": 0,
+    "failed_renewals": 0,
+    "churned_customers": 0,
+    "new_subscription_events_week": 0
+  },
+  "acceptance": {
+    "gate_rule": null,
+    "last_acceptance_session_id": null,
+    "last_acceptance_timestamp": null,
+    "last_acceptance_result": null,
+    "last_acceptance_ok": null,
+    "internal_acceptance_pass_count": 0,
+    "credited_streak": 0,
+    "duplicate_retry_count": 0,
+    "canonical_sessions_evaluated": 0,
+    "legacy_credit_count": 0,
+    "chronology_invalid_count": 0,
+    "latest_failed_session": null,
+    "coverage": {}
+  },
+  "internal_acceptance_finance": {
+    "generated_at": "2026-04-18T10:02:39.269239+00:00",
+    "source": "stripe_live",
+    "status": "ok",
+    "sessions": [],
+    "week_summary": {
+      "acceptance_charges_count": 0,
+      "gross_collected_cents": 0,
+      "stripe_fees_cents": 0,
+      "climate_contributions_cents": 0,
+      "net_pending_cents": 0,
+      "gross_collected_usd": 0.0,
+      "stripe_fees_usd": 0.0,
+      "climate_contributions_usd": 0.0,
+      "net_pending_usd": 0.0
+    }
+  },
+  "customers": {
+    "count": 0,
+    "by_status": {},
+    "active_customer_ids": [],
+    "at_risk_customer_ids": [],
+    "onboarding_generated": 0,
+    "recent_access_events_week": 0
+  },
+  "proof_usage": {
+    "proofs_day": 0,
+    "proofs_week": 0,
+    "proofs_by_customer_week": {},
+    "customer_counts_day": {},
+    "total_requests_day": 0,
+    "metering_mode": "unknown",
+    "avg_latency_ms": 0.0,
+    "failure_rate": 0.0,
+    "idle_paid_customers": [],
+    "heavy_users": [],
+    "route_counts": {}
+  },
+  "content": {
+    "recent_posts": [],
+    "pending_drafts": 0,
+    "syndication_total": 0
+  },
+  "ops_watchdog": {
+    "status": "blocked",
+    "generated_at": "2026-04-18T10:02:39.142682+00:00",
+    "shared_health_status": "degraded",
+    "shared_failed_checks": [
+      "Keychain: ghost-admin-api-key",
+      "Keychain: discord-bot-token",
+      "Keychain: stripe-secret-key",
+      "Keychain: github-pat",
+      "Keychain: openai-media-api-key",
+      "Ghost CMS",
+      "Proton Bridge SMTP",
+      "Metering Proxy Port",
+      "Tracked Redirect Port",
+      "Business Dashboard Freshness",
+      "Proof Server Health",
+      "Proof Queue Capacity",
+      "Cloudflare Access Edge",
+      "Proof Usage Freshness",
+      "Midnight Pain Monitor Freshness",
+      "Promotion Planner Freshness",
+      "Tracked Redirect Local",
+      "Tracked Redirect Public",
+      "Lead Pipeline Freshness",
+      "CTA Click Attribution Surface",
+      "Outward Gate Status: twitter-morning",
+      "Outward Gate Status: twitter-evening",
+      "Outward Gate Status: discord-community",
+      "Outward Gate Status: newsletter-pipeline",
+      "Proton Bridge Ready",
+      "Proton SMTP Token Ready",
+      "Proton Custom Domain DNS",
+      "Proton Drive Archive Freshness",
+      "Public Edge Watchdog State",
+      "Billing Service Local",
+      "Billing Service Public",
+      "Claim Surface Local",
+      "Stripe Webhook Secret",
+      "Self-Serve Gate Freshness",
+      "Money Path Smoke Freshness",
+      "Restore Drill Freshness",
+      "Hosted Lane SLA Objective",
+      "Cost Monitor Freshness"
+    ],
+    "ready_lanes": [],
+    "blocked_lanes": {
+      "twitter-morning": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "twitter-evening": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "discord-community": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Discord Auth Probe"
+      ],
+      "newsletter-pipeline": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Ghost Admin Probe"
+      ]
+    },
+    "truth_surface_drift": [
+      "Business Dashboard Freshness",
+      "CTA Click Attribution Surface",
+      "Claim Surface Local",
+      "Cost Monitor Freshness",
+      "Lead Pipeline Freshness",
+      "Midnight Pain Monitor Freshness",
+      "Money Path Smoke Freshness",
+      "Promotion Planner Freshness",
+      "Proof Usage Freshness",
+      "Proton Drive Archive Freshness",
+      "Restore Drill Freshness",
+      "Self-Serve Gate Freshness"
+    ],
+    "dependency_drift": [
+      "Billing Service Local",
+      "Billing Service Public",
+      "Ghost CMS",
+      "Hosted Lane SLA Objective",
+      "Metering Proxy Port",
+      "Outward Gate Status: discord-community",
+      "Outward Gate Status: newsletter-pipeline",
+      "Outward Gate Status: twitter-evening",
+      "Outward Gate Status: twitter-morning",
+      "Proof Queue Capacity",
+      "Proof Server Health",
+      "Proton Bridge Ready",
+      "Proton Bridge SMTP",
+      "Proton Custom Domain DNS",
+      "Proton SMTP Token Ready",
+      "Public Edge Watchdog State",
+      "Stripe Webhook Secret",
+      "Tracked Redirect Local",
+      "Tracked Redirect Port",
+      "Tracked Redirect Public",
+      "discord-community: Billing Hosted Public",
+      "discord-community: Billing Service Local",
+      "discord-community: Cloudflare Access Edge",
+      "discord-community: Planner Freshness",
+      "discord-community: Proof Queue Capacity",
+      "discord-community: Proof Server Local",
+      "discord-community: Self-Serve Checkout Path",
+      "discord-community: Tracked Redirect Local",
+      "discord-community: Tracked Redirect Public",
+      "newsletter-pipeline: Billing Hosted Public",
+      "newsletter-pipeline: Billing Service Local",
+      "newsletter-pipeline: Cloudflare Access Edge",
+      "newsletter-pipeline: Planner Freshness",
+      "newsletter-pipeline: Proof Queue Capacity",
+      "newsletter-pipeline: Proof Server Local",
+      "newsletter-pipeline: Self-Serve Checkout Path",
+      "newsletter-pipeline: Tracked Redirect Local",
+      "newsletter-pipeline: Tracked Redirect Public",
+      "twitter-evening: Billing Hosted Public",
+      "twitter-evening: Billing Service Local",
+      "twitter-evening: Cloudflare Access Edge",
+      "twitter-evening: Planner Freshness",
+      "twitter-evening: Proof Queue Capacity",
+      "twitter-evening: Proof Server Local",
+      "twitter-evening: Self-Serve Checkout Path",
+      "twitter-evening: Tracked Redirect Local",
+      "twitter-evening: Tracked Redirect Public",
+      "twitter-morning: Billing Hosted Public",
+      "twitter-morning: Billing Service Local",
+      "twitter-morning: Cloudflare Access Edge",
+      "twitter-morning: Planner Freshness",
+      "twitter-morning: Proof Queue Capacity",
+      "twitter-morning: Proof Server Local",
+      "twitter-morning: Self-Serve Checkout Path",
+      "twitter-morning: Tracked Redirect Local",
+      "twitter-morning: Tracked Redirect Public"
+    ],
+    "auth_runtime_drift": [
+      "Cloudflare Access Edge",
+      "Keychain: discord-bot-token",
+      "Keychain: ghost-admin-api-key",
+      "Keychain: github-pat",
+      "Keychain: openai-media-api-key",
+      "Keychain: stripe-secret-key",
+      "discord-community: Discord Auth Probe",
+      "newsletter-pipeline: Ghost Admin Probe",
+      "twitter-evening: Twitter Auth Material",
+      "twitter-morning: Twitter Auth Material"
+    ],
+    "report_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/reports/ops-drift/ops-drift-report-2026-04-18.md"
+  },
+  "edge": {
+    "status": "degraded",
+    "public_ready": false,
+    "local_ready": false,
+    "heal_actions": [
+      {
+        "label": "watchdog",
+        "action": "error",
+        "reason": "Command '['launchctl', 'kickstart', '-k', 'gui/501/com.ziros.proof-cta-redirects']' returned non-zero exit status 1.",
+        "ts": "2026-04-18T10:02:32.941032+00:00"
+      }
+    ],
+    "open_incident": {
+      "incident_id": "edge-1776506538",
+      "opened_at": "2026-04-18T10:02:18.500031+00:00"
+    },
+    "recent_cloudflared_errors": [],
+    "state_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/edge-watchdog.json"
+  },
+  "mail": {
+    "proton_readiness": {
+      "bridge_ready": false,
+      "smtp_token_ready": false,
+      "smtp_token_pool_ready": false,
+      "drive_ready": true,
+      "custom_domain_ready": false,
+      "delivery_sender": null,
+      "fallback_active": false,
+      "proof_delivery_ready": false,
+      "proof_delivery_backend": null
+    },
+    "delivery_backend_health": "degraded",
+    "archive_health": "degraded",
+    "unread_support_count": 0,
+    "unread_billing_count": 0,
+    "unread_sales_count": 0,
+    "stale_inbox_threads": 0,
+    "escalated_tickets": 0,
+    "queue_counts": {},
+    "latest_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/mail/inbox-latest.json",
+    "proton_health_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/mail/proton-health.json",
+    "proton_domain_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/mail/proton-domain-status.json",
+    "archive_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/mail/proton-drive-archive.json"
+  },
+  "sla": {
+    "formal_marketplace_sla": true,
+    "target_monthly_uptime_pct": 99.0,
+    "measured_uptime_pct": 0.0,
+    "downtime_minutes_month": 5,
+    "error_budget_minutes_month": 432.0,
+    "error_budget_remaining_minutes_month": 427.0,
+    "service_credit_if_month_closed_today_pct": 25,
+    "current_status": "degraded",
+    "open_incident": null,
+    "incidents_week": 0,
+    "support_ack_target_hours": 4,
+    "incident_update_cadence_minutes": 60,
+    "planned_maintenance_notice_hours": 24,
+    "breaking_change_notice_days": 7,
+    "public_status_url": "https://billing.ziros.dev/status",
+    "measurement_window_start": "2026-04-01T00:00:00-04:00",
+    "measurement_window_end": "2026-05-01T00:00:00-04:00",
+    "terms_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla.md",
+    "policy_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-policy.json",
+    "state_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-state.json",
+    "incidents_path": "/Users/sicarii/Desktop/ZirOS/.jacobian/workspace/business/marketplace-sla-incidents.jsonl"
+  },
+  "self_serve": {
+    "mode": "manual_only",
+    "sell_gate_status": "manual_only",
+    "checkout_target": "https://billing.ziros.dev/waitlist",
+    "acceptance_gate_blockers": [
+      "credited internal acceptance gate incomplete"
+    ],
+    "shared_health_blockers": [
+      "Cloudflare Access edge unhealthy",
+      "Stripe checkout target missing",
+      "Stripe webhook secret missing",
+      "billing public edge unhealthy",
+      "billing service unhealthy",
+      "billing status surface unhealthy",
+      "claim surface unhealthy",
+      "metering proxy unhealthy",
+      "proof lane unhealthy",
+      "proofs sender unhealthy",
+      "public edge degraded",
+      "redirect public edge unhealthy",
+      "redirect service unhealthy",
+      "restore drill overdue",
+      "watchdog critical shared health failed"
+    ],
+    "acceptance_gate_ready": false,
+    "shared_health_ready": false,
+    "checkout_paused_reason": "credited internal acceptance gate incomplete, Cloudflare Access edge unhealthy, Stripe checkout target missing, Stripe webhook secret missing, billing public edge unhealthy, billing service unhealthy, billing status surface unhealthy, claim surface unhealthy, metering proxy unhealthy, proof lane unhealthy, proofs sender unhealthy, public edge degraded, redirect public edge unhealthy, redirect service unhealthy, restore drill overdue, watchdog critical shared health failed",
+    "delivery_health": "degraded",
+    "pending_delivery": 0,
+    "pending_onboarding": 0,
+    "paid_today": 0,
+    "delivered_today": 0,
+    "first_success_today": 0,
+    "avg_minutes_paid_to_delivered": 0.0,
+    "avg_minutes_delivered_to_first_success": 0.0,
+    "paused_sell_minutes": 0,
+    "delivery_failures_week": 0,
+    "revoked_this_week": 0,
+    "healthy_real_smoke_count": 0
+  },
+  "cost": {},
+  "recovery": {},
+  "runtime": {},
+  "support": {},
+  "promotion": {
+    "signals_today": 0,
+    "signals_week": 0,
+    "top_pain_points": [],
+    "leads_new_week": 0,
+    "leads_by_status": {},
+    "lead_followups_due": 0,
+    "internal_test_lead_count": 0,
+    "internal_test_followups": [],
+    "lead_followup_packets": [],
+    "next_followup_lead_id": null,
+    "next_followup_action": null,
+    "next_followup_packet": null,
+    "next_followup_priority": null,
+    "diagnostic_clicks_week": 0,
+    "fix_path_clicks_week": 0,
+    "hosted_offer_clicks_week": 0,
+    "checkout_clicks_week": 0,
+    "paid_conversions_week": 0,
+    "top_converting_pain_themes": [],
+    "planner_packs_week": 0,
+    "x_actions_week": 0,
+    "discord_drafts_week": 1,
+    "newsletter_artifacts_week": 0,
+    "promotion_blind_spots": [
+      "midnight pain monitor has not produced a signal snapshot yet",
+      "proof promotion planner has not produced a plan pack yet",
+      "tracked CTA link map is missing",
+      "social impressions are not yet instrumented"
+    ],
+    "outward_gates_ready": [],
+    "outward_gates_blocked": {
+      "twitter-morning": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "twitter-evening": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Twitter Auth Material"
+      ],
+      "discord-community": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Discord Auth Probe"
+      ],
+      "newsletter-pipeline": [
+        "Planner Freshness",
+        "Proof Server Local",
+        "Proof Queue Capacity",
+        "Cloudflare Access Edge",
+        "Tracked Redirect Local",
+        "Tracked Redirect Public",
+        "Billing Service Local",
+        "Billing Hosted Public",
+        "Self-Serve Checkout Path",
+        "Ghost Admin Probe"
+      ]
+    },
+    "outward_gate_statuses": {
+      "twitter-morning": {
+        "status": "blocked",
+        "failed": [
+          "Planner Freshness",
+          "Proof Server Local",
+          "Proof Queue Capacity",
+          "Cloudflare Access Edge",
+          "Tracked Redirect Local",
+          "Tracked Redirect Public",
+          "Billing Service Local",
+          "Billing Hosted Public",
+          "Self-Serve Checkout Path",
+          "Twitter Auth Material"
+        ],
+        "generated_at": "2026-04-18T10:02:38.610015+00:00"
+      },
+      "twitter-evening": {
+        "status": "blocked",
+        "failed": [
+          "Planner Freshness",
+          "Proof Server Local",
+          "Proof Queue Capacity",
+          "Cloudflare Access Edge",
+          "Tracked Redirect Local",
+          "Tracked Redirect Public",
+          "Billing Service Local",
+          "Billing Hosted Public",
+          "Self-Serve Checkout Path",
+          "Twitter Auth Material"
+        ],
+        "generated_at": "2026-04-18T10:02:38.788136+00:00"
+      },
+      "discord-community": {
+        "status": "blocked",
+        "failed": [
+          "Planner Freshness",
+          "Proof Server Local",
+          "Proof Queue Capacity",
+          "Cloudflare Access Edge",
+          "Tracked Redirect Local",
+          "Tracked Redirect Public",
+          "Billing Service Local",
+          "Billing Hosted Public",
+          "Self-Serve Checkout Path",
+          "Discord Auth Probe"
+        ],
+        "generated_at": "2026-04-18T10:02:38.940254+00:00"
+      },
+      "newsletter-pipeline": {
+        "status": "blocked",
+        "failed": [
+          "Planner Freshness",
+          "Proof Server Local",
+          "Proof Queue Capacity",
+          "Cloudflare Access Edge",
+          "Tracked Redirect Local",
+          "Tracked Redirect Public",
+          "Billing Service Local",
+          "Billing Hosted Public",
+          "Self-Serve Checkout Path",
+          "Ghost Admin Probe"
+        ],
+        "generated_at": "2026-04-18T10:02:39.137136+00:00"
+      }
+    }
+  },
+  "discipline": {
+    "business_center": "hosted_proof_lane",
+    "internal_truth_running": true,
+    "blocked_external_lanes": [
+      "discord-community",
+      "newsletter-pipeline",
+      "twitter-evening",
+      "twitter-morning"
+    ],
+    "ready_external_lanes": [],
+    "truth_surfaces_stale": [
+      "acceptance_summary",
+      "cost_monitor",
+      "cta_link_map",
+      "customers",
+      "fulfillment_state",
+      "ghost_analytics",
+      "lead_followups",
+      "mail_inbox_latest",
+      "money_path_smoke",
+      "promotion_planner",
+      "proof_usage",
+      "proton_drive_archive",
+      "restore_drills",
+      "revenue_ledger",
+      "runtime_ownership",
+      "signal_monitor",
+      "support_tickets"
+    ],
+    "ops_watchdog_status": "blocked",
+    "monitor_scope": {
+      "top_signal_limit": null,
+      "top_signals_count": null,
+      "scope": null,
+      "bounded": false
+    },
+    "planner_scope": {
+      "signal_cap": null,
+      "signals_used": null,
+      "single_cta_per_asset": false,
+      "bounded": false
+    }
+  },
+  "freshness": {
+    "revenue_ledger": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 5400
+    },
+    "customers": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 5400
+    },
+    "proof_usage": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 5400
+    },
+    "ghost_analytics": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 86400
+    },
+    "ops_watchdog": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:39.142682+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 93600
+    },
+    "ops_blocker_state": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:39.142677+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 21600
+    },
+    "lead_pipeline": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:39.265877+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 604800
+    },
+    "lead_followups": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 21600
+    },
+    "self_serve_state": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:39.252744+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 300
+    },
+    "fulfillment_state": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 21600
+    },
+    "proton_health": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.214443+00:00",
+      "age_seconds": 1,
+      "stale": false,
+      "stale_after_seconds": 600
+    },
+    "proton_domain_status": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.214443+00:00",
+      "age_seconds": 1,
+      "stale": false,
+      "stale_after_seconds": 3600
+    },
+    "proton_drive_archive": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 3600
+    },
+    "mail_inbox_latest": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 900
+    },
+    "cost_monitor": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 7200
+    },
+    "money_path_smoke": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 7200
+    },
+    "acceptance_summary": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 7200
+    },
+    "restore_drills": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 86400
+    },
+    "runtime_ownership": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 604800
+    },
+    "support_tickets": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 900
+    },
+    "edge_watchdog": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.000686+00:00",
+      "age_seconds": 1,
+      "stale": false,
+      "stale_after_seconds": 600
+    },
+    "marketplace_sla_state": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.274346+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 900
+    },
+    "marketplace_sla_policy": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.273128+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 86400
+    },
+    "signal_monitor": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 28800
+    },
+    "promotion_planner": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 86400
+    },
+    "cta_link_map": {
+      "present": false,
+      "generated_at": null,
+      "stale": true,
+      "stale_after_seconds": 604800
+    },
+    "outward_gate_twitter-morning": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.610015+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 21600
+    },
+    "outward_gate_twitter-evening": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.788136+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 21600
+    },
+    "outward_gate_discord-community": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:38.940254+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 21600
+    },
+    "outward_gate_newsletter-pipeline": {
+      "present": true,
+      "generated_at": "2026-04-18T10:02:39.137136+00:00",
+      "age_seconds": 0,
+      "stale": false,
+      "stale_after_seconds": 21600
+    }
+  },
+  "blind_spots": [
+    "no Stripe-managed customers have been recognized yet",
+    "midnight pain monitor has not produced a signal snapshot yet",
+    "proof promotion planner has not produced a plan pack yet",
+    "tracked CTA link map is missing",
+    "social impressions are not yet instrumented"
+  ],
+  "alerts": [
+    {
+      "severity": "warn",
+      "title": "Proton SMTP tokens degraded",
+      "detail": "machine-sent customer mail is not ready"
+    },
+    {
+      "severity": "warn",
+      "title": "Proof-delivery sender degraded",
+      "detail": "Credential delivery requires proofs@ziros.dev; current proof-delivery backend is unavailable."
+    },
+    {
+      "severity": "warn",
+      "title": "Proton Bridge degraded",
+      "detail": "inbox automation and safe support replies are impaired"
+    },
+    {
+      "severity": "warn",
+      "title": "Ops watchdog blocked",
+      "detail": "Tracked Redirect Port, Proof Server Health, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Proton SMTP Token Ready, Public Edge Watchdog State, Billing Service Local, Billing Service Public, Stripe Webhook Secret, Self-Serve Gate Freshness"
+    },
+    {
+      "severity": "warn",
+      "title": "Outward lane blocked: twitter-morning",
+      "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Twitter Auth Material"
+    },
+    {
+      "severity": "warn",
+      "title": "Outward lane blocked: twitter-evening",
+      "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Twitter Auth Material"
+    },
+    {
+      "severity": "warn",
+      "title": "Outward lane blocked: discord-community",
+      "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Discord Auth Probe"
+    },
+    {
+      "severity": "warn",
+      "title": "Outward lane blocked: newsletter-pipeline",
+      "detail": "Planner Freshness, Proof Server Local, Proof Queue Capacity, Cloudflare Access Edge, Tracked Redirect Local, Tracked Redirect Public, Billing Service Local, Billing Hosted Public, Self-Serve Checkout Path, Ghost Admin Probe"
+    },
+    {
+      "severity": "warn",
+      "title": "Proton custom-domain mail not ready",
+      "detail": "ziros.dev mail DNS is incomplete or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Acceptance gate incomplete",
+      "detail": "Only 0 credited internal acceptance pass(es) are recorded in the current streak."
+    },
+    {
+      "severity": "warn",
+      "title": "Restore evidence missing",
+      "detail": "No full restore drill has been recorded yet."
+    },
+    {
+      "severity": "warn",
+      "title": "Hosted lane SLA below target",
+      "detail": "measured uptime is 0.000% against a 99.0% objective"
+    },
+    {
+      "severity": "warn",
+      "title": "Public edge degraded",
+      "detail": "redirect_local, billing_local, metering_local_unauth, go_public, billing_public, api_public_unauth"
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: revenue_ledger",
+      "detail": "revenue_ledger is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: customers",
+      "detail": "customers is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: proof_usage",
+      "detail": "proof_usage is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: ghost_analytics",
+      "detail": "ghost_analytics is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: lead_followups",
+      "detail": "lead_followups is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: fulfillment_state",
+      "detail": "fulfillment_state is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: proton_drive_archive",
+      "detail": "proton_drive_archive is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: mail_inbox_latest",
+      "detail": "mail_inbox_latest is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: cost_monitor",
+      "detail": "cost_monitor is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: money_path_smoke",
+      "detail": "money_path_smoke is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: acceptance_summary",
+      "detail": "acceptance_summary is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: restore_drills",
+      "detail": "restore_drills is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: runtime_ownership",
+      "detail": "runtime_ownership is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: support_tickets",
+      "detail": "support_tickets is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: signal_monitor",
+      "detail": "signal_monitor is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: promotion_planner",
+      "detail": "promotion_planner is stale or missing."
+    },
+    {
+      "severity": "warn",
+      "title": "Stale source: cta_link_map",
+      "detail": "cta_link_map is stale or missing."
+    }
+  ],
+  "self_serve_mode": "manual_only",
+  "sell_gate_status": "manual_only",
+  "checkout_paused_reason": "credited internal acceptance gate incomplete, Cloudflare Access edge unhealthy, Stripe checkout target missing, Stripe webhook secret missing, billing public edge unhealthy, billing service unhealthy, billing status surface unhealthy, claim surface unhealthy, metering proxy unhealthy, proof lane unhealthy, proofs sender unhealthy, public edge degraded, redirect public edge unhealthy, redirect service unhealthy, restore drill overdue, watchdog critical shared health failed",
+  "delivery_health": "degraded",
+  "customers_pending_delivery": 0,
+  "customers_pending_onboarding": 0,
+  "paid_today": 0,
+  "delivered_today": 0,
+  "first_success_today": 0,
+  "avg_minutes_paid_to_delivered": 0.0,
+  "avg_minutes_delivered_to_first_success": 0.0,
+  "paused_sell_minutes": 0,
+  "delivery_failures_week": 0,
+  "revoked_this_week": 0,
+  "mail_backlog": {
+    "support": 0,
+    "billing": 0,
+    "sales": 0,
+    "stale_threads": 0
+  },
+  "archive_health": "degraded",
+  "marketplace_sla": {
+    "target_monthly_uptime_pct": 99.0,
+    "measured_uptime_pct": 0.0,
+    "current_status": "degraded",
+    "downtime_minutes_month": 5,
+    "open_incident": null,
+    "incidents_week": 0,
+    "service_credit_if_month_closed_today_pct": 25,
+    "support_ack_target_hours": 4,
+    "incident_update_cadence_minutes": 60,
+    "planned_maintenance_notice_hours": 24,
+    "breaking_change_notice_days": 7,
+    "public_status_url": "https://billing.ziros.dev/status"
+  },
+  "next_followup_lead_id": null,
+  "next_followup_action": null,
+  "next_followup_packet": null,
+  "next_followup_priority": null,
+  "next_actions": [
+    "convert the first lead into a paying hosted-proof customer",
+    "use tracked CTA links consistently until click attribution starts showing real demand",
+    "tighten midnight pain monitoring until the top 3 builder blockers stay current",
+    "fix outward dependency-gate blockers before allowing more external mutation",
+    "repair Proton SMTP-token outbound before opening new self-serve checkout claims",
+    "finish Proton custom-domain mail DNS before treating ziros.dev mailboxes as live",
+    "complete the credited internal acceptance matrix before self-serve can reopen",
+    "repair shared hosted-lane health so self-serve is not blocked on edge, delivery, billing, or watchdog drift",
+    "record a full restore drill before treating the business as production-ready",
+    "keep the hosted lane above the measured uptime objective before selling broader marketplace reliability claims",
+    "stabilize the public edge watchdog and cloudflared path before pushing more public payment traffic"
+  ]
+}

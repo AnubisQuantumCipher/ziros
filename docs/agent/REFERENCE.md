@@ -13,7 +13,9 @@ This is the short reference for the setup-relevant surfaces only.
 | Agent approvals | `ziros agent approvals list`, `approve`, `reject` |
 | Agent continuity | `ziros agent worktree list`, `create`, `cleanup`; `ziros agent checkpoint list`, `create`, `rollback` |
 | Agent provider | `ziros agent provider status`, `route`, `test` |
-| Agent bridge | `ziros agent bridge prepare`, `list`, `accept` |
+| Agent bridge | `ziros agent bridge status`, `prepare`, `list`, `accept` |
+| Agent browser | `ziros agent browser status`, `open`, `eval` |
+| Agent web | `ziros agent web fetch --url ...` |
 | MCP | `ziros agent mcp serve`, `ziros gateway setup|install|start|stop|restart|status`, `ziros gateway serve`, `ziros gateway serve --allow-remote-writes` |
 | Midnight | `ziros midnight status`, `doctor`, `resolve`, `contract ...` |
 | EVM | `ziros evm verifier export`, `estimate-gas`, `foundry init`, `deploy`, `call`, `test`, `diagnose` |
@@ -27,6 +29,7 @@ This is the short reference for the setup-relevant surfaces only.
 | `~/.ziros/bin/ziros-agentd` | managed daemon binary |
 | `~/.ziros/agent/ziros-agentd.sock` | agent socket |
 | `~/.ziros/agent/brain.sqlite3` | encrypted Brain |
+| `~/.ziros/bridge-policy.json` | bridge-first reasoning policy and fallback posture |
 | `~/.ziros/state/ziros-first-run-v1` | first-run banner marker |
 | `~/.zkf/models/` | legacy Core ML bundle discovery path still honored by the runtime |
 
@@ -71,11 +74,34 @@ This is the short reference for the setup-relevant surfaces only.
 ```bash
 ziros agent --json doctor
 ziros agent --json provider status
+ziros agent --json bridge status
+ziros agent --json browser status
+ziros agent --json browser open --url https://platform.openai.com/docs/guides/tools-shell --browser chrome
+ziros agent --json web fetch --url https://platform.openai.com/docs/guides/tools-shell
 ziros agent --json provider route --provider openai-api --model gpt-5.2-codex
 ziros agent --json run --goal "Inspect this checkout"
 ziros agent --json bridge prepare --goal "Prepare a Midnight-first subsystem plan"
 ziros agent --json bridge accept --handoff-id bridge-handoff-...
 ```
 
-`--model` applies to the OpenAI-compatible assistant lane used for goal-intent
-compilation. ZirOS falls back to the embedded planner on failure.
+`ziros agent --json bridge status` reports the ChatGPT Pro bridge lane, the
+primary model label, bridge health, and the fail-closed downgrade policy.
+
+`ziros agent --json web fetch --url ...` is the deterministic official-web
+surface for resolving redirects, canonical URLs, page titles, and same-host
+links on allowlisted official documentation and release hosts. Prefer it before
+GUI browser automation when the task is official URL repair or doc discovery.
+
+`ziros agent --json browser status` reports whether Safari or Google Chrome are
+available for GUI automation on the local macOS host.
+
+`ziros agent --json browser open --url ...` opens a real browser tab or window
+for interactive flows.
+
+`ziros agent --json browser eval --script 'return ...' --browser chrome` runs
+JavaScript in a real browser tab on the local macOS host. Use it only when the
+page requires interaction that `web fetch` cannot satisfy.
+
+`--model` applies only to the direct provider lane used for local assistant
+routing. The ChatGPT Pro bridge remains a separate subscription-auth reasoning
+surface and its model labels are not OpenAI API ids.

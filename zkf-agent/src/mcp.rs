@@ -1,11 +1,11 @@
 use crate::daemon::{AgentRpcRequestV1, handle_rpc_request};
 use crate::types::{
-    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1,
-    AgentBridgeHandoffPrepareRequestV1, AgentCheckpointCreateRequestV1,
-    AgentCheckpointRollbackRequestV1, AgentProjectRegisterRequestV1,
-    AgentProviderRouteRequestV1, AgentProviderTestRequestV1, AgentRejectRequestV1,
-    AgentRunOptionsV1, AgentWorktreeCleanupRequestV1, AgentWorktreeCreateRequestV1,
-    EventSubscriptionRequestV1, GoalIntentV1,
+    AgentApproveRequestV1, AgentBridgeHandoffAcceptRequestV1, AgentBridgeHandoffPrepareRequestV1,
+    AgentBrowserEvalRequestV1, AgentBrowserKindV1, AgentBrowserOpenRequestV1,
+    AgentCheckpointCreateRequestV1, AgentCheckpointRollbackRequestV1,
+    AgentProjectRegisterRequestV1, AgentProviderRouteRequestV1, AgentProviderTestRequestV1,
+    AgentRejectRequestV1, AgentRunOptionsV1, AgentWebFetchRequestV1, AgentWorktreeCleanupRequestV1,
+    AgentWorktreeCreateRequestV1, EventSubscriptionRequestV1, GoalIntentV1,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -78,10 +78,7 @@ pub fn serve_mcp_stdio() -> Result<(), String> {
     Ok(())
 }
 
-pub fn handle_mcp_jsonrpc_bytes(
-    body: &[u8],
-    exposure: McpExposureV1,
-) -> Result<Vec<u8>, String> {
+pub fn handle_mcp_jsonrpc_bytes(body: &[u8], exposure: McpExposureV1) -> Result<Vec<u8>, String> {
     let request: JsonRpcRequest =
         serde_json::from_slice(body).map_err(|error| error.to_string())?;
     let response = match handle_mcp_request(request, exposure) {
@@ -216,14 +213,14 @@ fn call_tool(name: &str, arguments: Value, exposure: McpExposureV1) -> Result<Va
             let goal = read_string(&arguments, "goal")?;
             AgentRpcRequestV1::Plan {
                 goal,
-                options: read_run_options(&arguments)?,
+                options: read_run_options_for_exposure(&arguments, true, exposure)?,
             }
         }
         "agent_run" => {
             let goal = read_string(&arguments, "goal")?;
             AgentRpcRequestV1::Run {
                 goal,
-                options: read_run_options(&arguments)?,
+                options: read_run_options_for_exposure(&arguments, true, exposure)?,
             }
         }
         "agent_resume" => AgentRpcRequestV1::Resume {
@@ -271,7 +268,35 @@ fn call_tool(name: &str, arguments: Value, exposure: McpExposureV1) -> Result<Va
                 origin: read_optional_string(&arguments, "origin")
                     .unwrap_or_else(|| "remote-mcp".to_string()),
                 goal: read_string(&arguments, "goal")?,
-                options: read_run_options_with_default(&arguments, false)?,
+                options: read_run_options_for_exposure(&arguments, true, exposure)?,
+            },
+        },
+        "agent_bridge_status" => AgentRpcRequestV1::BridgeStatus,
+        "agent_browser_status" => AgentRpcRequestV1::BrowserStatus,
+        "agent_browser_open" => AgentRpcRequestV1::BrowserOpen {
+            request: AgentBrowserOpenRequestV1 {
+                url: read_string(&arguments, "url")?,
+                browser: read_optional_browser_kind(&arguments, "browser")?,
+                activate: arguments.get("activate").and_then(Value::as_bool),
+                new_window: arguments.get("new_window").and_then(Value::as_bool),
+            },
+        },
+        "agent_browser_eval" => AgentRpcRequestV1::BrowserEval {
+            request: AgentBrowserEvalRequestV1 {
+                script: read_string(&arguments, "script")?,
+                url: read_optional_string(&arguments, "url"),
+                browser: read_optional_browser_kind(&arguments, "browser")?,
+                activate: arguments.get("activate").and_then(Value::as_bool),
+                wait_millis: arguments.get("wait_millis").and_then(Value::as_u64),
+            },
+        },
+        "agent_web_fetch" => AgentRpcRequestV1::WebFetch {
+            request: AgentWebFetchRequestV1 {
+                url: read_string(&arguments, "url")?,
+                max_bytes: arguments
+                    .get("max_bytes")
+                    .and_then(Value::as_u64)
+                    .map(|value| value as usize),
             },
         },
         "agent_bridge_handoffs" => AgentRpcRequestV1::BridgeHandoffList,
@@ -328,6 +353,12 @@ fn call_tool(name: &str, arguments: Value, exposure: McpExposureV1) -> Result<Va
                 model_override: read_optional_string(&arguments, "model_override"),
             },
         },
+        "agent_hermes_status" => AgentRpcRequestV1::HermesStatus,
+        "agent_hermes_diff" => AgentRpcRequestV1::HermesDiff,
+        "agent_hermes_install" => AgentRpcRequestV1::HermesInstall,
+        "agent_hermes_sync" => AgentRpcRequestV1::HermesSync,
+        "agent_hermes_doctor" => AgentRpcRequestV1::HermesDoctor,
+        "agent_hermes_export_bootstrap" => AgentRpcRequestV1::HermesExportBootstrap,
         "agent_approve" => AgentRpcRequestV1::Approve {
             request: AgentApproveRequestV1 {
                 session_id: read_optional_string(&arguments, "session_id"),
@@ -377,7 +408,10 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
             "inputSchema": goal_schema()
         }),
     ];
-    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+    if matches!(
+        exposure,
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite
+    ) {
         tools.extend(vec![
             json!({
                 "name": "agent_run",
@@ -523,17 +557,20 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
             "description": "Prepare a local ZirOS bridge handoff so ChatGPT can plan remotely and the operator can accept execution locally.",
             "inputSchema": {
                 "type": "object",
-                "properties": {
-                    "origin": { "type": "string", "default": "remote-mcp" },
-                    "goal": { "type": "string" },
-                    "workflow_override": { "type": "string" },
-                    "strict": { "type": "boolean", "default": false },
-                    "compat_allowed": { "type": "boolean", "default": false },
-                    "use_worktree": { "type": "boolean", "default": true },
-                    "wallet_network": { "type": "string", "default": "preprod" },
+                    "properties": {
+                        "origin": { "type": "string", "default": "remote-mcp" },
+                        "goal": { "type": "string" },
+                        "workflow_override": { "type": "string" },
+                        "strict": { "type": "boolean", "default": true },
+                        "compat_allowed": { "type": "boolean", "default": false },
+                        "use_worktree": { "type": "boolean", "default": true },
+                        "wallet_network": { "type": "string", "default": "preprod" },
                     "project_root": { "type": "string" },
                     "provider_override": { "type": "string" },
-                    "model_override": { "type": "string" }
+                    "model_override": { "type": "string" },
+                    "reasoning_lane": { "type": "string" },
+                    "reasoning_model_label": { "type": "string" },
+                    "reasoning_origin": { "type": "string" }
                 },
                 "required": ["goal"],
                 "additionalProperties": false
@@ -549,7 +586,10 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
             }
         }),
     ]);
-    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+    if matches!(
+        exposure,
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite
+    ) {
         tools.extend(vec![
             json!({
                 "name": "agent_projects_register",
@@ -578,20 +618,21 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
             }),
         ]);
     }
-    tools.extend(vec![
-        json!({
-            "name": "agent_worktrees_list",
-            "description": "List daemon-managed worktrees for a session or for the whole local Brain.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" }
-                },
-                "additionalProperties": false
-            }
-        }),
-    ]);
-    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+    tools.extend(vec![json!({
+        "name": "agent_worktrees_list",
+        "description": "List daemon-managed worktrees for a session or for the whole local Brain.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "session_id": { "type": "string" }
+            },
+            "additionalProperties": false
+        }
+    })]);
+    if matches!(
+        exposure,
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite
+    ) {
         tools.extend(vec![
             json!({
                 "name": "agent_worktrees_create",
@@ -620,21 +661,22 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
             }),
         ]);
     }
-    tools.extend(vec![
-        json!({
-            "name": "agent_checkpoints_list",
-            "description": "List persisted checkpoints for a ZirOS agent session.",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "session_id": { "type": "string" }
-                },
-                "required": ["session_id"],
-                "additionalProperties": false
-            }
-        }),
-    ]);
-    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+    tools.extend(vec![json!({
+        "name": "agent_checkpoints_list",
+        "description": "List persisted checkpoints for a ZirOS agent session.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "session_id": { "type": "string" }
+            },
+            "required": ["session_id"],
+            "additionalProperties": false
+        }
+    })]);
+    if matches!(
+        exposure,
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite
+    ) {
         tools.extend(vec![
             json!({
                 "name": "agent_checkpoints_create",
@@ -665,8 +707,39 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
     }
     tools.extend(vec![
         json!({
+            "name": "agent_bridge_status",
+            "description": "Inspect the ChatGPT Pro bridge status, policy, MCP URL, and bridge-first routing posture.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+        json!({
+            "name": "agent_browser_status",
+            "description": "Inspect the local macOS GUI browser automation surface for Safari and Google Chrome.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+        json!({
+            "name": "agent_web_fetch",
+            "description": "Fetch an official allowlisted web URL without relying on a GUI browser; follows redirects, reports the final URL, title, canonical URL, and same-host links.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "url": { "type": "string" },
+                    "max_bytes": { "type": "integer", "minimum": 1 }
+                },
+                "required": ["url"],
+                "additionalProperties": false
+            }
+        }),
+        json!({
             "name": "agent_provider_status",
-            "description": "Inspect local-first provider routing and any detected local model endpoints.",
+            "description": "Inspect local provider routing together with bridge-first primary lane metadata.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -701,9 +774,97 @@ fn tool_definitions(exposure: McpExposureV1) -> Vec<Value> {
                 "additionalProperties": false
             }
         }),
+        json!({
+            "name": "agent_hermes_status",
+            "description": "Inspect the repo-managed Hermes pack status for ZirOS and report asset, config, and lock health.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+        json!({
+            "name": "agent_hermes_diff",
+            "description": "Report current repo-managed Hermes pack drift for ZirOS without mutating local Hermes state.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+        json!({
+            "name": "agent_hermes_doctor",
+            "description": "Run the hard-gated Hermes rigorous profile checks for ZirOS and summarize violations.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
+        json!({
+            "name": "agent_hermes_export_bootstrap",
+            "description": "Export the canonical ZirOS Hermes bootstrap prompt and the repo-managed pack asset list.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            }
+        }),
     ]);
-    if matches!(exposure, McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite) {
+    if matches!(
+        exposure,
+        McpExposureV1::LocalStdio | McpExposureV1::RemoteBridgeWrite
+    ) {
         tools.extend(vec![
+            json!({
+                "name": "agent_browser_open",
+                "description": "Open a URL in a real GUI browser on the local macOS host for interactive web flows.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "url": { "type": "string" },
+                        "browser": { "type": "string", "enum": ["default", "safari", "chrome"] },
+                        "activate": { "type": "boolean", "default": true },
+                        "new_window": { "type": "boolean", "default": false }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_browser_eval",
+                "description": "Run JavaScript in Safari or Google Chrome on the local macOS host for interactive browser automation.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "script": { "type": "string" },
+                        "url": { "type": "string" },
+                        "browser": { "type": "string", "enum": ["default", "safari", "chrome"] },
+                        "activate": { "type": "boolean", "default": true },
+                        "wait_millis": { "type": "integer", "minimum": 0, "default": 1000 }
+                    },
+                    "required": ["script"],
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_hermes_install",
+                "description": "Install the repo-managed Hermes pack for ZirOS into the local Hermes home and merge the managed config overlay.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": false
+                }
+            }),
+            json!({
+                "name": "agent_hermes_sync",
+                "description": "Reapply the repo-managed Hermes pack for ZirOS into the local Hermes home and refresh the managed lock file.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": false
+                }
+            }),
             json!({
                 "name": "agent_approve",
                 "description": "Approve a pending wallet request through the ZirOS wallet policy core and optionally attach the receipt to an agent session.",
@@ -753,9 +914,16 @@ fn is_tool_allowed(name: &str, exposure: McpExposureV1) -> bool {
                 | "agent_bridge_handoffs"
                 | "agent_worktrees_list"
                 | "agent_checkpoints_list"
+                | "agent_bridge_status"
+                | "agent_browser_status"
+                | "agent_web_fetch"
                 | "agent_provider_status"
                 | "agent_provider_route"
                 | "agent_provider_test"
+                | "agent_hermes_status"
+                | "agent_hermes_diff"
+                | "agent_hermes_doctor"
+                | "agent_hermes_export_bootstrap"
         ),
     }
 }
@@ -799,7 +967,10 @@ fn goal_schema() -> Value {
                 "additionalProperties": false
             },
             "provider_override": { "type": "string" },
-            "model_override": { "type": "string" }
+            "model_override": { "type": "string" },
+            "reasoning_lane": { "type": "string" },
+            "reasoning_model_label": { "type": "string" },
+            "reasoning_origin": { "type": "string" }
         },
         "required": ["goal"],
         "additionalProperties": false
@@ -828,7 +999,9 @@ fn read_message<R: BufRead>(reader: &mut R) -> Result<Option<JsonRpcRequest>, St
     let mut content_length = None;
     loop {
         let mut line = String::new();
-        let read = reader.read_line(&mut line).map_err(|error| error.to_string())?;
+        let read = reader
+            .read_line(&mut line)
+            .map_err(|error| error.to_string())?;
         if read == 0 {
             return Ok(None);
         }
@@ -846,7 +1019,9 @@ fn read_message<R: BufRead>(reader: &mut R) -> Result<Option<JsonRpcRequest>, St
     }
     let length = content_length.ok_or_else(|| "missing Content-Length header".to_string())?;
     let mut body = vec![0_u8; length];
-    reader.read_exact(&mut body).map_err(|error| error.to_string())?;
+    reader
+        .read_exact(&mut body)
+        .map_err(|error| error.to_string())?;
     serde_json::from_slice(&body)
         .map(Some)
         .map_err(|error| error.to_string())
@@ -903,8 +1078,21 @@ fn tool_error(message: String) -> Value {
     })
 }
 
-fn read_run_options(arguments: &Value) -> Result<AgentRunOptionsV1, String> {
-    read_run_options_with_default(arguments, true)
+fn read_run_options_for_exposure(
+    arguments: &Value,
+    strict_default: bool,
+    exposure: McpExposureV1,
+) -> Result<AgentRunOptionsV1, String> {
+    if matches!(exposure, McpExposureV1::RemoteBridgeReadOnly)
+        && arguments.get("project_root").is_some()
+    {
+        return Err(
+            "remote read-only bridge does not accept project_root; choose the local workspace \
+when you accept the handoff or configure the gateway locally."
+                .to_string(),
+        );
+    }
+    read_run_options_with_default(arguments, strict_default)
 }
 
 fn read_run_options_with_default(
@@ -930,6 +1118,9 @@ fn read_run_options_with_default(
         intent: read_optional_intent(arguments)?,
         provider_override: read_optional_string(arguments, "provider_override"),
         model_override: read_optional_string(arguments, "model_override"),
+        reasoning_lane: read_optional_string(arguments, "reasoning_lane"),
+        reasoning_model_label: read_optional_string(arguments, "reasoning_model_label"),
+        reasoning_origin: read_optional_string(arguments, "reasoning_origin"),
     })
 }
 
@@ -972,6 +1163,25 @@ fn read_optional_path(arguments: &Value, key: &str) -> Option<PathBuf> {
         .map(PathBuf::from)
 }
 
+fn read_optional_browser_kind(
+    arguments: &Value,
+    key: &str,
+) -> Result<Option<AgentBrowserKindV1>, String> {
+    arguments
+        .get(key)
+        .and_then(Value::as_str)
+        .map(|value| match value {
+            "default" => Ok(AgentBrowserKindV1::Default),
+            "safari" => Ok(AgentBrowserKindV1::Safari),
+            "chrome" => Ok(AgentBrowserKindV1::Chrome),
+            other => Err(format!(
+                "invalid browser '{}' ; expected one of: default, safari, chrome",
+                other
+            )),
+        })
+        .transpose()
+}
+
 fn read_usize(arguments: &Value, key: &str, default: usize) -> Result<usize, String> {
     match arguments.get(key).and_then(Value::as_u64) {
         Some(value) => usize::try_from(value).map_err(|error| error.to_string()),
@@ -985,14 +1195,17 @@ mod tests {
 
     #[test]
     fn initialize_request_returns_tool_capability() {
-        let response = handle_mcp_request(JsonRpcRequest {
-            jsonrpc: "2.0".to_string(),
-            id: Some(json!(1)),
-            method: "initialize".to_string(),
-            params: json!({
-                "protocolVersion": "2024-11-05"
-            }),
-        }, McpExposureV1::LocalStdio)
+        let response = handle_mcp_request(
+            JsonRpcRequest {
+                jsonrpc: "2.0".to_string(),
+                id: Some(json!(1)),
+                method: "initialize".to_string(),
+                params: json!({
+                    "protocolVersion": "2024-11-05"
+                }),
+            },
+            McpExposureV1::LocalStdio,
+        )
         .expect("initialize");
         let result = response.result.expect("result");
         assert_eq!(result["capabilities"]["tools"], json!({}));
@@ -1000,15 +1213,18 @@ mod tests {
 
     #[test]
     fn tools_call_unknown_tool_returns_tool_error_result() {
-        let response = handle_mcp_request(JsonRpcRequest {
-            jsonrpc: "2.0".to_string(),
-            id: Some(json!(2)),
-            method: "tools/call".to_string(),
-            params: json!({
-                "name": "nope",
-                "arguments": {}
-            }),
-        }, McpExposureV1::LocalStdio)
+        let response = handle_mcp_request(
+            JsonRpcRequest {
+                jsonrpc: "2.0".to_string(),
+                id: Some(json!(2)),
+                method: "tools/call".to_string(),
+                params: json!({
+                    "name": "nope",
+                    "arguments": {}
+                }),
+            },
+            McpExposureV1::LocalStdio,
+        )
         .expect("tool call");
         let result = response.result.expect("result");
         assert_eq!(result["isError"], json!(true));
@@ -1016,12 +1232,15 @@ mod tests {
 
     #[test]
     fn remote_bridge_exposure_hides_mutating_tools() {
-        let response = handle_mcp_request(JsonRpcRequest {
-            jsonrpc: "2.0".to_string(),
-            id: Some(json!(3)),
-            method: "tools/list".to_string(),
-            params: json!({}),
-        }, McpExposureV1::RemoteBridgeReadOnly)
+        let response = handle_mcp_request(
+            JsonRpcRequest {
+                jsonrpc: "2.0".to_string(),
+                id: Some(json!(3)),
+                method: "tools/list".to_string(),
+                params: json!({}),
+            },
+            McpExposureV1::RemoteBridgeReadOnly,
+        )
         .expect("tools/list");
         let result = response.result.expect("result");
         let tools = result["tools"].as_array().expect("tools array");
@@ -1030,12 +1249,14 @@ mod tests {
             .filter_map(|tool| tool.get("name").and_then(Value::as_str))
             .collect::<Vec<_>>();
         assert!(names.contains(&"agent_bridge_prepare"));
+        assert!(names.contains(&"agent_hermes_status"));
         assert!(!names.contains(&"agent_run"));
         assert!(!names.contains(&"agent_approve"));
+        assert!(!names.contains(&"agent_hermes_sync"));
     }
 
     #[test]
-    fn bridge_prepare_schema_defaults_to_non_strict() {
+    fn bridge_prepare_schema_defaults_to_strict() {
         let tools = tool_definitions(McpExposureV1::RemoteBridgeReadOnly);
         let bridge_prepare = tools
             .into_iter()
@@ -1043,14 +1264,75 @@ mod tests {
             .expect("bridge prepare tool");
         assert_eq!(
             bridge_prepare["inputSchema"]["properties"]["strict"]["default"],
-            json!(false)
+            json!(true)
+        );
+        assert_eq!(
+            bridge_prepare["inputSchema"]["properties"]["reasoning_lane"]["type"],
+            json!("string")
+        );
+        assert_eq!(
+            bridge_prepare["inputSchema"]["properties"]["reasoning_model_label"]["type"],
+            json!("string")
+        );
+        assert_eq!(
+            bridge_prepare["inputSchema"]["properties"]["reasoning_origin"]["type"],
+            json!("string")
         );
     }
 
     #[test]
-    fn bridge_prepare_parser_defaults_to_non_strict() {
-        let options = read_run_options_with_default(&json!({ "goal": "inspect host readiness" }), false)
-            .expect("bridge options");
-        assert!(!options.strict);
+    fn bridge_prepare_parser_defaults_to_strict() {
+        let options = read_run_options_for_exposure(
+            &json!({ "goal": "inspect host readiness" }),
+            true,
+            McpExposureV1::RemoteBridgeReadOnly,
+        )
+        .expect("bridge options");
+        assert!(options.strict);
+    }
+
+    #[test]
+    fn readonly_bridge_prepare_rejects_remote_project_root() {
+        let error = handle_mcp_request(
+            JsonRpcRequest {
+                jsonrpc: "2.0".to_string(),
+                id: Some(json!(4)),
+                method: "tools/call".to_string(),
+                params: json!({
+                    "name": "agent_bridge_prepare",
+                    "arguments": {
+                        "goal": "prepare host audit",
+                        "project_root": "/tmp/attacker"
+                    }
+                }),
+            },
+            McpExposureV1::RemoteBridgeReadOnly,
+        )
+        .expect_err("remote project_root should be rejected");
+        assert!(error.contains("project_root"));
+    }
+
+    #[test]
+    fn readonly_bridge_exposes_bridge_status_tool() {
+        assert!(is_tool_allowed(
+            "agent_bridge_status",
+            McpExposureV1::RemoteBridgeReadOnly
+        ));
+    }
+
+    #[test]
+    fn readonly_bridge_exposes_browser_status_but_not_gui_browser_mutations() {
+        assert!(is_tool_allowed(
+            "agent_browser_status",
+            McpExposureV1::RemoteBridgeReadOnly
+        ));
+        assert!(!is_tool_allowed(
+            "agent_browser_open",
+            McpExposureV1::RemoteBridgeReadOnly
+        ));
+        assert!(!is_tool_allowed(
+            "agent_browser_eval",
+            McpExposureV1::RemoteBridgeReadOnly
+        ));
     }
 }
